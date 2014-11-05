@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.academic.dto.pedagogicalCouncil.elections;
+package pt.ist.fenixedu.delegates.dto;
 
 import java.io.Serializable;
 
@@ -24,10 +24,10 @@ import org.fenixedu.academic.domain.CurricularYear;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.degree.DegreeType;
-import org.fenixedu.academic.domain.elections.DelegateElection;
-import org.fenixedu.academic.domain.elections.DelegateElectionVotingPeriod;
-
 import org.joda.time.YearMonthDay;
+
+import pt.ist.fenixedu.delegates.domain.elections.DelegateElection;
+import pt.ist.fenixedu.delegates.domain.elections.DelegateElectionVotingPeriod;
 
 public class ElectionPeriodBean implements Serializable {
     private DegreeType degreeType;

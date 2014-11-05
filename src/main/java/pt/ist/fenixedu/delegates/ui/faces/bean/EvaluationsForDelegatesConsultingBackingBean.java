@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.academic.ui.faces.bean.delegate;
+package pt.ist.fenixedu.delegates.ui.faces.bean;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -30,6 +30,8 @@ import java.util.Map;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.struts.util.MessageResources;
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.CurricularYear;
 import org.fenixedu.academic.domain.Degree;
@@ -47,9 +49,6 @@ import org.fenixedu.academic.ui.faces.bean.base.FenixBackingBean;
 import org.fenixedu.academic.ui.faces.components.util.CalendarLink;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.academic.util.PeriodState;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.struts.util.MessageResources;
 import org.fenixedu.commons.i18n.I18N;
 
 import pt.ist.fenixframework.FenixFramework;

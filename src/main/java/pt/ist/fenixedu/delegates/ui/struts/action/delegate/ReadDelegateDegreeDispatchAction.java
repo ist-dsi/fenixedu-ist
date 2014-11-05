@@ -16,23 +16,22 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.academic.ui.struts.action.delegate;
+package pt.ist.fenixedu.delegates.ui.struts.action.delegate;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.fenixedu.academic.dto.InfoExecutionDegree;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.academic.dto.InfoExecutionDegree;
 import org.fenixedu.academic.ui.struts.action.base.FenixAction;
 import org.fenixedu.academic.ui.struts.action.exceptions.FenixActionException;
 import org.fenixedu.academic.ui.struts.action.resourceAllocationManager.utils.PresentationConstants;
-
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;

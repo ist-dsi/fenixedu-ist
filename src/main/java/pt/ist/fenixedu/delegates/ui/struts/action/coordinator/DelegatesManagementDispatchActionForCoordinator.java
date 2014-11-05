@@ -16,22 +16,22 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.academic.ui.struts.action.coordinator;
+package pt.ist.fenixedu.delegates.ui.struts.action.coordinator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.fenixedu.academic.dto.pedagogicalCouncil.delegates.DelegateBean;
-import org.fenixedu.academic.domain.ExecutionDegree;
-import org.fenixedu.academic.ui.struts.action.commons.delegates.DelegatesManagementDispatchAction;
-
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.fenixedu.academic.domain.ExecutionDegree;
+import org.fenixedu.academic.ui.struts.action.coordinator.DegreeCoordinatorIndex;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
 
+import pt.ist.fenixedu.delegates.dto.DelegateBean;
+import pt.ist.fenixedu.delegates.ui.struts.action.commons.delegates.DelegatesManagementDispatchAction;
 import pt.ist.fenixframework.FenixFramework;
 
 @Mapping(module = "coordinator", path = "/delegatesManagement", functionality = DegreeCoordinatorIndex.class)

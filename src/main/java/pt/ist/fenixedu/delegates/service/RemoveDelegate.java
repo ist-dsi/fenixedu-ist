@@ -16,16 +16,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.academic.service.services.pedagogicalCouncil.delegates;
+package pt.ist.fenixedu.delegates.service;
 
 import static org.fenixedu.academic.predicate.AccessControl.check;
 
 import java.util.List;
 
-import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.elections.DelegateElection;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.organizationalStructure.DegreeUnit;
 import org.fenixedu.academic.domain.organizationalStructure.Function;
@@ -33,13 +31,14 @@ import org.fenixedu.academic.domain.organizationalStructure.FunctionType;
 import org.fenixedu.academic.domain.organizationalStructure.PedagogicalCouncilUnit;
 import org.fenixedu.academic.domain.organizationalStructure.PersonFunction;
 import org.fenixedu.academic.domain.person.RoleType;
-import org.fenixedu.academic.domain.student.Delegate;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.predicate.RolePredicates;
-
+import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 import org.joda.time.LocalDate;
 import org.joda.time.YearMonthDay;
 
+import pt.ist.fenixedu.delegates.domain.elections.DelegateElection;
+import pt.ist.fenixedu.delegates.domain.student.Delegate;
 import pt.ist.fenixframework.Atomic;
 
 public class RemoveDelegate {

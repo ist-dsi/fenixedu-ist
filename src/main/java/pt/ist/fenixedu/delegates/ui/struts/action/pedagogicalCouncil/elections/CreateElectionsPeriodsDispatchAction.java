@@ -16,31 +16,30 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.academic.ui.struts.action.pedagogicalCouncil.elections;
+package pt.ist.fenixedu.delegates.ui.struts.action.pedagogicalCouncil.elections;
 
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
-import org.fenixedu.academic.service.services.pedagogicalCouncil.elections.CreateDelegateCandidacyPeriod;
-import org.fenixedu.academic.service.services.pedagogicalCouncil.elections.CreateDelegateVotingPeriod;
-import org.fenixedu.academic.dto.pedagogicalCouncil.elections.ElectionPeriodBean;
-import org.fenixedu.academic.domain.CurricularYear;
-import org.fenixedu.academic.domain.Degree;
-import org.fenixedu.academic.domain.elections.DelegateElection;
-import org.fenixedu.academic.domain.elections.YearDelegateElection;
-import org.fenixedu.academic.ui.struts.action.pedagogicalCouncil.PedagogicalCouncilApp.PedagogicalDelegateElectionsEntryPoint;
-
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.fenixedu.academic.domain.CurricularYear;
+import org.fenixedu.academic.domain.Degree;
+import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
+import org.fenixedu.academic.ui.struts.action.pedagogicalCouncil.PedagogicalCouncilApp.PedagogicalDelegateElectionsEntryPoint;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
 
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
+import pt.ist.fenixedu.delegates.domain.elections.DelegateElection;
+import pt.ist.fenixedu.delegates.domain.elections.YearDelegateElection;
+import pt.ist.fenixedu.delegates.dto.ElectionPeriodBean;
+import pt.ist.fenixedu.delegates.service.CreateDelegateCandidacyPeriod;
+import pt.ist.fenixedu.delegates.service.CreateDelegateVotingPeriod;
 import pt.ist.fenixframework.FenixFramework;
 
 @Mapping(module = "pedagogicalCouncil", path = "/createElectionsPeriods",

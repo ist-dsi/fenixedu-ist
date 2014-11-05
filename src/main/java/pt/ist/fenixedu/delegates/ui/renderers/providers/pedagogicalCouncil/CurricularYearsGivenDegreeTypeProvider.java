@@ -16,20 +16,19 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.academic.ui.renderers.providers.pedagogicalCouncil;
+package pt.ist.fenixedu.delegates.ui.renderers.providers.pedagogicalCouncil;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.fenixedu.academic.dto.pedagogicalCouncil.elections.ElectionPeriodBean;
 import org.fenixedu.academic.domain.CurricularYear;
-
 import org.fenixedu.bennu.core.domain.Bennu;
 
 import pt.ist.fenixWebFramework.rendererExtensions.converters.DomainObjectKeyConverter;
 import pt.ist.fenixWebFramework.renderers.DataProvider;
 import pt.ist.fenixWebFramework.renderers.components.converters.Converter;
+import pt.ist.fenixedu.delegates.dto.ElectionPeriodBean;
 
 public class CurricularYearsGivenDegreeTypeProvider implements DataProvider {
 

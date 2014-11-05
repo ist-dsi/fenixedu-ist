@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.academic.dto.student.elections;
+package pt.ist.fenixedu.delegates.dto;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -27,13 +27,13 @@ import java.util.List;
 
 import org.fenixedu.academic.domain.CurricularYear;
 import org.fenixedu.academic.domain.ExecutionYear;
-import org.fenixedu.academic.domain.elections.DelegateElectionPeriod;
-import org.fenixedu.academic.domain.elections.YearDelegateElection;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
-
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.security.Authenticate;
+
+import pt.ist.fenixedu.delegates.domain.elections.DelegateElectionPeriod;
+import pt.ist.fenixedu.delegates.domain.elections.YearDelegateElection;
 
 public class StudentVoteBean implements Serializable {
 

@@ -1,4 +1,4 @@
-package org.fenixedu.academic.ui.struts.action;
+package pt.ist.fenixedu.delegates.ui.struts.action;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -8,6 +8,7 @@ import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.organizationalStructure.PersonFunction;
 import org.fenixedu.academic.domain.student.Student;
+
 import pt.ist.fenixframework.FenixFramework;
 
 @WebListener

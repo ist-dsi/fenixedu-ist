@@ -16,13 +16,15 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.academic.dto.commons.delegates;
+package pt.ist.fenixedu.delegates.dto;
 
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.beanutils.BeanComparator;
+import org.apache.commons.collections.comparators.ComparatorChain;
 import org.fenixedu.academic.domain.CurricularYear;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionDegree;
@@ -32,9 +34,6 @@ import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.organizationalStructure.FunctionType;
 import org.fenixedu.academic.domain.organizationalStructure.PersonFunction;
 import org.fenixedu.academic.domain.student.Registration;
-
-import org.apache.commons.beanutils.BeanComparator;
-import org.apache.commons.collections.comparators.ComparatorChain;
 import org.joda.time.YearMonthDay;
 
 import pt.ist.fenixWebFramework.rendererExtensions.converters.DomainObjectKeyConverter;

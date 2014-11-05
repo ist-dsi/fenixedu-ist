@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.academic.domain.student;
+package pt.ist.fenixedu.delegates.domain.student;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,11 +37,13 @@ import org.fenixedu.academic.domain.organizationalStructure.FunctionType;
 import org.fenixedu.academic.domain.organizationalStructure.PedagogicalCouncilUnit;
 import org.fenixedu.academic.domain.organizationalStructure.PersonFunction;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
-import org.fenixedu.academic.domain.util.email.PersonFunctionSender;
-
+import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.joda.time.Interval;
 import org.joda.time.YearMonthDay;
+
+import pt.ist.fenixedu.delegates.domain.util.email.PersonFunctionSender;
 
 public class Delegate extends Delegate_Base {
 
@@ -302,7 +304,8 @@ public class Delegate extends Delegate_Base {
         List<PersonFunction> result = new ArrayList<PersonFunction>();
         Set<Function> functions = Function.readAllActiveFunctionsByType(functionType);
         for (Function function : functions) {
-            for (PersonFunction personFunction : PersonFunction.getActivePersonFunctionsStartingIn(function, currentExecutionYear)) {
+            for (PersonFunction personFunction : PersonFunction
+                    .getActivePersonFunctionsStartingIn(function, currentExecutionYear)) {
                 if (personFunction.getPerson().equals(student.getPerson())) {
                     result.add(personFunction);
                 }
@@ -319,7 +322,8 @@ public class Delegate extends Delegate_Base {
         for (FunctionType delegateFunctionType : FunctionType.getAllDelegateFunctionTypes()) {
             Set<Function> functions = Function.readAllActiveFunctionsByType(delegateFunctionType);
             for (Function function : functions) {
-                for (PersonFunction personFunction : PersonFunction.getActivePersonFunctionsStartingIn(function, currentExecutionYear)) {
+                for (PersonFunction personFunction : PersonFunction.getActivePersonFunctionsStartingIn(function,
+                        currentExecutionYear)) {
                     if (personFunction.getPerson().equals(student.getPerson())) {
                         result.add(personFunction);
                     }

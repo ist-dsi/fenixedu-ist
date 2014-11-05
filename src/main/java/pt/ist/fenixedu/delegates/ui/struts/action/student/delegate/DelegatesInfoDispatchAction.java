@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.academic.ui.struts.action.student.delegate;
+package pt.ist.fenixedu.delegates.ui.struts.action.student.delegate;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,7 +26,9 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.fenixedu.academic.dto.commons.delegates.DelegateSearchBean;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
 import org.fenixedu.academic.domain.CurricularYear;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionDegree;
@@ -36,15 +38,9 @@ import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.organizationalStructure.Function;
 import org.fenixedu.academic.domain.organizationalStructure.FunctionType;
 import org.fenixedu.academic.domain.organizationalStructure.PersonFunction;
-import org.fenixedu.academic.domain.student.Delegate;
 import org.fenixedu.academic.domain.student.Student;
-import org.fenixedu.academic.domain.student.YearDelegate;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
 import org.fenixedu.academic.ui.struts.action.student.StudentApplication.StudentViewApp;
-
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
@@ -52,6 +48,9 @@ import org.fenixedu.bennu.struts.portal.EntryPoint;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
 
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
+import pt.ist.fenixedu.delegates.domain.student.Delegate;
+import pt.ist.fenixedu.delegates.domain.student.YearDelegate;
+import pt.ist.fenixedu.delegates.dto.DelegateSearchBean;
 
 @StrutsFunctionality(app = StudentViewApp.class, path = "delegates-info", titleKey = "link.student.delegatesInfo")
 @Mapping(module = "student", path = "/delegatesInfo")
@@ -202,7 +201,8 @@ public class DelegatesInfoDispatchAction extends FenixDispatchAction {
 
         Set<Function> functions = Function.readAllActiveFunctionsByType(FunctionType.DELEGATE_OF_GGAE);
         for (Function function : functions) {
-            for (PersonFunction personFunction : PersonFunction.getActivePersonFunctionsStartingIn(function, currentExecutionYear)) {
+            for (PersonFunction personFunction : PersonFunction
+                    .getActivePersonFunctionsStartingIn(function, currentExecutionYear)) {
                 DelegateSearchBean bean = new DelegateSearchBean(personFunction.getPerson(), personFunction);
                 result.add(bean);
             }

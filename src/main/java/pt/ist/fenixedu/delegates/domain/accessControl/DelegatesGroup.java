@@ -16,25 +16,26 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.academic.domain.accessControl;
+package pt.ist.fenixedu.delegates.domain.accessControl;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import org.fenixedu.academic.domain.Degree;
+import org.fenixedu.academic.domain.accessControl.FenixGroup;
 import org.fenixedu.academic.domain.organizationalStructure.Function;
 import org.fenixedu.academic.domain.organizationalStructure.FunctionType;
 import org.fenixedu.academic.domain.organizationalStructure.PersonFunction;
-import org.fenixedu.academic.domain.student.Delegate;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.util.Bundle;
-
 import org.fenixedu.bennu.core.annotation.GroupArgument;
 import org.fenixedu.bennu.core.annotation.GroupOperator;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.groups.PersistentGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
+
+import pt.ist.fenixedu.delegates.domain.student.Delegate;
 
 import com.google.common.base.Objects;
 

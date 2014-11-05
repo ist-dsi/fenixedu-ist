@@ -16,13 +16,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.academic.dto.pedagogicalCouncil.elections;
+package pt.ist.fenixedu.delegates.dto;
 
 import java.io.Serializable;
 import java.util.List;
 
-import org.fenixedu.academic.domain.elections.DelegateElection;
 import org.fenixedu.academic.domain.student.Student;
+
+import pt.ist.fenixedu.delegates.domain.elections.DelegateElection;
 
 public class NewRoundElectionBean implements Serializable {
 

@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.academic.ui.struts.action.student.elections;
+package pt.ist.fenixedu.delegates.ui.struts.action.student.elections;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,28 +26,18 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
-import org.fenixedu.academic.service.services.student.elections.AddCandidateYearDelegateElections;
-import org.fenixedu.academic.service.services.student.elections.RemoveCandidateYearDelegateElections;
-import org.fenixedu.academic.service.services.student.elections.VoteYearDelegateElections;
-import org.fenixedu.academic.dto.student.elections.StudentVoteBean;
-import org.fenixedu.academic.domain.ExecutionYear;
-import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.elections.DelegateElection;
-import org.fenixedu.academic.domain.elections.DelegateElectionPeriod;
-import org.fenixedu.academic.domain.elections.DelegateElectionResultsByStudentDTO;
-import org.fenixedu.academic.domain.elections.DelegateElectionVotingPeriod;
-import org.fenixedu.academic.domain.elections.YearDelegateElection;
-import org.fenixedu.academic.domain.exceptions.DomainException;
-import org.fenixedu.academic.domain.student.Registration;
-import org.fenixedu.academic.domain.student.Student;
-import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
-import org.fenixedu.academic.ui.struts.action.student.StudentApplication.StudentParticipateApp;
-
 import org.apache.commons.beanutils.BeanComparator;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.exceptions.DomainException;
+import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.academic.domain.student.Student;
+import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
+import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
+import org.fenixedu.academic.ui.struts.action.student.StudentApplication.StudentParticipateApp;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
@@ -55,6 +45,15 @@ import org.fenixedu.bennu.struts.portal.EntryPoint;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
 
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
+import pt.ist.fenixedu.delegates.domain.elections.DelegateElection;
+import pt.ist.fenixedu.delegates.domain.elections.DelegateElectionPeriod;
+import pt.ist.fenixedu.delegates.domain.elections.DelegateElectionResultsByStudentDTO;
+import pt.ist.fenixedu.delegates.domain.elections.DelegateElectionVotingPeriod;
+import pt.ist.fenixedu.delegates.domain.elections.YearDelegateElection;
+import pt.ist.fenixedu.delegates.dto.StudentVoteBean;
+import pt.ist.fenixedu.delegates.service.AddCandidateYearDelegateElections;
+import pt.ist.fenixedu.delegates.service.RemoveCandidateYearDelegateElections;
+import pt.ist.fenixedu.delegates.service.VoteYearDelegateElections;
 
 @StrutsFunctionality(app = StudentParticipateApp.class, path = "year-delegate-management",
         titleKey = "link.student.yearDelegateElections")

@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.academic.ui.struts.action.delegate;
+package pt.ist.fenixedu.delegates.ui.struts.action.delegate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,8 +29,9 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.fenixedu.academic.dto.commons.ExecutionYearBean;
-import org.fenixedu.academic.dto.delegate.DelegateCurricularCourseBean;
+import org.apache.struts.action.ActionForm;
+import org.apache.struts.action.ActionForward;
+import org.apache.struts.action.ActionMapping;
 import org.fenixedu.academic.domain.Coordinator;
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.Degree;
@@ -39,21 +40,15 @@ import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.accessControl.DelegateStudentsGroup;
 import org.fenixedu.academic.domain.accessControl.StudentGroup;
 import org.fenixedu.academic.domain.organizationalStructure.FunctionType;
 import org.fenixedu.academic.domain.organizationalStructure.PersonFunction;
-import org.fenixedu.academic.domain.student.Delegate;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.domain.util.email.Recipient;
+import org.fenixedu.academic.dto.commons.ExecutionYearBean;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
-import org.fenixedu.academic.ui.struts.action.delegate.DelegateApplication.DelegateMessagingApp;
 import org.fenixedu.academic.ui.struts.action.messaging.EmailsDA;
-
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
@@ -62,6 +57,10 @@ import org.fenixedu.bennu.struts.portal.EntryPoint;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
 
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
+import pt.ist.fenixedu.delegates.domain.accessControl.DelegateStudentsGroup;
+import pt.ist.fenixedu.delegates.domain.student.Delegate;
+import pt.ist.fenixedu.delegates.dto.DelegateCurricularCourseBean;
+import pt.ist.fenixedu.delegates.ui.struts.action.delegate.DelegateApplication.DelegateMessagingApp;
 import pt.ist.fenixframework.FenixFramework;
 
 @StrutsFunctionality(app = DelegateMessagingApp.class, path = "send-email-to-students", titleKey = "link.sendEmailToStudents")

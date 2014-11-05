@@ -1,4 +1,4 @@
-package org.fenixedu.academic.domain;
+package pt.ist.fenixedu.delegates.domain;
 
 class student.Delegate  {
     
@@ -31,7 +31,7 @@ class elections.DelegateElectionCandidacyPeriod extends elections.DelegateElecti
 class elections.DelegateElectionVotingPeriod extends elections.DelegateElectionPeriod {
 }
 
-class accessControl.PersistentDelegatesGroup extends accessControl.FenixPredicateGroup {
+class accessControl.PersistentDelegatesGroup extends .org.fenixedu.academic.domain.accessControl.FenixPredicateGroup {
     public FunctionType function;
 }
 
@@ -39,20 +39,20 @@ class accessControl.PersistentDelegateStudentsGroup extends .org.fenixedu.bennu.
     public FunctionType type;
 }
 
-class util.email.PersonFunctionSender extends util.email.Sender {}
+class util.email.PersonFunctionSender extends .org.fenixedu.academic.domain.util.email.Sender {}
 
 relation DelegateElectionDegree {
     elections.DelegateElection playsRole delegateElections {
         multiplicity *;
     }
-    Degree playsRole degree;
+    .org.fenixedu.academic.domain.Degree playsRole degree;
 }
 
 relation DelegateElectionCandidatesStudent {
     elections.DelegateElection playsRole electionsWithStudentCandidacies {
         multiplicity *;
     }
-    student.Student playsRole candidates {
+    .org.fenixedu.academic.domain.student.Student playsRole candidates {
         multiplicity *;
     }
 }
@@ -61,7 +61,7 @@ relation DelegateElectionStudent {
     elections.DelegateElection playsRole delegateElections {
         multiplicity *;
     }
-    student.Student playsRole students {
+    .org.fenixedu.academic.domain.student.Student playsRole students {
         multiplicity *;
     }
 }
@@ -70,7 +70,7 @@ relation DelegateElectionVotingPeriodVotingStudent {
     elections.DelegateElectionVotingPeriod playsRole electionsWithVotingStudents {
         multiplicity *;
     }
-    student.Student playsRole votingStudents {
+    .org.fenixedu.academic.domain.student.Student playsRole votingStudents {
         multiplicity *;
     }
 }
@@ -79,7 +79,7 @@ relation DelegateElectionVotingPeriodStudentForNewRoundElections {
     elections.DelegateElectionVotingPeriod playsRole votingPeriodForNewRoundElections {
         multiplicity *;
     }
-    student.Student playsRole candidatesForNewRoundElections {
+    .org.fenixedu.academic.domain.student.Student playsRole candidatesForNewRoundElections {
         multiplicity *;
     }
 }
@@ -88,18 +88,18 @@ relation DelegateElectionExecutionYear {
     elections.DelegateElection playsRole delegateElections {
         multiplicity *;
     }
-    ExecutionYear playsRole executionYear;
+    .org.fenixedu.academic.domain.ExecutionYear playsRole executionYear;
 }
 
 relation YearDelegateElectionCurricularYear {
     elections.YearDelegateElection playsRole yearDelegateElections {
         multiplicity *;
     }
-    CurricularYear playsRole curricularYear;
+    .org.fenixedu.academic.domain.CurricularYear playsRole curricularYear;
 }
 
 relation StudentDelegateElectionVote {
-    student.Student playsRole student;
+    .org.fenixedu.academic.domain.student.Student playsRole student;
     elections.DelegateElectionVote playsRole votes {
         multiplicity *;
     }
@@ -124,7 +124,7 @@ relation DelegateElectionVotingPeriodDelegateElectionVote {
 }
 
 relation StudentDelegateElection {
-    student.Student playsRole electedStudent;
+    .org.fenixedu.academic.domain.student.Student playsRole electedStudent;
     elections.DelegateElection playsRole electedElections {
         multiplicity *;
     }
@@ -153,11 +153,11 @@ relation RootDomainObjectDelegateElectionPeriod {
 
 relation DelegatePersonFunction {
     student.Delegate playsRole delegate;
-    organizationalStructure.PersonFunction playsRole delegateFunction;
+    .org.fenixedu.academic.domain.organizationalStructure.PersonFunction playsRole delegateFunction;
 }
 
 relation DelegateRegistration {
-    student.Registration playsRole registration;
+    .org.fenixedu.academic.domain.student.Registration playsRole registration;
     student.Delegate playsRole delegates {
         multiplicity *;
     }
@@ -174,7 +174,7 @@ relation PersistentDelegatesGroupDegree {
     public accessControl.PersistentDelegatesGroup playsRole delegatesGroup {
         multiplicity *;
     }
-    public Degree playsRole degree {
+    public .org.fenixedu.academic.domain.Degree playsRole degree {
         multiplicity 0..1;
     }
 }
@@ -183,12 +183,12 @@ relation PersistentDelegateStudentsGroupPersonFunction {
     public accessControl.PersistentDelegateStudentsGroup playsRole delegateStudentsGroup {
         multiplicity *;
     }
-    public organizationalStructure.PersonFunction playsRole delegateFunction {
+    public .org.fenixedu.academic.domain.organizationalStructure.PersonFunction playsRole delegateFunction {
         multiplicity 1..1;
     }
 }
 
 relation PersonFunctionSender {
-    organizationalStructure.PersonFunction playsRole personFunction;
+    .org.fenixedu.academic.domain.organizationalStructure.PersonFunction playsRole personFunction;
     util.email.PersonFunctionSender playsRole sender;
 }

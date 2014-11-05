@@ -16,15 +16,15 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.academic.ui.struts.action.pedagogicalCouncil.delegates;
+package pt.ist.fenixedu.delegates.ui.struts.action.pedagogicalCouncil.delegates;
 
-import org.fenixedu.academic.ui.struts.action.commons.delegates.DelegatesManagementDispatchAction;
 import org.fenixedu.academic.ui.struts.action.pedagogicalCouncil.PedagogicalCouncilApp.PedagogicalDelegatesApp;
-
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
+
+import pt.ist.fenixedu.delegates.ui.struts.action.commons.delegates.DelegatesManagementDispatchAction;
 
 @StrutsFunctionality(app = PedagogicalDelegatesApp.class, path = "manage", titleKey = "link.delegatesManagement")
 @Mapping(module = "pedagogicalCouncil", path = "/delegatesManagement")

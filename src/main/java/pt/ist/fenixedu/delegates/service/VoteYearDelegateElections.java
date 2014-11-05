@@ -16,27 +16,27 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.academic.service.services.student.elections;
+package pt.ist.fenixedu.delegates.service;
 
 import static org.fenixedu.academic.predicate.AccessControl.check;
-import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
+
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.elections.DelegateElectionBlankVote;
-import org.fenixedu.academic.domain.elections.DelegateElectionVote;
-import org.fenixedu.academic.domain.elections.DelegateElectionVotingPeriod;
-import org.fenixedu.academic.domain.elections.YearDelegateElection;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.domain.util.email.ConcreteReplyTo;
 import org.fenixedu.academic.domain.util.email.Message;
 import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.academic.predicate.RolePredicates;
+import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 import org.fenixedu.academic.util.Bundle;
-
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 
+import pt.ist.fenixedu.delegates.domain.elections.DelegateElectionBlankVote;
+import pt.ist.fenixedu.delegates.domain.elections.DelegateElectionVote;
+import pt.ist.fenixedu.delegates.domain.elections.DelegateElectionVotingPeriod;
+import pt.ist.fenixedu.delegates.domain.elections.YearDelegateElection;
 import pt.ist.fenixframework.Atomic;
 
 public class VoteYearDelegateElections {

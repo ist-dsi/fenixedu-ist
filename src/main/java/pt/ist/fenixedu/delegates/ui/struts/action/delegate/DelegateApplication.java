@@ -16,24 +16,24 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.academic.ui.struts.action.delegate;
+package pt.ist.fenixedu.delegates.ui.struts.action.delegate;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.fenixedu.academic.domain.ExecutionYear;
-import org.fenixedu.academic.domain.organizationalStructure.PersonFunction;
-import org.fenixedu.academic.domain.student.Delegate;
-import org.fenixedu.academic.domain.student.Student;
-import org.fenixedu.academic.predicate.AccessControl;
 
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.organizationalStructure.PersonFunction;
+import org.fenixedu.academic.domain.student.Student;
+import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.bennu.struts.annotations.Mapping;
 import org.fenixedu.bennu.struts.portal.StrutsApplication;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
+
+import pt.ist.fenixedu.delegates.domain.student.Delegate;
 
 public class DelegateApplication {
 

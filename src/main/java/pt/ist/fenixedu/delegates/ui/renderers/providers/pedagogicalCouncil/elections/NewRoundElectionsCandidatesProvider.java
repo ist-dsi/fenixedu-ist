@@ -16,12 +16,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.academic.ui.renderers.providers.pedagogicalCouncil.elections;
+package pt.ist.fenixedu.delegates.ui.renderers.providers.pedagogicalCouncil.elections;
 
-import org.fenixedu.academic.dto.pedagogicalCouncil.elections.NewRoundElectionBean;
 import pt.ist.fenixWebFramework.rendererExtensions.converters.DomainObjectKeyArrayConverter;
 import pt.ist.fenixWebFramework.renderers.DataProvider;
 import pt.ist.fenixWebFramework.renderers.components.converters.Converter;
+import pt.ist.fenixedu.delegates.dto.NewRoundElectionBean;
 
 public class NewRoundElectionsCandidatesProvider implements DataProvider {
 

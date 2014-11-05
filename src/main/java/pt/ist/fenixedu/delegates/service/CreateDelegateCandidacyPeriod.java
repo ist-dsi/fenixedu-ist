@@ -16,16 +16,18 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.academic.service.services.pedagogicalCouncil.elections;
+package pt.ist.fenixedu.delegates.service;
 
 import static org.fenixedu.academic.predicate.AccessControl.check;
-import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
-import org.fenixedu.academic.dto.pedagogicalCouncil.elections.ElectionPeriodBean;
+
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionYear;
-import org.fenixedu.academic.domain.elections.YearDelegateElection;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.predicate.RolePredicates;
+import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
+
+import pt.ist.fenixedu.delegates.domain.elections.YearDelegateElection;
+import pt.ist.fenixedu.delegates.dto.ElectionPeriodBean;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
 

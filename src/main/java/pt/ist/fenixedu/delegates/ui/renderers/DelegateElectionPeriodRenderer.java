@@ -16,11 +16,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.academic.ui.renderers;
+package pt.ist.fenixedu.delegates.ui.renderers;
 
-import org.fenixedu.academic.domain.elections.DelegateElectionCandidacyPeriod;
-import org.fenixedu.academic.domain.elections.DelegateElectionPeriod;
-import org.fenixedu.academic.domain.elections.DelegateElectionVotingPeriod;
 import pt.ist.fenixWebFramework.renderers.OutputRenderer;
 import pt.ist.fenixWebFramework.renderers.components.HtmlBlockContainer;
 import pt.ist.fenixWebFramework.renderers.components.HtmlComponent;
@@ -29,6 +26,9 @@ import pt.ist.fenixWebFramework.renderers.components.HtmlText;
 import pt.ist.fenixWebFramework.renderers.components.state.ViewDestination;
 import pt.ist.fenixWebFramework.renderers.layouts.Layout;
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
+import pt.ist.fenixedu.delegates.domain.elections.DelegateElectionCandidacyPeriod;
+import pt.ist.fenixedu.delegates.domain.elections.DelegateElectionPeriod;
+import pt.ist.fenixedu.delegates.domain.elections.DelegateElectionVotingPeriod;
 
 public class DelegateElectionPeriodRenderer extends OutputRenderer {
 

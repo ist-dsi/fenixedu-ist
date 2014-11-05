@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.academic.domain.elections;
+package pt.ist.fenixedu.delegates.domain.elections;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,6 +24,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.poi.hssf.util.Region;
 import org.fenixedu.academic.domain.CurricularYear;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
@@ -33,9 +35,6 @@ import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.util.Bundle;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.poi.hssf.util.Region;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.YearMonthDay;
 

@@ -16,10 +16,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.academic.domain.elections;
+package pt.ist.fenixedu.delegates.domain.elections;
 
 import org.fenixedu.academic.domain.exceptions.DomainException;
-
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.joda.time.YearMonthDay;
 

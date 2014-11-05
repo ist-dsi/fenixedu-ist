@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.academic.domain.student;
+package pt.ist.fenixedu.delegates.domain.student;
 
 import java.util.List;
 
@@ -27,6 +27,8 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.organizationalStructure.DegreeUnit;
 import org.fenixedu.academic.domain.organizationalStructure.FunctionType;
 import org.fenixedu.academic.domain.organizationalStructure.PersonFunction;
+import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.academic.domain.student.Student;
 
 public class YearDelegate extends YearDelegate_Base {
 

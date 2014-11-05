@@ -16,27 +16,29 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.academic.domain.util.email;
+package pt.ist.fenixedu.delegates.domain.util.email;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.accessControl.DelegatesGroup;
 import org.fenixedu.academic.domain.organizationalStructure.Function;
 import org.fenixedu.academic.domain.organizationalStructure.FunctionType;
 import org.fenixedu.academic.domain.organizationalStructure.PersonFunction;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
-import org.fenixedu.academic.domain.student.Delegate;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
-
+import org.fenixedu.academic.domain.util.email.CurrentUserReplyTo;
+import org.fenixedu.academic.domain.util.email.Recipient;
+import org.fenixedu.academic.domain.util.email.Sender;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.groups.UserGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import pt.ist.fenixedu.delegates.domain.accessControl.DelegatesGroup;
+import pt.ist.fenixedu.delegates.domain.student.Delegate;
 import pt.ist.fenixframework.Atomic;
 
 public class PersonFunctionSender extends PersonFunctionSender_Base {
@@ -107,7 +109,8 @@ public class PersonFunctionSender extends PersonFunctionSender_Base {
 
             /* A student can have a GGAE delegate role too */
             if (PersonFunction.getActiveGGAEDelegatePersonFunction(person) != null) {
-                groups.add(DelegatesGroup.get(PersonFunction.getActiveGGAEDelegatePersonFunction(person).getFunction().getFunctionType()));
+                groups.add(DelegatesGroup.get(PersonFunction.getActiveGGAEDelegatePersonFunction(person).getFunction()
+                        .getFunctionType()));
             }
         } else {
             delegateFunction = PersonFunction.getActiveGGAEDelegatePersonFunction(person);
