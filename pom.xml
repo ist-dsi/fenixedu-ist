@@ -8,7 +8,7 @@
     </parent>
 
     <groupId>pt.ist</groupId>
-    <artifactId>fenixedu-tutorship</artifactId>
+    <artifactId>fenixedu-ist-tutorship</artifactId>
     <packaging>jar</packaging>
     <version>4.0.0-SNAPSHOT</version>
 
