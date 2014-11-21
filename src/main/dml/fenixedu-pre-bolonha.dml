@@ -84,7 +84,7 @@ relation MasterDegreeProofVersionExternalJury {
     MasterDegreeProofVersion playsRole masterDegreeProofsExternalJury {
         multiplicity *;
     }
-    organizationalStructure.ExternalContract playsRole externalJuries {
+    organizationalStructure.Accountability playsRole externalJuries {
         multiplicity *;
     }
 }
@@ -125,7 +125,7 @@ relation MasterDegreeThesisDataVersionExternalAssistentGuider {
     MasterDegreeThesisDataVersion playsRole masterDegreeThesisExternalAssistentGuider {
         multiplicity *;
     }
-    organizationalStructure.ExternalContract playsRole externalAssistentGuiders {
+    organizationalStructure.Accountability playsRole externalAssistentGuiders {
         multiplicity *;
     }
 }
@@ -134,7 +134,7 @@ relation MasterDegreeThesisDataVersionExternalGuider {
     MasterDegreeThesisDataVersion playsRole masterDegreeThesisExternalGuider {
         multiplicity *;
     }
-    organizationalStructure.ExternalContract playsRole externalGuiders {
+    organizationalStructure.Accountability playsRole externalGuiders {
         multiplicity *;
     }
 }
