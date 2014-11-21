@@ -18,7 +18,6 @@
     along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page isELIgnored="true"%>
 <%@ page language="java" %>
 <%@ taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <%@ taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
@@ -26,8 +25,6 @@
 <%@ taglib uri="http://fenix-ashes.ist.utl.pt/fenix-renderers" prefix="fr" %>
 
 <html:xhtml/>
-
-<%@page import="org.fenixedu.academic.util.BundleUtil"%>
 
 <h2><bean:message key="title.sendEmail" bundle="APPLICATION_RESOURCES"/></h2>
 
@@ -73,11 +70,11 @@
 	
 	<fr:form id="receiversBeanForm" action="/sendMailToTutoredStudents.do?method=prepare">
 		<fr:edit id="receiversBean" name="receiversBean">
-			<fr:schema bundle="APPLICATION_RESOURCES" type="org.fenixedu.academic.dto.teacher.tutor.StudentsByTutorBean">
+			<fr:schema bundle="APPLICATION_RESOURCES" type="pt.ist.fenixedu.tutorship.dto.teacher.tutor.StudentsByTutorBean">
 				<fr:slot name="studentsEntryYear" key="label.studentsEntryYear" layout="menu-select-postback">
-					<fr:property name="providerClass" value="org.fenixedu.academic.ui.renderers.providers.teacher.TutorshipEntryExecutionYearProvider$ActiveTutorshipEntryExecutionYearProviderByTeacher"/> 
-					<fr:property name="format" value="${year}"/>
-					<fr:property name="defaultText" value="<%= "-- " + BundleUtil.getMessageFromModuleOrApplication("application", "label.view.all") +  " --" %>"/>
+					<fr:property name="providerClass" value="pt.ist.fenixedu.tutorship.ui.renderers.providers.TutorshipEntryExecutionYearProvider$ActiveTutorshipEntryExecutionYearProviderByTeacher"/> 
+					<fr:property name="format" value="\${year}"/>
+					<fr:property name="defaultText" value="-- ${portal.message('resources.ApplicationResources', 'label.view.all')} --"/>
 				</fr:slot>
 			</fr:schema>
 			<fr:destination name="postBack" path="/sendMailToTutoredStudents.do?method=prepare"/>

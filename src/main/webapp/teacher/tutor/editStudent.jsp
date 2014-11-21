@@ -61,7 +61,7 @@
 		</table>
 		<fr:edit id="kkkkk"
 					name="tutorshipLog"
-					type="org.fenixedu.academic.domain.TutorshipLog"
+					type="pt.ist.fenixedu.tutorship.domain.TutorshipLog"
 					schema="teacher.student.tutorship.log"
 					action="/viewStudentsByTutor.do?method=viewStudentsByTutor">
 			<fr:layout>

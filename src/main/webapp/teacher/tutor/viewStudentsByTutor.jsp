@@ -18,15 +18,12 @@
     along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page isELIgnored="true"%>
 <%@ page language="java" %>
 <%@ taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
 <html:xhtml/>
 <%@ taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 <%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@ taglib uri="http://fenix-ashes.ist.utl.pt/fenix-renderers" prefix="fr"%>
-
-<%@page import="org.fenixedu.academic.util.BundleUtil"%>
 
 <h2><bean:message key="label.teacher.tutor.viewStudentsByTutor"/></h2>
 
@@ -42,24 +39,29 @@
 </p>
 
 <logic:present name="tutorshipHistory">
-	<fr:view name="tutorshipHistory" schema="teacher.tutorshipHistory.resume">
-		<fr:layout name="tabular">
-	  	    <fr:property name="classes" value="tstyle2 thlight thright"/>
-	   </fr:layout>
-	</fr:view>
-
-	<fr:form action="/viewStudentsByTutor.do?method=viewStudentsByTutor">
-		<fr:edit id="performanceBean" name="performanceBean">
-			<fr:schema bundle="APPLICATION_RESOURCES" type="org.fenixedu.academic.dto.teacher.tutor.StudentsPerformanceInfoBean$StudentsPerformanceInfoNullEntryYearBean">
-				<fr:slot name="studentsEntryYear" key="label.studentsEntryYear" layout="menu-select-postback">
-					<fr:property name="providerClass" value="org.fenixedu.academic.ui.renderers.providers.teacher.TutorshipEntryExecutionYearProvider$TutorshipEntryExecutionYearProviderByTeacher"/> 
-					<fr:property name="format" value="${year}"/>
-					<fr:property name="defaultText" value="<%= "-- " + BundleUtil.getMessageFromModuleOrApplication("application", "label.view.all") +  " --" %>"/>
-				</fr:slot>
-			</fr:schema>
-			<fr:destination name="postBack" path="/viewStudentsByTutor.do?method=viewStudentsByTutor"/>
-		</fr:edit>
-	</fr:form>
+	<div class="clearfix">
+		<div class="col-sm-3">
+			<fr:view name="tutorshipHistory" schema="teacher.tutorshipHistory.resume">
+				<fr:layout name="tabular">
+			  	    <fr:property name="classes" value="tstyle2 thlight thright"/>
+			   </fr:layout>
+			</fr:view>
+		</div>
+		<div class="col-sm-9">
+			<fr:form action="/viewStudentsByTutor.do?method=viewStudentsByTutor">
+				<fr:edit id="performanceBean" name="performanceBean">
+					<fr:schema bundle="APPLICATION_RESOURCES" type="pt.ist.fenixedu.tutorship.dto.teacher.tutor.StudentsPerformanceInfoBean$StudentsPerformanceInfoNullEntryYearBean">
+						<fr:slot name="studentsEntryYear" key="label.studentsEntryYear" layout="menu-select-postback">
+							<fr:property name="providerClass" value="pt.ist.fenixedu.tutorship.ui.renderers.providers.TutorshipEntryExecutionYearProvider$TutorshipEntryExecutionYearProviderByTeacher"/> 
+							<fr:property name="format" value="\${year}"/>
+							<fr:property name="defaultText" value="-- ${portal.message('resources.ApplicationResources', 'label.view.all')} --"/>
+						</fr:slot>
+					</fr:schema>
+					<fr:destination name="postBack" path="/viewStudentsByTutor.do?method=viewStudentsByTutor"/>
+				</fr:edit>
+			</fr:form>
+		</div>
+	</div>
 	
 	<logic:notEmpty name="tutorshipHistory" property="activeTutorshipsByEntryYear">
 		<p class="mtop2 mbottom1 separator2"/>
@@ -80,7 +82,7 @@
 					<fr:layout>
 						<fr:property name="classes" value="tstyle1 thlight mtop0 mbottom15 tdcenter"/>
 						<fr:property name="columnClasses" value=",aleft,,,"/>
-						<fr:property name="linkFormat(edit)" value="/viewStudentsByTutor.do?method=editStudent&studentID=${tutorship.student.student.externalId}&registrationID=${tutorship.student.externalId}" />
+						<fr:property name="linkFormat(edit)" value="/viewStudentsByTutor.do?method=editStudent&studentID=\${tutorship.student.student.externalId}&registrationID=\${tutorship.student.externalId}" />
 						<fr:property name="key(edit)" value="link.edit"/>
 						<fr:property name="bundle(edit)" value="APPLICATION_RESOURCES"/>
 						<fr:property name="contextRelative(edit)" value="true"/>
@@ -102,7 +104,7 @@
 					<fr:layout>
 						<fr:property name="classes" value="tstyle1 thlight mtop0 mbottom15 tdcenter"/>
 						<fr:property name="columnClasses" value=",aleft,,,"/>
-						<fr:property name="linkFormat(edit)" value="/viewStudentsByTutor.do?method=editStudent&studentID=${tutorship.student.student.externalId}&registrationID=${tutorship.student.externalId}" />
+						<fr:property name="linkFormat(edit)" value="/viewStudentsByTutor.do?method=editStudent&studentID=\${tutorship.student.student.externalId}&registrationID=\${tutorship.student.externalId}" />
 						<fr:property name="key(edit)" value="link.edit"/>
 						<fr:property name="bundle(edit)" value="APPLICATION_RESOURCES"/>
 						<fr:property name="contextRelative(edit)" value="true"/>

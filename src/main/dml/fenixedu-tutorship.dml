@@ -1,9 +1,9 @@
-package org.fenixedu.academic.domain;
+package pt.ist.fenixedu.tutorship.domain;
 
-enum org.fenixedu.academic.domain.TutorshipParticipationType                                                           as TutorshipParticipationType;
-enum org.fenixedu.academic.domain.TutorshipSummarySatisfaction                                                         as TutorshipSummarySatisfaction;
-enum org.fenixedu.academic.domain.TutorshipSummaryProgramAssessment                                                    as TutorshipSummaryProgramAssessment;
-enum org.fenixedu.academic.domain.teacher.WishesTutor                                                                  as WishesTutor;
+enum pt.ist.fenixedu.tutorship.domain.TutorshipParticipationType                                                           as TutorshipParticipationType;
+enum pt.ist.fenixedu.tutorship.domain.TutorshipSummarySatisfaction                                                         as TutorshipSummarySatisfaction;
+enum pt.ist.fenixedu.tutorship.domain.TutorshipSummaryProgramAssessment                                                    as TutorshipSummaryProgramAssessment;
+enum pt.ist.fenixedu.tutorship.domain.teacher.WishesTutor                                                                  as WishesTutor;
 
 class TutorshipIntention  {
     AcademicInterval academicInterval (REQUIRED);
@@ -79,23 +79,20 @@ class TutorshipLog  {
     String spaceToValidateStudentsRegistration;
 }
 
-class TutorshipStudentLowPerformanceQueueJob extends QueueJobWithFile {
+class TutorshipStudentLowPerformanceQueueJob extends .org.fenixedu.academic.domain.QueueJobWithFile {
     PrescriptionEnum prescriptionEnum;
 }
 
-class StudentHighPerformanceQueueJob extends QueueJobWithFile {
+class StudentHighPerformanceQueueJob extends .org.fenixedu.academic.domain.QueueJobWithFile {
     AcademicInterval executionInterval (REQUIRED);
 }
 
-class organizationalStructure.TutorUnit extends organizationalStructure.Unit {
-}
+class reports.TutorshipProgramReportFile extends .org.fenixedu.academic.domain.reports.GepReportFile {}
 
-class reports.TutorshipProgramReportFile extends reports.GepReportFile {}
-
-class ProgramTutoredParticipationLog extends DegreeLog { }
+class ProgramTutoredParticipationLog extends .org.fenixedu.academic.domain.DegreeLog { }
 
 relation DegreeCurricularPlanTutorshipIntentions {
-    DegreeCurricularPlan playsRole degreeCurricularPlan {
+    .org.fenixedu.academic.domain.DegreeCurricularPlan playsRole degreeCurricularPlan {
         multiplicity 1..1;
     }
     TutorshipIntention playsRole tutorshipIntention {
@@ -104,7 +101,7 @@ relation DegreeCurricularPlanTutorshipIntentions {
 }
 
 relation TeachersTutorshipIntentions {
-    Teacher playsRole teacher {
+    .org.fenixedu.academic.domain.Teacher playsRole teacher {
         multiplicity 1..1;
     }
     TutorshipIntention playsRole tutorshipIntention {
@@ -162,7 +159,7 @@ relation TutorshipTutorshipSummaries {
 }
 
 relation TutorshipStudentLowPerformanceExecutionYear {
-    ExecutionYear playsRole executionYear;
+    .org.fenixedu.academic.domain.ExecutionYear playsRole executionYear;
     TutorshipStudentLowPerformanceQueueJob playsRole tutorshipStudentLowPerformanceQueueJob {
         multiplicity *;
     }
@@ -170,28 +167,28 @@ relation TutorshipStudentLowPerformanceExecutionYear {
 
 relation TutorshipSummaryPeriodExecutionSemester {
     TutorshipSummaryPeriod playsRole tutorshipSummaryPeriod;
-    ExecutionSemester playsRole executionSemester;
+    .org.fenixedu.academic.domain.ExecutionSemester playsRole executionSemester;
 }
 
 relation TutorshipSummarySemester {
     TutorshipSummary playsRole tutorshipSummaries {
         multiplicity *;
     }
-    ExecutionSemester playsRole semester;
+    .org.fenixedu.academic.domain.ExecutionSemester playsRole semester;
 }
 
 relation TutorshipSummaryDegree {
     TutorshipSummary playsRole tutorshipSummaries {
         multiplicity *;
     }
-    Degree playsRole degree;
+    .org.fenixedu.academic.domain.Degree playsRole degree;
 }
 
 relation TutorshipSummaryTeacher {
     TutorshipSummary playsRole tutorshipSummaries {
         multiplicity *;
     }
-    Teacher playsRole teacher;
+    .org.fenixedu.academic.domain.Teacher playsRole teacher;
 }
 
 relation TutorshipTutorshipLogs {
@@ -203,13 +200,13 @@ relation TutorshipStudentCurricularPlan {
     Tutorship playsRole tutorships {
         multiplicity *;
     }
-    StudentCurricularPlan playsRole studentCurricularPlan;
+    .org.fenixedu.academic.domain.StudentCurricularPlan playsRole studentCurricularPlan;
 }
 
 relation TutorshipTeacher {
     Tutorship playsRole tutorships {
         multiplicity *;
     }
-    Teacher playsRole teacher;
+    .org.fenixedu.academic.domain.Teacher playsRole teacher;
 }
 

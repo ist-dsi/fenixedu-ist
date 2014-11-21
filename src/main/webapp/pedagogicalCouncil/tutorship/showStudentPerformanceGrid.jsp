@@ -31,25 +31,21 @@
 <h2><bean:message key="title.tutorship.student.performance.grid" bundle="PEDAGOGICAL_COUNCIL" /></h2>
 
 <fr:form action="/studentTutorship.do?method=showStudentPerformanceGrid">
-	<table>
-	<tr>
-		<td>
-			<fr:edit id="filterForm" name="tutorateBean" schema="tutorship.student.number">
-				<fr:edit id="tutorateBean" name="tutorateBean" visible="false" />
-				<fr:layout>
-					<fr:property name="classes" value="tstyle5 thlight thleft mtop0"/>
-					<fr:property name="columnClasses" value=",,tdclear tderror1"/>
-				</fr:layout>
-				<fr:destination name="invalid" path="/studentTutorship.do?method=prepareStudentSearch" />
-			</fr:edit>
-		</td>
-		<td>
-		<html:submit>
-			<bean:message key="label.submit" bundle="PEDAGOGICAL_COUNCIL" />
-		</html:submit>
-		</td>
-	</tr>
-	</table>
+	<fr:edit id="filterForm" name="tutorateBean" schema="tutorship.student.number">
+		<fr:edit id="tutorateBean" name="tutorateBean" visible="false" />
+		<fr:layout>
+			<fr:property name="classes" value="tstyle5 thlight thleft mtop0"/>
+			<fr:property name="columnClasses" value=",,tdclear tderror1"/>
+		</fr:layout>
+		<fr:destination name="invalid" path="/studentTutorship.do?method=prepareStudentSearch" />
+	</fr:edit>
+	<div class="form-group">
+		<div class="col-sm-offset-2 col-sm-10">
+			<html:submit>
+				<bean:message key="label.submit" bundle="PEDAGOGICAL_COUNCIL" />
+			</html:submit>
+		</div>
+	</div>
 </fr:form>
 
 
@@ -120,12 +116,12 @@
 				<fr:edit id="performanceGridFiltersBean"
 					name="performanceGridFiltersBean" layout="tabular-editable">
 					<fr:schema bundle="APPLICATION_RESOURCES"
-						type="org.fenixedu.academic.dto.teacher.tutor.StudentsPerformanceInfoBean">
+						type="pt.ist.fenixedu.tutorship.dto.teacher.tutor.StudentsPerformanceInfoBean">
 						<fr:slot name="studentsEntryYear" key="label.entryYear"
 							layout="menu-select-postback"
 							validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator">
 							<fr:property name="providerClass"
-								value="org.fenixedu.academic.ui.renderers.providers.teacher.TutorshipEntryExecutionYearProvider$TutorshipEntryExecutionYearProviderForSingleStudent" />
+								value="pt.ist.fenixedu.tutorship.ui.renderers.providers.TutorshipEntryExecutionYearProvider$TutorshipEntryExecutionYearProviderForSingleStudent" />
 							<fr:property name="format" value="${year}" />
 							<fr:property name="sortBy" value="year" />
 							<fr:property name="destination" value="post-back" />
@@ -135,7 +131,7 @@
 							layout="menu-select-postback"
 							validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator">
 							<fr:property name="providerClass"
-								value="org.fenixedu.academic.ui.renderers.providers.teacher.TutorshipMonitoringExecutionYearProvider" />
+								value="pt.ist.fenixedu.tutorship.ui.renderers.providers.TutorshipMonitoringExecutionYearProvider" />
 							<fr:property name="format" value="${year}" />
 							<fr:property name="sortBy" value="year" />
 							<fr:property name="destination" value="post-back" />

@@ -24,6 +24,7 @@
 <%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean"%>
 <%@ taglib uri="http://struts.apache.org/tags-logic" prefix="logic"%>
 <%@ taglib uri="http://fenix-ashes.ist.utl.pt/fenix-renderers" prefix="fr"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <!-- showTutorPerformanceGrid.jsp -->
 
@@ -46,15 +47,15 @@
 
 <logic:present name="tutor">
 
-<logic:equal name="tutor" property="teacher.numberOfTutorships" value="0">
+<c:if test="${empty tutor.teacher.tutorshipsSet}">
     <p class="mtop1">
         <em>
             <bean:message bundle="APPLICATION_RESOURCES" key="label.teacher.tutor.emptyStudentsList" />
         </em>
     </p>
-</logic:equal>
+</c:if>
 
-<logic:notEqual name="tutor" property="teacher.numberOfTutorships" value="0">
+<c:if test="${not empty tutor.teacher.tutorshipsSet}">
 
     <logic:present name="performanceGridFiltersBean">
 	    <fr:edit id="performanceGridFiltersBean" name="performanceGridFiltersBean" layout="tabular-editable" schema="teacher.tutor.performanceGrid.filters">
@@ -79,7 +80,7 @@ height: 50px;
         
         <logic:notEmpty name="performanceGridTable" property="performanceGridTableLines">
         
-            <bean:define id="filtersBean" name="performanceGridFiltersBean" type="org.fenixedu.academic.dto.teacher.tutor.StudentsPerformanceInfoBean"/>
+            <bean:define id="filtersBean" name="performanceGridFiltersBean" type="pt.ist.fenixedu.tutorship.dto.teacher.tutor.StudentsPerformanceInfoBean"/>
             <bean:define id="degreeOID" value="<%= filtersBean.getDegree().getExternalId().toString() %>" />
             <bean:define id="entryYearOID" value="<%= filtersBean.getStudentsEntryYear().getExternalId().toString() %>" />
             <bean:define id="monitoringYearOID" value="<%= filtersBean.getCurrentMonitoringYear().getExternalId().toString() %>" />
@@ -138,7 +139,7 @@ height: 50px;
                             <th colspan="2"><bean:message bundle="APPLICATION_RESOURCES" key="label.studentsPercentage" /></th>
                         </tr>
         
-                        <logic:iterate id="statistics" name="tutorStatistics" type="org.fenixedu.academic.dto.teacher.tutor.TutorStatisticsBean">
+                        <logic:iterate id="statistics" name="tutorStatistics" type="pt.ist.fenixedu.tutorship.dto.teacher.tutor.TutorStatisticsBean">
                             <tr>
                                 <td width="75px"><%= statistics.getApprovedEnrolmentsNumber()  %></td>
                                 <td width="75px"><%= statistics.getStudentsNumber() %></td>
@@ -157,7 +158,7 @@ height: 50px;
         </logic:present>
     
         <logic:present name="performanceGridFiltersBean">
-            <bean:define id="filtersBean" name="performanceGridFiltersBean" type="org.fenixedu.academic.dto.teacher.tutor.StudentsPerformanceInfoBean"/>
+            <bean:define id="filtersBean" name="performanceGridFiltersBean" type="pt.ist.fenixedu.tutorship.dto.teacher.tutor.StudentsPerformanceInfoBean"/>
             <bean:define id="degreeOID" value="<%= filtersBean.getDegree().getExternalId().toString() %>" />
             <bean:define id="entryYearOID" value="<%= filtersBean.getStudentsEntryYear().getExternalId().toString() %>" />
             <bean:define id="monitoringYearOID" value="<%= filtersBean.getCurrentMonitoringYear().getExternalId().toString() %>" />
@@ -199,7 +200,7 @@ height: 50px;
                             <th><bean:message bundle="APPLICATION_RESOURCES" key="label.studentsNumber" /></th>
                             <th colspan="2"><bean:message bundle="APPLICATION_RESOURCES" key="label.studentsPercentage" /></th>
                         </tr>
-                        <logic:iterate id="studentStatistics" name="allStudentsStatistics" type="org.fenixedu.academic.dto.teacher.tutor.TutorStatisticsBean">
+                        <logic:iterate id="studentStatistics" name="allStudentsStatistics" type="pt.ist.fenixedu.tutorship.dto.teacher.tutor.TutorStatisticsBean">
                             <tr>
                                 <td width="75px"><%= studentStatistics.getApprovedEnrolmentsNumber()  %></td>
                                 <td width="75px"><%= studentStatistics.getStudentsNumber() %></td>
@@ -227,7 +228,7 @@ height: 50px;
         </p>
     </logic:notPresent>
 
-</logic:notEqual>
+</c:if>
 
 </logic:present>
 

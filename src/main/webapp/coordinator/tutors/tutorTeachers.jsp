@@ -24,10 +24,6 @@
 <%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean"%>
 <%@ taglib uri="http://fenix-ashes.ist.utl.pt/fenix-renderers" prefix="fr"%>
 
-<jsp:include page="/coordinator/context.jsp" />
-
-<html:xhtml />
-
 <bean:define id="degreeCurricularPlanID" name="master_degree" property="degreeCurricularPlan.externalId" type="java.lang.String" />
 <bean:define id="executionDegreeID" name="master_degree" property="externalId" />
 
@@ -36,7 +32,7 @@
 <fr:form action="/tutorTeachers.do">
     <fr:edit id="yearSelection" name="yearSelection">
         <fr:schema bundle="COORDINATOR_RESOURCES"
-            type="org.fenixedu.academic.ui.struts.action.coordinator.TutorTeachersManagementDispatchAction$YearSelection">
+            type="pt.ist.fenixedu.tutorship.ui.Action.coordinator.TutorTeachersManagementDispatchAction$YearSelection">
             <fr:slot name="executionYear" layout="menu-select-postback">
                 <fr:property name="providerClass"
                     value="org.fenixedu.academic.ui.renderers.providers.FutureAndCurrentAcademicIntervalYears" />
@@ -62,7 +58,7 @@
      + degreeCurricularPlanID + "&academicInterval=" + academicInterval %>">
         <fr:edit id="selector" name="selector">
             <fr:schema bundle="COORDINATOR_RESOURCES"
-                type="org.fenixedu.academic.ui.struts.action.coordinator.TutorTeachersManagementDispatchAction$TutorshipIntentionSelector">
+                type="pt.ist.fenixedu.tutorship.ui.Action.coordinator.TutorTeachersManagementDispatchAction$TutorshipIntentionSelector">
                 <fr:slot name="department.acronym" key="label.teacher.department" readOnly="true" />
                 <fr:slot name="teacher.person.name" key="label.teacher.name" readOnly="true" />
                 <fr:slot name="teacher.person.username" key="label.username" readOnly="true" />
