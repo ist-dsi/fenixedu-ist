@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.academic.ui.struts.action.library;
+package pt.ist.fenixedu.libraryattendance.ui;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -26,7 +26,6 @@ import java.util.Set;
 
 import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.academic.ui.renderers.providers.AbstractDomainObjectProvider;
-
 import org.fenixedu.spaces.domain.Space;
 
 import pt.ist.fenixWebFramework.renderers.DataProvider;
@@ -54,7 +53,6 @@ public class LibraryInformation implements Serializable {
             List<RoleType> roles = new ArrayList<RoleType>();
             roles.add(RoleType.STUDENT);
             roles.add(RoleType.TEACHER);
-            roles.add(RoleType.EMPLOYEE);
             roles.add(RoleType.GRANT_OWNER);
             roles.add(RoleType.ALUMNI);
             return roles;

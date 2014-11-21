@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.academic.ui.struts.action.library;
+package pt.ist.fenixedu.libraryattendance.ui;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -25,35 +25,26 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
+import org.fenixedu.academic.domain.Department;
+import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.exceptions.DomainException;
+import org.fenixedu.academic.domain.organizationalStructure.Unit;
+import org.fenixedu.academic.domain.person.RoleType;
+import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
+import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.academic.service.services.person.SearchPerson;
 import org.fenixedu.academic.service.services.person.SearchPerson.SearchParameters;
 import org.fenixedu.academic.service.services.person.SearchPerson.SearchPersonPredicate;
-import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.exceptions.DomainException;
-import org.fenixedu.academic.domain.organizationalStructure.Accountability;
-import org.fenixedu.academic.domain.organizationalStructure.AccountabilityTypeEnum;
-import org.fenixedu.academic.domain.organizationalStructure.Invitation;
-import org.fenixedu.academic.domain.organizationalStructure.ResearchUnit;
-import org.fenixedu.academic.domain.organizationalStructure.Unit;
-import org.fenixedu.academic.domain.person.RoleType;
-import org.fenixedu.academic.domain.personnelSection.contracts.GiafProfessionalData;
-import org.fenixedu.academic.domain.personnelSection.contracts.PersonContractSituation;
-import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
-import org.fenixedu.academic.domain.space.SpaceAttendances;
-import org.fenixedu.academic.domain.student.Registration;
-import org.fenixedu.academic.domain.teacher.CategoryType;
-import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.academic.ui.renderers.providers.AbstractDomainObjectProvider;
-
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
-import org.joda.time.YearMonthDay;
 
 import pt.ist.fenixWebFramework.renderers.DataProvider;
 import pt.ist.fenixWebFramework.renderers.components.converters.Converter;
 import pt.ist.fenixWebFramework.renderers.converters.EnumConverter;
+import pt.ist.fenixedu.libraryattendance.space.SpaceAttendances;
 import pt.ist.fenixframework.Atomic;
 import pt.utl.ist.fenix.tools.util.CollectionPager;
 
@@ -78,7 +69,6 @@ public class LibraryAttendance implements Serializable {
             List<RoleType> roles = new ArrayList<RoleType>();
             roles.add(RoleType.STUDENT);
             roles.add(RoleType.TEACHER);
-            roles.add(RoleType.EMPLOYEE);
             roles.add(RoleType.GRANT_OWNER);
             roles.add(RoleType.ALUMNI);
             return roles;
@@ -111,12 +101,6 @@ public class LibraryAttendance implements Serializable {
     private Unit externalTeacherUnit;
 
     private Unit researcherUnit;
-
-    private Unit grantOwnerUnit;
-
-    private LocalDate grantOwnerEnd;
-
-    private Invitation invitation;
 
     private Registration studentRegistration;
 
@@ -191,12 +175,9 @@ public class LibraryAttendance implements Serializable {
         this.person = person;
         externalTeacherUnit = null;
         researcherUnit = null;
-        grantOwnerUnit = null;
-        grantOwnerEnd = null;
         studentRegistration = null;
         alumniRegistration = null;
         phdProcess = null;
-        invitation = null;
         setSelectedSpace(null);
         setPersonAttendance(null);
         if (person != null) {
@@ -214,19 +195,9 @@ public class LibraryAttendance implements Serializable {
                 }
             }
             if (person.getTeacher() != null) {
-                externalTeacherUnit = person.getEmployee() != null ? person.getEmployee().getCurrentWorkingPlace() : null;
-            }
-            if (!ResearchUnit.getWorkingResearchUnits(person).isEmpty()) {
-                researcherUnit = getWorkingPlaceUnitForAnyRoleType(person);
-            }
-
-            if (person.hasRole(RoleType.GRANT_OWNER) && person.getEmployee() != null) {
-                PersonContractSituation currentGrantOwnerContractSituation =
-                        person.getPersonProfessionalData() != null ? person.getPersonProfessionalData()
-                                .getCurrentPersonContractSituationByCategoryType(CategoryType.GRANT_OWNER) : null;
-                if (currentGrantOwnerContractSituation != null) {
-                    grantOwnerUnit = getWorkingPlaceUnitForAnyRoleType(person);
-                    grantOwnerEnd = currentGrantOwnerContractSituation.getEndDate();
+                Department department = person.getTeacher().getDepartment();
+                if (department != null) {
+                    externalTeacherUnit = department.getDepartmentUnit();
                 }
             }
             if (person.getStudent() != null) {
@@ -240,37 +211,7 @@ public class LibraryAttendance implements Serializable {
                     }
                 }
             }
-
-            for (Invitation otherInvitation : Invitation.getActiveInvitations(person)) {
-                if (invitation == null || invitation.getEndDate().isBefore(otherInvitation.getEndDate())) {
-                    invitation = otherInvitation;
-                }
-            }
         }
-    }
-
-    public static Unit getWorkingPlaceUnitForAnyRoleType(Person person) {
-        if (person.hasRole(RoleType.TEACHER) || person.hasRole(RoleType.EMPLOYEE) || person.hasRole(RoleType.GRANT_OWNER)) {
-            return person.getEmployee() != null ? person.getEmployee().getCurrentWorkingPlace() : null;
-        }
-        if (person.hasRole(RoleType.RESEARCHER)) {
-            if (person.getEmployee() != null && person.getResearcher() != null
-                    && person.getResearcher().isActiveContractedResearcher()) {
-                final Unit currentWorkingPlace = person.getEmployee().getCurrentWorkingPlace();
-                if (currentWorkingPlace != null) {
-                    return currentWorkingPlace;
-                }
-            }
-            final Collection<? extends Accountability> accountabilities =
-                    person.getParentAccountabilities(AccountabilityTypeEnum.RESEARCH_CONTRACT);
-            final YearMonthDay currentDate = new YearMonthDay();
-            for (final Accountability accountability : accountabilities) {
-                if (accountability.isActive(currentDate)) {
-                    return (Unit) accountability.getParentParty();
-                }
-            }
-        }
-        return null;
     }
 
     public Collection<Person> getMatches() {
@@ -287,27 +228,6 @@ public class LibraryAttendance implements Serializable {
 
     public Unit getResearcherUnit() {
         return researcherUnit;
-    }
-
-    public Unit getGrantOwnerUnit() {
-        return grantOwnerUnit;
-    }
-
-    public LocalDate getGrantOwnerEnd() {
-        return grantOwnerEnd;
-    }
-
-    public Boolean getHasGrantOwnerEnd() {
-        return grantOwnerEnd != null;
-    }
-
-    public Invitation getInvitation() {
-        return invitation;
-    }
-
-    public Collection<GiafProfessionalData> getGiafProfessionalDataSet() {
-        return getPerson().getPersonProfessionalData() == null ? new ArrayList<GiafProfessionalData>() : getPerson()
-                .getPersonProfessionalData().getGiafProfessionalDatasSet();
     }
 
     public Registration getStudentRegistration() {
@@ -400,6 +320,17 @@ public class LibraryAttendance implements Serializable {
     public static int currentAttendaceCount(Space space) {
         return space.getCurrentAttendanceSet().size()
                 + space.getChildren().stream().mapToInt(LibraryAttendance::currentAttendaceCount).sum();
+    }
+
+    public int getCurrentAttendanceCount() {
+        return library == null ? 0 : currentAttendaceCount(library);
+    }
+
+    public int getAttendancePercentage() {
+        if (library == null) {
+            return 100;
+        }
+        return (int) ((((double) currentAttendaceCount(library)) * 100) / ((double) library.getAllocatableCapacity()));
     }
 
     private static SpaceAttendances addAttendance(Space space, Person person, String responsibleUsername) {

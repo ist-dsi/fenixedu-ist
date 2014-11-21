@@ -16,17 +16,16 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.academic.ui.struts.action.library;
+package pt.ist.fenixedu.libraryattendance.ui;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.fenixedu.academic.domain.space.SpaceAttendances;
-import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
-
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
+import org.fenixedu.academic.ui.struts.action.library.LibraryApplication;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
@@ -35,6 +34,7 @@ import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
 import org.fenixedu.spaces.domain.Space;
 
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
+import pt.ist.fenixedu.libraryattendance.space.SpaceAttendances;
 import pt.ist.fenixframework.FenixFramework;
 
 @StrutsFunctionality(app = LibraryApplication.class, path = "operator", titleKey = "label.library.operator")

@@ -1,4 +1,4 @@
-package org.fenixedu.academic.domain;
+package pt.ist.fenixedu.libraryattendance;
 
 class space.SpaceAttendances {
     String personUsername;
