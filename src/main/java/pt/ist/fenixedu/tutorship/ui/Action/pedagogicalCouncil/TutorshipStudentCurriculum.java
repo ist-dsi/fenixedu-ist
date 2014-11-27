@@ -26,7 +26,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
-import org.fenixedu.academic.dto.pedagogicalCouncil.NumberBean;
 import org.fenixedu.academic.ui.struts.action.administrativeOffice.student.CurriculumDispatchAction;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
 import org.fenixedu.bennu.struts.annotations.Forward;
@@ -35,6 +34,7 @@ import org.fenixedu.bennu.struts.annotations.Mapping;
 import org.fenixedu.bennu.struts.portal.EntryPoint;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
 
+import pt.ist.fenixedu.tutorship.dto.NumberBean;
 import pt.ist.fenixedu.tutorship.ui.TutorshipApplications.TutorshipApp;
 import pt.ist.fenixframework.FenixFramework;
 

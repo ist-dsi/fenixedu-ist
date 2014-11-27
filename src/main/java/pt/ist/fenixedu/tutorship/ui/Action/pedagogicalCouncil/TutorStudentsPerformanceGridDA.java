@@ -36,7 +36,6 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.curriculum.EnrollmentState;
 import org.fenixedu.academic.domain.student.Registration;
-import org.fenixedu.academic.dto.pedagogicalCouncil.NumberBean;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.struts.annotations.Forward;
@@ -46,6 +45,7 @@ import org.fenixedu.bennu.struts.portal.EntryPoint;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
 
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
+import pt.ist.fenixedu.tutorship.dto.NumberBean;
 import pt.ist.fenixedu.tutorship.dto.teacher.tutor.PerformanceGridTableDTO;
 import pt.ist.fenixedu.tutorship.dto.teacher.tutor.PerformanceGridTableDTO.PerformanceGridLine;
 import pt.ist.fenixedu.tutorship.dto.teacher.tutor.PerformanceGridTableDTO.PerformanceGridLine.PerformanceGridLineYearGroup;

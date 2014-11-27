@@ -16,38 +16,40 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
  */
-package pt.ist.fenixedu.tutorship.ui.Action.pedagogicalCouncil.studentLowPerformance;
+package pt.ist.fenixedu.tutorship.dto;
 
-import java.math.BigDecimal;
+import java.io.Serializable;
 
-import org.fenixedu.academic.domain.ExecutionYear;
+public class NumberBean implements Serializable {
 
-import pt.ist.fenixedu.tutorship.domain.PrescriptionEnum;
+    private Integer number;
+    private String id;
+    private Integer degreeCurricularPeriod;
 
-class PrescriptionRuleMomentThree extends PrescriptionRuleGenericMoment {
-
-    public PrescriptionRuleMomentThree() {
-        super();
+    public NumberBean() {
     }
 
-    @Override
-    public BigDecimal getMinimumEcts() {
-        return new BigDecimal(40);
+    public String getId() {
+        return id;
     }
 
-    @Override
-    public PrescriptionEnum getPrescriptionEnum() {
-        return PrescriptionEnum.MOMENT3;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    @Override
-    public int getNumberOfEntriesStudentInSecretary() {
-        return 2;
+    public Integer getDegreeCurricularPeriod() {
+        return degreeCurricularPeriod;
     }
 
-    @Override
-    public ExecutionYear getRegistrationStart(ExecutionYear executionYear) {
-        return executionYear.getPreviousExecutionYear();
+    public void setDegreeCurricularPeriod(Integer degreeCurricularPeriod) {
+        this.degreeCurricularPeriod = degreeCurricularPeriod;
     }
 
+    public void setNumber(Integer number) {
+        this.number = number;
+    }
+
+    public Integer getNumber() {
+        return number;
+    }
 }

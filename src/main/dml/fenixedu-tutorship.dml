@@ -1,5 +1,8 @@
 package pt.ist.fenixedu.tutorship.domain;
 
+enum pt.ist.fenixedu.tutorship.domain.Level                                                                                as Level;
+enum pt.ist.fenixedu.tutorship.domain.Option                                                                               as Option;
+enum pt.ist.fenixedu.tutorship.domain.PrescriptionEnum                                                                     as PrescriptionEnum;
 enum pt.ist.fenixedu.tutorship.domain.TutorshipParticipationType                                                           as TutorshipParticipationType;
 enum pt.ist.fenixedu.tutorship.domain.TutorshipSummarySatisfaction                                                         as TutorshipSummarySatisfaction;
 enum pt.ist.fenixedu.tutorship.domain.TutorshipSummaryProgramAssessment                                                    as TutorshipSummaryProgramAssessment;

@@ -23,8 +23,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.fenixedu.academic.domain.ExecutionYear;
-import org.fenixedu.academic.domain.PrescriptionEnum;
 import org.fenixedu.academic.domain.student.Registration;
+
+import pt.ist.fenixedu.tutorship.domain.PrescriptionEnum;
 
 public abstract class AbstractPrescriptionRule {
 

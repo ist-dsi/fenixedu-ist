@@ -27,7 +27,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.fenixedu.academic.domain.ExecutionYear;
-import org.fenixedu.academic.domain.PrescriptionEnum;
 import org.fenixedu.academic.domain.QueueJobResult;
 import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.student.Registration;

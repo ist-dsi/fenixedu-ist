@@ -21,7 +21,8 @@ package pt.ist.fenixedu.tutorship.ui.Action.pedagogicalCouncil.studentLowPerform
 import java.math.BigDecimal;
 
 import org.fenixedu.academic.domain.ExecutionYear;
-import org.fenixedu.academic.domain.PrescriptionEnum;
+
+import pt.ist.fenixedu.tutorship.domain.PrescriptionEnum;
 
 class PrescriptionRuleMomentTwo extends PrescriptionRuleGenericMoment {
 

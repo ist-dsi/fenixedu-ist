@@ -21,11 +21,10 @@ package pt.ist.fenixedu.tutorship.ui.renderers.providers;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.fenixedu.academic.domain.PrescriptionEnum;
-
 import pt.ist.fenixWebFramework.renderers.DataProvider;
 import pt.ist.fenixWebFramework.renderers.components.converters.Converter;
 import pt.ist.fenixWebFramework.renderers.converters.EnumConverter;
+import pt.ist.fenixedu.tutorship.domain.PrescriptionEnum;
 import pt.ist.fenixedu.tutorship.ui.Action.pedagogicalCouncil.studentLowPerformance.AbstractPrescriptionRule;
 
 public class StudentsLowPerformancePrescriptionProvider implements DataProvider {

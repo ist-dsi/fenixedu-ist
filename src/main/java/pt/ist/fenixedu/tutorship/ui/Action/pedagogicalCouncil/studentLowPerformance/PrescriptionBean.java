@@ -21,7 +21,8 @@ package pt.ist.fenixedu.tutorship.ui.Action.pedagogicalCouncil.studentLowPerform
 import java.io.Serializable;
 
 import org.fenixedu.academic.domain.ExecutionYear;
-import org.fenixedu.academic.domain.PrescriptionEnum;
+
+import pt.ist.fenixedu.tutorship.domain.PrescriptionEnum;
 
 public class PrescriptionBean implements Serializable {
     private static final long serialVersionUID = 1L;
