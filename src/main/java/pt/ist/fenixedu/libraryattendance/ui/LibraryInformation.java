@@ -53,7 +53,6 @@ public class LibraryInformation implements Serializable {
             List<RoleType> roles = new ArrayList<RoleType>();
             roles.add(RoleType.STUDENT);
             roles.add(RoleType.TEACHER);
-            roles.add(RoleType.GRANT_OWNER);
             roles.add(RoleType.ALUMNI);
             return roles;
         }
