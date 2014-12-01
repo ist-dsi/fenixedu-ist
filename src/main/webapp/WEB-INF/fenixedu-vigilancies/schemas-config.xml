@@ -18,9 +18,6 @@
     along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
 
 -->
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE schemas SYSTEM "../fenix-renderers-schemas.dtd">
-
 <schemas>
 <schema name="presentVigilantWithCategory" type="org.fenixedu.academic.domain.vigilancy.VigilantWrapper" bundle="VIGILANCY_RESOURCES">
         <slot name="person.teacher" layout="null-as-label" key="label.vigilancy.category">
@@ -42,7 +39,7 @@
     </slot>
 </schema>
 
-<schema name="presentTeacherCategoryCodeString" type="org.fenixedu.academic.domain.personnelSection.contracts.ProfessionalCategory" bundle="VIGILANCY_RESOURCES">
+<schema name="presentTeacherCategoryCodeString" type="pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalCategory" bundle="VIGILANCY_RESOURCES">
     <slot name="name" key="label.vigilancy.category"/>
 </schema>
 
@@ -712,13 +709,13 @@ extends="presentSimpleConvokesWithoutLink">
 
 
 <!--  Others -->    
-<schema name="presentEmployee" type="org.fenixedu.academic.domain.Employee" bundle="VIGILANCY_RESOURCES">
+<schema name="presentEmployee" type="pt.ist.fenixedu.contracts.domain.Employee" bundle="VIGILANCY_RESOURCES">
         <slot name="person" key="label.vigilancy.name">
             <property name="format" value="${name} (${username})"/>
         </slot>
 </schema>
 
-<schema name="presentEmployeeWithCatAndNumber" type="org.fenixedu.academic.domain.Employee" bundle="VIGILANCY_RESOURCES">
+<schema name="presentEmployeeWithCatAndNumber" type="pt.ist.fenixedu.contracts.domain.Employee" bundle="VIGILANCY_RESOURCES">
         <slot name="person.teacher" layout="null-as-label" key="label.vigilancy.category">
             <property name="label" value=" "/>
             <property name="subLayout" value="values"/>
@@ -815,7 +812,7 @@ extends="presentSimpleConvokesWithoutLink">
     <slot name="bound"/>
 </schema>
 
-<schema name="employeesForVigilantWrappers" type="org.fenixedu.academic.domain.Employee" bundle="VIGILANCY_RESOURCES">
+<schema name="employeesForVigilantWrappers" type="pt.ist.fenixedu.contracts.domain.Employee" bundle="VIGILANCY_RESOURCES">
     <slot name="person.teacher" layout="null-as-label" key="label.vigilancy.category">
             <property name="label" value=" "/>
             <property name="subLayout" value="values"/>

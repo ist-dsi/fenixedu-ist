@@ -1,6 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE renderers-config SYSTEM "../fenix-renderers-config.dtd">
-
 <renderers-config>
     <!--@ Special layout to present a vigilant table with a slightly different organization. -->
     <renderer type="org.fenixedu.academic.domain.vigilancy.VigilantGroup" layout="vigilant-table" class="org.fenixedu.academic.ui.renderers.VigilantTableRender">

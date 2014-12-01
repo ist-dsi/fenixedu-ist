@@ -222,12 +222,10 @@
 <logic:equal name="bean" property="showCourseColumn" value="true">
 <td>
 		<p class="mvert05"><strong><bean:message key="label.vigilancy.courses" bundle="VIGILANCY_RESOURCES"/>:</strong></p>
-<fr:view name="group" property="executionCourses">
+<fr:view name="group" property="executionCourses" schema="presentExecutionCourse">
 	<fr:layout>
-		<fr:property name="eachSchema" value="presentExecutionCourse"/>
 		<fr:property name="sortBy" value="nome"/>
-		<fr:property name="eachLayout" value="values"/>
-		<fr:property name="classes" value="list2 mtop05"/>
+		<fr:property name="headerClasses" value="hide"/>
 	</fr:layout>
 	</fr:view>
 </td>
@@ -235,12 +233,11 @@
 <logic:equal name="bean" property="showCoordinators" value="true">
 <td>
 		<p class="mvert05"><strong><bean:message key="label.vigilancy.examCoordinators" bundle="VIGILANCY_RESOURCES"/>:</strong></p>
-<fr:view name="group" property="examCoordinators"> 
+<fr:view name="group" property="examCoordinators" schema="presentCoordinatorName"> 
 	<fr:layout>
-		<fr:property name="eachSchema" value="presentCoordinatorName"/>
-		<fr:property name="eachLayout" value="values"/>
 		<fr:property name="sortBy" value="person.name"/>
 		<fr:property name="classes" value="list2 mtop05"/>
+		<fr:property name="headerClasses" value="hide"/>
 	</fr:layout>
 	</fr:view>
 		</td>
