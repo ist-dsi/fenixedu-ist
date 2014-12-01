@@ -51,7 +51,7 @@ public class JasperReportPrinter implements ReportPrinter {
     }
 
     @Override
-    public byte[] printReports(ReportDescription... reports) throws Exception {
+    public ReportResult printReports(ReportDescription... reports) throws Exception {
         final List<JasperPrint> partials = new ArrayList<JasperPrint>();
 
         for (final ReportDescription report : reports) {
@@ -61,8 +61,7 @@ public class JasperReportPrinter implements ReportPrinter {
                 throw new NullPointerException();
             } else {
                 // HACK!
-                if (report.getKey().equals(
-                        "net.sourceforge.fenixedu.presentationTier.docs.thesis.StudentThesisIdentificationDocument")) {
+                if (report.getKey().equals("org.fenixedu.academic.report.thesis.StudentThesisIdentificationDocument")) {
                     jasperPrint = processStudentThesisIdentificationDocument(jasperPrint);
                 }
             }
@@ -72,17 +71,17 @@ public class JasperReportPrinter implements ReportPrinter {
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         export(new JRPdfExporter(), partials, baos, (PrintRequestAttributeSet) null);
-        return baos.toByteArray();
+        return new ReportResult(baos.toByteArray(), "application/pdf", "pdf");
     }
 
     @Override
-    public byte[] printReport(String key, Map<String, Object> parameters, Collection<?> dataSource) throws Exception {
+    public ReportResult printReport(String key, Map<String, Object> parameters, Collection<?> dataSource) throws Exception {
         final JasperPrint jasperPrint = createJasperPrint(key, parameters, dataSource);
 
         if (jasperPrint != null) {
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
             export(new JRPdfExporter(), Collections.singletonList(jasperPrint), baos, (PrintRequestAttributeSet) null);
-            return baos.toByteArray();
+            return new ReportResult(baos.toByteArray(), "application/pdf", "pdf");
         }
 
         return null;
