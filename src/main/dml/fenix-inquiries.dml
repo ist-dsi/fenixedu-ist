@@ -614,7 +614,7 @@ relation InquiryDelegateAnswerExecutionDegree {
 }
 
 relation InquiryDelegateAnswerDelegate {
-    student.YearDelegate playsRole delegate;
+    .pt.ist.fenixedu.delegates.domain.student.YearDelegate playsRole delegate;
     inquiries.InquiryDelegateAnswer playsRole inquiryDelegateAnswers {
         multiplicity *;
     }
