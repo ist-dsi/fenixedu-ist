@@ -18,101 +18,81 @@
  */
 package pt.ist.fenixedu.delegates.domain.student;
 
-import java.util.List;
+import static org.fenixedu.bennu.FenixEduDelegatesConfiguration.BUNDLE;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.CurricularYear;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionYear;
-import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.organizationalStructure.DegreeUnit;
-import org.fenixedu.academic.domain.organizationalStructure.FunctionType;
-import org.fenixedu.academic.domain.organizationalStructure.PersonFunction;
-import org.fenixedu.academic.domain.student.Registration;
-import org.fenixedu.academic.domain.student.Student;
+import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.core.groups.UserGroup;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
+
+import pt.ist.fenixedu.delegates.domain.util.email.DelegateSender;
+import pt.ist.fenixedu.delegates.ui.DelegateBean;
 
 public class YearDelegate extends YearDelegate_Base {
 
-    public YearDelegate() {
+    public YearDelegate(User user, Degree degree, CurricularYear curricularYear) {
         super();
+        setUser(user);
+        setDegree(degree);
+        setCurricularYear(curricularYear);
     }
 
-    public YearDelegate(Registration registration, PersonFunction delegateFunction) {
-        this();
-        setRegistration(registration);
-        setDelegateFunction(delegateFunction);
+    @Override
+    public DelegateBean getBean() {
+        return new DelegateBean(this);
     }
 
-    public CurricularYear getCurricularYear() {
-        return getDelegateFunction().getCurricularYear();
+    @Override
+    public void setSender(DelegateSender sender) {
+        super.setSender(sender);
+        getSender().setMembers(UserGroup.of(getUser()));
+        getSender().addRecipients(getDegree().getDegreeDelegatesRecipient());
     }
 
-    public Person getPerson() {
-        return getRegistration().getPerson();
+    @Override
+    public String getTitle() {
+        String delegate = BundleUtil.getString(BUNDLE, "delegate");
+        String of = BundleUtil.getString(BUNDLE, "delegate.of");
+        String year = BundleUtil.getString(BUNDLE, "delegate.year");
+        return delegate + " " + of + " " + getCurricularYear().getYear() + " " + year;
     }
 
-    public boolean isAfter(YearDelegate yearDelegate) {
-        return getDelegateFunction().getEndDate().isAfter(yearDelegate.getDelegateFunction().getEndDate());
-    }
-
-    public static PersonFunction getActiveYearDelegatePersonFunctionByCurricularYear(DegreeUnit degreeUnit,
-            CurricularYear curricularYear) {
-        final List<PersonFunction> delegateFunctions =
-                Delegate.getAllActiveDelegatePersonFunctionsByFunctionType(degreeUnit, FunctionType.DELEGATE_OF_YEAR, null);
-        for (PersonFunction delegateFunction : delegateFunctions) {
-            if (delegateFunction.getCurricularYear() != null && delegateFunction.getCurricularYear().equals(curricularYear)) {
-                return delegateFunction;
-            }
+    @Override
+    public Boolean samePosition(Delegate delegate) {
+        YearDelegate yearDelegate = (YearDelegate) delegate;
+        if (getDegree().equals(yearDelegate.getDegree()) && getCurricularYear().equals(yearDelegate.getCurricularYear())) {
+            return true;
         }
-        return null;
+        return false;
     }
 
-    public static PersonFunction getLastYearDelegatePersonFunctionByExecutionYearAndCurricularYear(DegreeUnit degreeUnit,
-            ExecutionYear executionYear, CurricularYear curricularYear) {
-        final List<PersonFunction> delegateFunctions =
-                Delegate.getAllDelegatePersonFunctionsByExecutionYearAndFunctionType(degreeUnit, executionYear,
-                        FunctionType.DELEGATE_OF_YEAR);
+    @Override
+    public List<CurricularCourse> getDelegateCourses() {
 
-        PersonFunction lastDelegateFunction = null;
-        for (PersonFunction delegateFunction : delegateFunctions) {
-            if (delegateFunction.getCurricularYear().equals(curricularYear)
-                    && delegateFunction.belongsToPeriod(executionYear.getBeginDateYearMonthDay(),
-                            executionYear.getEndDateYearMonthDay())) {
-                if (lastDelegateFunction == null || lastDelegateFunction.getEndDate().isBefore(delegateFunction.getEndDate())) {
-                    lastDelegateFunction = delegateFunction;
-                }
-            }
-        }
-        return lastDelegateFunction;
+        ExecutionYear execYear = ExecutionYear.getExecutionYearByDate(getStart().toYearMonthDay());
+
+        return getDegree()
+                .getDegreeCurricularPlansForYear(execYear)
+                .stream()
+                .flatMap(
+                        p -> p.getCurricularCoursesByExecutionYearAndCurricularYear(execYear, getCurricularYear().getYear())
+                                .stream()).collect(Collectors.toList());
     }
 
-    public static Student getActiveYearDelegateByCurricularYear(Degree degree, CurricularYear curricularYear) {
-        if (degree.isEmpty() || degree.getUnit() == null) {
-            return null;
-        }
-        final PersonFunction delegateFunction =
-                getActiveYearDelegatePersonFunctionByCurricularYear(degree.getUnit(), curricularYear);
-        return delegateFunction != null ? delegateFunction.getPerson().getStudent() : null;
+    @Override
+    public Boolean isDegreeOrCycleDelegate() {
+        return false;
     }
 
-    /*
-     * DELEGATES FROM GIVEN EXECUTION YEAR (PAST DELEGATES)
-     */
-    public static Student getYearDelegateByExecutionYearAndCurricularYear(Degree degree, ExecutionYear executionYear,
-            CurricularYear curricularYear) {
-        if (degree.isEmpty() || degree.getUnit() == null) {
-            return null;
-        }
-        final List<PersonFunction> delegateFunctions =
-                Delegate.getAllDelegatePersonFunctionsByExecutionYearAndFunctionType(degree.getUnit(), executionYear,
-                        FunctionType.DELEGATE_OF_YEAR);
-        for (PersonFunction delegateFunction : delegateFunctions) {
-            if (delegateFunction.getCurricularYear().equals(curricularYear)
-                    && delegateFunction.belongsToPeriod(executionYear.getBeginDateYearMonthDay(),
-                            executionYear.getEndDateYearMonthDay())) {
-                return delegateFunction.getPerson().getStudent();
-            }
-        }
-        return null;
+    @Override
+    public Boolean isYearDelegate() {
+        return true;
     }
 
 }
