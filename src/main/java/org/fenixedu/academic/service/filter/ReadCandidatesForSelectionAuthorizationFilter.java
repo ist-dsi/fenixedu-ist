@@ -23,13 +23,12 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.fenixedu.academic.service.services.exceptions.NotAuthorizedException;
 import org.fenixedu.academic.domain.Coordinator;
 import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.person.RoleType;
+import org.fenixedu.academic.service.services.exceptions.NotAuthorizedException;
 import org.fenixedu.academic.util.SituationName;
-
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.security.Authenticate;
 
@@ -89,7 +88,7 @@ public class ReadCandidatesForSelectionAuthorizationFilter extends Filtro {
             return false;
         }
 
-        if (id.getPerson().hasRole(RoleType.MASTER_DEGREE_ADMINISTRATIVE_OFFICE)) {
+        if (RoleType.MASTER_DEGREE_ADMINISTRATIVE_OFFICE.isMember(id)) {
             if (executionDegree.getDegreeCurricularPlan().getDegree().getDegreeType().equals(DegreeType.MASTER_DEGREE)) {
 
                 return true;
@@ -98,7 +97,7 @@ public class ReadCandidatesForSelectionAuthorizationFilter extends Filtro {
 
         }
 
-        if (id.getPerson().hasRole(RoleType.COORDINATOR)) {
+        if (RoleType.COORDINATOR.isMember(id)) {
             // modified by Tânia Pousão
             Collection<Coordinator> coodinatorsList = executionDegree.getCoordinatorsListSet();
             if (coodinatorsList == null) {

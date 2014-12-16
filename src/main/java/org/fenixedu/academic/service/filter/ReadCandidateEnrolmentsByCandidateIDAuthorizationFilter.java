@@ -22,12 +22,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.fenixedu.academic.service.services.exceptions.NotAuthorizedException;
 import org.fenixedu.academic.domain.Coordinator;
 import org.fenixedu.academic.domain.MasterDegreeCandidate;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.person.RoleType;
-
+import org.fenixedu.academic.service.services.exceptions.NotAuthorizedException;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.security.Authenticate;
 
@@ -69,11 +68,11 @@ public class ReadCandidateEnrolmentsByCandidateIDAuthorizationFilter extends Fil
      * @return
      */
     private boolean hasPrivilege(User id, String candidateID) {
-        if (id.getPerson().hasRole(RoleType.MASTER_DEGREE_ADMINISTRATIVE_OFFICE)) {
+        if (RoleType.MASTER_DEGREE_ADMINISTRATIVE_OFFICE.isMember(id)) {
             return true;
         }
 
-        if (id.getPerson().hasRole(RoleType.COORDINATOR)) {
+        if (RoleType.COORDINATOR.isMember(id)) {
             final Person person = id.getPerson();
             // Read The ExecutionDegree
 
