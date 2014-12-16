@@ -42,10 +42,12 @@ import org.fenixedu.academic.domain.inquiries.DelegateInquiryTemplate;
 import org.fenixedu.academic.domain.inquiries.InquiryDelegateAnswer;
 import org.fenixedu.academic.domain.inquiries.InquiryResult;
 import org.fenixedu.academic.domain.inquiries.ResultPersonCategory;
-import org.fenixedu.academic.predicate.AccessControl;
+import org.fenixedu.academic.domain.student.delegate.DelegateUtils;
+import org.fenixedu.academic.presentationTier.Action.delegate.DelegateApplication.DelegateParticipateApp;
 import org.fenixedu.academic.presentationTier.Action.publico.ViewCourseInquiryPublicResults;
 import org.fenixedu.academic.presentationTier.Action.publico.ViewTeacherInquiryPublicResults;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
+import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
@@ -53,7 +55,7 @@ import org.fenixedu.bennu.struts.portal.EntryPoint;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
 
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
-import pt.ist.fenixedu.contracts.domain.organizationalStructure.PersonFunction;
+import pt.ist.fenixedu.delegates.domain.student.Delegate;
 import pt.ist.fenixedu.delegates.domain.student.YearDelegate;
 import pt.ist.fenixframework.FenixFramework;
 
@@ -79,10 +81,10 @@ public class YearDelegateInquiryDA extends FenixDispatchAction {
         }
         YearDelegate yearDelegate = null;
         ExecutionSemester executionPeriod = delegateInquiryTemplate.getExecutionPeriod();
-        for (Delegate delegate : Delegate.getDelegates(AccessControl.getPerson().getStudent())) {
+        for (Delegate delegate : Authenticate.getUser().getDelegatesSet()) {
             if (delegate instanceof YearDelegate) {
-                if (delegate.isActiveForFirstExecutionYear(executionPeriod.getExecutionYear())) {
-                    if (yearDelegate == null || ((YearDelegate) delegate).isAfter(yearDelegate)) {
+                if (DelegateUtils.DelegateIsActiveForFirstExecutionYear(delegate, executionPeriod.getExecutionYear())) {
+                    if (yearDelegate == null || ((YearDelegate) delegate).getStart().isAfter(yearDelegate.getStart())) {
                         yearDelegate = (YearDelegate) delegate;
                     }
                 }
@@ -90,19 +92,21 @@ public class YearDelegateInquiryDA extends FenixDispatchAction {
         }
 
         if (yearDelegate != null) {
-            PersonFunction lastYearDelegatePersonFunction =
-                    YearDelegate.getLastYearDelegatePersonFunctionByExecutionYearAndCurricularYear(yearDelegate.getDegree()
-                            .getUnit(), executionPeriod.getExecutionYear(), yearDelegate.getCurricularYear());
-            if (lastYearDelegatePersonFunction.getDelegate() != yearDelegate) {
+            Delegate lastYearDelegatePersonFunction =
+                    DelegateUtils.getLastYearDelegateByExecutionYearAndCurricularYear(yearDelegate.getDegree(),
+                            executionPeriod.getExecutionYear(), yearDelegate.getCurricularYear());
+            if (lastYearDelegatePersonFunction != yearDelegate) {
                 return actionMapping.findForward("inquiriesClosed");
             }
 
             final ExecutionDegree executionDegree =
-                    ExecutionDegree.getByDegreeCurricularPlanAndExecutionYear(yearDelegate.getDegree().getDegreeCurricularPlan(),
+
+                    ExecutionDegree.getByDegreeCurricularPlanAndExecutionYear(yearDelegate.getRegistration()
+                            .getStudentCurricularPlan(executionPeriod).getDegreeCurricularPlan(),
                             executionPeriod.getExecutionYear());
-            final ExecutionSemester executionSemester = executionPeriod;
+
             Set<ExecutionCourse> executionCoursesToInquiries =
-                    DelegateInquiryTemplate.getExecutionCoursesToInquiries(yearDelegate, executionSemester, executionDegree);
+                    DelegateUtils.getExecutionCoursesToInquiries(yearDelegate, executionPeriod, executionDegree);
 
             List<CurricularCourseResumeResult> coursesResultResume = new ArrayList<CurricularCourseResumeResult>();
             for (ExecutionCourse executionCourse : executionCoursesToInquiries) {
@@ -127,7 +131,8 @@ public class YearDelegateInquiryDA extends FenixDispatchAction {
         ExecutionDegree executionDegree =
                 FenixFramework.getDomainObject(getFromRequest(request, "executionDegreeOID").toString());
 
-        List<InquiryResult> results = InquiryResult.getInquiryResultsByExecutionDegreeAndForTeachers(executionCourse, executionDegree);
+        List<InquiryResult> results =
+                InquiryResult.getInquiryResultsByExecutionDegreeAndForTeachers(executionCourse, executionDegree);
         DelegateInquiryTemplate delegateInquiryTemplate = DelegateInquiryTemplate.getCurrentTemplate();
         InquiryDelegateAnswer inquiryDelegateAnswer = null;
         for (InquiryDelegateAnswer delegateAnswer : yearDelegate.getInquiryDelegateAnswersSet()) {

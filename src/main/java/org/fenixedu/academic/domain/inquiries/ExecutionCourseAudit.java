@@ -35,10 +35,10 @@ public class ExecutionCourseAudit extends ExecutionCourseAudit_Base {
     }
 
     public void edit(Person teacher, Person student) {
-        if (!student.hasRole(RoleType.STUDENT)) {
+        if (!RoleType.STUDENT.isMember(student.getUser())) {
             throw new DomainException("error.inquiry.audit.hasToBeStudent");
         }
-        if (!teacher.hasRole(RoleType.TEACHER)) {
+        if (!RoleType.TEACHER.isMember(teacher.getUser())) {
             throw new DomainException("error.inquiry.audit.hasToBeTeacher");
         }
         setTeacherAuditor(teacher.getTeacher());

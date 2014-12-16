@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -39,7 +41,9 @@ import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.inquiries.DelegateInquiryTemplate;
+import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
+import org.fenixedu.academic.domain.student.delegate.DelegateUtils;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
 import org.fenixedu.academic.ui.struts.action.pedagogicalCouncil.PedagogicalCouncilApp.PedagogicalControlApp;
 import org.fenixedu.bennu.struts.annotations.Forward;
@@ -49,7 +53,6 @@ import org.fenixedu.bennu.struts.portal.EntryPoint;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
 import org.joda.time.DateTime;
 
-import pt.ist.fenixedu.contracts.domain.organizationalStructure.FunctionType;
 import pt.ist.fenixedu.delegates.domain.student.Delegate;
 import pt.ist.fenixedu.delegates.domain.student.YearDelegate;
 import pt.ist.fenixframework.FenixFramework;
@@ -89,8 +92,9 @@ public class ViewQucDelegatesStatus extends FenixDispatchAction {
 
         for (Degree degree : degreeList) {
             Map<Integer, YearDelegate> yearDelegateByYear = new HashMap<Integer, YearDelegate>();
-            for (Student student : Delegate.getAllDelegatesByExecutionYearAndFunctionType(degree,
-                    executionPeriod.getExecutionYear(), FunctionType.DELEGATE_OF_YEAR)) {
+            for (Student student : DelegateUtils
+                    .getAllDelegatesByExecutionYearAndFunctionType(degree, executionPeriod.getExecutionYear(), true).stream()
+                    .map(d -> d.getUser().getPerson().getStudent()).collect(Collectors.toList())) {
                 YearDelegate yearDelegate = getYearDelegate(student, executionPeriod);
                 YearDelegate yearDelegateMap = yearDelegateByYear.get(yearDelegate.getCurricularYear().getYear());
                 if (yearDelegateMap == null) {
@@ -159,14 +163,18 @@ public class ViewQucDelegatesStatus extends FenixDispatchAction {
     public DelegateBean getCoursesToComment(final Degree degree, final YearDelegate yearDelegate,
             final ExecutionSemester executionSemester) {
         List<ExecutionCourse> coursesToComment = new ArrayList<ExecutionCourse>();
-        final ExecutionDegree executionDegree =
-                ExecutionDegree.getByDegreeCurricularPlanAndExecutionYear(yearDelegate.getRegistration()
-                        .getStudentCurricularPlan(executionSemester).getDegreeCurricularPlan(),
-                        executionSemester.getExecutionYear());
-        for (ExecutionCourse executionCourse : DelegateInquiryTemplate.getExecutionCoursesToInquiries(yearDelegate,
-                executionSemester, executionDegree)) {
-            if (DelegateInquiryTemplate.hasMandatoryCommentsToMake(yearDelegate, executionCourse, executionDegree)) {
-                coursesToComment.add(executionCourse);
+        Set<Registration> regSet = yearDelegate.getUser().getPerson().getStudent().getRegistrationsSet();
+        List<ExecutionDegree> execDegrees =
+                regSet.stream()
+                        .map(reg -> ExecutionDegree.getByDegreeCurricularPlanAndExecutionYear(
+                                reg.getStudentCurricularPlan(executionSemester).getDegreeCurricularPlan(),
+                                executionSemester.getExecutionYear())).collect(Collectors.toList());
+        for (ExecutionDegree execDegree : execDegrees) {
+            for (ExecutionCourse executionCourse : DelegateUtils.getExecutionCoursesToInquiries(yearDelegate, executionSemester,
+                    execDegree)) {
+                if (DelegateInquiryTemplate.hasMandatoryCommentsToMake(yearDelegate, executionCourse, execDegree)) {
+                    coursesToComment.add(executionCourse);
+                }
             }
         }
         if (!coursesToComment.isEmpty()) {
@@ -177,12 +185,10 @@ public class ViewQucDelegatesStatus extends FenixDispatchAction {
 
     private YearDelegate getYearDelegate(Student student, ExecutionSemester executionPeriod) {
         YearDelegate yearDelegate = null;
-        for (Delegate delegate : Delegate.getDelegates(student)) {
+        for (Delegate delegate : student.getPerson().getUser().getDelegatesSet()) {
             if (delegate instanceof YearDelegate) {
-                if (delegate.isActiveForFirstExecutionYear(executionPeriod.getExecutionYear())) {
-                    if (yearDelegate == null
-                            || delegate.getDelegateFunction().getEndDate()
-                                    .isAfter(yearDelegate.getDelegateFunction().getEndDate())) {
+                if (DelegateUtils.DelegateIsActiveForFirstExecutionYear(delegate, executionPeriod.getExecutionYear())) {
+                    if (yearDelegate == null || delegate.getEnd().isAfter(yearDelegate.getEnd())) {
                         yearDelegate = (YearDelegate) delegate;
                     }
                 }
