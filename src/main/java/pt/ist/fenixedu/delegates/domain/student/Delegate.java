@@ -3,6 +3,7 @@ package pt.ist.fenixedu.delegates.domain.student;
 import java.util.List;
 
 import org.fenixedu.academic.domain.CurricularCourse;
+import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
@@ -37,6 +38,14 @@ public abstract class Delegate extends Delegate_Base {
 
     public Boolean isActive(DateTime when) {
         return getInterval().contains(when);
+    }
+
+    public Boolean isAfter(Delegate delegate) {
+        return getEnd().isAfter(delegate.getEnd());
+    }
+
+    public Registration getRegistration() {
+        return getUser().getPerson().getStudent().getActiveRegistrationFor(getDegree());
     }
 
 }
