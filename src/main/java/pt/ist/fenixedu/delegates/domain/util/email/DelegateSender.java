@@ -1,5 +1,9 @@
 package pt.ist.fenixedu.delegates.domain.util.email;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.fenixedu.academic.domain.util.email.ReplyTo;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.groups.UserGroup;
 
@@ -14,9 +18,18 @@ public class DelegateSender extends DelegateSender_Base {
     public DelegateSender(Delegate delegate) {
         setFromName(delegate.getUser().getPerson().getName() + " (" + delegate.getTitle() + ")");
         setFromAddress(getNoreplyMail());
-        addReplyTos(delegate.getUser().getPerson().getReplyTo());
         setMembers(UserGroup.of(delegate.getUser()));
         setRootDomainObject(Bennu.getInstance());
+    }
+
+    @Override
+    public Set<ReplyTo> getReplyTosSet() {
+        return getDelegateSet().stream().map(d -> d.getUser().getPerson().getReplyTo()).collect(Collectors.toSet());
+    }
+
+    @Override
+    public Set<ReplyTo> getReplyTos() {
+        return getReplyTosSet();
     }
 
 }

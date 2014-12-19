@@ -27,10 +27,13 @@ import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.DegreeModuleScope;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.accessControl.StudentGroup;
 import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.groups.UserGroup;
 
+import pt.ist.fenixedu.delegates.domain.student.CycleDelegate;
+import pt.ist.fenixedu.delegates.domain.student.DegreeDelegate;
 import pt.ist.fenixedu.delegates.domain.student.Delegate;
 import pt.ist.fenixedu.delegates.domain.student.YearDelegate;
 
@@ -120,6 +123,26 @@ public class DelegateStudentSelectBean {
                             .map(s -> s.getPerson().getUser()).distinct().collect(Collectors.toSet()));
             toRet.add(Recipient.newInstance("Selected Students", userGroup));
         }
+        if (selectedYearStudents && selectedPosition instanceof YearDelegate) {
+            YearDelegate yearDelegate = (YearDelegate) selectedPosition;
+            StudentGroup sg =
+                    StudentGroup.get(selectedPosition.getDegree(), yearDelegate.getCurricularYear(),
+                            ExecutionYear.getExecutionYearByDate(yearDelegate.getStart().toYearMonthDay()));
+            toRet.add(Recipient.newInstance("Selected Students", sg));
+        }
+        if (selectedDegreeOrCycleStudents) {
+            if (selectedPosition instanceof CycleDelegate) {
+                CycleDelegate cycleDelegate = (CycleDelegate) selectedPosition;
+                StudentGroup sg = StudentGroup.get(selectedPosition.getDegree(), cycleDelegate.getCycle());
+                toRet.add(Recipient.newInstance("Selected Students", sg));
+            }
+            if (selectedPosition instanceof DegreeDelegate) {
+                DegreeDelegate degreeDelegate = (DegreeDelegate) selectedPosition;
+                StudentGroup sg = StudentGroup.get(degreeDelegate.getDegree(), null);
+                toRet.add(Recipient.newInstance("Selected Students", sg));
+            }
+        }
+
         return toRet;
     }
 
