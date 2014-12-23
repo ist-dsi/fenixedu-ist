@@ -47,7 +47,7 @@ public class YearDelegatesGroup extends GroupStrategy {
 
     @Override
     public String getPresentationName() {
-        return BundleUtil.getString(Bundle.GROUP, getPresentationNameKey());
+        return BundleUtil.getString(Bundle.DELEGATE, getPresentationNameKey());
     }
 
 }

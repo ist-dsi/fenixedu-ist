@@ -23,10 +23,12 @@ import java.util.Set;
 
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.accessControl.FenixGroup;
+import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.annotation.GroupArgument;
 import org.fenixedu.bennu.core.annotation.GroupOperator;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixedu.delegates.domain.student.Delegate;
@@ -113,6 +115,16 @@ public class DegreeDelegatesGroup extends FenixGroup {
     @Override
     public int hashCode() {
         return Objects.hashCode(degree);
+    }
+
+    @Override
+    public String getPresentationNameKey() {
+        return "label.name." + getClass().getSimpleName();
+    }
+
+    @Override
+    public String getPresentationName() {
+        return BundleUtil.getString(Bundle.DELEGATE, getPresentationNameKey());
     }
 
 }

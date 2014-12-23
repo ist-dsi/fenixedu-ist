@@ -5,13 +5,13 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
-<h1>SELECTS ALL COURSESSS!!!11one</h1>
+<h1><spring:message code="title.delegate.select.groups"/></h1>
 <spring:url var="formActionReload" value="${reload}" />
 <form:form modelAttribute="students" role="form" method="post"
 	action="${formActionReload}" enctype="multipart/form-data"
 	class="form-horizontal">
 	<div class="row">
-		<div class="col-sm-2">Enviar mail como:</div>
+		<div class="col-sm-2"><spring:message code="delegates.messaging.send.email.as"/>:</div>
 		<div class="col-sm-5">
 			<form:select path="selectedPosition" items="${students.positions}"
 				itemLabel="title" itemValue="externalId" onchange="submit();"
@@ -28,26 +28,24 @@
 			value="${students.selectedPosition.externalId}"
 			path="selectedPosition" />
 	<div class="row">
-		<div class="col-sm-2">Enviar mail a:</div>
+		<div class="col-sm-2"><spring:message code="delegates.messaging.send.mail.to"/>:</div>
 		<div class="col-sm-5">
 			<a
-				href="${formActionUrl}${students.selectedPosition.externalId}?studentGroups=true">Grupos
-				de alunos</a>, <a
-				href="${formActionUrl}${students.selectedPosition.externalId}?studentGroups=false">Alunos
-				das disciplinas selecionadas</a>
+				href="${formActionUrl}${students.selectedPosition.externalId}?studentGroups=true"><spring:message code="delegates.messaging.student.groups"/></a>, <a
+				href="${formActionUrl}${students.selectedPosition.externalId}?studentGroups=false"><spring:message code="delegates.messaging.student.selected.courses"/></a>
 		</div>
 	</div>
 	<p>
 		<c:if test="${executionCourses == null}">
 			<div class="row">
-				<div class="col-sm-2">Destinatários (BCC):</div>
+				<div class="col-sm-2"><spring:message code="delegates.messaging.bcc"/>:</div>
 				<div class="col-sm-5">
 					<c:if test="${yearStudents}">
 						<div class="row">
 							<div class="col-md-5">
 								<form:checkbox value="${execCourse.curricularCourse.externalId}"
 									path="selectedYearStudents" />
-								Alunos do ano do Delegado
+								<spring:message code="delegates.messaging.year.students"/>
 							</div>
 						</div>
 					</c:if>
@@ -56,7 +54,7 @@
 							<div class="col-md-5">
 								<form:checkbox value="${execCourse.curricularCourse.externalId}"
 									path="selectedDegreeOrCycleStudents" />
-								Alunos do Mestrado
+								<spring:message code="delegates.messaging.degreeCycle.students"/>
 							</div>
 						</div>
 					</c:if>
@@ -69,10 +67,10 @@
 					<table class="table table-condensed">
 						<tr>
 							<td class="col-sm-1"></td>
-							<td class="col-sm-8">Name</td>
-							<td class="col-sm-1">Year</td>
-							<td class="col-sm-1">Semester</td>
-							<td class="col-sm-1">Students</td>
+							<td class="col-sm-8"><spring:message code="delegates.messaging.table.name"/></td>
+							<td class="col-sm-1"><spring:message code="delegates.messaging.table.year"/></td>
+							<td class="col-sm-1"><spring:message code="delegates.messaging.table.semester"/></td>
+							<td class="col-sm-1"><spring:message code="delegates.messaging.table.students"/></td>
 						</tr>
 						<c:forEach var="execCourse" items="${executionCourses}">
 							<tr>

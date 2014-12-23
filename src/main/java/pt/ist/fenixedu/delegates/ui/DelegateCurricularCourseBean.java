@@ -101,9 +101,9 @@ public class DelegateCurricularCourseBean {
 
     public void calculateEnrolledStudents() {
         List<Student> enrolledStudents = new ArrayList<Student>();
-        for (Enrolment enrolment : getCurricularCourse().getEnrolmentsByExecutionPeriod(getExecutionPeriod())) {
+        for (Enrolment enrolment : getCurricularCourse().getEnrolmentsByAcademicInterval(
+                getExecutionPeriod().getAcademicInterval())) {
             enrolledStudents.add(enrolment.getRegistration().getStudent());
-
         }
         Collections.sort(enrolledStudents, Student.NUMBER_COMPARATOR);
         setEnrolledStudents(enrolledStudents);

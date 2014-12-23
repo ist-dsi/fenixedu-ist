@@ -25,12 +25,11 @@ import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.DegreeModuleScope;
+import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.accessControl.StudentGroup;
 import org.fenixedu.academic.domain.util.email.Recipient;
-import org.fenixedu.bennu.core.groups.Group;
-import org.fenixedu.bennu.core.groups.UserGroup;
 
 import pt.ist.fenixedu.delegates.domain.student.CycleDelegate;
 import pt.ist.fenixedu.delegates.domain.student.DegreeDelegate;
@@ -114,32 +113,41 @@ public class DelegateStudentSelectBean {
 
     public List<Recipient> getRecipients() {
         List<Recipient> toRet = new ArrayList<Recipient>();
-        if (selectedExecutionCourses.size() > 0) {
-            Group userGroup;
+        if (selectedExecutionCourses != null && selectedExecutionCourses.size() > 0) {
+
             List<DelegateCurricularCourseBean> lccb =
                     getCurricularCoursesBeans(selectedPosition, selectedExecutionCourses.stream().collect(Collectors.toSet()));
-            userGroup =
-                    UserGroup.of(lccb.stream().flatMap(ccb -> ccb.getEnrolledStudents().stream())
-                            .map(s -> s.getPerson().getUser()).distinct().collect(Collectors.toSet()));
-            toRet.add(Recipient.newInstance("Selected Students", userGroup));
+
+            List<ExecutionCourse> selectedStudentCourses =
+                    lccb.stream()
+                            .flatMap(
+                                    ccb -> ccb
+                                            .getCurricularCourse()
+                                            .getExecutionCoursesByExecutionPeriod(ccb.getExecutionPeriod())
+                                            .stream()
+                                            .filter(ec -> (ec.getDegreesSortedByDegreeName().contains(selectedPosition
+                                                    .getDegree())))).collect(Collectors.toList());
+
+            selectedStudentCourses.stream().map(ec -> StudentGroup.get(ec)).forEach(sg -> toRet.add(Recipient.newInstance(sg)));
+
         }
         if (selectedYearStudents && selectedPosition instanceof YearDelegate) {
             YearDelegate yearDelegate = (YearDelegate) selectedPosition;
             StudentGroup sg =
                     StudentGroup.get(selectedPosition.getDegree(), yearDelegate.getCurricularYear(),
                             ExecutionYear.getExecutionYearByDate(yearDelegate.getStart().toYearMonthDay()));
-            toRet.add(Recipient.newInstance("Selected Students", sg));
+            toRet.add(Recipient.newInstance(sg));
         }
         if (selectedDegreeOrCycleStudents) {
             if (selectedPosition instanceof CycleDelegate) {
                 CycleDelegate cycleDelegate = (CycleDelegate) selectedPosition;
                 StudentGroup sg = StudentGroup.get(selectedPosition.getDegree(), cycleDelegate.getCycle());
-                toRet.add(Recipient.newInstance("Selected Students", sg));
+                toRet.add(Recipient.newInstance(sg));
             }
             if (selectedPosition instanceof DegreeDelegate) {
                 DegreeDelegate degreeDelegate = (DegreeDelegate) selectedPosition;
                 StudentGroup sg = StudentGroup.get(degreeDelegate.getDegree(), null);
-                toRet.add(Recipient.newInstance("Selected Students", sg));
+                toRet.add(Recipient.newInstance(sg));
             }
         }
 
