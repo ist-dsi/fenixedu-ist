@@ -22,7 +22,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -49,7 +48,6 @@ import org.fenixedu.academic.domain.inquiries.StudentInquiryTemplate;
 import org.fenixedu.academic.domain.inquiries.StudentTeacherInquiryTemplate;
 import org.joda.time.DateTime;
 
-import pt.ist.fenixedu.teacher.domain.NonRegularTeachingService;
 import pt.ist.fenixedu.teacher.domain.teacher.DegreeTeachingService;
 import pt.ist.fenixframework.Atomic;
 
@@ -77,7 +75,6 @@ public class StudentInquiryBean implements Serializable {
         Map<Person, Map<ShiftType, StudentTeacherInquiryBean>> teachersShifts =
                 new HashMap<Person, Map<ShiftType, StudentTeacherInquiryBean>>();
         Map<ShiftType, Double> allTeachingServicesShiftType = null;
-        Set<ShiftType> nonAssociatedTeachersShiftTypes = null;
         for (final Professorship professorship : executionCourse.getProfessorshipsSet()) {
 
             final Person person = professorship.getPerson();
@@ -106,17 +103,6 @@ public class StudentInquiryBean implements Serializable {
                     shiftTypesPercentageMap.put(shiftType, percentage);
                 }
             }
-            for (NonRegularTeachingService nonRegularTeachingService : professorship.getNonRegularTeachingServicesSet()) {
-                for (ShiftType shiftType : nonRegularTeachingService.getShift().getTypes()) {
-                    Double percentage = shiftTypesPercentageMap.get(shiftType);
-                    if (percentage == null) {
-                        percentage = nonRegularTeachingService.getPercentage();
-                    } else {
-                        percentage += nonRegularTeachingService.getPercentage();
-                    }
-                    shiftTypesPercentageMap.put(shiftType, percentage);
-                }
-            }
 
             for (ShiftType shiftType : shiftTypesPercentageMap.keySet()) {
                 Double percentage = shiftTypesPercentageMap.get(shiftType);
@@ -132,13 +118,9 @@ public class StudentInquiryBean implements Serializable {
                 if (allTeachingServicesShiftType == null) {
                     allTeachingServicesShiftType = getAllDegreeTeachingServices(executionCourse);
                 }
-                if (nonAssociatedTeachersShiftTypes == null) {
-                    nonAssociatedTeachersShiftTypes = getNonAssociatedTeachersShiftTypes(executionCourse);
-                }
                 for (final ShiftType shiftType : shiftTypes) {
                     Double shiftTypePercentage = allTeachingServicesShiftType.get(shiftType);
-                    if (shiftTypePercentage == null || shiftTypePercentage < 100.0
-                            || nonAssociatedTeachersShiftTypes.contains(shiftType)) {
+                    if (shiftTypePercentage == null || shiftTypePercentage < 100.0) {
                         teacherShift.put(shiftType, new StudentTeacherInquiryBean(teacherDTO, executionCourse, shiftType,
                                 studentTeacherInquiryTemplate));
                     }
@@ -155,16 +137,6 @@ public class StudentInquiryBean implements Serializable {
         }
     }
 
-    private Set<ShiftType> getNonAssociatedTeachersShiftTypes(ExecutionCourse executionCourse) {
-        Set<ShiftType> nonAssociatedTeachersShiftTypes = new HashSet<ShiftType>();
-        for (Shift shift : executionCourse.getAssociatedShifts()) {
-            if (shift.getDegreeTeachingServicesSet().isEmpty() && shift.getNonRegularTeachingServicesSet().isEmpty()) {
-                nonAssociatedTeachersShiftTypes.addAll(shift.getTypes());
-            }
-        }
-        return nonAssociatedTeachersShiftTypes;
-    }
-
     private Map<ShiftType, Double> getAllDegreeTeachingServices(ExecutionCourse executionCourse) {
         Map<ShiftType, Double> shiftTypesPercentageMap = new HashMap<ShiftType, Double>();
         for (Professorship professorship : executionCourse.getProfessorshipsSet()) {
@@ -175,17 +147,6 @@ public class StudentInquiryBean implements Serializable {
                         percentage = degreeTeachingService.getPercentage();
                     } else {
                         percentage += degreeTeachingService.getPercentage();
-                    }
-                    shiftTypesPercentageMap.put(shiftType, percentage);
-                }
-            }
-            for (NonRegularTeachingService nonRegularTeachingService : professorship.getNonRegularTeachingServicesSet()) {
-                for (ShiftType shiftType : nonRegularTeachingService.getShift().getTypes()) {
-                    Double percentage = shiftTypesPercentageMap.get(shiftType);
-                    if (percentage == null) {
-                        percentage = nonRegularTeachingService.getPercentage();
-                    } else {
-                        percentage += nonRegularTeachingService.getPercentage();
                     }
                     shiftTypesPercentageMap.put(shiftType, percentage);
                 }
@@ -303,7 +264,8 @@ public class StudentInquiryBean implements Serializable {
             inquiryCourseAnswer.addEnrolledShifts(enrolledShift);
         }
         final StudentInquiryExecutionPeriod studentInquiryExecutionPeriod =
-                StudentInquiryExecutionPeriod.getStudentInquiryExecutionPeriod(getInquiryRegistry().getRegistration().getStudent(), getInquiryRegistry().getExecutionPeriod());
+                StudentInquiryExecutionPeriod.getStudentInquiryExecutionPeriod(getInquiryRegistry().getRegistration()
+                        .getStudent(), getInquiryRegistry().getExecutionPeriod());
         inquiryCourseAnswer.setWeeklyHoursSpentInAutonomousWork(studentInquiryExecutionPeriod
                 .getWeeklyHoursSpentInClassesSeason());
         inquiryCourseAnswer.setWeeklyHoursSpentPercentage(getInquiryRegistry().getWeeklyHoursSpentPercentage());

@@ -33,7 +33,6 @@ import org.fenixedu.bennu.core.domain.Bennu;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalCategory;
-import pt.ist.fenixedu.teacher.domain.NonRegularTeachingService;
 import pt.ist.fenixedu.teacher.domain.teacher.DegreeTeachingService;
 
 public class TeacherInquiryTemplate extends TeacherInquiryTemplate_Base {
@@ -69,7 +68,9 @@ public class TeacherInquiryTemplate extends TeacherInquiryTemplate_Base {
         }
         final Teacher teacher = person.getTeacher();
         boolean mandatoryTeachingService = false;
-        if (teacher != null && ProfessionalCategory.isTeacherProfessorCategory(teacher, professorship.getExecutionCourse().getExecutionPeriod())) {
+        if (teacher != null
+                && ProfessionalCategory.isTeacherProfessorCategory(teacher, professorship.getExecutionCourse()
+                        .getExecutionPeriod())) {
             mandatoryTeachingService = true;
         }
 
@@ -88,17 +89,6 @@ public class TeacherInquiryTemplate extends TeacherInquiryTemplate_Base {
                         percentage = degreeTeachingService.getPercentage();
                     } else {
                         percentage += degreeTeachingService.getPercentage();
-                    }
-                    shiftTypesPercentageMap.put(shiftType, percentage);
-                }
-            }
-            for (final NonRegularTeachingService nonRegularTeachingService : professorship.getNonRegularTeachingServicesSet()) {
-                for (final ShiftType shiftType : nonRegularTeachingService.getShift().getTypes()) {
-                    Double percentage = shiftTypesPercentageMap.get(shiftType);
-                    if (percentage == null) {
-                        percentage = nonRegularTeachingService.getPercentage();
-                    } else {
-                        percentage += nonRegularTeachingService.getPercentage();
                     }
                     shiftTypesPercentageMap.put(shiftType, percentage);
                 }
