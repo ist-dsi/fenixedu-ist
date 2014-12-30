@@ -23,7 +23,6 @@
 <!-- TODO: make this a public id or at least obsolute 
      Currently there is a semi-hack built in the RendererPlugin to accept this format.
 -->
-<!DOCTYPE schemas SYSTEM "../fenix-renderers-schemas.dtd" []>
 
 <schemas>
 

@@ -23,7 +23,6 @@
 <!-- TODO: make this a public id or at least obsolute 
      Currently there is a semi-hack built in the RendererPlugin to accept this format.
 -->
-<!DOCTYPE renderers-config SYSTEM "../fenix-renderers-config.dtd">
 
 <renderers-config>
 	<renderer type="org.fenixedu.academic.domain.elections.DelegateElectionPeriod" layout="delegate-election-period-link" class="org.fenixedu.academic.ui.renderers.DelegateElectionPeriodLinkRenderer"/>
