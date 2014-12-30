@@ -19,11 +19,9 @@
 
 -->
 
-<!DOCTYPE schemas SYSTEM "../fenix-renderers-schemas.dtd">
-
 <schemas>
 <schema name="org.fenixedu.academic.domain.inquiry.SelectInquiryResponsePeriod.edit"
-		type="org.fenixedu.academic.dto.inquiries.InquiryDefinitionPeriodBean" bundle="INQUIRIES_RESOURCES">
+		type="org.fenixedu.academic.dataTransferObject.inquiries.InquiryDefinitionPeriodBean" bundle="INQUIRIES_RESOURCES">
 	<slot name="responsePeriodType" layout="menu-select-postback">
 		<property name="providerClass"	value="org.fenixedu.academic.ui.renderers.providers.choiceType.replacement.single.InquiryResponsePeriodTypeProvider" />
 		<property name="nullOptionHidden" value="true"/>
@@ -38,7 +36,7 @@
 </schema>
 
 <schema name="org.fenixedu.academic.domain.inquiry.InquiryResponsePeriodMessage.edit"
-		type="org.fenixedu.academic.dto.inquiries.InquiryDefinitionPeriodBean" bundle="INQUIRIES_RESOURCES">
+		type="org.fenixedu.academic.dataTransferObject.inquiries.InquiryDefinitionPeriodBean" bundle="INQUIRIES_RESOURCES">
 	<slot name="begin"/>
 	<slot name="end"/>
 	<slot name="message" layout="rich-text">
@@ -50,12 +48,12 @@
 </schema>
 	
 <schema name="inquiryQuestionDTO.answer"
-		type="org.fenixedu.academic.dto.inquiries.InquiryQuestionDTO" >	
+		type="org.fenixedu.academic.dataTransferObject.inquiries.InquiryQuestionDTO" >	
 	<slot name="responseValue" />
 </schema>
 
 <schema name="questionResultsSummaryBean.input"
-		type="org.fenixedu.academic.dto.inquiries.QuestionResultsSummaryBean" >
+		type="org.fenixedu.academic.dataTransferObject.inquiries.QuestionResultsSummaryBean" >
 	<slot name="editableComment">
 	</slot>
 </schema>
@@ -75,7 +73,7 @@
 </schema>
 
 <schema name="curricularCourseInquiriesRegistryDTO.submitHoursAndDays"
-		type="org.fenixedu.academic.dto.inquiries.CurricularCourseInquiriesRegistryDTO" bundle="INQUIRIES_RESOURCES">
+		type="org.fenixedu.academic.dataTransferObject.inquiries.CurricularCourseInquiriesRegistryDTO" bundle="INQUIRIES_RESOURCES">
 	<slot name="curricularCourse.name" key="label.curricularCourse.name" read-only="true"/>			
 	<slot name="weeklyContactLoad" key="label.contactLoad.b" read-only="true">
 		<property name="headerToolTip" value="toolTip.studentInquiries.weeklyScheduleLoad" />
@@ -96,7 +94,7 @@
 </schema>
 
 <schema name="curricularCourseInquiriesRegistryDTO.submitHoursAndDays.edit"
-		type="org.fenixedu.academic.dto.inquiries.CurricularCourseInquiriesRegistryDTO" bundle="INQUIRIES_RESOURCES">
+		type="org.fenixedu.academic.dataTransferObject.inquiries.CurricularCourseInquiriesRegistryDTO" bundle="INQUIRIES_RESOURCES">
 	<slot name="curricularCourse.name" key="label.curricularCourse.name" read-only="true"/>	
 	<slot name="weeklyContactLoad" key="label.contactLoad" read-only="true">
 		<property name="headerToolTip" value="toolTip.studentInquiries.weeklyScheduleLoad" />
@@ -105,7 +103,7 @@
 			validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator">
 		<property name="headerToolTip" value="toolTip.studentInquiries.attendenceClassesPercentage" />
 		<property name="defaultText" value=""/>
-		<property name="providerClass" value="org.fenixedu.academic.dto.inquiries.CurricularCourseInquiriesRegistryDTO$NumbersToHundred5To5" />		
+		<property name="providerClass" value="org.fenixedu.academic.dataTransferObject.inquiries.CurricularCourseInquiriesRegistryDTO$NumbersToHundred5To5" />		
 	</slot>
 	<slot name="weeklyHoursSpentPercentage" key="label.weeklyHoursSpentPercentage.withBreaks">
 		<property name="headerToolTip" value="toolTip.studentInquiries.weeklyHoursSpentPercentage" />
