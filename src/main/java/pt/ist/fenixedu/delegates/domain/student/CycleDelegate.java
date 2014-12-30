@@ -12,11 +12,13 @@ import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.degreeStructure.CycleType;
-import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 
+import pt.ist.fenixedu.delegates.domain.accessControl.DegreeDelegatesGroup;
+import pt.ist.fenixedu.delegates.domain.accessControl.DelegatesOfDegreeGroup;
+import pt.ist.fenixedu.delegates.domain.accessControl.YearDelegatesGroup;
 import pt.ist.fenixedu.delegates.domain.util.email.DelegateSender;
 import pt.ist.fenixedu.delegates.ui.DelegateBean;
 
@@ -35,7 +37,12 @@ public class CycleDelegate extends CycleDelegate_Base {
     }
 
     private void setupRecipients() {
-        Bennu.getInstance().getDelegateRecipientSet().stream().forEach(r -> getSender().addRecipients(r));
+        DelegatesOfDegreeGroup delegatesOfDegreeGroup = new DelegatesOfDegreeGroup();
+        getSender().addRecipients(getRecipientFromGroup(delegatesOfDegreeGroup));
+        YearDelegatesGroup yearDelegatesGroup = new YearDelegatesGroup();
+        getSender().addRecipients(getRecipientFromGroup(yearDelegatesGroup));
+        DegreeDelegatesGroup degreeDelegatesGroup = DegreeDelegatesGroup.get(getDegree());
+        getSender().addRecipients(getRecipientFromGroup(degreeDelegatesGroup));
     }
 
     @Override
@@ -75,7 +82,6 @@ public class CycleDelegate extends CycleDelegate_Base {
     public void setSender(DelegateSender sender) {
         super.setSender(sender);
         getSender().setMembers(UserGroup.of(getUser()));
-        getSender().addRecipients(getDegree().getDegreeDelegatesRecipient());
         setupRecipients();
     }
 

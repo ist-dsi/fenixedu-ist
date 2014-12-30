@@ -31,6 +31,7 @@ import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 
+import pt.ist.fenixedu.delegates.domain.accessControl.DegreeDelegatesGroup;
 import pt.ist.fenixedu.delegates.domain.util.email.DelegateSender;
 import pt.ist.fenixedu.delegates.ui.DelegateBean;
 
@@ -52,7 +53,7 @@ public class YearDelegate extends YearDelegate_Base {
     public void setSender(DelegateSender sender) {
         super.setSender(sender);
         getSender().setMembers(UserGroup.of(getUser()));
-        getSender().addRecipients(getDegree().getDegreeDelegatesRecipient());
+        getSender().addRecipients(getRecipientFromGroup(DegreeDelegatesGroup.get(getDegree())));
     }
 
     @Override

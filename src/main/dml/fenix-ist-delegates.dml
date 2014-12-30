@@ -28,21 +28,9 @@ relation DelegateWithSender {
     util.email.DelegateSender playsRole sender;
 }
 
-relation DelegateRecipients {
-    .org.fenixedu.academic.domain.Degree playsRole degree;
-    .org.fenixedu.academic.domain.util.email.Recipient playsRole degreeDelegatesRecipient;
-}
-
 relation DelegateGroup {
     .org.fenixedu.academic.domain.Degree playsRole degree;
     accessControl.PersistentDegreeDelegatesGroup playsRole degreeDelegatesGroup;
-}
-
-relation DelegateRecipientsRootDomainObject {
-    .org.fenixedu.bennu.core.domain.Bennu playsRole bennu;
-    .org.fenixedu.academic.domain.util.email.Recipient playsRole delegateRecipient {
-        multiplicity *;
-    }
 }
 
 relation DelegateDegree{
