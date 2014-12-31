@@ -2,7 +2,9 @@ package pt.ist.fenixedu.delegates.domain;
 
 class util.email.DelegateSender extends .org.fenixedu.academic.domain.util.email.Sender {}
 
-class accessControl.PersistentDegreeDelegatesGroup extends .org.fenixedu.academic.domain.accessControl.FenixPredicateGroup;
+class accessControl.PersistentDelegateGroup extends .org.fenixedu.academic.domain.accessControl.FenixPredicateGroup {
+    protected Boolean yearDelegate;
+}
 
 class student.Delegate  {
     DateTime start;
@@ -28,9 +30,13 @@ relation DelegateWithSender {
     util.email.DelegateSender playsRole sender;
 }
 
-relation DelegateGroup {
-    .org.fenixedu.academic.domain.Degree playsRole degree;
-    accessControl.PersistentDegreeDelegatesGroup playsRole degreeDelegatesGroup;
+relation DelegateGroupDegree {
+    protected .org.fenixedu.academic.domain.Degree playsRole degree {
+        multiplicity 0..1;
+    }
+    public accessControl.PersistentDelegateGroup playsRole delegatesGroup {
+        multiplicity *;
+    }
 }
 
 relation DelegateDegree{

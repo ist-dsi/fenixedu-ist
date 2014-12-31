@@ -4,13 +4,10 @@ import java.util.List;
 
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.student.Registration;
-import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.bennu.core.domain.Bennu;
-import org.fenixedu.bennu.core.groups.Group;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 
-import pt.ist.fenixedu.delegates.domain.accessControl.DelegatesOfDegreeGroup;
 import pt.ist.fenixedu.delegates.ui.DelegateBean;
 
 public abstract class Delegate extends Delegate_Base {
@@ -50,15 +47,4 @@ public abstract class Delegate extends Delegate_Base {
     public Registration getRegistration() {
         return getUser().getPerson().getStudent().getActiveRegistrationFor(getDegree());
     }
-
-    protected Recipient getRecipientFromGroup(Group group) {
-        Recipient recipient = null;
-        if (!group.toPersistentGroup().getRecipientAsMembersSet().isEmpty()) {
-            recipient = group.toPersistentGroup().getRecipientAsMembersSet().iterator().next();
-        } else {
-            recipient = Recipient.newInstance(new DelegatesOfDegreeGroup());
-        }
-        return recipient;
-    }
-
 }
