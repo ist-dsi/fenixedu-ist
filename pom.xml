@@ -49,6 +49,13 @@
         </dependency>
     </dependencies>
 
+    <distributionManagement>
+        <repository>
+            <id>fenixedu-contrib-releases</id>
+            <url>https://repo.fenixedu.org/fenixedu-contrib-releases</url>
+        </repository>
+    </distributionManagement>
+
     <repositories>
         <repository>
             <id>fenixedu-maven-repository</id>
