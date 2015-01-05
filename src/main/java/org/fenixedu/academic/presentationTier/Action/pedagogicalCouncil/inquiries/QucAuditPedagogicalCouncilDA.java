@@ -21,6 +21,7 @@ package org.fenixedu.academic.presentationTier.Action.pedagogicalCouncil.inquiri
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,6 +31,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.fenixedu.academic.dataTransferObject.inquiries.AuditSelectPersonsECBean;
 import org.fenixedu.academic.dataTransferObject.inquiries.CompetenceCourseResultsResume;
+import org.fenixedu.academic.dataTransferObject.inquiries.ExecutionCourseBean;
 import org.fenixedu.academic.dataTransferObject.inquiries.ExecutionCourseQucAuditSearchBean;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
@@ -70,7 +72,8 @@ public class QucAuditPedagogicalCouncilDA extends ViewQucAuditProcessDA {
         }
         final Collection<ExecutionCourse> executionCourses = executionCourseSearchBean.search();
         if (executionCourses != null) {
-            request.setAttribute("executionCourses", executionCourses);
+            request.setAttribute("executionCourses",
+                    executionCourses.stream().map(ec -> new ExecutionCourseBean(ec)).collect(Collectors.toList()));
         }
         List<ExecutionCourseAudit> executionCoursesAudits = getExecutionCoursesAudits(executionSemester);
 

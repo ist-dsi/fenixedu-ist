@@ -23,7 +23,7 @@
 <schema name="org.fenixedu.academic.domain.inquiry.SelectInquiryResponsePeriod.edit"
 		type="org.fenixedu.academic.dataTransferObject.inquiries.InquiryDefinitionPeriodBean" bundle="INQUIRIES_RESOURCES">
 	<slot name="responsePeriodType" layout="menu-select-postback">
-		<property name="providerClass"	value="org.fenixedu.academic.ui.renderers.providers.choiceType.replacement.single.InquiryResponsePeriodTypeProvider" />
+		<property name="providerClass"	value="org.fenixedu.academic.presentationTier.renderers.providers.choiceType.replacement.single.InquiryResponsePeriodTypeProvider" />
 		<property name="nullOptionHidden" value="true"/>
 		<property name="destination" value="postBack"/>
 	</slot>

@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.CurricularYear;
@@ -19,7 +21,6 @@ import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.inquiries.InquiriesRoot;
 import org.fenixedu.academic.domain.student.Student;
-import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.joda.time.Interval;
 
@@ -36,7 +37,7 @@ public class DelegateUtils {
     public static YearDelegate getLastYearDelegateByExecutionYearAndCurricularYear(Degree degree, ExecutionYear executionYear,
             CurricularYear curricularYear) {
         List<YearDelegate> yearDelegates =
-                Bennu.getInstance().getDelegatesSet().stream().filter(d -> d instanceof YearDelegate).map(d -> (YearDelegate) d)
+                degree.getDelegateSet().stream().filter(d -> d instanceof YearDelegate).map(d -> (YearDelegate) d)
                         .collect(Collectors.toList());
 
         YearDelegate lastDelegateFunction = null;
@@ -132,18 +133,25 @@ public class DelegateUtils {
 
     public static Delegate getActiveDelegateByStudent(Degree degree, Student student, ExecutionYear executionYear,
             Boolean yearDelegate) {
-        User user = student.getPerson().getUser();
-        return user.getDelegatesSet().stream().filter(d -> d.isActive() && (d instanceof YearDelegate) == yearDelegate).findAny()
-                .get();
+
+        Stream<Delegate> stream = degree.getDelegateSet().stream();
+        if (yearDelegate) {
+            stream = stream.filter(d -> d instanceof YearDelegate);
+        }
+        Optional<Delegate> result =
+                stream.filter(d -> d.isActive() && d.getUser().equals(student.getPerson().getUser())).findAny();
+        return result.isPresent() ? result.get() : null;
     }
 
     public static List<User> getAllActiveDelegatesByType(Degree degree, boolean delegateOfYear, ExecutionYear executionYear) {
         if (degree.isEmpty()) {
             return Collections.emptyList();
         }
-        List<User> result =
-                degree.getDelegateSet().stream().filter(d -> d.isActive() && ((d instanceof YearDelegate) == delegateOfYear))
-                        .map(d -> d.getUser()).collect(Collectors.toList());
+        Stream<Delegate> stream = degree.getDelegateSet().stream();
+        if (delegateOfYear) {
+            stream = stream.filter(d -> d instanceof YearDelegate);
+        }
+        List<User> result = stream.filter(d -> d.isActive()).map(d -> d.getUser()).collect(Collectors.toList());
         return result;
     }
 
@@ -181,8 +189,10 @@ public class DelegateUtils {
         Interval execInterval =
                 new Interval(executionYear.getBeginDateYearMonthDay().toDateTimeAtMidnight(), executionYear
                         .getEndDateYearMonthDay().toDateTimeAtMidnight());
-        return degree.getDelegateSet().stream()
-                .filter(d -> ((d instanceof YearDelegate) == delegateOfYear) && d.getInterval().overlaps(execInterval))
-                .collect(Collectors.toList());
+        Stream<Delegate> stream = degree.getDelegateSet().stream();
+        if (delegateOfYear) {
+            stream = stream.filter(d -> d instanceof YearDelegate);
+        }
+        return stream.filter(d -> d.getInterval().overlaps(execInterval)).collect(Collectors.toList());
     }
 }

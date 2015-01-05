@@ -19,10 +19,12 @@
 package org.fenixedu.academic.applicationTier.Servico.gep.inquiries;
 
 import static org.fenixedu.academic.predicate.AccessControl.check;
+
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.executionCourse.ExecutionCourseSearchBean;
 import org.fenixedu.academic.domain.inquiries.InquiriesRoot;
 import org.fenixedu.academic.predicate.RolePredicates;
+
 import pt.ist.fenixframework.Atomic;
 
 public class SelectAllExecutionCoursesForInquiries {
@@ -39,7 +41,7 @@ public class SelectAllExecutionCoursesForInquiries {
     public static void unselectAll(final ExecutionCourseSearchBean executionCourseSearchBean) {
         check(RolePredicates.GEP_PREDICATE);
         for (final ExecutionCourse executionCourse : executionCourseSearchBean.search()) {
-            executionCourse.setAvailableForInquiries(InquiriesRoot.getInstance());
+            executionCourse.setAvailableForInquiries(null);
         }
     }
 

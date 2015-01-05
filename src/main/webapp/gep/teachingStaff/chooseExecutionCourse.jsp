@@ -35,9 +35,10 @@
 	<bean:define id="executionYear" name="executionYear" type="java.lang.String" />
 	<logic:iterate id="degreeModuleScope" name="sortedScopes">
 		<bean:define id="curricularCourse" name="degreeModuleScope" property="curricularCourse"/>
-		<logic:iterate id="executionCourse" name="curricularCourse" property="associatedExecutionCourses" >
-			<logic:equal name="executionCourse" property="executionPeriod.state" value="CURRENT">
-			<logic:equal name="executionCourse" property="availableForInquiries" value="true">
+		<logic:iterate id="executionCourse" name="curricularCourse" property="associatedExecutionCourses" type="org.fenixedu.academic.domain.ExecutionCourse">
+			<logic:equal name="executionCourse" property="executionPeriod.state" value="CURRENT">	
+			<bean:define id="isAvailableForInquiry" value="<%=java.lang.String.valueOf(org.fenixedu.academic.domain.inquiries.InquiriesRoot.isAvailableForInquiry(executionCourse))%>"/>
+			<logic:equal name="isAvailableForInquiry" value="true">
 				<tr class="listClasses">
 					<td><strong><bean:write name="degreeModuleScope" property="curricularYear" /></strong></td>
 					<td><strong><bean:write name="executionCourse" property="executionPeriod.semester" /></strong></td>

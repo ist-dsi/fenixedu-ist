@@ -30,7 +30,7 @@
 		<fr:edit id="executionSemesterBean" name="executionSemesterBean">
 			<fr:schema bundle="INQUIRIES_RESOURCES" type="org.fenixedu.academic.dto.VariantBean">
 				<fr:slot name="domainObject" key="label.inquiries.semester" layout="menu-select-postback">
-					<fr:property name="providerClass" value="org.fenixedu.academic.ui.struts.action.departmentMember.ViewQUCResultsDA$ExecutionSemesterQucProvider" />
+					<fr:property name="providerClass" value="org.fenixedu.academic.presentationTier.Action.departmentMember.ViewQUCResultsDA$ExecutionSemesterQucProvider" />
 					<fr:property name="format" value="${executionYear.year} - ${semester}º Semestre" />
 					<fr:property name="nullOptionHidden" value="true"/>
 					<fr:property name="destination" value="showPostBack"/>
@@ -54,10 +54,16 @@
 		<logic:iterate id="executionCourseAudit" name="executionCoursesAudits">
 			<tr>
 				<td>
-					<bean:define id="ecSite" name="executionCourseAudit" property="executionCourse.site.reversePath" type="java.lang.String"/>
-					<!-- NO_CHECKSUM --><html:link page="<%= ecSite %>" target="_blank" module="">
+					<logic:notEmpty name="executionCourseAudit" property="executionCourse.siteUrl">
+						<bean:define id="ecSite" name="executionCourseAudit" property="executionCourse.siteUrl" type="java.lang.String"/>
+						<!-- NO_CHECKSUM -->
+						<html:link page="<%= ecSite %>" target="_blank" module="">
+							<bean:write name="executionCourseAudit" property="executionCourse.name"/>
+						</html:link>
+					</logic:notEmpty>
+					<logic:empty name="executionCourseAudit" property="executionCourse.siteUrl">
 						<bean:write name="executionCourseAudit" property="executionCourse.name"/>
-					</html:link>
+					</logic:empty>
 				</td>				
 				<td>
 					<bean:write name="executionCourseAudit" property="teacherAuditor.person.name"/>, 

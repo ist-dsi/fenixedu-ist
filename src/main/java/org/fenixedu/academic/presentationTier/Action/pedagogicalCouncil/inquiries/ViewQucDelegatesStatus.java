@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -164,9 +165,11 @@ public class ViewQucDelegatesStatus extends FenixDispatchAction {
             final ExecutionSemester executionSemester) {
         List<ExecutionCourse> coursesToComment = new ArrayList<ExecutionCourse>();
         Set<Registration> regSet = yearDelegate.getUser().getPerson().getStudent().getRegistrationsSet();
+        Stream<Registration> filteredRegSet =
+                regSet.stream().filter(reg -> reg.getStudentCurricularPlan(executionSemester) != null);
         List<ExecutionDegree> execDegrees =
-                regSet.stream()
-                        .map(reg -> ExecutionDegree.getByDegreeCurricularPlanAndExecutionYear(
+                filteredRegSet.map(
+                        reg -> ExecutionDegree.getByDegreeCurricularPlanAndExecutionYear(
                                 reg.getStudentCurricularPlan(executionSemester).getDegreeCurricularPlan(),
                                 executionSemester.getExecutionYear())).collect(Collectors.toList());
         for (ExecutionDegree execDegree : execDegrees) {

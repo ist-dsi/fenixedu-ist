@@ -77,9 +77,9 @@
 
 <fr:form action="/qucAudit.do?method=searchExecutionCourse">		
 	<fr:edit id="executionCourseSearchBean" name="executionCourseSearchBean">
-		<fr:schema type="org.fenixedu.academic.dto.inquiries.ExecutionCourseQucAuditSearchBean" bundle="APPLICATION_RESOURCES">
+		<fr:schema type="org.fenixedu.academic.dataTransferObject.inquiries.ExecutionCourseQucAuditSearchBean" bundle="APPLICATION_RESOURCES">
 			<fr:slot name="executionPeriod" key="label.executionPeriod" layout="menu-select-postback" validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator">
-				<fr:property name="providerClass" value="org.fenixedu.academic.ui.struts.action.departmentMember.ViewQUCResultsDA$ExecutionSemesterQucProvider"/>
+				<fr:property name="providerClass" value="org.fenixedu.academic.presentationTier.Action.departmentMember.ViewQUCResultsDA$ExecutionSemesterQucProvider"/>
 				<fr:property name="format" value="${semester}º Semestre ${executionYear.year}" />
 			</fr:slot>
 			<fr:slot name="executionDegree" key="label.executionDegree" layout="menu-select">
@@ -100,7 +100,7 @@
 
 <logic:present name="executionCourses">
 	<fr:view name="executionCourses">
-		<fr:schema bundle="APPLICATION_RESOURCES" type="org.fenixedu.academic.domain.ExecutionCourse">
+		<fr:schema bundle="APPLICATION_RESOURCES" type="org.fenixedu.academic.dataTransferObject.inquiries.ExecutionCourseBean">
 			<fr:slot name="departments" key="label.department" layout="flowLayout">
 				<fr:property name="eachSchema" value="show.department"/>
 				<fr:property name="eachLayout" value="values" />
@@ -115,11 +115,11 @@
 			<fr:property name="linkFormat(create)" value="/qucAudit.do?method=prepareSelectPersons&executionCourseOID=${externalId}"/>
 			<fr:property name="key(create)" value="label.create" />
 			<fr:property name="bundle(create)" value="APPLICATION_RESOURCES" />
-			<fr:property name="visibleIfNot(create)" value="hasExecutionCourseAudit" />
+			<fr:property name="visibleIfNot(create)" value="executionCourseUnderAudition" />
 			<fr:property name="linkFormat(view)" value="/qucAudit.do?method=viewProcessDetails&executionCourseAuditOID=${executionCourseAudit.externalId}"/>
 			<fr:property name="key(view)" value="link.inquiry.auditProcess" />
 			<fr:property name="bundle(view)" value="INQUIRIES_RESOURCES" />
-			<fr:property name="visibleIf(view)" value="hasExecutionCourseAudit" />
+			<fr:property name="visibleIf(view)" value="executionCourseUnderAudition" />
 		</fr:layout>
 	</fr:view>
 </logic:present>

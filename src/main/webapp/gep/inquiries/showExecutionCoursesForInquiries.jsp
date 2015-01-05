@@ -53,7 +53,6 @@
 			</fr:edit>
 			<html:submit><bean:message key="button.submit"/></html:submit>
 		</logic:present>
-
 	</fr:form>
 
 	<logic:present name="executionCourses">

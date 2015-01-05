@@ -305,6 +305,7 @@ public class StudentInquiryRegistry extends StudentInquiryRegistry_Base {
         return executionCourse;
     }
 
+    @Atomic
     public static void setSpentTimeInPeriodForInquiry(Student student, List<CurricularCourseInquiriesRegistryDTO> courses,
             Integer weeklySpentHours, ExecutionSemester executionSemester) {
         check(student, RolePredicates.STUDENT_PREDICATE);

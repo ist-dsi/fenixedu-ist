@@ -41,6 +41,7 @@ import org.fenixedu.academic.domain.inquiries.InquiryResult;
 import org.fenixedu.academic.domain.inquiries.InquiryResultType;
 import org.fenixedu.academic.domain.inquiries.ResultsInquiryTemplate;
 import org.fenixedu.academic.domain.inquiries.StudentTeacherInquiryTemplate;
+import org.fenixedu.bennu.portal.servlet.PortalLayoutInjector;
 import org.fenixedu.bennu.struts.annotations.Mapping;
 
 import pt.ist.fenixframework.FenixFramework;
@@ -89,6 +90,7 @@ public class ViewTeacherInquiryPublicResults extends ViewInquiryPublicResults {
 
         setTeacherScaleColorException(executionPeriod, request);
         request.setAttribute("publicContext", true);
+        PortalLayoutInjector.skipLayoutOn(request);
         return new ActionForward(null, "/inquiries/showTeacherInquiryResult_v3.jsp", false, "/teacher");
     }
 

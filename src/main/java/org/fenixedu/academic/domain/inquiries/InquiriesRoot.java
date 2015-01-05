@@ -46,11 +46,9 @@ public final class InquiriesRoot extends InquiriesRoot_Base {
 
     public static boolean isAvailableDegreeTypeForInquiries(Registration registration) {
         final DegreeType degreeType = registration.getDegreeType();
-        return degreeType == DegreeType.BOLONHA_DEGREE
-                || degreeType == DegreeType.BOLONHA_INTEGRATED_MASTER_DEGREE
+        return degreeType == DegreeType.BOLONHA_DEGREE || degreeType == DegreeType.BOLONHA_INTEGRATED_MASTER_DEGREE
                 || degreeType == DegreeType.BOLONHA_MASTER_DEGREE
-                || THIRD_CYCLE_AVAILABLE_INQUIRY_DEGREES
-                        .contains(registration.getDegree().getSigla().toLowerCase());
+                || THIRD_CYCLE_AVAILABLE_INQUIRY_DEGREES.contains(registration.getDegree().getSigla().toLowerCase());
     }
 
     public static boolean isMasterDegreeDFAOnly(ExecutionCourse executionCourse) {
@@ -59,8 +57,8 @@ public final class InquiriesRoot extends InquiriesRoot_Base {
             if (!degreeType.equals(DegreeType.MASTER_DEGREE)
                     && !degreeType.equals(DegreeType.BOLONHA_ADVANCED_FORMATION_DIPLOMA)
                     && !degreeType.equals(DegreeType.BOLONHA_SPECIALIZATION_DEGREE)
-                    && !THIRD_CYCLE_AVAILABLE_INQUIRY_DEGREES.contains(curricularCourse.getDegreeCurricularPlan()
-                            .getDegree().getSigla().toLowerCase())) {
+                    && !THIRD_CYCLE_AVAILABLE_INQUIRY_DEGREES.contains(curricularCourse.getDegreeCurricularPlan().getDegree()
+                            .getSigla().toLowerCase())) {
                 return false;
             }
         }
@@ -74,8 +72,8 @@ public final class InquiriesRoot extends InquiriesRoot_Base {
                     || degreeType.equals(DegreeType.BOLONHA_INTEGRATED_MASTER_DEGREE)) {
                 return true;
             }
-            if (THIRD_CYCLE_AVAILABLE_INQUIRY_DEGREES.contains(curricularCourse.getDegreeCurricularPlan()
-                    .getDegree().getSigla().toLowerCase())) {
+            if (THIRD_CYCLE_AVAILABLE_INQUIRY_DEGREES.contains(curricularCourse.getDegreeCurricularPlan().getDegree().getSigla()
+                    .toLowerCase())) {
                 return true;
             }
         }

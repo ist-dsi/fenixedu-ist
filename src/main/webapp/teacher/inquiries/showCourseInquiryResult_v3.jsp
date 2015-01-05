@@ -37,7 +37,6 @@
 <script type="text/javascript" src="<%= request.getContextPath() %>/javaScript/inquiries/highcharts.js"></script> 
 <script type="text/javascript" src="<%= request.getContextPath() %>/javaScript/inquiries/exporting.js"></script> 
 <script type="text/javascript">var example = 'bar-basic', theme = 'default';</script> 
-<script type="text/javascript" src="<%= request.getContextPath() %>/javaScript/jquery/scripts.js"></script> 
 <script type="text/javascript">Highcharts.theme = { colors: [] }; var highchartsOptions = Highcharts.getOptions();</script> 
 <link href="<%= request.getContextPath() %>/CSS/quc_results.css" rel="stylesheet" media="screen, print" type="text/css" />
  
@@ -54,7 +53,7 @@ page-break-after: always;
 <bean:define id="totalAnswersLabel" name="totalAnswers" property="inquiryQuestion.label"/>
 <bean:define id="totalAnswersNumber" name="totalAnswers" property="questionResult.value"/>
 
-<logic:equal value="true" name="executionCourse" property="availableForInquiries">
+<logic:equal value="true" name="isAvailableForInquiries">
 <bean:define id="answerResultsJS">
 <script type="text/javascript"> 
 var chart;
@@ -115,7 +114,7 @@ jQuery(document).ready(function() {
 				<bean:define id="questionLabel" name="questionResult" property="inquiryQuestion.label"/>				
 				<bean:define id="questionValue" name="questionResult" property="presentationValue"/>	  
 				<logic:notEqual value="0" name="questionValue">          
-	            	<%= "['" + questionLabel.toString() + "', " + questionValue + "],"%>
+	            	<%= "['" + questionLabel.toString().replace("'","\\'") + "', " + questionValue + "],"%>
 	            </logic:notEqual>  	            
             </logic:iterate>
          ]
@@ -233,7 +232,7 @@ jQuery(document).ready(function() {
          categories: [
              <logic:iterate id="questionSummary" name="ucEvaluationsGroupBean" property="questionsResults">
              	<logic:iterate id="category" name="questionSummary" property="inquiryQuestion.inquiryQuestionHeader.scaleHeaders.scale">
-             		<%= "'" + category + "'," %>
+             		<%= "'" + category.toString().replace("'","\\'") + "'," %>
              	</logic:iterate>
              </logic:iterate>
          ]
@@ -290,7 +289,7 @@ jQuery(document).ready(function() {
 </script>
 </bean:define>
 
-<logic:equal value="true" name="executionCourse" property="availableForInquiries">
+<logic:equal value="true" name="isAvailableForInquiries">
 	<bean:write name="answerResultsJS" filter="false"/>
 </logic:equal>
 <bean:write name="workloadJS" filter="false"/>
@@ -377,7 +376,7 @@ jQuery(document).ready(function() {
 				p.nonresponses { margin-bottom: 0; }
 				p.inquiry-available { margin-top: 0;}			
 			</style> 
-			<logic:equal value="true" name="executionCourse" property="availableForInquiries">
+			<logic:equal value="true" name="isAvailableForInquiries">
 				<div class="chart" style="margin-top: 5px;"> 
 					<div id="pie1" class="highcharts-container" style="height: 225px; width: 480px;"></div> 
 				</div>				
@@ -402,10 +401,10 @@ jQuery(document).ready(function() {
 			<p class="inquiry-available">
 				<span>
 					Disponível para inquérito: 
-					<logic:equal value="true" name="executionCourse" property="availableForInquiries">
+					<logic:equal value="true" name="isAvailableForInquiries">
 						Sim
 					</logic:equal>
-					<logic:notEqual value="true" name="executionCourse" property="availableForInquiries">
+					<logic:notEqual value="true" name="isAvailableForInquiries">
 						Não
 					</logic:notEqual>
 				</span>
@@ -449,7 +448,7 @@ jQuery(document).ready(function() {
 	 font-size: 12px;
 	}
 </style>
-<logic:iterate indexId="iter" id="blockResult" name="blockResultsSummaryBeans" type="org.fenixedu.academic.dto.inquiries.BlockResultsSummaryBean">
+<logic:iterate indexId="iter" id="blockResult" name="blockResultsSummaryBeans" type="org.fenixedu.academic.dataTransferObject.inquiries.BlockResultsSummaryBean">
 	<div id="report">
 		<h2>
 			<logic:notEmpty name="blockResult" property="blockResultClassification">
@@ -491,7 +490,7 @@ jQuery(document).ready(function() {
 <logic:notEmpty name="teachersSummaryBeans">
 	<h2><bean:write name="teachersNumber"/>. <bean:message key="title.inquiry.teachingStaff" bundle="INQUIRIES_RESOURCES"/></h2>
 	<table class="graph teacher-results">
-		<logic:iterate id="teacherResult" name="teachersSummaryBeans" type="org.fenixedu.academic.dto.inquiries.TeacherShiftTypeGeneralResultBean">
+		<logic:iterate id="teacherResult" name="teachersSummaryBeans" type="org.fenixedu.academic.dataTransferObject.inquiries.TeacherShiftTypeGeneralResultBean">
 			<bean:define id="colorCode"><%= teacherResult.getInquiryResult().getResultClassification().name().toLowerCase() %></bean:define>
 			<tr>
 				<td><div class="<%= "bar-" + colorCode %>">&nbsp;</div></td>

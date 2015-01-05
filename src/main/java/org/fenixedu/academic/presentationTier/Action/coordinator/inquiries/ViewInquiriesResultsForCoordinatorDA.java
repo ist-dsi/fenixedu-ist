@@ -54,23 +54,30 @@ import org.fenixedu.academic.domain.inquiries.ResultClassification;
 import org.fenixedu.academic.domain.inquiries.ResultPersonCategory;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.academic.presentationTier.Action.publico.ViewTeacherInquiryPublicResults;
+import org.fenixedu.academic.ui.struts.action.coordinator.CoordinatorApplication.CoordinatorManagementApp;
+import org.fenixedu.academic.ui.struts.action.coordinator.CoordinatorDegreeManagement;
 import org.fenixedu.academic.ui.struts.action.coordinator.DegreeCoordinatorIndex;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
+import org.fenixedu.bennu.struts.portal.EntryPoint;
+import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
 
+import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
 import pt.ist.fenixframework.FenixFramework;
 
 /**
  * @author - Shezad Anavarali (shezad@ist.utl.pt)
  *
  */
-
+@StrutsFunctionality(app = CoordinatorManagementApp.class, path = "quc-results", titleKey = "link.coordinator.QUCResults",
+        bundle = "FenixEduQucResources")
 @Mapping(path = "/viewInquiriesResults", module = "coordinator", formBeanClass = ViewInquiriesResultPageDTO.class,
         functionality = DegreeCoordinatorIndex.class)
 @Forwards({ @Forward(name = "curricularUnitSelection", path = "/coordinator/inquiries/curricularUnitSelection.jsp"),
         @Forward(name = "coordinatorUCView", path = "/coordinator/inquiries/coordinatorUCView.jsp"),
         @Forward(name = "coordinatorInquiry", path = "/coordinator/inquiries/coordinatorInquiry.jsp") })
+@Forward(name = "entry-point", path = "/coordinator/inquiries/entryPoint.jsp")
 public class ViewInquiriesResultsForCoordinatorDA extends ViewInquiriesResultsDA {
 
     @Override
@@ -78,6 +85,13 @@ public class ViewInquiriesResultsForCoordinatorDA extends ViewInquiriesResultsDA
             HttpServletResponse response) throws Exception {
         DegreeCoordinatorIndex.setCoordinatorContext(request);
         return super.execute(mapping, actionForm, request, response);
+    }
+
+    @EntryPoint
+    public ActionForward entryPoint(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        request.setAttribute("degrees", CoordinatorDegreeManagement.readCoordinatedDegrees());
+        return mapping.findForward("entry-point");
     }
 
     @Override
@@ -199,13 +213,15 @@ public class ViewInquiriesResultsForCoordinatorDA extends ViewInquiriesResultsDA
 
             InquiryCoordinatorAnswer inquiryCoordinatorAnswer = null;
             if (coordinatorInquiryTemplate.getShared()) {
-                inquiryCoordinatorAnswer = InquiryCoordinatorAnswer.getInquiryCoordinationAnswers(executionDegree, executionSemester);
+                inquiryCoordinatorAnswer =
+                        InquiryCoordinatorAnswer.getInquiryCoordinationAnswers(executionDegree, executionSemester);
             } else {
                 // TODO since in the 1rst semester more than one could fill in
                 // the inquiry, it should show multiples links for each one, it
                 // is only showing one link
                 if (coordinator != null) {
-                    inquiryCoordinatorAnswer = InquiryCoordinatorAnswer.getInquiryCoordinatorAnswer(coordinator, executionSemester);
+                    inquiryCoordinatorAnswer =
+                            InquiryCoordinatorAnswer.getInquiryCoordinatorAnswer(coordinator, executionSemester);
                 }
             }
             if (inquiryCoordinatorAnswer == null
@@ -323,6 +339,36 @@ public class ViewInquiriesResultsForCoordinatorDA extends ViewInquiriesResultsDA
                 .getDegreeCurricularPlan().getExternalId());
         request.setAttribute("degreeCurricularPlanID", coordinatorResultsBean.getExecutionDegree().getDegreeCurricularPlan()
                 .getExternalId().toString());
+
+        DegreeCoordinatorIndex.setCoordinatorContext(request);
+        return selectexecutionSemester(actionMapping, actionForm, request, response);
+    }
+
+    public ActionForward saveInquiry(ActionMapping actionMapping, ActionForm actionForm, HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+
+        final CoordinatorInquiryBean coordinatorInquiryBean = getRenderedObject("coordinatorInquiryBean");
+
+        String validationResult = coordinatorInquiryBean.validateInquiry();
+        if (!Boolean.valueOf(validationResult)) {
+            RenderUtils.invalidateViewState();
+            addActionMessage(request, "error.inquiries.fillInQuestion", validationResult);
+
+            request.setAttribute("coordinatorInquiryBean", coordinatorInquiryBean);
+            request.setAttribute("executionPeriod", coordinatorInquiryBean.getExecutionSemester());
+            request.setAttribute("executionCourse", coordinatorInquiryBean.getCoordinator().getExecutionDegree().getDegree()
+                    .getSigla());
+            return actionMapping.findForward("coordinatorInquiry");
+        }
+
+        RenderUtils.invalidateViewState("coordinatorInquiry");
+        coordinatorInquiryBean.saveInquiry();
+
+        ((ViewInquiriesResultPageDTO) actionForm).setExecutionSemester(coordinatorInquiryBean.getExecutionSemester());
+        ((ViewInquiriesResultPageDTO) actionForm).setDegreeCurricularPlanID(coordinatorInquiryBean.getCoordinator()
+                .getExecutionDegree().getDegreeCurricularPlan().getExternalId());
+        request.setAttribute("degreeCurricularPlanID", coordinatorInquiryBean.getCoordinator().getExecutionDegree()
+                .getDegreeCurricularPlan().getExternalId().toString());
 
         DegreeCoordinatorIndex.setCoordinatorContext(request);
         return selectexecutionSemester(actionMapping, actionForm, request, response);

@@ -49,6 +49,7 @@ import org.fenixedu.academic.domain.inquiries.InquiryResult;
 import org.fenixedu.academic.domain.inquiries.InquiryResultType;
 import org.fenixedu.academic.domain.inquiries.ResultClassification;
 import org.fenixedu.academic.domain.inquiries.ResultsInquiryTemplate;
+import org.fenixedu.bennu.portal.servlet.PortalLayoutInjector;
 import org.fenixedu.bennu.struts.annotations.Mapping;
 
 import pt.ist.fenixframework.FenixFramework;
@@ -151,12 +152,14 @@ public class ViewCourseInquiryPublicResults extends ViewInquiryPublicResults {
 
         request.setAttribute("hasNotRelevantData", hasNotRelevantData);
         request.setAttribute("executionCourse", executionCourse);
+        request.setAttribute("isAvailableForInquiries", InquiriesRoot.isAvailableForInquiry(executionCourse));
         request.setAttribute("executionPeriod", executionPeriod);
         request.setAttribute("executionDegree", executionDegree);
         request.setAttribute("resultsDate", results.iterator().next().getResultDate());
         request.setAttribute("blockResultsSummaryBeans", blockResultsSummaryBeans);
 
         request.setAttribute("publicContext", true);
+        PortalLayoutInjector.skipLayoutOn(request);
         return new ActionForward(null, "/inquiries/showCourseInquiryResult_v3.jsp", false, "/teacher");
     }
 

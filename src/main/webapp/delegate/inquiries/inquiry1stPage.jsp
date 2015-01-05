@@ -32,8 +32,16 @@
 	<tr>
 		<td><bean:message key="label.curricularCourse.name" bundle="INQUIRIES_RESOURCES"/>:</td>
 		<td>
-			<bean:define id="executionCourseLink"><c:out value="${pageContext.request.contextPath}" /><c:out value="${inquiryDTO.executionCourse.site.reversePath}" /></bean:define>	
-			<!-- NO_CHECKSUM --><a href="<%= executionCourseLink %>" target="_blank" title="Ir para p&aacute;gina da UC"><bean:write name="inquiryDTO" property="executionCourse.nome" /></a>	
+			<logic:notEmpty name="inquiryDTO" property="executionCourse.siteUrl">
+				<bean:define id="executionCourseLink" value="inquiryDTO.executionCourse.siteUrl"/>	
+				<!-- NO_CHECKSUM -->
+				<a href="<%= executionCourseLink %>" target="_blank" title="Ir para p&aacute;gina da UC">
+					<bean:write name="inquiryDTO" property="executionCourse.nome" />
+				</a>
+			</logic:notEmpty>
+			<logic:empty>
+				<bean:write name="inquiryDTO" property="executionCourse.nome" />
+			</logic:empty>	
 		</td>
 	</tr>
 	<tr>

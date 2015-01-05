@@ -36,19 +36,19 @@ import pt.ist.fenixedu.delegates.domain.student.Delegate;
 public class DelegateApplication {
 
     @StrutsApplication(bundle = "DelegateResources", path = "consult", titleKey = "label.delegates.consult",
-            accessGroup = "role(DELEGATE)", hint = "Delegate")
+            accessGroup = "delegate", hint = "Delegate")
     public static class DelegateConsultApp {
 
     }
 
     @StrutsApplication(bundle = "DelegateResources", path = "communication", titleKey = "label.delegates.comunication",
-            accessGroup = "role(DELEGATE)", hint = "Delegate")
+            accessGroup = "delegate", hint = "Delegate")
     public static class DelegateMessagingApp {
 
     }
 
     @StrutsApplication(bundle = "DelegateResources", path = "participate", titleKey = "label.participate",
-            accessGroup = "role(DELEGATE)", hint = "Delegate")
+            accessGroup = "delegate", hint = "Delegate")
     public static class DelegateParticipateApp {
 
     }
@@ -64,7 +64,7 @@ public class DelegateApplication {
                 HttpServletResponse response) throws Exception {
             User user = Authenticate.getUser();
             if (user != null) {
-                Delegate function = user.getDelegatesSet().stream().findFirst().filter(d -> d.isActive()).get();
+                Delegate function = user.getDelegatesSet().stream().filter(d -> d.isActive()).findFirst().get();
                 if (function != null) {
                     return new ActionForward("/evaluationsForDelegates.faces?degreeID=" + function.getDegree().getExternalId());
                 }
