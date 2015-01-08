@@ -50,12 +50,12 @@ public class DelegateGroup extends CustomGroup {
         return new DelegateGroup(degree, null);
     }
 
-    public static DelegateGroup get(boolean yearDelegate) {
-        return new DelegateGroup(null, yearDelegate ? yearDelegate : null);
+    public static DelegateGroup get(Boolean yearDelegate) {
+        return new DelegateGroup(null, (yearDelegate == null || yearDelegate == false) ? null : yearDelegate);
     }
 
-    public static DelegateGroup get(Degree degree, boolean yearDelegate) {
-        return new DelegateGroup(degree, yearDelegate ? yearDelegate : null);
+    public static DelegateGroup get(Degree degree, Boolean yearDelegate) {
+        return new DelegateGroup(degree, (yearDelegate == null || yearDelegate == false) ? null : yearDelegate);
     }
 
     @Override
