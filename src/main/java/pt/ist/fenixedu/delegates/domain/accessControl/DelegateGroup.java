@@ -61,17 +61,17 @@ public class DelegateGroup extends CustomGroup {
     @Override
     public String getPresentationName() {
         if (yearDelegate != null && degree != null) {
-            return BundleUtil.getString("resources.FenixEduDelegateResources", "label.name.DelegateGroup.yearDelegateOfDegree",
+            return BundleUtil.getString("resources.FenixEduDelegatesResources", "label.name.DelegateGroup.yearDelegateOfDegree",
                     degree.getPresentationName());
         }
         if (yearDelegate != null) {
-            return BundleUtil.getString("resources.FenixEduDelegateResources", "label.name.DelegateGroup.yearDelegate");
+            return BundleUtil.getString("resources.FenixEduDelegatesResources", "label.name.DelegateGroup.yearDelegate");
         }
         if (degree != null) {
-            return BundleUtil.getString("resources.FenixEduDelegateResources", "label.name.DelegateGroup.degreeDelegate",
+            return BundleUtil.getString("resources.FenixEduDelegatesResources", "label.name.DelegateGroup.degreeDelegate",
                     degree.getPresentationName());
         }
-        return BundleUtil.getString("resources.FenixEduDelegateResources", "label.name.DelegateGroup");
+        return BundleUtil.getString("resources.FenixEduDelegatesResources", "label.name.DelegateGroup");
     }
 
     public String getPresentationNameBundle() {
