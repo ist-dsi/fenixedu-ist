@@ -45,19 +45,26 @@
         <dependency>
             <groupId>org.fenixedu</groupId>
             <artifactId>fenixedu-academic</artifactId>
-            <version>4.0.1</version>
+            <version>4.0.2</version>
         </dependency>
         <dependency>
             <groupId>pt.ist</groupId>
             <artifactId>fenixedu-ist-delegates</artifactId>
-            <version>4.0.0-SNAPSHOT</version>
+            <version>4.0.0</version>
         </dependency>
         <dependency>
             <groupId>pt.ist</groupId>
             <artifactId>fenixedu-ist-teacher-credits</artifactId>
-            <version>4.0.0-SNAPSHOT</version>
+            <version>4.0.0.RC1</version>
         </dependency>
     </dependencies>
+
+    <distributionManagement>
+        <repository>
+            <id>fenixedu-contrib-releases</id>
+            <url>https://repo.fenixedu.org/fenixedu-contrib-releases</url>
+        </repository>
+    </distributionManagement>
 
     <repositories>
         <repository>
