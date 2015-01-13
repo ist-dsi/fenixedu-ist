@@ -21,6 +21,7 @@ package org.fenixedu.academic.ui.struts.action.vigilancy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -107,6 +108,12 @@ public class VigilantManagement extends FenixDispatchAction {
         WrittenEvaluation writtenEvaluation = getDomainObject(request, "writtenEvaluationId");
 
         request.setAttribute("writtenEvaluation", writtenEvaluation);
+        request.setAttribute("ownVigilancies",
+                writtenEvaluation.getVigilanciesSet().stream().filter(v -> v.isOwnCourseVigilancy()).collect(Collectors.toSet()));
+        request.setAttribute("otherVigilancies",
+                writtenEvaluation.getVigilanciesSet().stream().filter(v -> v.isOtherCourseVigilancy())
+                        .collect(Collectors.toSet()));
+
         return mapping.findForward("showReport");
     }
 

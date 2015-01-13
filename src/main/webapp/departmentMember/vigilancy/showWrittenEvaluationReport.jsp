@@ -48,7 +48,7 @@
 	</logic:empty>
 </p>
 
-<logic:notEmpty name="writtenEvaluation" property="teachersVigilancies">
+<logic:notEmpty name="ownVigilancies">
 <strong><bean:message key="label.vigilancy.vigilantsThatTeachCourse" bundle="VIGILANCY_RESOURCES"/>:</strong><br/>
 <table class="tstyle1">
 	<tr>
@@ -59,9 +59,7 @@
 		<th><bean:message key="label.vigilancy.attended" bundle="VIGILANCY_RESOURCES"/></th>
 		<th><bean:message key="label.vigilancy.points" bundle="VIGILANCY_RESOURCES"/></th>
 	</tr>
-	<logic:iterate id="vigilancy" name="writtenEvaluation" property="teachersVigilancies" type="org.fenixedu.academic.domain.vigilancy.Vigilancy">
-	<bean:define id="vigilancy" name="vigilancy" type="org.fenixedu.academic.domain.vigilancy.Vigilancy"/>
-		
+	<logic:iterate id="vigilancy" name="ownVigilancies" type="org.fenixedu.academic.domain.vigilancy.Vigilancy">
 	<tr class="<%= !vigilancy.isActive() ? "color888" : ""%>">
 		<td><fr:view name="vigilancy" property="vigilantWrapper.teacherCategoryCode"/></td>
 			<td><fr:view name="vigilancy" property="vigilantWrapper.person.username"/></td>
@@ -74,7 +72,7 @@
 </table>
 </logic:notEmpty>
 
-<logic:notEmpty name="writtenEvaluation" property="othersVigilancies">
+<logic:notEmpty name="otherVigilancies">
 <strong><bean:message key="label.vigilancy.vigilants" bundle="VIGILANCY_RESOURCES"/>:</strong><br/>
 <table class="tstyle1">
 	<tr>
@@ -87,10 +85,7 @@
 		<th><bean:message key="label.vigilancy.points" bundle="VIGILANCY_RESOURCES"/></th>
 
 	</tr>
-<logic:iterate id="vigilancy" name="writtenEvaluation" property="othersVigilancies" type="org.fenixedu.academic.domain.vigilancy.Vigilancy">
-		
-	<bean:define id="vigilancy" name="vigilancy" type="org.fenixedu.academic.domain.vigilancy.Vigilancy"/>
-		
+    <logic:iterate id="vigilancy" name="otherVigilancies" type="org.fenixedu.academic.domain.vigilancy.Vigilancy">
 	<tr class="<%= !vigilancy.isActive() ? "color888" : ""%>">
 		<td><fr:view name="vigilancy" property="vigilantWrapper.teacherCategoryCode"/></td>
 			<td><fr:view name="vigilancy" property="vigilantWrapper.person.username"/></td>
@@ -100,6 +95,6 @@
 			<td class="acenter"><fr:view name="vigilancy" property="attended"/></td>
 			<td class="acenter"><fr:view name="vigilancy" property="points"/></td>
 	</tr>
-</logic:iterate>
+    </logic:iterate>
 </table>
 </logic:notEmpty>

@@ -78,7 +78,9 @@ white-space: nowrap;
 </logic:present>
 
 <logic:notPresent name="bean" property="selectedVigilantGroup">
-	<fr:view name="LOGGED_USER_ATTRIBUTE" property="person.currentExamCoordinator.vigilantGroups">
+    <bean:define id="loggedUser" name="LOGGED_USER_ATTRIBUTE" />
+    <bean:define id="currentExamCoordinator" value="${org.fenixedu.academic.domain.vigilancy.ExamCoordinator.getCurrentExamCoordinator(loggedUser.getPerson())}"/>
+	<fr:view name="currentExamCoordinator">
 			<fr:layout name="flowLayout">
 				<fr:property name="htmlSeparator" value=","/>
 				<fr:property name="eachLayout" value="values"/>

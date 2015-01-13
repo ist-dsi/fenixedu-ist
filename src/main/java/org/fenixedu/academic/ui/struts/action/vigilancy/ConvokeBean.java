@@ -21,6 +21,7 @@ package org.fenixedu.academic.ui.struts.action.vigilancy;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.ExecutionCourse;
@@ -28,6 +29,7 @@ import org.fenixedu.academic.domain.WrittenEvaluation;
 import org.fenixedu.academic.domain.vigilancy.Vigilancy;
 import org.fenixedu.academic.domain.vigilancy.VigilantWrapper;
 import org.fenixedu.academic.domain.vigilancy.strategies.UnavailableInformation;
+
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
 
 import com.google.common.base.Joiner;
@@ -187,6 +189,13 @@ public class ConvokeBean extends VigilantGroupBean implements Serializable {
                 this.selectedUnavailableVigilants.add(vigilant);
             }
         }
+    }
+
+    public Set<Vigilancy> getVigilancies(WrittenEvaluation evaluation) {
+        if (isShowNotActiveConvokes()) {
+            return evaluation.getVigilanciesSet();
+        }
+        return evaluation.getVigilanciesSet().stream().filter(v -> v.isActive()).collect(Collectors.toSet());
     }
 
     public String getVigilantsAsString() {

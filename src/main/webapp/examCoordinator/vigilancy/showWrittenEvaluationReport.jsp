@@ -67,7 +67,7 @@
 	}
 </script>
 
-<logic:notEmpty name="writtenEvaluation" property="teachersVigilancies">
+<logic:notEmpty name="ownVigilancies">
 <strong><bean:message key="label.vigilancy.vigilantsThatTeachCourse" bundle="VIGILANCY_RESOURCES"/>:</strong><br/>
 
 
@@ -95,7 +95,7 @@
 		<th><bean:message key="label.vigilancy.dismissed" bundle="VIGILANCY_RESOURCES"/></th>
 	</tr>
 
-	<logic:iterate id="vigilancy"  name="writtenEvaluation" property="teachersVigilancies" type="org.fenixedu.academic.domain.vigilancy.Vigilancy">
+	<logic:iterate id="vigilancy"  name="ownVigilancies" type="org.fenixedu.academic.domain.vigilancy.Vigilancy">
 	<logic:equal name="permission" value="true">
 	<tr class="<%= !vigilancy.isActive() ? "color888" : ""%>">
 		<td><fr:view name="vigilancy" property="vigilantWrapper.teacherCategoryCode"/></td>
@@ -209,7 +209,7 @@
 </form>
 </logic:notEmpty>
 
-<logic:notEmpty name="writtenEvaluation" property="othersVigilancies">
+<logic:notEmpty name="otherVigilancies">
 <strong><bean:message key="label.vigilancy.vigilants" bundle="VIGILANCY_RESOURCES"/>:</strong><br/>
 
 <form id="convokeForm2" action="<%= request.getContextPath() + "/examCoordination/vigilancy/convokeManagement.do"%>" method="post">
@@ -237,9 +237,7 @@
 		<th><bean:message key="label.vigilancy.dismissed" bundle="VIGILANCY_RESOURCES"/></th>
 	</tr>
 
-	<logic:iterate id="vigilancy"  name="writtenEvaluation" property="othersVigilancies" type="org.fenixedu.academic.domain.vigilancy.Vigilancy">
-	
-	<bean:define id="vigilancy" name="vigilancy" type="org.fenixedu.academic.domain.vigilancy.Vigilancy"/>
+	<logic:iterate id="vigilancy"  name="otherVigilancies" type="org.fenixedu.academic.domain.vigilancy.Vigilancy">
 	<logic:equal name="permission" value="true">
 	<tr class="<%= !vigilancy.isActive() ? "color888" : ""%>">
 		<td><fr:view name="vigilancy" property="vigilantWrapper.teacherCategoryCode"/></td>

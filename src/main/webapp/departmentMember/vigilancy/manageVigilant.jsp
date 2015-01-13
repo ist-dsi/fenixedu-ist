@@ -34,7 +34,7 @@
 			<logic:equal name="bean" property="executionYear.current"
 				value="true">
 				<logic:equal name="vigilant"
-					property="person.allowedToSpecifyUnavailablePeriod" value="true">
+					property="allowedToSpecifyUnavailablePeriod" value="true">
 					<bean:define id="externalId" name="vigilant" property="externalId" />
 					<logic:present name="bean" property="selectedVigilantGroup.externalId">
 						<bean:define id="groupId" name="bean" property="selectedVigilantGroup.externalId"/>
@@ -161,7 +161,7 @@
 		</logic:messagesPresent>
 		<logic:notEmpty name="vigilant" property="unavailablePeriods">
 			<logic:equal name="vigilant"
-				property="person.allowedToSpecifyUnavailablePeriod" value="true">
+				property="allowedToSpecifyUnavailablePeriod" value="true">
 				<fr:view name="vigilant" property="unavailablePeriods"
 					schema="unavailableShow">
 					<fr:layout name="tabular">
@@ -181,7 +181,7 @@
 			</logic:equal>
 
 			<logic:equal name="vigilant"
-				property="person.allowedToSpecifyUnavailablePeriod" value="false">
+				property="allowedToSpecifyUnavailablePeriod" value="false">
 
 				<fr:view name="vigilant" property="unavailablePeriods"
 					schema="unavailableShow">

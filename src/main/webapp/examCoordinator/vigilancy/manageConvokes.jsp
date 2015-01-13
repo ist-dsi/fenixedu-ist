@@ -24,6 +24,7 @@
 <%@ taglib uri="http://struts.apache.org/tags-logic" prefix="logic"%>
 <%@ taglib uri="http://jakarta.apache.org/taglibs/datetime-1.0" prefix="date"%>
 <%@ taglib uri="http://fenix-ashes.ist.utl.pt/fenix-renderers" prefix="fr" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <h2><bean:message bundle="VIGILANCY_RESOURCES" key="label.manage"/> <bean:message bundle="VIGILANCY_RESOURCES" key="label.vigilancy.convokes"/></h2>
 
@@ -169,7 +170,8 @@
 				</logic:iterate>
 				<bean:define id="bean" name="bean" type="org.fenixedu.academic.ui.struts.action.vigilancy.ConvokeBean"/>
 				
-				<logic:notEmpty name="evaluation" property="<%= bean.isShowNotActiveConvokes() ? "vigilancies" :  "allActiveVigilancies"%>">
+				<c:set var="vigilancies" value="${bean.getVigilancies(evaluation)}" />
+				<logic:notEmpty name="vigilancies">
 
 				<table class="tstyle1 tdtop thleft mtop05 mbottom0">
 					<tr>
@@ -213,8 +215,7 @@
 						<th>
 						</th>
 					</tr>
-					<logic:iterate id="vigilancy" name="evaluation" property="<%= bean.isShowNotActiveConvokes() ? "vigilancies" :  "allActiveVigilancies"%>" type="org.fenixedu.academic.domain.vigilancy.Vigilancy">
-						<bean:define id="vigilancy" name="vigilancy" type="org.fenixedu.academic.domain.vigilancy.Vigilancy"/>
+					<logic:iterate id="vigilancy" name="vigilancies" type="org.fenixedu.academic.domain.vigilancy.Vigilancy">
 						
 						<tr class="<%= vigilancy.isOtherCourseVigilancy() ? (!vigilancy.isActive() ? "color888" : "") : "color007b4d"%>">
 							<td><fr:view name="vigilancy" property="vigilantWrapper.teacherCategoryCode"/>
@@ -228,8 +229,10 @@
 								</td>
 							</logic:equal>
 							<logic:equal name="bean" property="showIncompatibilities" value="true">
+							 <logic:present name="vigilancy" property="vigilantWrapper.person.incompatibleVigilant">
 								<td><fr:view name="vigilancy" property="vigilantWrapper.person.incompatibleVigilant.name" type="java.lang.String"/>
 								</td>
+						     </logic:present>
 							</logic:equal>
 							<logic:equal name="bean" property="showBoundsJustification" value="true">
 								<td><fr:view name="vigilancy" property="vigilantWrapper.boundsAsString"/>
