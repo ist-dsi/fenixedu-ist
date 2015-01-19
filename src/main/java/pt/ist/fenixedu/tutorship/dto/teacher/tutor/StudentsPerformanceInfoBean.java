@@ -31,9 +31,9 @@ import org.fenixedu.academic.domain.student.Student;
 import pt.ist.fenixedu.tutorship.domain.Tutorship;
 import pt.ist.fenixedu.tutorship.ui.renderers.providers.TeacherDepartmentDegreesProvider;
 import pt.ist.fenixedu.tutorship.ui.renderers.providers.TutorshipEntryExecutionYearProvider;
-import pt.ist.fenixedu.tutorship.ui.renderers.providers.TutorshipMonitoringExecutionYearProvider;
 import pt.ist.fenixedu.tutorship.ui.renderers.providers.TutorshipEntryExecutionYearProvider.TutorshipEntryExecutionYearProviderByTeacher;
 import pt.ist.fenixedu.tutorship.ui.renderers.providers.TutorshipEntryExecutionYearProvider.TutorshipEntryExecutionYearProviderForSingleStudent;
+import pt.ist.fenixedu.tutorship.ui.renderers.providers.TutorshipMonitoringExecutionYearProvider;
 
 public class StudentsPerformanceInfoBean implements Serializable {
     private static final long serialVersionUID = 1L;

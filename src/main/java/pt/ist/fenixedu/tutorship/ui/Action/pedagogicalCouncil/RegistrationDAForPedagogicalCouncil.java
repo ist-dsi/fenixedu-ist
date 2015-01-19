@@ -19,7 +19,6 @@
 package pt.ist.fenixedu.tutorship.ui.Action.pedagogicalCouncil;
 
 import org.fenixedu.academic.ui.struts.action.administrativeOffice.student.RegistrationDA;
-
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;

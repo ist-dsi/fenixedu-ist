@@ -31,6 +31,7 @@ import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.util.Month;
+
 import pt.ist.fenixframework.FenixFramework;
 
 public class StudentsByEntryYearBean implements Serializable {
