@@ -20,7 +20,6 @@ package org.fenixedu.academic.domain.vigilancy;
 
 import org.fenixedu.academic.domain.WrittenEvaluation;
 import org.fenixedu.academic.domain.exceptions.DomainException;
-
 import org.joda.time.DateTime;
 
 public class OtherCourseVigilancy extends OtherCourseVigilancy_Base {

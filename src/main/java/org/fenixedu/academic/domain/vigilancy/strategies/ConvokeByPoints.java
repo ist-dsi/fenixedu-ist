@@ -25,14 +25,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.collections.comparators.ComparatorChain;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.WrittenEvaluation;
 import org.fenixedu.academic.domain.vigilancy.UnavailableTypes;
 import org.fenixedu.academic.domain.vigilancy.Vigilancy;
 import org.fenixedu.academic.domain.vigilancy.VigilantWrapper;
-
-import org.apache.commons.collections.comparators.ComparatorChain;
 
 public class ConvokeByPoints extends Strategy {
 

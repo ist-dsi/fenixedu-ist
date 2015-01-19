@@ -20,6 +20,7 @@ package org.fenixedu.academic.service;
 
 import org.fenixedu.academic.domain.vigilancy.Vigilancy;
 import org.fenixedu.academic.domain.vigilancy.VigilantWrapper;
+
 import pt.ist.fenixframework.Atomic;
 
 public class RemoveIncompatiblePerson {

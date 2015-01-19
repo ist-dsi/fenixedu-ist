@@ -21,7 +21,6 @@ package org.fenixedu.academic.service;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.vigilancy.VigilantGroup;
-
 import org.joda.time.DateTime;
 
 import pt.ist.fenixframework.Atomic;

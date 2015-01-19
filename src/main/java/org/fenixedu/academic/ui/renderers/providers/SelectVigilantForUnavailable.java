@@ -22,11 +22,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.beanutils.BeanComparator;
 import org.fenixedu.academic.domain.vigilancy.VigilantGroup;
 import org.fenixedu.academic.domain.vigilancy.VigilantWrapper;
 import org.fenixedu.academic.ui.struts.action.vigilancy.UnavailablePeriodBean;
-
-import org.apache.commons.beanutils.BeanComparator;
 
 import pt.ist.fenixWebFramework.rendererExtensions.converters.DomainObjectKeyConverter;
 import pt.ist.fenixWebFramework.renderers.DataProvider;

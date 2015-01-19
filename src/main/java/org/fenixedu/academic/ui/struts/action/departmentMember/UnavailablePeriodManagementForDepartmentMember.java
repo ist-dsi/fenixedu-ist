@@ -19,7 +19,6 @@
 package org.fenixedu.academic.ui.struts.action.departmentMember;
 
 import org.fenixedu.academic.ui.struts.action.vigilancy.UnavailablePeriodManagement;
-
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;

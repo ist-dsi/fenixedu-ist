@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.fenixedu.academic.ui.struts.action.vigilancy.InformationTypeToDisplay;
+
 import pt.ist.fenixWebFramework.renderers.DataProvider;
 import pt.ist.fenixWebFramework.renderers.components.converters.Converter;
 

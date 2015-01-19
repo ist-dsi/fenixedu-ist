@@ -8,8 +8,6 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
-import org.fenixedu.academic.service.services.manager.MergeExecutionCourses;
-import org.fenixedu.academic.service.services.resourceAllocationManager.exams.EditWrittenEvaluation.EditWrittenEvaluationEvent;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.WrittenEvaluation;
@@ -20,8 +18,9 @@ import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.academic.domain.util.email.Sender;
 import org.fenixedu.academic.domain.vigilancy.Vigilancy;
 import org.fenixedu.academic.domain.vigilancy.VigilantGroup;
+import org.fenixedu.academic.service.services.manager.MergeExecutionCourses;
+import org.fenixedu.academic.service.services.resourceAllocationManager.exams.EditWrittenEvaluation.EditWrittenEvaluationEvent;
 import org.fenixedu.academic.util.Bundle;
-
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;

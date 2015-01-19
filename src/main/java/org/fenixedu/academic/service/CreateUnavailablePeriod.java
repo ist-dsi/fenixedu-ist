@@ -28,7 +28,6 @@ import org.fenixedu.academic.domain.util.email.Message;
 import org.fenixedu.academic.domain.util.email.Sender;
 import org.fenixedu.academic.domain.vigilancy.UnavailablePeriod;
 import org.fenixedu.academic.domain.vigilancy.VigilantGroup;
-
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
@@ -62,8 +61,8 @@ public class CreateUnavailablePeriod {
                             + String.format("%02d", end.getHourOfDay()) + ":" + String.format("%02d", end.getMinuteOfHour())
                             + "h";;
             String message =
-                    BundleUtil.getString("resources.VigilancyResources", "email.convoke.unavailablePeriod", new String[] { person.getName(),
-                            beginDate, endDate, justification });
+                    BundleUtil.getString("resources.VigilancyResources", "email.convoke.unavailablePeriod",
+                            new String[] { person.getName(), beginDate, endDate, justification });
 
             String subject =
                     BundleUtil.getString("resources.VigilancyResources", "email.convoke.unavailablePeriod.subject",

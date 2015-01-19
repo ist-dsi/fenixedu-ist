@@ -23,6 +23,7 @@ import java.util.Collection;
 import org.fenixedu.academic.domain.vigilancy.ExamCoordinator;
 import org.fenixedu.academic.domain.vigilancy.VigilantGroup;
 import org.fenixedu.academic.ui.struts.action.vigilancy.VigilantGroupBean;
+
 import pt.ist.fenixWebFramework.rendererExtensions.converters.DomainObjectKeyArrayConverter;
 import pt.ist.fenixWebFramework.renderers.DataProvider;
 import pt.ist.fenixWebFramework.renderers.components.converters.Converter;

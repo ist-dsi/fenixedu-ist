@@ -33,7 +33,6 @@ import org.fenixedu.academic.domain.vigilancy.ExamCoordinator;
 import org.fenixedu.academic.domain.vigilancy.Vigilancy;
 import org.fenixedu.academic.domain.vigilancy.VigilantGroup;
 import org.fenixedu.academic.util.Bundle;
-
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
 
@@ -95,8 +94,8 @@ public class ChangeConvokeActive {
                 "email.convoke.active.body",
                 new String[] {
                         convoke.getVigilantWrapper().getPerson().getName(),
-                        (bool) ? BundleUtil.getString("resources.VigilancyResources", "email.convoke.convokedAgain") : BundleUtil.getString(
-                                "resources.VigilancyResources", "email.convoke.uncovoked"), writtenEvaluation.getFullName(), date,
-                        writtenEvaluation.getBeginningDateHourMinuteSecond().toString() });
+                        (bool) ? BundleUtil.getString("resources.VigilancyResources", "email.convoke.convokedAgain") : BundleUtil
+                                .getString("resources.VigilancyResources", "email.convoke.uncovoked"),
+                        writtenEvaluation.getFullName(), date, writtenEvaluation.getBeginningDateHourMinuteSecond().toString() });
     }
 }

@@ -19,7 +19,6 @@
 package org.fenixedu.academic.domain.accessControl.arguments;
 
 import org.fenixedu.academic.domain.vigilancy.Vigilancy;
-
 import org.fenixedu.bennu.core.annotation.GroupArgumentParser;
 
 @GroupArgumentParser

@@ -29,7 +29,6 @@ import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.WrittenEvaluation;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
-
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.joda.time.DateTime;
 

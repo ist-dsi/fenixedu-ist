@@ -24,6 +24,7 @@ import java.util.List;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.vigilancy.VigilantGroup;
+
 import pt.ist.fenixframework.Atomic;
 
 public class AddExecutionCourseToGroup {

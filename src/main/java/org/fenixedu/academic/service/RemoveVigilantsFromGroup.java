@@ -26,6 +26,7 @@ import java.util.Set;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.vigilancy.VigilantGroup;
 import org.fenixedu.academic.domain.vigilancy.VigilantWrapper;
+
 import pt.ist.fenixframework.Atomic;
 
 public class RemoveVigilantsFromGroup {

@@ -19,6 +19,7 @@
 package org.fenixedu.academic.service;
 
 import org.fenixedu.academic.domain.vigilancy.UnavailablePeriod;
+
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
 

@@ -23,7 +23,6 @@ import java.util.Set;
 
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.vigilancy.Vigilancy;
-
 import org.fenixedu.bennu.core.annotation.GroupArgument;
 import org.fenixedu.bennu.core.annotation.GroupOperator;
 import org.fenixedu.bennu.core.domain.User;

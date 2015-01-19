@@ -19,7 +19,6 @@
 package org.fenixedu.academic.domain.vigilancy;
 
 import org.fenixedu.academic.domain.WrittenEvaluation;
-
 import org.joda.time.DateTime;
 
 public class OwnCourseVigilancy extends OwnCourseVigilancy_Base {

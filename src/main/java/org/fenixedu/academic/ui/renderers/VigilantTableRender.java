@@ -25,12 +25,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.collections.comparators.ComparatorChain;
 import org.fenixedu.academic.domain.vigilancy.AttendingStatus;
 import org.fenixedu.academic.domain.vigilancy.Vigilancy;
 import org.fenixedu.academic.domain.vigilancy.VigilantGroup;
 import org.fenixedu.academic.domain.vigilancy.VigilantWrapper;
-
-import org.apache.commons.collections.comparators.ComparatorChain;
 
 import pt.ist.fenixWebFramework.renderers.OutputRenderer;
 import pt.ist.fenixWebFramework.renderers.components.HtmlBlockContainer;

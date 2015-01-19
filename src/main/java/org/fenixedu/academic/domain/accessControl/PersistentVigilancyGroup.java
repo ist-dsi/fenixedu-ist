@@ -21,7 +21,6 @@ package org.fenixedu.academic.domain.accessControl;
 import java.util.Optional;
 
 import org.fenixedu.academic.domain.vigilancy.Vigilancy;
-
 import org.fenixedu.bennu.core.groups.Group;
 
 public class PersistentVigilancyGroup extends PersistentVigilancyGroup_Base {

@@ -34,6 +34,7 @@ import org.fenixedu.academic.domain.organizationalStructure.DepartmentUnit;
 import org.fenixedu.academic.domain.organizationalStructure.ScientificAreaUnit;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.ui.struts.action.vigilancy.VigilancyCourseGroupBean;
+
 import pt.ist.fenixWebFramework.rendererExtensions.converters.DomainObjectKeyArrayConverter;
 import pt.ist.fenixWebFramework.renderers.DataProvider;
 import pt.ist.fenixWebFramework.renderers.components.converters.Converter;

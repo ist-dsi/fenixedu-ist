@@ -27,7 +27,6 @@ import org.fenixedu.academic.domain.vigilancy.ExamCoordinator;
 import org.fenixedu.academic.domain.vigilancy.UnavailablePeriod;
 import org.fenixedu.academic.domain.vigilancy.VigilantGroup;
 import org.fenixedu.academic.domain.vigilancy.VigilantWrapper;
-
 import org.joda.time.DateTime;
 
 public class UnavailablePeriodBean implements Serializable {

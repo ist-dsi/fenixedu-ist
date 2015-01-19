@@ -19,7 +19,6 @@
 package org.fenixedu.academic.service;
 
 import org.fenixedu.academic.domain.vigilancy.UnavailablePeriod;
-
 import org.joda.time.DateTime;
 
 import pt.ist.fenixframework.Atomic;

@@ -21,11 +21,10 @@ package org.fenixedu.academic.ui.renderers.providers;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.beanutils.BeanComparator;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.vigilancy.ExamCoordinator;
 import org.fenixedu.academic.ui.struts.action.vigilancy.ConvokeBean;
-
-import org.apache.commons.beanutils.BeanComparator;
 
 import pt.ist.fenixWebFramework.rendererExtensions.converters.DomainObjectKeyConverter;
 import pt.ist.fenixWebFramework.renderers.DataProvider;

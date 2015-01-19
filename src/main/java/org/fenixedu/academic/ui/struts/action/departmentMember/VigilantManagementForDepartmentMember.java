@@ -20,7 +20,6 @@ package org.fenixedu.academic.ui.struts.action.departmentMember;
 
 import org.fenixedu.academic.ui.struts.action.departmentMember.DepartmentMemberApp.DepartmentMemberDepartmentApp;
 import org.fenixedu.academic.ui.struts.action.vigilancy.VigilantManagement;
-
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;

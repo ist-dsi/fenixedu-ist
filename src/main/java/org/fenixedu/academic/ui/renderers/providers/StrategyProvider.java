@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Set;
 
 import org.fenixedu.academic.domain.vigilancy.strategies.StrategyFactory;
+
 import pt.ist.fenixWebFramework.renderers.DataProvider;
 import pt.ist.fenixWebFramework.renderers.components.converters.Converter;
 

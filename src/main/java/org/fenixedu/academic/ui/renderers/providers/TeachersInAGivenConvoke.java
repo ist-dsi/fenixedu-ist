@@ -19,6 +19,7 @@
 package org.fenixedu.academic.ui.renderers.providers;
 
 import org.fenixedu.academic.ui.struts.action.vigilancy.ConvokeBean;
+
 import pt.ist.fenixWebFramework.rendererExtensions.converters.DomainObjectKeyArrayConverter;
 import pt.ist.fenixWebFramework.renderers.DataProvider;
 import pt.ist.fenixWebFramework.renderers.components.converters.Converter;

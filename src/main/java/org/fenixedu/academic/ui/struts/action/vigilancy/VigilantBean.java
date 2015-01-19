@@ -28,7 +28,6 @@ import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.vigilancy.Vigilancy;
 import org.fenixedu.academic.domain.vigilancy.VigilantGroup;
-
 import org.fenixedu.bennu.core.security.Authenticate;
 
 public class VigilantBean implements Serializable {

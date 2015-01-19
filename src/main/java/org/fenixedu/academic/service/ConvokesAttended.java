@@ -19,6 +19,7 @@
 package org.fenixedu.academic.service;
 
 import org.fenixedu.academic.domain.vigilancy.Vigilancy;
+
 import pt.ist.fenixframework.Atomic;
 
 public class ConvokesAttended {
