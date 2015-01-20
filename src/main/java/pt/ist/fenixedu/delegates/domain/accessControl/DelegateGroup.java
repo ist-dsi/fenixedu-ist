@@ -104,7 +104,7 @@ public class DelegateGroup extends CustomGroup {
 
     @Override
     public boolean isMember(User user, DateTime when) {
-        return filterMatches(user.getDelegatesSet().stream(), when).findAny().isPresent();
+        return user != null && filterMatches(user.getDelegatesSet().stream(), when).findAny().isPresent();
     }
 
     private Stream<Delegate> filterMatches(Stream<Delegate> stream, DateTime when) {
