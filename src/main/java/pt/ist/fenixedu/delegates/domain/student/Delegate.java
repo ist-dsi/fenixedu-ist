@@ -3,6 +3,8 @@ package pt.ist.fenixedu.delegates.domain.student;
 import java.util.List;
 
 import org.fenixedu.academic.domain.CurricularCourse;
+import org.fenixedu.academic.domain.CurricularYear;
+import org.fenixedu.academic.domain.degreeStructure.CycleType;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.joda.time.DateTime;
@@ -46,5 +48,13 @@ public abstract class Delegate extends Delegate_Base {
 
     public Registration getRegistration() {
         return getUser().getPerson().getStudent().getActiveRegistrationFor(getDegree());
+    }
+
+    public CurricularYear getCurricularYear() {
+        return null;
+    }
+
+    public CycleType getCycleType() {
+        return null;
     }
 }

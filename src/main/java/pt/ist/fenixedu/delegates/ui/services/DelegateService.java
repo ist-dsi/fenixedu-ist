@@ -5,14 +5,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.CurricularCourse;
+import org.fenixedu.academic.domain.CurricularYear;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.DegreeModuleScope;
 import org.fenixedu.academic.domain.EmptyDegree;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.degree.DegreeType;
+import org.fenixedu.academic.domain.degreeStructure.CycleType;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.joda.time.DateTime;
@@ -23,8 +26,10 @@ import pt.ist.fenixedu.delegates.domain.student.Delegate;
 import pt.ist.fenixedu.delegates.domain.student.YearDelegate;
 import pt.ist.fenixedu.delegates.ui.DelegateBean;
 import pt.ist.fenixedu.delegates.ui.DelegateCurricularCourseBean;
+import pt.ist.fenixedu.delegates.ui.DelegatePositionBean;
 import pt.ist.fenixedu.delegates.ui.DelegateSearchBean;
 import pt.ist.fenixedu.delegates.ui.DelegateStudentSelectBean;
+import pt.ist.fenixframework.Atomic;
 
 @Service
 public class DelegateService {
@@ -85,6 +90,12 @@ public class DelegateService {
         withDuplicates.removeAll(toRemove);
 
         return withDuplicates.stream().map(p -> p.getBean()).collect(Collectors.toList());
+    }
+
+    public List<DelegateBean> searchDelegates(DelegateSearchBean delegateSearchBean, DateTime when) {
+        List<Delegate> toRemove = new ArrayList<Delegate>();
+        Stream<Delegate> delegateStream = delegateSearchBean.getDegree().getDelegateSet().stream();
+        return delegateStream.filter(d -> d.isActive(when)).map(d -> d.getBean()).collect(Collectors.toList());
     }
 
     public List<DelegateCurricularCourseBean> getCurricularCourses(Delegate delegate) {
@@ -157,5 +168,44 @@ public class DelegateService {
             }
         }
         return new ArrayList<User>();
+    }
+
+    @Atomic
+    public void terminateDelegatePosition(Delegate delegate) {
+        delegate.setEnd(new DateTime());
+    }
+
+    public List<DelegateBean> getDegreePositions(Degree degree) {
+        DegreeType degreeType = degree.getDegreeType();
+        List<DelegateBean> ldpb = new ArrayList<DelegateBean>();
+        ldpb.add(new DelegatePositionBean(null, null, CurricularYear.readByYear(1), degree));
+        ldpb.add(new DelegatePositionBean(null, null, CurricularYear.readByYear(2), degree));
+        if (degreeType == DegreeType.BOLONHA_MASTER_DEGREE) {
+            ldpb.add(new DelegatePositionBean(null, CycleType.SECOND_CYCLE, null, degree));
+            return ldpb;
+        }
+        if (degreeType == DegreeType.BOLONHA_INTEGRATED_MASTER_DEGREE) {
+            ldpb.add(new DelegatePositionBean(null, null, CurricularYear.readByYear(3), degree));
+            ldpb.add(new DelegatePositionBean(null, null, CurricularYear.readByYear(4), degree));
+            ldpb.add(new DelegatePositionBean(null, null, CurricularYear.readByYear(5), degree));
+            ldpb.add(new DelegatePositionBean(null, CycleType.FIRST_CYCLE, null, degree));
+            ldpb.add(new DelegatePositionBean(null, null, null, degree));
+            return ldpb;
+        }
+        if (degreeType == DegreeType.BOLONHA_DEGREE) {
+            ldpb.add(new DelegatePositionBean(null, null, CurricularYear.readByYear(3), degree));
+            ldpb.add(new DelegatePositionBean(null, CycleType.FIRST_CYCLE, null, degree));
+        }
+        return new ArrayList<DelegateBean>();
+    }
+
+    @Atomic
+    public void attributeDelegatePosition(DelegatePositionBean delegatePositionBean) {
+        User user = User.findByUsername(delegatePositionBean.getName());
+        Delegate oldDelegate = delegatePositionBean.getDelegate();
+        if (oldDelegate != null) {
+            terminateDelegatePosition(oldDelegate);
+        }
+        delegatePositionBean.getDelegateFromPositionBean(user);
     }
 }
