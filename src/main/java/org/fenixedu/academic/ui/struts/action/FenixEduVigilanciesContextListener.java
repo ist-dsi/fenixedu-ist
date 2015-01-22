@@ -42,7 +42,6 @@ import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
-import org.fenixedu.bennu.signals.DomainObjectEvent;
 import org.fenixedu.bennu.signals.Signal;
 import org.joda.time.DateTime;
 
@@ -66,9 +65,9 @@ public class FenixEduVigilanciesContextListener implements ServletContextListene
             }
         });
         MergeExecutionCourses.registerMergeHandler(FenixEduVigilanciesContextListener::copyVigilantGroups);
-        Signal.register("academic.writtenevaluation.deleted",
+        FenixFramework.getDomainModel().registerDeletionListener(WrittenEvaluation.class,
                 FenixEduVigilanciesContextListener::notifyVigilantsOfDeletedEvaluation);
-        Signal.register("academic.writtenevaluation.deleted",
+        Signal.register("academic.writtenevaluation.edited",
                 FenixEduVigilanciesContextListener::notifyVigilantsOfEditedEvaluation);
     }
 
@@ -78,8 +77,7 @@ public class FenixEduVigilanciesContextListener implements ServletContextListene
         }
     }
 
-    private static void notifyVigilantsOfDeletedEvaluation(DomainObjectEvent<WrittenEvaluation> event) {
-        WrittenEvaluation writtenEvaluation = event.getInstance();
+    private static void notifyVigilantsOfDeletedEvaluation(WrittenEvaluation writtenEvaluation) {
         if (!writtenEvaluation.getVigilanciesSet().isEmpty()) {
             final Set<Person> tos = new HashSet<Person>();
 
