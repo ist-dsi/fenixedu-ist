@@ -16,6 +16,13 @@
         <jasper.threads>3</jasper.threads>
     </properties>
 
+    <scm>
+        <connection>scm:git:git@github.com:ist-dsi/fenixedu-ist-reports.git</connection>
+        <developerConnection>scm:git:git@github.com:ist-dsi/fenixedu-ist-reports.git</developerConnection>
+        <url>https://github.com/ist-dsi/fenixedu-ist-reports</url>
+        <tag>HEAD</tag>
+    </scm>
+
     <build>
         <plugins>
             <plugin>
