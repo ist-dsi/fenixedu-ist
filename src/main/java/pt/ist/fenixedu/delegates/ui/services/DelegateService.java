@@ -38,14 +38,15 @@ public class DelegateService {
         ExecutionYear executionYear = delegateSearchBean.getExecutionYear();
         Degree degree = delegateSearchBean.getDegree();
         DegreeType degreeType = delegateSearchBean.getDegreeType();
-        delegateSearchBean.setExecutionYears(Bennu.getInstance().getExecutionYearsSet().stream().collect(Collectors.toList()));
+        delegateSearchBean.setExecutionYears(Bennu.getInstance().getExecutionYearsSet().stream()
+                .sorted(ExecutionYear.REVERSE_COMPARATOR_BY_YEAR).collect(Collectors.toList()));
         Set<DegreeType> aux =
                 executionYear.getExecutionDegreesSet().stream().map(d -> d.getDegree().getDegreeType())
                         .collect(Collectors.toSet());
         delegateSearchBean.setDegreeTypes(aux.stream().collect(Collectors.toList()));
         if (degreeType == null && (degree == null || EmptyDegree.class.isInstance(degree))) {
             delegateSearchBean.setDegrees(executionYear.getExecutionDegreesSet().stream().map(d -> d.getDegree())
-                    .collect(Collectors.toList()));
+                    .sorted(Degree.COMPARATOR_BY_NAME).collect(Collectors.toList()));
             delegateSearchBean.setDegree(delegateSearchBean.getDegrees().iterator().next());
             delegateSearchBean.setDegreeType(delegateSearchBean.getDegree().getDegreeType());
             return delegateSearchBean;
@@ -53,13 +54,13 @@ public class DelegateService {
         if (degree == null || EmptyDegree.class.isInstance(degree)) {
             delegateSearchBean.setDegrees(executionYear.getExecutionDegreesSet().stream()
                     .filter(d -> d.getDegree().getDegreeType().equals(degreeType)).map(d -> d.getDegree())
-                    .collect(Collectors.toList()));
+                    .sorted(Degree.COMPARATOR_BY_NAME).collect(Collectors.toList()));
             delegateSearchBean.setDegree(delegateSearchBean.getDegrees().iterator().next());
             return delegateSearchBean;
         }
         delegateSearchBean.setDegrees(executionYear.getExecutionDegreesSet().stream()
                 .filter(d -> d.getDegree().getDegreeType().equals(degreeType)).map(d -> d.getDegree())
-                .collect(Collectors.toList()));
+                .sorted(Degree.COMPARATOR_BY_NAME).collect(Collectors.toList()));
         return delegateSearchBean;
     }
 

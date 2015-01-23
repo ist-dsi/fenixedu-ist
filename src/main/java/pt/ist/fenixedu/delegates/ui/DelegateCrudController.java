@@ -59,7 +59,7 @@ public class DelegateCrudController {
         searchBean = delegateService.generateNewBean(searchBean);
         model.addAttribute("searchBean", searchBean);
         Set<DelegateBean> delegateBeanSet =
-                delegateService.searchDelegates(searchBean, DateTime.now()).stream().collect(Collectors.toSet());
+                delegateService.searchDelegates(searchBean, new DateTime()).stream().collect(Collectors.toSet());
         delegateBeanSet.addAll(delegateService.getDegreePositions(searchBean.getDegree()));
         model.addAttribute("delegates", delegateBeanSet.stream().distinct().collect(Collectors.toList()));
         return search(model);
