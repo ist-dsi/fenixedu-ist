@@ -86,4 +86,9 @@ public class CycleDelegate extends CycleDelegate_Base {
         return false;
     }
 
+    @Override
+    public CycleType getCycleType() {
+        return getCycle();
+    }
+
 }

@@ -5,6 +5,8 @@ import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.util.email.ReplyTo;
 import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.bennu.core.groups.Group;
+import org.fenixedu.bennu.core.groups.NobodyGroup;
 import org.fenixedu.bennu.core.groups.UserGroup;
 
 import pt.ist.fenixedu.delegates.domain.student.Delegate;
@@ -30,6 +32,14 @@ public class DelegateSender extends DelegateSender_Base {
     @Override
     public Set<ReplyTo> getReplyTos() {
         return getReplyTosSet();
+    }
+
+    @Override
+    public Group getMembers() {
+        if (getDelegateSet().iterator().next().isActive()) {
+            return super.getMembers();
+        }
+        return NobodyGroup.get();
     }
 
 }

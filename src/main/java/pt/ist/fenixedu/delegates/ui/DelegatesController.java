@@ -32,8 +32,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import pt.ist.fenixedu.delegates.ui.services.DelegateService;
 
-@SpringApplication(group = "anyone", path = "delegates", title = "title.delegates.management", hint = "delegate-manager")
-@SpringFunctionality(app = DelegatesController.class, title = "title.delegates.management")
+@SpringApplication(group = "anyone", path = "delegates", title = "title.delegates.app", hint = "delegate-manager")
+@SpringFunctionality(app = DelegatesController.class, title = "title.delegates.app")
 @RequestMapping("/delegates")
 public class DelegatesController {
 
