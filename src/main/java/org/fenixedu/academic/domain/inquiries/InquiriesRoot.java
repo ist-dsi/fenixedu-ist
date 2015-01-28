@@ -16,12 +16,9 @@ public final class InquiriesRoot extends InquiriesRoot_Base {
     public static final List<String> THIRD_CYCLE_AVAILABLE_INQUIRY_DEGREES = new ArrayList<String>();
 
     static {
-        THIRD_CYCLE_AVAILABLE_INQUIRY_DEGREES.add("deargf");
-        THIRD_CYCLE_AVAILABLE_INQUIRY_DEGREES.add("dec");
-        THIRD_CYCLE_AVAILABLE_INQUIRY_DEGREES.add("deft");
+        THIRD_CYCLE_AVAILABLE_INQUIRY_DEGREES.add("degest");
         THIRD_CYCLE_AVAILABLE_INQUIRY_DEGREES.add("deic");
         THIRD_CYCLE_AVAILABLE_INQUIRY_DEGREES.add("dmat");
-        THIRD_CYCLE_AVAILABLE_INQUIRY_DEGREES.add("cesidb");
     }
 
     private InquiriesRoot() {
