@@ -42,26 +42,26 @@
 </script>
 
 <div class="page-header">
-  <h1>Delegados<small>Procurar Delegados</small></h1>
+  <h1><spring:message code="title.delegates.app"/><small><spring:message code="title.delegates.search"/></small></h1>
 </div>
 
 <spring:url var="formActionUrl" value="${action}"/>
 
 <form:form modelAttribute="searchBean" role="form" method="post" action="${formActionUrl}" enctype="multipart/form-data" class="form-horizontal">
 	<div class="form-group">
-		<label for="executionYear" class="col-md-1 control-label">Execution Year</label>
+		<label for="executionYear" class="col-md-1 control-label"><spring:message code="label.delegates.select.execution.year"/></label>
 		<div class="col-md-11">
 			<form:select path="executionYear" items="${searchBean.executionYears}" itemLabel="name" itemValue="externalId" onchange="onchangeExecYear(); submit();" class="form-control"/>
 		</div>
 	</div>
 	<div class="form-group">
-		<label for="degreeType" class="col-md-1 control-label">Degree Type</label>
+		<label for="degreeType" class="col-md-1 control-label"><spring:message code="label.delegates.select.degree.type"/></label>
 		<div class="col-md-11">
 			<form:select path="degreeType" items="${searchBean.degreeTypes}" itemLabel="localizedName" onchange="onchangeDegreeType(); submit();" class="form-control"/>
 		</div>
 	</div>
 	<div class="form-group">
-		<label for="degree" class="col-md-1 control-label">Degree</label>
+		<label for="degree" class="col-md-1 control-label"><spring:message code="label.delegates.select.degree.sel"/></label>
 		<div class="col-md-11">
 			<form:select path="degree" items="${searchBean.degrees}" itemLabel="nameI18N" itemValue="externalId" onchange="onchangeDegree(); submit();" class="form-control"/>
 		</div>
