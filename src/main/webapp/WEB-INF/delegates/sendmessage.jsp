@@ -25,7 +25,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
-<h1> SELECTS ALL COURSESSS!!!<small>11one</small></h1>
+<h1> Selecionar Disciplinas<small></small></h1>
 <spring:url var="formActionUrl" value="${action}"/>
 <form class="form-horizontal" role="form">
   <div class="form-group">
@@ -37,15 +37,15 @@
   <div class="form-group">
     <label for="inputPassword3" class="col-sm-1 control-label">Responder a</label>
     <div class="col-sm-11">
-      <p><input type="checkbox">  OIOIOOI</p>
+      <p><input type="checkbox"></p>
     </div>
   </div>
   <div class="form-group">
-    <label for="inputPassword3" class="col-sm-1 control-label">Destinatarios (BCC)</label>
+    <label for="inputPassword3" class="col-sm-1 control-label"><spring:message code="delegates.messaging.bcc"/></label>
     <div class="col-sm-11">
       <p><input type="checkbox" disabled checked="checked">Alunos Pre-selecionados</p>
-      <p><input type="checkbox">  OIOIOOI</p>
-      <p><input type="checkbox">  OIOIOOI</p>
+      <p><input type="checkbox"></p>
+      <p><input type="checkbox"></p>
     </div>
   </div>
   <div class="form-group">

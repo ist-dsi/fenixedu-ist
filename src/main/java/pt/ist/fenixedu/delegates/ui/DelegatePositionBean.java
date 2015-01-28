@@ -62,8 +62,7 @@ public class DelegatePositionBean extends DelegateBean {
             newDelegate = new DegreeDelegate(user, degree);
         }
         newDelegate.setStart(new DateTime());
-        newDelegate.setEnd(ExecutionYear.readCurrentExecutionYear().getNextExecutionYear().getEndDateYearMonthDay()
-                .toDateTimeAtMidnight());
+        newDelegate.setEnd(ExecutionYear.readCurrentExecutionYear().getEndDateYearMonthDay().toDateTimeAtMidnight().plusYears(1));
         newDelegate.setSender(new DelegateSender(newDelegate));
         return newDelegate;
     }
