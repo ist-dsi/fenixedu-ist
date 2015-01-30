@@ -20,6 +20,7 @@ package org.fenixedu.academic.ui.struts.action.vigilancy;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -196,6 +197,10 @@ public class ConvokeBean extends VigilantGroupBean implements Serializable {
             return evaluation.getVigilanciesSet();
         }
         return evaluation.getVigilanciesSet().stream().filter(v -> v.isActive()).collect(Collectors.toSet());
+    }
+
+    public Collection<Vigilancy> getActiveVigilants() {
+        return Vigilancy.getActiveVigilancies(getWrittenEvaluation());
     }
 
     public String getVigilantsAsString() {
