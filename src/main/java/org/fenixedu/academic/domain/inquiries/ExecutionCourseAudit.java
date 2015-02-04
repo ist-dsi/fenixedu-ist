@@ -96,4 +96,11 @@ public class ExecutionCourseAudit extends ExecutionCourseAudit_Base {
         return getAvailableProcess();
     }
 
+    public void delete() {
+        setExecutionCourse(null);
+        setRootDomainObject(null);
+        setStudentAuditor(null);
+        setTeacherAuditor(null);
+        super.deleteDomainObject();
+    }
 }

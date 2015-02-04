@@ -8,6 +8,8 @@ import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.inquiries.InquiryCourseAnswer;
+import org.fenixedu.academic.domain.inquiries.InquiryDelegateAnswer;
+import org.fenixedu.academic.domain.inquiries.InquiryGlobalComment;
 import org.fenixedu.academic.domain.inquiries.InquiryResult;
 import org.fenixedu.academic.domain.inquiries.StudentInquiryRegistry;
 import org.fenixedu.academic.service.filter.enrollment.ClassEnrollmentAuthorizationFilter;
@@ -57,6 +59,12 @@ public class FenixEduQUCContextListener implements ServletContextListener {
                                         "error.remove.professorship.hasInquiryRegentAnswer"));
                             }
                         });
+        FenixFramework.getDomainModel().registerDeletionListener(ExecutionCourse.class, executionCourse -> {
+            executionCourse.setAvailableForInquiries(null);
+            if (executionCourse.getExecutionCourseAudit() != null) {
+                executionCourse.getExecutionCourseAudit().delete();
+            }
+        });
     }
 
     @Override
@@ -72,6 +80,15 @@ public class FenixEduQUCContextListener implements ServletContextListener {
         }
         for (final InquiryCourseAnswer inquiryCourseAnswer : executionCourseFrom.getInquiryCourseAnswersSet()) {
             inquiryCourseAnswer.setExecutionCourse(executionCourseTo);
+        }
+        for (final InquiryDelegateAnswer inquiryDelegateAnswer : executionCourseFrom.getInquiryDelegatesAnswersSet()) {
+            inquiryDelegateAnswer.setExecutionCourse(executionCourseTo);
+        }
+        for (final InquiryGlobalComment inquiryGlobalComment : executionCourseFrom.getInquiryGlobalCommentsSet()) {
+            inquiryGlobalComment.setExecutionCourse(executionCourseTo);
+        }
+        if (executionCourseFrom.getExecutionCourseAudit() != null && executionCourseTo.getExecutionCourseAudit() == null) {
+            executionCourseTo.setExecutionCourseAudit(executionCourseFrom.getExecutionCourseAudit());
         }
     }
 }
