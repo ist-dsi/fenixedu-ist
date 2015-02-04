@@ -190,7 +190,7 @@
 	<table class="tstyle1 thlight mtop0 mbottom15 tdleft">
 		<tr>
 			<td>Apreciação Global do Programa:</td>
-			<td><fr:view name="createSummaryBean" property="tutorshipSummaryProgramAssessment" type="org.fenixedu.academic.domain.TutorshipSummaryProgramAssessment" /></td>
+			<td><fr:view name="createSummaryBean" property="tutorshipSummaryProgramAssessment" type="pt.ist.fenixedu.tutorship.domain.TutorshipSummaryProgramAssessment" /></td>
 		</tr>
 	</table>
 	
