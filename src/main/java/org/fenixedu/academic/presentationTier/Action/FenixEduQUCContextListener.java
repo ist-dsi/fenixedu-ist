@@ -6,7 +6,7 @@ import javax.servlet.annotation.WebListener;
 
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.Professorship;
-import org.fenixedu.academic.domain.exceptions.DomainException;
+import org.fenixedu.academic.domain.exceptions.FenixEduQucDomainException;
 import org.fenixedu.academic.domain.inquiries.InquiryCourseAnswer;
 import org.fenixedu.academic.domain.inquiries.InquiryDelegateAnswer;
 import org.fenixedu.academic.domain.inquiries.InquiryGlobalComment;
@@ -22,20 +22,13 @@ import pt.ist.fenixframework.FenixFramework;
 
 @WebListener
 public class FenixEduQUCContextListener implements ServletContextListener {
-    public class InquiriesNotAnswered extends DomainException {
-        private static final long serialVersionUID = -105643185383592476L;
-
-        public InquiriesNotAnswered() {
-            super("resources.ApplicationResources", "message.student.cannotEnroll.inquiriesNotAnswered");
-        }
-    }
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         MergeExecutionCourses.registerMergeHandler(FenixEduQUCContextListener::copyInquiries);
         ClassEnrollmentAuthorizationFilter.registerCondition(registration -> {
             if (StudentInquiryRegistry.hasInquiriesToRespond(Authenticate.getUser().getPerson().getStudent())) {
-                throw new InquiriesNotAnswered();
+                throw FenixEduQucDomainException.inquiriesNotAnswered();
             }
         });
         FenixFramework.getDomainModel()
