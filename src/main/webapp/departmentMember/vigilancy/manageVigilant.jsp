@@ -105,116 +105,118 @@
 </logic:present>
 
 <logic:present name="bean">
-	<p class="mbottom05"><strong><bean:message
-		key="vigilancy.yourGroups" bundle="VIGILANCY_RESOURCES" /></strong>: <fr:view
-		name="bean" property="userViewVigilantGroups">
-		<fr:layout name="flowLayout">
-			<fr:property name="eachLayout" value="values" />
-			<fr:property name="eachSchema" value="presentVigilantGroupName" />
-			<fr:property name="htmlSeparator" value="," />
-
-		</fr:layout>
-	</fr:view></p>
-	<p class="mbottom05"><strong><bean:message
-		key="vigilancy.myConvokes" bundle="VIGILANCY_RESOURCES" /></strong>:</p>
-	<logic:empty name="vigilant" property="activeVigilancies">
-		<p class="mtop05"><em><bean:message
-			key="label.vigilancy.noConvokesToDisplay"
-			bundle="VIGILANCY_RESOURCES" /></em></p>
-	</logic:empty>
-
-	<logic:present name="bean" property="activeOtherCourseVigilancies">
-		<logic:equal name="bean" property="executionYear.current" value="true">
-			<fr:view name="bean" property="activeOtherCourseVigilancies"
-				schema="present.convokes" layout="tabular">
-				<fr:layout>
-					<fr:property name="classes" value="tstyle1 mtop05" />
-					<fr:property name="key(confirmar)" value="label.confirm" />
-					<fr:property name="bundle(confirmar)" value="VIGILANCY_RESOURCES" />
-					<fr:property name="link(confirmar)"
-						value="/vigilancy/vigilantManagement.do?method=vigilantAcceptsConvoke" />
-					<fr:property name="param(confirmar)" value="externalId/oid" />
-					<fr:property name="visibleIfNot(confirmar)" value="confirmed" />
-				</fr:layout>
-			</fr:view>
-		</logic:equal>
-		<logic:equal name="bean" property="executionYear.current"
-			value="false">
-			<fr:view name="vigilant" property="activeOtherCourseVigilancies"
-				schema="present.convokes" layout="tabular">
-				<fr:layout>
-					<fr:property name="classes" value="tstyle1 mtop05" />
-				</fr:layout>
-			</fr:view>
-		</logic:equal>
-	</logic:present>
-
-	<logic:equal name="bean" property="showUnavailables" value="true">
+	<logic:present name="vigilant">
 		<p class="mbottom05"><strong><bean:message
-			key="vigilancy.myUnavailablePeriods" bundle="VIGILANCY_RESOURCES" /></strong>:</p>
-		<logic:messagesPresent message="true">
-			<p>
-			<html:messages id="messages" message="true" bundle="VIGILANCY_RESOURCES">
-				<span class="error0"><bean:write name="messages"/></span>
-			</html:messages>
-			</p>
-		</logic:messagesPresent>
-		<logic:notEmpty name="vigilant" property="unavailablePeriods">
-			<logic:equal name="vigilant"
-				property="allowedToSpecifyUnavailablePeriod" value="true">
-				<fr:view name="vigilant" property="unavailablePeriods"
-					schema="unavailableShow">
-					<fr:layout name="tabular">
-						<fr:property name="classes" value="tstyle1 mtop05" />
-						<fr:property name="key(edit)" value="label.edit" />
-						<fr:property name="bundle(edit)" value="VIGILANCY_RESOURCES" />
-						<fr:property name="link(edit)"
-							value="/vigilancy/unavailablePeriodManagement.do?method=editUnavailablePeriod" />
-						<fr:property name="param(edit)" value="externalId/oid" />
-						<fr:property name="key(delete)" value="label.delete" />
-						<fr:property name="bundle(delete)" value="VIGILANCY_RESOURCES" />
-						<fr:property name="link(delete)"
-							value="/vigilancy/unavailablePeriodManagement.do?method=deleteUnavailablePeriod" />
-						<fr:property name="param(delete)" value="externalId/oid" />
-					</fr:layout>
-				</fr:view>
-			</logic:equal>
-
-			<logic:equal name="vigilant"
-				property="allowedToSpecifyUnavailablePeriod" value="false">
-
-				<fr:view name="vigilant" property="unavailablePeriods"
-					schema="unavailableShow">
-					<fr:layout name="tabular">
-						<fr:property name="classes" value="tstyle1 mtop05" />
-					</fr:layout>
-				</fr:view>
-			</logic:equal>
-		</logic:notEmpty>
-
-		<logic:empty name="vigilant" property="unavailablePeriods">
+			key="vigilancy.yourGroups" bundle="VIGILANCY_RESOURCES" /></strong>: <fr:view
+			name="bean" property="userViewVigilantGroups">
+			<fr:layout name="flowLayout">
+				<fr:property name="eachLayout" value="values" />
+				<fr:property name="eachSchema" value="presentVigilantGroupName" />
+				<fr:property name="htmlSeparator" value="," />
+	
+			</fr:layout>
+		</fr:view></p>
+		<p class="mbottom05"><strong><bean:message
+			key="vigilancy.myConvokes" bundle="VIGILANCY_RESOURCES" /></strong>:</p>
+		<logic:empty name="vigilant" property="activeVigilancies">
 			<p class="mtop05"><em><bean:message
-				key="label.vigilancy.youHaveNoUnavailablePeriods"
+				key="label.vigilancy.noConvokesToDisplay"
 				bundle="VIGILANCY_RESOURCES" /></em></p>
 		</logic:empty>
-	</logic:equal>
-
-	<logic:equal name="bean" property="showIncompatibilities" value="true">
-		<p class="mbottom05"><strong><bean:message
-			key="vigilancy.myIncompatibility" bundle="VIGILANCY_RESOURCES" /></strong>:</p>
-		<logic:notEmpty name="vigilant" property="person.incompatibleVigilant">
-			<fr:view name="vigilant" property="incompatiblePersonName">
-				<fr:layout>
-					<fr:property name="classes" value="mtop05" />
-				</fr:layout>
-			</fr:view>
-		</logic:notEmpty>
-		<logic:empty name="vigilant" property="person.incompatibleVigilant">
-			<p class="mtop05"><em><bean:message
-				bundle="VIGILANCY_RESOURCES"
-				key="label.vigilancy.youHaveNoIncompatibilities" /></em></p>
-		</logic:empty>
-	</logic:equal>
+	
+		<logic:present name="bean" property="activeOtherCourseVigilancies">
+			<logic:equal name="bean" property="executionYear.current" value="true">
+				<fr:view name="bean" property="activeOtherCourseVigilancies"
+					schema="present.convokes" layout="tabular">
+					<fr:layout>
+						<fr:property name="classes" value="tstyle1 mtop05" />
+						<fr:property name="key(confirmar)" value="label.confirm" />
+						<fr:property name="bundle(confirmar)" value="VIGILANCY_RESOURCES" />
+						<fr:property name="link(confirmar)"
+							value="/vigilancy/vigilantManagement.do?method=vigilantAcceptsConvoke" />
+						<fr:property name="param(confirmar)" value="externalId/oid" />
+						<fr:property name="visibleIfNot(confirmar)" value="confirmed" />
+					</fr:layout>
+				</fr:view>
+			</logic:equal>
+			<logic:equal name="bean" property="executionYear.current"
+				value="false">
+				<fr:view name="vigilant" property="activeOtherCourseVigilancies"
+					schema="present.convokes" layout="tabular">
+					<fr:layout>
+						<fr:property name="classes" value="tstyle1 mtop05" />
+					</fr:layout>
+				</fr:view>
+			</logic:equal>
+		</logic:present>
+	
+		<logic:equal name="bean" property="showUnavailables" value="true">
+			<p class="mbottom05"><strong><bean:message
+				key="vigilancy.myUnavailablePeriods" bundle="VIGILANCY_RESOURCES" /></strong>:</p>
+			<logic:messagesPresent message="true">
+				<p>
+				<html:messages id="messages" message="true" bundle="VIGILANCY_RESOURCES">
+					<span class="error0"><bean:write name="messages"/></span>
+				</html:messages>
+				</p>
+			</logic:messagesPresent>
+			<logic:notEmpty name="vigilant" property="unavailablePeriods">
+				<logic:equal name="vigilant"
+					property="allowedToSpecifyUnavailablePeriod" value="true">
+					<fr:view name="vigilant" property="unavailablePeriods"
+						schema="unavailableShow">
+						<fr:layout name="tabular">
+							<fr:property name="classes" value="tstyle1 mtop05" />
+							<fr:property name="key(edit)" value="label.edit" />
+							<fr:property name="bundle(edit)" value="VIGILANCY_RESOURCES" />
+							<fr:property name="link(edit)"
+								value="/vigilancy/unavailablePeriodManagement.do?method=editUnavailablePeriod" />
+							<fr:property name="param(edit)" value="externalId/oid" />
+							<fr:property name="key(delete)" value="label.delete" />
+							<fr:property name="bundle(delete)" value="VIGILANCY_RESOURCES" />
+							<fr:property name="link(delete)"
+								value="/vigilancy/unavailablePeriodManagement.do?method=deleteUnavailablePeriod" />
+							<fr:property name="param(delete)" value="externalId/oid" />
+						</fr:layout>
+					</fr:view>
+				</logic:equal>
+	
+				<logic:equal name="vigilant"
+					property="allowedToSpecifyUnavailablePeriod" value="false">
+	
+					<fr:view name="vigilant" property="unavailablePeriods"
+						schema="unavailableShow">
+						<fr:layout name="tabular">
+							<fr:property name="classes" value="tstyle1 mtop05" />
+						</fr:layout>
+					</fr:view>
+				</logic:equal>
+			</logic:notEmpty>
+	
+			<logic:empty name="vigilant" property="unavailablePeriods">
+				<p class="mtop05"><em><bean:message
+					key="label.vigilancy.youHaveNoUnavailablePeriods"
+					bundle="VIGILANCY_RESOURCES" /></em></p>
+			</logic:empty>
+		</logic:equal>
+	
+		<logic:equal name="bean" property="showIncompatibilities" value="true">
+			<p class="mbottom05"><strong><bean:message
+				key="vigilancy.myIncompatibility" bundle="VIGILANCY_RESOURCES" /></strong>:</p>
+			<logic:notEmpty name="vigilant" property="person.incompatibleVigilant">
+				<fr:view name="vigilant" property="incompatiblePersonName">
+					<fr:layout>
+						<fr:property name="classes" value="mtop05" />
+					</fr:layout>
+				</fr:view>
+			</logic:notEmpty>
+			<logic:empty name="vigilant" property="person.incompatibleVigilant">
+				<p class="mtop05"><em><bean:message
+					bundle="VIGILANCY_RESOURCES"
+					key="label.vigilancy.youHaveNoIncompatibilities" /></em></p>
+			</logic:empty>
+		</logic:equal>
+	</logic:present>
 </logic:present>
 
 

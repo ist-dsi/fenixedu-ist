@@ -124,7 +124,7 @@ public class VigilantManagement extends FenixDispatchAction {
         bean.setExecutionYear(executionYear);
         VigilantGroup selectedVigilantGroup = bean.getSelectedVigilantGroup();
 
-        VigilantWrapper vigilant = vigilantWrappers.iterator().next();
+        VigilantWrapper vigilant = vigilantWrappers.iterator().hasNext() ? vigilantWrappers.iterator().next() : null;
         if (selectedVigilantGroup != null) {
             for (VigilantWrapper vigilantWrapper : vigilantWrappers) {
                 if (vigilantWrapper.getVigilantGroup().equals(selectedVigilantGroup)) {
