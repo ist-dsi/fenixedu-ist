@@ -46,7 +46,7 @@
         <dependency>
             <groupId>org.fenixedu</groupId>
             <artifactId>fenixedu-academic</artifactId>
-            <version>4.0.2</version>
+            <version>4.0.11</version>
         </dependency>
     </dependencies>
 
