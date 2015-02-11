@@ -38,6 +38,7 @@ import org.fenixedu.academic.dto.administrativeOffice.candidacy.DFACandidacyBean
 import org.fenixedu.academic.dto.administrativeOffice.candidacy.RegisterCandidacyBean;
 import org.fenixedu.academic.dto.candidacy.CandidacyDocumentUploadBean;
 import org.fenixedu.academic.dto.candidacy.PrecedentDegreeInformationBean;
+import org.fenixedu.academic.dto.person.PersonBean;
 import org.fenixedu.academic.service.services.administrativeOffice.candidacy.EditPrecedentDegreeInformation;
 import org.fenixedu.academic.service.services.commons.StateMachineRunner;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
@@ -203,7 +204,7 @@ public class DFACandidacyDispatchAction extends FenixDispatchAction {
             return prepareValidateCandidacyData(mapping, actionForm, request, response);
         }
 
-        request.setAttribute("candidacy", candidacy);
+        request.setAttribute("personBean", new PersonBean(candidacy.getPerson()));
 
         PrecedentDegreeInformation precedentDegreeInformation = ((StudentCandidacy) candidacy).getPrecedentDegreeInformation();
         request.setAttribute("precedentDegreeInformation", new PrecedentDegreeInformationBean(precedentDegreeInformation));
@@ -225,6 +226,14 @@ public class DFACandidacyDispatchAction extends FenixDispatchAction {
     public ActionForward alterCandidacyData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
             HttpServletResponse response) throws FenixServiceException {
 
+        PersonBean personBean = (PersonBean) getRenderedObject("personBean");
+        try {
+            personBean.save();            
+        } catch (DomainException e) {
+            addActionMessage(request, e.getMessage(), e.getArgs());
+            return mapping.findForward("showCandidacyAlterData");
+        }
+        
         PrecedentDegreeInformationBean precedentDegreeInformation =
                 (PrecedentDegreeInformationBean) RenderUtils.getViewState("precedentDegreeInformation").getMetaObject()
                         .getObject();
