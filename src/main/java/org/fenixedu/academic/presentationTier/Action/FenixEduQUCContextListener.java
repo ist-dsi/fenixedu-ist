@@ -16,7 +16,6 @@ import org.fenixedu.academic.service.filter.enrollment.ClassEnrollmentAuthorizat
 import org.fenixedu.academic.service.services.manager.MergeExecutionCourses;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
-import org.fenixedu.bennu.core.security.Authenticate;
 
 import pt.ist.fenixframework.FenixFramework;
 
@@ -27,7 +26,7 @@ public class FenixEduQUCContextListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
         MergeExecutionCourses.registerMergeHandler(FenixEduQUCContextListener::copyInquiries);
         ClassEnrollmentAuthorizationFilter.registerCondition(registration -> {
-            if (StudentInquiryRegistry.hasInquiriesToRespond(Authenticate.getUser().getPerson().getStudent())) {
+            if (StudentInquiryRegistry.hasInquiriesToRespond(registration.getStudent())) {
                 throw FenixEduQucDomainException.inquiriesNotAnswered();
             }
         });
