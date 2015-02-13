@@ -10,7 +10,7 @@
     <groupId>pt.ist</groupId>
     <artifactId>fenixedu-ist-pre-bolonha</artifactId>
     <packaging>jar</packaging>
-    <version>4.1.0-SNAPSHOT</version>
+    <version>4.0.1</version>
 
     <name>FenixEdu Pre Bolonha</name>
     <url>http://fenixedu.org</url>
@@ -38,7 +38,7 @@
         <connection>scm:git:git@github.com:fenixedu/fenix.git</connection>
         <developerConnection>scm:git:git@github.com:fenixedu/fenix.git</developerConnection>
         <url>http://fenixedu.org</url>
-        <tag>HEAD</tag>
+        <tag>v4.0.1</tag>
     </scm>
 
     <dependencies>
