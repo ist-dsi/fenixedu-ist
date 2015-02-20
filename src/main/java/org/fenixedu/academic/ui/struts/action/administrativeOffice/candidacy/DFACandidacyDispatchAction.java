@@ -86,6 +86,7 @@ public class DFACandidacyDispatchAction extends FenixDispatchAction {
         candidacyBean.setExecutionYear(null);
         RenderUtils.invalidateViewState();
         request.setAttribute("candidacyBean", candidacyBean);
+        
 
         return mapping.getInputForward();
     }
@@ -216,7 +217,7 @@ public class DFACandidacyDispatchAction extends FenixDispatchAction {
             HttpServletResponse response) throws FenixServiceException {
 
         PrecedentDegreeInformationBean precedentDegreeInformationBean = getRenderedObject("precedentDegreeInformation");
-        request.setAttribute("candidacy", precedentDegreeInformationBean.getPrecedentDegreeInformation().getStudentCandidacy());
+        request.setAttribute("personBean", getRenderedObject("personBean"));
         RenderUtils.invalidateViewState();
         request.setAttribute("precedentDegreeInformation", precedentDegreeInformationBean);
 
