@@ -32,6 +32,7 @@ import org.fenixedu.academic.domain.person.IDDocumentType;
 import org.fenixedu.academic.domain.phd.candidacy.PHDProgramCandidacy;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.core.domain.UserLoginPeriod;
 import org.fenixedu.bennu.core.domain.UserProfile;
 import org.joda.time.YearMonthDay;
 
@@ -58,6 +59,8 @@ public class CreateCandidacy {
         if (person.getStudent() == null) {
             new Student(person);
         }
+
+        UserLoginPeriod.createOpenPeriod(person.getUser());
 
         Candidacy candidacy = newCandidacy(degreeType, person, executionDegree, startDate);
 
