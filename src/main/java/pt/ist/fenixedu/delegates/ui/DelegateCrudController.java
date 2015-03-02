@@ -103,8 +103,16 @@ public class DelegateCrudController {
 
     @RequestMapping(value = "/attributePosition", method = RequestMethod.POST)
     public String attributePosition(@ModelAttribute DelegatePositionBean delegatePositionBean, BindingResult errors, Model model) {
-        delegateService.attributeDelegatePosition(delegatePositionBean);
-        return toSearch(delegatePositionBean.getDegree(), model);
+        if (delegateService.attributeDelegatePosition(delegatePositionBean) == true) {
+            return toSearch(delegatePositionBean.getDegree(), model);
+        } else {
+            String cycleType =
+                    delegatePositionBean.getCycleType() != null ? delegatePositionBean.getCycleType().getDescription() : "";
+            String curricularYear =
+                    delegatePositionBean.getCurricularYear() != null ? delegatePositionBean.getCurricularYear().getExternalId() : "";
+            return attributePosition(delegatePositionBean.getDegree(), delegatePositionBean.getDelegateOID(), curricularYear,
+                    cycleType, model);
+        }
     }
 
     private String toSearch(Degree degree, Model model) {
