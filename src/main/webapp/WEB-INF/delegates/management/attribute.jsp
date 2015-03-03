@@ -24,7 +24,7 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
-
+${portal.toolkit()}
 <div>
 <div class="page-header">
   <h1><spring:message code="title.delegates.app"/><small><spring:message code="title.delegates.attribute.position"/></small></h1>
@@ -46,7 +46,8 @@
 	</c:if>
 	<div class="form-group">
 		<form:label for="nameInput" path="name"><spring:message code="label.student"/></form:label>
-		<form:input type="text" class="form-control" id="nameInput" path="name" required="required"/>
+		<input bennu-user-autocomplete class="form-control" name="name" required="required" placeholder="utilizador"/>
+<%-- 		<form:input type="text" class="form-control" id="nameInput" path="name" required="required"/> --%>
 	</div>
 	<button type="submit" class="btn btn-default"><spring:message code="label.submit"/></button>
 </form:form>

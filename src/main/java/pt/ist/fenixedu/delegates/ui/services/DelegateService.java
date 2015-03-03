@@ -18,6 +18,8 @@
  */
 package pt.ist.fenixedu.delegates.ui.services;
 
+import static org.fenixedu.bennu.FenixEduDelegatesConfiguration.BUNDLE;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -36,6 +38,7 @@ import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.degreeStructure.CycleType;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.springframework.stereotype.Service;
@@ -214,17 +217,24 @@ public class DelegateService {
         if (degreeType == DegreeType.BOLONHA_DEGREE) {
             ldpb.add(new DelegatePositionBean(null, null, CurricularYear.readByYear(3), degree));
             ldpb.add(new DelegatePositionBean(null, CycleType.FIRST_CYCLE, null, degree));
+            return ldpb;
         }
-        return new ArrayList<DelegateBean>();
+        return ldpb;
     }
 
     @Atomic
-    public void attributeDelegatePosition(DelegatePositionBean delegatePositionBean) {
+    public boolean attributeDelegatePosition(DelegatePositionBean delegatePositionBean) {
         User user = User.findByUsername(delegatePositionBean.getName());
+        if (user == null) {
+            delegatePositionBean.setErrorMessage(BundleUtil.getString(BUNDLE, "user.not.found") + " "
+                    + delegatePositionBean.getName());
+            return false;
+        }
         Delegate oldDelegate = delegatePositionBean.getDelegate();
         if (oldDelegate != null) {
             terminateDelegatePosition(oldDelegate);
         }
         delegatePositionBean.getDelegateFromPositionBean(user);
+        return true;
     }
 }

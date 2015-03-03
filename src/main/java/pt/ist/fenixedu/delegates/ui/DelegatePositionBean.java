@@ -33,6 +33,8 @@ import pt.ist.fenixedu.delegates.domain.util.email.DelegateSender;
 
 public class DelegatePositionBean extends DelegateBean {
 
+    String errorMessage;
+
     public DelegatePositionBean(Delegate delegate) {
         this.curricularYear = delegate.getCurricularYear();
         this.delegate = delegate;
@@ -48,6 +50,14 @@ public class DelegatePositionBean extends DelegateBean {
 
     public DelegatePositionBean() {
 
+    }
+
+    public void setErrorMessage(String message) {
+        errorMessage = message;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
     }
 
     public Delegate getDelegateFromPositionBean(User user) {
