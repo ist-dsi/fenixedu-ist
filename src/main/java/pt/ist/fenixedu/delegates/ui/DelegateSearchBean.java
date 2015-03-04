@@ -54,7 +54,11 @@ public class DelegateSearchBean {
     }
 
     public void setDegree(Degree degree) {
+        if (degree == null) {
+            return;
+        }
         this.degree = degree;
+        this.degreeType = degree.getDegreeType();
     }
 
     public List<ExecutionYear> getExecutionYears() {
