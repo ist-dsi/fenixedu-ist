@@ -24,6 +24,7 @@ import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.bennu.core.domain.User;
 import org.joda.time.Interval;
 
+import pt.ist.fenixedu.delegates.domain.student.CycleDelegate;
 import pt.ist.fenixedu.delegates.domain.student.DegreeDelegate;
 import pt.ist.fenixedu.delegates.domain.student.Delegate;
 import pt.ist.fenixedu.delegates.domain.student.YearDelegate;
@@ -136,12 +137,19 @@ public class DelegateUtils {
     public static Delegate getActiveDelegateByStudent(Degree degree, Student student, ExecutionYear executionYear,
             Boolean degreeDelegate) {
 
-        Stream<Delegate> stream = degree.getDelegateSet().stream();
+        Stream<Delegate> stream =
+                degree.getDelegateSet().stream().filter(d -> d.isActive() && d.getUser().equals(student.getPerson().getUser()));
         if (degreeDelegate) {
-            stream = stream.filter(d -> d instanceof DegreeDelegate);
+            Stream<Delegate> degreeStream = null;
+            if (degree.isSecondCycle()) {
+                degreeStream = stream.filter(d -> d instanceof DegreeDelegate);
+            } else {
+                degreeStream = stream.filter(d -> d instanceof CycleDelegate);
+            }
+            Optional<Delegate> result = degreeStream.findAny();
+            return result.isPresent() ? result.get() : null;
         }
-        Optional<Delegate> result =
-                stream.filter(d -> d.isActive() && d.getUser().equals(student.getPerson().getUser())).findAny();
+        Optional<Delegate> result = stream.findAny();
         return result.isPresent() ? result.get() : null;
     }
 
