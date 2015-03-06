@@ -20,11 +20,9 @@ package org.fenixedu.academic.domain.inquiries;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
-import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.ExecutionSemester;
@@ -33,7 +31,6 @@ import org.fenixedu.academic.domain.student.delegate.DelegateUtils;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.joda.time.DateTime;
 
-import pt.ist.fenixedu.contracts.domain.organizationalStructure.FunctionType;
 import pt.ist.fenixedu.delegates.domain.student.Delegate;
 import pt.ist.fenixedu.delegates.domain.student.YearDelegate;
 
@@ -124,34 +121,4 @@ public class DelegateInquiryTemplate extends DelegateInquiryTemplate_Base {
         }
         return null;
     }
-
-    private static void addIfNecessaryExecutionCoursesFromOtherYears(YearDelegate yearDelegate,
-            final ExecutionSemester executionSemester, ExecutionDegree executionDegree, final Set<ExecutionCourse> result) {
-        final Degree degree = yearDelegate.getDegree();
-        //final CycleType currentCycleType = getRegistration().getCurrentCycleType(); //TODO to pass EC to degree and master delegates
-        final Student student = yearDelegate.getUser().getPerson().getStudent();
-        final Delegate degreeDelegateFunction =
-                DelegateUtils.getActiveDelegateByStudent(degree, student, executionSemester.getExecutionYear(), false);
-
-        if (degreeDelegateFunction != null) {
-            DelegateUtils.addExecutionCoursesForOtherYears(yearDelegate, executionSemester, executionDegree, degree, student,
-                    result);
-        }
-    }
-
-    private static FunctionType getFunctionType(Degree degree) {
-        switch (degree.getDegreeType()) {
-        case BOLONHA_DEGREE:
-            return FunctionType.DELEGATE_OF_DEGREE;
-        case BOLONHA_MASTER_DEGREE:
-            return FunctionType.DELEGATE_OF_MASTER_DEGREE;
-        case BOLONHA_INTEGRATED_MASTER_DEGREE:
-            //      degree.getDegreeType().getYears(CycleType.FIRST_CYCLE); //TODO pass to degree delegate
-            //      degree.getDegreeType().getYears(CycleType.SECOND_CYCLE); //TODO pass to master degree delegate
-            return FunctionType.DELEGATE_OF_INTEGRATED_MASTER_DEGREE;
-        default:
-            return null;
-        }
-    }
-
 }
