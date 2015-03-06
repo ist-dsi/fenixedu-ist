@@ -24,6 +24,7 @@ import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.bennu.core.domain.User;
 import org.joda.time.Interval;
 
+import pt.ist.fenixedu.delegates.domain.student.DegreeDelegate;
 import pt.ist.fenixedu.delegates.domain.student.Delegate;
 import pt.ist.fenixedu.delegates.domain.student.YearDelegate;
 
@@ -60,7 +61,7 @@ public class DelegateUtils {
         //final CycleType currentCycleType = getRegistration().getCurrentCycleType(); //TODO to pass EC to degree and master delegates
         final Student student = yearDelegate.getUser().getPerson().getStudent();
         final Delegate degreeDelegateFunction =
-                getActiveDelegateByStudent(degree, student, executionSemester.getExecutionYear(), false);
+                getActiveDelegateByStudent(degree, student, executionSemester.getExecutionYear(), true);
 
         if (degreeDelegateFunction != null) {
             addExecutionCoursesForOtherYears(yearDelegate, executionSemester, executionDegree, degree, student, result);
@@ -115,7 +116,8 @@ public class DelegateUtils {
             final ExecutionSemester executionSemester, final ExecutionDegree executionDegree, Integer curricularYear) {
         final List<ExecutionCourse> result = new ArrayList<ExecutionCourse>();
         for (ExecutionCourse executionCourse : yearDelegate.getDegree().getExecutionCourses(curricularYear, executionSemester)) {
-            if (InquiriesRoot.getAvailableForInquiries(executionCourse) && executionCourse.hasAnyEnrolment(executionDegree)) {
+            if (InquiriesRoot.getAvailableForInquiries(executionCourse) && executionCourse.hasAnyEnrolment(executionDegree)
+                    && !executionCourse.getInquiryResultsSet().isEmpty()) {
                 result.add(executionCourse);
             }
         }
@@ -132,11 +134,11 @@ public class DelegateUtils {
     }
 
     public static Delegate getActiveDelegateByStudent(Degree degree, Student student, ExecutionYear executionYear,
-            Boolean yearDelegate) {
+            Boolean degreeDelegate) {
 
         Stream<Delegate> stream = degree.getDelegateSet().stream();
-        if (yearDelegate) {
-            stream = stream.filter(d -> d instanceof YearDelegate);
+        if (degreeDelegate) {
+            stream = stream.filter(d -> d instanceof DegreeDelegate);
         }
         Optional<Delegate> result =
                 stream.filter(d -> d.isActive() && d.getUser().equals(student.getPerson().getUser())).findAny();
