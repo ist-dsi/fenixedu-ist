@@ -60,8 +60,7 @@ public class TutorSummaryBean extends TutorSearchBean {
 
         /* each CreateSummaryBean must have a unique degree */
         List<CreateSummaryBean> result = new ArrayList<CreateSummaryBean>();
-
-        if (getTeacher() != null) {
+        if (getTeacher() != null && (isSearchType() || getExecutionSemester() == null)) {
             /* add active - already created - summaries */
             for (TutorshipSummary ts : getTeacher().getTutorshipSummariesSet()) {
                 if (ts.isActive()) {
@@ -69,7 +68,6 @@ public class TutorSummaryBean extends TutorSearchBean {
                     result.add(createSummaryBean);
                 }
             }
-
             /* add - not created - available summaries */
             Set<ExecutionSemester> activePeriods = TutorshipSummary.getActivePeriods();
 
@@ -84,12 +82,39 @@ public class TutorSummaryBean extends TutorSearchBean {
                         break;
                     }
                 }
-
                 if (addDegree) {
                     for (ExecutionSemester semester : activePeriods) {
                         if (t.isActive()) {
                             CreateSummaryBean createSummaryBean = new CreateSummaryBean(getTeacher(), semester, studentDegree);
                             result.add(createSummaryBean);
+                        }
+                    }
+                }
+            }
+        } else if (getExecutionSemester() != null) {
+            if (isSearchType()) {
+                if (getDepartment() != null) {
+                    for (Teacher teacher : getDepartment().getAllCurrentTeachers()) {
+                        if (!teacher.getTutorshipsSet().isEmpty()) {
+                            for (TutorshipSummary ts : teacher.getTutorshipSummariesSet()) {
+                                if ((ts.isActive()) && ts.getSemester().equals(getExecutionSemester())) {
+                                    result.add(new CreateSummaryBean(ts));
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                if (getDegree() != null && getExecutionSemester() != null) {
+                    for (TutorshipSummary ts : getDegree().getTutorshipSummariesSet()) {
+                        if (ts.isActive() && ts.getSemester().equals(getExecutionSemester())) {
+                            result.add(new CreateSummaryBean(ts));
+                        }
+                    }
+                } else if (getDegree() != null && getExecutionSemester() == null) {
+                    for (TutorshipSummary ts : getDegree().getTutorshipSummariesSet()) {
+                        if (ts.isActive()) {
+                            result.add(new CreateSummaryBean(ts));
                         }
                     }
                 }
