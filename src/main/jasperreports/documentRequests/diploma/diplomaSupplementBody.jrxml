@@ -167,7 +167,7 @@
 					<textFieldExpression class="java.lang.String"><![CDATA[$P{bundle}.getString("diploma.supplement.two.one")]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="false">
-					<reportElement key="textField-37" x="13" y="256" width="352" height="22"/>
+					<reportElement key="textField-37" x="13" y="256" width="352" height="30"/>
 					<box>
 						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
