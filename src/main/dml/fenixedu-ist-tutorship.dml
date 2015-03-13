@@ -1,0 +1,215 @@
+package pt.ist.fenixedu.tutorship.domain;
+
+enum pt.ist.fenixedu.tutorship.domain.Level                                                                                as Level;
+enum pt.ist.fenixedu.tutorship.domain.Option                                                                               as Option;
+enum pt.ist.fenixedu.tutorship.domain.PrescriptionEnum                                                                     as PrescriptionEnum;
+enum pt.ist.fenixedu.tutorship.domain.TutorshipParticipationType                                                           as TutorshipParticipationType;
+enum pt.ist.fenixedu.tutorship.domain.TutorshipSummarySatisfaction                                                         as TutorshipSummarySatisfaction;
+enum pt.ist.fenixedu.tutorship.domain.TutorshipSummaryProgramAssessment                                                    as TutorshipSummaryProgramAssessment;
+enum pt.ist.fenixedu.tutorship.domain.teacher.WishesTutor                                                                  as WishesTutor;
+
+class TutorshipIntention  {
+    AcademicInterval academicInterval (REQUIRED);
+    Integer maxStudentsToTutor;
+}
+
+class Tutorship  {
+    Partial startDate;
+    Partial endDate;
+}
+
+class TutorshipSummary  {
+    Integer howManyReunionsGroup;
+    Integer howManyReunionsIndividual;
+    Integer howManyContactsPhone;
+    Integer howManyContactsEmail;
+
+    TutorshipSummarySatisfaction tutorshipSummarySatisfaction;
+    TutorshipSummaryProgramAssessment tutorshipSummaryProgramAssessment;
+    String difficulties;
+    String gains;
+    String suggestions;
+    
+    Boolean problemsR1;
+    Boolean problemsR2;
+    Boolean problemsR3;
+    Boolean problemsR4;
+    Boolean problemsR5;
+    Boolean problemsR6;
+    Boolean problemsR7;
+    Boolean problemsR8;
+    Boolean problemsR9;
+    Boolean problemsR10;
+    String  problemsOther;
+    
+    Boolean gainsR1;
+    Boolean gainsR2;
+    Boolean gainsR3;
+    Boolean gainsR4;
+    Boolean gainsR5;
+    Boolean gainsR6;
+    Boolean gainsR7;
+    Boolean gainsR8;
+    Boolean gainsR9;
+    Boolean gainsR10;
+    String gainsOther;
+}
+
+class TutorshipSummaryPeriod  {
+    LocalDate beginDate;
+    LocalDate endDate;
+}
+
+class TutorshipSummaryRelation  {
+    TutorshipParticipationType participationType;
+    Boolean participationRegularly;
+    Boolean participationNone;
+    Boolean outOfTouch;
+    Boolean highPerformance;
+    Boolean lowPerformance;
+    Boolean withoutEnrolments;
+}
+
+class TutorshipLog  {
+    Level motivation;
+    WishesTutor wishesTutor;
+    Boolean relativesSupport;
+    Boolean countsWithSupport;
+    Boolean difficultiesOrSpecialLimitations;
+    Option optionNumberDegree;
+    Integer howManyReunions;
+    String annotations;
+    String spaceToValidateStudentsRegistration;
+}
+
+class TutorshipStudentLowPerformanceQueueJob extends .org.fenixedu.academic.domain.QueueJobWithFile {
+    PrescriptionEnum prescriptionEnum;
+}
+
+class StudentHighPerformanceQueueJob extends .org.fenixedu.academic.domain.QueueJobWithFile {
+    AcademicInterval executionInterval (REQUIRED);
+}
+
+class reports.TutorshipProgramReportFile extends .org.fenixedu.academic.domain.reports.GepReportFile {}
+
+class ProgramTutoredParticipationLog extends .org.fenixedu.academic.domain.DegreeLog { }
+
+relation DegreeCurricularPlanTutorshipIntentions {
+    .org.fenixedu.academic.domain.DegreeCurricularPlan playsRole degreeCurricularPlan {
+        multiplicity 1..1;
+    }
+    TutorshipIntention playsRole tutorshipIntention {
+        multiplicity *;
+    }
+}
+
+relation TeachersTutorshipIntentions {
+    .org.fenixedu.academic.domain.Teacher playsRole teacher {
+        multiplicity 1..1;
+    }
+    TutorshipIntention playsRole tutorshipIntention {
+        multiplicity *;
+    }
+}
+
+relation RootDomainObjectTutorship {
+    .org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject;
+    Tutorship playsRole tutorships {
+        multiplicity *;
+    }
+}
+
+relation RootDomainObjectTutorshipSummary {
+    .org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject;
+    TutorshipSummary playsRole tutorshipSummaries {
+        multiplicity *;
+    }
+}
+
+relation RootDomainObjectTutorshipSummaryPeriod {
+    .org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject;
+    TutorshipSummaryPeriod playsRole tutorshipSummaryPeriods {
+        multiplicity *;
+    }
+}
+
+relation RootDomainObjectTutorshipSummaryRelation {
+    .org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject;
+    TutorshipSummaryRelation playsRole tutorshipSummaryRelations {
+        multiplicity *;
+    }
+}
+
+relation RootDomainObjectTutorshipLog {
+    .org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject;
+    TutorshipLog playsRole tutorshipLogs {
+        multiplicity *;
+    }
+}
+
+relation TutorshipSummaryTutorships {
+    Tutorship playsRole tutorship;
+    TutorshipSummaryRelation playsRole tutorshipSummaryRelations {
+        multiplicity *;
+    }
+}
+
+relation TutorshipTutorshipSummaries {
+    TutorshipSummary playsRole tutorshipSummary;
+    TutorshipSummaryRelation playsRole tutorshipSummaryRelations {
+        multiplicity *;
+    }
+}
+
+relation TutorshipStudentLowPerformanceExecutionYear {
+    .org.fenixedu.academic.domain.ExecutionYear playsRole executionYear;
+    TutorshipStudentLowPerformanceQueueJob playsRole tutorshipStudentLowPerformanceQueueJob {
+        multiplicity *;
+    }
+}
+
+relation TutorshipSummaryPeriodExecutionSemester {
+    TutorshipSummaryPeriod playsRole tutorshipSummaryPeriod;
+    .org.fenixedu.academic.domain.ExecutionSemester playsRole executionSemester;
+}
+
+relation TutorshipSummarySemester {
+    TutorshipSummary playsRole tutorshipSummaries {
+        multiplicity *;
+    }
+    .org.fenixedu.academic.domain.ExecutionSemester playsRole semester;
+}
+
+relation TutorshipSummaryDegree {
+    TutorshipSummary playsRole tutorshipSummaries {
+        multiplicity *;
+    }
+    .org.fenixedu.academic.domain.Degree playsRole degree;
+}
+
+relation TutorshipSummaryTeacher {
+    TutorshipSummary playsRole tutorshipSummaries {
+        multiplicity *;
+    }
+    .org.fenixedu.academic.domain.Teacher playsRole teacher;
+}
+
+relation TutorshipTutorshipLogs {
+    Tutorship playsRole tutorship;
+    TutorshipLog playsRole tutorshipLog;
+}
+
+relation TutorshipStudentCurricularPlan {
+    Tutorship playsRole tutorships {
+        multiplicity *;
+    }
+    .org.fenixedu.academic.domain.StudentCurricularPlan playsRole studentCurricularPlan;
+}
+
+relation TutorshipTeacher {
+    Tutorship playsRole tutorships {
+        multiplicity *;
+    }
+    .org.fenixedu.academic.domain.Teacher playsRole teacher;
+}
+
