@@ -1,0 +1,68 @@
+package pt.ist.fenixedu.delegates.domain;
+
+class util.email.DelegateSender extends .org.fenixedu.academic.domain.util.email.Sender {}
+
+class accessControl.PersistentDelegateGroup extends .org.fenixedu.academic.domain.accessControl.FenixPredicateGroup {
+    protected Boolean yearDelegate;
+}
+
+class student.Delegate  {
+    DateTime start;
+    DateTime end;
+}
+
+class student.YearDelegate extends student.Delegate {
+
+}
+
+class student.DegreeDelegate extends student.Delegate {
+
+}
+
+class student.CycleDelegate extends student.Delegate {
+    CycleType cycle;
+}
+
+relation DelegateWithSender {
+    student.Delegate playsRole delegate{
+        multiplicity *;
+    }
+    util.email.DelegateSender playsRole sender;
+}
+
+relation DelegateGroupDegree {
+    protected .org.fenixedu.academic.domain.Degree playsRole degree {
+        multiplicity 0..1;
+    }
+    public accessControl.PersistentDelegateGroup playsRole delegatesGroup {
+        multiplicity *;
+    }
+}
+
+relation DelegateDegree{
+    student.Delegate playsRole delegate{
+        multiplicity *;
+    }
+    .org.fenixedu.academic.domain.Degree playsRole degree;
+}
+
+relation DelegateYear {
+    student.YearDelegate playsRole delegate{
+        multiplicity *;
+    }
+    .org.fenixedu.academic.domain.CurricularYear playsRole curricularYear;
+}
+
+relation DelegateUser {
+    .org.fenixedu.bennu.core.domain.User playsRole user;
+     student.Delegate playsRole delegates {
+         multiplicity *;
+     }
+}
+
+relation DelegateRootDomainObject {
+    .org.fenixedu.bennu.core.domain.Bennu playsRole bennu;
+    student.Delegate playsRole delegates {
+        multiplicity *;
+    }
+}

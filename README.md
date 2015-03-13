@@ -25,3 +25,7 @@ Fenix IST
 To compile, simply type:
 
     mvn clean install
+
+FenixEdu Delegates
+==========
+
