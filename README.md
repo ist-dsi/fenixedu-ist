@@ -38,3 +38,8 @@ fenixedu-ist-vigilancies
 ========================
 
 Exam vigilancies for IST
+
+fenixedu-ist-libraryspace
+=========================
+
+System for access control for library spaces
