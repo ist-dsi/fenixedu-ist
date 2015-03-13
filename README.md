@@ -33,3 +33,8 @@ fenixedu-ist-pre-bolonha
 ========================
 
 Pre-bolonha legacy code
+
+fenixedu-ist-vigilancies
+========================
+
+Exam vigilancies for IST
