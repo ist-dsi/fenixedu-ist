@@ -11,3 +11,8 @@ Fenix IST Parking
 To install, simply type:
 
     mvn clean install
+
+fenixedu-ist-teacher-service
+============================
+
+Staff management and evaluation

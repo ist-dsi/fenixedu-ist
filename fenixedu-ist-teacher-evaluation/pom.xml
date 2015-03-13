@@ -1,0 +1,38 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>pt.ist</groupId>
+        <artifactId>fenixedu-ist-teacher-service</artifactId>
+        <version>5.2.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>fenixedu-ist-teacher-evaluation</artifactId>
+    <packaging>jar</packaging>
+
+    <name>FenixEdu Teacher Evaluation</name>
+    <url>http://tecnico.ulisboa.pt/</url>
+    <inceptionYear>2011</inceptionYear>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.fenixedu</groupId>
+            <artifactId>fenixedu-academic</artifactId>
+            <version>4.0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>pt.ist</groupId>
+            <artifactId>fenixedu-ist-giaf-contracts</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <id>fenixedu-maven-repository</id>
+            <url>https://repo.fenixedu.org/fenixedu-maven-repository</url>
+        </repository>
+    </repositories>
+
+</project>

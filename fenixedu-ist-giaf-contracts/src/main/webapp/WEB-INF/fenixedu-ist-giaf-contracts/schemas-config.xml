@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright © 2011 Instituto Superior Técnico
+
+    This file is part of FenixEdu GIAF Contracts.
+
+    FenixEdu GIAF Contracts is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    FenixEdu GIAF Contracts is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with FenixEdu GIAF Contracts.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<!-- TODO: make this a public id or at least obsolute 
+     Currently there is a semi-hack built in the RendererPlugin to accept this format.
+-->
+
+<schemas>
+
+<schema name="view.person.personProfessionalData" type="pt.ist.fenixedu.contracts.domain.personnelSection.contracts.GiafProfessionalData" bundle="CONTRACTS_RESOURCES">
+    <slot name="professionalContractType" key="label.type" layout="values" schema="view.professionalContractType.name"/>
+    <slot name="giafPersonIdentification" key="label.giafPersonIdentification" layout="null-as-label"/>
+    <slot name="campus" key="label.campus" layout="values" schema="view.campus.name"/>
+    <slot name="institutionEntryDate" key="label.institutionEntryDate" layout="null-as-label"/>
+    <slot name="contractSituation" key="label.situation" layout="values" schema="view.contractSituation.name"/>
+    <slot name="contractSituationDate" key="label.date"/>
+    <slot name="contractSituation" key="label.situation" layout="values" schema="view.contractSituation.name"/>
+    <slot name="contractSituationDate" key="label.date"/>
+    <slot name="terminationSituationDate" key="label.date"/>
+    <slot name="professionalRelation" key="label.relation" layout="values" schema="view.professionalRelation.name"/>
+    <slot name="professionalRelationDate" key="label.date"/>
+    <slot name="professionalCategory" key="label.category" layout="values" schema="view.professionalCategory.name"/>
+    <slot name="professionalCategoryDate" key="label.date"/>
+    <slot name="professionalRegime" key="label.regime" layout="values" schema="view.professionalRegime.name"/>
+    <slot name="professionalRegimeDate" key="label.date"/>
+</schema>
+
+<schema name="view.campus.name" type="org.fenixedu.spaces.domain.Space" bundle="CONTRACTS_RESOURCES">
+    <slot name="name" key="label.campus" layout="null-as-label"/>
+</schema>
+
+<schema name="view.person.personContractSituation" type="pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonContractSituation" bundle="CONTRACTS_RESOURCES">
+    <slot name="beginDate"/>
+    <slot name="endDate"/>
+    <slot name="contractSituation" key="label.situation" layout="values" schema="view.contractSituation.name"/>
+    <slot name="step"/>
+    <slot name="professionalCategory" key="label.category" layout="values" schema="view.professionalCategory.name" />
+</schema>
+
+<schema name="view.person.personContractSituation.MANAGER" type="pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonContractSituation" bundle="CONTRACTS_RESOURCES" extends="view.person.personContractSituation">
+    <slot name="creationDate"/>
+    <slot name="modifiedDate"/>
+    <slot name="importationDate"/>
+</schema>
+
+<schema name="view.person.personProfessionalCategory" type="pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalCategory" bundle="CONTRACTS_RESOURCES">
+    <slot name="beginDate"/>
+    <slot name="endDate"/>
+    <slot name="professionalCategory" key="label.category" layout="values-dash" schema="view.professionalCategory.nameAndType"/>
+    <slot name="professionalRegime" key="label.regime" layout="values" schema="view.professionalRegime.name"/>
+    <slot name="professionalRelation" key="label.relation" layout="values" schema="view.professionalRelation.name"/>
+    <slot name="level"/>
+    <slot name="step"/>
+</schema>
+
+<schema name="view.person.personProfessionalRegime" type="pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalRegime" bundle="CONTRACTS_RESOURCES">
+    <slot name="beginDate"/>
+    <slot name="endDate"/>
+    <slot name="professionalRegime" key="label.regime" layout="values-dash" schema="view.professionalRegime.nameAndType"/>
+</schema>
+
+<schema name="view.person.personProfessionalRelation" type="pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalRelation" bundle="CONTRACTS_RESOURCES">
+    <slot name="beginDate"/>
+    <slot name="endDate"/>
+    <slot name="professionalRelation" key="label.relation" layout="values" schema="view.professionalRelation.name"/>
+    <slot name="professionalCategory" key="label.category" layout="values"  schema="view.professionalCategory.name"/>
+</schema>
+
+<schema name="view.person.personProfessionalContract" type="pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalContract" bundle="CONTRACTS_RESOURCES">
+    <slot name="beginDate"/>
+    <slot name="endDate"/>
+    <slot name="contractSituation" key="label.situation" layout="values" schema="view.contractSituation.name"/>
+</schema>
+
+<schema name="view.person.personFunctionsAccumulation" type="pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonFunctionsAccumulation" bundle="CONTRACTS_RESOURCES">
+    <slot name="beginDate"/>
+    <slot name="endDate"/>
+    <slot name="hours" />
+    <slot name="professionalRegime" key="label.regime" layout="values" schema="view.professionalRegime.name"/>
+    <slot name="functionsAccumulation" key="label.function" layout="values" schema="view.functionsAccumulation.name"/>
+</schema>
+
+<schema name="view.person.personSabbatical" type="pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalExemption" bundle="CONTRACTS_RESOURCES">
+    <slot name="beginDate"/>
+    <slot name="endDate"/>
+</schema>
+
+<schema name="view.person.personServiceExemption" type="pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalExemption" bundle="CONTRACTS_RESOURCES">
+    <slot name="beginDate"/>
+    <slot name="endDate"/>
+    <slot name="serviceExemption" key="label.exemption" layout="values" schema="view.serviceExemption.name"/>
+</schema>
+
+<schema name="view.person.personAbsence" type="pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalExemption" bundle="CONTRACTS_RESOURCES">
+    <slot name="beginDate"/>
+    <slot name="endDate"/>
+    <slot name="absence" key="label.absences" layout="values" schema="view.absence.name"/>
+</schema>
+
+<schema name="country.name" type="org.fenixedu.academic.domain.Country">
+    <slot name="name" />
+</schema>
+
+<schema name="view.person.personGrantOwnerEquivalent" type="pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalExemption" bundle="CONTRACTS_RESOURCES">
+    <slot name="beginDate"/>
+    <slot name="endDate"/>
+    <slot name="motive"/>
+    <slot name="local"/>
+    <slot name="giafCountryName"/>
+    <slot name="country" schema="country.name" layout="values"/>
+    <slot name="grantOwnerEquivalent" key="label.type" layout="values" schema="view.grantOwnerEquivalent.name"/>
+</schema>
+
+<schema name="view.professionalContractType.name" type="pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalContractType" bundle="CONTRACTS_RESOURCES">
+    <slot name="name" key="label.type" layout="null-as-label"/>
+</schema>
+
+<schema name="view.contractSituation.name" type="pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ContractSituation" bundle="CONTRACTS_RESOURCES">
+    <slot name="name" key="label.situation" layout="null-as-label"/>
+</schema>
+
+<schema name="view.professionalRegime.name" type="pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalRegime" bundle="CONTRACTS_RESOURCES">
+    <slot name="name" key="label.regime" layout="null-as-label"/>
+</schema>
+
+<schema name="view.professionalRegime.nameAndType" type="pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalRegime" bundle="CONTRACTS_RESOURCES">
+    <slot name="name" key="label.regime" layout="null-as-label"/>
+    <slot name="categoryType" key="label.type" layout="null-as-label"/>
+</schema>
+
+<schema name="view.professionalCategory.name" type="pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalCategory" bundle="CONTRACTS_RESOURCES">
+    <slot name="name" key="label.category" layout="null-as-label"/>
+</schema>
+
+<schema name="view.teacherCategory.name" type="org.fenixedu.academic.domain.TeacherCategory" bundle="CONTRACTS_RESOURCES">
+    <slot name="name" key="label.category" layout="null-as-label"/>
+</schema>
+
+<schema name="view.professionalCategory.nameAndType" type="pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalCategory" bundle="CONTRACTS_RESOURCES">
+    <slot name="name" key="label.category" layout="null-as-label"/>
+    <slot name="categoryType" key="label.type" layout="null-as-label"/>
+</schema>
+
+<schema name="view.professionalRelation.name" type="pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalRelation" bundle="CONTRACTS_RESOURCES">
+    <slot name="name" key="label.relation" layout="null-as-label"/>
+</schema>
+
+<schema name="view.functionsAccumulation.name" type="pt.ist.fenixedu.contracts.domain.personnelSection.contracts.FunctionsAccumulation" bundle="CONTRACTS_RESOURCES">
+    <slot name="name" key="label.function" layout="null-as-label"/>
+</schema>
+
+<schema name="view.serviceExemption.name" type="pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ServiceExemption" bundle="CONTRACTS_RESOURCES">
+    <slot name="name" key="label.exemption" layout="null-as-label"/>
+</schema>
+
+<schema name="view.grantOwnerEquivalent.name" type="pt.ist.fenixedu.contracts.domain.personnelSection.contracts.GrantOwnerEquivalent" bundle="CONTRACTS_RESOURCES">
+    <slot name="name" key="label.type" layout="null-as-label"/>
+</schema>
+
+<schema name="view.absence.name" type="pt.ist.fenixedu.contracts.domain.personnelSection.contracts.Absence" bundle="CONTRACTS_RESOURCES">
+    <slot name="name" key="label.absences" layout="null-as-label"/>
+</schema>
+
+<schema name="ViewPersonInvitations" type="pt.ist.fenixedu.contracts.domain.organizationalStructure.Invitation" bundle="MANAGER_RESOURCES">
+    <slot name="beginDate" />
+    <slot name="endDate" />
+    <slot name="hostUnit.presentationNameWithParents" key="label.host.unit"/>
+    <slot name="responsible.name" key="label.responsible.party"/>
+</schema>
+
+<schema name="EditInviteTimeInterval" type="pt.ist.fenixedu.contracts.domain.organizationalStructure.Invitation" bundle="MANAGER_RESOURCES">
+    <slot name="beginDate" validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator"/>
+    <slot name="endDate" validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator"/>
+    <setter signature="setInvitationInterval(beginDate, endDate)"/>
+</schema>
+
+<schema name="EditInvitationResponsible" type="pt.ist.fenixedu.contracts.domain.organizationalStructure.Invitation" bundle="MANAGER_RESOURCES">
+    <slot name="responsiblePerson" layout="username-as-person" key="label.responsibility.person.username" validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator"/>             
+</schema>
+
+
+<schema name="personManagement.merge.chooseObjects"
+        type="pt.ist.fenix.ui.struts.action.manager.personManagement.MergePersonsDA$MergePersonsBean"
+        bundle="MANAGER_RESOURCES">
+    <slot name="leftOid" key="label.personManagement.merge.destiny.oid"/>
+    <slot name="rightOid" key="label.personManagement.merge.remove.oid"/> 
+</schema>
+
+
+<schema name="show.personAndEmployee" type="org.fenixedu.academic.domain.Person" bundle="CONTRACTS_RESOURCES">
+    <slot name="this" key="label.empty" layout="view-as-image">
+		<fr:property name="classes" value="column3" />
+		<fr:property name="moduleRelative" value="false" />
+		<fr:property name="contextRelative" value="true" />
+		<fr:property name="imageFormat" value="/user/photo/${username}" />
+	</slot>
+	<slot name="username" key="label.username"/>
+	<slot name="presentationName" key="label.name"/>
+	<slot name="employee" key="label.name" schema="view.employee.number" layout="values"/>
+</schema>
+
+<schema name="view.employee.number" type="pt.ist.fenixedu.contracts.domain.Employee" bundle="CONTRACTS_RESOURCES">
+    <slot name="employeeNumber" key="label.giafId" layout="null-as-label"/>
+</schema>
+
+<schema name="ChooseInvitedPersonResponsibilityPerson" type="pt.ist.fenixedu.contracts.dto.InvitedPersonBean" bundle="MANAGER_RESOURCES">
+    <slot name="responsiblePerson" layout="username-as-person" key="label.responsibility.person.username" validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator"/>             
+</schema>   
+
+<schema name="NewInvitedPersonIdentificationInfo" type="pt.ist.fenixedu.contracts.dto.InvitedPersonBean" bundle="MANAGER_RESOURCES">
+    <slot name="documentIdNumber" validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator"/> 
+    <slot name="idDocumentType" validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator">
+        <property name="excludedValues" value="CITIZEN_CARD" />
+    </slot>         
+    <slot name="documentIdEmissionLocation" />
+    <slot name="documentIdEmissionDate" />
+    <slot name="documentIdExpirationDate" />
+</schema>
+
+<schema name="NewInvitedPersonPersonalInfo" type="pt.ist.fenixedu.contracts.dto.InvitedPersonBean" bundle="MANAGER_RESOURCES">
+    <slot name="givenNames" validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator">
+        <property name="size" value="50"/>
+    </slot>
+    <slot name="familyNames">
+        <property name="size" value="50"/>
+    </slot>
+    <slot name="gender" validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator"/>
+    <slot name="socialSecurityNumber"/>
+    <slot name="profession"/>
+    <slot name="maritalStatus"/>    
+</schema>   
+
+<schema name="NewInvitedPersonFiliationInfo" type="pt.ist.fenixedu.contracts.dto.InvitedPersonBean" bundle="MANAGER_RESOURCES">
+    <slot name="countryOfBirth" layout="menu-select" validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator"> 
+        <property name="format" value="${name}"/>
+        <property name="sortBy" value="name=asc" />
+        <property name="providerClass" value="org.fenixedu.academic.ui.renderers.providers.DistinctCountriesProvider" />
+    </slot>
+    <slot name="nationality" layout="menu-select" validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator"> 
+        <property name="providerClass" value="org.fenixedu.academic.ui.renderers.providers.CountryProvider"/> 
+        <property name="format" value="${nationality}"/>
+        <property name="sortBy" value="nationality=asc" />
+    </slot>
+    <slot name="dateOfBirth" />
+    <slot name="parishOfBirth">
+        <property name="size" value="50"/>
+        <property name="maxLength" value="100"/>
+    </slot>
+    <slot name="districtSubdivisionOfBirth">
+        <property name="size" value="50"/>
+        <property name="maxLength" value="100"/>
+    </slot>
+    <slot name="districtOfBirth">
+        <property name="size" value="50"/>
+        <property name="maxLength" value="100"/>
+    </slot>
+    <slot name="fatherName">
+        <property name="size" value="50"/>
+        <property name="maxLength" value="100"/>
+    </slot>
+    <slot name="motherName">
+        <property name="size" value="50"/>
+        <property name="maxLength" value="100"/>
+    </slot>          
+</schema>
+
+<schema name="NewInvitedPersonResidenceInfo" type="pt.ist.fenixedu.contracts.dto.InvitedPersonBean" bundle="MANAGER_RESOURCES">
+    <slot name="countryOfResidence" layout="menu-select" > 
+        <property name="format" value="${name}"/>
+        <property name="sortBy" value="name=asc" />
+        <property name="providerClass" value="org.fenixedu.academic.ui.renderers.providers.DistinctCountriesProvider" />
+    </slot>
+    <slot name="address" >
+        <property name="size" value="50"/>
+        <property name="maxLength" value="100"/>
+    </slot>
+    <slot name="areaCode"/>
+    <slot name="areaOfAreaCode" />
+    <slot name="area"/>
+    <slot name="parishOfResidence" >
+        <property name="size" value="50"/>
+        <property name="maxLength" value="100"/>
+    </slot>
+    <slot name="districtSubdivisionOfResidence">
+        <property name="size" value="50"/>
+        <property name="maxLength" value="100"/>
+    </slot>
+    <slot name="districtOfResidence" >
+        <property name="size" value="50"/>
+        <property name="maxLength" value="100"/>
+    </slot>
+</schema>
+
+
+<schema name="NewInvitedPersonContactsInfo" type="pt.ist.fenixedu.contracts.dto.InvitedPersonBean" bundle="MANAGER_RESOURCES">
+    <slot name="phone">
+        <property name="size" value="15"/>
+        <property name="maxLength" value="15"/>
+        <validator class="pt.ist.fenixWebFramework.renderers.validators.RegexpValidator">
+            <property name="regexp" value="(\d{4,15})?" />
+            <property name="message" value="error.phone.invalidFormat" />
+            <property name="key" value="true" />
+        </validator>
+    </slot>    
+    <slot name="mobile">
+        <property name="size" value="15"/>
+        <property name="maxLength" value="15"/>
+        <validator class="pt.ist.fenixWebFramework.renderers.validators.RegexpValidator">
+            <property name="regexp" value="(\d{4,15})?" />
+            <property name="message" value="error.phone.invalidFormat" />
+            <property name="key" value="true" />
+        </validator>
+    </slot>
+    <slot name="email">
+        <property name="size" value="30"/>
+        <property name="maxLength" value="100"/>
+    </slot>
+    <slot name="webAddress">
+        <property name="size" value="50"/>
+        <property name="maxLength" value="200"/>
+        <validator class="pt.ist.fenixWebFramework.renderers.validators.UrlValidator">
+            <property name="required" value="false" />
+        </validator>
+    </slot>    
+</schema>   
+
+<schema name="NewInvitedPersonLoginInfo" type="pt.ist.fenixedu.contracts.dto.InvitedPersonBean" bundle="MANAGER_RESOURCES">
+    <slot name="begin" key="label.login.begin" validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator"/>        
+    <slot name="end" key="label.login.end" validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator"/>        
+</schema>   
+
+</schemas>

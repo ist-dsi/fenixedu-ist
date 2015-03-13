@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright © 2011 Instituto Superior Técnico
+
+    This file is part of FenixEdu Teacher Credits.
+
+    FenixEdu Teacher Credits is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    FenixEdu Teacher Credits is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with FenixEdu Teacher Credits.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<schemas>
+
+<!-- Teacher Service Distribution -->
+<schema name="show.degreeProjectTutorialService" type="pt.ist.fenixedu.teacher.domain.teacher.DegreeProjectTutorialService" bundle="TEACHER_CREDITS_SHEET_RESOURCES">
+	<slot name="attend.registration.number" key="label.teacher-thesis-student.student-number"/>
+	<slot name="attend.registration.student.person.name" key="label.teacher-thesis-student.student-name"/>
+	<slot name="attend.enrolment" key="label.date" layout="values" schema="show.enrolment.approvementDate"/>
+	<slot name="percentageValue" key="label.teacher-thesis-student.percentage" layout="null-as-label"/>
+</schema>
+
+<schema name="show.degreeProjectTutorialService.attend" bundle="TEACHER_CREDITS_SHEET_RESOURCES" type="org.fenixedu.academic.domain.Attends">
+	<slot name="registration.number" key="label.teacher-thesis-student.student-number"/>
+	<slot name="registration.student.person.name" key="label.teacher-thesis-student.student-name"/>
+	<slot name="enrolment" key="label.date" layout="values" schema="show.enrolment.approvementDate"/>
+</schema>
+
+<schema name="show.enrolment.approvementDate" type="org.fenixedu.academic.domain.Enrolment">
+	<slot name="approvementDate" key="label.date" layout="null-as-label"/>
+</schema>
+
+<schema name="create.reductionService" type="pt.ist.fenixedu.teacher.domain.teacher.ReductionService" constructor="teacherService,requestCreditsReduction" bundle="TEACHER_CREDITS_SHEET_RESOURCES">
+	<slot name="teacherService" hidden="true"/>
+	<slot name="requestCreditsReduction" key="label.requestCreditsReduction"  layout="radio" required="true">
+		<property name="classes" value="nobullet"/>
+	</slot>
+</schema>
+
+<schema name="create.reductionServiceAttributed" type="pt.ist.fenixedu.teacher.domain.teacher.ReductionService" constructor="creditsReductionAttributed,teacherService" bundle="TEACHER_CREDITS_SHEET_RESOURCES">
+	<slot name="teacherService" hidden="true"/>
+	<slot name="creditsReductionAttributed" key="label.attributedReductionCredits" validator="pt.ist.fenixWebFramework.renderers.validators.NumberValidator" required="true"/>
+</schema>
+
+<schema name="manage.otherService" type="pt.ist.fenixedu.teacher.domain.teacher.OtherService" constructor="teacherService,credits,reason,correctedExecutionSemester" bundle="TEACHER_CREDITS_SHEET_RESOURCES">
+	<slot name="teacherService" hidden="true"/>
+	<slot name="credits" key="label.credits" required="true"/>
+	<slot name="reason" key="label.otherTypeCreditLine.reason" layout="longText" required="true">
+		<property name="columns" value="60" />
+		<property name="rows" value="5" />
+	</slot>
+	<slot name="correctedExecutionSemester" key="label.execution-period" layout="menu-select">
+		<property name="providerClass" value="org.fenixedu.academic.ui.renderers.providers.ExecutionSemestersProvider" />
+		<property name="format" value="${executionYear.year} - ${semester}º semestre" />
+	</slot>
+	<setter signature="setValues(teacherService,credits,reason,correctedExecutionSemester)"/>
+</schema>
+
+<schema name="create.teacherServiceComment" type="pt.ist.fenixedu.teacher.domain.teacher.TeacherServiceComment" constructor="teacherService,content" bundle="TEACHER_CREDITS_SHEET_RESOURCES">
+	<slot name="teacherService" hidden="true"/>
+	<slot name="content" key="label.comment" layout="longText" required="true">
+		<property name="columns" value="60" />
+		<property name="rows" value="5" />
+	</slot>
+</schema>
+
+<schema name="edit.institutionWorkTime" type="pt.ist.fenixedu.teacher.domain.teacher.InstitutionWorkTime" bundle="TEACHER_CREDITS_SHEET_RESOURCES">
+	<slot name="weekDay">
+		<validator class="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator"/>
+	</slot>
+	<slot name="startTime" key="label.teacher-institution-working-time.start-time">
+		<property name="format" value="HH:mm" />
+		<validator class="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator"/>
+	</slot>
+	<slot name="endTime" key="label.teacher-institution-working-time.end-time">
+		<property name="format" value="HH:mm" />
+		<validator class="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator"/>
+	</slot>
+	<setter signature="update(weekDay,startTime,endTime)"/>
+</schema>
+
+<schema name="create.institutionWorkTime" type="pt.ist.fenixedu.teacher.domain.teacher.InstitutionWorkTime" constructor="teacherService,startTime,endTime,weekDay" bundle="TEACHER_CREDITS_SHEET_RESOURCES">
+	<slot name="teacherService" hidden="true"/>
+	<slot name="weekDay">
+		<validator class="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator"/>
+	</slot>
+	<slot name="startTime" key="label.teacher-institution-working-time.start-time">
+		<property name="format" value="HH:mm" />
+		<validator class="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator"/>
+	</slot>
+	<slot name="endTime" key="label.teacher-institution-working-time.end-time">
+		<property name="format" value="HH:mm" />
+		<validator class="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator"/>
+	</slot>
+</schema>
+
+<schema name="scientificCouncil.credits.employee" type="pt.ist.fenixedu.contracts.domain.Employee">
+    <slot name="employeeNumber" key="label.department.credits.employeeNumber">
+    </slot>
+    <slot name="person.name" key="label.department.credits.employeeName">
+    </slot>
+</schema>
+
+<schema name="manage.supportLesson" type="pt.ist.fenixedu.teacher.domain.SupportLesson" constructor="professorship,weekDayObject,startTimeHourMinuteSecond,endTimeHourMinuteSecond,place" bundle="TEACHER_CREDITS_SHEET_RESOURCES">
+	<slot name="professorship" hidden="true"/>
+	<slot name="weekDayObject" key="label.support-lesson.weekday" required="true"/>
+	<slot name="startTimeHourMinuteSecond" key="label.support-lesson.start-time" required="true">
+		<property name="second" value="false"/>
+	</slot>
+	<slot name="endTimeHourMinuteSecond" key="label.support-lesson.end-time" required="true">
+		<property name="second" value="false"/>
+	</slot>
+	<slot name="place" key="label.support-lesson.place"/>
+	<setter signature="edit(weekDayObject,startTimeHourMinuteSecond,endTimeHourMinuteSecond,place)"/>
+</schema>
+
+</schemas>
