@@ -1,0 +1,47 @@
+<!--
+
+    Copyright © ${project.inceptionYear} Instituto Superior Técnico
+
+    This file is part of Fenix IST.
+
+    Fenix IST is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Fenix IST is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with Fenix IST.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+{% macro curricularPlanDegreeName(curricularPlan) %}
+	{{ 	i18n('resources.EnumerationResources', 
+			 curricularPlan.specialization.name equals 'STUDENT_CURRICULAR_PLAN_SPECIALIZATION' ? 
+				'STUDENT_CURRICULAR_PLAN_SPECIALIZATION' :
+				curricularPlan.degreeCurricularPlan.degree.tipoCurso.name)
+		+ ' ' + i18n('resources.HomepageResources','label.in')
+		+ ' ' + curricularPlan.degreeCurricularPlan.degree.name }}
+{% endmacro %}
+
+{% macro curricularPlanDegreeLink(curricularPlan) %}
+	{% if curricularPlan.degree.siteUrl is not empty %}
+		<a href="{{ curricularPlan.degree.siteUrl }}">
+			{{ curricularPlanDegreeName(curricularPlan) }}
+		</a>
+	{% else %}
+		{{ curricularPlanDegreeName(curricularPlan) }}
+	{% endif %}
+{% endmacro %}
+
+{% macro curricularPlanDegreeList(curricularPlans, separator=',') %}
+	{% for curricularPlan in curricularPlans %}
+		<p>{% if loop.index != 0 %}
+			
+		{% endif %}
+		{{ curricularPlanDegreeLink(curricularPlan) }}</p>
+	{% endfor %}
+{% endmacro %}

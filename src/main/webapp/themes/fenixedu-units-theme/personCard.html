@@ -1,0 +1,66 @@
+<!--
+
+    Copyright © ${project.inceptionYear} Instituto Superior Técnico
+
+    This file is part of Fenix IST.
+
+    Fenix IST is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Fenix IST is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with Fenix IST.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+{% macro personsCards(persons, title) %}
+
+	{% if persons is not empty %}
+		<h4 class="persons-title"><small>{{ title }}</small></h4>
+		{% lazyFor person in persons %}
+			<div class="person-card-item">
+				{{ personCard(person) }}
+				<hr>
+			</div>
+		{% endLazyFor %}
+	{% endif %}
+
+{% endmacro %}
+
+{% macro personCard(person) %}
+	{% if person is not empty %}
+        <div class="container-fluid">
+
+            <div class="person-card row">
+                <div class="col-md-3 person-photo text-center">
+                    {% if person.homepageWebAddress is not empty %}
+                        <a href="{{ person.homepageWebAddress }}">
+                            <img class="img-circle" alt="{{ person.presentationName }}" src="{{ person.user.profile.avatarUrl }}"/>
+                        </a>
+                    {% else %}
+                        <img class="img-circle" alt="{{ person.presentationName }}" src="{{ person.user.profile.avatarUrl }}"/>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-9 person-details text-left">
+                    <br/>
+                    {% if person.homepageWebAddress is not empty %}
+                        <a href="{{ person.homepageWebAddress }}">{{ person.presentationName }}</a></p>
+                    {% else %}
+                        <p>{{ person.presentationName }}</p>
+                    {% endif %}
+                    {% if person.getDefaultEmailAddressValue is not empty %}
+                        <p><a href="mailto:{{ person.getDefaultEmailAddressValue }}">{{ person.getDefaultEmailAddressValue }}</a></p>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+	{% endif %}
+{% endmacro %}
+

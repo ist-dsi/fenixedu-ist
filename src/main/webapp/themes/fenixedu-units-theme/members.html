@@ -1,0 +1,61 @@
+<!--
+
+    Copyright © ${project.inceptionYear} Instituto Superior Técnico
+
+    This file is part of Fenix IST.
+
+    Fenix IST is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Fenix IST is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with Fenix IST.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+{% extends "fenixedu-units-theme/base.html" %}
+
+{% import "fenixedu-units-theme/personCard.html" %}
+
+{% block content %}
+
+	{% macro researchUnitMembers(unit) %}
+        {% if unit.researchers is empty and unit.technicalStaff is empty and unit.internships is empty and unit.scholarships is empty %}
+            <p>{{ i18n('resources.FenixEduLearningResources', 'researchUnit.members.empty') }}</p>
+        {% else %}
+            {{ personsCards(unit.researchers, i18n('resources.SiteResources', 'label.researchers')) }}
+
+            {{ personsCards(unit.technicalStaff, i18n('resources.SiteResources', 'label.technicalStaff')) }}
+
+            {{ personsCards(unit.internships, i18n('resources.SiteResources', 'label.internship')) }}
+
+            {{ personsCards(unit.scholarships, i18n('resources.SiteResources', 'label.scholarship')) }}
+        {% endif %}
+	{% endmacro %}
+
+	<h3>{{ unit.nameWithAcronym }}</h3>
+
+	<div>{{ researchUnitMembers(unit) }}</div>
+
+	{% if unit.allCurrentActiveSubUnits is not empty %}
+		{% for subunit in unit.allCurrentActiveSubUnits %}
+			{% if subunit.researchUnit %}
+				{% set unitUrl = subunit.site.initialPage is not empty ? 'unit.site.initialPage.pageAddress' : '#' %}
+				<h4><a href="{{ unitUrl }}">{{ subunit.nameWithAcronym }}</a></h4>
+				
+				{% if subunit.siteAvailable %}
+					{{ researchUnitMembers(subunit) }}
+				{% else %}
+					<p>{{ i18n('resources.SiteResources', 'label.noMembersDefined') }}</p>
+				{% endif %}
+			{% endif %}
+		{% endfor %}
+	{% endif %}
+
+{% endblock content %}
+

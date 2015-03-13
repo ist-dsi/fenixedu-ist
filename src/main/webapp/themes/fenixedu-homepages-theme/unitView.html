@@ -1,0 +1,68 @@
+<!--
+
+    Copyright © ${project.inceptionYear} Instituto Superior Técnico
+
+    This file is part of Fenix IST.
+
+    Fenix IST is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Fenix IST is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with Fenix IST.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+{% macro unitLink(unit) %}
+	 <p>{% if unit.webAddress is not empty %}
+	 	<a href="{{ unit.webAddress }}">{{ unit.name }}</a>
+	 {% else %}
+	 	{{ unit.name }}
+	 {% endif %}</p>
+{% endmacro %}
+
+{%	macro listNonAggregateUnits(unitList, separator=',') %}
+	{% set first=true %}
+	{% for unit in unitList %}
+		{% if not unit.aggregateUnit %}
+			{% if first %}
+				{% set first=false %}
+			{% else %}
+				{{ separator | raw }}
+			{% endif %}
+			{{ unitLink(unit) }}
+		{% endif %}
+	{% endfor %}
+{% endmacro %}
+
+{% macro listUnitAndParents(unit, firstSeparator='', separator=',') %}
+	{{ unitLink(unit) }}
+	{% if unit.parentUnits is not empty %}
+		{{ firstSeparator | raw }}
+		{{ listNonAggregateUnits(unit.parentUnits, separator) }}
+	{% endif %}
+{% endmacro %}
+
+{% macro listUnitTree(unit, separator='') %}
+	{{ unitLink(unit) }}
+	{% if unit.parentUnitsPath is not empty %}
+		{{ separator | raw }}
+		{{ listNonAggregateUnits(unit.parentUnitsPath | reverse, separator) }}
+	{% endif %}
+{% endmacro %}
+
+{% macro researchUnitsList(units) %}
+	{% for unit in units %}
+		{% if loop.index != 0 %}
+			
+		{% endif %}
+		<p>
+			{{ listUnitAndParents(unit) }}
+		</p>
+	{% endfor %}
+{% endmacro %}

@@ -1,0 +1,77 @@
+<!--
+
+    Copyright © ${project.inceptionYear} Instituto Superior Técnico
+
+    This file is part of Fenix IST.
+
+    Fenix IST is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Fenix IST is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with Fenix IST.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+{% extends "fenixedu-units-theme/base.html" %}
+{% import "fenixedu-units-theme/view.html" %}
+
+{% block content %}
+
+    {% block unitHeader %}{% endblock unitHeader %}
+    
+    <hr />
+
+    <div class="row">   
+        {% set colSize = showEvents and events is not empty and showAnnouncements and announcements is not empty ? 6 : 12 %}
+
+        {% if showAnnouncements and announcements is not empty %}
+        <div class="col-md-{{ colSize }}">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{ i18n('resources.FenixEduLearningResources', 'label.announcements') }}</h3>
+                </div>
+
+                <div class="panel-body">
+                    <p>{{ viewPost(announcements | head) }}</p>
+                    <hr>
+                    <a href="{{ announcementsUrl }}">{{ i18n('resources.FenixEduLearningResources', 'label.announcements.all') }}</a>
+                </div>
+            </div>
+
+        </div>
+        {% endif %}
+
+        {% if showEvents and events is not empty %}
+        <div class="col-md-{{ colSize }}">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{ i18n('resources.FenixEduLearningResources', 'label.events') }}</h3>
+                </div>
+
+                <div class="panel-body">
+                    <p>{{ viewPost(events | head) }}</p>
+                    <hr>
+                    <a href="{{ eventsUrl }}">{{ i18n('resources.FenixEduLearningResources', 'label.announcements.all') }}</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+    <style>
+        .banner {
+            width: 100%;
+            float: left;
+            background-color: {{ color }};
+            /*background-image: url('{{ backgroundImage }}');*/
+            background-repeat: {{ repeatType }};
+        }
+    </style>
+
+{% endblock content %}
