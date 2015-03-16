@@ -32,9 +32,10 @@ import org.fenixedu.bennu.scheduler.annotation.Task;
 import org.fenixedu.bennu.scheduler.custom.CustomTask;
 import org.fenixedu.commons.StringNormalizer;
 import org.fenixedu.idcards.domain.SantanderCardInformation;
-import org.fenixedu.parking.domain.ParkingGroup;
-import org.fenixedu.parking.domain.ParkingParty;
 import org.joda.time.DateTime;
+
+import pt.ist.fenixedu.parking.domain.ParkingGroup;
+import pt.ist.fenixedu.parking.domain.ParkingParty;
 
 @Task(englishTitle = "Send car park users to remote car park")
 public class ExportCarParkUsers extends CustomTask {

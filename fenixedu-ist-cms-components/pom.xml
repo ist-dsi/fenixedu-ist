@@ -93,7 +93,7 @@
         </dependency>
         <dependency>
             <groupId>pt.ist</groupId>
-            <artifactId>fenix-parking</artifactId>
+            <artifactId>fenixedu-ist-parking</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

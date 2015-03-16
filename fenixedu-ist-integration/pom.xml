@@ -39,7 +39,7 @@
         </dependency>
         <dependency>
             <groupId>pt.ist</groupId>
-            <artifactId>fenix-parking</artifactId>
+            <artifactId>fenixedu-ist-cms-components</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -60,6 +60,11 @@
         <dependency>
             <groupId>pt.ist</groupId>
             <artifactId>fenixedu-ist-libraryspace</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>pt.ist</groupId>
+            <artifactId>fenixedu-ist-parking</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
