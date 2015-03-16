@@ -146,7 +146,6 @@ import pt.ist.fenixedu.contracts.domain.Employee;
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.EmployeeContract;
 import pt.ist.fenixedu.teacher.domain.SupportLesson;
 import pt.ist.fenixedu.teacher.domain.teacher.TeacherService;
-import pt.ist.fenixedu.teacher.dto.teacher.professorship.SupportLessonDTO;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
 import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;
@@ -1273,14 +1272,14 @@ public class CreateTestData {
                     // DegreeTeachingService(teacherService, professorship,
                     // shift, Double.valueOf(100), RoleType.SCIENTIFIC_COUNCIL);
 
-                    final SupportLessonDTO supportLessonDTO = new SupportLessonDTO();
-                    supportLessonDTO.setProfessorshipID(professorship.getExternalId());
-                    supportLessonDTO.setPlace("Room23");
-                    supportLessonDTO.setStartTime(new DateTime().withField(DateTimeFieldType.hourOfDay(), 20).toDate());
-                    supportLessonDTO.setEndTime(new DateTime().withField(DateTimeFieldType.hourOfDay(), 21).toDate());
-                    supportLessonDTO.setWeekDay(new DiaSemana(DiaSemana.SABADO));
-
-                    SupportLesson.create(supportLessonDTO, professorship, RoleType.SCIENTIFIC_COUNCIL);
+//                    final SupportLessonDTO supportLessonDTO = new SupportLessonDTO();
+//                    supportLessonDTO.setProfessorshipID(professorship.getExternalId());
+//                    supportLessonDTO.setPlace("Room23");
+//                    supportLessonDTO.setStartTime(new DateTime().withField(DateTimeFieldType.hourOfDay(), 20).toDate());
+//                    supportLessonDTO.setEndTime(new DateTime().withField(DateTimeFieldType.hourOfDay(), 21).toDate());
+//                    supportLessonDTO.setWeekDay(new DiaSemana(DiaSemana.SABADO));
+//
+//                    SupportLesson.create(supportLessonDTO, professorship, RoleType.SCIENTIFIC_COUNCIL);
                 }
             }
         }
