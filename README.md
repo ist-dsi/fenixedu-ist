@@ -1,50 +1,27 @@
-fenixedu-ist-tutorship
-======================
+FenixEdu IST
+============
 
-Tutorship program for IST
+Contribution modules specific for IST installation of the [FenixEdu](http://fenixedu.org/) project.
 
-Fenix IST Parking
-==================
+The modules are:
+- CMS Components - CMS contribution components
+- Delegates - Delegates are students elected 
+- Giaf Contracts - Integration with HR
+- Integration - Tasks and services for external integration
+- Library Space - Access control for libraries
+- Parking - Car park access management
+- Pre Bolonha - Legacy component for pre-bolonha degrees
+- Quc - [http://quc.tecnico.ulisboa.pt/](http://quc.tecnico.ulisboa.pt/)
+- Reports - jasper based academic report templates
+- Teacher Credits - Credit system to measure teacher work
+- Teacher Evaluation - Teacher evaluation system
+- Tutorship - Tutorship program for IST
+- Vigilancies - Exam vigilancies for IST
 
-[Fenix](http://www.github.com/FenixEdu/fenix)'s parking module
+##Issue Tracking
 
-To install, simply type:
+Issue Tracking for the FenixEdu IST project is done in the [FenixEdu JIRA](https://jira.fenixedu.org/browse/FIST).
 
-    mvn clean install
+## Contribute
 
-fenixedu-ist-teacher-service
-============================
-
-Staff management and evaluation
-
-Fenix IST
-==========
-
-[Fenix](http://www.github.com/FenixEdu/fenix)'s IST specific features
-
-To compile, simply type:
-
-    mvn clean install
-
-FenixEdu Delegates
-==========
-
-fenixedu-ist-pre-bolonha
-========================
-
-Pre-bolonha legacy code
-
-fenixedu-ist-vigilancies
-========================
-
-Exam vigilancies for IST
-
-fenixedu-ist-libraryspace
-=========================
-
-System for access control for library spaces
-
-fenixedu-ist-quc
-================
-
-QUC for IST
+FenixEdu IST is open sourced under the LGPL 3. We welcome interest in the project and are open to your contributions
