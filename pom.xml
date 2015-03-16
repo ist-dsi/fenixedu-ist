@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.fenixedu</groupId>
+        <artifactId>fenix-framework-project</artifactId>
+        <version>2.2.0</version>
+    </parent>
+
+    <groupId>pt.ist</groupId>
+    <artifactId>fenixedu-ist</artifactId>
+    <version>6.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>FenixEdu IST Contribution Modules</name>
+    <inceptionYear>2013</inceptionYear>
+
+    <licenses>
+        <license>
+            <name>GNU Lesser General Public License v3.0</name>
+            <url>https://www.gnu.org/licenses/lgpl-3.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:git@github.com:ist-dsi/fenixedu-ist.git</connection>
+        <developerConnection>scm:git:git@github.com:ist-dsi/fenixedu-ist.git</developerConnection>
+        <url>http://fenixedu.org</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.fenixedu</groupId>
+                <artifactId>fenixedu-academic</artifactId>
+                <version>4.1.5</version>
+            </dependency>
+            <dependency>
+                <groupId>org.fenixedu</groupId>
+                <artifactId>bennu-scheduler</artifactId>
+                <version>3.4.1</version>
+            </dependency>
+            <dependency>
+                <groupId>com.oracle</groupId>
+                <artifactId>ojdbc14</artifactId>
+                <version>9.0.2.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.fenixedu</groupId>
+                <artifactId>fenixedu-id-cards</artifactId>
+                <version>2.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.fenixedu</groupId>
+                <artifactId>fenixedu-learning</artifactId>
+                <version>1.0.11</version>
+            </dependency>
+            <dependency>
+                <groupId>org.fenixedu</groupId>
+                <artifactId>fenixedu-academic-thesis</artifactId>
+                <version>3.1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.healthmarketscience.jackcess</groupId>
+                <artifactId>jackcess</artifactId>
+                <version>1.2.8</version>
+            </dependency>
+            <dependency>
+                <groupId>net.sf.jasperreports</groupId>
+                <artifactId>jasperreports</artifactId>
+                <version>3.6.0</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>jdtcore</artifactId>
+                        <groupId>eclipse</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.lowagie</groupId>
+                <artifactId>itext</artifactId>
+                <version>2.1.0</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <distributionManagement>
+        <repository>
+            <id>fenixedu-contrib-releases</id>
+            <url>https://repo.fenixedu.org/fenixedu-contrib-releases</url>
+        </repository>
+    </distributionManagement>
+
+    <repositories>
+        <repository>
+            <id>fenixedu-maven-repository</id>
+            <url>https://repo.fenixedu.org/fenixedu-maven-repository</url>
+        </repository>
+    </repositories>
+
+    <modules>
+        <module>fenix-ist</module>
+        <module>fenix-parking</module>
+        <module>fenixedu-ist-delegates</module>
+        <module>fenixedu-ist-giaf-contracts</module>
+        <module>fenixedu-ist-libraryspace</module>
+        <module>fenixedu-ist-pre-bolonha</module>
+        <module>fenixedu-ist-quc</module>
+        <module>fenixedu-ist-reports</module>
+        <module>fenixedu-ist-teacher-credits</module>
+        <module>fenixedu-ist-teacher-evaluation</module>
+        <module>fenixedu-ist-tutorship</module>
+        <module>fenixedu-ist-vigilancies</module>
+    </modules>
+</project>

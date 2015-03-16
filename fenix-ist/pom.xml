@@ -3,37 +3,17 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.fenixedu</groupId>
-        <artifactId>fenix-framework-project</artifactId>
-        <version>2.2.0</version>
+        <groupId>pt.ist</groupId>
+        <artifactId>fenixedu-ist</artifactId>
+        <version>6.0.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>pt.ist</groupId>
     <artifactId>fenix-ist</artifactId>
-    <version>2.5.0-SNAPSHOT</version>
 
     <name>Fenix IST</name>
-    <url>http://www.fenixedu.org</url>
-    <description>IST Specific Features for FenixEdu</description>
-
-    <scm>
-        <connection>scm:git:git@github.com:ist-dsi/fenix-ist.git</connection>
-        <developerConnection>scm:git:git@github.com:ist-/fenix-ist.git</developerConnection>
-        <url>http://fenixedu.org</url>
-        <tag>HEAD</tag>
-    </scm>
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <fork>true</fork>
-                    <maxmem>2048</maxmem>
-                    <meminitial>1536</meminitial>
-                </configuration>
-            </plugin>
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>1.7</version>
@@ -63,76 +43,83 @@
         <dependency>
             <groupId>org.fenixedu</groupId>
             <artifactId>fenixedu-academic</artifactId>
-            <version>4.1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>pt.ist</groupId>
-            <artifactId>fenixedu-ist-giaf-contracts</artifactId>
-            <version>4.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>pt.ist</groupId>
-            <artifactId>fenixedu-ist-delegates</artifactId>
-            <version>4.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>pt.ist</groupId>
-            <artifactId>fenixedu-ist-quc</artifactId>
-            <version>4.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.fenixedu</groupId>
             <artifactId>bennu-scheduler</artifactId>
-            <version>3.4.1</version>
         </dependency>
         <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc14</artifactId>
-            <version>9.0.2.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.fenixedu</groupId>
             <artifactId>fenixedu-id-cards</artifactId>
-            <version>2.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>pt.ist</groupId>
-            <artifactId>fenixedu-ist-vigilancies</artifactId>
-            <version>4.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>pt.ist</groupId>
-            <artifactId>fenixedu-ist-tutorship</artifactId>
-            <version>4.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.fenixedu</groupId>
-            <artifactId>ashes-theme</artifactId>
-            <version>1.1.2</version>
         </dependency>
         <dependency>
             <groupId>org.fenixedu</groupId>
             <artifactId>fenixedu-learning</artifactId>
-            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.fenixedu</groupId>
             <artifactId>fenixedu-academic-thesis</artifactId>
-            <version>3.1.0</version>
         </dependency>
         <dependency>
             <groupId>pt.ist</groupId>
             <artifactId>fenix-parking</artifactId>
-            <version>2.0.2</version>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>pt.ist</groupId>
+            <artifactId>fenixedu-ist-delegates</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>pt.ist</groupId>
+            <artifactId>fenixedu-ist-giaf-contracts</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>pt.ist</groupId>
+            <artifactId>fenixedu-ist-libraryspace</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>pt.ist</groupId>
+            <artifactId>fenixedu-ist-pre-bolonha</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>pt.ist</groupId>
+            <artifactId>fenixedu-ist-quc</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>pt.ist</groupId>
+            <artifactId>fenixedu-ist-reports</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>pt.ist</groupId>
+            <artifactId>fenixedu-ist-teacher-credits</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>pt.ist</groupId>
+            <artifactId>fenixedu-ist-teacher-evaluation</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>pt.ist</groupId>
+            <artifactId>fenixedu-ist-tutorship</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>pt.ist</groupId>
+            <artifactId>fenixedu-ist-vigilancies</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
-
-    <distributionManagement>
-        <repository>
-            <id>fenixedu-contrib-releases</id>
-            <url>https://repo.fenixedu.org/fenixedu-contrib-releases</url>
-        </repository>
-    </distributionManagement>
 
     <repositories>
         <repository>
