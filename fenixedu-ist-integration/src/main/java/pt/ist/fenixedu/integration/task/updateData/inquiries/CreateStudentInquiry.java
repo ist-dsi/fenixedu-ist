@@ -19,11 +19,12 @@
 package pt.ist.fenixedu.integration.task.updateData.inquiries;
 
 import org.fenixedu.academic.domain.ExecutionSemester;
-import org.fenixedu.academic.domain.inquiries.CurricularCourseInquiryTemplate;
-import org.fenixedu.academic.domain.inquiries.InquiryBlock;
-import org.fenixedu.academic.domain.inquiries.StudentTeacherInquiryTemplate;
 import org.fenixedu.bennu.scheduler.custom.CustomTask;
 import org.joda.time.DateTime;
+
+import pt.ist.fenixedu.quc.domain.CurricularCourseInquiryTemplate;
+import pt.ist.fenixedu.quc.domain.InquiryBlock;
+import pt.ist.fenixedu.quc.domain.StudentTeacherInquiryTemplate;
 
 public class CreateStudentInquiry extends CustomTask {
 

@@ -66,7 +66,7 @@ font-weight: normal;
 		</h3>
 		<logic:present name="coordinatorInquiryBean" property="otherInquiryResultComments">
 			<logic:notEmpty name="coordinatorInquiryBean" property="otherInquiryResultComments">
-				<logic:iterate id="globalComment" name="coordinatorInquiryBean" property="otherInquiryResultComments" type="org.fenixedu.academic.domain.inquiries.InquiryResultComment">
+				<logic:iterate id="globalComment" name="coordinatorInquiryBean" property="otherInquiryResultComments" type="pt.ist.fenixedu.quc.domain.InquiryResultComment">
 					<logic:notEmpty name="globalComment" property="comment">
 			            <p class="mbottom05"><b><bean:message key="label.commentHeader.coordinator" bundle="INQUIRIES_RESOURCES" arg0="<%= globalComment.getPerson().getName() %>"/> :</b></p>
 			            <p class="mtop05"><bean:write name="globalComment" property="comment"/></p>
@@ -75,7 +75,7 @@ font-weight: normal;
 			</logic:notEmpty>
 		</logic:present>
 		<fr:edit name="coordinatorInquiryBean">
-			<fr:schema bundle="INQUIRIES_RESOURCES" type="org.fenixedu.academic.dataTransferObject.inquiries.CoordinatorResultsBean">
+			<fr:schema bundle="INQUIRIES_RESOURCES" type="pt.ist.fenixedu.quc.dto.CoordinatorResultsBean">
 				<fr:slot name="comment" layout="longText" key="label.inquiry.comment">
 					<fr:property name="columns" value="70"/>
 					<fr:property name="rows" value="6"/>
@@ -114,9 +114,9 @@ font-weight: normal;
 		</html:link>
 	</p>		
 	<bean:define id="hasNotRelevantData">
-		<%= org.fenixedu.academic.domain.inquiries.InquiryResult.hasNotRelevantDataFor(executionCourse,executionDegree) %>
+		<%= pt.ist.fenixedu.quc.domain.InquiryResult.hasNotRelevantDataFor(executionCourse,executionDegree) %>
 	</bean:define>
-	<logic:iterate indexId="iter" id="blockResult" name="coordinatorInquiryBean" property="curricularBlockResults" type="org.fenixedu.academic.dataTransferObject.inquiries.BlockResultsSummaryBean">
+	<logic:iterate indexId="iter" id="blockResult" name="coordinatorInquiryBean" property="curricularBlockResults" type="pt.ist.fenixedu.quc.dto.BlockResultsSummaryBean">
 		<logic:equal name="hasNotRelevantData" value="false"> <!-- if group is not GREY -->
 			<bean:define id="toogleFunctions">
 				<bean:write name="toogleFunctions" filter="false"/>
@@ -169,7 +169,7 @@ font-weight: normal;
 			<bean:define id="teacherToogleFunctions" value=""/>
 			<logic:notEmpty name="coordinatorInquiryBean" property="teachersResultsMap">
 				<logic:iterate id="entrySet" name="coordinatorInquiryBean" property="teachersResultsMap">
-					<logic:iterate indexId="teacherIter" id="teacherShiftTypeResult" name="entrySet" property="value" type="org.fenixedu.academic.dataTransferObject.inquiries.TeacherShiftTypeResultsBean">
+					<logic:iterate indexId="teacherIter" id="teacherShiftTypeResult" name="entrySet" property="value" type="pt.ist.fenixedu.quc.dto.TeacherShiftTypeResultsBean">
 						<div style="margin: 2.5em 0 3.5em 0;">
 							<h3>
 								<bean:write name="teacherShiftTypeResult" property="professorship.person.name"/> / 
@@ -183,7 +183,7 @@ font-weight: normal;
 									<bean:message bundle="INQUIRIES_RESOURCES" key="link.inquiry.showTeacherResults"/>
 								</html:link>
 							</p>
-							<logic:iterate indexId="iter" id="blockResult" name="teacherShiftTypeResult" property="blockResults" type="org.fenixedu.academic.dataTransferObject.inquiries.BlockResultsSummaryBean">
+							<logic:iterate indexId="iter" id="blockResult" name="teacherShiftTypeResult" property="blockResults" type="pt.ist.fenixedu.quc.dto.BlockResultsSummaryBean">
 								<bean:define id="teacherToogleFunctions">
 									<bean:write name="teacherToogleFunctions" filter="false"/>
 									<%= "$('#teacher-block" + teacherShiftTypeResult.getProfessorship().getExternalId() + teacherShiftTypeResult.getShiftType() + (Integer.valueOf(iter)+(int)1) + "').click(function()" 

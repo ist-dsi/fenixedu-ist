@@ -269,7 +269,7 @@ jQuery(document).ready(function() {
          name: 'Real',
          data: [ 0,
 				<logic:iterate id="questionSummary" name="ucEvaluationsGroupBean" property="questionsResults">
-					<logic:iterate id="inquiryResult" name="questionSummary" property="scaleValues" type="org.fenixedu.academic.domain.inquiries.InquiryResult">
+					<logic:iterate id="inquiryResult" name="questionSummary" property="scaleValues" type="pt.ist.fenixedu.quc.domain.InquiryResult">
 						<%= inquiryResult.getPresentationValue() + "," %>
 					</logic:iterate>
 				</logic:iterate>
@@ -278,7 +278,7 @@ jQuery(document).ready(function() {
 		{
          name: 'Alunos',
          data: [
-				<logic:iterate id="inquiryResult" name="estimatedEvaluationBeanQuestion" property="scaleValues" type="org.fenixedu.academic.domain.inquiries.InquiryResult">
+				<logic:iterate id="inquiryResult" name="estimatedEvaluationBeanQuestion" property="scaleValues" type="pt.ist.fenixedu.quc.domain.InquiryResult">
 					<%= inquiryResult.getPresentationValue() + "," %>
 				</logic:iterate>
                ]
@@ -448,7 +448,7 @@ jQuery(document).ready(function() {
 	 font-size: 12px;
 	}
 </style>
-<logic:iterate indexId="iter" id="blockResult" name="blockResultsSummaryBeans" type="org.fenixedu.academic.dataTransferObject.inquiries.BlockResultsSummaryBean">
+<logic:iterate indexId="iter" id="blockResult" name="blockResultsSummaryBeans" type="pt.ist.fenixedu.quc.dto.BlockResultsSummaryBean">
 	<div id="report">
 		<h2>
 			<logic:notEmpty name="blockResult" property="blockResultClassification">
@@ -490,7 +490,7 @@ jQuery(document).ready(function() {
 <logic:notEmpty name="teachersSummaryBeans">
 	<h2><bean:write name="teachersNumber"/>. <bean:message key="title.inquiry.teachingStaff" bundle="INQUIRIES_RESOURCES"/></h2>
 	<table class="graph teacher-results">
-		<logic:iterate id="teacherResult" name="teachersSummaryBeans" type="org.fenixedu.academic.dataTransferObject.inquiries.TeacherShiftTypeGeneralResultBean">
+		<logic:iterate id="teacherResult" name="teachersSummaryBeans" type="pt.ist.fenixedu.quc.dto.TeacherShiftTypeGeneralResultBean">
 			<bean:define id="colorCode"><%= teacherResult.getInquiryResult().getResultClassification().name().toLowerCase() %></bean:define>
 			<tr>
 				<td><div class="<%= "bar-" + colorCode %>">&nbsp;</div></td>

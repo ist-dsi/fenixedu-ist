@@ -24,12 +24,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.fenixedu.academic.domain.inquiries.CurricularCourseInquiryTemplate;
-import org.fenixedu.academic.domain.inquiries.StudentInquiryTemplate;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
 import org.fenixedu.bennu.struts.annotations.Mapping;
 
 import pt.ist.fenixWebFramework.servlets.filters.contentRewrite.GenericChecksumRewriter;
+import pt.ist.fenixedu.quc.domain.CurricularCourseInquiryTemplate;
+import pt.ist.fenixedu.quc.domain.StudentInquiryTemplate;
 
 @Mapping(path = "/respondToInquiriesQuestion")
 public class RespondToInquiriesQuestion extends FenixDispatchAction {

@@ -39,7 +39,7 @@
 </logic:present>
 <logic:notEmpty name="executionCoursesAudits">
 	<fr:view name="executionCoursesAudits">
-		<fr:schema bundle="INQUIRIES_RESOURCES" type="org.fenixedu.academic.domain.inquiries.ExecutionCourseAudit">
+		<fr:schema bundle="INQUIRIES_RESOURCES" type="pt.ist.fenixedu.quc.domain.ExecutionCourseAudit">
 			<fr:slot name="executionCourse.name" key="label.executionCourse.name" bundle="APPLICATION_RESOURCES"/>
 			<fr:slot name="teacherAuditor.person.name" key="teacher.docente" bundle="APPLICATION_RESOURCES"/>
 			<fr:slot name="studentAuditor.person.name" key="student" bundle="APPLICATION_RESOURCES"/>
@@ -77,9 +77,9 @@
 
 <fr:form action="/qucAudit.do?method=searchExecutionCourse">		
 	<fr:edit id="executionCourseSearchBean" name="executionCourseSearchBean">
-		<fr:schema type="org.fenixedu.academic.dataTransferObject.inquiries.ExecutionCourseQucAuditSearchBean" bundle="APPLICATION_RESOURCES">
+		<fr:schema type="pt.ist.fenixedu.quc.dto.ExecutionCourseQucAuditSearchBean" bundle="APPLICATION_RESOURCES">
 			<fr:slot name="executionPeriod" key="label.executionPeriod" layout="menu-select-postback" validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator">
-				<fr:property name="providerClass" value="org.fenixedu.academic.presentationTier.Action.departmentMember.ViewQUCResultsDA$ExecutionSemesterQucProvider"/>
+				<fr:property name="providerClass" value="pt.ist.fenixedu.quc.ui.struts.action.departmentMember.ViewQUCResultsDA$ExecutionSemesterQucProvider"/>
 				<fr:property name="format" value="${semester}º Semestre ${executionYear.year}" />
 			</fr:slot>
 			<fr:slot name="executionDegree" key="label.executionDegree" layout="menu-select">
@@ -100,7 +100,7 @@
 
 <logic:present name="executionCourses">
 	<fr:view name="executionCourses">
-		<fr:schema bundle="APPLICATION_RESOURCES" type="org.fenixedu.academic.dataTransferObject.inquiries.ExecutionCourseBean">
+		<fr:schema bundle="APPLICATION_RESOURCES" type="pt.ist.fenixedu.quc.dto.ExecutionCourseBean">
 			<fr:slot name="departments" key="label.department" layout="flowLayout">
 				<fr:property name="eachSchema" value="show.department"/>
 				<fr:property name="eachLayout" value="values" />

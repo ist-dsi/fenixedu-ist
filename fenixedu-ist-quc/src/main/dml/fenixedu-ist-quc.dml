@@ -1,93 +1,93 @@
-package org.fenixedu.academic.domain;
+package pt.ist.fenixedu.quc.domain;
 
-enum org.fenixedu.academic.domain.inquiries.InquiriesRegistryState                                                     as InquiriesRegistryState;
-enum org.fenixedu.academic.domain.inquiries.InquiryNotAnsweredJustification                                            as InquiryNotAnsweredJustification;
-enum org.fenixedu.academic.domain.inquiries.InquiryResponsePeriodType                                                  as InquiryResponsePeriodType;
-enum org.fenixedu.academic.domain.inquiries.GroupResultType                                                            as GroupResultType;
-enum org.fenixedu.academic.domain.inquiries.InquiryGradesInterval                                                      as InquiryGradesInterval;
-enum org.fenixedu.academic.domain.inquiries.InquiryResultType                                                          as InquiryResultType;
-enum org.fenixedu.academic.domain.inquiries.InquiryConnectionType                                                      as InquiryConnectionType;
-enum org.fenixedu.academic.domain.inquiries.ResultClassification                                                       as ResultClassification;
-enum org.fenixedu.academic.domain.inquiries.ResultPersonCategory                                                       as ResultPersonCategory;
+enum pt.ist.fenixedu.quc.domain.InquiriesRegistryState                                                     as InquiriesRegistryState;
+enum pt.ist.fenixedu.quc.domain.InquiryNotAnsweredJustification                                            as InquiryNotAnsweredJustification;
+enum pt.ist.fenixedu.quc.domain.InquiryResponsePeriodType                                                  as InquiryResponsePeriodType;
+enum pt.ist.fenixedu.quc.domain.GroupResultType                                                            as GroupResultType;
+enum pt.ist.fenixedu.quc.domain.InquiryGradesInterval                                                      as InquiryGradesInterval;
+enum pt.ist.fenixedu.quc.domain.InquiryResultType                                                          as InquiryResultType;
+enum pt.ist.fenixedu.quc.domain.InquiryConnectionType                                                      as InquiryConnectionType;
+enum pt.ist.fenixedu.quc.domain.ResultClassification                                                       as ResultClassification;
+enum pt.ist.fenixedu.quc.domain.ResultPersonCategory                                                       as ResultPersonCategory;
 
-valueType org.fenixedu.academic.domain.inquiries.QuestionScale as QuestionScale {
+valueType pt.ist.fenixedu.quc.domain.QuestionScale as QuestionScale {
     externalizeWith {
         String exportAsString();
     }
     internalizeWith importFromString();
 }
 
-class inquiries.InquiriesRoot {
+class InquiriesRoot {
 }
 
-class inquiries.InquiryTemplate  {
+class InquiryTemplate  {
     DateTime responsePeriodBegin;
     DateTime responsePeriodEnd;
     MultiLanguageString inquiryMessage;
 }
 
-    class inquiries.StudentInquiryTemplate extends inquiries.InquiryTemplate {
+    class StudentInquiryTemplate extends InquiryTemplate {
     }
     
-        class inquiries.CurricularCourseInquiryTemplate extends inquiries.StudentInquiryTemplate {
+        class CurricularCourseInquiryTemplate extends StudentInquiryTemplate {
             CompetenceCourseType courseType;
         }
         
-        class inquiries.StudentTeacherInquiryTemplate extends inquiries.StudentInquiryTemplate {
+        class StudentTeacherInquiryTemplate extends StudentInquiryTemplate {
         }
         
-        class inquiries.RoomInquiryTemplate extends inquiries.StudentInquiryTemplate {
+        class RoomInquiryTemplate extends StudentInquiryTemplate {
         }
     
     
-    class inquiries.DelegateInquiryTemplate extends inquiries.InquiryTemplate {
+    class DelegateInquiryTemplate extends InquiryTemplate {
     }
         
-    class inquiries.TeacherInquiryTemplate extends inquiries.InquiryTemplate {
+    class TeacherInquiryTemplate extends InquiryTemplate {
     }   
 
-    class inquiries.RegentInquiryTemplate extends inquiries.InquiryTemplate {
+    class RegentInquiryTemplate extends InquiryTemplate {
     }
     
-    class inquiries.CoordinatorInquiryTemplate extends inquiries.InquiryTemplate {
+    class CoordinatorInquiryTemplate extends InquiryTemplate {
         Boolean shared;
     }
     
-    class inquiries.ResultsInquiryTemplate extends inquiries.InquiryTemplate {
+    class ResultsInquiryTemplate extends InquiryTemplate {
     }
     
-    class inquiries.StudentRegistrationInquiryTemplate extends inquiries.InquiryTemplate {
+    class StudentRegistrationInquiryTemplate extends InquiryTemplate {
     }
     
-    class inquiries.StudentCycleInquiryTemplate extends inquiries.InquiryTemplate {     
+    class StudentCycleInquiryTemplate extends InquiryTemplate {     
     }
     
-        class inquiries.Student1rstCycleInquiryTemplate extends inquiries.StudentCycleInquiryTemplate { 
+        class Student1rstCycleInquiryTemplate extends StudentCycleInquiryTemplate { 
         }
         
-        class inquiries.Student2ndCycleInquiryTemplate extends inquiries.StudentCycleInquiryTemplate {  
+        class Student2ndCycleInquiryTemplate extends StudentCycleInquiryTemplate {  
         }
         
-        class inquiries.StudentOtherCycleInquiryTemplate extends inquiries.StudentCycleInquiryTemplate {    
+        class StudentOtherCycleInquiryTemplate extends StudentCycleInquiryTemplate {    
         }
     
-class inquiries.InquiryBlock  { 
+class InquiryBlock  { 
     Integer blockOrder;
 }
 
-class inquiries.InquiryGroupQuestion  { 
+class InquiryGroupQuestion  { 
     Integer groupOrder;
     Boolean required;
     GroupResultType groupResultType; 
 }
 
-class inquiries.InquiryQuestionHeader  {
+class InquiryQuestionHeader  {
     MultiLanguageString title;
     MultiLanguageString toolTip;
     QuestionScale scaleHeaders;
 }
 
-class inquiries.InquiryQuestion  {
+class InquiryQuestion  {
     MultiLanguageString label;
     MultiLanguageString toolTip;
     Boolean required;
@@ -99,33 +99,33 @@ class inquiries.InquiryQuestion  {
     Integer questionOrder;
 }
 
-    class inquiries.InquiryCheckBoxQuestion extends inquiries.InquiryQuestion {
+    class InquiryCheckBoxQuestion extends InquiryQuestion {
     }
 
-    class inquiries.InquiryTextBoxQuestion extends inquiries.InquiryQuestion {
+    class InquiryTextBoxQuestion extends InquiryQuestion {
         Boolean textArea;
     }
     
-    class inquiries.InquiryRadioGroupQuestion extends inquiries.InquiryQuestion {
+    class InquiryRadioGroupQuestion extends InquiryQuestion {
         Boolean isMatrix;
     }
 
-class inquiries.QuestionCondition  {    
+class QuestionCondition  {    
 }
-    class inquiries.MandatoryCondition extends inquiries.QuestionCondition {    
+    class MandatoryCondition extends QuestionCondition {    
         String conditionValues;
         Boolean dependsResult;
         Boolean showIfConditionIsFalse;
         Integer minimumNumberOfChars;
     }
     
-    class inquiries.ECTSVisibleCondition extends inquiries.QuestionCondition {
+    class ECTSVisibleCondition extends QuestionCondition {
         Double ectsDifference;
         Boolean workLoadExcessive;
     }
 
 
-class inquiries.StudentInquiryRegistry  {
+class StudentInquiryRegistry  {
     InquiriesRegistryState state;
     Integer weeklyHoursSpentPercentage;
     Integer attendenceClassesPercentage;
@@ -133,15 +133,15 @@ class inquiries.StudentInquiryRegistry  {
     Double estimatedECTS;   
 }
 
-class inquiries.StudentInquiryExecutionPeriod  {
+class StudentInquiryExecutionPeriod  {
     Boolean dontWantToRespond;
     Integer weeklyHoursSpentInClassesSeason;
 }
     
-class inquiries.InquiryAnswer  {
+class InquiryAnswer  {
     DateTime responseDateTime;
 }
-    class inquiries.InquiryCourseAnswer extends inquiries.InquiryAnswer {
+    class InquiryCourseAnswer extends InquiryAnswer {
         Integer weeklyHoursSpentPercentage;
         Integer weeklyHoursSpentInAutonomousWork;
         Double studyDaysSpentInExamsSeason;
@@ -156,35 +156,35 @@ class inquiries.InquiryAnswer  {
         String notAnsweredOtherJustification;        
     }
     
-    class inquiries.InquiryStudentTeacherAnswer extends inquiries.InquiryAnswer {
+    class InquiryStudentTeacherAnswer extends InquiryAnswer {
         ShiftType shiftType;
     }
     
-    class inquiries.InquiryRoomAnswer extends inquiries.InquiryAnswer {
+    class InquiryRoomAnswer extends InquiryAnswer {
     }
     
-    class inquiries.InquiryDelegateAnswer extends inquiries.InquiryAnswer {     
+    class InquiryDelegateAnswer extends InquiryAnswer {     
         Boolean allowAcademicPublicizing;
     }
     
-    class inquiries.InquiryTeacherAnswer extends inquiries.InquiryAnswer {      
+    class InquiryTeacherAnswer extends InquiryAnswer {      
         Boolean allowAcademicPublicizing;
     }
     
-    class inquiries.InquiryRegentAnswer extends inquiries.InquiryAnswer {
+    class InquiryRegentAnswer extends InquiryAnswer {
     }
     
-    class inquiries.InquiryCoordinatorAnswer extends inquiries.InquiryAnswer {  
+    class InquiryCoordinatorAnswer extends InquiryAnswer {  
     }
     
-    class inquiries.InquiryStudentCycleAnswer extends inquiries.InquiryAnswer {
+    class InquiryStudentCycleAnswer extends InquiryAnswer {
     }
 
-class inquiries.QuestionAnswer  {
+class QuestionAnswer  {
     String answer;    
 }
 
-class inquiries.InquiryResult  {
+class InquiryResult  {
     InquiryResultType resultType;
     InquiryConnectionType connectionType;
     String value;
@@ -195,17 +195,17 @@ class inquiries.InquiryResult  {
     DateTime resultDate;
 }
 
-class inquiries.InquiryResultComment  {
+class InquiryResultComment  {
     String comment;
     Integer resultOrder;
     ResultPersonCategory personCategory;
 }
 
-class inquiries.InquiryGlobalComment  {
+class InquiryGlobalComment  {
     Boolean commentOnTeacher;
 }
 
-class inquiries.ExecutionCourseAudit  {
+class ExecutionCourseAudit  {
     String measuresToTake;
     String conclusions;
     Boolean approvedByStudent;
@@ -213,13 +213,13 @@ class inquiries.ExecutionCourseAudit  {
     Boolean availableProcess;
 }
 
-class inquiries.ExecutionCourseAuditFile extends File {
+class ExecutionCourseAuditFile extends .org.fenixedu.academic.domain.File {
 }
 
-class QUCResultsLog extends DegreeLog { }
+class QUCResultsLog extends .org.fenixedu.academic.domain.DegreeLog { }
 
 relation InquiriesRootLink {
-    inquiries.InquiriesRoot playsRole inquiriesRoot {
+    InquiriesRoot playsRole inquiriesRoot {
         multiplicity 0..1;
     }
     .org.fenixedu.bennu.core.domain.Bennu playsRole root {
@@ -228,519 +228,519 @@ relation InquiriesRootLink {
 }
 
 relation AvailableForInquiries {
-    inquiries.InquiriesRoot playsRole availableForInquiries {
+    InquiriesRoot playsRole availableForInquiries {
         multiplicity 0..1;
     }
-    ExecutionCourse playsRole coursesAvailableForInquiries {
+    .org.fenixedu.academic.domain.ExecutionCourse playsRole coursesAvailableForInquiries {
         multiplicity *;
     }
 }
 
 relation RootDomainObjectInquiryTemplate {
     .org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject;
-    inquiries.InquiryTemplate playsRole inquiryTemplates {
+    InquiryTemplate playsRole inquiryTemplates {
         multiplicity *;
     }
 }
     
 relation RootDomainObjectInquiryBlock {
     .org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject;
-    inquiries.InquiryBlock playsRole inquiryBlocks {
+    InquiryBlock playsRole inquiryBlocks {
         multiplicity *;
     }
 }
 
 relation RootDomainObjectInquiryGroupQuestion {
     .org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject;
-    inquiries.InquiryGroupQuestion playsRole inquiryGroupsQuestions {
+    InquiryGroupQuestion playsRole inquiryGroupsQuestions {
         multiplicity *;
     }
 }
 
 relation RootDomainObjectInquiryQuestion {
     .org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject;
-    inquiries.InquiryQuestion playsRole inquiryQuestions {
+    InquiryQuestion playsRole inquiryQuestions {
         multiplicity *;
     }
 }
 
 relation RootDomainObjectInquiryQuestionHeader {
     .org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject;
-    inquiries.InquiryQuestionHeader playsRole inquiryQuestionHeaders {
+    InquiryQuestionHeader playsRole inquiryQuestionHeaders {
         multiplicity *;
     }
 }
 
 relation RootDomainObjectQuestionCondition {
     .org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject;
-    inquiries.QuestionCondition playsRole questionsConditions {
+    QuestionCondition playsRole questionsConditions {
         multiplicity *;
     }
 }
 
 relation RootDomainObjectStudentInquiryRegistry {
     .org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject;
-    inquiries.StudentInquiryRegistry playsRole studentsInquiryRegistries {
+    StudentInquiryRegistry playsRole studentsInquiryRegistries {
         multiplicity *;
     }
 }
 
 relation RootDomainObjectInquiryAnswer {
     .org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject;
-    inquiries.InquiryAnswer playsRole inquiriesAnswers {
+    InquiryAnswer playsRole inquiriesAnswers {
         multiplicity *;
     }
 }
 
 relation RootDomainObjectQuestionAnswer {
     .org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject;
-    inquiries.QuestionAnswer playsRole questionAnswers {
+    QuestionAnswer playsRole questionAnswers {
         multiplicity *;
     }
 }
 
 relation RootDomainObjectStudentInquiryExecutionPeriod {
     .org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject;
-    inquiries.StudentInquiryExecutionPeriod playsRole studentsInquiriesExecutionPeriod {
+    StudentInquiryExecutionPeriod playsRole studentsInquiriesExecutionPeriod {
         multiplicity *;
     }
 }
 
 relation RootDomainObjectInquiryResult {
     .org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject;
-    inquiries.InquiryResult playsRole inquiryResults {
+    InquiryResult playsRole inquiryResults {
         multiplicity *;
     }
 }
 
 relation RootDomainObjectInquiryResultComment {
     .org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject;
-    inquiries.InquiryResultComment playsRole inquiryResultComments {
+    InquiryResultComment playsRole inquiryResultComments {
         multiplicity *;
     }
 }
 
 relation RootDomainObjectInquiryGlobalComment {
     .org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject;
-    inquiries.InquiryGlobalComment playsRole inquiryGlobalComments {
+    InquiryGlobalComment playsRole inquiryGlobalComments {
         multiplicity *;
     }
 }
 
 relation RootDomainObjectExecutionCourseAudit {
     .org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject;
-    inquiries.ExecutionCourseAudit playsRole executionCourseAudits {
+    ExecutionCourseAudit playsRole executionCourseAudits {
         multiplicity *;
     }
 }
 
 relation InquiryTemplateExecutionPeriod {
-    inquiries.InquiryTemplate playsRole inquiriesTemplates {
+    InquiryTemplate playsRole inquiriesTemplates {
         multiplicity *;
     }
-    ExecutionSemester playsRole executionPeriod;    
+    .org.fenixedu.academic.domain.ExecutionSemester playsRole executionPeriod;    
 }
 
 relation InquiryTemplateInquiryBlock {
-    inquiries.InquiryTemplate playsRole inquiries {
+    InquiryTemplate playsRole inquiries {
         multiplicity *;
     }
-    inquiries.InquiryBlock playsRole inquiryBlocks {
+    InquiryBlock playsRole inquiryBlocks {
         multiplicity *;
     }
 }
 
 relation InquiryBlockInquiryGroupQuestion {
-    inquiries.InquiryBlock playsRole inquiryBlock;
-    inquiries.InquiryGroupQuestion playsRole inquiryGroupsQuestions {
+    InquiryBlock playsRole inquiryBlock;
+    InquiryGroupQuestion playsRole inquiryGroupsQuestions {
         multiplicity *;
     }
 }
 
 relation ResultQuestionInquiryBlocks {
-    inquiries.InquiryQuestion playsRole resultQuestion;
-    inquiries.InquiryBlock playsRole associatedBlocks {
+    InquiryQuestion playsRole resultQuestion;
+    InquiryBlock playsRole associatedBlocks {
         multiplicity *;
     }
 }
 
 relation ResultQuestionInquiryResultBlocks {
-    inquiries.InquiryQuestion playsRole groupResultQuestion;
-    inquiries.InquiryBlock playsRole associatedResultBlocks {
+    InquiryQuestion playsRole groupResultQuestion;
+    InquiryBlock playsRole associatedResultBlocks {
         multiplicity *;
     }
 }
 
 relation InquiryGroupQuestionInquiryQuestion {
-    inquiries.InquiryGroupQuestion playsRole inquiryGroupQuestion;
-    inquiries.InquiryQuestion playsRole inquiryQuestions {
+    InquiryGroupQuestion playsRole inquiryGroupQuestion;
+    InquiryQuestion playsRole inquiryQuestions {
         multiplicity *;
     }
 }
 
 relation InquiryGroupQuestionInquiryQuestionResult {
-    inquiries.InquiryGroupQuestion playsRole checkboxGroupQuestion;
-    inquiries.InquiryQuestion playsRole resultQuestion;
+    InquiryGroupQuestion playsRole checkboxGroupQuestion;
+    InquiryQuestion playsRole resultQuestion;
 }
 
 relation InquiryGroupQuestionInquiryQuestionHeader {
-    inquiries.InquiryGroupQuestion playsRole inquiryGroupQuestion;
-    inquiries.InquiryQuestionHeader playsRole inquiryQuestionHeader;
+    InquiryGroupQuestion playsRole inquiryGroupQuestion;
+    InquiryQuestionHeader playsRole inquiryQuestionHeader;
 }
 
 relation InquiryGroupQuestionInquiryQuestionHeaderResult {
-    inquiries.InquiryGroupQuestion playsRole resultGroupQuestion;
-    inquiries.InquiryQuestionHeader playsRole resultQuestionHeader;
+    InquiryGroupQuestion playsRole resultGroupQuestion;
+    InquiryQuestionHeader playsRole resultQuestionHeader;
 }
 
 relation InquiryBlockInquiryQuestionHeader {
-    inquiries.InquiryBlock playsRole inquiryBlock;
-    inquiries.InquiryQuestionHeader playsRole inquiryQuestionHeader;
+    InquiryBlock playsRole inquiryBlock;
+    InquiryQuestionHeader playsRole inquiryQuestionHeader;
 }
 
 relation InquiryQuestionInquiryQuestionHeader {
-    inquiries.InquiryQuestion playsRole inquiryQuestion;
-    inquiries.InquiryQuestionHeader playsRole inquiryQuestionHeader;
+    InquiryQuestion playsRole inquiryQuestion;
+    InquiryQuestionHeader playsRole inquiryQuestionHeader;
 }
 
 relation InquiryQuestionQuestionCondition {
-    inquiries.QuestionCondition playsRole questionConditions {
+    QuestionCondition playsRole questionConditions {
         multiplicity *;
     }
-    inquiries.InquiryQuestion playsRole inquiryQuestion;
+    InquiryQuestion playsRole inquiryQuestion;
 }
 
 relation InquiryQuestionDependentQuestionCondition {
-    inquiries.QuestionCondition playsRole dependentQuestionCondition;
-    inquiries.InquiryQuestion playsRole inquiryDependentQuestion;
+    QuestionCondition playsRole dependentQuestionCondition;
+    InquiryQuestion playsRole inquiryDependentQuestion;
 }
 
 relation InquiryQuestionGroupQuestionCondition {
-    inquiries.QuestionCondition playsRole questionConditions {
+    QuestionCondition playsRole questionConditions {
         multiplicity *;
     }
-    inquiries.InquiryGroupQuestion playsRole inquiryGroupQuestion;
+    InquiryGroupQuestion playsRole inquiryGroupQuestion;
 }
 
 relation StudentInquiryRegistryExecutionCourse {
-    inquiries.StudentInquiryRegistry playsRole studentsInquiryRegistries {
+    StudentInquiryRegistry playsRole studentsInquiryRegistries {
         multiplicity *;
     }
-    ExecutionCourse playsRole executionCourse;
+    .org.fenixedu.academic.domain.ExecutionCourse playsRole executionCourse;
 }
 
 relation StudentInquiryRegistryExecutionPeriod {
-    inquiries.StudentInquiryRegistry playsRole studentsInquiryRegistries {
+    StudentInquiryRegistry playsRole studentsInquiryRegistries {
         multiplicity *;
     }
-    ExecutionSemester playsRole executionPeriod;
+    .org.fenixedu.academic.domain.ExecutionSemester playsRole executionPeriod;
 }
 
 relation StudentInquiryRegistryCurricularCourse {
-    inquiries.StudentInquiryRegistry playsRole studentsInquiryRegistries {
+    StudentInquiryRegistry playsRole studentsInquiryRegistries {
         multiplicity *;
     }
-    CurricularCourse playsRole curricularCourse;
+    .org.fenixedu.academic.domain.CurricularCourse playsRole curricularCourse;
 }
 
 relation StudentInquiryRegistryRegistration {
-    inquiries.StudentInquiryRegistry playsRole studentsInquiryRegistries {
+    StudentInquiryRegistry playsRole studentsInquiryRegistries {
         multiplicity *;
     }
-    student.Registration playsRole registration;
+    .org.fenixedu.academic.domain.student.Registration playsRole registration;
 }
 
 relation StudentInquiryRegistryStudent {
-    inquiries.StudentInquiryRegistry playsRole studentsInquiryRegistries {
+    StudentInquiryRegistry playsRole studentsInquiryRegistries {
         multiplicity *;
     }
-    student.Student playsRole student;
+    .org.fenixedu.academic.domain.student.Student playsRole student;
 }
 
 relation StudentInquiryExecutionPeriodStudent {
-    student.Student playsRole student;
-    inquiries.StudentInquiryExecutionPeriod playsRole studentsInquiriesExecutionPeriods {
+    .org.fenixedu.academic.domain.student.Student playsRole student;
+    StudentInquiryExecutionPeriod playsRole studentsInquiriesExecutionPeriods {
         multiplicity *;
     }
 }
 
 relation ExecutionPeriodStudentInquiryExecutionPeriod {
-    inquiries.StudentInquiryExecutionPeriod playsRole studentsInquiriesExecutionPeriod {
+    StudentInquiryExecutionPeriod playsRole studentsInquiriesExecutionPeriod {
         multiplicity *;
     }
-    ExecutionSemester playsRole executionPeriod;
+    .org.fenixedu.academic.domain.ExecutionSemester playsRole executionPeriod;
 }
 
 relation InquiryCourseAnswerExecutionCourse {
-    inquiries.InquiryCourseAnswer playsRole inquiryCourseAnswers {
+    InquiryCourseAnswer playsRole inquiryCourseAnswers {
         multiplicity *;
     }
-    ExecutionCourse playsRole executionCourse;
+    .org.fenixedu.academic.domain.ExecutionCourse playsRole executionCourse;
 }
 
 relation InquiryCourseAnswerExecutionDegree {
-    inquiries.InquiryCourseAnswer playsRole inquiryCourseAnswers {
+    InquiryCourseAnswer playsRole inquiryCourseAnswers {
         multiplicity *;
     }
-    ExecutionDegree playsRole executionDegreeCourse;
+    .org.fenixedu.academic.domain.ExecutionDegree playsRole executionDegreeCourse;
 }
 
 relation InquiryCourseAnswerExecutionDegreeStudent {
-    inquiries.InquiryCourseAnswer playsRole studentInquiryCourseAnswers {
+    InquiryCourseAnswer playsRole studentInquiryCourseAnswers {
         multiplicity *;
     }
-    ExecutionDegree playsRole executionDegreeStudent;
+    .org.fenixedu.academic.domain.ExecutionDegree playsRole executionDegreeStudent;
 }
 
 relation InquiryCourseAnswerExecutionSemester {
-    inquiries.InquiryCourseAnswer playsRole inquiryCourseAnswers {
+    InquiryCourseAnswer playsRole inquiryCourseAnswers {
         multiplicity *;
     }
-    ExecutionSemester playsRole executionPeriod;
+    .org.fenixedu.academic.domain.ExecutionSemester playsRole executionPeriod;
 }
 
 relation InquiryStudentTeacherAnswerProfessorship {
-    inquiries.InquiryStudentTeacherAnswer playsRole inquiryStudentTeacherAnswers {
+    InquiryStudentTeacherAnswer playsRole inquiryStudentTeacherAnswers {
         multiplicity *;
     }
-    Professorship playsRole professorship;
+    .org.fenixedu.academic.domain.Professorship playsRole professorship;
 }
 
 relation InquiryStudentTeacherAnswerInquiryCourseAnswer {
-    inquiries.InquiryStudentTeacherAnswer playsRole associatedInquiryStudentTeacherAnswers {
+    InquiryStudentTeacherAnswer playsRole associatedInquiryStudentTeacherAnswers {
         multiplicity *;
     }
-    inquiries.InquiryCourseAnswer playsRole inquiryCourseAnswer;
+    InquiryCourseAnswer playsRole inquiryCourseAnswer;
 }
 
 relation InquiryCourseAnswerShift {
-    Shift playsRole enrolledShifts {
+    .org.fenixedu.academic.domain.Shift playsRole enrolledShifts {
         multiplicity *;
     }
-    inquiries.InquiryCourseAnswer playsRole inquiryCoursesAnswers {
+    InquiryCourseAnswer playsRole inquiryCoursesAnswers {
        multiplicity *;
     }
 }
 
 relation InquiryRoomAnswerRoom {
-    inquiries.InquiryRoomAnswer playsRole inquiryRoomAnswers {
+    InquiryRoomAnswer playsRole inquiryRoomAnswers {
         multiplicity *;
     }
     .org.fenixedu.spaces.domain.Space playsRole room;
 }
 
 relation QuestionAnswerInquiryAnswer {
-    inquiries.InquiryAnswer playsRole inquiryAnswer;
-    inquiries.QuestionAnswer playsRole questionAnswers {
+    InquiryAnswer playsRole inquiryAnswer;
+    QuestionAnswer playsRole questionAnswers {
         multiplicity *;
     }
 }
 
 relation QuestionAnswerQuestion {
-    inquiries.QuestionAnswer playsRole questionAnswers {
+    QuestionAnswer playsRole questionAnswers {
         multiplicity *;
     }
-    inquiries.InquiryQuestion playsRole inquiryQuestion; 
+    InquiryQuestion playsRole inquiryQuestion; 
 }
 
 relation InquiryResultInquiryQuestion {
-    inquiries.InquiryQuestion playsRole inquiryQuestion;
-    inquiries.InquiryResult playsRole inquiryResults {
+    InquiryQuestion playsRole inquiryQuestion;
+    InquiryResult playsRole inquiryResults {
         multiplicity *;
     }
 }
 
 relation InquiryResultProfessorship {
-    Professorship playsRole professorship;
-    inquiries.InquiryResult playsRole inquiryResults {
+    .org.fenixedu.academic.domain.Professorship playsRole professorship;
+    InquiryResult playsRole inquiryResults {
         multiplicity *;
     }
 }
 
 relation InquiryResultExecutionPeriod {
-    ExecutionSemester playsRole executionPeriod;
-    inquiries.InquiryResult playsRole inquiryResults {
+    .org.fenixedu.academic.domain.ExecutionSemester playsRole executionPeriod;
+    InquiryResult playsRole inquiryResults {
         multiplicity *;
     }
 }
 
 relation InquiryResultExecutionCourse {
-    ExecutionCourse playsRole executionCourse;
-    inquiries.InquiryResult playsRole inquiryResults {
+    .org.fenixedu.academic.domain.ExecutionCourse playsRole executionCourse;
+    InquiryResult playsRole inquiryResults {
         multiplicity *;
     }
 }
 
 relation InquiryResultExecutionDegree {
-    ExecutionDegree playsRole executionDegree;
-    inquiries.InquiryResult playsRole inquiryResults {
+    .org.fenixedu.academic.domain.ExecutionDegree playsRole executionDegree;
+    InquiryResult playsRole inquiryResults {
         multiplicity *;
     }
 }
 
 relation InquiryResultInquiryResultComment {
-    inquiries.InquiryResult playsRole inquiryResult;
-    inquiries.InquiryResultComment playsRole inquiryResultComments {
+    InquiryResult playsRole inquiryResult;
+    InquiryResultComment playsRole inquiryResultComments {
         multiplicity *;
     }
 }
 
 relation InquiryResultCommentPerson {
-    Person playsRole person;
-    inquiries.InquiryResultComment playsRole inquiryResultComments {
+    .org.fenixedu.academic.domain.Person playsRole person;
+    InquiryResultComment playsRole inquiryResultComments {
         multiplicity *;
     }
 }
 
 relation InquiryGlobalCommentInquiryResultComment {
-    inquiries.InquiryGlobalComment playsRole inquiryGlobalComment;
-    inquiries.InquiryResultComment playsRole inquiryResultComments {
+    InquiryGlobalComment playsRole inquiryGlobalComment;
+    InquiryResultComment playsRole inquiryResultComments {
         multiplicity *;
     }
 }
 
 relation InquiryDelegateAnswerExecutionCourse {
-    ExecutionCourse playsRole executionCourse;
-    inquiries.InquiryDelegateAnswer playsRole inquiryDelegatesAnswers {
+    .org.fenixedu.academic.domain.ExecutionCourse playsRole executionCourse;
+    InquiryDelegateAnswer playsRole inquiryDelegatesAnswers {
         multiplicity *;
     }
 }
 
 relation InquiryDelegateAnswerExecutionDegree {
-    ExecutionDegree playsRole executionDegree;
-    inquiries.InquiryDelegateAnswer playsRole inquiryDelegatesAnswers {
+    .org.fenixedu.academic.domain.ExecutionDegree playsRole executionDegree;
+    InquiryDelegateAnswer playsRole inquiryDelegatesAnswers {
         multiplicity *;
     }
 }
 
 relation InquiryDelegateAnswerDelegate {
     .pt.ist.fenixedu.delegates.domain.student.YearDelegate playsRole delegate;
-    inquiries.InquiryDelegateAnswer playsRole inquiryDelegateAnswers {
+    InquiryDelegateAnswer playsRole inquiryDelegateAnswers {
         multiplicity *;
     }
 }
 
 relation InquiryTeacherAnswerProfessorship {
-    Professorship playsRole professorship {
+    .org.fenixedu.academic.domain.Professorship playsRole professorship {
         multiplicity 1..1;
     }
-    inquiries.InquiryTeacherAnswer playsRole inquiryTeacherAnswer;
+    InquiryTeacherAnswer playsRole inquiryTeacherAnswer;
 }
 
 relation InquiryRegentAnswerProfessorship {
-    Professorship playsRole professorship {
+    .org.fenixedu.academic.domain.Professorship playsRole professorship {
         multiplicity 1..1;
     }
-    inquiries.InquiryRegentAnswer playsRole inquiryRegentAnswer;
+    InquiryRegentAnswer playsRole inquiryRegentAnswer;
 }
 
 relation InquiryStudentCycleAnswerRegistration {
-    student.Registration playsRole registration;
-    inquiries.InquiryStudentCycleAnswer playsRole inquiryStudentCycleAnswer;
+    .org.fenixedu.academic.domain.student.Registration playsRole registration;
+    InquiryStudentCycleAnswer playsRole inquiryStudentCycleAnswer;
 }
 
 relation InquiryStudentCycleAnswerPhdIndividualProgramProcess {
-    phd.PhdIndividualProgramProcess playsRole phdProcess;
-    inquiries.InquiryStudentCycleAnswer playsRole inquiryStudentCycleAnswer;
+    .org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess playsRole phdProcess;
+    InquiryStudentCycleAnswer playsRole inquiryStudentCycleAnswer;
 }
 
 relation InquiryCoordinatorAnswerCoordinator {
-    Coordinator playsRole coordinator;
-    inquiries.InquiryCoordinatorAnswer playsRole inquiryCoordinatorAnswers {
+    .org.fenixedu.academic.domain.Coordinator playsRole coordinator;
+    InquiryCoordinatorAnswer playsRole inquiryCoordinatorAnswers {
         multiplicity *;
     }
 }
 
 relation InquiryCoordinatorAnswerExecutionDegree {
-    ExecutionDegree playsRole executionDegree {
+    .org.fenixedu.academic.domain.ExecutionDegree playsRole executionDegree {
         multiplicity 1..1;
     }
-    inquiries.InquiryCoordinatorAnswer playsRole inquiryCoordinationAnswers {
+    InquiryCoordinatorAnswer playsRole inquiryCoordinationAnswers {
         multiplicity *;
     }
 }
 
 relation InquiryCoordinatorAnswerExecutionSemester {
-    ExecutionSemester playsRole executionSemester {
+    .org.fenixedu.academic.domain.ExecutionSemester playsRole executionSemester {
         multiplicity 1..1;
     }
-    inquiries.InquiryCoordinatorAnswer playsRole inquiryCoordinatorsAnswers {
+    InquiryCoordinatorAnswer playsRole inquiryCoordinatorsAnswers {
         multiplicity *;
     }
 }
 
 relation InquiryCoordinatorAnswerUpdatedByPerson {
-    Person playsRole lastUpdatedBy;
-    inquiries.InquiryCoordinatorAnswer playsRole inquiryCoordinatorsAnswers {
+    .org.fenixedu.academic.domain.Person playsRole lastUpdatedBy;
+    InquiryCoordinatorAnswer playsRole inquiryCoordinatorsAnswers {
         multiplicity *;
     }
 }
 
 relation InquiryGlobalCommentExecutionSemester {
-    ExecutionSemester playsRole executionSemester;
-    inquiries.InquiryGlobalComment playsRole inquiryGlobalComments {
+    .org.fenixedu.academic.domain.ExecutionSemester playsRole executionSemester;
+    InquiryGlobalComment playsRole inquiryGlobalComments {
         multiplicity *;
     }
 }
 
 relation InquiryGlobalCommentExecutionCourse {
-    ExecutionCourse playsRole executionCourse;
-    inquiries.InquiryGlobalComment playsRole inquiryGlobalComments {
+    .org.fenixedu.academic.domain.ExecutionCourse playsRole executionCourse;
+    InquiryGlobalComment playsRole inquiryGlobalComments {
         multiplicity *;
     }
 }
 
 relation InquiryGlobalCommentExecutionDegree {
-    ExecutionDegree playsRole executionDegree;
-    inquiries.InquiryGlobalComment playsRole inquiryGlobalComments {
+    .org.fenixedu.academic.domain.ExecutionDegree playsRole executionDegree;
+    InquiryGlobalComment playsRole inquiryGlobalComments {
         multiplicity *;
     }
 }
 
 relation InquiryGlobalCommentPerson {
-    Person playsRole teacher;
-    inquiries.InquiryGlobalComment playsRole inquiryGlobalComments {
+    .org.fenixedu.academic.domain.Person playsRole teacher;
+    InquiryGlobalComment playsRole inquiryGlobalComments {
         multiplicity *;
     }
 }
 
 relation ExecutionCourseAuditExecutionCourse {
-    ExecutionCourse playsRole executionCourse {
+    .org.fenixedu.academic.domain.ExecutionCourse playsRole executionCourse {
         multiplicity 1..1;
     }
-    inquiries.ExecutionCourseAudit playsRole executionCourseAudit;
+    ExecutionCourseAudit playsRole executionCourseAudit;
 }
 
 relation ExecutionCourseAuditTeacherAuditor {
-    Teacher playsRole teacherAuditor {
+    .org.fenixedu.academic.domain.Teacher playsRole teacherAuditor {
         multiplicity 1..1;
     }
-    inquiries.ExecutionCourseAudit playsRole executionCourseAudits {
+    ExecutionCourseAudit playsRole executionCourseAudits {
         multiplicity *;
     }
 }
 
 relation ExecutionCourseAuditStudentAuditor {
-    student.Student playsRole studentAuditor {
+    .org.fenixedu.academic.domain.student.Student playsRole studentAuditor {
         multiplicity 1..1;
     }
-    inquiries.ExecutionCourseAudit playsRole executionCourseAudits {
+    ExecutionCourseAudit playsRole executionCourseAudits {
         multiplicity *;
     }
 }
 
 relation ExecutionCourseAuditFileExecutionCourseAudit {
-    inquiries.ExecutionCourseAuditFile playsRole executionCourseAuditFiles {
+    ExecutionCourseAuditFile playsRole executionCourseAuditFiles {
         multiplicity *;
     }
-    inquiries.ExecutionCourseAudit playsRole executionCourseAudit;
+    ExecutionCourseAudit playsRole executionCourseAudit;
 }
 
 relation RegistrationProtocolInquiryCourseAnswer {
-    public student.RegistrationProtocol playsRole registrationProtocol {
+    public .org.fenixedu.academic.domain.student.RegistrationProtocol playsRole registrationProtocol {
         multiplicity 0..1;
     } 
-    public inquiries.InquiryCourseAnswer playsRole inquiryCourseAnswer {
+    public InquiryCourseAnswer playsRole inquiryCourseAnswer {
         multiplicity *;
     } 
 }

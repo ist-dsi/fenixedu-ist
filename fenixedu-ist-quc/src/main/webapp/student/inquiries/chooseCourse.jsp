@@ -40,9 +40,9 @@
 <html:messages id="message" message="true" bundle="INQUIRIES_RESOURCES">
 	<p><span class="error0"><!-- Error messages go here --><bean:write name="message" /></span></p>
 </html:messages>
-<bean:define id="weeklySpentHoursSubmittedForOpenInquiry" value="<%= java.lang.String.valueOf(org.fenixedu.academic.domain.inquiries.StudentInquiryExecutionPeriod.isWeeklySpentHoursSubmittedForOpenInquiry((org.fenixedu.academic.domain.student.Student)request.getAttribute("student")))%>" />
+<bean:define id="weeklySpentHoursSubmittedForOpenInquiry" value="<%= java.lang.String.valueOf(pt.ist.fenixedu.quc.domain.StudentInquiryExecutionPeriod.isWeeklySpentHoursSubmittedForOpenInquiry((org.fenixedu.academic.domain.student.Student)request.getAttribute("student")))%>" />
 <logic:equal name="weeklySpentHoursSubmittedForOpenInquiry" value="true">
-	<bean:define id="weeklyHoursSpentInClassesSeason" value="<%= java.lang.String.valueOf(org.fenixedu.academic.domain.inquiries.StudentInquiryExecutionPeriod.getOpenStudentInquiryExecutionPeriod((org.fenixedu.academic.domain.student.Student)request.getAttribute("student")).getWeeklyHoursSpentInClassesSeason()) %>"/>
+	<bean:define id="weeklyHoursSpentInClassesSeason" value="<%= java.lang.String.valueOf(pt.ist.fenixedu.quc.domain.StudentInquiryExecutionPeriod.getOpenStudentInquiryExecutionPeriod((org.fenixedu.academic.domain.student.Student)request.getAttribute("student")).getWeeklyHoursSpentInClassesSeason()) %>"/>
 	<p>
 		<bean:message key="label.weeklySpentHours" bundle="INQUIRIES_RESOURCES"/>: 
 		<b><bean:write name="weeklyHoursSpentInClassesSeason"/></b> 
@@ -97,7 +97,7 @@
 	</fr:view>
 	</div>
 </logic:equal>
-<bean:define id="weeklySpentHoursSubmittedForOpenInquiry" value="<%= java.lang.String.valueOf(org.fenixedu.academic.domain.inquiries.StudentInquiryExecutionPeriod.isWeeklySpentHoursSubmittedForOpenInquiry((org.fenixedu.academic.domain.student.Student)request.getAttribute("student")))%>" />
+<bean:define id="weeklySpentHoursSubmittedForOpenInquiry" value="<%= java.lang.String.valueOf(pt.ist.fenixedu.quc.domain.StudentInquiryExecutionPeriod.isWeeklySpentHoursSubmittedForOpenInquiry((org.fenixedu.academic.domain.student.Student)request.getAttribute("student")))%>" />
 <logic:equal name="weeklySpentHoursSubmittedForOpenInquiry" value="false">
 
 <p><bean:message key="message.inquiries.nhta.definition" bundle="INQUIRIES_RESOURCES"/></p>

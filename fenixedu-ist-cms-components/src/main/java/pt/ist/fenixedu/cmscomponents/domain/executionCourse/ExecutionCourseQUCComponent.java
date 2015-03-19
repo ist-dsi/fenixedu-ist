@@ -10,14 +10,15 @@ import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.academic.domain.ShiftType;
-import org.fenixedu.academic.domain.inquiries.InquiryResult;
-import org.fenixedu.academic.domain.inquiries.TeacherInquiryTemplate;
 import org.fenixedu.cms.domain.Page;
 import org.fenixedu.cms.domain.component.ComponentType;
 import org.fenixedu.cms.rendering.TemplateContext;
 import org.fenixedu.learning.domain.executionCourse.ExecutionCourseSite;
 import org.fenixedu.learning.domain.executionCourse.components.BaseExecutionCourseComponent;
 import org.joda.time.DateTime;
+
+import pt.ist.fenixedu.quc.domain.InquiryResult;
+import pt.ist.fenixedu.quc.domain.TeacherInquiryTemplate;
 
 @ComponentType(description = "Shows QUC Results on Public Pages", name = "QUC Results")
 public class ExecutionCourseQUCComponent extends BaseExecutionCourseComponent {

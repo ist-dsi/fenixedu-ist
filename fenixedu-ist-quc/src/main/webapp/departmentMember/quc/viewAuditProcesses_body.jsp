@@ -30,7 +30,7 @@
 		<fr:edit id="executionSemesterBean" name="executionSemesterBean">
 			<fr:schema bundle="INQUIRIES_RESOURCES" type="org.fenixedu.academic.dto.VariantBean">
 				<fr:slot name="domainObject" key="label.inquiries.semester" layout="menu-select-postback">
-					<fr:property name="providerClass" value="org.fenixedu.academic.presentationTier.Action.departmentMember.ViewQUCResultsDA$ExecutionSemesterQucProvider" />
+					<fr:property name="providerClass" value="pt.ist.fenixedu.quc.ui.struts.action.departmentMember.ViewQUCResultsDA$ExecutionSemesterQucProvider" />
 					<fr:property name="format" value="${executionYear.year} - ${semester}º Semestre" />
 					<fr:property name="nullOptionHidden" value="true"/>
 					<fr:property name="destination" value="showPostBack"/>

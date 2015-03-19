@@ -24,10 +24,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.fenixedu.academic.domain.inquiries.RegentInquiryTemplate;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
 import org.fenixedu.bennu.struts.annotations.Mapping;
+
+import pt.ist.fenixedu.quc.domain.RegentInquiryTemplate;
 
 @Mapping(path = "/respondToRegentInquiriesQuestion")
 public class RespondToRegentInquiriesQuestion extends FenixDispatchAction {

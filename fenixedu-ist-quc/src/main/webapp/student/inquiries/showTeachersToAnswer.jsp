@@ -22,7 +22,7 @@
 <%@ taglib uri="http://struts.apache.org/tags-logic" prefix="logic"%>
 <%@ taglib uri="http://struts.apache.org/tags-html" prefix="html"%>
 <%@ taglib uri="http://fenix-ashes.ist.utl.pt/fenix-renderers" prefix="fr"%>
-<%@ page import="org.fenixedu.academic.dataTransferObject.inquiries.StudentInquiryBean" %>
+<%@ page import="pt.ist.fenixedu.quc.dto.StudentInquiryBean" %>
 <html:xhtml />
 
 <em><bean:message key="title.studentPortal" bundle="INQUIRIES_RESOURCES"/></em>

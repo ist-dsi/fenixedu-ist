@@ -40,13 +40,13 @@
 </html:messages>
 
 <fr:edit id="auditProcessBean" name="auditProcessBean" action="/qucAudit.do?method=selectPersons">
-	<fr:schema type="org.fenixedu.academic.dataTransferObject.inquiries.AuditSelectPersonsECBean" bundle="APPLICATION_RESOURCES">
+	<fr:schema type="pt.ist.fenixedu.quc.dto.AuditSelectPersonsECBean" bundle="APPLICATION_RESOURCES">
 		<fr:slot name="teacher" layout="autoComplete" key="teacher.docente" required="true">
 			<fr:property name="size" value="80"/>
 			<fr:property name="format" value="${name} / ${username}"/>
 			<fr:property name="args" value="slot=name"/>
 			<fr:property name="minChars" value="3"/>
-			<fr:property name="provider" value="org.fenixedu.academic.applicationTier.Servico.commons.searchers.SearchEmployeesAndTeachers"/>
+			<fr:property name="provider" value="pt.ist.fenixedu.quc.service.commons.searchers.SearchEmployeesAndTeachers"/>
 			<fr:property name="indicatorShown" value="true"/>		
 			<fr:property name="errorStyleClass" value="error0"/>
 		</fr:slot>
