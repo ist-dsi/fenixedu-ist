@@ -15,7 +15,7 @@ import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.spaces.domain.Space;
 import org.fenixedu.spaces.domain.occupation.SharedOccupation;
 
-import pt.ist.fenix.domain.homepage.HomepageSite;
+import pt.ist.fenixedu.cmscomponents.domain.homepage.HomepageSite;
 import pt.ist.fenixedu.contracts.domain.Employee;
 
 public class PersonBean {

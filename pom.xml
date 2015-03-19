@@ -105,6 +105,7 @@
     <modules>
         <module>fenix-ist</module>
         <module>fenix-parking</module>
+        <module>fenixedu-ist-cms-components</module>
         <module>fenixedu-ist-delegates</module>
         <module>fenixedu-ist-giaf-contracts</module>
         <module>fenixedu-ist-libraryspace</module>

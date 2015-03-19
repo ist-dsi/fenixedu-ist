@@ -27,7 +27,7 @@
 <h1><bean:message key="link.Publications" bundle="RESEARCHER_RESOURCES"/></h1>
 
 <bean:define id="sotisURL">
-    <%= pt.ist.fenix.FenixIstConfiguration.getConfiguration().sotisURL() %>
+    <%= pt.ist.fenixedu.cmscomponents.FenixEduIstCmsComponentsConfiguration.getConfiguration().sotisURL() %>
 </bean:define>
 
 <bean:define id="lang">
