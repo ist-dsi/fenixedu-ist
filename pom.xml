@@ -103,11 +103,11 @@
     </repositories>
 
     <modules>
-        <module>fenix-ist</module>
         <module>fenix-parking</module>
         <module>fenixedu-ist-cms-components</module>
         <module>fenixedu-ist-delegates</module>
         <module>fenixedu-ist-giaf-contracts</module>
+        <module>fenixedu-ist-integration</module>
         <module>fenixedu-ist-libraryspace</module>
         <module>fenixedu-ist-pre-bolonha</module>
         <module>fenixedu-ist-quc</module>
