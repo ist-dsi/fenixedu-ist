@@ -37,12 +37,12 @@
 </logic:messagesPresent>
 
 <fr:form action="/vigilancy/examCoordinatorManagement.do?method=selectUnitForCoordinator">
-<fr:edit id="selectUnit" type="org.fenixedu.academic.ui.struts.action.vigilancy.VigilantGroupBean" layout="tabular"
+<fr:edit id="selectUnit" type="pt.ist.fenixedu.vigilancies.ui.struts.action.vigilancy.VigilantGroupBean" layout="tabular"
 name="bean" schema="selectUnitInVigilantGroup"/>
 </fr:form>
 <!--  selectUnitInVigilantGroup -->
 
-<bean:define id="bean" name="bean" type="org.fenixedu.academic.ui.struts.action.vigilancy.VigilantGroupBean"/>
+<bean:define id="bean" name="bean" type="pt.ist.fenixedu.vigilancies.ui.struts.action.vigilancy.VigilantGroupBean"/>
 
 
 <logic:present name="bean" property="selectedUnit">		

@@ -27,7 +27,7 @@
 
 
 <h2><bean:message bundle="VIGILANCY_RESOURCES" key="label.vigilancy.editVigilantGroup"/></h2>
-<bean:define id="bean" name="bean" type="org.fenixedu.academic.ui.struts.action.vigilancy.VigilantGroupBean"/>
+<bean:define id="bean" name="bean" type="pt.ist.fenixedu.vigilancies.ui.struts.action.vigilancy.VigilantGroupBean"/>
 
 
 <p class="mtop1 mbottom025"><strong><fr:view name="bean" property="selectedVigilantGroup.name"/>:</strong></p>
@@ -35,7 +35,7 @@
 <fr:form action="/vigilancy/vigilantGroupManagement.do?method=applyChangesToVigilantGroup">
 <fr:edit 
 		   id="editVigilantGroup.block1"
-		   type="org.fenixedu.academic.ui.struts.action.vigilancy.VigilantGroupBean" layout="tabular"
+		   type="pt.ist.fenixedu.vigilancies.ui.struts.action.vigilancy.VigilantGroupBean" layout="tabular"
 		   name="bean"
            schema="vigilantGroup.block1" 
 >
@@ -49,7 +49,7 @@
 <p class="mtop1 mbottom025"><strong><bean:message key="label.vigilancy.firstUnavailablePeriod" bundle="VIGILANCY_RESOURCES"/>:</strong></p>
 <fr:edit 
 		   id="editVigilantGroup.block2"
-		   type="org.fenixedu.academic.ui.struts.action.vigilancy.VigilantGroupBean" layout="tabular"
+		   type="pt.ist.fenixedu.vigilancies.ui.struts.action.vigilancy.VigilantGroupBean" layout="tabular"
 		   name="bean"
            schema="vigilantGroup.block2" 
 >
@@ -62,7 +62,7 @@
 <p class="mtop1"><strong><bean:message key="label.vigilancy.secondUnavailablePeriod" bundle="VIGILANCY_RESOURCES"/>:</strong></p>
 <fr:edit 
 		   id="editVigilantGroup.block3"
-		   type="org.fenixedu.academic.ui.struts.action.vigilancy.VigilantGroupBean" layout="tabular"
+		   type="pt.ist.fenixedu.vigilancies.ui.struts.action.vigilancy.VigilantGroupBean" layout="tabular"
 		   name="bean"
            schema="vigilantGroup.block3" 
 >

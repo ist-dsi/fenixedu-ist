@@ -47,7 +47,7 @@
 
 <fr:edit 
 		   id="createVigilantGroup.block1"
-		   type="org.fenixedu.academic.ui.struts.action.vigilancy.VigilantGroupBean" layout="tabular"
+		   type="pt.ist.fenixedu.vigilancies.ui.struts.action.vigilancy.VigilantGroupBean" layout="tabular"
 		   name="bean"
            schema="vigilantGroup.block1" >
 	<fr:layout>
@@ -60,7 +60,7 @@
 <p class="mtop1 mbottom025"><strong><bean:message key="label.vigilancy.firstUnavailablePeriod" bundle="VIGILANCY_RESOURCES"/>:</strong></p>
 <fr:edit 
 		   id="createVigilantGroup.block2"
-		   type="org.fenixedu.academic.ui.struts.action.vigilancy.VigilantGroupBean" layout="tabular"
+		   type="pt.ist.fenixedu.vigilancies.ui.struts.action.vigilancy.VigilantGroupBean" layout="tabular"
 		   name="bean"
            schema="vigilantGroup.block2" 
 >
@@ -73,7 +73,7 @@
 <p class="mtop15 mbottom025"><strong><bean:message key="label.vigilancy.secondUnavailablePeriod" bundle="VIGILANCY_RESOURCES"/>:</strong></p>
 <fr:edit 
 		   id="createVigilantGroup.block3"
-		   type="org.fenixedu.academic.ui.struts.action.vigilancy.VigilantGroupBean" layout="tabular"
+		   type="pt.ist.fenixedu.vigilancies.ui.struts.action.vigilancy.VigilantGroupBean" layout="tabular"
 		   name="bean"
            schema="vigilantGroup.block3" 
 >

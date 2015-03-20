@@ -227,7 +227,7 @@
 		<h3 class="mtop15 mbottom05"><fr:view name="bean"
 			property="selectedVigilantGroup.name" /></h3>
 		<bean:define id="bean" name="bean"
-			type="org.fenixedu.academic.ui.struts.action.vigilancy.VigilantBean" />
+			type="pt.ist.fenixedu.vigilancies.ui.struts.action.vigilancy.VigilantBean" />
 
 		<div class="mbottom2">
 			<p class="mtop2 mbottom0"><em><bean:message key="label.vigilancy.label" bundle="VIGILANCY_RESOURCES"/>:</em></p>

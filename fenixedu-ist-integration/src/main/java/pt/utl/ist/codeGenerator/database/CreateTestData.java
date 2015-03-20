@@ -120,8 +120,6 @@ import org.fenixedu.academic.domain.time.calendarStructure.AcademicCalendarRootE
 import org.fenixedu.academic.domain.time.calendarStructure.AcademicPeriod;
 import org.fenixedu.academic.domain.time.calendarStructure.AcademicSemesterCE;
 import org.fenixedu.academic.domain.time.calendarStructure.AcademicYearCE;
-import org.fenixedu.academic.domain.vigilancy.Vigilancy;
-import org.fenixedu.academic.domain.vigilancy.VigilantGroup;
 import org.fenixedu.academic.dto.GenericPair;
 import org.fenixedu.academic.util.DiaSemana;
 import org.fenixedu.academic.util.HourMinuteSecond;
@@ -144,6 +142,8 @@ import org.slf4j.LoggerFactory;
 import pt.ist.fenixedu.contracts.domain.Employee;
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.EmployeeContract;
 import pt.ist.fenixedu.teacher.domain.teacher.TeacherService;
+import pt.ist.fenixedu.vigilancies.domain.Vigilancy;
+import pt.ist.fenixedu.vigilancies.domain.VigilantGroup;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
 import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;

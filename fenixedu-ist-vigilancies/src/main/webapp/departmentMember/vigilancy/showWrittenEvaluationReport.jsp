@@ -59,7 +59,7 @@
 		<th><bean:message key="label.vigilancy.attended" bundle="VIGILANCY_RESOURCES"/></th>
 		<th><bean:message key="label.vigilancy.points" bundle="VIGILANCY_RESOURCES"/></th>
 	</tr>
-	<logic:iterate id="vigilancy" name="ownVigilancies" type="org.fenixedu.academic.domain.vigilancy.Vigilancy">
+	<logic:iterate id="vigilancy" name="ownVigilancies" type="pt.ist.fenixedu.vigilancies.domain.Vigilancy">
 	<tr class="<%= !vigilancy.isActive() ? "color888" : ""%>">
 		<td><fr:view name="vigilancy" property="vigilantWrapper.teacherCategoryCode"/></td>
 			<td><fr:view name="vigilancy" property="vigilantWrapper.person.username"/></td>
@@ -85,7 +85,7 @@
 		<th><bean:message key="label.vigilancy.points" bundle="VIGILANCY_RESOURCES"/></th>
 
 	</tr>
-    <logic:iterate id="vigilancy" name="otherVigilancies" type="org.fenixedu.academic.domain.vigilancy.Vigilancy">
+    <logic:iterate id="vigilancy" name="otherVigilancies" type="pt.ist.fenixedu.vigilancies.domain.Vigilancy">
 	<tr class="<%= !vigilancy.isActive() ? "color888" : ""%>">
 		<td><fr:view name="vigilancy" property="vigilantWrapper.teacherCategoryCode"/></td>
 			<td><fr:view name="vigilancy" property="vigilantWrapper.person.username"/></td>

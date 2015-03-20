@@ -78,7 +78,7 @@
 	</tr>
 
 
-<logic:iterate id="vigilancy" name="ownVigilancies" type="org.fenixedu.academic.domain.vigilancy.Vigilancy">
+<logic:iterate id="vigilancy" name="ownVigilancies" type="pt.ist.fenixedu.vigilancies.domain.Vigilancy">
 <tr class="<%= !vigilancy.isActive() ? "color888" : ""%>">
 <td class="acenter">
 	<logic:present name="vigilancy" property="vigilantWrapper.teacher">
@@ -115,7 +115,7 @@
 </tr>
 </logic:iterate>
 
-<logic:iterate id="vigilancy" name="vigilancies" type="org.fenixedu.academic.domain.vigilancy.Vigilancy">
+<logic:iterate id="vigilancy" name="vigilancies" type="pt.ist.fenixedu.vigilancies.domain.Vigilancy">
 <tr class="<%= !vigilancy.isActive() ? "color888" : ""%>">
 <td class="acenter">
 	<logic:present name="vigilancy" property="vigilantWrapper.teacher">

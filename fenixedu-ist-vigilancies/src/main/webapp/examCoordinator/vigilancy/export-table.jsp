@@ -24,7 +24,7 @@
 <%@ taglib uri="http://jakarta.apache.org/taglibs/datetime-1.0" prefix="date"%>
 <%@ taglib uri="http://fenix-ashes.ist.utl.pt/fenix-renderers" prefix="fr" %>
 
-<bean:define id="bean" name="bean" type="org.fenixedu.academic.ui.struts.action.vigilancy.ConvokeBean"/>
+<bean:define id="bean" name="bean" type="pt.ist.fenixedu.vigilancies.ui.struts.action.vigilancy.ConvokeBean"/>
 
 <html:html xhtml="true">
 <head>
@@ -79,7 +79,7 @@ white-space: nowrap;
 
 <logic:notPresent name="bean" property="selectedVigilantGroup">
     <bean:define id="loggedUser" name="LOGGED_USER_ATTRIBUTE" />
-    <bean:define id="currentExamCoordinator" value="${org.fenixedu.academic.domain.vigilancy.ExamCoordinator.getCurrentExamCoordinator(loggedUser.getPerson())}"/>
+    <bean:define id="currentExamCoordinator" value="${pt.ist.fenixedu.vigilancies.domain.ExamCoordinator.getCurrentExamCoordinator(loggedUser.getPerson())}"/>
 	<fr:view name="currentExamCoordinator">
 			<fr:layout name="flowLayout">
 				<fr:property name="htmlSeparator" value=","/>
