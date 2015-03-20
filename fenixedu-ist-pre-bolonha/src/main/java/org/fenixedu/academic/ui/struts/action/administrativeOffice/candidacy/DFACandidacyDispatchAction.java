@@ -86,7 +86,6 @@ public class DFACandidacyDispatchAction extends FenixDispatchAction {
         candidacyBean.setExecutionYear(null);
         RenderUtils.invalidateViewState();
         request.setAttribute("candidacyBean", candidacyBean);
-        
 
         return mapping.getInputForward();
     }
@@ -229,12 +228,12 @@ public class DFACandidacyDispatchAction extends FenixDispatchAction {
 
         PersonBean personBean = (PersonBean) getRenderedObject("personBean");
         try {
-            personBean.save();            
+            personBean.save();
         } catch (DomainException e) {
             addActionMessage(request, e.getMessage(), e.getArgs());
             return mapping.findForward("showCandidacyAlterData");
         }
-        
+
         PrecedentDegreeInformationBean precedentDegreeInformation =
                 (PrecedentDegreeInformationBean) RenderUtils.getViewState("precedentDegreeInformation").getMetaObject()
                         .getObject();

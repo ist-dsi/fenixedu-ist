@@ -492,7 +492,8 @@ public class MergePersonsDA extends FenixDispatchAction {
 
     private Person checkUser() {
         Person person = AccessControl.getPerson();
-        Unit ciistUnit = Unit.readByCostCenterCode(FenixEduIstIntegrationConfiguration.getConfiguration().getCIISTCostCenterCode());
+        Unit ciistUnit =
+                Unit.readByCostCenterCode(FenixEduIstIntegrationConfiguration.getConfiguration().getCIISTCostCenterCode());
         Unit currentWorkingPlace = person.getEmployee().getCurrentWorkingPlace();
         if ((currentWorkingPlace != null && ciistUnit != null && !currentWorkingPlace.equals(ciistUnit))
                 || !RoleType.MANAGER.isMember(Authenticate.getUser())) {

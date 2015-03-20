@@ -88,7 +88,8 @@ public class ViewQucRegentsStatus extends FenixDispatchAction {
                 Person person = professorship.getPerson();
                 boolean isToAnswer = RegentInquiryTemplate.hasToAnswerRegentInquiry(professorship);
                 if (isToAnswer) {
-                    boolean hasMandatoryCommentsToMake = InquiryResultComment.hasMandatoryCommentsToMakeAsResponsible(professorship);
+                    boolean hasMandatoryCommentsToMake =
+                            InquiryResultComment.hasMandatoryCommentsToMakeAsResponsible(professorship);
                     boolean inquiryToAnswer =
                             professorship.getInquiryRegentAnswer() == null
                                     || professorship.getInquiryRegentAnswer().hasRequiredQuestionsToAnswer(regentInquiryTemplate);

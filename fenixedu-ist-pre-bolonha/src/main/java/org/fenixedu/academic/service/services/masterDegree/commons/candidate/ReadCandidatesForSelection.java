@@ -22,15 +22,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.fenixedu.academic.domain.CandidateSituation;
+import org.fenixedu.academic.domain.ExecutionDegree;
+import org.fenixedu.academic.domain.MasterDegreeCandidate;
+import org.fenixedu.academic.dto.InfoMasterDegreeCandidateWithInfoPerson;
 import org.fenixedu.academic.service.filter.ReadCandidatesForSelectionAuthorizationFilter;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 import org.fenixedu.academic.service.services.exceptions.NonExistingServiceException;
 import org.fenixedu.academic.service.services.exceptions.NotAuthorizedException;
-import org.fenixedu.academic.dto.InfoMasterDegreeCandidateWithInfoPerson;
-import org.fenixedu.academic.domain.CandidateSituation;
-import org.fenixedu.academic.domain.ExecutionDegree;
-import org.fenixedu.academic.domain.MasterDegreeCandidate;
 import org.fenixedu.academic.util.SituationName;
+
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
 
@@ -45,7 +46,8 @@ public class ReadCandidatesForSelection {
 
         ExecutionDegree executionDegree = FenixFramework.getDomainObject(executionDegreeID);
 
-        List<CandidateSituation> resultTemp = MasterDegreeCandidate.getCandidateSituationsInSituation(executionDegree, situationNames);
+        List<CandidateSituation> resultTemp =
+                MasterDegreeCandidate.getCandidateSituationsInSituation(executionDegree, situationNames);
 
         if (resultTemp.isEmpty()) {
             throw new NonExistingServiceException();

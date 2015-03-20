@@ -40,8 +40,8 @@ public class DepartmentDegrees extends UnitSiteComponent {
     public void handle(Page page, TemplateContext componentContext, TemplateContext global) {
         Department department = unit(page).getDepartment();
         Predicate<Degree> isActive = Degree::isActive;
-        global.put("activeTypes",
-                department.getDegreesSet().stream().filter(isActive).map(Degree::getDegreeType).distinct().collect(toList()));
+        global.put("activeTypes", department.getDegreesSet().stream().filter(isActive).map(Degree::getDegreeType).distinct()
+                .collect(toList()));
         global.put("inactiveTypes", department.getDegreesSet().stream().filter(isActive.negate()).map(Degree::getDegreeType)
                 .distinct().collect(toList()));
         global.put("degreesByType", department.getDegreesSet().stream().collect(groupingBy(Degree::getDegreeType)));

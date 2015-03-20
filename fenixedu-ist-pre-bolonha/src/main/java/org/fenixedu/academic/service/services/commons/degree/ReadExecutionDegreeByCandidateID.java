@@ -18,12 +18,13 @@
  */
 package org.fenixedu.academic.service.services.commons.degree;
 
+import org.fenixedu.academic.domain.ExecutionDegree;
+import org.fenixedu.academic.domain.MasterDegreeCandidate;
+import org.fenixedu.academic.dto.InfoExecutionDegree;
 import org.fenixedu.academic.service.filter.ReadExecutionDegreeByCandidateIDAuthorizationFilter;
 import org.fenixedu.academic.service.services.exceptions.NonExistingServiceException;
 import org.fenixedu.academic.service.services.exceptions.NotAuthorizedException;
-import org.fenixedu.academic.dto.InfoExecutionDegree;
-import org.fenixedu.academic.domain.ExecutionDegree;
-import org.fenixedu.academic.domain.MasterDegreeCandidate;
+
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
 

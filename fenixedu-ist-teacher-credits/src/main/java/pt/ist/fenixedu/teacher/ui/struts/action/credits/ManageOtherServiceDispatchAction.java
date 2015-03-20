@@ -40,7 +40,6 @@ import org.fenixedu.bennu.struts.portal.EntryPoint;
 
 import pt.ist.fenixedu.teacher.domain.teacher.OtherService;
 import pt.ist.fenixedu.teacher.domain.teacher.TeacherService;
-import pt.ist.fenixedu.teacher.ui.struts.action.credits.ManageCreditsPeriods;
 import pt.ist.fenixframework.FenixFramework;
 
 @Mapping(path = "/otherServiceManagement", functionality = ManageCreditsPeriods.class)

@@ -83,9 +83,11 @@ public class ViewQucCoordinatorsStatus extends FenixDispatchAction {
                             && coordinator.getPerson().getTeacher() != null) {
                         InquiryCoordinatorAnswer inquiryCoordinatorAnswer = null;
                         if (coordinatorInquiryTemplate.getShared()) {
-                            inquiryCoordinatorAnswer = InquiryCoordinatorAnswer.getInquiryCoordinationAnswers(executionDegree, executionPeriod);
+                            inquiryCoordinatorAnswer =
+                                    InquiryCoordinatorAnswer.getInquiryCoordinationAnswers(executionDegree, executionPeriod);
                         } else {
-                            inquiryCoordinatorAnswer = InquiryCoordinatorAnswer.getInquiryCoordinatorAnswer(coordinator, executionPeriod);
+                            inquiryCoordinatorAnswer =
+                                    InquiryCoordinatorAnswer.getInquiryCoordinatorAnswer(coordinator, executionPeriod);
                         }
                         if (inquiryCoordinatorAnswer == null
                                 || inquiryCoordinatorAnswer.hasRequiredQuestionsToAnswer(coordinatorInquiryTemplate)) {

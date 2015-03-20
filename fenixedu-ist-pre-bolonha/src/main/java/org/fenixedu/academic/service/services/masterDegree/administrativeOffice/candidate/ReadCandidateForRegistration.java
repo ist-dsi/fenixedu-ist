@@ -28,16 +28,17 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
-import org.fenixedu.academic.service.services.exceptions.NonExistingServiceException;
-import org.fenixedu.academic.dto.InfoCandidateSituation;
-import org.fenixedu.academic.dto.InfoMasterDegreeCandidate;
-import org.fenixedu.academic.dto.InfoMasterDegreeCandidateWithInfoPerson;
 import org.fenixedu.academic.domain.CandidateSituation;
 import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.MasterDegreeCandidate;
+import org.fenixedu.academic.dto.InfoCandidateSituation;
+import org.fenixedu.academic.dto.InfoMasterDegreeCandidate;
+import org.fenixedu.academic.dto.InfoMasterDegreeCandidateWithInfoPerson;
 import org.fenixedu.academic.predicate.RolePredicates;
+import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
+import org.fenixedu.academic.service.services.exceptions.NonExistingServiceException;
 import org.fenixedu.academic.util.SituationName;
+
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
 
@@ -57,7 +58,8 @@ public class ReadCandidateForRegistration {
                         SituationName.ADMITED_SPECIALIZATION_OBJ });
 
         ExecutionDegree executionDegree = FenixFramework.getDomainObject(executionDegreeCode);
-        List<CandidateSituation> result = MasterDegreeCandidate.getCandidateSituationsInSituation(executionDegree, situationNames);
+        List<CandidateSituation> result =
+                MasterDegreeCandidate.getCandidateSituationsInSituation(executionDegree, situationNames);
 
         if (result.isEmpty()) {
             throw new NonExistingServiceException();

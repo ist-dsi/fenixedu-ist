@@ -19,7 +19,6 @@
 package org.fenixedu.academic.ui.struts.action.masterDegree.administrativeOffice;
 
 import org.fenixedu.academic.ui.struts.action.commons.ChooseExecutionYearToCandidateStudyPlanDA;
-
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;

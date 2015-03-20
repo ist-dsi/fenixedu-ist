@@ -26,17 +26,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.fenixedu.academic.dto.InfoCandidateSituation;
-import org.fenixedu.academic.dto.InfoExecutionDegree;
-import org.fenixedu.academic.dto.InfoMasterDegreeCandidate;
-import org.fenixedu.academic.dto.InfoMasterDegreeCandidateWithInfoPerson;
 import org.fenixedu.academic.domain.CandidateSituation;
 import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.MasterDegreeCandidate;
 import org.fenixedu.academic.domain.studentCurricularPlan.Specialization;
+import org.fenixedu.academic.dto.InfoCandidateSituation;
+import org.fenixedu.academic.dto.InfoExecutionDegree;
+import org.fenixedu.academic.dto.InfoMasterDegreeCandidate;
+import org.fenixedu.academic.dto.InfoMasterDegreeCandidateWithInfoPerson;
 import org.fenixedu.academic.predicate.RolePredicates;
 import org.fenixedu.academic.util.SituationName;
+
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
 

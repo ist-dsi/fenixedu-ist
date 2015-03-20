@@ -23,14 +23,13 @@ import java.util.List;
 import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
 
-import org.fenixedu.academic.service.services.commons.ReadNotClosedExecutionYears;
-import org.fenixedu.academic.service.services.masterDegree.administrativeOffice.gratuity.CreateGratuitySituationsForCurrentExecutionYear;
-import org.fenixedu.academic.dto.InfoExecutionYear;
-import org.fenixedu.academic.ui.faces.bean.base.FenixBackingBean;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.struts.util.LabelValueBean;
+import org.fenixedu.academic.dto.InfoExecutionYear;
+import org.fenixedu.academic.service.services.commons.ReadNotClosedExecutionYears;
+import org.fenixedu.academic.service.services.masterDegree.administrativeOffice.gratuity.CreateGratuitySituationsForCurrentExecutionYear;
+import org.fenixedu.academic.ui.faces.bean.base.FenixBackingBean;
 
 /**
  * 

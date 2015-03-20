@@ -41,7 +41,6 @@ import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.studentCurricularPlan.Specialization;
 import org.fenixedu.academic.util.SituationName;
 import org.fenixedu.academic.util.State;
-
 import org.fenixedu.bennu.core.domain.Bennu;
 
 public class MasterDegreeCandidate extends MasterDegreeCandidate_Base {

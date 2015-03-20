@@ -63,10 +63,9 @@ import com.google.gson.JsonPrimitive;
 @Service
 public class PagesAdminService {
 
-    private final Predicate<MenuItem> isStaticPage =
-            menuItem -> menuItem.getPage() != null && menuItem.getPage().getComponentsSet().stream()
-                    .filter(StaticPost.class::isInstance).map(component -> ((StaticPost) component).getPost())
-                    .filter(post -> post != null).findFirst().isPresent();
+    private final Predicate<MenuItem> isStaticPage = menuItem -> menuItem.getPage() != null
+            && menuItem.getPage().getComponentsSet().stream().filter(StaticPost.class::isInstance)
+                    .map(component -> ((StaticPost) component).getPost()).filter(post -> post != null).findFirst().isPresent();
 
     protected static Stream<Page> dynamicPages(Site site) {
         return site.getPagesSet().stream().filter(PagesAdminService::isDynamicPage)
@@ -288,8 +287,9 @@ public class PagesAdminService {
 
     @Atomic
     protected GroupBasedFile addPostFile(MultipartFile attachment, MenuItem menuItem) throws IOException {
-        GroupBasedFile f = new GroupBasedFile(attachment.getOriginalFilename(), attachment.getOriginalFilename(),
-                        attachment.getBytes(), AnyoneGroup.get());
+        GroupBasedFile f =
+                new GroupBasedFile(attachment.getOriginalFilename(), attachment.getOriginalFilename(), attachment.getBytes(),
+                        AnyoneGroup.get());
         postForPage(menuItem.getPage()).getPostFiles().putFile(f);
         return f;
     }
@@ -299,7 +299,7 @@ public class PagesAdminService {
         Post post = postForPage(menuItem.getPage());
         Post.Attachments attachments = post.getAttachments();
         int attachmentPosition = attachments.getFiles().indexOf(file);
-        if(attachmentPosition != -1) {
+        if (attachmentPosition != -1) {
             attachments.removeFile(attachmentPosition);
             file.delete();
         } else if (post.getPostFiles().getFiles().indexOf(file) != -1) {
@@ -342,7 +342,7 @@ public class PagesAdminService {
     }
 
     protected void copyStaticPage(MenuItem oldMenuItem, ExecutionCourseSite newSite, Menu newMenu, MenuItem newParent) {
-        if(oldMenuItem.getPage() != null) {
+        if (oldMenuItem.getPage() != null) {
             Page oldPage = oldMenuItem.getPage();
             staticPost(oldPage).ifPresent(oldPost -> {
                 Page newPage = new Page(newSite);
@@ -351,8 +351,8 @@ public class PagesAdminService {
                 newPage.setCreatedBy(Authenticate.getUser());
                 newPage.setPublished(false);
 
-                for(Component component : oldPage.getComponentsSet()) {
-                    if(component instanceof StaticPost) {
+                for (Component component : oldPage.getComponentsSet()) {
+                    if (component instanceof StaticPost) {
                         StaticPost staticPostComponent = (StaticPost) component;
                         Post newPost = clonePost(staticPostComponent.getPost(), newSite);
                         newPost.setActive(true);
@@ -366,7 +366,7 @@ public class PagesAdminService {
                 newMenuItem.setUrl(oldMenuItem.getUrl());
                 newMenuItem.setFolder(oldMenuItem.getFolder());
 
-                oldMenuItem.getChildrenSet().stream().forEach(child->copyStaticPage(child, newSite, newMenu, newMenuItem));
+                oldMenuItem.getChildrenSet().stream().forEach(child -> copyStaticPage(child, newSite, newMenu, newMenuItem));
             });
         }
     }
@@ -379,7 +379,7 @@ public class PagesAdminService {
         newPost.setCreatedBy(Authenticate.getUser());
         newPost.setActive(oldPost.getActive());
 
-        for(Category oldCategory : oldPost.getCategoriesSet()) {
+        for (Category oldCategory : oldPost.getCategoriesSet()) {
             Category newCategory = newSite.getOrCreateCategoryForSlug(oldCategory.getSlug(), oldCategory.getName());
             newPost.addCategories(newCategory);
         }

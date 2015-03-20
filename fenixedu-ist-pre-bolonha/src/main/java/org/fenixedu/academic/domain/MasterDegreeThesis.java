@@ -27,7 +27,6 @@ import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.masterDegree.MasterDegreeThesisState;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.util.State;
-
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.joda.time.YearMonthDay;
 

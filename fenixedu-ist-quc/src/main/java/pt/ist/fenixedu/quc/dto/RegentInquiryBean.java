@@ -78,7 +78,8 @@ public class RegentInquiryBean implements Serializable {
                 CurricularCourseInquiryTemplate.getTemplateByExecutionPeriod(executionCourse.getExecutionPeriod());
         for (ExecutionDegree executionDegree : executionCourse.getExecutionDegrees()) {
             ArrayList<BlockResultsSummaryBean> blockResults = new ArrayList<BlockResultsSummaryBean>();
-            List<InquiryResult> results = InquiryResult.getInquiryResultsByExecutionDegreeAndForTeachers(executionCourse, executionDegree);
+            List<InquiryResult> results =
+                    InquiryResult.getInquiryResultsByExecutionDegreeAndForTeachers(executionCourse, executionDegree);
             if (results != null && results.size() > 5) {
                 for (InquiryBlock inquiryBlock : courseInquiryTemplate.getInquiryBlocksSet()) {
                     blockResults.add(new BlockResultsSummaryBean(inquiryBlock, results, person, ResultPersonCategory.REGENT));

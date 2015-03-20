@@ -12,8 +12,10 @@ import pt.ist.fenixframework.FenixFramework;
 /**
  * Created by borgez on 20-02-2015.
  */
-@WebListener public class FenixISTLearningContextListener implements ServletContextListener {
-    @Override public void contextInitialized(ServletContextEvent sce) {
+@WebListener
+public class FenixISTLearningContextListener implements ServletContextListener {
+    @Override
+    public void contextInitialized(ServletContextEvent sce) {
         FenixFramework.getDomainModel().registerDeletionListener(Person.class, (person) -> {
             HomepageSite homepageSite = person.getHomepage();
             if (homepageSite != null) {
@@ -23,7 +25,8 @@ import pt.ist.fenixframework.FenixFramework;
         });
     }
 
-    @Override public void contextDestroyed(ServletContextEvent sce) {
+    @Override
+    public void contextDestroyed(ServletContextEvent sce) {
 
     }
 }

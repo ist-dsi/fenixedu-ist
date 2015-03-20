@@ -51,8 +51,10 @@ public class ISTConnectDA extends ExternalInterfaceDispatchAction {
     private boolean doLogin(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request, HttpServletResponse response) {
         final String username = (String) getFromRequest(request, "username");
         final String password = (String) getFromRequest(request, "password");
-        final String usernameProp = FenixEduIstIntegrationConfiguration.getConfiguration().getExternalServicesISTConnectUsername();
-        final String passwordProp = FenixEduIstIntegrationConfiguration.getConfiguration().getExternalServicesISTConnectPassword();
+        final String usernameProp =
+                FenixEduIstIntegrationConfiguration.getConfiguration().getExternalServicesISTConnectUsername();
+        final String passwordProp =
+                FenixEduIstIntegrationConfiguration.getConfiguration().getExternalServicesISTConnectPassword();
         if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password) || StringUtils.isEmpty(usernameProp)
                 || StringUtils.isEmpty(passwordProp)) {
             return false;

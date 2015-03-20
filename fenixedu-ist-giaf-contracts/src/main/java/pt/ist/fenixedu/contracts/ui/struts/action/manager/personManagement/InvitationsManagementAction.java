@@ -61,16 +61,16 @@ import pt.ist.fenixedu.contracts.service.manager.EditInvitationResponsible;
 import pt.utl.ist.fenix.tools.util.CollectionPager;
 
 @StrutsFunctionality(app = AccountManagementApp.class, path = "invitations-management",
-titleKey = "title.manage.external.persons")
+        titleKey = "title.manage.external.persons")
 @Mapping(path = "/invitationsManagement", module = "manager")
 @Forwards({
-    @Forward(name = "searhPersonBeforeInvitationsManagement",
-            path = "/manager/personManagement/choosePersonForManageInvitations.jsp"),
-            @Forward(name = "managePersonInvitations", path = "/manager/personManagement/managePersonInvitations.jsp"),
-            @Forward(name = "prepareEditInvitation", path = "/manager/personManagement/editInvitation.jsp"),
-            @Forward(name = "prepareEditInvitationDetails", path = "/manager/personManagement/changeInvitationDetails.jsp"),
-            @Forward(name = "prepareCreateNewPersonInvitation", path = "/manager/personManagement/createNewPersonInvitation.jsp"),
-            @Forward(name = "prepareCreateInvitedPerson", path = "/manager/personManagement/createInvitedPerson.jsp") })
+        @Forward(name = "searhPersonBeforeInvitationsManagement",
+                path = "/manager/personManagement/choosePersonForManageInvitations.jsp"),
+        @Forward(name = "managePersonInvitations", path = "/manager/personManagement/managePersonInvitations.jsp"),
+        @Forward(name = "prepareEditInvitation", path = "/manager/personManagement/editInvitation.jsp"),
+        @Forward(name = "prepareEditInvitationDetails", path = "/manager/personManagement/changeInvitationDetails.jsp"),
+        @Forward(name = "prepareCreateNewPersonInvitation", path = "/manager/personManagement/createNewPersonInvitation.jsp"),
+        @Forward(name = "prepareCreateInvitedPerson", path = "/manager/personManagement/createInvitedPerson.jsp") })
 public class InvitationsManagementAction extends FenixDispatchAction {
 
     public ActionForward prepareCreateInvitedPerson(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,

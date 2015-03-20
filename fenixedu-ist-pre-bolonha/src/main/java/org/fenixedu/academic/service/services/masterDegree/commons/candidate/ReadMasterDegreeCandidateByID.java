@@ -18,9 +18,10 @@
  */
 package org.fenixedu.academic.service.services.masterDegree.commons.candidate;
 
+import org.fenixedu.academic.domain.MasterDegreeCandidate;
 import org.fenixedu.academic.dto.InfoMasterDegreeCandidate;
 import org.fenixedu.academic.dto.InfoMasterDegreeCandidateWithInfoPerson;
-import org.fenixedu.academic.domain.MasterDegreeCandidate;
+
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
 

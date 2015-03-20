@@ -18,7 +18,6 @@
  */
 package pt.ist.fenixedu.quc.domain;
 
-
 public class InquiryStudentTeacherAnswer extends InquiryStudentTeacherAnswer_Base {
 
     public InquiryStudentTeacherAnswer() {

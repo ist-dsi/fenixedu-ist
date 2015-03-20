@@ -30,6 +30,7 @@ import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.studentCurricularPlan.Specialization;
 import org.fenixedu.academic.domain.transactions.GratuityTransaction;
+
 import pt.ist.fenixframework.Atomic;
 
 /**

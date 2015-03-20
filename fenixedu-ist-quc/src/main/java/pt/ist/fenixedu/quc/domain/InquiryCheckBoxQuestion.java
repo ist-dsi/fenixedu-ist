@@ -18,7 +18,6 @@
  */
 package pt.ist.fenixedu.quc.domain;
 
-
 public class InquiryCheckBoxQuestion extends InquiryCheckBoxQuestion_Base {
 
     public InquiryCheckBoxQuestion() {

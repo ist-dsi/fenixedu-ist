@@ -23,15 +23,14 @@ import java.util.List;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 
-import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
-import org.fenixedu.academic.service.services.exceptions.NonExistingServiceException;
-import org.fenixedu.academic.dto.InfoMasterDegreeThesisDataVersionWithGuidersAndRespAndThesis;
-import org.fenixedu.academic.domain.DegreeCurricularPlan;
-import org.fenixedu.academic.domain.MasterDegreeThesisDataVersion;
-import org.fenixedu.academic.predicate.IllegalDataAccessException;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
+import org.fenixedu.academic.domain.DegreeCurricularPlan;
+import org.fenixedu.academic.domain.MasterDegreeThesisDataVersion;
+import org.fenixedu.academic.dto.InfoMasterDegreeThesisDataVersionWithGuidersAndRespAndThesis;
+import org.fenixedu.academic.predicate.IllegalDataAccessException;
+import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
+import org.fenixedu.academic.service.services.exceptions.NonExistingServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,7 +82,8 @@ public class ListStudentThesis {
 
         DegreeCurricularPlan degreeCurricularPlan = FenixFramework.getDomainObject(degreeCurricularPlanID);
 
-        List masterDegreeThesisDataVersions = MasterDegreeThesisDataVersion.readActiveMasterDegreeThesisDataVersions(degreeCurricularPlan);
+        List masterDegreeThesisDataVersions =
+                MasterDegreeThesisDataVersion.readActiveMasterDegreeThesisDataVersions(degreeCurricularPlan);
 
         if (masterDegreeThesisDataVersions == null || masterDegreeThesisDataVersions.isEmpty()) {
             throw new NonExistingServiceException("error.exception.masterDegree.nonExistingMasterDegreeThesis");

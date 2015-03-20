@@ -18,7 +18,6 @@
  */
 package pt.ist.fenixedu.quc.domain;
 
-
 public class InquiryTextBoxQuestion extends InquiryTextBoxQuestion_Base {
 
     public InquiryTextBoxQuestion() {

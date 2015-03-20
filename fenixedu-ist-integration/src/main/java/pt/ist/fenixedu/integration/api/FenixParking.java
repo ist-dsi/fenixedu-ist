@@ -26,8 +26,8 @@ public class FenixParking {
         try {
             return client.target(FenixEduIstIntegrationConfiguration.getConfiguration().getApiParkingUrl())
                     .queryParam("username", FenixEduIstIntegrationConfiguration.getConfiguration().getApiParkingUsername())
-                    .queryParam("password", FenixEduIstIntegrationConfiguration.getConfiguration().getApiParkingPassword()).request()
-                    .get(String.class);
+                    .queryParam("password", FenixEduIstIntegrationConfiguration.getConfiguration().getApiParkingPassword())
+                    .request().get(String.class);
         } catch (Exception e) {
             throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
         }

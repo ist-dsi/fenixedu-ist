@@ -21,9 +21,10 @@ package org.fenixedu.academic.service.services.masterDegree.commons.candidate;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
-import org.fenixedu.academic.dto.InfoMasterDegreeCandidateWithInfoPerson;
 import org.fenixedu.academic.domain.MasterDegreeCandidate;
+import org.fenixedu.academic.dto.InfoMasterDegreeCandidateWithInfoPerson;
+import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
+
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
 

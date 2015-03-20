@@ -21,7 +21,6 @@ package org.fenixedu.academic.ui.struts.action.masterDegree.administrativeOffice
 import org.fenixedu.academic.ui.struts.action.commons.ChooseExecutionYearToEditCandidatesDA;
 import org.fenixedu.academic.ui.struts.action.exceptions.ExistingActionException;
 import org.fenixedu.academic.ui.struts.config.FenixErrorExceptionHandler;
-
 import org.fenixedu.bennu.struts.annotations.ExceptionHandling;
 import org.fenixedu.bennu.struts.annotations.Exceptions;
 import org.fenixedu.bennu.struts.annotations.Forward;

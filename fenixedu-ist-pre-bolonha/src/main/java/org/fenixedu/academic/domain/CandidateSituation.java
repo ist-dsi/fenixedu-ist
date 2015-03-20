@@ -22,7 +22,6 @@ import java.util.Date;
 
 import org.fenixedu.academic.util.SituationName;
 import org.fenixedu.academic.util.State;
-
 import org.fenixedu.bennu.core.domain.Bennu;
 
 public class CandidateSituation extends CandidateSituation_Base {

@@ -114,7 +114,9 @@ public class DepartmentTeacherResumeRenderer extends InquiryBlocksResumeRenderer
         String fillInParameters =
                 buildFillInParameters(teacher, executionSemester, departmentTeacherResultsResume.isBackToResume());
         if (showCommentLink) {
-            if (DepartmentTeacherResumeRenderer.hasQucGlobalCommentsMadeBy(teacher, departmentTeacherResultsResume.getPresident(), executionSemester, departmentTeacherResultsResume.getPersonCategory())) {
+            if (DepartmentTeacherResumeRenderer.hasQucGlobalCommentsMadeBy(teacher,
+                    departmentTeacherResultsResume.getPresident(), executionSemester,
+                    departmentTeacherResultsResume.getPersonCategory())) {
                 commentLinkText = RenderUtils.getResourceString("INQUIRIES_RESOURCES", "link.inquiry.viewComment");
             }
             HtmlLink commentLink = new HtmlLink();

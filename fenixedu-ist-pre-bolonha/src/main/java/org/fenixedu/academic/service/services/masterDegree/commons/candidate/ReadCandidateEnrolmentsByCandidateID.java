@@ -23,14 +23,15 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.fenixedu.academic.domain.CandidateEnrolment;
+import org.fenixedu.academic.domain.MasterDegreeCandidate;
+import org.fenixedu.academic.dto.InfoCandidateEnrolment;
+import org.fenixedu.academic.dto.InfoCandidateEnrolmentWithCurricularCourseAndMasterDegreeCandidateAndExecutionDegreeAndDegreeCurricularPlanAndDegree;
 import org.fenixedu.academic.service.filter.ReadCandidateEnrolmentsByCandidateIDAuthorizationFilter;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 import org.fenixedu.academic.service.services.exceptions.NonExistingServiceException;
 import org.fenixedu.academic.service.services.exceptions.NotAuthorizedException;
-import org.fenixedu.academic.dto.InfoCandidateEnrolment;
-import org.fenixedu.academic.dto.InfoCandidateEnrolmentWithCurricularCourseAndMasterDegreeCandidateAndExecutionDegreeAndDegreeCurricularPlanAndDegree;
-import org.fenixedu.academic.domain.CandidateEnrolment;
-import org.fenixedu.academic.domain.MasterDegreeCandidate;
+
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
 

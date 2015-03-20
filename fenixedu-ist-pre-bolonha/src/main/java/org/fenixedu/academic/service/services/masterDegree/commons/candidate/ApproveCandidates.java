@@ -20,11 +20,12 @@ package org.fenixedu.academic.service.services.masterDegree.commons.candidate;
 
 import java.util.Calendar;
 
-import org.fenixedu.academic.service.services.exceptions.NotAuthorizedException;
 import org.fenixedu.academic.domain.CandidateSituation;
 import org.fenixedu.academic.domain.MasterDegreeCandidate;
+import org.fenixedu.academic.service.services.exceptions.NotAuthorizedException;
 import org.fenixedu.academic.util.SituationName;
 import org.fenixedu.academic.util.State;
+
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
 

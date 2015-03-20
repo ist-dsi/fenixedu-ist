@@ -91,10 +91,8 @@ public class PagesAdminController {
     }
 
     @RequestMapping(value = "{menuItemId}/addFile.json", method = RequestMethod.POST)
-    public
-    @ResponseBody
-    String addFileJson(@PathVariable("menuItemId") String menuItemId,
-                    @RequestParam("file") MultipartFile file) throws IOException {
+    public @ResponseBody String addFileJson(@PathVariable("menuItemId") String menuItemId,
+            @RequestParam("file") MultipartFile file) throws IOException {
         MenuItem menuItem = FenixFramework.getDomainObject(menuItemId);
         GroupBasedFile addedFile = service.addPostFile(file, menuItem);
         return service.describeFile(menuItem.getPage(), addedFile).toString();
@@ -138,7 +136,7 @@ public class PagesAdminController {
         MenuItem menuItem = getDomainObject(updateMessage.get("menuItemId").getAsString());
         GroupBasedFile attachment = getDomainObject(updateMessage.get("fileId").getAsString());
         service.updateAttachment(menuItem, attachment, updateMessage.get("position").getAsInt(), updateMessage.get("group")
-                        .getAsInt(), updateMessage.get("name").getAsString(), updateMessage.get("visible").getAsBoolean());
+                .getAsInt(), updateMessage.get("name").getAsString(), updateMessage.get("visible").getAsBoolean());
         return getAttachments(menuItem.getExternalId());
     }
 

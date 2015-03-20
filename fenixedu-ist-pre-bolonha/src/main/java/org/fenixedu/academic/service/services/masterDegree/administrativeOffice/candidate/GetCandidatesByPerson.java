@@ -23,16 +23,17 @@ import static org.fenixedu.academic.predicate.AccessControl.check;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
+import org.fenixedu.academic.domain.CandidateSituation;
+import org.fenixedu.academic.domain.MasterDegreeCandidate;
+import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.dto.InfoCandidateSituation;
 import org.fenixedu.academic.dto.InfoExecutionDegree;
 import org.fenixedu.academic.dto.InfoMasterDegreeCandidate;
 import org.fenixedu.academic.dto.InfoMasterDegreeCandidateWithInfoPerson;
-import org.fenixedu.academic.domain.CandidateSituation;
-import org.fenixedu.academic.domain.MasterDegreeCandidate;
-import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.predicate.RolePredicates;
+import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 import org.fenixedu.academic.util.State;
+
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
 

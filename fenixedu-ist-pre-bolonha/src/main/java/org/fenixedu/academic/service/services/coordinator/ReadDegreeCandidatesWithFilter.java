@@ -22,17 +22,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
-import org.fenixedu.academic.dto.InfoCandidateSituation;
-import org.fenixedu.academic.dto.InfoMasterDegreeCandidate;
-import org.fenixedu.academic.dto.InfoMasterDegreeCandidateWithInfoPerson;
 import org.fenixedu.academic.domain.CandidateSituation;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.MasterDegreeCandidate;
 import org.fenixedu.academic.domain.studentCurricularPlan.Specialization;
+import org.fenixedu.academic.dto.InfoCandidateSituation;
+import org.fenixedu.academic.dto.InfoMasterDegreeCandidate;
+import org.fenixedu.academic.dto.InfoMasterDegreeCandidateWithInfoPerson;
+import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 import org.fenixedu.academic.util.PrintAllCandidatesFilter;
 import org.fenixedu.academic.util.SituationName;
 import org.fenixedu.academic.util.State;
+
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
 
@@ -51,10 +52,12 @@ public class ReadDegreeCandidatesWithFilter {
 
         switch (filterBy) {
         case FILTERBY_SPECIALIZATION_VALUE:
-            return MasterDegreeCandidate.readMasterDegreeCandidatesBySpecialization(degreeCurricularPlan, Specialization.valueOf(filterValue));
+            return MasterDegreeCandidate.readMasterDegreeCandidatesBySpecialization(degreeCurricularPlan,
+                    Specialization.valueOf(filterValue));
 
         case FILTERBY_SITUATION_VALUE:
-            return MasterDegreeCandidate.readMasterDegreeCandidatesBySituatioName(degreeCurricularPlan, new SituationName(filterValue));
+            return MasterDegreeCandidate.readMasterDegreeCandidatesBySituatioName(degreeCurricularPlan, new SituationName(
+                    filterValue));
 
         case FILTERBY_GIVESCLASSES_VALUE:
             return MasterDegreeCandidate.readMasterDegreeCandidatesByCourseAssistant(degreeCurricularPlan, true);

@@ -1,7 +1,6 @@
 package pt.ist.fenixedu.contracts.ui.spring;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -29,8 +28,7 @@ public class PersonnelSectionSearchBean extends SearchParametersBean {
         Collection<Person> search = super.search();
         Stream<User> stream = search.isEmpty() ? null : search.stream().map(p -> p.getUser());
         Stream<User> matches = filterEmployeeNumber(stream);
-        return matches == null ? null : matches.map(u -> u.getPerson()).filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+        return matches == null ? null : matches.map(u -> u.getPerson()).filter(Objects::nonNull).collect(Collectors.toSet());
     }
 
     private Stream<User> filterEmployeeNumber(Stream<User> matches) {

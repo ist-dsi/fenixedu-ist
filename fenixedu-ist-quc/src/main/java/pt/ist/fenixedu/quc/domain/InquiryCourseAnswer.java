@@ -54,7 +54,8 @@ public class InquiryCourseAnswer extends InquiryCourseAnswer_Base {
         check(RolePredicates.STUDENT_PREDICATE);
         final InquiryCourseAnswer courseAnswer = new InquiryCourseAnswer(inquiryRegistry);
         final StudentInquiryExecutionPeriod studentInquiryExecutionPeriod =
-                StudentInquiryExecutionPeriod.getStudentInquiryExecutionPeriod(inquiryRegistry.getRegistration().getStudent(), inquiryRegistry.getExecutionPeriod());
+                StudentInquiryExecutionPeriod.getStudentInquiryExecutionPeriod(inquiryRegistry.getRegistration().getStudent(),
+                        inquiryRegistry.getExecutionPeriod());
         courseAnswer.setWeeklyHoursSpentInAutonomousWork(studentInquiryExecutionPeriod.getWeeklyHoursSpentInClassesSeason());
         courseAnswer.setNotAnsweredJustification(justification);
         courseAnswer.setNotAnsweredOtherJustification(otherJustification);

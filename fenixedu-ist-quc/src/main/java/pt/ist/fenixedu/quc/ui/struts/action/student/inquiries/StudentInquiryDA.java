@@ -107,7 +107,8 @@ public class StudentInquiryDA extends FenixDispatchAction {
             }
         }
 
-        if (courses.isEmpty() || (!isAnyInquiryToAnswer && StudentInquiryExecutionPeriod.isWeeklySpentHoursSubmittedForOpenInquiry(student))) {
+        if (courses.isEmpty()
+                || (!isAnyInquiryToAnswer && StudentInquiryExecutionPeriod.isWeeklySpentHoursSubmittedForOpenInquiry(student))) {
             return actionMapping.findForward("inquiriesClosed");
         }
 
@@ -131,7 +132,8 @@ public class StudentInquiryDA extends FenixDispatchAction {
 
         Student student = AccessControl.getPerson().getStudent();
         try {
-            StudentInquiryRegistry.setSpentTimeInPeriodForInquiry(student, courses, weeklySpentHours.getInteger(), executionSemester);
+            StudentInquiryRegistry.setSpentTimeInPeriodForInquiry(student, courses, weeklySpentHours.getInteger(),
+                    executionSemester);
         } catch (DomainException e) {
             addActionMessage(request, e.getKey());
         }

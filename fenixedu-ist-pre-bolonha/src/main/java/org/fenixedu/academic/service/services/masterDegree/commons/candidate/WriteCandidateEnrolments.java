@@ -23,16 +23,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
-import org.fenixedu.academic.service.services.exceptions.NonExistingServiceException;
-import org.fenixedu.academic.service.services.exceptions.NotAuthorizedException;
-import org.fenixedu.academic.domain.CandidateEnrolment;
-import org.fenixedu.academic.domain.CurricularCourse;
-import org.fenixedu.academic.domain.MasterDegreeCandidate;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.collections.Transformer;
+import org.fenixedu.academic.domain.CandidateEnrolment;
+import org.fenixedu.academic.domain.CurricularCourse;
+import org.fenixedu.academic.domain.MasterDegreeCandidate;
+import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
+import org.fenixedu.academic.service.services.exceptions.NonExistingServiceException;
+import org.fenixedu.academic.service.services.exceptions.NotAuthorizedException;
 
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;

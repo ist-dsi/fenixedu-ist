@@ -18,7 +18,6 @@
  */
 package pt.ist.fenixedu.quc.domain;
 
-
 public class InquiryRadioGroupQuestion extends InquiryRadioGroupQuestion_Base {
 
     public InquiryRadioGroupQuestion() {

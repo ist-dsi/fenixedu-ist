@@ -18,7 +18,6 @@
  */
 package pt.ist.fenixedu.quc.domain;
 
-
 public class ECTSVisibleCondition extends ECTSVisibleCondition_Base {
 
     final static public String UC_ECTS_MARKER = "_!##!_";

@@ -18,8 +18,9 @@
  */
 package org.fenixedu.academic.service.services.commons.degree;
 
-import org.fenixedu.academic.service.services.exceptions.NonExistingServiceException;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
+import org.fenixedu.academic.service.services.exceptions.NonExistingServiceException;
+
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
 
