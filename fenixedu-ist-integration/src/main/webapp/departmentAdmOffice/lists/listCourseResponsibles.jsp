@@ -54,7 +54,7 @@
 
 <logic:present name="courseResponsibles">
 	<fr:view name="courseResponsibles">
-		<fr:schema type="org.fenixedu.academic.dto.administrativeOffice.lists.SearchCourseResponsiblesParametersBean" bundle="ACADEMIC_OFFICE_RESOURCES">
+		<fr:schema type="pt.ist.fenixedu.integration.dto.SearchCourseResponsiblesParametersBean" bundle="ACADEMIC_OFFICE_RESOURCES">
 			<fr:slot name="curricularCourse.name" key="label.curricular.course.from.curriculum"/>
 			<fr:slot name="competenceCourse.name" key="label.competence.course.name"/>
 			<fr:slot name="degree.sigla" key="degree"/>
