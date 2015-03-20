@@ -6,12 +6,12 @@ After you execute the SQL statements from fenixedu academic's guide you should r
 
 ```sql
 delete from SENDER where ((OID >> 32) & 0xFFFF) in (select DOMAIN_CLASS_ID from FF$DOMAIN_CLASS_INFO where DOMAIN_CLASS_NAME in (
-	'org.fenixedu.academic.domain.util.email.PersonFunctionSender'
+    'org.fenixedu.academic.domain.util.email.PersonFunctionSender'
 ));
 
 delete from PERSISTENT_GROUP where ((OID >> 32) & 0xFFFF) in (select DOMAIN_CLASS_ID from FF$DOMAIN_CLASS_INFO where DOMAIN_CLASS_NAME in (
-	'org.fenixedu.academic.domain.accessControl.PersistentDelegatesGroup',
-	'org.fenixedu.academic.domain.accessControl.PersistentDelegateStudentsGroup'
+    'org.fenixedu.academic.domain.accessControl.PersistentDelegatesGroup',
+    'org.fenixedu.academic.domain.accessControl.PersistentDelegateStudentsGroup'
 ));
 ```
 
