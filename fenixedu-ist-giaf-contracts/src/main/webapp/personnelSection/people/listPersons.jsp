@@ -55,7 +55,7 @@
 			</fr:slot>
 			<fr:slot name="username" key="label.username"/>
 			<fr:slot name="presentationName" key="label.name"/>
-			<fr:slot name="employee.employeeNumber" key="label.name" schema="view.employee.number" layout="null-as-label"/>
+			<fr:slot name="employee.employeeNumber" key="label.name" layout="null-as-label"/>
 		</fr:schema>
 		<fr:layout name="tabular"></fr:layout>
 	</fr:view>

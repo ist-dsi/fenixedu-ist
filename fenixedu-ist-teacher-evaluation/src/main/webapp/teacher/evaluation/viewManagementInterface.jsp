@@ -19,7 +19,8 @@
 
 --%>
 <%@page import="org.fenixedu.academic.predicate.AccessControl"%>
-<%@page import="org.fenixedu.academic.domain.person.RoleType"%>
+<%@page import="org.fenixedu.bennu.core.groups.DynamicGroup"%>
+<%@page import="org.fenixedu.bennu.core.security.Authenticate"%>
 <%@ page language="java" %>
 
 <%@ taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
@@ -129,7 +130,7 @@
 	
 	
 	<ul>
-		<% if (AccessControl.getPerson().isTeacherEvaluationCoordinatorCouncilMember() || AccessControl.getPerson().hasRole(RoleType.MANAGER)) { %>
+		<% if (AccessControl.getPerson().isTeacherEvaluationCoordinatorCouncilMember() || DynamicGroup.get("managers").isMember(Authenticate.getUser())) { %>
 		<li>
 			<html:link page="/teacherEvaluation.do?method=prepareEditFacultyEvaluationProcess" paramId="facultyEvaluationProcessOID" paramName="facultyEvaluationProcess" paramProperty="OID">
 				<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.edit" bundle="RESEARCHER_RESOURCES"/>
@@ -174,7 +175,7 @@
 		<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.teacherEvaluationProcess.evaluation.approved.count" bundle="RESEARCHER_RESOURCES"/>:
 		<bean:write name="approvedEvaluatedCount"/>
 	</p>
-	<% if (AccessControl.getPerson().isTeacherEvaluationCoordinatorCouncilMember() || AccessControl.getPerson().hasRole(RoleType.MANAGER)) { %>
+	<% if (AccessControl.getPerson().isTeacherEvaluationCoordinatorCouncilMember() || DynamicGroup.get("managers").isMember(Authenticate.getUser())) { %>
 	<p class="mtop05 mbottom15">
 		<logic:equal name="facultyEvaluationProcess" property="areApprovedMarksPublished" value="true">
 			<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.areApprovedMarksPublished.yes" bundle="RESEARCHER_RESOURCES"/>

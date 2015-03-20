@@ -21,7 +21,8 @@
 <%@ page isELIgnored="true"%>
 <%@ page language="java"%>
 <%@page import="org.fenixedu.academic.predicate.AccessControl"%>
-<%@page import="org.fenixedu.academic.domain.person.RoleType"%>
+<%@page import="org.fenixedu.bennu.core.groups.DynamicGroup"%>
+<%@page import="org.fenixedu.bennu.core.security.Authenticate"%>
 <%@ taglib uri="http://struts.apache.org/tags-html" prefix="html"%>
 <%@ taglib uri="http://struts.apache.org/tags-logic" prefix="logic"%>
 <%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean"%>
@@ -64,7 +65,7 @@
 		<fr:property name="classes" value="tstyle2 thlight thleft mtop05" />
 	</fr:layout>
 </fr:view>
-<% if (AccessControl.getPerson().isTeacherEvaluationCoordinatorCouncilMember() || AccessControl.getPerson().hasRole(RoleType.MANAGER)) { %>
+<% if (AccessControl.getPerson().isTeacherEvaluationCoordinatorCouncilMember() || DynamicGroup.get("managers").isMember(Authenticate.getUser())) { %>
 	<p class="mtop05 mbottom15">
 		<!--  <logic:equal name="process" property="readyForCCADConsideration" value="true">
 				<html:link action="/teacherEvaluation.do?method=insertApprovedEvaluationMark" paramId="process" paramName="process"
