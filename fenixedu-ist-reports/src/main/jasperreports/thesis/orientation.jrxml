@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.0.3.final using JasperReports Library version 3.6.1  -->
-<!-- 2015-03-20T18:41:35 -->
+<!-- 2015-03-23T11:53:46 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="thesisReport_studentOrientation" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="595" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
 	<property name="ireport.scriptlethandling" value="0"/>
 	<property name="ireport.encoding" value="UTF-8"/>
 	<import value="net.sf.jasperreports.engine.*"/>
 	<import value="java.util.*"/>
 	<import value="net.sf.jasperreports.engine.data.*"/>
-	<parameter name="studentNumber" class="java.lang.Number" isForPrompting="false"/>
-	<parameter name="studentName" class="java.lang.String" isForPrompting="false"/>
 	<field name="advisorName" class="java.lang.String"/>
 	<field name="advisorCategory" class="java.lang.String"/>
 	<field name="advisorAffiliation" class="java.lang.String"/>
@@ -21,10 +19,10 @@
 	<pageHeader>
 		<band splitType="Stretch"/>
 	</pageHeader>
-	<columnHeader>
-		<band height="359" splitType="Stretch">
+	<detail>
+		<band height="68" splitType="Stretch">
 			<textField isBlankWhenNull="false">
-				<reportElement key="textField-1" positionType="Float" x="0" y="0" width="425" height="51"/>
+				<reportElement key="textField-3" positionType="Float" x="0" y="0" width="425" height="51"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -34,39 +32,29 @@
 				<textElement verticalAlignment="Top" rotation="None" lineSpacing="1_1_2">
 					<font size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="true"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA["ALUNO" + 
-"\nNúmero: " + $P{studentNumber} +
-"\nNome: " + $P{studentName}]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="false">
-				<reportElement key="textField-2" positionType="Float" x="0" y="57" width="90" height="13"/>
-				<box>
-					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<bottomPen lineWidth="0.0" lineColor="#000000"/>
-					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement verticalAlignment="Top" rotation="None" lineSpacing="1_1_2">
-					<font size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="true"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA["ORIENTAÇÃO"]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA["Nome: " + $F{advisorName} + 
+"\nCategoria: " + $F{advisorCategory} + 
+"\nAfiliação: " + $F{advisorAffiliation}]]></textFieldExpression>
 			</textField>
 			<line direction="BottomUp">
-				<reportElement key="line-1" positionType="Float" x="41" y="33" width="81" height="1"/>
+				<reportElement key="line-6" positionType="Float" x="33" y="17" width="392" height="1"/>
 				<graphicElement>
 					<pen lineWidth="0.25" lineStyle="Solid"/>
 				</graphicElement>
 			</line>
 			<line direction="BottomUp">
-				<reportElement key="line-2" positionType="Float" x="33" y="49" width="392" height="1"/>
+				<reportElement key="line-7" positionType="Float" x="49" y="34" width="376" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.25" lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+			<line direction="BottomUp">
+				<reportElement key="line-8" positionType="Float" x="43" y="50" width="382" height="1"/>
 				<graphicElement>
 					<pen lineWidth="0.25" lineStyle="Solid"/>
 				</graphicElement>
 			</line>
 		</band>
-	</columnHeader>
-	<detail>
-		<band splitType="Stretch"/>
 	</detail>
 	<columnFooter>
 		<band splitType="Stretch"/>

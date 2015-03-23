@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.3.final using JasperReports Library version 3.6.1  -->
+<!-- 2015-03-23T15:14:23 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="approveJuryForm" pageWidth="595" pageHeight="842" columnWidth="469" leftMargin="70" rightMargin="56" topMargin="56" bottomMargin="14">
 	<property name="ireport.scriptlethandling" value="0"/>
 	<property name="ireport.encoding" value="UTF-8"/>
@@ -36,12 +38,16 @@
 	<parameter name="author" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="ccDate" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="ccAuthor" class="java.lang.String" isForPrompting="false"/>
-	<group name="a" isReprintHeaderOnEachPage="true">
+	<parameter name="advisors" class="java.util.Collection" isForPrompting="false"/>
+	<group name="a">
 		<groupExpression><![CDATA[]]></groupExpression>
 		<groupHeader>
-			<band height="460" splitType="Prevent">
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band height="312" splitType="Prevent">
 				<textField isBlankWhenNull="false">
-					<reportElement key="textField-19" x="0" y="128" width="469" height="45"/>
+					<reportElement key="textField-19" x="0" y="10" width="469" height="45"/>
 					<box>
 						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -55,89 +61,26 @@
 "\nCategoria: " + $P{vowel2Category} + 
 "\nAfiliação: " + $P{vowel2Affiliation}]]></textFieldExpression>
 				</textField>
-				<textField isBlankWhenNull="false">
-					<reportElement key="textField-20" x="0" y="62" width="469" height="60"/>
-					<box>
-						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-						<bottomPen lineWidth="0.0" lineColor="#000000"/>
-						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					</box>
-					<textElement verticalAlignment="Top" rotation="None" lineSpacing="1_1_2">
-						<font size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="true"/>
-					</textElement>
-					<textFieldExpression class="java.lang.String"><![CDATA["Vogais:" + 
-"\nNome: " + ( $P{guidanceVowel}.intValue() == 1 ? "(Orientador) ":"") + $P{vowel1Name} + 
-"\nCategoria: " + $P{vowel1Category} + 
-"\nAfiliação: " + $P{vowel1Affiliation}]]></textFieldExpression>
-				</textField>
-				<textField isBlankWhenNull="false">
-					<reportElement key="textField-21" x="0" y="-19" width="469" height="75"/>
-					<box>
-						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-						<bottomPen lineWidth="0.0" lineColor="#000000"/>
-						<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					</box>
-					<textElement verticalAlignment="Top" rotation="None" lineSpacing="1_1_2">
-						<font size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="true"/>
-					</textElement>
-					<textFieldExpression class="java.lang.String"><![CDATA["JÚRI" + 
-"\nPresidente:" + 
-"\nNome: " + $P{juryPresidentName} + 
-"\nCategoria: " + $P{juryPresidentCategory} + 
-"\nAfiliação: " + $P{juryPresidentAffiliation}]]></textFieldExpression>
-				</textField>
 				<line>
-					<reportElement key="jury-1" x="27" y="25" width="442" height="1"/>
+					<reportElement key="line-43" x="27" y="24" width="442" height="1"/>
 					<graphicElement>
 						<pen lineWidth="0.25" lineStyle="Solid"/>
 					</graphicElement>
 				</line>
 				<line>
-					<reportElement key="line-39" x="42" y="40" width="427" height="1"/>
+					<reportElement key="line-44" x="42" y="39" width="427" height="1"/>
 					<graphicElement>
 						<pen lineWidth="0.25" lineStyle="Solid"/>
 					</graphicElement>
 				</line>
 				<line>
-					<reportElement key="line-40" x="27" y="91" width="442" height="1"/>
-					<graphicElement>
-						<pen lineWidth="0.25" lineStyle="Solid"/>
-					</graphicElement>
-				</line>
-				<line>
-					<reportElement key="line-41" x="42" y="106" width="427" height="1"/>
-					<graphicElement>
-						<pen lineWidth="0.25" lineStyle="Solid"/>
-					</graphicElement>
-				</line>
-				<line>
-					<reportElement key="line-42" x="37" y="121" width="432" height="1"/>
-					<graphicElement>
-						<pen lineWidth="0.25" lineStyle="Solid"/>
-					</graphicElement>
-				</line>
-				<line>
-					<reportElement key="line-43" x="27" y="142" width="442" height="1"/>
-					<graphicElement>
-						<pen lineWidth="0.25" lineStyle="Solid"/>
-					</graphicElement>
-				</line>
-				<line>
-					<reportElement key="line-44" x="42" y="157" width="427" height="1"/>
-					<graphicElement>
-						<pen lineWidth="0.25" lineStyle="Solid"/>
-					</graphicElement>
-				</line>
-				<line>
-					<reportElement key="line-45" x="37" y="172" width="432" height="1"/>
+					<reportElement key="line-45" x="37" y="54" width="432" height="1"/>
 					<graphicElement>
 						<pen lineWidth="0.25" lineStyle="Solid"/>
 					</graphicElement>
 				</line>
 				<textField isBlankWhenNull="false">
-					<reportElement key="staticText-116" positionType="FixRelativeToBottom" x="161" y="372" width="308" height="16"/>
+					<reportElement key="staticText-116" positionType="FixRelativeToBottom" x="161" y="256" width="308" height="16"/>
 					<box>
 						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -150,7 +93,7 @@
 					<textFieldExpression class="java.lang.String"><![CDATA["Nome: " + $P{ccAuthor}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement key="staticText-6" positionType="FixRelativeToBottom" x="0" y="371" width="469" height="37"/>
+					<reportElement key="staticText-6" positionType="FixRelativeToBottom" x="0" y="255" width="469" height="37"/>
 					<box>
 						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -163,7 +106,7 @@
 					<textFieldExpression class="java.lang.String"><![CDATA["Data: " + $P{ccDate}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement key="staticText-226" positionType="FixRelativeToBottom" x="0" y="391" width="469" height="16"/>
+					<reportElement key="staticText-226" positionType="FixRelativeToBottom" x="0" y="275" width="469" height="16"/>
 					<box>
 						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -176,7 +119,7 @@
 					<textFieldExpression class="java.lang.String"><![CDATA["Assinatura: "]]></textFieldExpression>
 				</textField>
 				<staticText>
-					<reportElement key="staticText-7" positionType="FixRelativeToBottom" x="0" y="285" width="332" height="15"/>
+					<reportElement key="staticText-7" positionType="FixRelativeToBottom" x="0" y="169" width="332" height="15"/>
 					<box>
 						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -189,7 +132,7 @@
 					<text><![CDATA[HOMOLOGAÇÃO DO JÚRI PELO COORDENADOR DE CURSO]]></text>
 				</staticText>
 				<staticText>
-					<reportElement key="staticText-8" positionType="FixRelativeToBottom" x="0" y="352" width="372" height="15"/>
+					<reportElement key="staticText-8" positionType="FixRelativeToBottom" x="0" y="236" width="372" height="15"/>
 					<box>
 						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -202,7 +145,7 @@
 					<text><![CDATA[HOMOLOGAÇÃO DO JÚRI PELO CONSELHO CIENTÍFICO *]]></text>
 				</staticText>
 				<staticText>
-					<reportElement key="staticText-8" positionType="FixRelativeToBottom" x="0" y="413" width="469" height="15"/>
+					<reportElement key="staticText-8" positionType="FixRelativeToBottom" x="0" y="297" width="469" height="15"/>
 					<box>
 						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -215,49 +158,43 @@
 					<text><![CDATA[(*) Esta homologação só é necessária no caso do coordenador de curso ser orientador/coorientador da tese.]]></text>
 				</staticText>
 				<line>
-					<reportElement key="line-52" positionType="FixRelativeToBottom" x="46" y="403" width="423" height="1"/>
+					<reportElement key="line-52" positionType="FixRelativeToBottom" x="46" y="287" width="423" height="1"/>
 					<graphicElement>
 						<pen lineWidth="0.25" lineStyle="Solid"/>
 					</graphicElement>
 				</line>
 				<line>
-					<reportElement key="line-53" positionType="FixRelativeToBottom" x="22" y="383" width="102" height="1"/>
+					<reportElement key="line-53" positionType="FixRelativeToBottom" x="22" y="267" width="102" height="1"/>
 					<graphicElement>
 						<pen lineWidth="0.25" lineStyle="Solid"/>
 					</graphicElement>
 				</line>
 				<line>
-					<reportElement key="line-54" positionType="FixRelativeToBottom" x="189" y="383" width="280" height="1"/>
+					<reportElement key="line-54" positionType="FixRelativeToBottom" x="189" y="267" width="280" height="1"/>
 					<graphicElement>
 						<pen lineWidth="0.25" lineStyle="Solid"/>
 					</graphicElement>
 				</line>
 				<line>
-					<reportElement key="line-55" x="37" y="55" width="432" height="1"/>
+					<reportElement key="line-43" x="27" y="75" width="442" height="1"/>
 					<graphicElement>
 						<pen lineWidth="0.25" lineStyle="Solid"/>
 					</graphicElement>
 				</line>
 				<line>
-					<reportElement key="line-43" x="27" y="193" width="442" height="1"/>
+					<reportElement key="line-44" x="42" y="90" width="427" height="1"/>
 					<graphicElement>
 						<pen lineWidth="0.25" lineStyle="Solid"/>
 					</graphicElement>
 				</line>
 				<line>
-					<reportElement key="line-44" x="42" y="208" width="427" height="1"/>
-					<graphicElement>
-						<pen lineWidth="0.25" lineStyle="Solid"/>
-					</graphicElement>
-				</line>
-				<line>
-					<reportElement key="line-45" x="37" y="223" width="432" height="1"/>
+					<reportElement key="line-45" x="37" y="105" width="432" height="1"/>
 					<graphicElement>
 						<pen lineWidth="0.25" lineStyle="Solid"/>
 					</graphicElement>
 				</line>
 				<textField isBlankWhenNull="false">
-					<reportElement key="textField-19" x="0" y="179" width="469" height="45"/>
+					<reportElement key="textField-19" x="0" y="61" width="469" height="45"/>
 					<box>
 						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -272,7 +209,7 @@
 "\nAfiliação: " + $P{vowel3Affiliation}]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="false">
-					<reportElement key="textField-19" x="0" y="230" width="469" height="45"/>
+					<reportElement key="textField-19" x="0" y="112" width="469" height="45"/>
 					<box>
 						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -287,31 +224,31 @@
 "\nAfiliação: " + $P{vowel4Affiliation}]]></textFieldExpression>
 				</textField>
 				<line>
-					<reportElement key="line-43" x="27" y="244" width="442" height="1"/>
+					<reportElement key="line-43" x="27" y="126" width="442" height="1"/>
 					<graphicElement>
 						<pen lineWidth="0.25" lineStyle="Solid"/>
 					</graphicElement>
 				</line>
 				<line>
-					<reportElement key="line-45" x="37" y="274" width="432" height="1"/>
+					<reportElement key="line-45" x="37" y="156" width="432" height="1"/>
 					<graphicElement>
 						<pen lineWidth="0.25" lineStyle="Solid"/>
 					</graphicElement>
 				</line>
 				<line>
-					<reportElement key="line-44" x="42" y="259" width="427" height="1"/>
+					<reportElement key="line-44" x="42" y="141" width="427" height="1"/>
 					<graphicElement>
 						<pen lineWidth="0.25" lineStyle="Solid"/>
 					</graphicElement>
 				</line>
 				<line>
-					<reportElement key="line-53" positionType="FixRelativeToBottom" x="22" y="317" width="102" height="1"/>
+					<reportElement key="line-53" positionType="FixRelativeToBottom" x="22" y="201" width="102" height="1"/>
 					<graphicElement>
 						<pen lineWidth="0.25" lineStyle="Solid"/>
 					</graphicElement>
 				</line>
 				<textField isBlankWhenNull="false">
-					<reportElement key="staticText-116" positionType="FixRelativeToBottom" x="161" y="306" width="308" height="16"/>
+					<reportElement key="staticText-116" positionType="FixRelativeToBottom" x="161" y="190" width="308" height="16"/>
 					<box>
 						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -324,7 +261,7 @@
 					<textFieldExpression class="java.lang.String"><![CDATA["Nome: " + $P{author}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement key="staticText-6" positionType="FixRelativeToBottom" x="0" y="305" width="469" height="36"/>
+					<reportElement key="staticText-6" positionType="FixRelativeToBottom" x="0" y="189" width="469" height="36"/>
 					<box>
 						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -337,19 +274,19 @@
 					<textFieldExpression class="java.lang.String"><![CDATA["Data: " + $P{date}]]></textFieldExpression>
 				</textField>
 				<line>
-					<reportElement key="line-52" positionType="FixRelativeToBottom" x="46" y="337" width="423" height="1"/>
+					<reportElement key="line-52" positionType="FixRelativeToBottom" x="46" y="221" width="423" height="1"/>
 					<graphicElement>
 						<pen lineWidth="0.25" lineStyle="Solid"/>
 					</graphicElement>
 				</line>
 				<line>
-					<reportElement key="line-54" positionType="FixRelativeToBottom" x="189" y="317" width="280" height="1"/>
+					<reportElement key="line-54" positionType="FixRelativeToBottom" x="189" y="201" width="280" height="1"/>
 					<graphicElement>
 						<pen lineWidth="0.25" lineStyle="Solid"/>
 					</graphicElement>
 				</line>
 				<textField>
-					<reportElement key="staticText-226" positionType="FixRelativeToBottom" x="0" y="325" width="469" height="17"/>
+					<reportElement key="staticText-226" positionType="FixRelativeToBottom" x="0" y="209" width="469" height="17"/>
 					<box>
 						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -362,9 +299,6 @@
 					<textFieldExpression class="java.lang.String"><![CDATA["Assinatura: "]]></textFieldExpression>
 				</textField>
 			</band>
-		</groupHeader>
-		<groupFooter>
-			<band/>
 		</groupFooter>
 	</group>
 	<background>
@@ -407,7 +341,13 @@
 		</band>
 	</title>
 	<pageHeader>
-		<band height="230" splitType="Prevent">
+		<band/>
+	</pageHeader>
+	<columnHeader>
+		<band/>
+	</columnHeader>
+	<detail>
+		<band height="258" splitType="Prevent">
 			<textField isBlankWhenNull="false">
 				<reportElement key="textField-5" x="0" y="-12" width="469" height="46"/>
 				<box>
@@ -436,7 +376,7 @@
 				</graphicElement>
 			</line>
 			<textField isBlankWhenNull="false">
-				<reportElement key="textField-6" x="0" y="165" width="88" height="34"/>
+				<reportElement key="textField-6" positionType="Float" x="0" y="70" width="88" height="34"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -449,13 +389,13 @@
 				<textFieldExpression class="java.lang.String"><![CDATA["DISSERTAÇÃO"]]></textFieldExpression>
 			</textField>
 			<line>
-				<reportElement key="line-37" x="26" y="197" width="443" height="1"/>
+				<reportElement key="line-37" positionType="Float" x="26" y="102" width="443" height="1"/>
 				<graphicElement>
 					<pen lineWidth="0.25" lineStyle="Solid"/>
 				</graphicElement>
 			</line>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
-				<reportElement key="textField-17" x="0" y="186" width="469" height="17"/>
+				<reportElement key="textField-17" positionType="Float" x="0" y="91" width="469" height="17"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -484,26 +424,8 @@
 					<pen lineWidth="0.25" lineStyle="Solid"/>
 				</graphicElement>
 			</line>
-			<line>
-				<reportElement key="line-41" x="42" y="88" width="427" height="1"/>
-				<graphicElement>
-					<pen lineWidth="0.25" lineStyle="Solid"/>
-				</graphicElement>
-			</line>
-			<line>
-				<reportElement key="line-40" x="27" y="73" width="442" height="1"/>
-				<graphicElement>
-					<pen lineWidth="0.25" lineStyle="Solid"/>
-				</graphicElement>
-			</line>
-			<line>
-				<reportElement key="line-42" x="37" y="103" width="432" height="1"/>
-				<graphicElement>
-					<pen lineWidth="0.25" lineStyle="Solid"/>
-				</graphicElement>
-			</line>
 			<textField isBlankWhenNull="false">
-				<reportElement key="textField-20" x="0" y="44" width="469" height="60"/>
+				<reportElement key="textField-20" x="0" y="44" width="469" height="16"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -513,19 +435,30 @@
 				<textElement verticalAlignment="Top" rotation="None" lineSpacing="1_1_2">
 					<font size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="true"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA["ORIENTAÇÃO:" + 
-"\nNome: " + $P{orientatorName} + 
-"\nCategoria: " + $P{orientatorCategory} + 
-"\nAfiliação: " + $P{orientatorAffiliation}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA["ORIENTAÇÃO:"]]></textFieldExpression>
 			</textField>
 			<line>
-				<reportElement key="line-44" x="42" y="139" width="427" height="1"/>
+				<reportElement key="line-2" positionType="Float" x="0" y="113" width="469" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.25" lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+			<subreport isUsingCache="true">
+				<reportElement key="subreport-orientation" positionType="Float" mode="Transparent" x="0" y="60" width="469" height="4"/>
+				<subreportParameter name="entries">
+					<subreportParameterExpression><![CDATA[$P{advisors}]]></subreportParameterExpression>
+				</subreportParameter>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource(((Collection)$P{advisors}))]]></dataSourceExpression>
+				<subreportExpression class="java.lang.String"><![CDATA["reports/thesis/orientation.jasper"]]></subreportExpression>
+			</subreport>
+			<line>
+				<reportElement key="line-55" positionType="Float" x="37" y="194" width="432" height="1"/>
 				<graphicElement>
 					<pen lineWidth="0.25" lineStyle="Solid"/>
 				</graphicElement>
 			</line>
 			<textField isBlankWhenNull="false">
-				<reportElement key="textField-19" x="0" y="110" width="469" height="45"/>
+				<reportElement key="textField-20" positionType="Float" x="0" y="198" width="469" height="60"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -535,35 +468,59 @@
 				<textElement verticalAlignment="Top" rotation="None" lineSpacing="1_1_2">
 					<font size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="true"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA["Nome: " + $P{coorientatorName} + 
-"\nCategoria: " + $P{coorientatorCategory} + 
-"\nAfiliação: " + $P{coorientatorAffiliation}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA["Vogais:" + 
+"\nNome: " + ( $P{guidanceVowel}.intValue() == 1 ? "(Orientador) ":"") + $P{vowel1Name} + 
+"\nCategoria: " + $P{vowel1Category} + 
+"\nAfiliação: " + $P{vowel1Affiliation}]]></textFieldExpression>
 			</textField>
 			<line>
-				<reportElement key="line-43" x="27" y="124" width="442" height="1"/>
+				<reportElement key="line-41" positionType="Float" x="42" y="242" width="427" height="1"/>
 				<graphicElement>
 					<pen lineWidth="0.25" lineStyle="Solid"/>
 				</graphicElement>
 			</line>
 			<line>
-				<reportElement key="line-45" x="37" y="154" width="432" height="1"/>
+				<reportElement key="line-42" positionType="Float" x="37" y="257" width="432" height="1"/>
 				<graphicElement>
 					<pen lineWidth="0.25" lineStyle="Solid"/>
 				</graphicElement>
 			</line>
 			<line>
-				<reportElement key="line-2" x="0" y="208" width="469" height="1"/>
+				<reportElement key="line-40" positionType="Float" x="27" y="227" width="442" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.25" lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+			<textField isBlankWhenNull="false">
+				<reportElement key="textField-21" positionType="Float" x="0" y="120" width="469" height="75"/>
+				<box>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement verticalAlignment="Top" rotation="None" lineSpacing="1_1_2">
+					<font size="9" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["JÚRI" + 
+"\nPresidente:" + 
+"\nNome: " + $P{juryPresidentName} + 
+"\nCategoria: " + $P{juryPresidentCategory} + 
+"\nAfiliação: " + $P{juryPresidentAffiliation}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement key="line-39" positionType="Float" x="42" y="179" width="427" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.25" lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement key="jury-1" positionType="Float" x="27" y="164" width="442" height="1"/>
 				<graphicElement>
 					<pen lineWidth="0.25" lineStyle="Solid"/>
 				</graphicElement>
 			</line>
 		</band>
-	</pageHeader>
-	<columnHeader>
-		<band/>
-	</columnHeader>
-	<detail>
-		<band splitType="Prevent"/>
 	</detail>
 	<columnFooter>
 		<band splitType="Prevent"/>
