@@ -35,12 +35,12 @@ public class FenixEduPreBolonhaContextListener implements ServletContextListener
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         FenixFramework.getDomainModel().registerDeletionBlockerListener(ExecutionDegree.class, (executionDegree, blockers) -> {
-            if (executionDegree.getMasterDegreeCandidatesSet().isEmpty()) {
+            if (!executionDegree.getMasterDegreeCandidatesSet().isEmpty()) {
                 blockers.add(BundleUtil.getString(Bundle.APPLICATION, "execution.degree.cannot.be.deleted"));
             }
         });
         FenixFramework.getDomainModel().registerDeletionBlockerListener(Person.class, (person, blockers) -> {
-            if (person.getMasterDegreeCandidatesSet().isEmpty()) {
+            if (!person.getMasterDegreeCandidatesSet().isEmpty()) {
                 blockers.add(BundleUtil.getString(Bundle.APPLICATION, "error.person.cannot.be.deleted"));
             }
         });
