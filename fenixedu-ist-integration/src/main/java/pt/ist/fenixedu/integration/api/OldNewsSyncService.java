@@ -34,7 +34,7 @@ import org.fenixedu.cms.domain.Site;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 
-// DO NOT CHANGE THIS CLASS EVER AGAIN.
+// DO NOT CHANGE THIS CLASS EVER AGAIN. yeah right
 
 @Path("/fenix-ist/oldNewsSyncService")
 public class OldNewsSyncService extends BennuRestResource {
@@ -74,7 +74,7 @@ public class OldNewsSyncService extends BennuRestResource {
         result += "<list>\n";
         int index = 1;
         for (Post post : posts.stream().sorted(Post.CREATION_DATE_COMPARATOR).filter(x -> i.contains(x.getPublicationBegin()))
-                .collect(Collectors.toList())) {
+                .filter(x -> x.isVisible()).collect(Collectors.toList())) {
             result += "  <net.sourceforge.fenixedu.presentationTier.Action.externalServices.AnnouncementDTO>\n";
             result += "    <creationDate>" + post.getCreationDate().toString("dd/MM/yyyy HH:mm:ss") + "</creationDate>\n";
             result +=
