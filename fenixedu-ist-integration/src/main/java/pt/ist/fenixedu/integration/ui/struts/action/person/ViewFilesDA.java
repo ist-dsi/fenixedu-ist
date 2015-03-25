@@ -54,7 +54,11 @@ import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;
 @Forwards(value = { @Forward(name = "uploadFile", path = "/commons/unitFiles/uploadFile.jsp"),
         @Forward(name = "manageFiles", path = "/commons/unitFiles/manageFiles.jsp"),
         @Forward(name = "showSources", path = "/messaging/files/showSources.jsp"),
-        @Forward(name = "editFile", path = "/commons/unitFiles/editFile.jsp") })
+        @Forward(name = "editFile", path = "/commons/unitFiles/editFile.jsp"),
+        @Forward(name = "editUploaders", path = "/commons/PersistentMemberGroups/configureUploaders.jsp"),
+        @Forward(name = "managePersistedGroups", path = "/commons/PersistentMemberGroups/managePersistedGroups.jsp"),
+        @Forward(name = "editPersistedGroup", path = "/commons/PersistentMemberGroups/editPersistedGroup.jsp"),
+        @Forward(name = "createPersistedGroup", path = "/commons/PersistentMemberGroups/createPersistedGroup.jsp") })
 public class ViewFilesDA extends UnitFunctionalities {
 
     @Override
