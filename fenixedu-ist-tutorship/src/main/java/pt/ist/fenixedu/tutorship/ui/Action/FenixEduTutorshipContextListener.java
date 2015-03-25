@@ -25,6 +25,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
+import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.candidacy.StudentCandidacy;
@@ -56,6 +57,9 @@ public class FenixEduTutorshipContextListener implements ServletContextListener 
                         ;
                     }
                 });
+        FenixFramework.getDomainModel().registerDeletionListener(DegreeCurricularPlan.class, dcp -> {
+            dcp.getTutorshipIntentionSet().forEach(t -> t.delete());
+        });
 
         Signal.register("academic.candidacy.registration.created", FenixEduTutorshipContextListener::associateTutor);
     }
