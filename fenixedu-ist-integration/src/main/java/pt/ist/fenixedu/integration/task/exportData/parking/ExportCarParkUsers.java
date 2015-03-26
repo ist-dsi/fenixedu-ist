@@ -206,7 +206,7 @@ public class ExportCarParkUsers extends CustomTask {
 
         || name.equals("IPSFL")
 
-//                || name.equals("3º ciclo")
+                || name.equals("3º ciclo")
 
                 || name.equals("Investigadores")
 
@@ -220,7 +220,7 @@ public class ExportCarParkUsers extends CustomTask {
 
                 || name.equals("ADIST - Informática")
 
-//                || name.equals("2º ciclo")
+                || name.equals("2º ciclo")
 
 //                || name.equals("Limitados")
 
