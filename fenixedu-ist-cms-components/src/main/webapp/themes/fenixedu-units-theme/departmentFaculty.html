@@ -46,7 +46,6 @@
         </div>
 
         <div class="tab-pane fade in" id="area">
-
             {% for areaTeachers in entries(teachersByArea) %}
 
                 <h3 class="page-header">{{areaTeachers.key.nameI18n}}</h3>
@@ -58,13 +57,13 @@
 
             {% endfor %}
 
-            {% if hasTeachersWithoutArea is not empty and hasTeachersWithoutArea %}
+            {% if teachersWithoutArea is not empty %}
                 <h3 class="page-header">{{ i18n('resources.PublicDepartmentResources','link.teacher.area.noArea') }}</h3>
 
-                {% lazyFor teacher in teachersWithoutArea %}
+                {% for teacher in teachersWithoutArea %}
                     {{ personCard(teacher.person) }}
                     <hr/>
-                {% endLazyFor %}
+                {% endfor %}
             {% endif %}
         </div>
     </div>
