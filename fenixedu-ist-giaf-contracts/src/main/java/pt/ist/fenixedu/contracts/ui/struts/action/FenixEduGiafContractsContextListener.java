@@ -72,25 +72,27 @@ public class FenixEduGiafContractsContextListener implements ServletContextListe
         ThesisEvaluationParticipant participation = event.getInstance();
         Person person = participation.getPerson();
 
-        Teacher teacher = person.getTeacher();
-        if (teacher != null && teacher.getDepartment() != null) {
-            if (teacher.getLastCategory() == null) {
-                participation.setCategory("-");
-            } else {
-                participation.setCategory(teacher.getLastCategory().getName().getContent());
-            }
-            participation.setAffiliation(teacher.getDepartment().getRealName());
-        } else {
-            Employee employee = person.getEmployee();
-            if (employee != null) {
-                Unit currentWorkingPlace = employee.getCurrentWorkingPlace();
-                if (currentWorkingPlace != null) {
-                    participation.setAffiliation(currentWorkingPlace.getNameWithAcronym());
+        if (person != null) {
+            Teacher teacher = person.getTeacher();
+            if (teacher != null && teacher.getDepartment() != null) {
+                if (teacher.getLastCategory() == null) {
+                    participation.setCategory("-");
+                } else {
+                    participation.setCategory(teacher.getLastCategory().getName().getContent());
                 }
+                participation.setAffiliation(teacher.getDepartment().getRealName());
             } else {
-                ExternalContract contract = ExternalContract.getExternalContract(person);
-                if (contract != null) {
-                    participation.setAffiliation(contract.getInstitutionUnit().getName());
+                Employee employee = person.getEmployee();
+                if (employee != null) {
+                    Unit currentWorkingPlace = employee.getCurrentWorkingPlace();
+                    if (currentWorkingPlace != null) {
+                        participation.setAffiliation(currentWorkingPlace.getNameWithAcronym());
+                    }
+                } else {
+                    ExternalContract contract = ExternalContract.getExternalContract(person);
+                    if (contract != null) {
+                        participation.setAffiliation(contract.getInstitutionUnit().getName());
+                    }
                 }
             }
         }
