@@ -50,7 +50,7 @@ import pt.utl.ist.fenix.tools.predicates.Predicate;
 public class UpdateAbandonStateBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private static final String RESOURCE_BUNDLE = "FENIX_IST_RESOURCES";
+    private static final String RESOURCE_BUNDLE = "FENIXEDU_IST_INTEGRATION_RESOURCES";
 
     private ExecutionSemester whenToAbandon;
     private StringBuilder log;

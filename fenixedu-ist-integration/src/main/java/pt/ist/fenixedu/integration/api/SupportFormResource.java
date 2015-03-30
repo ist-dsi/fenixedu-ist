@@ -167,7 +167,7 @@ public class SupportFormResource extends BennuRestResource {
     }
 
     private static String str(String key) {
-        return BundleUtil.getString("resources.FenixEduIstIntegrationResources", key);
+        return BundleUtil.getString("resources.FenixeduIstIntegrationResources", key);
     }
 
     private StringBuilder generateLabel(StringBuilder builder, String label) {

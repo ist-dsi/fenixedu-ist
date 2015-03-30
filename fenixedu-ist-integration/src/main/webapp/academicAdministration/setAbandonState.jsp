@@ -25,11 +25,11 @@
 <%@ taglib uri="http://fenix-ashes.ist.utl.pt/fenix-renderers"	prefix="fr"%>
 
 <h2>
-	<bean:message key="label.academicAdministration.setAbandonState" bundle="FENIX_IST_RESOURCES"/>
+	<bean:message key="label.academicAdministration.setAbandonState" bundle="FENIXEDU_IST_INTEGRATION_RESOURCES"/>
 </h2>
 
 <div class="infoop2">
-	<bean:message key="message.academicAdministration.abandonState.info" bundle="FENIX_IST_RESOURCES"/>
+	<bean:message key="message.academicAdministration.abandonState.info" bundle="FENIXEDU_IST_INTEGRATION_RESOURCES"/>
 </div>
 
 <br/>
@@ -48,7 +48,7 @@
 		<fr:destination name="invalid" path="/setAbandonState.do?method=prepare"/>
 	</fr:edit>
 	
-	<html:submit><bean:message key="button.updateStates" bundle="FENIX_IST_RESOURCES"/></html:submit>
+	<html:submit><bean:message key="button.updateStates" bundle="FENIXEDU_IST_INTEGRATION_RESOURCES"/></html:submit>
 </fr:form>
 
 <br/>	
@@ -57,11 +57,11 @@
 	<bean:define id="previousExecutionSemesterName" name="updateAbandonStateBean" property="whenToAbandon.previousExecutionPeriod.qualifiedName" type="java.lang.String"/>
 	<bean:define id="previousPreviousExecutionSemesterName" name="previousExecutionSemester" property="previousExecutionPeriod.qualifiedName" type="java.lang.String"/>
 	<p class="warning1">
-		<bean:message key="message.academicAdministration.abandonState.warning" bundle="FENIX_IST_RESOURCES" arg0="<%= previousPreviousExecutionSemesterName %>"
+		<bean:message key="message.academicAdministration.abandonState.warning" bundle="FENIXEDU_IST_INTEGRATION_RESOURCES" arg0="<%= previousPreviousExecutionSemesterName %>"
 		 arg1="<%= previousExecutionSemesterName %>"/>
 	</p>
 	<p>
-		<bean:message key="label.operatioConfirmation" bundle="FENIX_IST_RESOURCES"/>
+		<bean:message key="label.operatioConfirmation" bundle="FENIXEDU_IST_INTEGRATION_RESOURCES"/>
 	</p>
 
 	<fr:form id="confirmUpdate" action="/setAbandonState.do">
