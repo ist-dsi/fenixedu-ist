@@ -24,6 +24,7 @@ import org.fenixedu.bennu.core.domain.Bennu;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonContractSituation;
 import pt.ist.fenixedu.contracts.domain.util.CategoryType;
 
+@Deprecated
 public class Researcher extends Researcher_Base {
     public Researcher(Person person) {
         super();

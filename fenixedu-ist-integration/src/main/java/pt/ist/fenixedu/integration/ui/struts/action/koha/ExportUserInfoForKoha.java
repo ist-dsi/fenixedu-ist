@@ -62,7 +62,8 @@ import org.joda.time.DateTime;
 import org.joda.time.YearMonthDay;
 
 import pt.ist.fenixedu.contracts.domain.Employee;
-import pt.ist.fenixedu.contracts.domain.research.Researcher;
+import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonContractSituation;
+import pt.ist.fenixedu.contracts.domain.util.CategoryType;
 import pt.ist.fenixedu.integration.FenixEduIstIntegrationConfiguration;
 import pt.ist.fenixedu.integration.ui.struts.action.externalServices.ExternalInterfaceDispatchAction;
 import pt.utl.ist.fenix.tools.util.excel.Spreadsheet;
@@ -153,9 +154,12 @@ public class ExportUserInfoForKoha extends ExternalInterfaceDispatchAction {
                 teachersAndResearchers.add(teacher.getPerson());
             }
         }
-        for (Researcher researcher : Bennu.getInstance().getResearchersSet()) {
-            if (researcher.isActiveContractedResearcher()) {
-                teachersAndResearchers.add(researcher.getPerson());
+        for (Employee employee : Bennu.getInstance().getEmployeesSet()) {
+            PersonContractSituation currentResearcherContractSituation =
+                    employee.getPerson().getPersonProfessionalData() != null ? employee.getPerson().getPersonProfessionalData()
+                            .getCurrentPersonContractSituationByCategoryType(CategoryType.RESEARCHER) : null;
+            if (currentResearcherContractSituation != null) {
+                teachersAndResearchers.add(employee.getPerson());
             }
         }
         teachersAndResearchers.forEach(p -> addEmployeeInformation(spreadsheet, p));

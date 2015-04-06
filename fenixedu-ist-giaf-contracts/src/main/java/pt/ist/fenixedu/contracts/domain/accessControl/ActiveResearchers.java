@@ -27,7 +27,8 @@ import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.groups.GroupStrategy;
 import org.joda.time.DateTime;
 
-import pt.ist.fenixedu.contracts.domain.research.Researcher;
+import pt.ist.fenixedu.contracts.domain.Employee;
+import pt.ist.fenixedu.contracts.domain.util.CategoryType;
 
 @GroupOperator("activeResearchers")
 public class ActiveResearchers extends GroupStrategy {
@@ -40,8 +41,8 @@ public class ActiveResearchers extends GroupStrategy {
 
     @Override
     public Set<User> getMembers() {
-        return Bennu.getInstance().getResearchersSet().stream().filter(Researcher::isActiveContractedResearcher)
-                .map(researcher -> researcher.getPerson().getUser()).collect(Collectors.toSet());
+        return Bennu.getInstance().getEmployeesSet().stream().filter(ActiveResearchers::isResearcher)
+                .map(employee -> employee.getPerson().getUser()).collect(Collectors.toSet());
     }
 
     @Override
@@ -51,8 +52,8 @@ public class ActiveResearchers extends GroupStrategy {
 
     @Override
     public boolean isMember(User user) {
-        return user != null && user.getPerson() != null && user.getPerson().getResearcher() != null
-                && user.getPerson().getResearcher().isActiveContractedResearcher();
+        return user != null && user.getPerson() != null && user.getPerson().getEmployee() != null
+                && isResearcher(user.getPerson().getEmployee());
     }
 
     @Override
@@ -60,4 +61,8 @@ public class ActiveResearchers extends GroupStrategy {
         return isMember(user);
     }
 
+    protected static boolean isResearcher(Employee employee) {
+        return (employee.getPerson().getPersonProfessionalData() != null ? employee.getPerson().getPersonProfessionalData()
+                .getCurrentPersonContractSituationByCategoryType(CategoryType.RESEARCHER) : null) != null;
+    }
 }

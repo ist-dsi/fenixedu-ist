@@ -436,6 +436,12 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
             }
         }
         if (person.getEmployee() != null) {
+            PersonContractSituation currentResearcherContractSituation =
+                    person.getPersonProfessionalData() != null ? person.getPersonProfessionalData()
+                            .getCurrentPersonContractSituationByCategoryType(CategoryType.RESEARCHER) : null;
+            if (currentResearcherContractSituation != null) {
+                return person.getEmployee().getEmployeeNumber();
+            }
             PersonContractSituation currentGrantOwnerContractSituation =
                     person.getPersonProfessionalData() != null ? person.getPersonProfessionalData()
                             .getCurrentPersonContractSituationByCategoryType(CategoryType.GRANT_OWNER) : null;
@@ -446,10 +452,6 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
         if (person.getTeacher() != null && person.getTeacher().getDepartment() != null
                 && ProfessionalCategory.isMonitor(person.getTeacher(), ExecutionSemester.readActualExecutionSemester())
                 && person.getEmployee() != null) {
-            return person.getEmployee().getEmployeeNumber();
-        }
-
-        if (person.getEmployee() != null && person.getResearcher() != null) {
             return person.getEmployee().getEmployeeNumber();
         }
         return null;

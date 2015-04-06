@@ -54,6 +54,7 @@ import org.slf4j.Logger;
 
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveEmployees;
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveGrantOwner;
+import pt.ist.fenixedu.contracts.domain.accessControl.ActiveResearchers;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonContractSituation;
 import pt.ist.fenixedu.contracts.domain.util.CategoryType;
 import pt.ist.fenixframework.Atomic;
@@ -144,8 +145,8 @@ public class SantanderBatchFillerWorker {
     }
 
     private boolean treatAsResearcher(Person person) {
-        if (person.getResearcher() != null) {
-            return person.getResearcher().isActiveContractedResearcher();
+        if (person.getEmployee() != null) {
+            return new ActiveResearchers().isMember(person.getUser());
         }
         return false;
     }
