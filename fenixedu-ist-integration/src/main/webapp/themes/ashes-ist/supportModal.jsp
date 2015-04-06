@@ -27,58 +27,58 @@
         <input type="hidden" name="referer" value="${pageContext.request.getHeader('Referer')}" />
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-            <h4 class="modal-title" id="myModalLabel">${fr:message('resources.FenixEduIstIntegrationResources', 'label.support.form')}</h4>
+            <h4 class="modal-title" id="myModalLabel">${fr:message('resources.FenixeduIstIntegrationResources', 'label.support.form')}</h4>
         </div>
         <div class="modal-body form-body">
-            ${fr:message('resources.FenixEduIstIntegrationResources', 'label.support.form.welcome')}
+            ${fr:message('resources.FenixeduIstIntegrationResources', 'label.support.form.welcome')}
             <hr />
                 <div class="form-group">
-                    <label for="subject" class="col-sm-2 control-label">${fr:message('resources.FenixEduIstIntegrationResources', 'label.error.page.subject')}:</label>
+                    <label for="subject" class="col-sm-2 control-label">${fr:message('resources.FenixeduIstIntegrationResources', 'label.error.page.subject')}:</label>
                     <div class="col-sm-10">
                         <input type="text" name="subject" id="subject" class="form-control" required />
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="description" class="col-sm-2 control-label">${fr:message('resources.FenixEduIstIntegrationResources', 'label.error.page.description')}:</label>
+                    <label for="description" class="col-sm-2 control-label">${fr:message('resources.FenixeduIstIntegrationResources', 'label.error.page.description')}:</label>
                     <div class="col-sm-10">
                         <textarea id="description" name="description" rows="5" style="width: 100%" required></textarea>
-                        <small>${fr:message('resources.FenixEduIstIntegrationResources', 'label.error.page.help')}</small>
+                        <small>${fr:message('resources.FenixeduIstIntegrationResources', 'label.error.page.help')}</small>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="type" class="col-sm-2 control-label">${fr:message('resources.FenixEduIstIntegrationResources', 'label.support.form.type')}:</label>
+                    <label for="type" class="col-sm-2 control-label">${fr:message('resources.FenixeduIstIntegrationResources', 'label.support.form.type')}:</label>
                     <div class="col-sm-10">
                         <label class="radio-inline">
                             <input type="radio" name="type" id="type-error" value="error" checked>
-                            ${fr:message('resources.FenixEduIstIntegrationResources', 'label.support.form.type.error')}
+                            ${fr:message('resources.FenixeduIstIntegrationResources', 'label.support.form.type.error')}
                         </label>
                         <label class="radio-inline">
                             <input type="radio" name="type" id="type-request" value="request" required>
-                            ${fr:message('resources.FenixEduIstIntegrationResources', 'label.support.form.type.request')}
+                            ${fr:message('resources.FenixeduIstIntegrationResources', 'label.support.form.type.request')}
                         </label>
                         <label class="radio-inline">
                             <input type="radio" name="type" id="type-question" value="question">
-                            ${fr:message('resources.FenixEduIstIntegrationResources', 'label.support.form.type.question')}
+                            ${fr:message('resources.FenixeduIstIntegrationResources', 'label.support.form.type.question')}
                         </label>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="attachment" class="col-sm-2 control-label">${fr:message('resources.FenixEduIstIntegrationResources', 'label.support.form.attachment')}:</label>
+                    <label for="attachment" class="col-sm-2 control-label">${fr:message('resources.FenixeduIstIntegrationResources', 'label.support.form.attachment')}:</label>
                     <div class="col-sm-10">
                         <div class="alert alert-danger" id="largeFile" style="display: none">
-                            ${fr:message('resources.FenixEduIstIntegrationResources', 'label.support.form.attachment.file.too.large')}
+                            ${fr:message('resources.FenixeduIstIntegrationResources', 'label.support.form.attachment.file.too.large')}
                         </div>
                         <input type="file" name="attachment" id="attachment" />
-                        <small>${fr:message('resources.FenixEduIstIntegrationResources', 'label.support.form.attachment.help')}</small>
+                        <small>${fr:message('resources.FenixeduIstIntegrationResources', 'label.support.form.attachment.help')}</small>
                     </div>
                 </div>
         </div>
         <div class="modal-body success text-center hide">
-            <h3>${fr:message('resources.FenixEduIstIntegrationResources', 'message.error.page.submitted')}</h3>
-            ${fr:message('resources.FenixEduIstIntegrationResources', 'message.error.page.submitted.body')} <a href="mailto:dsi@tecnico.ulisboa.pt">dsi@tecnico.ulisboa.pt</a>.
+            <h3>${fr:message('resources.FenixeduIstIntegrationResources', 'message.error.page.submitted')}</h3>
+            ${fr:message('resources.FenixeduIstIntegrationResources', 'message.error.page.submitted.body')} <a href="mailto:dsi@tecnico.ulisboa.pt">dsi@tecnico.ulisboa.pt</a>.
         </div>
         <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">${fr:message('resources.FenixEduIstIntegrationResources', 'label.error.page.submit')}</button>
+            <button type="submit" class="btn btn-primary">${fr:message('resources.FenixeduIstIntegrationResources', 'label.error.page.submit')}</button>
         </div>
         </form>
     </div>
@@ -100,7 +100,7 @@ $('#supportForm input[type=file]').on('change', function (event) {
 });
 $('#supportForm').on('submit', function(event) {
     event.preventDefault(); var target = $(event.target); $.map(target.serializeArray(), function(n, i){ data[n['name']] = n['value']; });
-    target.find('button[type=submit]').html("${fr:message('resources.FenixEduIstIntegrationResources', 'label.error.page.submitting')}...");
+    target.find('button[type=submit]').html("${fr:message('resources.FenixeduIstIntegrationResources', 'label.error.page.submitting')}...");
     target.find('button[type=submit]').attr('disabled', true);
     $.post('${pageContext.request.contextPath}/api/fenix-ist/support-form', JSON.stringify(data), function () {
         target.find('.success').removeClass('hide'); target.find('.modal-footer').hide(); target.find('.form-body').hide();

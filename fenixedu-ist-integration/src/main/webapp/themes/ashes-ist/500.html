@@ -34,7 +34,7 @@
 			</div>
 			<div class="content" ng-show="!success">
 				<p>
-					{{i18n('resources.FenixEduIstIntegrationResources', 'label.error.page.welcome')}}
+					{{i18n('resources.FenixeduIstIntegrationResources', 'label.error.page.welcome')}}
 				</p>
 
 				<form ng-submit="sendForm()">
@@ -73,7 +73,7 @@ Locale       | {{locale}}
 {{stackTrace}}
 " />
 					<div class="form-control">
-						<label for="email">{{i18n('resources.FenixEduIstIntegrationResources', 'label.error.page.email')}}:</label>
+						<label for="email">{{i18n('resources.FenixeduIstIntegrationResources', 'label.error.page.email')}}:</label>
 						<div class="form-input">
 							{% if loggedUser is null %}
 								<input type="email" ng-model="data.email" id="email" required />
@@ -83,25 +83,25 @@ Locale       | {{locale}}
 						</div>
 					</div>
 					<div class="form-control">
-						<label for="subject">{{i18n('resources.FenixEduIstIntegrationResources', 'label.error.page.subject')}}</label>
+						<label for="subject">{{i18n('resources.FenixeduIstIntegrationResources', 'label.error.page.subject')}}</label>
 						<div class="form-input">
 							<input type="text" ng-model="data.subject" id="subject" required />
 						</div>
 					</div>
 					<div class="form-control">
-						<label for="description">{{i18n('resources.FenixEduIstIntegrationResources', 'label.error.page.description')}}</label>
+						<label for="description">{{i18n('resources.FenixeduIstIntegrationResources', 'label.error.page.description')}}</label>
 						<div class="form-input">
 							<textarea ng-model="data.description" id="description" rows="5" required></textarea>
-							<small>{{i18n('resources.FenixEduIstIntegrationResources', 'label.error.page.help')}}</small>
+							<small>{{i18n('resources.FenixeduIstIntegrationResources', 'label.error.page.help')}}</small>
 						</div>
 					</div>
-					<input type="submit" value="{{i18n('resources.FenixEduIstIntegrationResources', 'label.error.page.submit')}}" ng-if="!sending">
-					<input type="submit" disabled value="{{i18n('resources.FenixEduIstIntegrationResources', 'label.error.page.submitting')}}..." ng-if="sending">
+					<input type="submit" value="{{i18n('resources.FenixeduIstIntegrationResources', 'label.error.page.submit')}}" ng-if="!sending">
+					<input type="submit" disabled value="{{i18n('resources.FenixeduIstIntegrationResources', 'label.error.page.submitting')}}..." ng-if="sending">
 				</form>
 			</div>
 			<div class="success" ng-if="success">
-				<h3>{{i18n('resources.FenixEduIstIntegrationResources', 'message.error.page.submitted')}}</h3>
-				{{i18n('resources.FenixEduIstIntegrationResources', 'message.error.page.submitted.body')}} <a href="mailto:{{config.supportEmailAddress}}">{{config.supportEmailAddress}}</a>.
+				<h3>{{i18n('resources.FenixeduIstIntegrationResources', 'message.error.page.submitted')}}</h3>
+				{{i18n('resources.FenixeduIstIntegrationResources', 'message.error.page.submitted.body')}} <a href="mailto:{{config.supportEmailAddress}}">{{config.supportEmailAddress}}</a>.
 			</div>
 		</div>
 	</body>

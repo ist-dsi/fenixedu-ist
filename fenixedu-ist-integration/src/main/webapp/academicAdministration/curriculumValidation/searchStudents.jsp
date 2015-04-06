@@ -25,7 +25,7 @@
 <%@ taglib uri="http://fenix-ashes.ist.utl.pt/fenix-renderers" prefix="fr" %>
 <html:xhtml/>
 
-<h2><bean:message key="label.academicAdministration.managePreBologna.viewStudents" bundle="FENIX_IST_RESOURCES"/></h2>
+<h2><bean:message key="label.academicAdministration.managePreBologna.viewStudents" bundle="FENIXEDU_IST_INTEGRATION_RESOURCES"/></h2>
 
 <fr:edit name="studentsSearchBean" schema="student.StudentsSearchBean" >
 	<fr:layout name="tabular" >
