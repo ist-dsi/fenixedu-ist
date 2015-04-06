@@ -57,15 +57,18 @@ public enum PartyClassification {
                 return PartyClassification.EMPLOYEE;
             }
             if (person.getEmployee() != null) {
+                PersonContractSituation currentResearcherContractSituation =
+                        person.getPersonProfessionalData() != null ? person.getPersonProfessionalData()
+                                .getCurrentPersonContractSituationByCategoryType(CategoryType.RESEARCHER) : null;
+                if (currentResearcherContractSituation != null) {
+                    return PartyClassification.RESEARCHER;
+                }
                 final PersonContractSituation currentGrantOwnerContractSituation =
                         person.getPersonProfessionalData() != null ? person.getPersonProfessionalData()
                                 .getCurrentPersonContractSituationByCategoryType(CategoryType.GRANT_OWNER) : null;
                 if (currentGrantOwnerContractSituation != null) {
                     return PartyClassification.GRANT_OWNER;
                 }
-            }
-            if (person.getResearcher() != null && person.getResearcher().isActiveContractedResearcher()) {
-                return PartyClassification.RESEARCHER;
             }
             if (person.getStudent() != null) {
                 final DegreeType degreeType = person.getStudent().getMostSignificantDegreeType();

@@ -56,7 +56,6 @@ import pt.ist.fenixedu.contracts.domain.Employee;
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveEmployees;
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveGrantOwner;
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.Invitation;
-import pt.ist.fenixedu.contracts.domain.organizationalStructure.ResearchUnit;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonContractSituation;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalData;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalCategory;
@@ -323,22 +322,15 @@ public class ParkingParty extends ParkingParty_Base {
                                     currentGrantOwnerContractSituation.getEndDate());
                     occupations.add(thisOccupation);
                 }
-            }
-
-            if (person.getResearcher() != null) {
-                StringBuilder stringBuilder =
-                        new StringBuilder(BundleUtil.getString("resources.ParkingResources", "message.person.identification",
-                                new String[] { RoleType.RESEARCHER.getLocalizedName(),
-                                        PartyClassification.getMostSignificantNumber(person).toString() }));
-
-                String researchUnitNames = getWorkingResearchUnitNames(person);
-                if (!StringUtils.isEmpty(researchUnitNames)) {
-                    stringBuilder.append(researchUnitNames).append("<br/>");
-                }
 
                 PersonContractSituation currentResearcherContractSituation =
-                        person.getResearcher() != null ? person.getResearcher().getCurrentContractedResearcherContractSituation() : null;
+                        person.getPersonProfessionalData() != null ? person.getPersonProfessionalData()
+                                .getCurrentPersonContractSituationByCategoryType(CategoryType.RESEARCHER) : null;
                 if (currentResearcherContractSituation != null) {
+                    StringBuilder stringBuilder =
+                            new StringBuilder(BundleUtil.getString("resources.ParkingResources", "message.person.identification",
+                                    new String[] { RoleType.RESEARCHER.getLocalizedName(),
+                                            PartyClassification.getMostSignificantNumber(person).toString() }));
                     Unit currentUnit = person.getEmployee() != null ? person.getEmployee().getCurrentWorkingPlace() : null;
                     if (currentUnit != null) {
                         stringBuilder.append(currentUnit.getName()).append("<br/>");
@@ -351,6 +343,7 @@ public class ParkingParty extends ParkingParty_Base {
                     occupations.add(stringBuilder.append(")<br/>").toString());
                 }
             }
+
             Student student = person.getStudent();
             if (student != null && RoleType.STUDENT.isMember(person.getUser())) {
 
@@ -404,19 +397,6 @@ public class ParkingParty extends ParkingParty_Base {
             }
         }
         return occupations;
-    }
-
-    private static String getWorkingResearchUnitNames(Person person) {
-        String names = "";
-        final List<ResearchUnit> units = ResearchUnit.getWorkingResearchUnits(person);
-        int length = units.size();
-        for (final ResearchUnit unit : units) {
-            names += unit.getName();
-            if (--length > 0) {
-                names += ", ";
-            }
-        }
-        return names;
     }
 
     private String getOccupation(String type, String identification, String workingPlace) {
