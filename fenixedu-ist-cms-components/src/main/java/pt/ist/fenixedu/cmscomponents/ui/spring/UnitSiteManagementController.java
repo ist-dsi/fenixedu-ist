@@ -2,10 +2,12 @@ package pt.ist.fenixedu.cmscomponents.ui.spring;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.exceptions.BennuCoreDomainException;
 import org.fenixedu.bennu.core.groups.AnyoneGroup;
+import org.fenixedu.bennu.core.groups.DynamicGroup;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.io.domain.GroupBasedFile;
 import org.fenixedu.bennu.spring.portal.SpringApplication;
@@ -21,14 +23,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.view.RedirectView;
 import pt.ist.fenixedu.cmscomponents.domain.unit.UnitSite;
+import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
 
 import java.io.IOException;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -42,17 +46,40 @@ import static org.fenixedu.bennu.io.servlets.FileDownloadServlet.getDownloadUrl;
 @RequestMapping("/unit/sites")
 public class UnitSiteManagementController {
 
+    private static final int ITEMS_PER_PAGE = 30;
+
     @RequestMapping
-    public String allSites(Model model) {
-        model.addAttribute("unitSites", unitSitesForUser(Authenticate.getUser()));
-        return "fenix-learning/unitSites";
+    public String list(Model model) {
+        return list(0, model);
     }
 
-    private Collection<Site> unitSitesForUser(User user) {
+    @RequestMapping(value = "manage/{page}", method = RequestMethod.GET)
+    public String list(@PathVariable(value = "page") int page, Model model) {
+        List<List<Site>> pages = Lists.partition(getSites(), ITEMS_PER_PAGE);
+        int currentPage = normalize(page, pages);
+        model.addAttribute("numberOfPages", pages.size());
+        model.addAttribute("currentPage", currentPage);
+        model.addAttribute("sites", pages.isEmpty() ? Collections.emptyList() : pages.get(currentPage));
+        model.addAttribute("isManager", DynamicGroup.get("managers").isMember(Authenticate.getUser()));
+        return "fenix-learning/istSites";
+    }
+
+    private int normalize(int page, List<List<Site>> pages) {
+        if (page < 0) {
+            return 0;
+        }
+        if (page >= pages.size()) {
+            return pages.size() - 1;
+        }
+        return page;
+    }
+
+    private List<Site> getSites() {
+        User user = Authenticate.getUser();
         Set<Site> allSites = Bennu.getInstance().getSitesSet();
         Predicate<Site> isAdminMember = site -> site.getCanAdminGroup().isMember(user);
-        Predicate<Site> isUnitSite = site -> site instanceof UnitSite;
-        return allSites.stream().filter(isUnitSite.and(isAdminMember)).collect(toList());
+        Predicate<Site> isPostsMember = site -> site.getCanPostGroup().isMember(user);
+        return allSites.stream().filter(isAdminMember.or(isPostsMember)).collect(Collectors.toList());
     }
 
     @RequestMapping(value = "/{unitSiteSlug}")
@@ -115,6 +142,25 @@ public class UnitSiteManagementController {
         });
         return defaultRedirect(unitSite);
     }
+
+    @RequestMapping(value = "default", method = RequestMethod.POST)
+    public RedirectView setAsDefault(@RequestParam String slug) {
+        Site s = Site.fromSlug(slug);
+
+        if (!DynamicGroup.get("managers").isMember(Authenticate.getUser())) {
+            throw CmsDomainException.forbiden();
+        }
+
+        makeDefaultSite(s);
+
+        return new RedirectView("/unit/sites", true);
+    }
+
+    @Atomic
+    private void makeDefaultSite(Site s) {
+        Bennu.getInstance().setDefaultSite(s);
+    }
+
 
     private RedirectView defaultRedirect(Site unitSite) {
         return new RedirectView(String.format("/unit/sites/%s", unitSite.getSlug()), true);
