@@ -25,7 +25,7 @@
     <div>
         {% if post.isVisible %}
 
-            {% if post.name.content != page.name.content %}
+            {% if not post.name.content equals page.name.content %}
                 <h2 style="margin-top: 0"><a href="{{post.address}}">{{ post.name.content }}</a></h2>
                 <p class="small">
                     {{ post.creationDate|formatDate("d MMMM Y, HH:mm") }} - {{post.createdBy.displayName}}
@@ -48,7 +48,7 @@
         {% else %}
 
             {% if request.user.isAuthenticated %}
-                
+
                 <p>
                     {{ i18n('CmsExceptionResources', 'label.autenticated.private.post') }}
                 </p>
@@ -61,9 +61,9 @@
 
                 <p>
                     <a href="/login?callback={{ request.url }}">Login</a>
-                </p>    
+                </p>
 
-            {% endif %}    
+            {% endif %}
 
         {% endif %}
 
