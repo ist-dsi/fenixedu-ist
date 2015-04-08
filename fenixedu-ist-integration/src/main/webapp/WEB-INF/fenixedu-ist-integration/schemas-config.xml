@@ -245,7 +245,7 @@
 	</schema>
 	
 	<schema name="set.evaluation.curriculum.entry.read.only" type="org.fenixedu.academic.dto.degreeAdministrativeOffice.gradeSubmission.MarkSheetEnrolmentEvaluationBean" bundle="ACADEMIC_OFFICE_RESOURCES">
-		<slot name="enrolmentEvaluationTypeDescription" key="label.set.evaluation.type" read-only="true" />
+		<slot name="evaluationSeason.name.content" key="label.set.evaluation.type" read-only="true" />
 		<slot name="executionYearFullLabel" key="label.set.evaluation.execution.year" read-only="true" />
 		<slot name="gradeValue" key="label.set.evaluation.grade.value" read-only="true" />
 		<slot name="evaluationDate" key="label.set.evaluation.exam.date" read-only="true" />
@@ -254,7 +254,7 @@
 	</schema>
 	
 	<schema name="set.evaluation.curriculum.entry" type="org.fenixedu.academic.dto.degreeAdministrativeOffice.gradeSubmission.MarkSheetEnrolmentEvaluationBean" bundle="ACADEMIC_OFFICE_RESOURCES">
-		<slot name="enrolmentEvaluationTypeDescription" key="label.set.evaluation.type" read-only="true" />
+		<slot name="evaluationSeason.name.content" key="label.set.evaluation.type" read-only="true" />
 		<slot name="executionYearFullLabel" key="label.set.evaluation.execution.year" read-only="true" />
 		<slot name="gradeValue" key="label.set.evaluation.grade.value.simple" validator="org.fenixedu.academic.ui.struts.action.administrativeOffice.studentEnrolment.bolonha.validators.GradeValidator">
 			<property name="size" value="4" />

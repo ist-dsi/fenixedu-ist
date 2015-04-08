@@ -59,6 +59,7 @@ import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.dto.GenericPair;
 import org.fenixedu.academic.util.DiaSemana;
 import org.fenixedu.academic.util.HourMinuteSecond;
+import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.scheduler.custom.CustomTask;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.DateTime;
@@ -249,8 +250,7 @@ public class CreateAndInitializeExecutionCourses extends CustomTask {
 
         for (final Lesson oldLesson : oldShift.getAssociatedLessonsSet()) {
             final GenericPair<YearMonthDay, YearMonthDay> maxLessonsPeriod = newShift.getExecutionCourse().getMaxLessonsPeriod();
-            final OccupationPeriod period =
-                    OccupationPeriod.readOccupationPeriod(maxLessonsPeriod.getLeft(), maxLessonsPeriod.getRight());
+            final OccupationPeriod period = readOccupationPeriod(maxLessonsPeriod.getLeft(), maxLessonsPeriod.getRight());
             final OccupationPeriod occupationPeriod =
                     findOccupationPeriod(newExecutionCourse, maxLessonsPeriod.getLeft(), maxLessonsPeriod.getRight());
 
@@ -347,6 +347,16 @@ public class CreateAndInitializeExecutionCourses extends CustomTask {
                 throw de;
             }
         }
+    }
+
+    private static OccupationPeriod readOccupationPeriod(YearMonthDay start, YearMonthDay end) {
+        for (final OccupationPeriod occupationPeriod : Bennu.getInstance().getOccupationPeriodsSet()) {
+            if (occupationPeriod.getNextPeriod() == null && occupationPeriod.getPreviousPeriod() == null
+                    && occupationPeriod.getStartYearMonthDay().equals(start) && occupationPeriod.getEndYearMonthDay().equals(end)) {
+                return occupationPeriod;
+            }
+        }
+        return null;
     }
 
     private void print(final String prefix, final OccupationPeriod occupationPeriod) {
