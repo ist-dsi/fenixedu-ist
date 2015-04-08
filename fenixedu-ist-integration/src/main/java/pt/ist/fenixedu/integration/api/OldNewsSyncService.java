@@ -28,7 +28,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.rest.BennuRestResource;
+import org.fenixedu.cms.domain.Category;
 import org.fenixedu.cms.domain.Post;
 import org.fenixedu.cms.domain.Site;
 import org.joda.time.DateTime;
@@ -70,11 +72,13 @@ public class OldNewsSyncService extends BennuRestResource {
                         .secondOfMinute().withMaximumValue();
         Interval i = new Interval(begin, end);
 
+        Category stickyCategory = Bennu.getInstance().getDefaultSite().categoryForSlug("sticky");
+
         String result = "SUCCESS\n";
         result += "<list>\n";
         int index = 1;
         for (Post post : posts.stream().sorted(Post.CREATION_DATE_COMPARATOR).filter(x -> i.contains(x.getPublicationBegin()))
-                .filter(x -> x.isVisible()).collect(Collectors.toList())) {
+                .filter(x -> x.getActive() != null && x.getActive()).collect(Collectors.toList())) {
             result += "  <net.sourceforge.fenixedu.presentationTier.Action.externalServices.AnnouncementDTO>\n";
             result += "    <creationDate>" + post.getCreationDate().toString("dd/MM/yyyy HH:mm:ss") + "</creationDate>\n";
             result +=
@@ -106,7 +110,7 @@ public class OldNewsSyncService extends BennuRestResource {
             result += "    <campus>Alameda</campus>\n";
             result += "    <categories/>\n";
             result += "    <pressRelease>false</pressRelease>\n";
-            result += "    <sticky>" + false + "</sticky>\n";
+            result += "    <sticky>" + post.getCategoriesSet().contains(stickyCategory) + "</sticky>\n";
             result += "    <priority>" + index++ + "</priority>\n";
             result += "  </net.sourceforge.fenixedu.presentationTier.Action.externalServices.AnnouncementDTO>\n";
         }
