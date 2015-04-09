@@ -1,0 +1,882 @@
+<?xml version="1.0" encoding="UTF-8"  ?>
+<!-- Created with iReport - A designer for JasperReports -->
+<!DOCTYPE jasperReport PUBLIC "//JasperReports//DTD Report Design//EN" "http://jasperreports.sourceforge.net/dtds/jasperreport.dtd">
+<jasperReport
+		 name="annualTeachingCreditsDocument_report"
+		 columnCount="1"
+		 printOrder="Vertical"
+		 orientation="Portrait"
+		 pageWidth="595"
+		 pageHeight="842"
+		 columnWidth="535"
+		 columnSpacing="0"
+		 leftMargin="30"
+		 rightMargin="30"
+		 topMargin="20"
+		 bottomMargin="20"
+		 whenNoDataType="NoPages"
+		 isTitleNewPage="false"
+		 isSummaryNewPage="false">
+	<property name="ireport.scriptlethandling" value="0" />
+	<property name="ireport.encoding" value="UTF-8" />
+	<import value="java.util.*" />
+	<import value="net.sf.jasperreports.engine.*" />
+	<import value="net.sf.jasperreports.engine.data.*" />
+
+	<parameter name="annualTeachingCreditsBean" isForPrompting="false" class="pt.ist.fenixedu.teacher.domain.credits.util.AnnualTeachingCreditsBean"/>
+	<parameter name="organization" isForPrompting="false" class="java.lang.String"/>
+	<parameter name="withConfidentionalInformation" isForPrompting="false" class="java.lang.Boolean"/>
+
+
+		<group  name="professorshipsGRoup" >
+			<groupExpression><![CDATA[]]></groupExpression>
+			<groupHeader>
+			<band height="90"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="0"
+						y="0"
+						width="535"
+						height="30"
+						backcolor="#EEEEEE"
+						key="textField-5"
+						positionType="Float"
+						isPrintRepeatedValues="false"/>
+					<box leftPadding="2" rightPadding="2"></box>
+					<textElement verticalAlignment="Middle">
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$R{label.teacherCreditsSheet.professorships}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="0"
+						y="30"
+						width="535"
+						height="25"
+						key="textField-12"
+						positionType="Float"
+						isPrintRepeatedValues="false">
+							<printWhenExpression><![CDATA[$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(0).getProfessorships().isEmpty()]]></printWhenExpression>
+						</reportElement>
+					<box></box>
+					<textElement verticalAlignment="Middle">
+						<font pdfFontName="Helvetica" size="10" isBold="false"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$R{label.teacherCreditsSheet.noDataFound}]]></textFieldExpression>
+				</textField>
+				<subreport  isUsingCache="true">
+					<reportElement
+						x="0"
+						y="30"
+						width="535"
+						height="25"
+						key="subreport-1"
+						positionType="Float">
+							<printWhenExpression><![CDATA[!$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(0).getProfessorships().isEmpty()]]></printWhenExpression>
+						</reportElement>
+					<subreportParameter  name="executionPeriodName">
+						<subreportParameterExpression><![CDATA[$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(0).getExecutionPeriod().getQualifiedName()]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter  name="REPORT_RESOURCE_BUNDLE">
+						<subreportParameterExpression><![CDATA[$P{REPORT_RESOURCE_BUNDLE}]]></subreportParameterExpression>
+					</subreportParameter>
+					<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource(((Collection)$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(0).getProfessorships()))]]></dataSourceExpression>
+					<subreportExpression  class="java.lang.String"><![CDATA["reports/teacherCredits/professorshipTeachingService.jasper"]]></subreportExpression>
+				</subreport>
+				<subreport  isUsingCache="true">
+					<reportElement
+						x="0"
+						y="55"
+						width="535"
+						height="25"
+						key="subreport-2"
+						positionType="Float"
+						isRemoveLineWhenBlank="true">
+							<printWhenExpression><![CDATA[$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().size()>1 && !$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(1).getProfessorships().isEmpty()]]></printWhenExpression>
+						</reportElement>
+					<subreportParameter  name="executionPeriodName">
+						<subreportParameterExpression><![CDATA[$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(1).getExecutionPeriod().getQualifiedName()]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter  name="REPORT_RESOURCE_BUNDLE">
+						<subreportParameterExpression><![CDATA[$P{REPORT_RESOURCE_BUNDLE}]]></subreportParameterExpression>
+					</subreportParameter>
+					<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource(((Collection)$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(1).getProfessorships()))]]></dataSourceExpression>
+					<subreportExpression  class="java.lang.String"><![CDATA["reports/teacherCredits/professorshipTeachingService.jasper"]]></subreportExpression>
+				</subreport>
+			</band>
+			</groupHeader>
+			<groupFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+			</groupFooter>
+		</group>
+		<group  name="institutionWorkingTime" >
+			<groupExpression><![CDATA[]]></groupExpression>
+			<groupHeader>
+			<band height="90"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="0"
+						y="0"
+						width="535"
+						height="30"
+						backcolor="#EEEEEE"
+						key="textField-6"
+						positionType="Float"
+						isPrintRepeatedValues="false"/>
+					<box leftPadding="2" rightPadding="2"></box>
+					<textElement textAlignment="Left" verticalAlignment="Middle">
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[msg($R{label.teacherCreditsSheet.institutionWorkingTime.optional}, $P{organization})]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="0"
+						y="30"
+						width="535"
+						height="25"
+						key="textField-13"
+						positionType="Float"
+						isPrintRepeatedValues="false">
+							<printWhenExpression><![CDATA[$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(0).getInstitutionWorkTime().isEmpty()]]></printWhenExpression>
+						</reportElement>
+					<box></box>
+					<textElement verticalAlignment="Middle">
+						<font pdfFontName="Helvetica" size="10" isBold="false"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$R{label.teacherCreditsSheet.noDataFound}]]></textFieldExpression>
+				</textField>
+				<subreport  isUsingCache="true">
+					<reportElement
+						x="0"
+						y="30"
+						width="535"
+						height="25"
+						key="subreport-3"
+						positionType="Float">
+							<printWhenExpression><![CDATA[!$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(0).getInstitutionWorkTime().isEmpty()]]></printWhenExpression>
+						</reportElement>
+					<subreportParameter  name="executionPeriodName">
+						<subreportParameterExpression><![CDATA[$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(0).getExecutionPeriod().getQualifiedName()]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter  name="REPORT_RESOURCE_BUNDLE">
+						<subreportParameterExpression><![CDATA[$P{REPORT_RESOURCE_BUNDLE}]]></subreportParameterExpression>
+					</subreportParameter>
+					<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource(((Collection)$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(0).getInstitutionWorkTime()))]]></dataSourceExpression>
+					<subreportExpression  class="java.lang.String"><![CDATA["reports/teacherCredits/institutionWorkingTime.jasper"]]></subreportExpression>
+				</subreport>
+				<subreport  isUsingCache="true">
+					<reportElement
+						x="0"
+						y="55"
+						width="535"
+						height="25"
+						key="subreport-4"
+						positionType="Float"
+						isRemoveLineWhenBlank="true">
+							<printWhenExpression><![CDATA[$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().size()>1 && !$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(1).getInstitutionWorkTime().isEmpty()]]></printWhenExpression>
+						</reportElement>
+					<subreportParameter  name="executionPeriodName">
+						<subreportParameterExpression><![CDATA[$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(1).getExecutionPeriod().getQualifiedName()]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter  name="REPORT_RESOURCE_BUNDLE">
+						<subreportParameterExpression><![CDATA[$P{REPORT_RESOURCE_BUNDLE}]]></subreportParameterExpression>
+					</subreportParameter>
+					<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource(((Collection)$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(1).getInstitutionWorkTime()))]]></dataSourceExpression>
+					<subreportExpression  class="java.lang.String"><![CDATA["reports/teacherCredits/institutionWorkingTime.jasper"]]></subreportExpression>
+				</subreport>
+			</band>
+			</groupHeader>
+			<groupFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+			</groupFooter>
+		</group>
+		<group  name="masterDegreeTheses" >
+			<groupExpression><![CDATA[]]></groupExpression>
+			<groupHeader>
+			<band height="65"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="0"
+						y="0"
+						width="535"
+						height="30"
+						backcolor="#EEEEEE"
+						key="textField-7"
+						positionType="Float"
+						isPrintRepeatedValues="false"/>
+					<box leftPadding="2" rightPadding="2"></box>
+					<textElement verticalAlignment="Middle">
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$R{label.credits.masterDegreeTheses}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="0"
+						y="30"
+						width="535"
+						height="25"
+						key="textField-14"
+						positionType="Float"
+						isPrintRepeatedValues="false">
+							<printWhenExpression><![CDATA[$P{annualTeachingCreditsBean}.getMasterDegreeThesis().isEmpty()]]></printWhenExpression>
+						</reportElement>
+					<box></box>
+					<textElement verticalAlignment="Middle">
+						<font pdfFontName="Helvetica" size="10" isBold="false"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$R{label.teacherCreditsSheet.noDataFound}]]></textFieldExpression>
+				</textField>
+				<subreport  isUsingCache="true">
+					<reportElement
+						x="0"
+						y="30"
+						width="535"
+						height="25"
+						key="subreport-5"
+						positionType="Float">
+							<printWhenExpression><![CDATA[!$P{annualTeachingCreditsBean}.getMasterDegreeThesis().isEmpty()]]></printWhenExpression>
+						</reportElement>
+					<subreportParameter  name="REPORT_RESOURCE_BUNDLE">
+						<subreportParameterExpression><![CDATA[$P{REPORT_RESOURCE_BUNDLE}]]></subreportParameterExpression>
+					</subreportParameter>
+					<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource(((Collection)$P{annualTeachingCreditsBean}.getMasterDegreeThesis()))]]></dataSourceExpression>
+					<subreportExpression  class="java.lang.String"><![CDATA["reports/teacherCredits/masterDegreeThesis.jasper"]]></subreportExpression>
+				</subreport>
+			</band>
+			</groupHeader>
+			<groupFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+			</groupFooter>
+		</group>
+		<group  name="phdDegreeTheses" >
+			<groupExpression><![CDATA[]]></groupExpression>
+			<groupHeader>
+			<band height="65"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="0"
+						y="0"
+						width="535"
+						height="30"
+						backcolor="#EEEEEE"
+						key="textField-8"
+						positionType="Float"
+						isPrintRepeatedValues="false"/>
+					<box leftPadding="2" rightPadding="2"></box>
+					<textElement verticalAlignment="Middle">
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$R{label.credits.phdDegreeTheses}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="0"
+						y="30"
+						width="535"
+						height="25"
+						key="textField-10"
+						positionType="Float"
+						isPrintRepeatedValues="false">
+							<printWhenExpression><![CDATA[$P{annualTeachingCreditsBean}.getPhdDegreeTheses().isEmpty()]]></printWhenExpression>
+						</reportElement>
+					<box></box>
+					<textElement verticalAlignment="Middle">
+						<font pdfFontName="Helvetica" size="10" isBold="false"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$R{label.teacherCreditsSheet.noDataFound}]]></textFieldExpression>
+				</textField>
+				<subreport  isUsingCache="true">
+					<reportElement
+						x="0"
+						y="30"
+						width="535"
+						height="25"
+						key="subreport-6"
+						positionType="Float">
+							<printWhenExpression><![CDATA[!$P{annualTeachingCreditsBean}.getPhdDegreeTheses().isEmpty()]]></printWhenExpression>
+						</reportElement>
+					<subreportParameter  name="REPORT_RESOURCE_BUNDLE">
+						<subreportParameterExpression><![CDATA[$P{REPORT_RESOURCE_BUNDLE}]]></subreportParameterExpression>
+					</subreportParameter>
+					<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource(((Collection)$P{annualTeachingCreditsBean}.getPhdDegreeTheses()))]]></dataSourceExpression>
+					<subreportExpression  class="java.lang.String"><![CDATA["reports/teacherCredits/phdDegreeThesis.jasper"]]></subreportExpression>
+				</subreport>
+			</band>
+			</groupHeader>
+			<groupFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+			</groupFooter>
+		</group>
+		<group  name="projectsAndTutorials" >
+			<groupExpression><![CDATA[]]></groupExpression>
+			<groupHeader>
+			<band height="65"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="0"
+						y="0"
+						width="535"
+						height="30"
+						backcolor="#EEEEEE"
+						key="textField-9"
+						positionType="Float"
+						isPrintRepeatedValues="false"/>
+					<box leftPadding="2" rightPadding="2"></box>
+					<textElement verticalAlignment="Middle">
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$R{label.credits.projectsAndTutorials}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="0"
+						y="30"
+						width="535"
+						height="25"
+						key="textField-11"
+						positionType="Float"
+						isPrintRepeatedValues="false">
+							<printWhenExpression><![CDATA[$P{annualTeachingCreditsBean}.getProjectAndTutorialProfessorships().isEmpty()]]></printWhenExpression>
+						</reportElement>
+					<box></box>
+					<textElement verticalAlignment="Middle">
+						<font pdfFontName="Helvetica" size="10" isBold="false"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$R{label.teacherCreditsSheet.noDataFound}]]></textFieldExpression>
+				</textField>
+				<subreport  isUsingCache="true">
+					<reportElement
+						x="0"
+						y="30"
+						width="535"
+						height="25"
+						key="subreport-7"
+						positionType="Float">
+							<printWhenExpression><![CDATA[!$P{annualTeachingCreditsBean}.getProjectAndTutorialProfessorships().isEmpty()]]></printWhenExpression>
+						</reportElement>
+					<subreportParameter  name="REPORT_RESOURCE_BUNDLE">
+						<subreportParameterExpression><![CDATA[$P{REPORT_RESOURCE_BUNDLE}]]></subreportParameterExpression>
+					</subreportParameter>
+					<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource(((Collection)$P{annualTeachingCreditsBean}.getProjectAndTutorialProfessorships()))]]></dataSourceExpression>
+					<subreportExpression  class="java.lang.String"><![CDATA["reports/teacherCredits/projectAndTutorialService.jasper"]]></subreportExpression>
+				</subreport>
+			</band>
+			</groupHeader>
+			<groupFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+			</groupFooter>
+		</group>
+		<group  name="managementPositionLines" >
+			<groupExpression><![CDATA[]]></groupExpression>
+			<groupHeader>
+			<band height="90"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="0"
+						y="0"
+						width="535"
+						height="30"
+						backcolor="#EEEEEE"
+						key="textField-15"
+						positionType="Float"
+						isPrintRepeatedValues="false"/>
+					<box leftPadding="2" rightPadding="2"></box>
+					<textElement verticalAlignment="Middle">
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$R{label.teacherCreditsSheet.managementPositionLines}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="0"
+						y="30"
+						width="535"
+						height="25"
+						key="textField-16"
+						positionType="Float"
+						isPrintRepeatedValues="false">
+							<printWhenExpression><![CDATA[$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(0).getPersonFunctions().isEmpty()]]></printWhenExpression>
+						</reportElement>
+					<box></box>
+					<textElement verticalAlignment="Middle">
+						<font pdfFontName="Helvetica" size="10" isBold="false"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$R{label.teacherCreditsSheet.noDataFound}]]></textFieldExpression>
+				</textField>
+				<subreport  isUsingCache="true">
+					<reportElement
+						x="0"
+						y="30"
+						width="535"
+						height="25"
+						key="subreport-8"
+						positionType="Float">
+							<printWhenExpression><![CDATA[!$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(0).getPersonFunctions().isEmpty()]]></printWhenExpression>
+						</reportElement>
+					<subreportParameter  name="REPORT_RESOURCE_BUNDLE">
+						<subreportParameterExpression><![CDATA[$P{REPORT_RESOURCE_BUNDLE}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter  name="executionPeriodName">
+						<subreportParameterExpression><![CDATA[$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(0).getExecutionPeriod().getQualifiedName()]]></subreportParameterExpression>
+					</subreportParameter>
+					<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource(((Collection)$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(0).getPersonFunctions()))]]></dataSourceExpression>
+					<subreportExpression  class="java.lang.String"><![CDATA["reports/teacherCredits/managementFunction.jasper"]]></subreportExpression>
+				</subreport>
+				<subreport  isUsingCache="true">
+					<reportElement
+						x="0"
+						y="55"
+						width="535"
+						height="25"
+						key="subreport-9"
+						positionType="Float"
+						isRemoveLineWhenBlank="true">
+							<printWhenExpression><![CDATA[$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().size()>1 && !$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(1).getPersonFunctions().isEmpty()]]></printWhenExpression>
+						</reportElement>
+					<subreportParameter  name="REPORT_RESOURCE_BUNDLE">
+						<subreportParameterExpression><![CDATA[$P{REPORT_RESOURCE_BUNDLE}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter  name="executionPeriodName">
+						<subreportParameterExpression><![CDATA[$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(1).getExecutionPeriod().getQualifiedName()]]></subreportParameterExpression>
+					</subreportParameter>
+					<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource(((Collection)$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(1).getPersonFunctions()))]]></dataSourceExpression>
+					<subreportExpression  class="java.lang.String"><![CDATA["reports/teacherCredits/managementFunction.jasper"]]></subreportExpression>
+				</subreport>
+			</band>
+			</groupHeader>
+			<groupFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+			</groupFooter>
+		</group>
+		<group  name="otherTypeCreditLines" >
+			<groupExpression><![CDATA[]]></groupExpression>
+			<groupHeader>
+			<band height="90"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="0"
+						y="0"
+						width="535"
+						height="30"
+						backcolor="#EEEEEE"
+						key="textField-17"
+						positionType="Float"
+						isPrintRepeatedValues="false"/>
+					<box leftPadding="2" rightPadding="2"></box>
+					<textElement textAlignment="Left" verticalAlignment="Middle">
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$R{label.teacherCreditsSheet.otherTypeCreditLines}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="0"
+						y="30"
+						width="535"
+						height="25"
+						key="textField-18"
+						positionType="Float"
+						isPrintRepeatedValues="false">
+							<printWhenExpression><![CDATA[$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(0).getOtherServices().isEmpty()]]></printWhenExpression>
+						</reportElement>
+					<box></box>
+					<textElement verticalAlignment="Middle">
+						<font pdfFontName="Helvetica" size="10" isBold="false"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$R{label.teacherCreditsSheet.noDataFound}]]></textFieldExpression>
+				</textField>
+				<subreport  isUsingCache="true">
+					<reportElement
+						x="0"
+						y="30"
+						width="535"
+						height="25"
+						key="subreport-10"
+						positionType="Float">
+							<printWhenExpression><![CDATA[!$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(0).getOtherServices().isEmpty()]]></printWhenExpression>
+						</reportElement>
+					<subreportParameter  name="REPORT_RESOURCE_BUNDLE">
+						<subreportParameterExpression><![CDATA[$P{REPORT_RESOURCE_BUNDLE}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter  name="executionPeriodName">
+						<subreportParameterExpression><![CDATA[$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(0).getExecutionPeriod().getQualifiedName()]]></subreportParameterExpression>
+					</subreportParameter>
+					<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource(((Collection)$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(0).getOtherServices()))]]></dataSourceExpression>
+					<subreportExpression  class="java.lang.String"><![CDATA["reports/teacherCredits/otherService.jasper"]]></subreportExpression>
+				</subreport>
+				<subreport  isUsingCache="true">
+					<reportElement
+						x="0"
+						y="55"
+						width="535"
+						height="25"
+						key="subreport-11"
+						positionType="Float"
+						isRemoveLineWhenBlank="true">
+							<printWhenExpression><![CDATA[$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().size()>1 && !$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(1).getOtherServices().isEmpty()]]></printWhenExpression>
+						</reportElement>
+					<subreportParameter  name="REPORT_RESOURCE_BUNDLE">
+						<subreportParameterExpression><![CDATA[$P{REPORT_RESOURCE_BUNDLE}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter  name="executionPeriodName">
+						<subreportParameterExpression><![CDATA[$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(0).getExecutionPeriod().getQualifiedName()]]></subreportParameterExpression>
+					</subreportParameter>
+					<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource(((Collection)$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(1).getOtherServices()))]]></dataSourceExpression>
+					<subreportExpression  class="java.lang.String"><![CDATA["reports/teacherCredits/otherService.jasper"]]></subreportExpression>
+				</subreport>
+			</band>
+			</groupHeader>
+			<groupFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+			</groupFooter>
+		</group>
+		<group  name="creditsReduction" >
+			<groupExpression><![CDATA[]]></groupExpression>
+			<groupHeader>
+			<band height="65"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="0"
+						y="0"
+						width="535"
+						height="30"
+						backcolor="#EEEEEE"
+						key="textField-19"
+						positionType="Float"
+						isPrintRepeatedValues="false"/>
+					<box leftPadding="2" rightPadding="2"></box>
+					<textElement verticalAlignment="Middle">
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$R{label.credits.creditsReduction.definition}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="0"
+						y="30"
+						width="535"
+						height="25"
+						key="textField-24"
+						stretchType="RelativeToTallestObject"
+						positionType="Float"
+						isPrintRepeatedValues="false">
+							<printWhenExpression><![CDATA[!$P{withConfidentionalInformation}]]></printWhenExpression>
+						</reportElement>
+					<box></box>
+					<textElement verticalAlignment="Middle">
+						<font pdfFontName="Helvetica" size="10" isBold="false"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$R{label.confidentialInformation}]]></textFieldExpression>
+				</textField>
+				<subreport  isUsingCache="true">
+					<reportElement
+						x="0"
+						y="30"
+						width="535"
+						height="25"
+						key="subreport-16"
+						stretchType="RelativeToTallestObject"
+						positionType="Float"
+						isPrintRepeatedValues="false">
+							<printWhenExpression><![CDATA[$P{withConfidentionalInformation}]]></printWhenExpression>
+						</reportElement>
+					<subreportParameter  name="REPORT_RESOURCE_BUNDLE">
+						<subreportParameterExpression><![CDATA[$P{REPORT_RESOURCE_BUNDLE}]]></subreportParameterExpression>
+					</subreportParameter>
+					<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource(((Collection)$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans()))]]></dataSourceExpression>
+					<subreportExpression  class="java.lang.String"><![CDATA["reports/teacherCredits/creditsReductionService.jasper"]]></subreportExpression>
+				</subreport>
+			</band>
+			</groupHeader>
+			<groupFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+			</groupFooter>
+		</group>
+		<group  name="serviceExemptionLines" >
+			<groupExpression><![CDATA[]]></groupExpression>
+			<groupHeader>
+			<band height="90"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="0"
+						y="0"
+						width="535"
+						height="30"
+						backcolor="#EEEEEE"
+						key="textField-20"
+						positionType="Float"
+						isPrintRepeatedValues="false"/>
+					<box leftPadding="2" rightPadding="2"></box>
+					<textElement verticalAlignment="Middle">
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$R{label.teacherCreditsSheet.serviceExemptionLines}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="0"
+						y="30"
+						width="535"
+						height="25"
+						key="textField-21"
+						positionType="Float"
+						isPrintRepeatedValues="false">
+							<printWhenExpression><![CDATA[$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(0).getServiceExemptions().isEmpty()]]></printWhenExpression>
+						</reportElement>
+					<box></box>
+					<textElement verticalAlignment="Middle">
+						<font pdfFontName="Helvetica" size="10" isBold="false"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$R{label.teacherCreditsSheet.noDataFound}]]></textFieldExpression>
+				</textField>
+				<subreport  isUsingCache="true">
+					<reportElement
+						x="0"
+						y="30"
+						width="535"
+						height="25"
+						key="subreport-13"
+						positionType="Float">
+							<printWhenExpression><![CDATA[!$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(0).getServiceExemptions().isEmpty()]]></printWhenExpression>
+						</reportElement>
+					<subreportParameter  name="REPORT_RESOURCE_BUNDLE">
+						<subreportParameterExpression><![CDATA[$P{REPORT_RESOURCE_BUNDLE}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter  name="executionPeriodName">
+						<subreportParameterExpression><![CDATA[$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(0).getExecutionPeriod().getQualifiedName()]]></subreportParameterExpression>
+					</subreportParameter>
+					<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource(((Collection)$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(0).getServiceExemptions()))]]></dataSourceExpression>
+					<subreportExpression  class="java.lang.String"><![CDATA["reports/teacherCredits/serviceExemptions.jasper"]]></subreportExpression>
+				</subreport>
+				<subreport  isUsingCache="true">
+					<reportElement
+						x="0"
+						y="55"
+						width="535"
+						height="25"
+						key="subreport-14"
+						positionType="Float"
+						isRemoveLineWhenBlank="true">
+							<printWhenExpression><![CDATA[$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().size()>1 && !$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(1).getServiceExemptions().isEmpty()]]></printWhenExpression>
+						</reportElement>
+					<subreportParameter  name="REPORT_RESOURCE_BUNDLE">
+						<subreportParameterExpression><![CDATA[$P{REPORT_RESOURCE_BUNDLE}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter  name="executionPeriodName">
+						<subreportParameterExpression><![CDATA[$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(1).getExecutionPeriod().getQualifiedName()]]></subreportParameterExpression>
+					</subreportParameter>
+					<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource(((Collection)$P{annualTeachingCreditsBean}.getAnnualTeachingCreditsByPeriodBeans().get(1).getServiceExemptions()))]]></dataSourceExpression>
+					<subreportExpression  class="java.lang.String"><![CDATA["reports/teacherCredits/serviceExemptions.jasper"]]></subreportExpression>
+				</subreport>
+			</band>
+			</groupHeader>
+			<groupFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+			</groupFooter>
+		</group>
+		<group  name="notes" >
+			<groupExpression><![CDATA[]]></groupExpression>
+			<groupHeader>
+			<band height="65"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="0"
+						y="0"
+						width="535"
+						height="30"
+						backcolor="#EEEEEE"
+						key="textField-22"
+						positionType="Float"
+						isPrintRepeatedValues="false"/>
+					<box leftPadding="2" rightPadding="2"></box>
+					<textElement verticalAlignment="Middle">
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$R{label.notes}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="0"
+						y="30"
+						width="535"
+						height="25"
+						key="textField-23"
+						positionType="Float"
+						isPrintRepeatedValues="false">
+							<printWhenExpression><![CDATA[$P{annualTeachingCreditsBean}.getTeacherServiceComments().isEmpty()]]></printWhenExpression>
+						</reportElement>
+					<box></box>
+					<textElement verticalAlignment="Middle">
+						<font pdfFontName="Helvetica" size="10" isBold="false"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$R{label.teacherCreditsSheet.noDataFound}]]></textFieldExpression>
+				</textField>
+				<subreport  isUsingCache="true">
+					<reportElement
+						x="0"
+						y="30"
+						width="535"
+						height="25"
+						key="subreport-15"
+						positionType="Float">
+							<printWhenExpression><![CDATA[!$P{annualTeachingCreditsBean}.getTeacherServiceComments().isEmpty()]]></printWhenExpression>
+						</reportElement>
+					<subreportParameter  name="REPORT_RESOURCE_BUNDLE">
+						<subreportParameterExpression><![CDATA[$P{REPORT_RESOURCE_BUNDLE}]]></subreportParameterExpression>
+					</subreportParameter>
+					<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource(((Collection)$P{annualTeachingCreditsBean}.getTeacherServiceComments()))]]></dataSourceExpression>
+					<subreportExpression  class="java.lang.String"><![CDATA["reports/teacherCredits/teacherServiceComments.jasper"]]></subreportExpression>
+				</subreport>
+			</band>
+			</groupHeader>
+			<groupFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+			</groupFooter>
+		</group>
+		<background>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</background>
+		<title>
+			<band height="80"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="false" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="0"
+						y="0"
+						width="535"
+						height="15"
+						key="textField-1"/>
+					<box></box>
+					<textElement>
+						<font pdfFontName="Helvetica-Bold" size="12" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA["Créditos "+$P{annualTeachingCreditsBean}.getExecutionYear().getName()]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement
+						x="0"
+						y="25"
+						width="80"
+						height="15"
+						key="staticText-1"/>
+					<box></box>
+					<textElement>
+						<font/>
+					</textElement>
+				<text><![CDATA[Nome:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="0"
+						y="40"
+						width="80"
+						height="15"
+						key="staticText-2"/>
+					<box></box>
+					<textElement>
+						<font/>
+					</textElement>
+				<text><![CDATA[Categoria:]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="0"
+						y="55"
+						width="80"
+						height="15"
+						key="staticText-3"/>
+					<box></box>
+					<textElement>
+						<font/>
+					</textElement>
+				<text><![CDATA[Departamento:]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="80"
+						y="25"
+						width="455"
+						height="15"
+						key="textField-2"/>
+					<box></box>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$P{annualTeachingCreditsBean}.getTeacher().getPerson().getName()]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="80"
+						y="40"
+						width="455"
+						height="15"
+						key="textField-3"/>
+					<box></box>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$P{annualTeachingCreditsBean}.getProfessionalCategoryName()]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="80"
+						y="55"
+						width="455"
+						height="15"
+						key="textField-4"/>
+					<box></box>
+					<textElement>
+						<font/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$P{annualTeachingCreditsBean}.getDepartmentName()]]></textFieldExpression>
+				</textField>
+			</band>
+		</title>
+		<pageHeader>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</pageHeader>
+		<columnHeader>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</columnHeader>
+		<detail>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</detail>
+		<columnFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</columnFooter>
+		<pageFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</pageFooter>
+		<summary>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</summary>
+</jasperReport>

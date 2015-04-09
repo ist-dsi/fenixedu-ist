@@ -32,6 +32,7 @@ import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
+import org.fenixedu.academic.service.services.exceptions.NotAuthorizedException;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.security.Authenticate;
@@ -114,7 +115,7 @@ public class ViewTeacherCreditsDA extends FenixDispatchAction {
                 } else {
                     if (annualTeachingCredits.isClosed()) {
                         AnnualTeachingCreditsDocument lastTeacherCreditsDocument =
-                                annualTeachingCredits.getLastTeacherCreditsDocument(!withConfidencialInformation);
+                                annualTeachingCredits.getLastTeacherCreditsDocument(withConfidencialInformation);
                         if (lastTeacherCreditsDocument != null) {
                             response.setContentType("application/pdf");
                             response.setHeader("Content-disposition",
@@ -123,6 +124,8 @@ public class ViewTeacherCreditsDA extends FenixDispatchAction {
                             outputStream.write(lastTeacherCreditsDocument.getContents());
                             outputStream.close();
                             return null;
+                        } else {
+                            throw new NotAuthorizedException();
                         }
                     }
                     annualTeachingCreditsBean = new AnnualTeachingCreditsBean(annualTeachingCredits);

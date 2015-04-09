@@ -44,6 +44,9 @@ public class AnnualTeachingCreditsDocument extends AnnualTeachingCreditsDocument
             }
         }
         groups.add(RoleType.SCIENTIFIC_COUNCIL.actualGroup());
+        if (!hasConfidencialInformation) {
+            groups.add(Group.parse("creditsManager"));
+        }
 
         init(filename, filename, content, UnionGroup.of(groups));
         setAnnualTeachingCredits(annualTeachingCredits);

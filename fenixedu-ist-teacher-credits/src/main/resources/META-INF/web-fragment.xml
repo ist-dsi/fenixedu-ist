@@ -31,15 +31,4 @@
         </before>
     </ordering>
 
-	<!-- Filter -->
-	<filter>
-		<filter-name>AnnualTeachingCreditsDocumentFilter</filter-name>
-		<filter-class>pt.ist.fenixedu.teacher.servlet.AnnualTeachingCreditsDocumentFilter</filter-class>
-	</filter>
-	<!-- Filter Mapping -->
-	<filter-mapping>
-		<filter-name>AnnualTeachingCreditsDocumentFilter</filter-name>
-		<url-pattern>/annualTeachingCreditsDocument.do</url-pattern>
-	</filter-mapping>
-
 </web-fragment>

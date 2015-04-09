@@ -29,11 +29,14 @@ import org.fenixedu.academic.domain.thesis.Thesis;
 import org.fenixedu.academic.domain.thesis.ThesisEvaluationParticipant;
 import org.fenixedu.academic.domain.thesis.ThesisParticipationType;
 import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.core.security.Authenticate;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalData;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalCategory;
 import pt.ist.fenixedu.teacher.domain.TeacherCredits;
+import pt.ist.fenixedu.teacher.domain.credits.util.AnnualTeachingCreditsBean;
 import pt.ist.fenixedu.teacher.domain.teacher.DegreeProjectTutorialService;
 import pt.ist.fenixedu.teacher.domain.teacher.TeacherService;
 import pt.ist.fenixframework.Atomic;
@@ -166,6 +169,10 @@ public class AnnualTeachingCredits extends AnnualTeachingCredits_Base {
         setAccumulatedCredits(accumulatedCredits);
         setLastModifiedDate(new DateTime());
 
+        AnnualTeachingCreditsBean annualTeachingCreditsBean = new AnnualTeachingCreditsBean(this);
+
+        new AnnualTeachingCreditsDocument(this, annualTeachingCreditsBean.getAnnualTeacherCreditsDocument(true), true);
+        new AnnualTeachingCreditsDocument(this, annualTeachingCreditsBean.getAnnualTeacherCreditsDocument(false), false);
     }
 
     private BigDecimal getPreviousAccumulatedCredits() {
@@ -175,9 +182,11 @@ public class AnnualTeachingCredits extends AnnualTeachingCredits_Base {
     }
 
     public AnnualTeachingCreditsDocument getLastTeacherCreditsDocument(Boolean withConfidencialInformation) {
+        User user = Authenticate.getUser();
         AnnualTeachingCreditsDocument lastAnnualTeachingCreditsDocument = null;
         for (AnnualTeachingCreditsDocument annualTeachingCreditsDocument : getAnnualTeachingCreditsDocumentSet()) {
             if (annualTeachingCreditsDocument.getHasConfidencialInformation() == withConfidencialInformation
+                    && annualTeachingCreditsDocument.isAccessible(user)
                     && (lastAnnualTeachingCreditsDocument == null || lastAnnualTeachingCreditsDocument.getUploadTime().isBefore(
                             annualTeachingCreditsDocument.getUploadTime()))) {
                 lastAnnualTeachingCreditsDocument = annualTeachingCreditsDocument;

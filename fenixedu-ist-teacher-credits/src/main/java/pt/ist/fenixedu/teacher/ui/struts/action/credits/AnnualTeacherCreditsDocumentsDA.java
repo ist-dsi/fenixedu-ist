@@ -18,6 +18,9 @@
  */
 package pt.ist.fenixedu.teacher.ui.struts.action.credits;
 
+import java.io.IOException;
+
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -26,23 +29,23 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Teacher;
+import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
-import org.fenixedu.bennu.struts.annotations.Forward;
-import org.fenixedu.bennu.struts.annotations.Forwards;
+import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.struts.annotations.Mapping;
 
 import pt.ist.fenixedu.teacher.domain.credits.AnnualTeachingCredits;
 import pt.ist.fenixedu.teacher.domain.credits.util.AnnualTeachingCreditsBean;
 
 @Mapping(path = "/annualTeachingCreditsDocument", functionality = ViewTeacherCreditsDA.class)
-@Forwards(@Forward(name = "showAnnualTeacherCreditsDocument", path = "/credits/showAnnualTeacherCreditsDocument.jsp"))
 public class AnnualTeacherCreditsDocumentsDA extends FenixDispatchAction {
 
     public ActionForward getAnnualTeachingCreditsPdf(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-            HttpServletResponse response) {
+            HttpServletResponse response) throws IOException {
 
-        Teacher teacher = (Teacher) request.getAttribute("teacher");
-        ExecutionYear executionYear = (ExecutionYear) request.getAttribute("executionYear");
+        Teacher teacher = getDomainObject(request, "teacherOid");
+        ExecutionYear executionYear = getDomainObject(request, "executionYearOid");
 
         AnnualTeachingCreditsBean annualTeachingCreditsBean = null;
         AnnualTeachingCredits annualTeachingCredits = AnnualTeachingCredits.readByYearAndTeacher(executionYear, teacher);
@@ -51,8 +54,20 @@ public class AnnualTeacherCreditsDocumentsDA extends FenixDispatchAction {
         } else {
             annualTeachingCreditsBean = new AnnualTeachingCreditsBean(executionYear, teacher);
         }
-        request.setAttribute("annualTeachingCreditsBean", annualTeachingCreditsBean);
-        return mapping.findForward("showAnnualTeacherCreditsDocument");
+        User user = Authenticate.getUser();
+        boolean withConfidencialInformation =
+                (RoleType.SCIENTIFIC_COUNCIL.isMember(user) || teacher.getPerson().getUser().equals(user));
+        byte[] data = annualTeachingCreditsBean.getAnnualTeacherCreditsDocument(withConfidencialInformation);
+        response.setContentType("application/pdf");
+        response.setHeader("Content-disposition",
+                "attachment; filename=" + teacher.getTeacherId() + "_" + executionYear.getName() + ".pdf");
+        response.setContentLength(data.length);
+        ServletOutputStream writer = response.getOutputStream();
+        writer.write(data);
+        writer.flush();
+        writer.close();
+        response.flushBuffer();
+        return null;
     }
 
 }

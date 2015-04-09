@@ -57,6 +57,11 @@
             <artifactId>fenixedu-academic</artifactId>
         </dependency>
         <dependency>
+            <groupId>pt.ist</groupId>
+            <artifactId>fenixedu-ist-teacher-credits</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>net.sf.jasperreports</groupId>
             <artifactId>jasperreports</artifactId>
         </dependency>
