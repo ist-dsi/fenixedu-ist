@@ -59,7 +59,7 @@ import pt.ist.fenixedu.parking.domain.ParkingParty;
 public class ExportCarParkUsers extends CustomTask {
 
     private static final String EMAIL_ADDRESSES_TO_SEND_DATA =
-            "arcodocego@empark.pt, mamede@empark.pt, aneves@empark.es, luis.cruz@tecnico.pt";
+            "arcodocego@empark.pt, mamede@empark.pt, aneves@empark.es, luis.cruz@tecnico.pt, lena@tecnico.ulisboa.pt";
 
     @Override
     public void runTask() throws Exception {
