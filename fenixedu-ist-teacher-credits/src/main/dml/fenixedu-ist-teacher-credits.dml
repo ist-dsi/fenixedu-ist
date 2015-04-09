@@ -117,6 +117,12 @@ class reports.TeacherCreditsReportFile extends .org.fenixedu.academic.domain.rep
 class credits.CreditsPersonFunctionsSharedQueueJob extends .org.fenixedu.academic.domain.QueueJob {
 }
 
+class credits.CalculateCreditsQueueJob extends .org.fenixedu.academic.domain.QueueJob {
+}
+
+class credits.CloseCreditsQueueJob extends .org.fenixedu.academic.domain.QueueJob {
+}
+
 class credits.AnnualTeachingCredits  {
     BigDecimal teachingCredits;
     BigDecimal masterDegreeThesesCredits;
@@ -377,6 +383,22 @@ relation CreditPersonFunctionsSharedQueueJobExecutionSemester {
         multiplicity *;
     }
 }
+
+
+relation CalculateCreditsQueueJobExecutionSemester {
+    .org.fenixedu.academic.domain.ExecutionYear playsRole executionYear;
+    credits.CalculateCreditsQueueJob playsRole calculateCreditsQueueJob{
+        multiplicity *;
+    }
+}
+
+relation CloseCreditsQueueJobExecutionSemester {
+    .org.fenixedu.academic.domain.ExecutionYear playsRole executionYear;
+    credits.CloseCreditsQueueJob playsRole closeCreditsQueueJob{
+        multiplicity *;
+    }
+}
+
 
 relation RootDomainObjectTeacherCreditsState {
     .org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject;

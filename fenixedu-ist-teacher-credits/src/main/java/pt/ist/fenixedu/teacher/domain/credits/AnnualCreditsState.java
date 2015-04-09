@@ -18,10 +18,18 @@
  */
 package pt.ist.fenixedu.teacher.domain.credits;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.Teacher;
+import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.bennu.core.domain.Bennu;
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
+import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalData;
 import pt.ist.fenixframework.Atomic;
 
 public class AnnualCreditsState extends AnnualCreditsState_Base {
@@ -33,6 +41,7 @@ public class AnnualCreditsState extends AnnualCreditsState_Base {
         setIsOrientationsCalculated(false);
         setIsFinalCreditsCalculated(false);
         setIsCreditsClosed(false);
+        setCreationDate(new DateTime());
         setRootDomainObject(Bennu.getInstance());
     }
 
@@ -45,4 +54,56 @@ public class AnnualCreditsState extends AnnualCreditsState_Base {
         return annualCreditsState;
     }
 
+    @Atomic
+    public static void closeAnnualCredits(ExecutionYear executionYear) {
+        AnnualCreditsState annualCreditsState = getAnnualCreditsState(executionYear);
+        if (!annualCreditsState.getIsCreditsClosed()) {
+            if (!annualCreditsState.getIsFinalCreditsCalculated()) {
+                calculateAnnualCredits(executionYear);
+            }
+            annualCreditsState.setIsCreditsClosed(true);
+        }
+    }
+
+    @Atomic
+    public static void calculateAnnualCredits(ExecutionYear executionYear) {
+        AnnualCreditsState annualCreditsState = getAnnualCreditsState(executionYear);
+        if (!annualCreditsState.getIsCreditsClosed()) {
+            Set<Teacher> teachers = annualCreditsState.getThisYearTeachers();
+            for (Teacher teacher : teachers) {
+                AnnualTeachingCredits annualTeachingCredits = AnnualTeachingCredits.readByYearAndTeacher(executionYear, teacher);
+                if (annualTeachingCredits == null) {
+                    annualTeachingCredits = new AnnualTeachingCredits(teacher, annualCreditsState);
+                }
+
+                annualTeachingCredits.calculateCredits();
+            }
+            annualCreditsState.setIsFinalCreditsCalculated(true);
+        }
+    }
+
+    private Set<Teacher> getThisYearTeachers() {
+        Set<Teacher> teachers = new HashSet<Teacher>();
+        Set<Teacher> allTeachers = Bennu.getInstance().getTeachersSet();
+        for (ExecutionSemester executionSemester : getExecutionYear().getExecutionPeriodsSet()) {
+            for (Teacher teacher : allTeachers) {
+                boolean isContractedTeacher = PersonProfessionalData.isTeacherActiveForSemester(teacher, executionSemester);
+                if (isContractedTeacher || teacher.hasTeacherAuthorization(executionSemester.getAcademicInterval())) {
+                    teachers.add(teacher);
+                }
+            }
+        }
+        return teachers;
+    }
+
+    @Override
+    public void setFinalCalculationDate(LocalDate finalCalculationDate) {
+        if (finalCalculationDate != null && finalCalculationDate.isBefore(new LocalDate())) {
+            throw new DomainException("renderers.validator.dateTime.beforeNow");
+        }
+        if (finalCalculationDate == null || !finalCalculationDate.equals(getFinalCalculationDate())) {
+            setIsFinalCreditsCalculated(false);
+            super.setFinalCalculationDate(finalCalculationDate);
+        }
+    }
 }
