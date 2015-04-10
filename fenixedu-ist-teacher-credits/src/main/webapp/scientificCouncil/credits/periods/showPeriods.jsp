@@ -40,6 +40,7 @@
 	</html:messages>
 	
 	<logic:notEmpty name="teacherCreditsBean">
+		<bean:define id="closed" name="teacherCreditsBean" property="annualCreditsState.isCreditsClosed"/>
 		
 		<fr:form action="/defineCreditsPeriods.do">
 			<fr:edit name="teacherCreditsBean" id="teacherCreditsBeanID">
@@ -56,17 +57,6 @@
 					<fr:property name="columnClasses" value=",,tdclear"/>			
 				</fr:layout>			
 			</fr:edit>
-			<logic:present role="role(MANAGER)">
-				<bean:define id="executionYearOid" name="teacherCreditsBean" property="executionPeriod.executionYear.externalId"/>
-				<logic:equal name="teacherCreditsBean" property="executionPeriod.executionYear.annualCreditsState.isCreditsClosed" value="false">
-					<logic:equal name="teacherCreditsBean" property="executionPeriod.executionYear.annualCreditsState.isFinalCreditsCalculated" value="true">
-						<p><html:link page='<%="/annualTeachingCreditsDocument.do?method=getAnnualTeachingCreditsPdf&executionYearOid=" + executionYearOid %>'>
-							<bean:message key="link.teacherCredits.close"/>
-						</html:link></p>
-						<bean:message key="label.teacherCredits.close.message"/>
-					</logic:equal>
-				</logic:equal>
-			</logic:present>
 		</fr:form>
 		<h3 class="mtop15 mbottom05"><bean:message key="label.teacher"/></h3>
 		<fr:view name="teacherCreditsBean" layout="tabular">
@@ -86,9 +76,11 @@
 				<fr:property name="classes" value="tstyle2 thleft thlight mtop05"/>
 			</fr:layout>
 		</fr:view>
-		<html:link page="/defineCreditsPeriods.do?method=prepareEditTeacherCreditsPeriod" paramName="teacherCreditsBean" paramProperty="executionPeriod.externalId" paramId="executionPeriodId">
-			<bean:message key="link.change" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/>
-		</html:link>
+		<logic:equal name="closed" value="false">
+			<html:link page="/defineCreditsPeriods.do?method=prepareEditTeacherCreditsPeriod" paramName="teacherCreditsBean" paramProperty="executionPeriod.externalId" paramId="executionPeriodId">
+				<bean:message key="link.change" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/>
+			</html:link>
+		</logic:equal>
 		
 		<h3 class="mtop15 mbottom05"><bean:message key="label.departmentAdmOffice" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/></h3>
 		<fr:view name="teacherCreditsBean" layout="tabular">
@@ -108,9 +100,11 @@
 				<fr:property name="classes" value="tstyle2 thleft thlight mtop05"/>
 			</fr:layout>
 		</fr:view>
-		<html:link page="/defineCreditsPeriods.do?method=prepareEditDepartmentAdmOfficeCreditsPeriod" paramName="teacherCreditsBean" paramProperty="executionPeriod.externalId" paramId="executionPeriodId">
-			<bean:message key="link.change" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/>
-		</html:link>			
+		<logic:equal name="closed" value="false">
+			<html:link page="/defineCreditsPeriods.do?method=prepareEditDepartmentAdmOfficeCreditsPeriod" paramName="teacherCreditsBean" paramProperty="executionPeriod.externalId" paramId="executionPeriodId">
+				<bean:message key="link.change" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/>
+			</html:link>			
+		</logic:equal>
 		
 		<logic:present name="editInterval">
 			<bean:define id="editInterval" name="editInterval" />
@@ -118,6 +112,8 @@
 		<logic:notPresent name="editInterval">
 			<bean:define id="editInterval" value="" />
 		</logic:notPresent>
+		
+		
 		
 		<h3 class="mtop15 mbottom05">Período para definir créditos unitários (ck) para as UC's partilhadas</h3>
 		<bean:define id="readOnly" value="true"/>
@@ -139,12 +135,14 @@
 				<fr:destination name="invalid" path="/defineCreditsPeriods.do?method=showPeriods"/>
 				<fr:destination name="cancel" path="/defineCreditsPeriods.do?method=showPeriods"/>
 			</fr:edit>
-			<logic:equal name="editInterval" value="sharedUnitCredits">
-				<html:submit bundle="HTMLALT_RESOURCES" altKey="submit.submit" styleClass="inputbutton"><bean:message key="link.change" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/></html:submit>
+			<logic:equal name="closed" value="false">
+				<logic:equal name="editInterval" value="sharedUnitCredits">
+					<html:submit bundle="HTMLALT_RESOURCES" altKey="submit.submit" styleClass="inputbutton"><bean:message key="link.change" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/></html:submit>
+				</logic:equal>
+				<logic:notEqual name="editInterval" value="sharedUnitCredits">
+					<a href="#" onclick="javascript:document.getElementById('sharedUnitCreditsForm').submit();"><bean:message key="link.change" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/></a>
+				</logic:notEqual>
 			</logic:equal>
-			<logic:notEqual name="editInterval" value="sharedUnitCredits">
-				<a href="#" onclick="javascript:document.getElementById('sharedUnitCreditsForm').submit();"><bean:message key="link.change" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/></a>
-			</logic:notEqual>
 		</fr:form>
 
 		<h3 class="mtop15 mbottom05">Período para definir créditos unitários (ck) para as restantes UC's</h3>		
@@ -167,20 +165,26 @@
 				<fr:destination name="invalid" path="/defineCreditsPeriods.do?method=showPeriods"/>
 				<fr:destination name="cancel" path="/defineCreditsPeriods.do?method=showPeriods"/>
 			</fr:edit>
-			<logic:equal name="editInterval" value="unitCredits">
-				<html:submit bundle="HTMLALT_RESOURCES" altKey="submit.submit" styleClass="inputbutton"><bean:message key="link.change" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/></html:submit>
+			<logic:equal name="closed" value="false">
+				<logic:equal name="editInterval" value="unitCredits">
+					<html:submit bundle="HTMLALT_RESOURCES" altKey="submit.submit" styleClass="inputbutton"><bean:message key="link.change" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/></html:submit>
+				</logic:equal>
+				<logic:notEqual name="editInterval" value="unitCredits">
+					<a href="#" onclick="javascript:document.getElementById('unitCreditsForm').submit();"><bean:message key="link.change" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/></a>
+				</logic:notEqual>
 			</logic:equal>
-			<logic:notEqual name="editInterval" value="unitCredits">
-				<a href="#" onclick="javascript:document.getElementById('unitCreditsForm').submit();"><bean:message key="link.change" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/></a>
-			</logic:notEqual>
 		</fr:form>
 			
 		<h3 class="mtop15 mbottom05">Outras datas</h3>
-		<fr:edit name="teacherCreditsBean" property="annualCreditsState">
+		<fr:edit id="annualCreditsState" name="teacherCreditsBean" property="annualCreditsState">
 			<fr:schema bundle="TEACHER_CREDITS_SHEET_RESOURCES" type="pt.ist.fenixedu.teacher.domain.credits.AnnualCreditsState">
-				<fr:slot name="orientationsCalculationDate" layout="null-as-label"/>
-				<fr:slot name="finalCalculationDate" layout="null-as-label"/>
-				<fr:slot name="closeCreditsDate" layout="null-as-label"/>
+				<fr:slot name="orientationsCalculationDate" layout="null-as-label" readOnly="true"/>
+				<fr:slot name="finalCalculationDate" layout="null-as-label" readOnly="<%= Boolean.valueOf(closed.toString())%>"/>
+				<fr:slot name="closeCreditsDate" layout="null-as-label" readOnly="<%= Boolean.valueOf(closed.toString())%>"/>
+				<logic:present role="role(MANAGER)">
+					<fr:slot name="isFinalCreditsCalculated" layout="null-as-label" readOnly="true"/>
+					<fr:slot name="isCreditsClosed" layout="null-as-label" readOnly="true"/>
+				</logic:present>
 			</fr:schema>
 			<fr:layout name="tabular">
 				<fr:property name="classes" value="tstyle2 thleft thlight mtop05"/>
