@@ -152,7 +152,7 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
                                         .stream()
                                         .filter(c -> partOf(enrolment.getCurricularCourse().getAssociatedExecutionCoursesSet(), c))
                                         .filter(StudentThesisCandidacy::getAcceptedByAdvisor)
-                                        .min(StudentThesisCandidacy.COMPARATOR_BY_PREFERENCE_NUMBER);
+                                        .min(StudentThesisCandidacy.COMPARATOR_BY_CANDIDACY_PERIOD_AND_PREFERENCE_NUMBER);
 
                         if (hit.isPresent()) {
                             StudentThesisCandidacy candidacy = hit.get();
