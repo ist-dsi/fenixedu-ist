@@ -20,7 +20,7 @@ package pt.ist.fenixedu.integration.ui.struts.action.academicAdministration;
 
 import org.fenixedu.bennu.struts.portal.StrutsApplication;
 
-@StrutsApplication(bundle = "FenixEduIstIntegrationResources", path = "ist-specific", titleKey = "label.fenix.ist.academic",
+@StrutsApplication(bundle = "FenixeduIstIntegrationResources", path = "ist-specific", titleKey = "label.fenix.ist.academic",
         accessGroup = "#managers", hint = "Fenix IST")
 public class FenixISTAcademicApp {
 
