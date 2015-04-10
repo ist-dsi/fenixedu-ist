@@ -1,11 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>pt.ist</groupId>
         <artifactId>fenixedu-ist</artifactId>
-        <version>6.1.0-SNAPSHOT</version>
+        <version>6.1.0</version>
     </parent>
 
     <artifactId>fenixedu-ist-cms-components</artifactId>
@@ -24,12 +23,8 @@
                         <phase>prepare-package</phase>
                         <configuration>
                             <target>
-                                <zip
-                                    destfile="${project.build.directory}/classes/META-INF/resources/WEB-INF/fenixedu-homepages-theme.zip"
-                                    basedir="${project.basedir}/src/main/webapp/themes/fenixedu-homepages-theme"></zip>
-                                <zip
-                                    destfile="${project.build.directory}/classes/META-INF/resources/WEB-INF/fenixedu-units-theme.zip"
-                                    basedir="${project.basedir}/src/main/webapp/themes/fenixedu-units-theme"></zip>
+                                <zip destfile="${project.build.directory}/classes/META-INF/resources/WEB-INF/fenixedu-homepages-theme.zip" basedir="${project.basedir}/src/main/webapp/themes/fenixedu-homepages-theme" />
+                                <zip destfile="${project.build.directory}/classes/META-INF/resources/WEB-INF/fenixedu-units-theme.zip" basedir="${project.basedir}/src/main/webapp/themes/fenixedu-units-theme" />
                             </target>
                         </configuration>
                         <goals>
