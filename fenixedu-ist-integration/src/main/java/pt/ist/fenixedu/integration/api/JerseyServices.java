@@ -50,7 +50,6 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Photograph;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
-import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.degreeStructure.CycleType;
 import org.fenixedu.academic.domain.organizationalStructure.Party;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
@@ -65,6 +64,7 @@ import org.fenixedu.academic.domain.studentCurriculum.CycleCurriculumGroup;
 import org.fenixedu.academic.domain.thesis.Thesis;
 import org.fenixedu.academic.dto.student.RegistrationConclusionBean;
 import org.fenixedu.academic.util.ContentType;
+import org.fenixedu.academic.util.MultiLanguageString;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.UserProfile;
@@ -80,7 +80,6 @@ import pt.ist.fenixedu.contracts.domain.organizationalStructure.ResearchUnit;
 import pt.ist.fenixedu.integration.util.JsonUtils;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
-import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
@@ -297,7 +296,7 @@ public class JerseyServices {
         Set<Registration> registrations = new HashSet<Registration>();
         LocalDate today = new LocalDate();
         for (Registration registration : student.getRegistrationsSet()) {
-            if (registration.isBolonha() && !registration.getDegreeType().equals(DegreeType.EMPTY)) {
+            if (registration.isBolonha() && !registration.getDegreeType().isEmpty()) {
                 if (registration.hasAnyActiveState(currentExecutionYear)) {
                     registrations.add(registration);
                 } else {
@@ -322,7 +321,7 @@ public class JerseyServices {
         final Student student = Person.readPersonByUsername(username).getStudent();
         Set<Registration> registrations = new HashSet<Registration>();
         for (Registration registration : student.getRegistrationsSet()) {
-            if (registration.isBolonha() && !registration.getDegreeType().equals(DegreeType.EMPTY)) {
+            if (registration.isBolonha() && !registration.getDegreeType().isEmpty()) {
                 RegistrationConclusionBean registrationConclusionBean = new RegistrationConclusionBean(registration);
                 if (registration.isActive() || registrationConclusionBean.isConcluded()) {
                     registrations.add(registration);
@@ -379,7 +378,7 @@ public class JerseyServices {
         LocalDate today = new LocalDate();
         for (Registration registration : Bennu.getInstance().getRegistrationsSet()) {
             if (registration.hasAnyActiveState(currentExecutionYear) && registration.isBolonha()
-                    && !registration.getDegreeType().equals(DegreeType.EMPTY)) {
+                    && !registration.getDegreeType().isEmpty()) {
                 registrations.add(registration);
             }
         }
@@ -442,7 +441,8 @@ public class JerseyServices {
     public static String readBolonhaDegrees() {
         JsonArray infos = new JsonArray();
         for (Degree degree : Degree.readBolonhaDegrees()) {
-            if (degree.isBolonhaMasterOrDegree()) {
+            if (degree.getDegreeType().isBolonhaDegree() || degree.getDegreeType().isBolonhaMasterDegree()
+                    || degree.getDegreeType().isIntegratedMasterDegree()) {
                 JsonObject degreeInfo = new JsonObject();
                 degreeInfo.addProperty("degreeOid", degree.getExternalId());
                 degreeInfo.addProperty("name", degree.getPresentationName());

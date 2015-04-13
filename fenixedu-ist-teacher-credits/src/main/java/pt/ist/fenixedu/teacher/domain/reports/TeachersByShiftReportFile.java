@@ -21,11 +21,11 @@ package pt.ist.fenixedu.teacher.domain.reports;
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.Shift;
+import org.fenixedu.commons.spreadsheet.Spreadsheet;
+import org.fenixedu.commons.spreadsheet.Spreadsheet.Row;
 
 import pt.ist.fenixedu.teacher.domain.teacher.DegreeTeachingService;
 import pt.ist.fenixedu.teacher.domain.teacher.TeacherService;
-import pt.utl.ist.fenix.tools.util.excel.Spreadsheet;
-import pt.utl.ist.fenix.tools.util.excel.Spreadsheet.Row;
 
 public class TeachersByShiftReportFile extends TeachersByShiftReportFile_Base {
 

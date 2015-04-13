@@ -26,7 +26,6 @@ import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.MasterDegreeCandidate;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
-import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.dto.InfoCandidateRegistration;
 import org.fenixedu.academic.dto.InfoEnrolment;
@@ -74,7 +73,7 @@ public class GetCandidateRegistrationInformation {
 
     private static Registration readStudentByDegreeType(Person person) {
         for (final Registration registration : person.getStudents()) {
-            if (registration.getDegreeType().equals(DegreeType.MASTER_DEGREE)) {
+            if (registration.getDegreeType().isPreBolonhaMasterDegree()) {
                 return registration;
             }
         }

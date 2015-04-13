@@ -114,7 +114,7 @@ public class SantanderBatchFillerWorker {
          * 1. Teacher
          * 2. Researcher
          * 3. Employee
-         * 4. GrantOwner 
+         * 4. GrantOwner
          * 5. Student
          */
         String line = null;
@@ -318,9 +318,8 @@ public class SantanderBatchFillerWorker {
             }
             for (final StudentCurricularPlan studentCurricularPlan : registration.getStudentCurricularPlansSet()) {
                 if (studentCurricularPlan.isActive()) {
-                    if (degreeType == DegreeType.BOLONHA_DEGREE || degreeType == DegreeType.BOLONHA_MASTER_DEGREE
-                            || degreeType == DegreeType.BOLONHA_INTEGRATED_MASTER_DEGREE
-                            || degreeType == DegreeType.BOLONHA_ADVANCED_SPECIALIZATION_DIPLOMA) {
+                    if (degreeType.isBolonhaDegree() || degreeType.isBolonhaMasterDegree()
+                            || degreeType.isIntegratedMasterDegree() || degreeType.isAdvancedSpecializationDiploma()) {
                         studentCurricularPlans.add(studentCurricularPlan);
                     } else {
                         final RegistrationState registrationState = registration.getActiveState();
@@ -578,8 +577,7 @@ public class SantanderBatchFillerWorker {
     private Degree getDegree(final Student student) {
         Degree degree = null;
         for (final Registration registration : student.getRegistrationsSet()) {
-            if (registration.isActive()
-                    && (degree == null || degree.getDegreeType().ordinal() < registration.getDegreeType().ordinal())) {
+            if (registration.isActive() && (degree == null || degree.getDegreeType().compareTo(registration.getDegreeType()) < 0)) {
                 degree = registration.getDegree();
             }
         }

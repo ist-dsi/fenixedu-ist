@@ -27,6 +27,7 @@ import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.person.IDDocumentType;
 import org.fenixedu.academic.domain.person.MaritalStatus;
+import org.fenixedu.academic.util.MultiLanguageString;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.commons.StringNormalizer;
 import org.slf4j.Logger;
@@ -42,7 +43,6 @@ import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalR
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalRelation;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ServiceExemption;
 import pt.ist.fenixedu.contracts.domain.util.CategoryType;
-import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;
 
 class GiafMetadata {
     private Map<Integer, Employee> employees = null;

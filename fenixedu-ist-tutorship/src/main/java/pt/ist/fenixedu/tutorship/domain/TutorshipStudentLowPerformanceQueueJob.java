@@ -28,18 +28,17 @@ import java.util.List;
 
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.QueueJobResult;
-import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.domain.student.registrationStates.RegistrationState;
 import org.fenixedu.academic.domain.student.registrationStates.RegistrationStateType;
+import org.fenixedu.commons.spreadsheet.Spreadsheet;
+import org.fenixedu.commons.spreadsheet.Spreadsheet.Row;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixedu.tutorship.ui.Action.pedagogicalCouncil.studentLowPerformance.AbstractPrescriptionRule;
 import pt.ist.fenixedu.tutorship.ui.Action.pedagogicalCouncil.studentLowPerformance.StudentLowPerformanceBean;
 import pt.ist.fenixframework.Atomic;
-import pt.utl.ist.fenix.tools.util.excel.Spreadsheet;
-import pt.utl.ist.fenix.tools.util.excel.Spreadsheet.Row;
 
 public class TutorshipStudentLowPerformanceQueueJob extends TutorshipStudentLowPerformanceQueueJob_Base {
 
@@ -94,8 +93,8 @@ public class TutorshipStudentLowPerformanceQueueJob extends TutorshipStudentLowP
 
                 else if (!registration.isBolonha() && isValidSourceLink(registration)) {
                     for (Registration destinationRegistration : registration.getDestinyRegistrationsSet()) {
-                        if ((destinationRegistration.getDegreeType() != DegreeType.BOLONHA_DEGREE)
-                                && (destinationRegistration.getDegreeType() != DegreeType.BOLONHA_INTEGRATED_MASTER_DEGREE)) {
+                        if ((!destinationRegistration.getDegreeType().isBolonhaDegree())
+                                && (!destinationRegistration.getDegreeType().isIntegratedMasterDegree())) {
                             continue;
                         }
                         if (!isValidRegistration(destinationRegistration)) {
@@ -201,7 +200,7 @@ public class TutorshipStudentLowPerformanceQueueJob extends TutorshipStudentLowP
             row.setCell(studentLowPerformanceBean.getStudent().getName());
             row.setCell(studentLowPerformanceBean.getStudent().getNumber().toString());
             row.setCell(studentLowPerformanceBean.getDegree().getName());
-            row.setCell(studentLowPerformanceBean.getDegree().getDegreeType().getLocalizedName());
+            row.setCell(studentLowPerformanceBean.getDegree().getDegreeType().getName().getContent());
             row.setCell(studentLowPerformanceBean.getSumEcts().toString());
             row.setCell(studentLowPerformanceBean.getRegime());
             row.setCell(studentLowPerformanceBean.getEmail());
@@ -222,8 +221,7 @@ public class TutorshipStudentLowPerformanceQueueJob extends TutorshipStudentLowP
 
     // Historic Student
     protected static List<Registration> getFullRegistrationPath(final Registration current) {
-        if (current.getDegreeType() == DegreeType.BOLONHA_DEGREE
-                || current.getDegreeType() == DegreeType.BOLONHA_INTEGRATED_MASTER_DEGREE) {
+        if (current.getDegreeType().isBolonhaDegree() || current.getDegreeType().isIntegratedMasterDegree()) {
             List<Registration> path = new ArrayList<Registration>();
             path.add(current);
             Registration source;

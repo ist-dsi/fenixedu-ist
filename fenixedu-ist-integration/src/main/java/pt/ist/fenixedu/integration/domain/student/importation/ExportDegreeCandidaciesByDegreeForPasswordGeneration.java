@@ -22,7 +22,6 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -52,8 +51,8 @@ import pt.ist.fenixedu.contracts.domain.accessControl.ActiveEmployees;
 public class ExportDegreeCandidaciesByDegreeForPasswordGeneration extends
         ExportDegreeCandidaciesByDegreeForPasswordGeneration_Base {
 
-    private static final List<DegreeType> ACCEPTED_DEGREE_TYPES = Arrays.asList(DegreeType.BOLONHA_DEGREE,
-            DegreeType.BOLONHA_INTEGRATED_MASTER_DEGREE);
+    private static final java.util.function.Predicate<DegreeType> ACCEPTED_DEGREE_TYPES = DegreeType.oneOf(
+            DegreeType::isBolonhaDegree, DegreeType::isIntegratedMasterDegree);
 
     public ExportDegreeCandidaciesByDegreeForPasswordGeneration() {
         super();
@@ -139,7 +138,7 @@ public class ExportDegreeCandidaciesByDegreeForPasswordGeneration extends
     }
 
     private boolean isAcceptedDegreeType(final ExecutionDegree executionDegree) {
-        return ACCEPTED_DEGREE_TYPES.contains(executionDegree.getDegree().getDegreeType());
+        return ACCEPTED_DEGREE_TYPES.test(executionDegree.getDegree().getDegreeType());
     }
 
     public static boolean canRequestJob() {

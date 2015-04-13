@@ -79,6 +79,6 @@ public class InvertFirstYearShiftsCapacity extends CustomTask {
     }
 
     private List<Degree> readDegrees() {
-        return Degree.readAllByDegreeType(DegreeType.BOLONHA_DEGREE, DegreeType.BOLONHA_INTEGRATED_MASTER_DEGREE);
+        return Degree.readAllMatching(DegreeType.oneOf(DegreeType::isBolonhaDegree, DegreeType::isIntegratedMasterDegree));
     }
 }

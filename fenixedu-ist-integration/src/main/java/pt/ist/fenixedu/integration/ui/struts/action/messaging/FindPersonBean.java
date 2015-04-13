@@ -21,6 +21,7 @@ package pt.ist.fenixedu.integration.ui.struts.action.messaging;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.Department;
@@ -105,7 +106,7 @@ public class FindPersonBean implements Serializable {
     }
 
     public List<Degree> getPossibleDegrees() {
-        return Collections.unmodifiableList(Degree.readAllByDegreeType(degreeType));
+        return Collections.unmodifiableList(Degree.readAllMatching(Predicate.isEqual(degreeType)));
     }
 
     public String getDepartmentExternalId() {

@@ -27,8 +27,6 @@ import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
-import org.fenixedu.academic.util.Bundle;
-import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import pt.ist.fenixedu.tutorship.domain.Tutorship;
 
@@ -61,7 +59,7 @@ public abstract class TutorshipManagement {
 
         if (!verifyIfBelongsToDegree(registration, degreeCurricularPlan.getDegree())) {
             // student doesn't belong to this degree
-            String degreeType = BundleUtil.getString(Bundle.ENUMERATION, executionDegree.getDegree().getDegreeType().getName());
+            String degreeType = executionDegree.getDegree().getDegreeType().getName().getContent();
 
             throw new FenixServiceException("error.tutor.studentNoDegree", new String[] { studentNumber.toString(), degreeType,
                     executionDegree.getDegree().getNameFor(registration.getStartExecutionYear()).getContent() });

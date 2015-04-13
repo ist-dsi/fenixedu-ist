@@ -23,8 +23,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 
+import org.fenixedu.academic.util.FileUtils;
+
 import pt.ist.fenixframework.Atomic;
-import pt.utl.ist.fenix.tools.util.FileUtils;
 
 public class FileUploadBean implements Serializable {
 

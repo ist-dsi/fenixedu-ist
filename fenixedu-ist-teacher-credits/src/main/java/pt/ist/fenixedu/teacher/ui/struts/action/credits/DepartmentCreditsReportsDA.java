@@ -43,6 +43,7 @@ import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
 import org.fenixedu.bennu.struts.portal.EntryPoint;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
+import org.fenixedu.commons.spreadsheet.StyledExcelSpreadsheet;
 
 import pt.ist.fenixedu.teacher.domain.credits.AnnualCreditsState;
 import pt.ist.fenixedu.teacher.domain.credits.AnnualTeachingCredits;
@@ -51,7 +52,6 @@ import pt.ist.fenixedu.teacher.domain.teacher.DegreeTeachingServiceCorrection;
 import pt.ist.fenixedu.teacher.domain.teacher.OtherService;
 import pt.ist.fenixedu.teacher.domain.teacher.TeacherService;
 import pt.ist.fenixedu.teacher.ui.struts.action.DepartmentCreditsManagerApp;
-import pt.utl.ist.fenix.tools.util.excel.StyledExcelSpreadsheet;
 
 @StrutsFunctionality(app = DepartmentCreditsManagerApp.class, path = "export-department-credits",
         titleKey = "label.department.credits")

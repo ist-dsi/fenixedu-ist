@@ -145,7 +145,7 @@ public class DelegateBean {
         if (curricularYear != null) {
             return delegate + " " + of + " " + curricularYear.getYear() + " " + year;
         }
-        return delegate + " " + of + " " + degree.getDegreeType().getLocalizedName();
+        return delegate + " " + of + " " + degree.getDegreeType().getName().getContent();
     }
 
     public void setDelegateTitle(String delegateType) {

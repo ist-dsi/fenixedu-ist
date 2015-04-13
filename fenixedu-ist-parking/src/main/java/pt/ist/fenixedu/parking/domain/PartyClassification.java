@@ -18,6 +18,8 @@
  */
 package pt.ist.fenixedu.parking.domain;
 
+import java.util.function.Predicate;
+
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Teacher;
@@ -31,12 +33,34 @@ import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalC
 import pt.ist.fenixedu.contracts.domain.util.CategoryType;
 
 public enum PartyClassification {
-    TEACHER, EMPLOYEE, RESEARCHER, GRANT_OWNER, MASTER_DEGREE, DEGREE, BOLONHA_SPECIALIZATION_DEGREE,
-    BOLONHA_ADVANCED_FORMATION_DIPLOMA, BOLONHA_MASTER_DEGREE, BOLONHA_INTEGRATED_MASTER_DEGREE,
-    BOLONHA_ADVANCED_SPECIALIZATION_DIPLOMA, BOLONHA_DEGREE, PERSON, UNIT;
+    TEACHER, EMPLOYEE, RESEARCHER, GRANT_OWNER, MASTER_DEGREE(DegreeType::isPreBolonhaMasterDegree), DEGREE(
+            DegreeType::isPreBolonhaDegree), BOLONHA_SPECIALIZATION_DEGREE(DegreeType::isSpecializationDegree),
+    BOLONHA_ADVANCED_FORMATION_DIPLOMA(DegreeType::isAdvancedFormationDiploma), BOLONHA_MASTER_DEGREE(
+            DegreeType::isBolonhaMasterDegree), BOLONHA_INTEGRATED_MASTER_DEGREE(DegreeType::isIntegratedMasterDegree),
+    BOLONHA_ADVANCED_SPECIALIZATION_DIPLOMA(DegreeType::isAdvancedSpecializationDiploma), BOLONHA_DEGREE(
+            DegreeType::isBolonhaDegree), PERSON, UNIT;
+
+    private final Predicate<DegreeType> mapping;
+
+    private PartyClassification() {
+        this.mapping = type -> false;
+    }
+
+    private PartyClassification(Predicate<DegreeType> mapping) {
+        this.mapping = mapping;
+    }
+
+    public static DegreeType degreeTypeFor(PartyClassification classification) {
+        return DegreeType.matching(classification.mapping).orElse(null);
+    }
 
     public static PartyClassification getClassificationByDegreeType(DegreeType degreeType) {
-        return valueOf(degreeType.name());
+        for (PartyClassification classification : values()) {
+            if (classification.mapping.test(degreeType)) {
+                return classification;
+            }
+        }
+        return null;
     }
 
     public static PartyClassification getPartyClassification(Party party) {
@@ -71,7 +95,7 @@ public enum PartyClassification {
                 }
             }
             if (person.getStudent() != null) {
-                final DegreeType degreeType = person.getStudent().getMostSignificantDegreeType();
+                final DegreeType degreeType = ParkingParty.mostSignificantDegreeType(person.getStudent());
                 if (degreeType != null) {
                     return PartyClassification.getClassificationByDegreeType(degreeType);
                 }

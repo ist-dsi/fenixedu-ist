@@ -24,12 +24,12 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.fenixedu.academic.util.MultiLanguageString;
 import org.slf4j.Logger;
 
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ContractSituation;
 import pt.ist.fenixedu.contracts.persistenceTierOracle.Oracle.PersistentSuportGiaf;
 import pt.ist.fenixedu.contracts.tasks.giafsync.GiafSync.MetadataProcessor;
-import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;
 
 class ImportContractSituationsFromGiaf implements MetadataProcessor {
     private List<String> getServiceExemptionList() {

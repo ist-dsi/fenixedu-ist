@@ -134,7 +134,7 @@ public class StudentsPerformanceInfoBean implements Serializable {
         }
         this.degree = degree;
         this.degreeCurricularPeriod =
-                (degree != null ? (int) degree.getDegreeType().getAcademicPeriod().getWeight() : getDegreeCurricularPeriod());
+                (degree != null ? degree.getLastActiveDegreeCurricularPlan().getDurationInYears() : getDegreeCurricularPeriod());
         refreshStudentsEntryYear();
     }
 

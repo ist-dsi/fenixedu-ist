@@ -53,7 +53,7 @@ public class ReadLecturedExecutionCoursesByTeacherIDAndExecutionYearIDAndDegreeT
 
         List<ExecutionCourse> result;
 
-        if (degreeType == DegreeType.DEGREE) {
+        if (degreeType.isPreBolonhaDegree()) {
             result = filterExecutionCourses(lecturedExecutionCourses, false);
         } else {
             // master degree

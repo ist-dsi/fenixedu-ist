@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.fenixedu.academic.domain.Coordinator;
 import org.fenixedu.academic.domain.ExecutionDegree;
-import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.academic.service.services.exceptions.NotAuthorizedException;
 import org.fenixedu.academic.util.SituationName;
@@ -89,7 +88,7 @@ public class ReadCandidatesForSelectionAuthorizationFilter extends Filtro {
         }
 
         if (RoleType.MASTER_DEGREE_ADMINISTRATIVE_OFFICE.isMember(id)) {
-            if (executionDegree.getDegreeCurricularPlan().getDegree().getDegreeType().equals(DegreeType.MASTER_DEGREE)) {
+            if (executionDegree.getDegreeCurricularPlan().getDegree().getDegreeType().isPreBolonhaMasterDegree()) {
 
                 return true;
             }

@@ -66,7 +66,7 @@ public class DegreeDelegate extends DegreeDelegate_Base {
     public String getTitle() {
         String delegate = BundleUtil.getString(BUNDLE, "delegate");
         String of = BundleUtil.getString(BUNDLE, "delegate.of");
-        return delegate + " " + of + " " + getDegree().getDegreeType().getLocalizedName();
+        return delegate + " " + of + " " + getDegree().getDegreeType().getName().getContent();
     }
 
     @Override

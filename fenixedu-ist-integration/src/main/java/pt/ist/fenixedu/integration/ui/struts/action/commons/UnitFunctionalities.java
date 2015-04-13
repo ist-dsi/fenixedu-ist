@@ -33,6 +33,7 @@ import org.apache.struts.action.ActionMapping;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
+import org.fenixedu.academic.util.FileUtils;
 import org.fenixedu.bennu.struts.portal.EntryPoint;
 
 import pt.ist.fenixWebFramework.renderers.components.state.IViewState;
@@ -50,7 +51,6 @@ import pt.ist.fenixedu.integration.service.services.manager.EditUnitFile;
 import pt.ist.fenixedu.integration.ui.struts.action.research.researchUnit.PersistentGroupMembersBean;
 import pt.ist.fenixedu.integration.ui.struts.action.research.researchUnit.UnitFileBean;
 import pt.ist.fenixedu.integration.ui.struts.action.research.researchUnit.UnitFileUploadBean;
-import pt.utl.ist.fenix.tools.util.FileUtils;
 
 public abstract class UnitFunctionalities extends FenixDispatchAction {
 

@@ -22,7 +22,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -71,15 +70,6 @@ import org.joda.time.Weeks;
 import org.joda.time.YearMonthDay;
 
 public class CreateAndInitializeExecutionCourses extends CustomTask {
-
-    private static final Set<DegreeType> DEGREE_TYPES;
-    static {
-        final Set<DegreeType> degreeTypes = new HashSet<DegreeType>();
-        degreeTypes.add(DegreeType.BOLONHA_DEGREE);
-        degreeTypes.add(DegreeType.BOLONHA_INTEGRATED_MASTER_DEGREE);
-        degreeTypes.add(DegreeType.BOLONHA_MASTER_DEGREE);
-        DEGREE_TYPES = Collections.unmodifiableSet(degreeTypes);
-    }
 
     protected ExecutionSemester originExecutionSemester;
     protected ExecutionSemester destinationExecutionSemester;
@@ -701,7 +691,7 @@ public class CreateAndInitializeExecutionCourses extends CustomTask {
 
     private boolean isDegreeTypeToBeProcessed(final CurricularCourse curricularCourse) {
         final DegreeType degreeType = curricularCourse.getDegreeType();
-        return DEGREE_TYPES.contains(degreeType);
+        return degreeType.isBolonhaDegree() || degreeType.isBolonhaMasterDegree() || degreeType.isIntegratedMasterDegree();
     }
 
     protected boolean hasExecutionCourse(final CurricularCourse curricularCourse) {
@@ -751,14 +741,14 @@ public class CreateAndInitializeExecutionCourses extends CustomTask {
     protected void printReport() {
         taskLog("Processed " + processedCurricularCourses.size() + " curricular courses." + "\n");
         taskLog("Processed " + schoolClassTranslation.size() + " school classes." + "\n");
-        int[] degreeTypeCounter = new int[DegreeType.NOT_EMPTY_VALUES.size()];
+        Map<DegreeType, Integer> degreeTypeCounter = new HashMap<>();
         Map<Degree, int[]> degreeCounter = new TreeMap<Degree, int[]>(Degree.COMPARATOR_BY_NAME_AND_ID);
         for (final CurricularCourse curricularCourse : processedCurricularCourses) {
             final DegreeCurricularPlan degreeCurricularPlan = curricularCourse.getDegreeCurricularPlan();
             final Degree degree = degreeCurricularPlan.getDegree();
             final DegreeType degreeType = degree.getDegreeType();
 
-            degreeTypeCounter[degreeType.ordinal()]++;
+            degreeTypeCounter.put(degreeType, degreeTypeCounter.getOrDefault(degreeType, 0) + 1);
 
             int[] dc = degreeCounter.get(degree);
             if (dc == null) {
@@ -775,11 +765,11 @@ public class CreateAndInitializeExecutionCourses extends CustomTask {
                 taskLog("\n");
             }
         }
-        for (final DegreeType degreeType : DegreeType.NOT_EMPTY_VALUES) {
+        for (final DegreeType degreeType : DegreeType.all().filter(type -> !type.isEmpty()).collect(Collectors.toList())) {
             taskLog("   ");
-            taskLog(degreeType.getLocalizedName());
+            taskLog(degreeType.getName().getContent());
             taskLog(": ");
-            taskLog(Integer.toString(degreeTypeCounter[degreeType.ordinal()]));
+            taskLog(Integer.toString(degreeTypeCounter.getOrDefault(degreeType, 0)));
             taskLog("\n");
 
             for (final Entry<Degree, int[]> entry : degreeCounter.entrySet()) {
@@ -804,5 +794,4 @@ public class CreateAndInitializeExecutionCourses extends CustomTask {
         taskLog("Skipped4 " + countSkippedLessons4 + " lessons.\n");
         taskLog("Did not copy " + countInconsistentLessons + " inconsistent lessons.\n");
     }
-
 }

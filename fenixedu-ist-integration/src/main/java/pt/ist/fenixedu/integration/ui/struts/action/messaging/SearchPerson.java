@@ -41,6 +41,7 @@ import org.fenixedu.academic.domain.person.IDDocumentType;
 import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
+import org.fenixedu.academic.util.CollectionPager;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.commons.StringNormalizer;
 
@@ -50,7 +51,6 @@ import pt.ist.fenixedu.contracts.domain.accessControl.ActiveGrantOwner;
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveResearchers;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
-import pt.utl.ist.fenix.tools.util.CollectionPager;
 
 public class SearchPerson implements Serializable {
 
@@ -122,7 +122,7 @@ public class SearchPerson implements Serializable {
             }
 
             if (degreeTypeString != null && degreeTypeString.length() > 0) {
-                degreeType = DegreeType.valueOf(degreeTypeString);
+                degreeType = FenixFramework.getDomainObject(degreeTypeString);
             }
 
             if (!StringUtils.isEmpty(departmentId)) {

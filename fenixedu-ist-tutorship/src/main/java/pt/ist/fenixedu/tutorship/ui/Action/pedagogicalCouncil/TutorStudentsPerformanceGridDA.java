@@ -43,6 +43,9 @@ import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
 import org.fenixedu.bennu.struts.portal.EntryPoint;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
+import org.fenixedu.commons.spreadsheet.SheetData;
+import org.fenixedu.commons.spreadsheet.SpreadsheetBuilder;
+import org.fenixedu.commons.spreadsheet.WorkbookExportFormat;
 
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
 import pt.ist.fenixedu.tutorship.dto.NumberBean;
@@ -53,9 +56,6 @@ import pt.ist.fenixedu.tutorship.dto.teacher.tutor.StudentsPerformanceInfoBean;
 import pt.ist.fenixedu.tutorship.ui.TutorshipApplications.TutorshipApp;
 import pt.ist.fenixedu.tutorship.ui.Action.teacher.ViewStudentsPerformanceGridDispatchAction;
 import pt.ist.fenixframework.FenixFramework;
-import pt.utl.ist.fenix.tools.spreadsheet.SheetData;
-import pt.utl.ist.fenix.tools.spreadsheet.SpreadsheetBuilder;
-import pt.utl.ist.fenix.tools.spreadsheet.WorkbookExportFormat;
 
 @StrutsFunctionality(app = TutorshipApp.class, path = "performance-grids", titleKey = "label.attends.shifts.tutorialperformance",
         bundle = "ApplicationResources")

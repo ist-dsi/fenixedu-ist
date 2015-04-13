@@ -214,7 +214,6 @@ class RemoteSystem {
 
 class RemoteHost {
     String name;
-    Strings url;
     String username;
     String password;
     Boolean allowInvocationAccess;

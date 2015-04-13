@@ -32,9 +32,9 @@ import org.apache.struts.action.ActionMapping;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.accessControl.ActiveTeachersGroup;
-import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
 import org.fenixedu.academic.ui.struts.action.messaging.MessagingApplication.MessagingSearchApp;
+import org.fenixedu.academic.util.CollectionPager;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.struts.annotations.Forward;
@@ -49,7 +49,6 @@ import pt.ist.fenixedu.integration.ui.struts.action.messaging.FindPersonBean.Sea
 import pt.ist.fenixedu.integration.ui.struts.action.messaging.SearchPerson.SearchParameters;
 import pt.ist.fenixedu.integration.ui.struts.action.messaging.SearchPerson.SearchPersonPredicate;
 import pt.ist.fenixframework.FenixFramework;
-import pt.utl.ist.fenix.tools.util.CollectionPager;
 
 @StrutsFunctionality(app = MessagingSearchApp.class, path = "search-person", titleKey = "label.person.findPerson")
 @Forwards(@Forward(name = "findPerson", path = "/messaging/findPersonIST.jsp"))
@@ -163,7 +162,7 @@ public class FindPersonISTAction extends FenixDispatchAction {
                 bean.setDegree(FenixFramework.<Degree> getDomainObject(degreeId));
             }
             if (!StringUtils.isEmpty(degreeType)) {
-                bean.setDegreeType(DegreeType.valueOf(degreeType));
+                bean.setDegreeType(FenixFramework.getDomainObject(degreeType));
             }
             if (!StringUtils.isEmpty(departmentId)) {
                 bean.setDepartment(FenixFramework.<Department> getDomainObject(departmentId));

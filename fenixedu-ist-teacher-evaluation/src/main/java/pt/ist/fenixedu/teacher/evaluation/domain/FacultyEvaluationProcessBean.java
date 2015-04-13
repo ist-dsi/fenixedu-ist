@@ -20,11 +20,11 @@ package pt.ist.fenixedu.teacher.evaluation.domain;
 
 import java.io.Serializable;
 
+import org.fenixedu.academic.util.MultiLanguageString;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 
 import pt.ist.fenixframework.Atomic;
-import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;
 
 public class FacultyEvaluationProcessBean implements Serializable {
 

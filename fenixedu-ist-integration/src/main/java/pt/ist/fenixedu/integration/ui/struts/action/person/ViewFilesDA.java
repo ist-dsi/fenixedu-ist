@@ -38,6 +38,7 @@ import org.fenixedu.academic.domain.organizationalStructure.PedagogicalCouncilUn
 import org.fenixedu.academic.domain.organizationalStructure.ScientificCouncilUnit;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.organizationalStructure.UnitUtils;
+import org.fenixedu.academic.util.MultiLanguageString;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
@@ -47,7 +48,6 @@ import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
 
 import pt.ist.fenixedu.integration.ui.struts.action.MessagingFilesApp;
 import pt.ist.fenixedu.integration.ui.struts.action.commons.UnitFunctionalities;
-import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;
 
 @StrutsFunctionality(app = MessagingFilesApp.class, path = "view", titleKey = "label.files.view")
 @Mapping(module = "messaging", path = "/viewFiles")

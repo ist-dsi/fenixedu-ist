@@ -120,14 +120,10 @@ public class ParkingRequestSearch implements Serializable {
     private boolean satisfiedPersonClassification(ParkingRequest request) {
         final ParkingParty parkingParty = request.getParkingParty();
         if (getPartyClassification() != null) {
-            DegreeType degreeType = null;
-            try {
-                degreeType = DegreeType.valueOf(getPartyClassification().name());
-            } catch (IllegalArgumentException e) {
-            }
+            DegreeType degreeType = PartyClassification.degreeTypeFor(getPartyClassification());
             if (degreeType != null && request.getRequestedAs() != null && request.getRequestedAs().equals(RoleType.STUDENT)) {
                 final Student student = ((Person) parkingParty.getParty()).getStudent();
-                if (degreeType.equals(DegreeType.BOLONHA_ADVANCED_SPECIALIZATION_DIPLOMA)) {
+                if (degreeType.isAdvancedSpecializationDiploma()) {
                     for (PhdIndividualProgramProcess phdIndividualProgramProcess : student.getPerson()
                             .getPhdIndividualProgramProcessesSet()) {
                         if (phdIndividualProgramProcess.getActiveState().isPhdActive()) {
@@ -135,7 +131,7 @@ public class ParkingRequestSearch implements Serializable {
                         }
                     }
                 }
-                return student.getActiveRegistrationByDegreeType(degreeType) != null;
+                return student.getActiveRegistrations().stream().anyMatch(reg -> reg.getDegreeType().equals(degreeType));
             } else if (PartyClassification.getPartyClassification(parkingParty.getParty()) == getPartyClassification()) {
                 if (getPartyClassification() == PartyClassification.TEACHER) {
                     final Teacher teacher = ((Person) parkingParty.getParty()).getTeacher();

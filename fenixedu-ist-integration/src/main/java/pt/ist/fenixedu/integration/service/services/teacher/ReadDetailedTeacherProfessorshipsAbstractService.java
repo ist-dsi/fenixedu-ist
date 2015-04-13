@@ -18,7 +18,7 @@
  */
 /*
  * Created on Dec 17, 2003 by jpvl
- *  
+ * 
  */
 package pt.ist.fenixedu.integration.service.services.teacher;
 
@@ -76,7 +76,7 @@ public class ReadDetailedTeacherProfessorshipsAbstractService {
                             CurricularCourse curricularCourse = (CurricularCourse) input;
                             InfoCurricularCourse infoCurricularCourse = InfoCurricularCourse.newInfoFromDomain(curricularCourse);
                             DegreeType degreeType = curricularCourse.getDegreeCurricularPlan().getDegree().getDegreeType();
-                            if (degreeType.equals(DegreeType.DEGREE)) {
+                            if (degreeType.isPreBolonhaDegree()) {
                                 detailedProfessorship.setMasterDegreeOnly(Boolean.FALSE);
                             }
                             return infoCurricularCourse;

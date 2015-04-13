@@ -57,6 +57,8 @@ import org.fenixedu.academic.domain.student.registrationStates.RegistrationState
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.struts.annotations.Mapping;
+import org.fenixedu.commons.spreadsheet.Spreadsheet;
+import org.fenixedu.commons.spreadsheet.Spreadsheet.Row;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.DateTime;
 import org.joda.time.YearMonthDay;
@@ -66,8 +68,6 @@ import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonContrac
 import pt.ist.fenixedu.contracts.domain.util.CategoryType;
 import pt.ist.fenixedu.integration.FenixEduIstIntegrationConfiguration;
 import pt.ist.fenixedu.integration.ui.struts.action.externalServices.ExternalInterfaceDispatchAction;
-import pt.utl.ist.fenix.tools.util.excel.Spreadsheet;
-import pt.utl.ist.fenix.tools.util.excel.Spreadsheet.Row;
 
 @Mapping(module = "external", path = "/exportUserInfoForKoha", scope = "request", parameter = "method")
 public class ExportUserInfoForKoha extends ExternalInterfaceDispatchAction {
@@ -107,10 +107,10 @@ public class ExportUserInfoForKoha extends ExternalInterfaceDispatchAction {
         final Spreadsheet spreadsheet = new Spreadsheet("DegreeTypes");
         spreadsheet.setHeader("*ID").setHeader("descrição");
 
-        for (final DegreeType degreeType : DegreeType.values()) {
+        DegreeType.all().forEach(degreeType -> {
             final Row row = spreadsheet.addRow();
-            row.setCell(degreeType.getName()).setCell(degreeType.getLocalizedName());
-        }
+            row.setCell(degreeType.getExternalId()).setCell(degreeType.getName().getContent());
+        });
 
         return sendXls(response, spreadsheet);
     }
@@ -123,7 +123,7 @@ public class ExportUserInfoForKoha extends ExternalInterfaceDispatchAction {
         for (final Degree degree : rootDomainObject.getDegreesSet()) {
             final Row row = spreadsheet.addRow();
             row.setCell(degree.getExternalId()).setCell(degree.getPresentationName()).setCell(degree.getSigla())
-                    .setCell(degree.getDegreeType().name());
+                    .setCell(degree.getDegreeType().getExternalId());
         }
 
         return sendXls(response, spreadsheet);
@@ -245,9 +245,8 @@ public class ExportUserInfoForKoha extends ExternalInterfaceDispatchAction {
             }
             for (final StudentCurricularPlan studentCurricularPlan : registration.getStudentCurricularPlansSet()) {
                 if (studentCurricularPlan.isActive()) {
-                    if (degreeType == DegreeType.BOLONHA_DEGREE || degreeType == DegreeType.BOLONHA_MASTER_DEGREE
-                            || degreeType == DegreeType.BOLONHA_INTEGRATED_MASTER_DEGREE
-                            || degreeType == DegreeType.BOLONHA_ADVANCED_SPECIALIZATION_DIPLOMA) {
+                    if (degreeType.isBolonhaDegree() || degreeType.isBolonhaMasterDegree()
+                            || degreeType.isIntegratedMasterDegree() || degreeType.isAdvancedSpecializationDiploma()) {
                         studentCurricularPlans.add(studentCurricularPlan);
                     } else {
                         final RegistrationState registrationState = registration.getActiveState();

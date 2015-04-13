@@ -238,7 +238,7 @@ public class ReportsByDegreeTypeDA extends FenixDispatchAction {
 
     private DegreeType getDegreeType(final HttpServletRequest httpServletRequest) {
         final String degreeTypeString = httpServletRequest.getParameter("degreeType");
-        return StringUtils.isEmpty(degreeTypeString) ? null : DegreeType.valueOf(degreeTypeString);
+        return StringUtils.isEmpty(degreeTypeString) ? null : FenixFramework.getDomainObject(degreeTypeString);
     }
 
     private ExecutionYear getExecutionYear(final HttpServletRequest httpServletRequest) {

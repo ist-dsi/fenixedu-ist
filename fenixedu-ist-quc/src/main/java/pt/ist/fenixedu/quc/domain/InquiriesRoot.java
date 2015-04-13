@@ -61,17 +61,16 @@ public final class InquiriesRoot extends InquiriesRoot_Base {
 
     public static boolean isAvailableDegreeTypeForInquiries(Registration registration) {
         final DegreeType degreeType = registration.getDegreeType();
-        return degreeType == DegreeType.BOLONHA_DEGREE || degreeType == DegreeType.BOLONHA_INTEGRATED_MASTER_DEGREE
-                || degreeType == DegreeType.BOLONHA_MASTER_DEGREE
+        return degreeType.isBolonhaDegree() || degreeType.isIntegratedMasterDegree() || degreeType.isBolonhaMasterDegree()
                 || THIRD_CYCLE_AVAILABLE_INQUIRY_DEGREES.contains(registration.getDegree().getSigla().toLowerCase());
     }
 
     public static boolean isMasterDegreeDFAOnly(ExecutionCourse executionCourse) {
         for (final CurricularCourse curricularCourse : executionCourse.getAssociatedCurricularCoursesSet()) {
             DegreeType degreeType = curricularCourse.getDegreeCurricularPlan().getDegree().getDegreeType();
-            if (!degreeType.equals(DegreeType.MASTER_DEGREE)
-                    && !degreeType.equals(DegreeType.BOLONHA_ADVANCED_FORMATION_DIPLOMA)
-                    && !degreeType.equals(DegreeType.BOLONHA_SPECIALIZATION_DEGREE)
+            if (!degreeType.isPreBolonhaDegree()
+                    && !degreeType.isAdvancedFormationDiploma()
+                    && !degreeType.isSpecializationDegree()
                     && !THIRD_CYCLE_AVAILABLE_INQUIRY_DEGREES.contains(curricularCourse.getDegreeCurricularPlan().getDegree()
                             .getSigla().toLowerCase())) {
                 return false;
@@ -83,8 +82,7 @@ public final class InquiriesRoot extends InquiriesRoot_Base {
     public static boolean isBolonhaDegreeOrMasterDegreeOrIntegratedMasterDegree(ExecutionCourse executionCourse) {
         for (final CurricularCourse curricularCourse : executionCourse.getAssociatedCurricularCoursesSet()) {
             DegreeType degreeType = curricularCourse.getDegreeCurricularPlan().getDegree().getDegreeType();
-            if (degreeType.equals(DegreeType.BOLONHA_DEGREE) || degreeType.equals(DegreeType.BOLONHA_MASTER_DEGREE)
-                    || degreeType.equals(DegreeType.BOLONHA_INTEGRATED_MASTER_DEGREE)) {
+            if (degreeType.isBolonhaDegree() || degreeType.isBolonhaMasterDegree() || degreeType.isIntegratedMasterDegree()) {
                 return true;
             }
             if (THIRD_CYCLE_AVAILABLE_INQUIRY_DEGREES.contains(curricularCourse.getDegreeCurricularPlan().getDegree().getSigla()

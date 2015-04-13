@@ -86,11 +86,9 @@ public class CreateCandidateDispatchAction extends FenixDispatchAction {
     public ActionForward chooseDegreeFromList(ActionMapping mapping, ActionForm form, HttpServletRequest request,
             HttpServletResponse response) throws Exception {
 
-        DegreeType degreeType = DegreeType.MASTER_DEGREE;
-
         List result = null;
         try {
-            result = ReadAllMasterDegrees.run(degreeType);
+            result = ReadAllMasterDegrees.run(DegreeType::isPreBolonhaMasterDegree);
         } catch (NonExistingServiceException e) {
             throw new NonExistingActionException("O Degree de Mestrado", e);
         }

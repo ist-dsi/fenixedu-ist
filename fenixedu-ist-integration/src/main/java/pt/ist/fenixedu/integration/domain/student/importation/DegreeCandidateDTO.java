@@ -43,16 +43,14 @@ import org.fenixedu.academic.domain.person.Gender;
 import org.fenixedu.academic.domain.person.HumanName;
 import org.fenixedu.academic.domain.person.IDDocumentType;
 import org.fenixedu.academic.domain.person.MaritalStatus;
+import org.fenixedu.academic.util.PhoneUtil;
 import org.fenixedu.academic.util.StringFormatter;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.UserProfile;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.YearMonthDay;
 
-import pt.utl.ist.fenix.tools.loaders.IFileLine;
-import pt.utl.ist.fenix.tools.util.PhoneUtil;
-
-public class DegreeCandidateDTO implements IFileLine {
+public class DegreeCandidateDTO {
 
     private static final SimpleDateFormat DATE_FORMAT;
 
@@ -148,7 +146,6 @@ public class DegreeCandidateDTO implements IFileLine {
      * </pre>
      */
 
-    @Override
     public boolean fillWithFileLineData(String dataLine) {
 
         if (StringUtils.isEmpty(dataLine.trim()) || dataLine.startsWith("#")) {
@@ -197,7 +194,6 @@ public class DegreeCandidateDTO implements IFileLine {
         }
     }
 
-    @Override
     public String getUniqueKey() {
         return this.documentIdNumber;
     }

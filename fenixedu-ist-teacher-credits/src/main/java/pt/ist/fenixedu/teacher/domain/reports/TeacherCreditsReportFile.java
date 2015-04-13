@@ -31,6 +31,8 @@ import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.commons.spreadsheet.Spreadsheet;
+import org.fenixedu.commons.spreadsheet.Spreadsheet.Row;
 import org.joda.time.Interval;
 import org.joda.time.PeriodType;
 import org.joda.time.YearMonthDay;
@@ -46,8 +48,6 @@ import pt.ist.fenixedu.teacher.domain.TeacherCredits;
 import pt.ist.fenixedu.teacher.domain.credits.util.AnnualTeachingCreditsBean;
 import pt.ist.fenixedu.teacher.domain.teacher.OtherService;
 import pt.ist.fenixedu.teacher.domain.teacher.TeacherService;
-import pt.utl.ist.fenix.tools.util.excel.Spreadsheet;
-import pt.utl.ist.fenix.tools.util.excel.Spreadsheet.Row;
 
 public class TeacherCreditsReportFile extends TeacherCreditsReportFile_Base {
 

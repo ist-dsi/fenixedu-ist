@@ -38,6 +38,7 @@ import org.fenixedu.academic.service.services.person.SearchPerson;
 import org.fenixedu.academic.service.services.person.SearchPerson.SearchParameters;
 import org.fenixedu.academic.service.services.person.SearchPerson.SearchPersonPredicate;
 import org.fenixedu.academic.ui.renderers.providers.AbstractDomainObjectProvider;
+import org.fenixedu.academic.util.CollectionPager;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.DateTime;
 
@@ -46,7 +47,6 @@ import pt.ist.fenixWebFramework.renderers.components.converters.Converter;
 import pt.ist.fenixWebFramework.renderers.converters.EnumConverter;
 import pt.ist.fenixedu.libraryattendance.space.SpaceAttendances;
 import pt.ist.fenixframework.Atomic;
-import pt.utl.ist.fenix.tools.util.CollectionPager;
 
 public class LibraryAttendance implements Serializable {
     public static class PlaceProvider extends AbstractDomainObjectProvider {

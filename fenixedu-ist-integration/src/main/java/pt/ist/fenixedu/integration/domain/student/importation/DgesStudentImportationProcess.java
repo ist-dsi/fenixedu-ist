@@ -51,7 +51,6 @@ import org.fenixedu.academic.domain.candidacy.DegreeCandidacy;
 import org.fenixedu.academic.domain.candidacy.IMDCandidacy;
 import org.fenixedu.academic.domain.candidacy.StandByCandidacySituation;
 import org.fenixedu.academic.domain.candidacy.StudentCandidacy;
-import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.organizationalStructure.UnitUtils;
 import org.fenixedu.academic.domain.person.RoleType;
@@ -59,6 +58,8 @@ import org.fenixedu.academic.domain.student.PrecedentDegreeInformation;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.dto.accounting.EntryDTO;
 import org.fenixedu.academic.dto.accounting.EntryWithInstallmentDTO;
+import org.fenixedu.academic.util.Bundle;
+import org.fenixedu.academic.util.LabelFormatter;
 import org.fenixedu.academic.util.Money;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.UserLoginPeriod;
@@ -71,7 +72,6 @@ import org.slf4j.LoggerFactory;
 import pt.ist.fenixedu.contracts.domain.Employee;
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveEmployees;
 import pt.ist.fenixedu.tutorship.domain.TutorshipIntention;
-import pt.utl.ist.fenix.tools.resources.LabelFormatter;
 
 public class DgesStudentImportationProcess extends DgesStudentImportationProcess_Base {
 
@@ -356,13 +356,13 @@ public class DgesStudentImportationProcess extends DgesStudentImportationProcess
                 degreeCandidateDTO.getExecutionDegree(getExecutionYear(), getDgesStudentImportationForCampus());
         StudentCandidacy candidacy = null;
 
-        if (executionDegree.getDegree().getDegreeType() == DegreeType.BOLONHA_DEGREE) {
+        if (executionDegree.getDegree().getDegreeType().isBolonhaDegree()) {
             candidacy =
                     new DegreeCandidacy(person, executionDegree, employee.getPerson(), degreeCandidateDTO.getEntryGrade(),
                             degreeCandidateDTO.getContigent(), degreeCandidateDTO.getIngression(),
                             degreeCandidateDTO.getEntryPhase(), degreeCandidateDTO.getPlacingOption());
 
-        } else if (executionDegree.getDegree().getDegreeType() == DegreeType.BOLONHA_INTEGRATED_MASTER_DEGREE) {
+        } else if (executionDegree.getDegree().getDegreeType().isIntegratedMasterDegree()) {
             candidacy =
                     new IMDCandidacy(person, executionDegree, employee.getPerson(), degreeCandidateDTO.getEntryGrade(),
                             degreeCandidateDTO.getContigent(), degreeCandidateDTO.getIngression(),
@@ -481,8 +481,9 @@ public class DgesStudentImportationProcess extends DgesStudentImportationProcess
 
     public LabelFormatter getDescriptionForEntryType(final Degree degree, EntryType entryType) {
         final LabelFormatter labelFormatter = new LabelFormatter();
-        labelFormatter.appendLabel(entryType.name(), "enum").appendLabel(" (").appendLabel(degree.getDegreeType().name(), "enum")
-                .appendLabel(" - ").appendLabel(degree.getNameFor(getExecutionYear()).getContent()).appendLabel(" - ")
+        labelFormatter.appendLabel(entryType.name(), Bundle.ENUMERATION).appendLabel(" (")
+                .appendLabel(degree.getDegreeType().getName().getContent()).appendLabel(" - ")
+                .appendLabel(degree.getNameFor(getExecutionYear()).getContent()).appendLabel(" - ")
                 .appendLabel(getExecutionYear().getYear()).appendLabel(")");
 
         return labelFormatter;

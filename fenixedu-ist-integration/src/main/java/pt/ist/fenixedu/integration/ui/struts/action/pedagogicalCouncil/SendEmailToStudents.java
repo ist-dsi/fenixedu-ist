@@ -19,6 +19,7 @@
 package pt.ist.fenixedu.integration.ui.struts.action.pedagogicalCouncil;
 
 import java.util.Collections;
+import java.util.function.Predicate;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -60,7 +61,7 @@ public class SendEmailToStudents extends FenixDispatchAction {
         final ExecutionYear currentExecutionYear = ExecutionYear.readCurrentExecutionYear();
 
         SendStudentEmailBean bean = new SendStudentEmailBean();
-        bean.setDegreeType(DegreeType.BOLONHA_INTEGRATED_MASTER_DEGREE); // default
+        bean.setDegreeType(DegreeType.all().findAny().orElse(null)); // default
         bean.setExecutionYear(currentExecutionYear); // default
 
         return selectDegreeType(mapping, actionForm, request, response, bean);
@@ -82,13 +83,13 @@ public class SendEmailToStudents extends FenixDispatchAction {
                 sendStudentEmailBean.setExecutionYear(currentExecutionYear); // default
             }
             if (sendStudentEmailBean.getDegreeType() == null) {
-                sendStudentEmailBean.setDegreeType(DegreeType.BOLONHA_INTEGRATED_MASTER_DEGREE); // default
+                sendStudentEmailBean.setDegreeType(DegreeType.all().findAny().orElse(null)); // default
             }
         }
 
         request.setAttribute("electionPeriodBean", sendStudentEmailBean);
         request.setAttribute("currentExecutionYear", currentExecutionYear);
-        request.setAttribute("degrees", Degree.readAllByDegreeType(sendStudentEmailBean.getDegreeType()));
+        request.setAttribute("degrees", Degree.readAllMatching(Predicate.isEqual(sendStudentEmailBean.getDegreeType())));
         return mapping.findForward("showDegrees");
     }
 

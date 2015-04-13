@@ -24,9 +24,9 @@ import java.util.List;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.predicate.AccessControl;
+import org.fenixedu.academic.util.MultiLanguageString;
 
 import pt.ist.fenixedu.integration.domain.UnitFile;
-import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;
 
 public class PersonFileSourceBean implements PersonFileSource {
 

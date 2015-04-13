@@ -33,12 +33,16 @@ import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.util.Bundle;
+import org.fenixedu.academic.util.Pair;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
 import org.fenixedu.bennu.struts.portal.EntryPoint;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
+import org.fenixedu.commons.spreadsheet.SheetData;
+import org.fenixedu.commons.spreadsheet.SpreadsheetBuilder;
+import org.fenixedu.commons.spreadsheet.WorkbookExportFormat;
 
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
 import pt.ist.fenixedu.tutorship.domain.TutorshipSummary;
@@ -46,10 +50,6 @@ import pt.ist.fenixedu.tutorship.domain.TutorshipSummaryRelation;
 import pt.ist.fenixedu.tutorship.ui.TutorshipApplications.TutorshipApp;
 import pt.ist.fenixedu.tutorship.ui.Action.commons.tutorship.ViewStudentsByTutorDispatchAction;
 import pt.ist.fenixframework.FenixFramework;
-import pt.utl.ist.fenix.tools.spreadsheet.SheetData;
-import pt.utl.ist.fenix.tools.spreadsheet.SpreadsheetBuilder;
-import pt.utl.ist.fenix.tools.spreadsheet.WorkbookExportFormat;
-import pt.utl.ist.fenix.tools.util.Pair;
 
 @StrutsFunctionality(app = TutorshipApp.class, path = "tutorship-summary", titleKey = "link.teacher.tutorship.summary",
         bundle = "ApplicationResources")

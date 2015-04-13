@@ -18,6 +18,7 @@
  */
 package pt.ist.fenixedu.integration.domain.student.importation;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -28,8 +29,6 @@ import org.fenixedu.academic.domain.EntryPhase;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.candidacy.Ingression;
 import org.fenixedu.academic.domain.exceptions.DomainException;
-
-import pt.utl.ist.fenix.tools.loaders.DataLoaderFromFile;
 
 /**
  * 
@@ -78,7 +77,13 @@ public abstract class DgesBaseProcess extends DgesBaseProcess_Base {
     protected List<DegreeCandidateDTO> parseDgesFile(byte[] contents, String university, EntryPhase entryPhase) {
 
         final List<DegreeCandidateDTO> result = new ArrayList<DegreeCandidateDTO>();
-        result.addAll(new DataLoaderFromFile<DegreeCandidateDTO>().load(DegreeCandidateDTO.class, contents));
+        String[] lines = readContent(contents);
+        for (String dataLine : lines) {
+            DegreeCandidateDTO dto = new DegreeCandidateDTO();
+            if (dto.fillWithFileLineData(dataLine)) {
+                result.add(dto);
+            }
+        }
         setConstantFields(university, entryPhase, result);
         return result;
 
@@ -91,4 +96,12 @@ public abstract class DgesBaseProcess extends DgesBaseProcess_Base {
         }
     }
 
+    public static String[] readContent(byte[] contents) {
+        try {
+            String fileContents = new String(contents, "UTF-8");
+            return fileContents.split("\n");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

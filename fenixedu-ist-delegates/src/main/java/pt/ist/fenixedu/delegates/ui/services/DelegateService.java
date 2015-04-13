@@ -202,11 +202,11 @@ public class DelegateService {
         List<DelegateBean> ldpb = new ArrayList<DelegateBean>();
         ldpb.add(new DelegatePositionBean(null, null, CurricularYear.readByYear(1), degree));
         ldpb.add(new DelegatePositionBean(null, null, CurricularYear.readByYear(2), degree));
-        if (degreeType == DegreeType.BOLONHA_MASTER_DEGREE) {
+        if (degreeType.isBolonhaMasterDegree()) {
             ldpb.add(new DelegatePositionBean(null, CycleType.SECOND_CYCLE, null, degree));
             return ldpb;
         }
-        if (degreeType == DegreeType.BOLONHA_INTEGRATED_MASTER_DEGREE) {
+        if (degreeType.isIntegratedMasterDegree()) {
             ldpb.add(new DelegatePositionBean(null, null, CurricularYear.readByYear(3), degree));
             ldpb.add(new DelegatePositionBean(null, null, CurricularYear.readByYear(4), degree));
             ldpb.add(new DelegatePositionBean(null, null, CurricularYear.readByYear(5), degree));
@@ -214,7 +214,7 @@ public class DelegateService {
             ldpb.add(new DelegatePositionBean(null, null, null, degree));
             return ldpb;
         }
-        if (degreeType == DegreeType.BOLONHA_DEGREE) {
+        if (degreeType.isBolonhaDegree()) {
             ldpb.add(new DelegatePositionBean(null, null, CurricularYear.readByYear(3), degree));
             ldpb.add(new DelegatePositionBean(null, CycleType.FIRST_CYCLE, null, degree));
             return ldpb;

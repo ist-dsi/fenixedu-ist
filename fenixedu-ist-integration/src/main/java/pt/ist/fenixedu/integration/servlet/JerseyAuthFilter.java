@@ -75,7 +75,7 @@ public class JerseyAuthFilter implements Filter {
         final String password = request.getHeader(PASSWORD_KEY);
         Boolean found = Boolean.FALSE;
         for (final RemoteHost remoteHost : RemoteSystem.getInstance().getRemoteHostsSet()) {
-            if (remoteHost.matches(url, username, password)) {
+            if (remoteHost.matches(username, password)) {
                 logger.debug("[Jersey Server Invoke by client " + url);
                 found = Boolean.TRUE;
             }

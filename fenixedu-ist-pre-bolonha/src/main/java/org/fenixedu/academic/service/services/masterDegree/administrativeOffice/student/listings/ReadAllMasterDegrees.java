@@ -23,6 +23,7 @@ import static org.fenixedu.academic.predicate.AccessControl.check;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.degree.DegreeType;
@@ -39,9 +40,9 @@ import pt.ist.fenixframework.Atomic;
 public class ReadAllMasterDegrees {
 
     @Atomic
-    public static List run(DegreeType degreeType) throws FenixServiceException {
+    public static List run(Predicate<DegreeType> degreeType) throws FenixServiceException {
         check(RolePredicates.MASTER_DEGREE_ADMINISTRATIVE_OFFICE_PREDICATE);
-        List<Degree> result = Degree.readAllByDegreeType(degreeType);
+        List<Degree> result = Degree.readAllMatching(degreeType);
 
         if (result == null || result.size() == 0) {
             throw new NonExistingServiceException();

@@ -31,13 +31,13 @@ import org.fenixedu.academic.domain.Photograph;
 import org.fenixedu.academic.domain.contacts.PhysicalAddressData;
 import org.fenixedu.academic.domain.person.Gender;
 import org.fenixedu.academic.util.ContentType;
+import org.fenixedu.academic.util.DateFormatUtil;
 import org.fenixedu.academic.util.StringFormatter;
 import org.joda.time.YearMonthDay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import pt.ist.fenixframework.Atomic;
-import pt.utl.ist.fenix.tools.util.DateFormatUtil;
 
 import com.google.common.io.BaseEncoding;
 

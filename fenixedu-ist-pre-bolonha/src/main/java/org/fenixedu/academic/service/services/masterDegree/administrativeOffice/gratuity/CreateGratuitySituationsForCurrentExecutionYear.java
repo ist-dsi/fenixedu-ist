@@ -53,7 +53,8 @@ public class CreateGratuitySituationsForCurrentExecutionYear {
 
         // read master degree and persistentSupportecialization execution
         // degrees
-        Collection<ExecutionDegree> executionDegrees = executionYear.getExecutionDegreesByType(DegreeType.MASTER_DEGREE);
+        Collection<ExecutionDegree> executionDegrees =
+                executionYear.getExecutionDegreesMatching(DegreeType::isPreBolonhaMasterDegree);
 
         for (ExecutionDegree executionDegree : executionDegrees) {
 
