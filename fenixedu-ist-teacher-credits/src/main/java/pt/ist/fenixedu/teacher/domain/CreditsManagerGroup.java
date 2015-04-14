@@ -23,10 +23,12 @@ import java.util.Set;
 
 import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.annotation.GroupOperator;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.groups.GroupStrategy;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
 
 @GroupOperator("creditsManager")
@@ -34,7 +36,7 @@ public class CreditsManagerGroup extends GroupStrategy {
 
     @Override
     public String getPresentationName() {
-        return "Credits Manager";
+        return BundleUtil.getString(Bundle.TEACHER_CREDITS, "label.group.CreditsManagerGroup");
     }
 
     @Override
