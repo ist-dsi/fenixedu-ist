@@ -21,10 +21,12 @@ package pt.ist.fenixedu.contracts.domain.accessControl;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.annotation.GroupOperator;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.groups.GroupStrategy;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixedu.contracts.domain.Employee;
@@ -36,7 +38,7 @@ public class ActiveGrantOwner extends GroupStrategy {
 
     @Override
     public String getPresentationName() {
-        return "Active Grant Owner";
+        return BundleUtil.getString(Bundle.GROUP, "label.name.ActiveGrantOwnersGroup");
     }
 
     @Override
