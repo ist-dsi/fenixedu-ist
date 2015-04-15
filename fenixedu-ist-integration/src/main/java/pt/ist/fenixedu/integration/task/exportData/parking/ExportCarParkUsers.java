@@ -59,7 +59,10 @@ import pt.ist.fenixedu.parking.domain.ParkingParty;
 public class ExportCarParkUsers extends CustomTask {
 
     private static final String EMAIL_ADDRESSES_TO_SEND_DATA =
-            "arcodocego@empark.pt, mamede@empark.pt, aneves@empark.es, luis.cruz@tecnico.pt, lena@tecnico.ulisboa.pt";
+            "arcodocego@empark.pt, mamede@empark.pt, aneves@empark.es";
+
+    private static final String EMAIL_ADDRESSES_BCC_SEND_DATA =
+            "luis.cruz@tecnico.pt, lena@tecnico.ulisboa.pt, susana.castanheira@tecnico.ulisboa.pt";
 
     @Override
     public void runTask() throws Exception {
@@ -250,6 +253,7 @@ public class ExportCarParkUsers extends CustomTask {
         final Message message = new MimeMessage(session);
         message.setFrom(new InternetAddress(sender.getFromAddress()));
         message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(EMAIL_ADDRESSES_TO_SEND_DATA));
+        message.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(EMAIL_ADDRESSES_BCC_SEND_DATA));
         message.setSubject("Utentes IST - Atualização");
         message.setText("Listagem atualizada de utentes do IST: " + new DateTime().toString("yyyy-MM-dd HH:mm"));
 
