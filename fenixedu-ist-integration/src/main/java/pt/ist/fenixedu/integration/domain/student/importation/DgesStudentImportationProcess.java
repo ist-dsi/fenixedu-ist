@@ -27,7 +27,6 @@ import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
-import org.fenixedu.academic.FenixEduAcademicConfiguration;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.EntryPhase;
@@ -71,6 +70,7 @@ import org.slf4j.LoggerFactory;
 
 import pt.ist.fenixedu.contracts.domain.Employee;
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveEmployees;
+import pt.ist.fenixedu.integration.FenixEduIstIntegrationConfiguration;
 import pt.ist.fenixedu.tutorship.domain.TutorshipIntention;
 
 public class DgesStudentImportationProcess extends DgesStudentImportationProcess_Base {
@@ -193,7 +193,7 @@ public class DgesStudentImportationProcess extends DgesStudentImportationProcess
         int processed = 0;
         int personsCreated = 0;
 
-        String prefix = FenixEduAcademicConfiguration.getConfiguration().dgesUsernamePrefix();
+        String prefix = FenixEduIstIntegrationConfiguration.getConfiguration().dgesUsernamePrefix();
 
         for (final DegreeCandidateDTO degreeCandidateDTO : degreeCandidateDTOs) {
 
