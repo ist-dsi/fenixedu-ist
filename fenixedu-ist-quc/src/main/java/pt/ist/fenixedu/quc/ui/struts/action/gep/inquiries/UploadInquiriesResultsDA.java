@@ -22,6 +22,7 @@
 package pt.ist.fenixedu.quc.ui.struts.action.gep.inquiries;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,7 +32,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
-import org.fenixedu.academic.util.FileUtils;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
@@ -43,6 +43,8 @@ import org.slf4j.LoggerFactory;
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
 import pt.ist.fenixedu.quc.domain.InquiryResult;
 import pt.ist.fenixedu.quc.dto.ResultsFileBean;
+
+import com.google.common.io.CharStreams;
 
 /**
  * @author - Ricardo Rodrigues (ricardo.rodrigues@ist.utl.pt)
@@ -85,6 +87,6 @@ public class UploadInquiriesResultsDA extends FenixDispatchAction {
     }
 
     private String readFile(ResultsFileBean resultsBean) throws IOException {
-        return FileUtils.readFile(resultsBean.getInputStream());
+        return CharStreams.toString(new InputStreamReader(resultsBean.getInputStream()));
     }
 }

@@ -19,7 +19,6 @@
 package pt.ist.fenixedu.parking.domain;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -32,7 +31,6 @@ import org.fenixedu.academic.domain.contacts.MobilePhone;
 import org.fenixedu.academic.domain.contacts.Phone;
 import org.fenixedu.academic.domain.organizationalStructure.Party;
 import org.fenixedu.academic.service.services.commons.FactoryExecutor;
-import org.fenixedu.academic.util.FileUtils;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.groups.DynamicGroup;
 import org.fenixedu.bennu.core.groups.Group;
@@ -232,7 +230,7 @@ public class ParkingRequest extends ParkingRequest_Base {
             setParkingParty(parkingParty);
         }
 
-        public void saveInputStreams() {
+        public void saveInputStreams() throws IOException {
             driverLicenseByteArray = getByteArray(driverLicenseInputStream, driverLicenseByteArray);
             firstCarPropertyRegistryByteArray =
                     getByteArray(firstCarPropertyRegistryInputStream, firstCarPropertyRegistryByteArray);
@@ -248,29 +246,11 @@ public class ParkingRequest extends ParkingRequest_Base {
             secondInsuranceByteArray = getByteArray(secondInsuranceInputStream, secondInsuranceByteArray);
         }
 
-        private byte[] getByteArray(final InputStream inputStream, byte[] b) {
+        private byte[] getByteArray(final InputStream inputStream, byte[] b) throws IOException {
             if (inputStream == null) {
                 return b;
             }
-            final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            try {
-                try {
-                    FileUtils.copy(inputStream, byteArrayOutputStream);
-                    byteArrayOutputStream.flush();
-                    b = byteArrayOutputStream.toByteArray();
-                    byteArrayOutputStream.close();
-                } catch (IOException e) {
-                    logger.error(e.getMessage(), e);
-                }
-            } finally {
-                try {
-                    inputStream.close();
-                    byteArrayOutputStream.close();
-                } catch (IOException e) {
-                    logger.error(e.getMessage(), e);
-                }
-            }
-            return b;
+            return ByteStreams.toByteArray(inputStream);
         }
 
         public String getDriverLicenseFileName() {

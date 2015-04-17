@@ -23,7 +23,7 @@ import java.util.Date;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.academic.util.Bundle;
-import org.fenixedu.academic.util.CalendarUtil;
+import org.fenixedu.academic.util.HourMinuteSecond;
 import org.fenixedu.academic.util.WeekDay;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.security.Authenticate;
@@ -102,9 +102,10 @@ public class InstitutionWorkTime extends InstitutionWorkTime_Base {
         for (InstitutionWorkTime teacherInstitutionWorkTime : getTeacherService().getInstitutionWorkTimes()) {
             if (this != teacherInstitutionWorkTime) {
                 if (teacherInstitutionWorkTime.getWeekDay().equals(getWeekDay())) {
-                    Date startWorkTime = teacherInstitutionWorkTime.getStartTime();
-                    Date endWorkTime = teacherInstitutionWorkTime.getEndTime();
-                    if (CalendarUtil.intersectTimes(getStartTime(), getEndTime(), startWorkTime, endWorkTime)) {
+                    HourMinuteSecond supportLessonStart = teacherInstitutionWorkTime.getStartTimeHourMinuteSecond();
+                    HourMinuteSecond supportLessonEnd = teacherInstitutionWorkTime.getStartTimeHourMinuteSecond();
+                    if (supportLessonEnd.compareTo(getStartTimeHourMinuteSecond()) < 0
+                            || supportLessonStart.compareTo(getEndTimeHourMinuteSecond()) > 0) {
                         throw new DomainException("message.overlapping.institution.working.period");
                     }
                 }
