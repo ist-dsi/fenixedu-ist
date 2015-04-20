@@ -20,7 +20,6 @@ package pt.ist.fenixedu.parking.domain;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -840,9 +839,17 @@ public class ParkingParty extends ParkingParty_Base {
                 .collect(Collectors.toList());
     }
 
-    private static final List<Predicate<DegreeType>> types = Arrays.asList(DegreeType::isSpecializationDegree,
-            DegreeType::isAdvancedFormationDiploma, DegreeType::isAdvancedSpecializationDiploma,
-            DegreeType::isBolonhaMasterDegree, DegreeType::isIntegratedMasterDegree, DegreeType::isBolonhaDegree);
+    private static final List<Predicate<DegreeType>> types;
+
+    static {
+        types = new ArrayList<>();
+        types.add(DegreeType::isSpecializationDegree);
+        types.add(DegreeType::isAdvancedFormationDiploma);
+        types.add(DegreeType::isAdvancedSpecializationDiploma);
+        types.add(DegreeType::isBolonhaMasterDegree);
+        types.add(DegreeType::isIntegratedMasterDegree);
+        types.add(DegreeType::isBolonhaDegree);
+    }
 
     public static DegreeType mostSignificantDegreeType(Student student) {
         for (Predicate<DegreeType> type : types) {
