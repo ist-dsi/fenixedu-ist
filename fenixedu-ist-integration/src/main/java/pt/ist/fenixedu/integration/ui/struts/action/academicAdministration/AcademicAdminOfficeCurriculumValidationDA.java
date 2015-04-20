@@ -176,7 +176,7 @@ public class AcademicAdminOfficeCurriculumValidationDA extends FenixDispatchActi
             HttpServletResponse response) {
         StudentCurricularPlan studentCurricularPlan = readStudentCurricularPlan(request);
         request.setAttribute("studentCurriculumValidationAllowed",
-                studentCurricularPlan.getEvaluationForCurriculumValidationAllowed());
+                PreBolognaEvaluationManagement.getEvaluationForCurriculumValidationAllowed(studentCurricularPlan));
         return mapping.findForward("show-curriculum-validation-options");
     }
 

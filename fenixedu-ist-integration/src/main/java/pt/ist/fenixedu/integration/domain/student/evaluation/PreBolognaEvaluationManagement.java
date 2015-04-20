@@ -41,7 +41,7 @@ public class PreBolognaEvaluationManagement {
     @Atomic
     public static void deleteEnrolmentEvaluationCurriculumValidationContext(EnrolmentEvaluation enrolmentEvaluation)
             throws Exception {
-        if (!enrolmentEvaluation.getEnrolment().getStudentCurricularPlan().getEvaluationForCurriculumValidationAllowed()) {
+        if (!getEvaluationForCurriculumValidationAllowed(enrolmentEvaluation.getEnrolment().getStudentCurricularPlan())) {
             throw new DomainException("error.curriculum.validation.enrolment.evaluatiom.removal.not.allowed");
         }
 
@@ -75,7 +75,7 @@ public class PreBolognaEvaluationManagement {
     }
 
     private static void changeStateIfAprovedAndEvaluationsIsEmpty(Enrolment enrolment) {
-        if (!enrolment.getStudentCurricularPlan().getEvaluationForCurriculumValidationAllowed()) {
+        if (!getEvaluationForCurriculumValidationAllowed(enrolment.getStudentCurricularPlan())) {
             throw new DomainException("error.curriculum.validation.enrolment.evaluatiom.removal.not.allowed");
         }
 
@@ -86,7 +86,7 @@ public class PreBolognaEvaluationManagement {
 
     @Atomic
     public static void markAsTemporaryEnrolled(Enrolment enrolment) {
-        if (!enrolment.getStudentCurricularPlan().getEvaluationForCurriculumValidationAllowed()) {
+        if (!getEvaluationForCurriculumValidationAllowed(enrolment.getStudentCurricularPlan())) {
             throw new DomainException("error.curriculum.validation.enrolment.evaluatiom.removal.not.allowed");
         }
 
