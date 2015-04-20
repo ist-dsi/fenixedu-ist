@@ -134,6 +134,15 @@ relation SIBSOutgoingPaymentFileExecutionYear {
     }
 }
 
+relation AllowedToUploadInUnit {
+    .org.fenixedu.academic.domain.organizationalStructure.Unit playsRole unitsWithUploadPermission {
+        multiplicity *;
+    }
+    .org.fenixedu.academic.domain.Person playsRole allowedPeopleToUploadFiles {
+        multiplicity *;
+    }
+}
+
 relation UnitUnitFileTag {
     UnitFileTag playsRole unitFileTags {
         multiplicity *;

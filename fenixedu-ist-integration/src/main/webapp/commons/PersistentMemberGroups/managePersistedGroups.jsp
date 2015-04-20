@@ -66,13 +66,13 @@
 		<span class="color555"><bean:message key="label.uploaders.explanation" bundle="RESEARCHER_RESOURCES"/></span>
 	</p>
 	
-	<logic:empty name="unit" property="allowedPeopleToUploadFiles">
+	<logic:empty name="unit" property="allowedPeopleToUploadFilesSet">
 		<p>
 			<em><bean:message key="label.noUploadersDefined" bundle="RESEARCHER_RESOURCES"/>.</em>
 		</p>
 	</logic:empty>
 	
-	<logic:notEmpty name="unit" property="allowedPeopleToUploadFiles">
+	<logic:notEmpty name="unit" property="allowedPeopleToUploadFilesSet">
 		<table class="tstyle2 thlight">
 		<tr>
 			<th><bean:message key="label.group" bundle="RESEARCHER_RESOURCES"/></th><th><bean:message key="label.members" bundle="RESEARCHER_RESOURCES"/></th>
@@ -82,7 +82,7 @@
 				<bean:message key="label.uploaders.groupName" bundle="RESEARCHER_RESOURCES"/>
 			</td>
 			<td>
-				<fr:view name="unit" property="allowedPeopleToUploadFiles">
+				<fr:view name="unit" property="allowedPeopleToUploadFilesSet">
                    <fr:layout name="flowLayout">
 						<fr:property name="eachLayout" value="values"/>
 						<fr:property name="eachSchema" value="showNickName"/>

@@ -74,6 +74,7 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
             for (; !unit.getUnitFileTagsSet().isEmpty(); unit.getUnitFileTagsSet().iterator().next().delete()) {
                 ;
             }
+            unit.getAllowedPeopleToUploadFilesSet().clear();
         });
 
         FenixFramework.getDomainModel().registerDeletionListener(Category.class, cat -> {

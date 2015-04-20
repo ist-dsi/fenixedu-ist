@@ -68,7 +68,7 @@ public class PersonFileSourceBean implements PersonFileSource {
 
     @Override
     public boolean isAllowedToUpload(Person person) {
-        return getUnit().isUserAllowedToUploadFiles(person);
+        return getUnit().getAllowedPeopleToUploadFilesSet().contains(person);
     }
 
 }
