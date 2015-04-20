@@ -53,13 +53,11 @@ import org.fenixedu.academic.dto.degreeAdministrativeOffice.gradeSubmission.Mark
 import org.fenixedu.academic.dto.student.RegistrationConclusionBean;
 import org.fenixedu.academic.dto.student.StudentsSearchBean;
 import org.fenixedu.academic.dto.student.enrollment.bolonha.BolonhaStudentEnrollmentBean;
-import org.fenixedu.academic.predicate.IllegalDataAccessException;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 import org.fenixedu.academic.service.services.student.enrolment.bolonha.EnrolBolonhaStudent;
 import org.fenixedu.academic.service.services.student.enrolment.bolonha.EnrolBolonhaStudentInCurriculumValidationContext;
 import org.fenixedu.academic.ui.struts.FenixActionForm;
 import org.fenixedu.academic.ui.struts.action.administrativeOffice.student.EditCandidacyInformationDA.ChooseRegistrationOrPhd;
-import org.fenixedu.academic.ui.struts.action.administrativeOffice.studentEnrolment.bolonha.CurriculumValidationServicesHelper;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
@@ -427,21 +425,23 @@ public class AcademicAdminOfficeCurriculumValidationDA extends FenixDispatchActi
     public ActionForward doRegistrationConclusion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
             HttpServletResponse response) throws FenixServiceException {
 
-        final RegistrationConclusionBean registrationConclusionBean = getRegistrationConclusionBeanFromViewState();
+        throw new DomainException("error.operation.not.supported");
 
-        try {
-            new CurriculumValidationServicesHelper().concludeRegistration(registrationConclusionBean);
-            return prepareCurriculumValidation(mapping, form, request, response);
-        } catch (final IllegalDataAccessException e) {
-            addActionMessage("illegal.access", request, "error.not.authorized.to.registration.conclusion.process");
-            request.setAttribute("registrationConclusionBean", registrationConclusionBean);
-            return mapping.findForward("registrationConclusion");
-
-        } catch (final DomainException e) {
-            addActionMessage(request, e.getKey(), e.getArgs());
-            request.setAttribute("registrationConclusionBean", registrationConclusionBean);
-            return mapping.findForward("registrationConclusion");
-        }
+//        final RegistrationConclusionBean registrationConclusionBean = getRegistrationConclusionBeanFromViewState();
+//
+//        try {
+////            new CurriculumValidationServicesHelper().concludeRegistration(registrationConclusionBean);
+//            return prepareCurriculumValidation(mapping, form, request, response);
+//        } catch (final IllegalDataAccessException e) {
+//            addActionMessage("illegal.access", request, "error.not.authorized.to.registration.conclusion.process");
+//            request.setAttribute("registrationConclusionBean", registrationConclusionBean);
+//            return mapping.findForward("registrationConclusion");
+//
+//        } catch (final DomainException e) {
+//            addActionMessage(request, e.getKey(), e.getArgs());
+//            request.setAttribute("registrationConclusionBean", registrationConclusionBean);
+//            return mapping.findForward("registrationConclusion");
+//        }
     }
 
     private RegistrationConclusionBean buildRegistrationConclusionBean(final Registration registration) {
