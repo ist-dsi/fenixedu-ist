@@ -292,13 +292,6 @@ relation RootDomainObjectInquiryAnswer {
     }
 }
 
-relation RootDomainObjectQuestionAnswer {
-    .org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject;
-    QuestionAnswer playsRole questionAnswers {
-        multiplicity *;
-    }
-}
-
 relation RootDomainObjectStudentInquiryExecutionPeriod {
     .org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject;
     StudentInquiryExecutionPeriod playsRole studentsInquiriesExecutionPeriod {
