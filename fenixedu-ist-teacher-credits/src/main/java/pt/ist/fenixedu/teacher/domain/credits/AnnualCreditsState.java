@@ -30,6 +30,7 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalData;
+import pt.ist.fenixedu.teacher.domain.time.calendarStructure.TeacherCreditsFillingForTeacherCE;
 import pt.ist.fenixframework.Atomic;
 
 public class AnnualCreditsState extends AnnualCreditsState_Base {
@@ -98,7 +99,8 @@ public class AnnualCreditsState extends AnnualCreditsState_Base {
 
     @Override
     public void setFinalCalculationDate(LocalDate finalCalculationDate) {
-        if (finalCalculationDate != null && finalCalculationDate.isBefore(new LocalDate())) {
+        if (finalCalculationDate != null && !finalCalculationDate.equals(getFinalCalculationDate())
+                && finalCalculationDate.isBefore(new LocalDate())) {
             throw new DomainException("renderers.validator.dateTime.beforeNow");
         }
         if (finalCalculationDate == null || !finalCalculationDate.equals(getFinalCalculationDate())) {
@@ -106,4 +108,28 @@ public class AnnualCreditsState extends AnnualCreditsState_Base {
             super.setFinalCalculationDate(finalCalculationDate);
         }
     }
+
+    public static boolean isInValidReductionServiceApprovalPeriod(ExecutionYear executionYear) {
+        AnnualCreditsState annualCreditsState = getAnnualCreditsState(executionYear);
+        return annualCreditsState.getReductionServiceApproval() != null
+                && annualCreditsState.getReductionServiceApproval().containsNow();
+    }
+
+    public static boolean isInValidTeacherFillingPeriod(ExecutionYear executionYear) {
+        for (ExecutionSemester executionSemester : executionYear.getExecutionPeriodsSet()) {
+            TeacherCreditsFillingForTeacherCE teacherCreditsFillingForTeacher =
+                    TeacherCreditsFillingForTeacherCE.getTeacherCreditsFillingForTeacher(executionSemester.getAcademicInterval());
+            if (teacherCreditsFillingForTeacher != null && teacherCreditsFillingForTeacher.containsNow()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean isInValidCreditsPeriod(ExecutionSemester executionSemester) {
+        TeacherCreditsFillingForTeacherCE teacherCreditsFillingForTeacher =
+                TeacherCreditsFillingForTeacherCE.getTeacherCreditsFillingForTeacher(executionSemester.getAcademicInterval());
+        return teacherCreditsFillingForTeacher != null && teacherCreditsFillingForTeacher.containsNow();
+    }
+
 }

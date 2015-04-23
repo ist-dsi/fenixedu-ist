@@ -32,14 +32,15 @@
 
 <em><bean:message key="label.teacherService.credits"/></em>
 <h3><bean:message key="label.credits.creditsReduction.definition" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/></h3>
-<%org.fenixedu.academic.domain.ExecutionSemester executionSemester = org.fenixedu.academic.domain.ExecutionSemester.readActualExecutionSemester(); 
-Boolean canAproveReductionServiceCredits = Boolean.FALSE;
+<%
+org.fenixedu.academic.domain.ExecutionYear executionYear = org.fenixedu.academic.domain.ExecutionYear.readCurrentExecutionYear(); 
+Boolean canAproveReductionServiceCredits = pt.ist.fenixedu.teacher.domain.credits.AnnualCreditsState.isInValidReductionServiceApprovalPeriod(executionYear);
 Boolean canInsertReductionServiceCredits = Boolean.FALSE;
 %>
-<bean:define id="executionSemesterName" value="<%= executionSemester.getQualifiedName()%>"/>
+<bean:define id="executionYearName" value="<%= executionYear.getQualifiedName()%>"/>
 <bean:define id="canAproveReductionService" value="<%= canAproveReductionServiceCredits.toString()%>"/>
 <bean:define id="canInsertReductionService" value="<%= canInsertReductionServiceCredits.toString()%>"/>
-<h3><bean:write name="executionSemesterName"/></h3>
+<h3><bean:write name="executionYearName"/></h3>
 
 <logic:equal name="canInsertReductionService" value="true">
 	<p><html:link page="/creditsReductions.do?method=selectTeacher">
@@ -57,6 +58,7 @@ Boolean canInsertReductionServiceCredits = Boolean.FALSE;
 				<fr:property name="imageFormat" value="/user/photo/${teacher.person.username}" />
 			</fr:slot>
 			<fr:slot name="teacherService.teacher.person.presentationName" key="label.name"/>
+			<fr:slot name="teacherService.executionPeriod.qualifiedName" key="label.execution-period"/>
 			<fr:slot name="requestCreditsReduction" key="label.requestedReductionCredits" layout="radio"/>
 			<fr:slot name="creditsReductionAttributed" key="label.attributedReductionCredits" layout="null-as-label"/>
 			<fr:slot name="attributionDate" key="label.attributionDate" layout="null-as-label"/>

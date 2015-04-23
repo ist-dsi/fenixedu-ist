@@ -60,11 +60,10 @@
 				<fr:property name="columnClasses" value=",,tdclear tderror1" />
 			</fr:layout>
 		</fr:edit>
-	
 	</logic:empty>
 	<logic:notEmpty name="reductionServiceBean" property="teacher">
 		<fr:view name="reductionServiceBean">
-			<fr:schema bundle="TEACHER_CREDITS_SHEET_RESOURCES" type="org.fenixedu.academic.domain.credits.util.ReductionServiceBean">
+			<fr:schema bundle="TEACHER_CREDITS_SHEET_RESOURCES" type="pt.ist.fenixedu.teacher.domain.credits.util.ReductionServiceBean">
 				<fr:slot name="teacher.person" key="label.empty" layout="view-as-image">
 					<fr:property name="classes" value="column3" />
 					<fr:property name="moduleRelative" value="false" />

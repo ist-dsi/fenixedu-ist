@@ -61,16 +61,8 @@
 		<h3 class="mtop15 mbottom05"><bean:message key="label.teacher"/></h3>
 		<fr:view name="teacherCreditsBean" layout="tabular">
 			<fr:schema type="pt.ist.fenixedu.teacher.dto.teacherCredits.TeacherCreditsPeriodBean" bundle="TEACHER_CREDITS_SHEET_RESOURCES">
-			    <fr:slot name="beginForTeacher" key="label.beginDate">
-			        <fr:validator name="org.fenixedu.academic.ui.renderers.validators.DateTimeValidator">
-			            <fr:property name="required" value="true" />
-			        </fr:validator>
-			    </fr:slot>
-			    <fr:slot name="endForTeacher" key="label.endDate">
-			        <fr:validator name="org.fenixedu.academic.ui.renderers.validators.DateTimeValidator">
-			            <fr:property name="required" value="true" />
-			        </fr:validator>
-			    </fr:slot>
+			    <fr:slot name="beginForTeacher" key="label.beginDate"/>
+			    <fr:slot name="endForTeacher" key="label.endDate"/>
 			</fr:schema>	
 			<fr:layout>
 				<fr:property name="classes" value="tstyle2 thleft thlight mtop05"/>
@@ -85,16 +77,8 @@
 		<h3 class="mtop15 mbottom05"><bean:message key="label.departmentAdmOffice" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/></h3>
 		<fr:view name="teacherCreditsBean" layout="tabular">
 			<fr:schema type="pt.ist.fenixedu.teacher.dto.teacherCredits.TeacherCreditsPeriodBean" bundle="TEACHER_CREDITS_SHEET_RESOURCES">
-			    <fr:slot name="beginForDepartmentAdmOffice" key="label.beginDate">
-			        <fr:validator name="org.fenixedu.academic.ui.renderers.validators.DateTimeValidator">
-			            <fr:property name="required" value="true" />
-			        </fr:validator>
-			    </fr:slot>
-			    <fr:slot name="endForDepartmentAdmOffice" key="label.endDate">
-			        <fr:validator name="org.fenixedu.academic.ui.renderers.validators.DateTimeValidator">
-			            <fr:property name="required" value="true" />
-			        </fr:validator>
-			    </fr:slot>
+			    <fr:slot name="beginForDepartmentAdmOffice" key="label.beginDate"/>
+			    <fr:slot name="endForDepartmentAdmOffice" key="label.endDate"/>
 			</fr:schema>
 			<fr:layout>
 				<fr:property name="classes" value="tstyle2 thleft thlight mtop05"/>
@@ -114,19 +98,13 @@
 		</logic:notPresent>
 		
 		
-		
-		<h3 class="mtop15 mbottom05">Período para definir créditos unitários (ck) para as UC's partilhadas</h3>
-		<bean:define id="readOnly" value="true"/>
-		<bean:define id="action" value="/defineCreditsPeriods.do?method=prepareEditAnnualCreditsDates&editInterval=sharedUnitCredits"/>
-		<logic:equal name="editInterval" value="sharedUnitCredits">
-			<bean:define id="readOnly" value="false"/>
-			<bean:define id="action" value="/defineCreditsPeriods.do?method=editAnnualCreditsDates&editInterval=sharedUnitCredits"/>
-		</logic:equal>
-		<fr:form id="sharedUnitCreditsForm" action="<%=action %>">
-			<fr:edit name="teacherCreditsBean">
+		<h3 class="mtop15 mbottom05">Créditos unitarios</h3>
+		<fr:form id="teacherCreditsBeanForm" action="/defineCreditsPeriods.do?method=editAnnualCreditsDates">
+			<h4 class="mtop15 mbottom05">Aprovação de AD65</h4>
+			<fr:edit name="teacherCreditsBean" id="reductionServiceApproval">
 				<fr:schema bundle="TEACHER_CREDITS_SHEET_RESOURCES" type="pt.ist.fenixedu.teacher.dto.teacherCredits.TeacherCreditsPeriodBean">
-					<fr:slot name="sharedUnitCreditsBeginDate" key="label.beginDate" layout="null-as-label" readOnly="<%=Boolean.valueOf(readOnly.toString())%>"/>
-					<fr:slot name="sharedUnitCreditsEndDate" key="label.endDate" layout="null-as-label"  readOnly="<%=Boolean.valueOf(readOnly.toString()) %>"/>
+					<fr:slot name="reductionServiceApprovalBeginDate" key="label.beginDate" layout="null-as-label" readOnly="<%=Boolean.valueOf(closed.toString())%>" validator="pt.ist.fenixWebFramework.rendererExtensions.validators.DateTimeValidator"/>
+					<fr:slot name="reductionServiceApprovalEndDate" key="label.endDate" layout="null-as-label"  readOnly="<%=Boolean.valueOf(closed.toString()) %>" validator="pt.ist.fenixWebFramework.rendererExtensions.validators.DateTimeValidator"/>
 				</fr:schema>
 				<fr:layout name="tabular">
 					<fr:property name="classes" value="tstyle2 thleft thlight mtop05"/>
@@ -135,28 +113,11 @@
 				<fr:destination name="invalid" path="/defineCreditsPeriods.do?method=showPeriods"/>
 				<fr:destination name="cancel" path="/defineCreditsPeriods.do?method=showPeriods"/>
 			</fr:edit>
-			<logic:equal name="closed" value="false">
-				<logic:equal name="editInterval" value="sharedUnitCredits">
-					<html:submit bundle="HTMLALT_RESOURCES" altKey="submit.submit" styleClass="inputbutton"><bean:message key="link.change" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/></html:submit>
-				</logic:equal>
-				<logic:notEqual name="editInterval" value="sharedUnitCredits">
-					<a href="#" onclick="javascript:document.getElementById('sharedUnitCreditsForm').submit();"><bean:message key="link.change" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/></a>
-				</logic:notEqual>
-			</logic:equal>
-		</fr:form>
-
-		<h3 class="mtop15 mbottom05">Período para definir créditos unitários (ck) para as restantes UC's</h3>		
-		<bean:define id="readOnly" value="true"/>
-		<bean:define id="action" value="/defineCreditsPeriods.do?method=prepareEditAnnualCreditsDates&editInterval=unitCredits"/>
-		<logic:equal name="editInterval" value="unitCredits">
-			<bean:define id="readOnly" value="false"/>
-			<bean:define id="action" value="/defineCreditsPeriods.do?method=editAnnualCreditsDates&editInterval=unitCredits"/>
-		</logic:equal>
-		<fr:form id="unitCreditsForm" action="<%=action %>">
-			<fr:edit name="teacherCreditsBean">
+			<h4 class="mtop15 mbottom05">Período para definir créditos unitários (ck) para as UC's partilhadas</h4>
+			<fr:edit name="teacherCreditsBean" id="sharedUnitCredits">
 				<fr:schema bundle="TEACHER_CREDITS_SHEET_RESOURCES" type="pt.ist.fenixedu.teacher.dto.teacherCredits.TeacherCreditsPeriodBean">
-					<fr:slot name="unitCreditsBeginDate" key="label.beginDate" layout="null-as-label" readOnly="<%=Boolean.valueOf(readOnly.toString()) %>"/>
-					<fr:slot name="unitCreditsEndDate" key="label.endDate" layout="null-as-label" readOnly="<%=Boolean.valueOf(readOnly.toString()) %>"/>
+					<fr:slot name="sharedUnitCreditsBeginDate" key="label.beginDate" layout="null-as-label" readOnly="<%=Boolean.valueOf(closed.toString())%>" validator="pt.ist.fenixWebFramework.rendererExtensions.validators.DateTimeValidator"/>
+					<fr:slot name="sharedUnitCreditsEndDate" key="label.endDate" layout="null-as-label"  readOnly="<%=Boolean.valueOf(closed.toString()) %>" validator="pt.ist.fenixWebFramework.rendererExtensions.validators.DateTimeValidator"/>
 				</fr:schema>
 				<fr:layout name="tabular">
 					<fr:property name="classes" value="tstyle2 thleft thlight mtop05"/>
@@ -165,45 +126,37 @@
 				<fr:destination name="invalid" path="/defineCreditsPeriods.do?method=showPeriods"/>
 				<fr:destination name="cancel" path="/defineCreditsPeriods.do?method=showPeriods"/>
 			</fr:edit>
-			<logic:equal name="closed" value="false">
-				<logic:equal name="editInterval" value="unitCredits">
-					<html:submit bundle="HTMLALT_RESOURCES" altKey="submit.submit" styleClass="inputbutton"><bean:message key="link.change" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/></html:submit>
-				</logic:equal>
-				<logic:notEqual name="editInterval" value="unitCredits">
-					<a href="#" onclick="javascript:document.getElementById('unitCreditsForm').submit();"><bean:message key="link.change" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/></a>
-				</logic:notEqual>
-			</logic:equal>
-		</fr:form>
-			
-		<h3 class="mtop15 mbottom05">Outras datas</h3>
-		<fr:edit id="annualCreditsState" name="teacherCreditsBean" property="annualCreditsState">
+			<h4 class="mtop15 mbottom05">Período para definir créditos unitários (ck) para as restantes UC's</h4>
+			<fr:edit name="teacherCreditsBean" id="unitCredits">
+				<fr:schema bundle="TEACHER_CREDITS_SHEET_RESOURCES" type="pt.ist.fenixedu.teacher.dto.teacherCredits.TeacherCreditsPeriodBean">
+					<fr:slot name="unitCreditsBeginDate" key="label.beginDate" layout="null-as-label" readOnly="<%=Boolean.valueOf(closed.toString()) %>" validator="pt.ist.fenixWebFramework.rendererExtensions.validators.DateTimeValidator"/>
+					<fr:slot name="unitCreditsEndDate" key="label.endDate" layout="null-as-label" readOnly="<%=Boolean.valueOf(closed.toString()) %>" validator="pt.ist.fenixWebFramework.rendererExtensions.validators.DateTimeValidator"/>
+				</fr:schema>
+				<fr:layout name="tabular">
+					<fr:property name="classes" value="tstyle2 thleft thlight mtop05"/>
+					<fr:property name="columnClasses" value=",,tderror1 tdclear"/>
+				</fr:layout>
+				<fr:destination name="invalid" path="/defineCreditsPeriods.do?method=showPeriods"/>
+				<fr:destination name="cancel" path="/defineCreditsPeriods.do?method=showPeriods"/>
+			</fr:edit>
+			<h4 class="mtop15 mbottom05">Outras datas</h4>
+			<fr:edit name="teacherCreditsBean" id="annualCreditsState" >
 			<fr:schema bundle="TEACHER_CREDITS_SHEET_RESOURCES" type="pt.ist.fenixedu.teacher.domain.credits.AnnualCreditsState">
-				<fr:slot name="orientationsCalculationDate" layout="null-as-label" readOnly="true"/>
-				<fr:slot name="finalCalculationDate" layout="null-as-label" readOnly="<%= Boolean.valueOf(closed.toString())%>"/>
-				<fr:slot name="closeCreditsDate" layout="null-as-label" readOnly="<%= Boolean.valueOf(closed.toString())%>"/>
+				<fr:slot name="annualCreditsState.orientationsCalculationDate" layout="null-as-label" readOnly="true" key="label.orientationsCalculationDate"/>
+				<fr:slot name="finalCalculationDate" layout="null-as-label" readOnly="<%= Boolean.valueOf(closed.toString())%>" validator="pt.ist.fenixWebFramework.rendererExtensions.validators.LocalDateValidator"/>
+				<fr:slot name="closeCreditsDate" layout="null-as-label" readOnly="<%= Boolean.valueOf(closed.toString())%>" validator="pt.ist.fenixWebFramework.rendererExtensions.validators.LocalDateValidator"/>
 				<logic:present role="role(MANAGER)">
-					<fr:slot name="isFinalCreditsCalculated" layout="null-as-label" readOnly="true"/>
-					<fr:slot name="isCreditsClosed" layout="null-as-label" readOnly="true"/>
+					<fr:slot name="annualCreditsState.isFinalCreditsCalculated" layout="null-as-label" readOnly="true"/>
+					<fr:slot name="annualCreditsState.isCreditsClosed" layout="null-as-label" readOnly="true"/>
 				</logic:present>
 			</fr:schema>
 			<fr:layout name="tabular">
 				<fr:property name="classes" value="tstyle2 thleft thlight mtop05"/>
 			</fr:layout>
 		</fr:edit>
+			<logic:equal name="closed" value="false">
+				<html:submit bundle="HTMLALT_RESOURCES" altKey="submit.submit" styleClass="inputbutton"><bean:message key="link.change" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/></html:submit>
+			</logic:equal>
+		</fr:form>
 	</logic:notEmpty>
-			
 </logic:present>
-
-<script type="text/javascript">
-function check(e,v){
-	if (e.className == "dnone")
-  	{
-	  e.className = "dblock";
-	  v.value = "-";
-	}
-	else {
-	  e.className = "dnone";
-  	  v.value = "+";
-	}
-}
-</script>
