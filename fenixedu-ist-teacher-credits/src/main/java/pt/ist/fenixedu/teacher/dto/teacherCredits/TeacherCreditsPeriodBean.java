@@ -21,8 +21,10 @@ package pt.ist.fenixedu.teacher.dto.teacherCredits;
 import java.io.Serializable;
 
 import org.fenixedu.academic.domain.ExecutionSemester;
+import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
+import org.joda.time.LocalDate;
 
 import pt.ist.fenixedu.teacher.domain.credits.AnnualCreditsState;
 import pt.ist.fenixedu.teacher.domain.time.calendarStructure.TeacherCreditsFillingForDepartmentAdmOfficeCE;
@@ -44,6 +46,11 @@ public class TeacherCreditsPeriodBean implements Serializable {
     private DateTime sharedUnitCreditsEndDate;
     private DateTime unitCreditsBeginDate;
     private DateTime unitCreditsEndDate;
+    private DateTime reductionServiceApprovalBeginDate;
+    private DateTime reductionServiceApprovalEndDate;
+
+    private LocalDate finalCalculationDate;
+    private LocalDate closeCreditsDate;
 
     private boolean teacher;
 
@@ -137,6 +144,12 @@ public class TeacherCreditsPeriodBean implements Serializable {
                 .getStart() : null);
         setUnitCreditsEndDate(annualCreditsState.getUnitCreditsInterval() != null ? annualCreditsState.getUnitCreditsInterval()
                 .getEnd() : null);
+        setReductionServiceApprovalBeginDate(annualCreditsState.getReductionServiceApproval() != null ? annualCreditsState
+                .getReductionServiceApproval().getStart() : null);
+        setReductionServiceApprovalEndDate(annualCreditsState.getReductionServiceApproval() != null ? annualCreditsState
+                .getReductionServiceApproval().getEnd() : null);
+        setFinalCalculationDate(annualCreditsState.getFinalCalculationDate());
+        setCloseCreditsDate(annualCreditsState.getCloseCreditsDate());
     }
 
     public DateTime getSharedUnitCreditsBeginDate() {
@@ -171,17 +184,68 @@ public class TeacherCreditsPeriodBean implements Serializable {
         this.unitCreditsEndDate = unitCreditsEndDate;
     }
 
+    public DateTime getReductionServiceApprovalBeginDate() {
+        return reductionServiceApprovalBeginDate;
+    }
+
+    public void setReductionServiceApprovalBeginDate(DateTime reductionServiceApprovalBeginDate) {
+        this.reductionServiceApprovalBeginDate = reductionServiceApprovalBeginDate;
+    }
+
+    public DateTime getReductionServiceApprovalEndDate() {
+        return reductionServiceApprovalEndDate;
+    }
+
+    public void setReductionServiceApprovalEndDate(DateTime reductionServiceApprovalEndDate) {
+        this.reductionServiceApprovalEndDate = reductionServiceApprovalEndDate;
+    }
+
     private Interval getSharedUnitCreditsInterval() {
-        return new Interval(getSharedUnitCreditsBeginDate(), getSharedUnitCreditsEndDate());
+        return getInterval(getSharedUnitCreditsBeginDate(), getSharedUnitCreditsEndDate());
     }
 
     private Interval getUnitCreditsInterval() {
-        return new Interval(getUnitCreditsBeginDate(), getUnitCreditsEndDate());
+        return getInterval(getUnitCreditsBeginDate(), getUnitCreditsEndDate());
+    }
+
+    private Interval getReductionServiceApprovalInterval() {
+        return getInterval(getReductionServiceApprovalBeginDate(), getReductionServiceApprovalEndDate());
+    }
+
+    private Interval getInterval(DateTime start, DateTime end) {
+        if (start == null && end == null) {
+            return null;
+        }
+        try {
+            return new Interval(start, end);
+        } catch (IllegalArgumentException e) {
+            throw new DomainException(e.getMessage());
+        }
+    }
+
+    public LocalDate getFinalCalculationDate() {
+        return finalCalculationDate;
+    }
+
+    public void setFinalCalculationDate(LocalDate finalCalculationDate) {
+        this.finalCalculationDate = finalCalculationDate;
+    }
+
+    public LocalDate getCloseCreditsDate() {
+        return closeCreditsDate;
+    }
+
+    public void setCloseCreditsDate(LocalDate closeCreditsDate) {
+        this.closeCreditsDate = closeCreditsDate;
     }
 
     @Atomic
     public void editIntervals() {
         annualCreditsState.setSharedUnitCreditsInterval(getSharedUnitCreditsInterval());
         annualCreditsState.setUnitCreditsInterval(getUnitCreditsInterval());
+        annualCreditsState.setReductionServiceApproval(getReductionServiceApprovalInterval());
+        annualCreditsState.setCloseCreditsDate(getCloseCreditsDate());
+        annualCreditsState.setFinalCalculationDate(getFinalCalculationDate());
+        setAnnualCreditsState();
     }
 }

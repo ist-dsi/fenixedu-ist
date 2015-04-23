@@ -50,6 +50,7 @@ import pt.ist.fenixedu.quc.domain.InquiryStudentCycleAnswer;
 import pt.ist.fenixedu.quc.domain.RegentInquiryTemplate;
 import pt.ist.fenixedu.quc.domain.StudentInquiryRegistry;
 import pt.ist.fenixedu.quc.domain.TeacherInquiryTemplate;
+import pt.ist.fenixedu.teacher.domain.credits.AnnualCreditsState;
 import pt.ist.fenixedu.teacher.domain.teacher.ReductionService;
 import pt.ist.fenixedu.teacher.domain.teacher.TeacherService;
 import pt.ist.fenixedu.teacher.domain.time.calendarStructure.TeacherCreditsFillingCE;
@@ -138,14 +139,15 @@ public abstract class BaseAuthenticationAction extends FenixAction {
                 && RoleType.DEPARTMENT_MEMBER.isMember(userView)) {
             Department department = userView.getPerson().getTeacher().getDepartment();
             if (department != null && DepartmentPresidentStrategy.isCurrentUserCurrentDepartmentPresident(department)) {
-                ExecutionSemester executionSemester = ExecutionSemester.readActualExecutionSemester();
-                if (executionSemester != null && TeacherCreditsFillingCE.isInValidCreditsPeriod(executionSemester, userView)) {
-                    boolean inValidTeacherCreditsPeriod =
-                            TeacherCreditsFillingCE.isInValidCreditsPeriod(executionSemester, userView);
-                    for (ReductionService reductionService : department.getPendingReductionServicesSet()) {
-                        if ((reductionService.getTeacherService().getTeacherServiceLock() != null || !inValidTeacherCreditsPeriod)
-                                && reductionService.getTeacherService().getExecutionPeriod().equals(executionSemester)) {
-                            return true;
+                ExecutionYear executionYear = ExecutionYear.readCurrentExecutionYear();
+                if (executionYear != null && AnnualCreditsState.isInValidReductionServiceApprovalPeriod(executionYear)) {
+                    for (ExecutionSemester executionSemester : executionYear.getExecutionPeriodsSet()) {
+                        boolean inValidTeacherCreditsPeriod = AnnualCreditsState.isInValidCreditsPeriod(executionSemester);
+                        for (ReductionService reductionService : department.getPendingReductionServicesSet()) {
+                            if ((reductionService.getTeacherService().getTeacherServiceLock() != null || !inValidTeacherCreditsPeriod)
+                                    && reductionService.getTeacherService().getExecutionPeriod().equals(executionSemester)) {
+                                return true;
+                            }
                         }
                     }
                 }

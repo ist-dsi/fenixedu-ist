@@ -124,7 +124,6 @@ public class ManageCreditsPeriods extends FenixDispatchAction {
             bean.editIntervals();
         } catch (Exception e) {
             addActionMessage(request, e.getMessage());
-            request.setAttribute("editInterval", request.getParameter("editInterval"));
         }
         RenderUtils.invalidateViewState();
         request.setAttribute("teacherCreditsBean", bean);

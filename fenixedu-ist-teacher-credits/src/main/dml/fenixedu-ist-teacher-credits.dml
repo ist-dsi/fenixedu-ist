@@ -152,6 +152,7 @@ class credits.AnnualCreditsState  {
     DateTime lastModifiedDate;
     Interval sharedUnitCreditsInterval;
     Interval unitCreditsInterval;
+    Interval reductionServiceApproval;
 }
 
 class reports.EffectiveTeachingLoadReportFile extends .org.fenixedu.academic.domain.reports.GepReportFile {}

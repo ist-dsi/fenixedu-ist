@@ -18,19 +18,20 @@
  */
 package pt.ist.fenixedu.teacher.ui.struts.action.credits.departmentMember;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.ExecutionSemester;
+import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 import org.fenixedu.bennu.core.domain.User;
@@ -43,10 +44,10 @@ import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
 
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
 import pt.ist.fenixedu.contracts.domain.accessControl.DepartmentPresidentStrategy;
+import pt.ist.fenixedu.teacher.domain.credits.AnnualCreditsState;
 import pt.ist.fenixedu.teacher.domain.credits.util.ReductionServiceBean;
 import pt.ist.fenixedu.teacher.domain.teacher.ReductionService;
 import pt.ist.fenixedu.teacher.domain.teacher.TeacherService;
-import pt.ist.fenixedu.teacher.domain.time.calendarStructure.TeacherCreditsFillingCE;
 import pt.ist.fenixedu.teacher.evaluation.ui.struts.action.departmentMember.DepartmentMemberPresidentApp;
 import pt.ist.fenixedu.teacher.ui.struts.action.credits.ManageCreditsReductionsDispatchAction;
 import pt.ist.fenixframework.FenixFramework;
@@ -63,26 +64,43 @@ public class DepartmentMemberManageCreditsReductionsDA extends ManageCreditsRedu
     @EntryPoint
     public ActionForward showReductionServices(ActionMapping mapping, ActionForm form, HttpServletRequest request,
             HttpServletResponse response) throws NumberFormatException, FenixServiceException {
-        ExecutionSemester executionSemester = ExecutionSemester.readActualExecutionSemester();
+        ExecutionYear executionYear = ExecutionYear.readCurrentExecutionYear();
         User userView = Authenticate.getUser();
         Department department = userView.getPerson().getTeacher().getDepartment();
-        List<ReductionService> creditsReductions = new ArrayList<ReductionService>();
-        if (department != null && DepartmentPresidentStrategy.isCurrentUserCurrentDepartmentPresident(department)) {
-            boolean inValidTeacherCreditsPeriod =
-                    TeacherCreditsFillingCE.isInValidCreditsPeriod(executionSemester, Authenticate.getUser());
-            for (Teacher teacher : department.getAllCurrentTeachers()) {
-                TeacherService teacherService = TeacherService.getTeacherServiceByExecutionPeriod(teacher, executionSemester);
-                if (teacherService != null
-                        && teacherService.getReductionService() != null
-                        && ((teacherService.getReductionService().getRequestCreditsReduction() != null && teacherService
-                                .getReductionService().getRequestCreditsReduction()) || teacherService.getReductionService()
-                                .getCreditsReductionAttributed() != null)
-                        && (teacherService.getTeacherServiceLock() != null || !inValidTeacherCreditsPeriod)) {
-                    creditsReductions.add(teacherService.getReductionService());
+        SortedSet<ReductionService> creditsReductions = new TreeSet<ReductionService>(new Comparator<ReductionService>() {
+            @Override
+            public int compare(ReductionService reductionService1, ReductionService reductionService2) {
+                final int teacherIdCompare =
+                        reductionService1.getTeacherService().getTeacher().getPerson().getUsername()
+                                .compareTo(reductionService2.getTeacherService().getTeacher().getPerson().getUsername());
+                return teacherIdCompare == 0 ? reductionService1.getTeacherService().getExecutionPeriod()
+                        .compareExecutionInterval(reductionService2.getTeacherService().getExecutionPeriod()) : teacherIdCompare;
+            }
+        });
+
+        boolean isInValidReductionServiceApprovalPeriod =
+                AnnualCreditsState.isInValidReductionServiceApprovalPeriod(executionYear);
+        if (department != null && DepartmentPresidentStrategy.isCurrentUserCurrentDepartmentPresident(department)
+                && isInValidReductionServiceApprovalPeriod) {
+
+            List<Teacher> allTeachers = department.getAllTeachers(executionYear);
+
+            for (ExecutionSemester executionSemester : executionYear.getExecutionPeriodsSet()) {
+                boolean inValidTeacherCreditsPeriod = AnnualCreditsState.isInValidCreditsPeriod(executionSemester);
+
+                for (Teacher teacher : allTeachers) {
+                    TeacherService teacherService = TeacherService.getTeacherServiceByExecutionPeriod(teacher, executionSemester);
+                    if (teacherService != null
+                            && teacherService.getReductionService() != null
+                            && ((teacherService.getReductionService().getRequestCreditsReduction() != null && teacherService
+                                    .getReductionService().getRequestCreditsReduction()) || teacherService.getReductionService()
+                                    .getCreditsReductionAttributed() != null)
+                            && (teacherService.getTeacherServiceLock() != null || !inValidTeacherCreditsPeriod)) {
+                        creditsReductions.add(teacherService.getReductionService());
+                    }
                 }
             }
         }
-        Collections.sort(creditsReductions, new BeanComparator("teacherService.teacher.teacherId"));
         request.setAttribute("creditsReductions", creditsReductions);
         return mapping.findForward("showReductionServices");
     }
