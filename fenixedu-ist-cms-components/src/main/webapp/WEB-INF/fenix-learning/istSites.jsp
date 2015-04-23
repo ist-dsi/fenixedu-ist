@@ -136,44 +136,41 @@
                         </button>
                         <h4><spring:message code="title.unit.site.layout"/></h4>
                     </div>
-                    <form id="layout-form" method="post" action="${unitSitesContext}/${i.slug}/layout">
-                        <div class="modal-body" id="site-layout" slug="${i.slug}">
-                            <center>
-                                <p><spring:message code="label.unit.site.layout.instructions"/></p>
-                                <input type="text" hidden="hidden" name="template" id="selected-layout"/>
-                                <ul class="list-inline">
-                                    <li>
-                                        <a href="#" layout='unitHomepageWithBannerIntro'>
-                                            <img src="${imagesContext}/banner_intro.gif" class="img-responsive"
-                                                 width="100" height="200" alt="Banner main image"/>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#" layout='unitHomepageWithIntroBanner'>
-                                            <img src="${imagesContext}/intro_banner.gif" class="img-responsive"
-                                                 width="100" height="200" alt="Banner main image"/>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="#" layout='unitHomepageWithIntroFloat'>
-                                            <img src="${imagesContext}/banner_intro_float.gif"
-                                                 class="img-responsive"
-                                                 width="100" height="200" alt="Banner main image"/>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </center>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" data-dismiss="modal" class="btn btn-default">
-                                <spring:message code="action.cancel"/>
-                            </button>
-                            <button type="submit" class="btn btn-primary">
-                                <spring:message code="action.save"/>
-                            </button>
-                        </div>
-                    </form>
-
+                    <div class="modal-body" id="site-layout" slug="${i.slug}">
+                        <center>
+                            <p><spring:message code="label.unit.site.layout.instructions"/></p>
+                            <input type="text" hidden="hidden" name="template" id="selected-layout"/>
+                            <ul class="list-inline">
+                                <li>
+                                    <a href="#" layout='unitHomepageWithBannerIntro'>
+                                        <img src="${imagesContext}/banner_intro.gif" class="img-responsive"
+                                             width="100" height="200" alt="Banner main image"/>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" layout='unitHomepageWithIntroBanner'>
+                                        <img src="${imagesContext}/intro_banner.gif" class="img-responsive"
+                                             width="100" height="200" alt="Banner main image"/>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" layout='unitHomepageWithIntroFloat'>
+                                        <img src="${imagesContext}/banner_intro_float.gif"
+                                             class="img-responsive"
+                                             width="100" height="200" alt="Banner main image"/>
+                                    </a>
+                                </li>
+                            </ul>
+                        </center>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="reset" data-dismiss="modal" class="btn btn-default">
+                            <spring:message code="action.cancel"/>
+                        </button>
+                        <button type="button" data-dismiss="modal" class="btn btn-primary" id="change-layout-btn">
+                            <spring:message code="action.save"/>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -181,15 +178,19 @@
             $(function () {
                 $('#site-layout[slug=${i.slug}] a').each(function () {
                     var el = $(this);
-                    console.log('init', el);
                     el.click(function () {
                         $('#site-layout[slug=${i.slug}] a').removeClass('active');
                         el.addClass('active');
-                        $('#selected-layout').val(el.attr('layout'));
                     })
                 });
 
                 $('#site-layout[slug=${i.slug}] a[layout=${i.initialPage.template.type}]').addClass('active');
+                
+                $('#editLayoutModal-${i.externalId} #change-layout-btn').click(function(evt){
+                    var selectedEl = $('#site-layout[slug=${i.slug}] a.active');
+                    var selectedLayout = selectedEl.attr('layout');
+                    $.post("${unitSitesContext}/${i.slug}/layout", { template: selectedLayout });
+                });
             });
         </script>
     </c:if>
