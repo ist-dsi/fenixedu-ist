@@ -18,6 +18,7 @@
  */
 package pt.ist.fenixedu.cmscomponents.domain.unit.components;
 
+import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.TeacherAuthorization;
 import org.fenixedu.academic.domain.TeacherCategory;
@@ -52,6 +53,7 @@ public class UnitTeachersComponent extends UnitSiteComponent {
         Unit unit = unit(page);
         globalContext.put("teachersByCategory", teachersByCategory(unit));
         setupTeachersAreas(unit, globalContext);
+        globalContext.put("currentSemester", ExecutionSemester.readActualExecutionSemester());
     }
 
     private SortedMap<TeacherCategory, TreeSet<Teacher>> teachersByCategory(Unit unit) {
