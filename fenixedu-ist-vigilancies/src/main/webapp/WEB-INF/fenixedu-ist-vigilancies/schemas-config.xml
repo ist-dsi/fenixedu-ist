@@ -730,7 +730,7 @@ extends="presentSimpleConvokesWithoutLink">
 <schema name="selectColumnsToDisplay" type="pt.ist.fenixedu.vigilancies.ui.struts.action.vigilancy.VigilantGroupBean" bundle="VIGILANCY_RESOURCES">
         <slot name="executionYear" key="label.vigilancy.executionYear" layout="menu-select-postback">
             <property name="providerClass"
-            value="pt.ist.fenixedu.vigilancies.ui.renderers.providers.OpenExecutionYearsProvider" />
+            value="org.fenixedu.academic.ui.renderers.providers.OpenExecutionYearsProvider" />
             <property name="format" value="${year}"/>
         </slot>
         <slot name="showVigilantColumn" key="label.vigilancy.vigilants" layout="option-select-postback"/>
@@ -741,7 +741,7 @@ extends="presentSimpleConvokesWithoutLink">
 <schema name="selectYearToDisplay" type="pt.ist.fenixedu.vigilancies.ui.struts.action.vigilancy.VigilantGroupBean" bundle="VIGILANCY_RESOURCES">
         <slot name="executionYear" key="label.vigilancy.executionYear" layout="menu-select-postback">
             <property name="providerClass"
-            value="pt.ist.fenixedu.vigilancies.ui.renderers.providers.OpenExecutionYearsProvider" />
+            value="org.fenixedu.academic.ui.renderers.providers.OpenExecutionYearsProvider" />
             <property name="format" value="${year}"/>
         </slot>
 </schema>
