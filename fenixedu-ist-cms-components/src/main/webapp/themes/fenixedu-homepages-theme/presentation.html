@@ -27,9 +27,9 @@
 
 {% macro presentationRow(title, content) %}
 	<div class="row" style="border-bottom:1px solid #ddd; padding-top:20px; padding-bottom:20px;">
-		<div class="col-sm-3" style="font-weight:700">{{ i18n('resources.HomepageResources', title) }}</div>
+		<div class="col-sm-3" style="font-weight:700">{{ i18n('resources.HomepageResources', title) }} <a href="#temporalInformation"><small>*</small></a></div>
 		<div class="col-sm-6">{{ content | raw }}</div>
-	</div>		
+	</div>
 {% endmacro %}
 
 {% macro presentationContactRows(title, contacts, type, ctxPath='') %}
@@ -37,7 +37,7 @@
 		<div class="row" style="border-bottom:1px solid #ddd; padding-top:20px; padding-bottom:20px;">
 			<div class="col-sm-3" style="font-weight:700">{{ i18n('resources.HomepageResources', title) }}</div>
 			<div class="col-sm-6">{{ contactView(contact,type,showDefault=(contacts | length > 1),ctxPath=ctxPath) }}</div>
-		</div>	
+		</div>
 	{% endfor %}
 {% endmacro %}
 
@@ -47,10 +47,10 @@
 					<img class="img-circle" alt="{{ i18n('resources.ImageResources','personPhoto') }}" src="{{ ownerAvatarUrl }}" style="border:1px solid #009ee2; "/>
 				</div>
 		{% endif %}
-	
-	
+
+
 		<!-- photo -->
-		
+
 
 		<!-- working unit -->
 		{% if workingUnit is not null %}
@@ -103,6 +103,8 @@
 		{% if teachingCourses is not empty %}
 			{{ presentationRow('label.homepage.showCurrentExecutionCourses', courseList(teachingCourses)) }}
 		{% endif %}
+
+        <br/><p id="temporalInformation"><small><em>* {{ i18n('resources.IstCmsTemplatesResources', 'label.information.date', currentSemester.qualifiedName) }}</em></small></p>
 
 
 {% endblock content %}

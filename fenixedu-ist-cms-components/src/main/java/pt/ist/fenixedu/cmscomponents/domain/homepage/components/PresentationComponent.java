@@ -18,16 +18,8 @@
  */
 package pt.ist.fenixedu.cmscomponents.domain.homepage.components;
 
-import static java.util.Arrays.asList;
-
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
-
 import org.fenixedu.academic.domain.Attends;
+import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.contacts.PartyContact;
@@ -37,11 +29,19 @@ import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.cms.domain.Page;
 import org.fenixedu.cms.domain.component.ComponentType;
 import org.fenixedu.cms.rendering.TemplateContext;
-
 import pt.ist.fenixedu.cmscomponents.domain.homepage.HomepageSite;
 import pt.ist.fenixedu.contracts.domain.Employee;
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.Contract;
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.ResearchUnit;
+
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+
+import static java.util.Arrays.asList;
 
 @ComponentType(name = "Presentation Component", description = "Provides homepage owner's presentation data.")
 public class PresentationComponent extends HomepageSiteComponent {
@@ -113,6 +113,7 @@ public class PresentationComponent extends HomepageSiteComponent {
             global.put("teachingCourses", owner.getTeacher().getCurrentExecutionCourses());
         }
 
+        global.put("currentSemester", ExecutionSemester.readActualExecutionSemester());
         //TODO Unit, ResearchUnit, PartyContact, StudentCurricularPlan, Attends and ExecutionCourse wrappers
 
     }
