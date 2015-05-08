@@ -133,7 +133,8 @@ public class TeacherCredits extends TeacherCredits_Base {
             }
         }
         Collections.sort(participants, ThesisEvaluationParticipant.COMPARATOR_BY_STUDENT_NUMBER);
-        return round(participants.stream().mapToDouble(p -> p.getParticipationCredits()).sum());
+        return round(participants.stream().mapToDouble(p -> p.getThesis().hasCredits() ? p.getPercentageDistribution() / 100 : 0)
+                .sum());
     }
 
     public static double calculateManagementFunctionsCredits(Teacher teacher, ExecutionSemester executionSemester) {
