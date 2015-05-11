@@ -71,7 +71,11 @@ public class FenixIstLoginConfigurer implements ServletContextListener {
         public void showLoginPage(HttpServletRequest req, HttpServletResponse resp, String callback) throws IOException,
                 ServletException {
             if (Authenticate.isLogged()) {
-                resp.sendRedirect(req.getContextPath() + "/login.do");
+                if (Strings.isNullOrEmpty(callback)) {
+                    resp.sendRedirect(req.getContextPath() + "/login.do");
+                } else {
+                    resp.sendRedirect(callback);
+                }
             } else {
                 CasConfig casConfig = CoreConfiguration.casConfig();
                 if (Strings.isNullOrEmpty(callback)) {
