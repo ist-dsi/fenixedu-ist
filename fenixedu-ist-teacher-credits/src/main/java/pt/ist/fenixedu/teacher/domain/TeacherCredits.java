@@ -42,7 +42,6 @@ import pt.ist.fenixedu.contracts.domain.organizationalStructure.PersonFunction;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonContractSituation;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalData;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalExemption;
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalCategory;
 import pt.ist.fenixedu.teacher.domain.teacher.TeacherService;
 
 public class TeacherCredits extends TeacherCredits_Base {
@@ -107,9 +106,13 @@ public class TeacherCredits extends TeacherCredits_Base {
         ExecutionSemester executionPeriodAfterEnd = endExecutionPeriod.getNextExecutionPeriod();
         while (startPeriod != executionPeriodAfterEnd && endExecutionPeriod.isBeforeOrEquals(lastExecutionSemester)) {
             TeacherCredits teacherCredits = readTeacherCredits(startPeriod, teacher);
+            boolean isMonitor =
+                    teacher.getCategory(startPeriod.getAcademicInterval()).map(tc -> tc.getProfessionalCategory())
+                            .map(pc -> pc.isTeacherMonitorCategory()).orElse(false);
+
             if (teacherCredits != null && teacherCredits.getTeacherCreditsState().isCloseState()) {
                 totalCredits += teacherCredits.getTotalCredits().subtract(teacherCredits.getMandatoryLessonHours()).doubleValue();
-            } else if (!ProfessionalCategory.isMonitor(teacher, startPeriod)) {
+            } else if (!isMonitor) {
                 final ExecutionSemester executionSemester = startPeriod;
                 TeacherService teacherService = TeacherService.getTeacherServiceByExecutionPeriod(teacher, executionSemester);
                 if (teacherService != null) {

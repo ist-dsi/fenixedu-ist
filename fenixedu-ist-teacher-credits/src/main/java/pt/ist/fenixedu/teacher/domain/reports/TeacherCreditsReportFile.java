@@ -29,6 +29,7 @@ import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Teacher;
+import org.fenixedu.academic.domain.TeacherAuthorization;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.joda.time.Interval;
@@ -108,18 +109,21 @@ public class TeacherCreditsReportFile extends TeacherCreditsReportFile_Base {
                     new Interval(executionSemester.getBeginDateYearMonthDay().toLocalDate().toDateTimeAtStartOfDay(),
                             executionSemester.getEndDateYearMonthDay().toLocalDate().toDateTimeAtStartOfDay());
             for (Teacher teacher : teachers) {
-                boolean isContractedTeacher = PersonProfessionalData.isTeacherActiveForSemester(teacher, executionSemester);
-                if (isContractedTeacher || teacher.hasTeacherAuthorization(executionSemester.getAcademicInterval())) {
+                TeacherAuthorization teacherAuthorization =
+                        teacher.getTeacherAuthorization(executionSemester.getAcademicInterval()).orElse(null);
+                if (teacherAuthorization != null) {
                     final Row row = spreadsheet.addRow();
                     row.setCell(teacher.getPerson().getUsername());
                     row.setCell(teacher.getPerson().getEmployee() != null ? teacher.getPerson().getEmployee().getEmployeeNumber() : null);
                     row.setCell(teacher.getPerson().getName());
                     row.setCell(executionSemester.getName());
-                    ProfessionalCategory category = null;
+                    ProfessionalCategory category =
+                            teacher.getCategory(executionSemester.getAcademicInterval()).map(tc -> tc.getProfessionalCategory())
+                                    .orElse(null);
                     PersonContractSituation situation = null;
                     ProfessionalRegime regime = null;
-                    category = ProfessionalCategory.getCategoryByPeriod(teacher, executionSemester);
-                    if (isContractedTeacher) {
+                    if (teacherAuthorization.isContracted()
+                            && PersonProfessionalData.isTeacherActiveForSemester(teacher, executionSemester)) {
                         situation =
                                 PersonContractSituation.getCurrentOrLastTeacherContractSituation(teacher, executionSemester
                                         .getBeginDateYearMonthDay().toLocalDate(), executionSemester.getEndDateYearMonthDay()
@@ -130,7 +134,7 @@ public class TeacherCreditsReportFile extends TeacherCreditsReportFile_Base {
                     row.setCell(situation == null ? null : situation.getContractSituation().getName().getContent());
 
                     row.setCell(regime == null ? null : regime.getName().getContent());
-                    row.setCell(ProfessionalCategory.isTeacherProfessorCategory(teacher, executionSemester) ? "S" : "N");
+                    row.setCell(category == null ? null : category.isTeacherProfessorCategory() ? "S" : "N");
                     Department lastDepartment = teacher.getLastDepartment(executionSemester.getAcademicInterval());
                     row.setCell(lastDepartment == null ? null : lastDepartment.getName());
                     Department creditsDepartment = teacher.getDepartment(executionSemester.getAcademicInterval()).orElse(null);

@@ -36,12 +36,12 @@ import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.academic.domain.Teacher;
+import org.fenixedu.academic.domain.TeacherCategory;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 import org.joda.time.Duration;
 
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.PersonFunction;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonContractSituation;
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalCategory;
 import pt.ist.fenixedu.teacher.domain.TeacherCredits;
 import pt.ist.fenixedu.teacher.domain.teacher.TeacherService;
 import pt.ist.fenixedu.teacher.dto.teacher.distribution.DistributionTeacherServicesByTeachersDTO;
@@ -76,9 +76,8 @@ public class ReadTeacherServiceDistributionByTeachers {
             List<Teacher> teachers = department.getAllTeachers(executionPeriodEntry);
 
             for (Teacher teacher : teachers) {
-                ProfessionalCategory professionalCategory =
-                        ProfessionalCategory.getCategoryByPeriod(teacher, executionPeriodEntry);
-                if (professionalCategory == null) {
+                TeacherCategory teacherCategory = teacher.getCategory(executionPeriodEntry.getAcademicInterval()).orElse(null);
+                if (teacherCategory == null) {
                     continue;
                 }
 
@@ -92,7 +91,7 @@ public class ReadTeacherServiceDistributionByTeachers {
                 } else {
                     Double accumulatedCredits =
                             (startPeriod == null ? 0.0 : TeacherCredits.calculateBalanceOfCreditsUntil(teacher, endPeriod));
-                    String category = professionalCategory != null ? professionalCategory.getName().getContent() : null;
+                    String category = teacherCategory != null ? teacherCategory.getName().getContent() : null;
                     returnDTO.addTeacher(teacher.getExternalId(), teacher.getPerson().getUsername(), category, teacher
                             .getPerson().getName(), mandatoryLessonHours, accumulatedCredits);
                 }

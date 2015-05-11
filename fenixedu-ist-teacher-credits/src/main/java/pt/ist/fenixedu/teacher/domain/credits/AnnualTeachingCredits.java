@@ -32,7 +32,6 @@ import org.fenixedu.bennu.core.domain.Bennu;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalData;
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalCategory;
 import pt.ist.fenixedu.teacher.domain.TeacherCredits;
 import pt.ist.fenixedu.teacher.domain.teacher.DegreeProjectTutorialService;
 import pt.ist.fenixedu.teacher.domain.teacher.TeacherService;
@@ -91,11 +90,12 @@ public class AnnualTeachingCredits extends AnnualTeachingCredits_Base {
         boolean hasFinalAndAccumulatedCredits = false;
 
         for (ExecutionSemester executionSemester : getAnnualCreditsState().getExecutionYear().getExecutionPeriodsSet()) {
-            boolean activeContractedTeacherForSemester =
-                    PersonProfessionalData.isTeacherActiveForSemester(getTeacher(), executionSemester);
             TeacherAuthorization teacherAuthorization =
                     getTeacher().getTeacherAuthorization(executionSemester.getAcademicInterval()).orElse(null);
-            boolean activeExternalTeacher = teacherAuthorization == null ? false : !teacherAuthorization.isContracted();
+            boolean activeContractedTeacherForSemester =
+                    teacherAuthorization != null && teacherAuthorization.isContracted()
+                            && PersonProfessionalData.isTeacherActiveForSemester(getTeacher(), executionSemester);
+            boolean activeExternalTeacher = teacherAuthorization != null && !teacherAuthorization.isContracted();
             if (activeContractedTeacherForSemester || activeExternalTeacher) {
                 BigDecimal thisSemesterManagementFunctionCredits =
                         new BigDecimal(TeacherCredits.calculateManagementFunctionsCredits(getTeacher(), executionSemester));
@@ -123,7 +123,11 @@ public class AnnualTeachingCredits extends AnnualTeachingCredits_Base {
                     setHasAnyLimitation(true);
                 }
                 yearCredits = yearCredits.add(thisSemesterYearCredits);
-                if (activeContractedTeacherForSemester && !ProfessionalCategory.isMonitor(getTeacher(), executionSemester)) {
+                boolean isTeacherMonitorCategory =
+                        getTeacher().getCategory(executionSemester.getAcademicInterval()).map(tc -> tc.getProfessionalCategory())
+                                .map(pc -> pc.isTeacherMonitorCategory()).orElse(false);
+
+                if (activeContractedTeacherForSemester && !isTeacherMonitorCategory) {
                     yearCreditsForFinalCredits = yearCreditsForFinalCredits.add(thisSemesterYearCredits);
                     annualTeachingLoadFinalCredits = annualTeachingLoadFinalCredits.add(thisSemesterTeachingLoad);
                     if (executionSemester.getSemester() == 2) {

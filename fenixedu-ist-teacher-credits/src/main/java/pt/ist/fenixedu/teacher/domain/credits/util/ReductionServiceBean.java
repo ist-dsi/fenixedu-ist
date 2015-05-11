@@ -31,7 +31,6 @@ import org.joda.time.Interval;
 import org.joda.time.PeriodType;
 import org.joda.time.YearMonthDay;
 
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalCategory;
 import pt.ist.fenixedu.teacher.domain.DepartmentCreditsPool;
 import pt.ist.fenixedu.teacher.domain.teacher.ReductionService;
 import pt.ist.fenixedu.teacher.domain.teacher.TeacherService;
@@ -88,8 +87,8 @@ public class ReductionServiceBean implements Serializable {
     }
 
     public String getTeacherCategory() {
-        ProfessionalCategory category = ProfessionalCategory.getCategoryByPeriod(getTeacher(), getExecutionSemester());
-        return category != null ? category.getName().getContent() : null;
+        return teacher.getCategory(getExecutionSemester().getAcademicInterval()).map(tc -> tc.getProfessionalCategory())
+                .map(pc -> pc.getName().getContent()).orElse(null);
     }
 
     @Atomic

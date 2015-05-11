@@ -45,7 +45,6 @@ import org.joda.time.LocalDate;
 
 import pt.ist.fenixedu.contracts.domain.accessControl.DepartmentPresidentStrategy;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalData;
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalCategory;
 import pt.ist.fenixedu.teacher.domain.TeacherCredits;
 import pt.ist.fenixedu.teacher.domain.credits.AnnualTeachingCredits;
 import pt.ist.fenixedu.teacher.domain.teacher.OtherService;
@@ -161,10 +160,8 @@ public class AnnualTeachingCreditsBean implements Serializable {
     }
 
     public String getProfessionalCategoryName() {
-        ProfessionalCategory professionalCategory =
-                ProfessionalCategory.getLastCategory(teacher, executionYear.getBeginDateYearMonthDay().toLocalDate(),
-                        executionYear.getEndDateYearMonthDay().toLocalDate());
-        return professionalCategory == null ? null : professionalCategory.getName().getContent();
+        return teacher.getLastCategory(executionYear.getAcademicInterval()).map(tc -> tc.getProfessionalCategory())
+                .map(pc -> pc.getName().getContent()).orElse(null);
     }
 
     public String getDepartmentName() {
@@ -365,11 +362,12 @@ public class AnnualTeachingCreditsBean implements Serializable {
         boolean hasFinalAndAccumulatedCredits = false;
 
         for (ExecutionSemester executionSemester : executionYear.getExecutionPeriodsSet()) {
-            boolean activeContractedTeacherForSemester =
-                    PersonProfessionalData.isTeacherActiveForSemester(getTeacher(), executionSemester);
             TeacherAuthorization teacherAuthorization =
                     getTeacher().getTeacherAuthorization(executionSemester.getAcademicInterval()).orElse(null);
-            boolean activeExternalTeacher = teacherAuthorization == null ? false : !teacherAuthorization.isContracted();
+            boolean activeContractedTeacherForSemester =
+                    teacherAuthorization != null && teacherAuthorization.isContracted()
+                            && PersonProfessionalData.isTeacherActiveForSemester(getTeacher(), executionSemester);
+            boolean activeExternalTeacher = teacherAuthorization != null && !teacherAuthorization.isContracted();
             if (activeContractedTeacherForSemester || activeExternalTeacher) {
                 BigDecimal thisSemesterManagementFunctionCredits =
                         new BigDecimal(TeacherCredits.calculateManagementFunctionsCredits(getTeacher(), executionSemester));
@@ -397,7 +395,10 @@ public class AnnualTeachingCreditsBean implements Serializable {
                     setHasAnyLimitation(true);
                 }
                 yearCredits = yearCredits.add(thisSemesterYearCredits);
-                if (activeContractedTeacherForSemester && !ProfessionalCategory.isMonitor(getTeacher(), executionSemester)) {
+                boolean isTeacherMonitorCategory =
+                        teacher.getCategory(executionSemester.getAcademicInterval()).map(tc -> tc.getProfessionalCategory())
+                                .map(pc -> pc.isTeacherMonitorCategory()).orElse(false);
+                if (activeContractedTeacherForSemester && !isTeacherMonitorCategory) {
                     yearCreditsForFinalCredits = yearCreditsForFinalCredits.add(thisSemesterYearCredits);
                     annualTeachingLoadFinalCredits = annualTeachingLoadFinalCredits.add(thisSemesterTeachingLoad);
                     if (executionSemester.getSemester() == 2) {
