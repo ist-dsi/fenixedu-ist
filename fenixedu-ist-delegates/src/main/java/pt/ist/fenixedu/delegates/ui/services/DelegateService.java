@@ -61,44 +61,36 @@ public class DelegateService {
         DegreeType degreeType = delegateSearchBean.getDegreeType();
         delegateSearchBean.setExecutionYears(Bennu.getInstance().getExecutionYearsSet().stream()
                 .sorted(ExecutionYear.REVERSE_COMPARATOR_BY_YEAR).collect(Collectors.toList()));
-        Set<DegreeType> aux =
-                executionYear.getExecutionDegreesSet().stream().map(d -> d.getDegree().getDegreeType())
-                        .collect(Collectors.toSet());
-        delegateSearchBean.setDegreeTypes(aux.stream().collect(Collectors.toList()));
+        delegateSearchBean.setDegreeTypes(executionYear.getExecutionDegreesSet().stream().map(d -> d.getDegree().getDegreeType())
+                .distinct().sorted().collect(Collectors.toList()));
         if (degreeType == null && (degree == null || EmptyDegree.class.isInstance(degree))) {
-            delegateSearchBean.setDegrees(executionYear.getExecutionDegreesSet().stream().map(d -> d.getDegree())
-                    .sorted(Degree.COMPARATOR_BY_NAME).collect(Collectors.toList()));
-            delegateSearchBean.setDegree(delegateSearchBean.getDegrees().iterator().next());
-            delegateSearchBean.setDegreeType(delegateSearchBean.getDegree().getDegreeType());
+            delegateSearchBean.setDegrees(executionYear.getExecutionDegreesSet().stream().map(d -> d.getDegree()).distinct()
+                    .sorted(Degree.COMPARATOR_BY_DEGREE_TYPE_DEGREE_NAME_AND_ID).collect(Collectors.toList()));
             return delegateSearchBean;
         }
         if (degree == null || EmptyDegree.class.isInstance(degree)) {
             delegateSearchBean.setDegrees(executionYear.getExecutionDegreesSet().stream()
-                    .filter(d -> d.getDegree().getDegreeType().equals(degreeType)).map(d -> d.getDegree())
-                    .sorted(Degree.COMPARATOR_BY_NAME).collect(Collectors.toList()));
-            delegateSearchBean.setDegree(delegateSearchBean.getDegrees().iterator().next());
+                    .filter(d -> d.getDegree().getDegreeType().equals(degreeType)).map(d -> d.getDegree()).distinct()
+                    .sorted(Degree.COMPARATOR_BY_DEGREE_TYPE_DEGREE_NAME_AND_ID).collect(Collectors.toList()));
             return delegateSearchBean;
         }
         delegateSearchBean.setDegrees(executionYear.getExecutionDegreesSet().stream()
-                .filter(d -> d.getDegree().getDegreeType().equals(degreeType)).map(d -> d.getDegree())
-                .sorted(Degree.COMPARATOR_BY_NAME).collect(Collectors.toList()));
+                .filter(d -> d.getDegree().getDegreeType().equals(degreeType)).map(d -> d.getDegree()).distinct()
+                .sorted(Degree.COMPARATOR_BY_DEGREE_TYPE_DEGREE_NAME_AND_ID).collect(Collectors.toList()));
         return delegateSearchBean;
     }
 
     public List<DelegateBean> searchDelegates(DelegateSearchBean delegateSearchBean) {
-        DateTime beginDate = delegateSearchBean.getExecutionYear().getBeginDateYearMonthDay().toDateTimeAtMidnight();
-        DateTime endDate = delegateSearchBean.getExecutionYear().getEndDateYearMonthDay().toDateTimeAtMidnight();
-        Interval executionYearSpan = new Interval(beginDate, endDate);
+        Interval interval = delegateSearchBean.getExecutionYear().getAcademicInterval().toInterval();
         List<Delegate> toRemove = new ArrayList<Delegate>();
-        List<Delegate> withDuplicates = delegateSearchBean.getDegree().getDelegateSet().stream().filter(d -> {
-            DateTime start = d.getStart();
-            DateTime end = d.getEnd();
-            Interval activity = new Interval(start, end);
-            if (executionYearSpan.overlaps(activity)) {
-                return true;
-            }
-            return false;
-        }).collect(Collectors.toList());
+        Stream<Delegate> stream;
+        List<Delegate> withDuplicates;
+        if (delegateSearchBean.getDegree() != null) {
+            stream = delegateSearchBean.getDegree().getDelegateSet().stream();
+        } else {
+            stream = Bennu.getInstance().getDelegatesSet().stream();
+        }
+        withDuplicates = stream.filter(d -> interval.overlaps(d.getInterval())).collect(Collectors.toList());
 
         for (Delegate delegate : withDuplicates) {
             for (Delegate delegate2 : withDuplicates) {
@@ -114,10 +106,25 @@ public class DelegateService {
         return withDuplicates.stream().map(p -> p.getBean()).collect(Collectors.toList());
     }
 
+    /**
+     * @deprecated use {@link #search(DelegateSearchBean, DateTime)} instead
+     */
+    //TODO: remove in the next major
+    @Deprecated
     public List<DelegateBean> searchDelegates(DelegateSearchBean delegateSearchBean, DateTime when) {
-        List<Delegate> toRemove = new ArrayList<Delegate>();
-        Stream<Delegate> delegateStream = delegateSearchBean.getDegree().getDelegateSet().stream();
-        return delegateStream.filter(d -> d.isActive(when)).map(d -> d.getBean()).collect(Collectors.toList());
+        return search(delegateSearchBean, when).collect(Collectors.toList());
+    }
+
+    public Stream<DelegateBean> search(DelegateSearchBean delegateSearchBean, DateTime when) {
+        Stream<Delegate> delegateStream;
+        if (delegateSearchBean.getDegree() != null) {
+            delegateStream = delegateSearchBean.getDegree().getDelegateSet().stream();
+        } else if (delegateSearchBean.getDegreeType() != null) {
+            delegateStream = delegateSearchBean.getDegrees().stream().flatMap(d -> d.getDelegateSet().stream());
+        } else {
+            delegateStream = Bennu.getInstance().getDelegatesSet().stream();
+        }
+        return delegateStream.filter(d -> d.isActive(when)).distinct().map(d -> d.getBean());
     }
 
     public List<DelegateCurricularCourseBean> getCurricularCourses(Delegate delegate) {

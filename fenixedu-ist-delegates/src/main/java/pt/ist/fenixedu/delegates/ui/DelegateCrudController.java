@@ -18,8 +18,8 @@
  */
 package pt.ist.fenixedu.delegates.ui;
 
-import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.CurricularYear;
 import org.fenixedu.academic.domain.Degree;
@@ -58,10 +58,16 @@ public class DelegateCrudController {
         searchBean.setExecutionYear(ExecutionYear.readCurrentExecutionYear());
         searchBean = delegateService.generateNewBean(searchBean);
         model.addAttribute("searchBean", searchBean);
-        Set<DelegateBean> delegateBeanSet =
-                delegateService.searchDelegates(searchBean, new DateTime()).stream().collect(Collectors.toSet());
-        delegateBeanSet.addAll(delegateService.getDegreePositions(searchBean.getDegree()));
-        model.addAttribute("delegates", delegateBeanSet.stream().distinct().collect(Collectors.toList()));
+        Stream<DelegateBean> delegates = delegateService.search(searchBean, new DateTime());
+        if (searchBean.getDegree() != null) {
+            delegates = Stream.concat(delegates, delegateService.getDegreePositions(searchBean.getDegree()).stream());
+        } else if (searchBean.getDegreeType() != null) {
+            delegates =
+                    Stream.concat(delegates,
+                            searchBean.getDegrees().stream().flatMap(d -> delegateService.getDegreePositions(d).stream()));
+        }
+        model.addAttribute("delegates", delegates.distinct().sorted(DelegateBean.COMPARATOR_BY_DEGREE_FUNTION_AND_INTERVAL)
+                .collect(Collectors.toList()));
         return search(model);
     }
 

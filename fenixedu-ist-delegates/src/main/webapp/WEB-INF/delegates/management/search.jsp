@@ -53,13 +53,19 @@
 	<div class="form-group">
 		<label for="degreeType" class="col-md-1 control-label"><spring:message code="label.delegates.select.degree.type"/></label>
 		<div class="col-md-11">
-			<form:select path="degreeType" items="${searchBean.degreeTypes}" itemLabel="localizedName" onchange="onchangeDegreeType(); submit();" class="form-control"/>
+			<form:select path="degreeType" onchange="onchangeDegreeType(); submit();" class="form-control">
+                <form:option value=""><spring:message code="label.delegates.select.degree.type.all"/></form:option>
+                <form:options items="${searchBean.degreeTypes}" itemLabel="localizedName"/>
+            </form:select>
 		</div>
 	</div>
 	<div class="form-group">
 		<label for="degree" class="col-md-1 control-label"><spring:message code="label.delegates.select.degree.sel"/></label>
 		<div class="col-md-11">
-			<form:select path="degree" items="${searchBean.degrees}" itemLabel="nameI18N" itemValue="externalId" onchange="onchangeDegree(); submit();" class="form-control"/>
+			<form:select path="degree" onchange="onchangeDegree(); submit();" class="form-control">
+			    <form:option value=""><spring:message code="label.delegates.select.degree.all"/></form:option>
+			    <form:options items="${searchBean.degrees}" itemLabel="presentationName" itemValue="externalId"/>
+			</form:select>
 		</div>
 	</div>
 </form:form>
@@ -77,6 +83,7 @@ td {
 <c:if test="${not empty delegates}">
 <b><spring:message code="label.delegates.of.selected.course"/></b><p>
 <table class="table table-bordered">
+    <th><spring:message code="label.delegates.degree"/></th>
 	<th><spring:message code="label.delegates.type"/></th>
 	<th><spring:message code="label.delegates.username"/></th>
 	<th><spring:message code="delegates.messaging.table.name"/></th>
@@ -85,6 +92,9 @@ td {
 	<th><spring:message code="label.delegates.operations"/></th>
 <c:forEach var="delegate" items="${delegates}">
 	<tr>
+    <td>
+        ${delegate.degree.presentationName}
+    </td>
 	<td>
 		${delegate.delegateTitle}
 	</td>

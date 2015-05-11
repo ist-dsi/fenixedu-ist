@@ -20,6 +20,7 @@ package pt.ist.fenixedu.delegates.ui;
 
 import static org.fenixedu.bennu.FenixEduDelegatesConfiguration.BUNDLE;
 
+import java.util.Comparator;
 import java.util.Objects;
 
 import org.fenixedu.academic.domain.CurricularYear;
@@ -32,6 +33,11 @@ import org.joda.time.format.DateTimeFormatter;
 import pt.ist.fenixedu.delegates.domain.student.Delegate;
 
 public class DelegateBean {
+
+    public static Comparator<DelegateBean> COMPARATOR_BY_DEGREE_FUNTION_AND_INTERVAL = Comparator
+            .<DelegateBean, Degree> comparing(b -> b.getDegree(), Degree.COMPARATOR_BY_DEGREE_TYPE_AND_NAME_AND_ID.reversed())
+            .thenComparing(b -> b.getCurricularYear(), Comparator.nullsLast(CurricularYear.CURRICULAR_YEAR_COMPARATORY_BY_YEAR))
+            .thenComparing(b -> b.getDelegate().getStart()).thenComparing(b -> b.getDelegate().getExternalId());
 
     String name;
     String username;
