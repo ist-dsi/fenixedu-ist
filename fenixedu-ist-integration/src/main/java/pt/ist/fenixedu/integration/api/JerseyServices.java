@@ -106,7 +106,7 @@ public class JerseyServices {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("remotePerson")
+    @Path("readAllProfileData")
     public String readAllProfileData(@QueryParam("method") final String method) throws NoSuchMethodException, SecurityException,
             IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         return Bennu.getInstance().getUserSet().stream().filter(u -> u.getProfile() != null)
