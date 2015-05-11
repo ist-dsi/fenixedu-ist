@@ -27,7 +27,6 @@ import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
 
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalCategory;
 import pt.ist.fenixedu.teacher.domain.credits.util.ReductionServiceBean;
 
 public class ReductionService extends ReductionService_Base {
@@ -119,8 +118,10 @@ public class ReductionService extends ReductionService_Base {
     }
 
     private void checkTeacherCategory() {
-        if (!ProfessionalCategory.isTeacherProfessorCategory(getTeacherService().getTeacher(), getTeacherService()
-                .getExecutionPeriod())) {
+        boolean isTeacherProfessorCategory =
+                getTeacherService().getTeacher().getCategory(getTeacherService().getExecutionPeriod().getAcademicInterval())
+                        .map(tc -> tc.getProfessionalCategory()).map(pc -> pc.isTeacherProfessorCategory()).orElse(false);
+        if (!isTeacherProfessorCategory) {
             throw new DomainException("label.creditsReduction.invalidCategory");
         }
     }

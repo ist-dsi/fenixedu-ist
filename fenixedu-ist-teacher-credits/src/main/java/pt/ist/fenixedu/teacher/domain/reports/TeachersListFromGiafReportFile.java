@@ -107,10 +107,10 @@ public class TeachersListFromGiafReportFile extends TeachersListFromGiafReportFi
                                         .getEmployee()
                                         .getLastWorkingPlace(executionYear.getBeginDateYearMonthDay(),
                                                 executionYear.getEndDateYearMonthDay()) : null;
+
                         ProfessionalCategory professionalCategory =
-                                personProfessionalData.getLastProfessionalCategoryByCategoryType(CategoryType.TEACHER,
-                                        executionYear.getBeginDateYearMonthDay().toLocalDate(), executionYear
-                                                .getEndDateYearMonthDay().toLocalDate());
+                                teacher.getLastCategory(executionYear.getAcademicInterval())
+                                        .map(tc -> tc.getProfessionalCategory()).orElse(null);
 
                         ProfessionalRegime professionalRegime =
                                 personProfessionalData.getLastProfessionalRegime(giafProfessionalData, executionYear

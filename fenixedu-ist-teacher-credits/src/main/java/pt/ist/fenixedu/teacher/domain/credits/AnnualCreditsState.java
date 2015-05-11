@@ -29,7 +29,6 @@ import org.fenixedu.bennu.core.domain.Bennu;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalData;
 import pt.ist.fenixedu.teacher.domain.time.calendarStructure.TeacherCreditsFillingForTeacherCE;
 import pt.ist.fenixframework.Atomic;
 
@@ -88,8 +87,7 @@ public class AnnualCreditsState extends AnnualCreditsState_Base {
         Set<Teacher> allTeachers = Bennu.getInstance().getTeachersSet();
         for (ExecutionSemester executionSemester : getExecutionYear().getExecutionPeriodsSet()) {
             for (Teacher teacher : allTeachers) {
-                boolean isContractedTeacher = PersonProfessionalData.isTeacherActiveForSemester(teacher, executionSemester);
-                if (isContractedTeacher || teacher.hasTeacherAuthorization(executionSemester.getAcademicInterval())) {
+                if (teacher.hasTeacherAuthorization(executionSemester.getAcademicInterval())) {
                     teachers.add(teacher);
                 }
             }

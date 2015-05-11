@@ -2,14 +2,12 @@ package pt.ist.fenixedu.teacher.domain.credits;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.QueueJobResult;
 import org.fenixedu.academic.domain.Teacher;
-import org.fenixedu.bennu.core.domain.Bennu;
-
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalData;
 
 public class CalculateCreditsQueueJob extends CalculateCreditsQueueJob_Base {
 
@@ -44,14 +42,9 @@ public class CalculateCreditsQueueJob extends CalculateCreditsQueueJob_Base {
 
     private Set<Teacher> getThisYearTeachers(ExecutionYear executionYear) {
         Set<Teacher> teachers = new HashSet<Teacher>();
-        Set<Teacher> allTeachers = Bennu.getInstance().getTeachersSet();
         for (ExecutionSemester executionSemester : getExecutionYear().getExecutionPeriodsSet()) {
-            for (Teacher teacher : allTeachers) {
-                boolean isContractedTeacher = PersonProfessionalData.isTeacherActiveForSemester(teacher, executionSemester);
-                if (isContractedTeacher || teacher.hasTeacherAuthorization(executionSemester.getAcademicInterval())) {
-                    teachers.add(teacher);
-                }
-            }
+            teachers.addAll(executionSemester.getTeacherAuthorizationStream().map(a -> a.getTeacher())
+                    .collect(Collectors.toSet()));
         }
         return teachers;
     }

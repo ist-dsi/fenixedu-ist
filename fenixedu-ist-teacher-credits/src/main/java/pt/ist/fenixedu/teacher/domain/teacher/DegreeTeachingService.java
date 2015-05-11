@@ -21,8 +21,6 @@ package pt.ist.fenixedu.teacher.domain.teacher;
 import java.math.BigDecimal;
 import java.util.Comparator;
 
-import org.fenixedu.academic.domain.ExecutionCourse;
-import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.Lesson;
 import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.academic.domain.Shift;
@@ -36,7 +34,6 @@ import org.joda.time.Interval;
 import org.joda.time.LocalTime;
 import org.joda.time.Minutes;
 
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalCategory;
 import pt.ist.fenixedu.teacher.domain.time.calendarStructure.TeacherCreditsFillingCE;
 
 public class DegreeTeachingService extends DegreeTeachingService_Base {
@@ -103,9 +100,11 @@ public class DegreeTeachingService extends DegreeTeachingService_Base {
     @Deprecated
     public double getHours() {
         double totalHours = 0;
-        final ExecutionCourse executionCourse = getProfessorship().getExecutionCourse();
-        final ExecutionSemester executionSemester = executionCourse.getExecutionPeriod();
-        if (ProfessionalCategory.isTeacherProfessorCategory(getProfessorship().getTeacher(), executionSemester)) {
+        boolean isTeacherProfessorCategory =
+                getProfessorship().getTeacher()
+                        .getCategory(getProfessorship().getExecutionCourse().getExecutionPeriod().getAcademicInterval())
+                        .map(tc -> tc.getProfessionalCategory()).map(pc -> pc.isTeacherProfessorCategory()).orElse(false);
+        if (isTeacherProfessorCategory) {
             double hoursAfter20PM = getShift().getHoursOnSaturdaysOrNightHours(20);
             double hoursBefore20PM = getShift().getUnitHours().doubleValue() - hoursAfter20PM;
             totalHours += hoursBefore20PM * (getPercentage().doubleValue() / 100);
@@ -118,9 +117,11 @@ public class DegreeTeachingService extends DegreeTeachingService_Base {
     }
 
     public double getEfectiveLoad() {
-        double afterHeightFactor =
-                ProfessionalCategory.isTeacherProfessorCategory(getProfessorship().getTeacher(), getProfessorship()
-                        .getExecutionCourse().getExecutionPeriod()) ? 1.5 : 1;
+        boolean isTeacherProfessorCategory =
+                getProfessorship().getTeacher()
+                        .getCategory(getProfessorship().getExecutionCourse().getExecutionPeriod().getAcademicInterval())
+                        .map(tc -> tc.getProfessionalCategory()).map(pc -> pc.isTeacherProfessorCategory()).orElse(false);
+        double afterHeightFactor = isTeacherProfessorCategory ? 1.5 : 1;
 
         double weeklyHoursAfter20 = getTotalHoursAfter20AndSaturdays() / 14;
         double weeklyHoursBefore20 = (getShift().getCourseLoadWeeklyAverage().doubleValue() - weeklyHoursAfter20);
