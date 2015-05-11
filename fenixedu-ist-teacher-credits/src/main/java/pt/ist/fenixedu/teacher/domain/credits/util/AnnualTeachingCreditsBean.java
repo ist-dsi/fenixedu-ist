@@ -56,6 +56,7 @@ import pt.ist.fenixedu.teacher.domain.teacher.TeacherServiceLog;
 public class AnnualTeachingCreditsBean implements Serializable {
     private final ExecutionYear executionYear;
     private final Teacher teacher;
+    private BigDecimal effectiveTeachingLoad;
     private BigDecimal teachingCredits;
     private BigDecimal masterDegreeThesesCredits;
     private BigDecimal phdDegreeThesesCredits;
@@ -91,6 +92,7 @@ public class AnnualTeachingCreditsBean implements Serializable {
         super();
         this.executionYear = annualTeachingCredits.getAnnualCreditsState().getExecutionYear();
         this.teacher = annualTeachingCredits.getTeacher();
+        this.effectiveTeachingLoad = annualTeachingCredits.getEffectiveTeachingLoad();
         this.teachingCredits = annualTeachingCredits.getTeachingCredits();
         this.masterDegreeThesesCredits = annualTeachingCredits.getMasterDegreeThesesCredits();
         this.phdDegreeThesesCredits = annualTeachingCredits.getPhdDegreeThesesCredits();
@@ -122,6 +124,7 @@ public class AnnualTeachingCreditsBean implements Serializable {
     public AnnualTeachingCreditsBean(ExecutionYear executionYear, Teacher teacher) {
         this.executionYear = executionYear;
         this.teacher = teacher;
+        this.effectiveTeachingLoad = BigDecimal.ZERO;
         this.teachingCredits = BigDecimal.ZERO;
         this.masterDegreeThesesCredits = BigDecimal.ZERO;
         this.phdDegreeThesesCredits = BigDecimal.ZERO;
@@ -236,6 +239,10 @@ public class AnnualTeachingCreditsBean implements Serializable {
 
     public Teacher getTeacher() {
         return teacher;
+    }
+
+    public BigDecimal getEffectiveTeachingLoad() {
+        return effectiveTeachingLoad;
     }
 
     public BigDecimal getTeachingCredits() {
@@ -384,6 +391,10 @@ public class AnnualTeachingCreditsBean implements Serializable {
                         TeacherService.getTeacherServiceByExecutionPeriod(getTeacher(), executionSemester);
                 BigDecimal thisSemesterCreditsReduction = BigDecimal.ZERO;
                 if (teacherService != null) {
+                    effectiveTeachingLoad =
+                            effectiveTeachingLoad.add(new BigDecimal(teacherService.getDegreeTeachingServices().stream()
+                                    .filter(d -> !d.getProfessorship().getExecutionCourse().getProjectTutorialCourse())
+                                    .mapToDouble(d -> d.getEfectiveLoad()).sum()));
                     teachingCredits = teachingCredits.add(new BigDecimal(teacherService.getTeachingDegreeCredits()));
                     thisSemesterCreditsReduction = teacherService.getReductionServiceCredits();
                     othersCredits = othersCredits.add(new BigDecimal(teacherService.getOtherServiceCredits()));

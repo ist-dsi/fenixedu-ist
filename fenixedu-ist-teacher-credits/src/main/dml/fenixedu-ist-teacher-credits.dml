@@ -124,6 +124,7 @@ class credits.CloseCreditsQueueJob extends .org.fenixedu.academic.domain.QueueJo
 }
 
 class credits.AnnualTeachingCredits  {
+    BigDecimal efectiveTeachingLoad;
     BigDecimal teachingCredits;
     BigDecimal masterDegreeThesesCredits;
     BigDecimal phdDegreeThesesCredits;

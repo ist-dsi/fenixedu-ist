@@ -59,6 +59,10 @@
 					<fr:property name="useParent" value="true" />
 					<fr:property name="linkFormat" value="/credits.do?method=viewAnnualTeachingCredits&amp;executionYearOid=${executionYear.externalId}&amp;teacherOid=${teacher.externalId}"/>
 				</fr:slot>
+				<fr:slot name="effectiveTeachingLoad" key="label.credits.effectiveTeachingLoad.simpleCode" layout="null-as-label">
+					<fr:property name="subLayout" value="decimal-format"/>
+					<fr:property name="headerToolTip" value="label.credits.effectiveTeachingLoad"/>
+				</fr:slot>
 				<fr:slot name="teachingCredits" key="label.credits.teachingCredits.simpleCode" layout="null-as-label">
 					<fr:property name="subLayout" value="decimal-format"/>
 					<fr:property name="headerToolTip" value="label.credits.teachingCredits"/>
@@ -133,6 +137,7 @@
 		</logic:equal>
 		
 		<p><strong><bean:message key="label.credits.legenda" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/></strong>
+		<br/><strong><bean:message key="label.credits.effectiveTeachingLoad.simpleCode" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/></strong>: <bean:message key="label.credits.effectiveTeachingLoad" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/>
 		<br/><strong><bean:message key="label.credits.teachingCredits.simpleCode" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/></strong>: <bean:message key="label.credits.teachingCredits" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/>
 		<br/><strong><bean:message key="label.credits.masterDegreeTheses.simpleCode" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/></strong>: <bean:message key="label.credits.masterDegreeTheses" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/>
 		<br/><strong><bean:message key="label.credits.phdDegreeTheses.simpleCode" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/></strong>: <bean:message key="label.credits.phdDegreeTheses" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/>

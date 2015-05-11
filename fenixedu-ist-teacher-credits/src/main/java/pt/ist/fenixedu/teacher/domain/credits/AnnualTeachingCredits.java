@@ -77,6 +77,7 @@ public class AnnualTeachingCredits extends AnnualTeachingCredits_Base {
         setPhdDegreeThesesCredits(calculatePhdDegreeThesesCredits(getTeacher(), getAnnualCreditsState().getExecutionYear()));
         setProjectsTutorialsCredits(calculateProjectsTutorialsCredits(getTeacher(), getAnnualCreditsState().getExecutionYear()));
 
+        BigDecimal effectiveTeachingLoad = BigDecimal.ZERO;
         BigDecimal teachingCredits = BigDecimal.ZERO;
         BigDecimal managementFunctionsCredits = BigDecimal.ZERO;
         BigDecimal reductionServiceCredits = BigDecimal.ZERO;
@@ -110,6 +111,10 @@ public class AnnualTeachingCredits extends AnnualTeachingCredits_Base {
                         TeacherService.getTeacherServiceByExecutionPeriod(getTeacher(), executionSemester);
                 BigDecimal thisSemesterCreditsReduction = BigDecimal.ZERO;
                 if (teacherService != null) {
+                    effectiveTeachingLoad =
+                            effectiveTeachingLoad.add(new BigDecimal(teacherService.getDegreeTeachingServices().stream()
+                                    .filter(d -> !d.getProfessorship().getExecutionCourse().getProjectTutorialCourse())
+                                    .mapToDouble(d -> d.getEfectiveLoad()).sum()));
                     teachingCredits = teachingCredits.add(new BigDecimal(teacherService.getTeachingDegreeCredits()));
                     thisSemesterCreditsReduction = teacherService.getReductionServiceCredits();
                     othersCredits = othersCredits.add(new BigDecimal(teacherService.getOtherServiceCredits()));
@@ -134,6 +139,7 @@ public class AnnualTeachingCredits extends AnnualTeachingCredits_Base {
                 }
             }
         }
+        setEffectiveTeachingLoad(effectiveTeachingLoad);
         setTeachingCredits(teachingCredits);
         setManagementFunctionCredits(managementFunctionsCredits);
         setCreditsReduction(reductionServiceCredits);
