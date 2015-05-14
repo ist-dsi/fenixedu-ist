@@ -1,4 +1,6 @@
 FenixEdu IST
+
+[![Build Status](https://travis-ci.org/ist-dsi/fenixedu-ist.png?branch=master)](https://travis-ci.org/ist-dsi/fenixedu-ist)
 ============
 
 Contribution modules specific for IST installation of the [FenixEdu](http://fenixedu.org/) project.
