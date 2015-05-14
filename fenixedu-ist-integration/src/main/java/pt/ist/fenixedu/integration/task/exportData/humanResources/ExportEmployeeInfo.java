@@ -4,6 +4,7 @@ import java.io.FileOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.TeacherAuthorization;
@@ -98,7 +99,7 @@ public class ExportEmployeeInfo extends CustomTask {
         final JsonObject object = new JsonObject();
         object.addProperty("user", user.getUsername());
         object.addProperty("role", type.name());
-        object.addProperty("wp", wp);
+        object.addProperty("wp", StringUtils.leftPad(wp, 4, '0'));
         object.addProperty("employer", employer);
         result.add(object);
     }
