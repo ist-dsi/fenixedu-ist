@@ -143,7 +143,7 @@ public class AnnualTeachingCredits extends AnnualTeachingCredits_Base {
                 }
             }
         }
-        setEffectiveTeachingLoad(effectiveTeachingLoad);
+        setEfectiveTeachingLoad(effectiveTeachingLoad);
         setTeachingCredits(teachingCredits);
         setManagementFunctionCredits(managementFunctionsCredits);
         setCreditsReduction(reductionServiceCredits);

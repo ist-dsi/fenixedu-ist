@@ -91,7 +91,7 @@ public class AnnualTeachingCreditsBean implements Serializable {
         super();
         this.executionYear = annualTeachingCredits.getAnnualCreditsState().getExecutionYear();
         this.teacher = annualTeachingCredits.getTeacher();
-        this.effectiveTeachingLoad = annualTeachingCredits.getEffectiveTeachingLoad();
+        this.effectiveTeachingLoad = annualTeachingCredits.getEfectiveTeachingLoad();
         this.teachingCredits = annualTeachingCredits.getTeachingCredits();
         this.masterDegreeThesesCredits = annualTeachingCredits.getMasterDegreeThesesCredits();
         this.phdDegreeThesesCredits = annualTeachingCredits.getPhdDegreeThesesCredits();
