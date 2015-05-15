@@ -1,30 +1,8 @@
 package pt.ist.fenixedu.cmscomponents.ui.spring;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import org.fenixedu.bennu.core.domain.Bennu;
-import org.fenixedu.bennu.core.domain.User;
-import org.fenixedu.bennu.core.domain.exceptions.BennuCoreDomainException;
-import org.fenixedu.bennu.core.groups.AnyoneGroup;
-import org.fenixedu.bennu.core.groups.DynamicGroup;
-import org.fenixedu.bennu.core.security.Authenticate;
-import org.fenixedu.bennu.io.domain.GroupBasedFile;
-import org.fenixedu.bennu.spring.portal.SpringApplication;
-import org.fenixedu.bennu.spring.portal.SpringFunctionality;
-import org.fenixedu.cms.domain.*;
-import org.fenixedu.cms.exceptions.CmsDomainException;
-import org.fenixedu.commons.i18n.LocalizedString;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.view.RedirectView;
-import pt.ist.fenixedu.cmscomponents.domain.unit.UnitSite;
-import pt.ist.fenixframework.Atomic;
-import pt.ist.fenixframework.FenixFramework;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
+import static org.fenixedu.bennu.io.servlets.FileDownloadServlet.getDownloadUrl;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -34,9 +12,37 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
-import static org.fenixedu.bennu.io.servlets.FileDownloadServlet.getDownloadUrl;
+import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.core.domain.exceptions.BennuCoreDomainException;
+import org.fenixedu.bennu.core.groups.AnyoneGroup;
+import org.fenixedu.bennu.core.groups.DynamicGroup;
+import org.fenixedu.bennu.core.security.Authenticate;
+import org.fenixedu.bennu.io.domain.GroupBasedFile;
+import org.fenixedu.bennu.spring.portal.SpringApplication;
+import org.fenixedu.bennu.spring.portal.SpringFunctionality;
+import org.fenixedu.cms.domain.CMSTemplate;
+import org.fenixedu.cms.domain.Category;
+import org.fenixedu.cms.domain.Post;
+import org.fenixedu.cms.domain.PostMetadata;
+import org.fenixedu.cms.domain.Site;
+import org.fenixedu.cms.exceptions.CmsDomainException;
+import org.fenixedu.commons.i18n.LocalizedString;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.view.RedirectView;
+
+import pt.ist.fenixedu.cmscomponents.domain.unit.UnitSite;
+import pt.ist.fenixframework.Atomic;
+import pt.ist.fenixframework.FenixFramework;
+
+import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 /**
  * Created by borgez on 18-03-2015.
@@ -192,6 +198,7 @@ public class UnitSiteManagementController {
         private String mainImageUrl;
         private String backgroundImageUrl;
         private Post post;
+        private String bannerUrl;
 
         public BannerBean() {
         }
@@ -206,6 +213,7 @@ public class UnitSiteManagementController {
             this.color = post.getMetadata().getAsString("color").orElse("white");
             this.mainImageUrl = post.getMetadata().getAsString("mainImage").orElse(null);
             this.backgroundImageUrl = post.getMetadata().getAsString("backgroundImage").orElse(null);
+            this.bannerUrl = post.getMetadata().getAsString("link").orElse(null);
         }
 
         public void save() {
@@ -226,6 +234,7 @@ public class UnitSiteManagementController {
             postMetadata = postMetadata.with("showBanner", ofNullable(showBanner).orElse(false));
             postMetadata = postMetadata.with("color", ofNullable(color).orElse("#ffffff"));
             postMetadata = uploadImage(post, postMetadata, "mainImage", mainImage);
+            postMetadata = postMetadata.with("link", ofNullable(bannerUrl).orElse("#"));
 
             post.setMetadata(postMetadata);
         }
@@ -323,6 +332,14 @@ public class UnitSiteManagementController {
 
         public void setMainImageUrl(String mainImageUrl) {
             this.mainImageUrl = mainImageUrl;
+        }
+
+        public String getBannerUrl() {
+            return bannerUrl;
+        }
+
+        public void setBannerUrl(String bannerUrl) {
+            this.bannerUrl = bannerUrl;
         }
 
     }
