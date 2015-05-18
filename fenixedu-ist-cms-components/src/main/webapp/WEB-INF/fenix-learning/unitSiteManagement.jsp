@@ -154,6 +154,18 @@ ${portal.toolkit()}
                                     </div>
                                 </div>
 
+                                <div class="form-group">
+                                    <label class="control-label col-sm-3">
+                                        <spring:message code="label.unit.site.banner.url"/>
+                                    </label>
+
+                                    <div class="col-sm-7">
+                                        <input type="text" name="bannerUrl" value="${banner.bannerUrl}" placeholder="<spring:message code='label.unit.site.banner.url.placeholder'/>"/>
+                                    </div>
+
+                                    <div class="col-sm-7"></div>    
+                                </div>
+
                             </div>
                             <div class="modal-footer">
                                 <button type="button" data-dismiss="modal" class="btn btn-default">
