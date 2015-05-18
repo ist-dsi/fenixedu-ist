@@ -297,8 +297,11 @@ public class PagesAdminService {
     @Atomic(mode = Atomic.TxMode.WRITE)
     public void delete(MenuItem menuItem, GroupBasedFile file) {
         Post post = postForPage(menuItem.getPage());
+
         Post.Attachments attachments = post.getAttachments();
-        int attachmentPosition = attachments.getFiles().indexOf(file);
+        int attachmentPosition =
+                (int) post.getAttachments().getFiles().stream().filter(f -> f == file).map(f -> f.getPostFile().getIndex())
+                        .findAny().orElse(-1);
         if (attachmentPosition != -1) {
             attachments.removeFile(attachmentPosition);
             file.delete();
