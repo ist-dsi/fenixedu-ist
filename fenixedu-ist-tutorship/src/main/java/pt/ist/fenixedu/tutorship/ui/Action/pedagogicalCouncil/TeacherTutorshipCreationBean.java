@@ -67,7 +67,7 @@ public class TeacherTutorshipCreationBean implements Serializable {
             if (bean.getExecutionDegree() != null) {
                 ExecutionDegree executionDegree = bean.getExecutionDegree();
                 for (final Teacher teacher : Tutorship.getPossibleTutorsFromExecutionDegreeDepartments(executionDegree)) {
-                    if (hasTutorshipIntentionFor(teacher, bean.getExecutionDegree())) {
+                    if (hasTutorshipIntentionFor(teacher, bean.getExecutionDegree()) && !teachers.contains(teacher.getPerson())) {
                         teachers.add(teacher.getPerson());
                     }
                 }
