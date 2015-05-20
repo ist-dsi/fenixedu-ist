@@ -359,13 +359,13 @@ public class DgesStudentImportationProcess extends DgesStudentImportationProcess
         if (executionDegree.getDegree().getDegreeType().isBolonhaDegree()) {
             candidacy =
                     new DegreeCandidacy(person, executionDegree, employee.getPerson(), degreeCandidateDTO.getEntryGrade(),
-                            degreeCandidateDTO.getContigent(), degreeCandidateDTO.getIngression(),
+                            degreeCandidateDTO.getContigent(), degreeCandidateDTO.getIngressionType(),
                             degreeCandidateDTO.getEntryPhase(), degreeCandidateDTO.getPlacingOption());
 
         } else if (executionDegree.getDegree().getDegreeType().isIntegratedMasterDegree()) {
             candidacy =
                     new IMDCandidacy(person, executionDegree, employee.getPerson(), degreeCandidateDTO.getEntryGrade(),
-                            degreeCandidateDTO.getContigent(), degreeCandidateDTO.getIngression(),
+                            degreeCandidateDTO.getContigent(), degreeCandidateDTO.getIngressionType(),
                             degreeCandidateDTO.getEntryPhase(), degreeCandidateDTO.getPlacingOption());
 
         } else {

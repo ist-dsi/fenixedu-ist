@@ -134,7 +134,7 @@ public class TutorshipStudentLowPerformanceQueueJob extends TutorshipStudentLowP
             studentState += flunkedStudent(fullRegistrationPath);
             return new StudentLowPerformanceBean(student, sumEcts, registration.getDegree(), numberOfEntriesStudentInSecretary,
                     student.getPerson().getDefaultEmailAddressValue(), studentState, fullRegistrationPath.iterator().next()
-                            .getStartDate().toString("yyyy-MM-dd"));
+                            .getStartDate().toString("yyyy-MM-dd"), registration.getIngressionType());
         }
         return null;
     }
@@ -192,6 +192,7 @@ public class TutorshipStudentLowPerformanceQueueJob extends TutorshipStudentLowP
         spreadsheet.setHeader("Email");
         spreadsheet.setHeader("Número de Inscrições");
         spreadsheet.setHeader("Início da Matrícula");
+        spreadsheet.setHeader("Tipo Ingresso");
         spreadsheet.setHeader("Tutor");
         spreadsheet.setHeader("Email do Tutor");
 
@@ -206,6 +207,7 @@ public class TutorshipStudentLowPerformanceQueueJob extends TutorshipStudentLowP
             row.setCell(studentLowPerformanceBean.getEmail());
             row.setCell(studentLowPerformanceBean.getNumberOfEntriesStudentInSecretary());
             row.setCell(studentLowPerformanceBean.getRegistrationStart());
+            row.setCell(studentLowPerformanceBean.getIngressionType().getLocalizedName());
             List<Tutorship> tutorships = Tutorship.getActiveTutorships(studentLowPerformanceBean.getStudent());
             if (!tutorships.isEmpty()) {
                 row.setCell(tutorships.iterator().next().getTeacher().getPerson().getPresentationName());

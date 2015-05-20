@@ -21,13 +21,10 @@ package pt.ist.fenixedu.integration.domain.student.importation;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.fenixedu.academic.domain.EntryPhase;
 import org.fenixedu.academic.domain.ExecutionYear;
-import org.fenixedu.academic.domain.candidacy.Ingression;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 
 /**
@@ -39,22 +36,6 @@ public abstract class DgesBaseProcess extends DgesBaseProcess_Base {
 
     protected static final String ALAMEDA_UNIVERSITY = "A";
     protected static final String TAGUS_UNIVERSITY = "T";
-    static Map<String, Ingression> CONTINGENT_TO_INGRESSION_CONVERSION = new HashMap<String, Ingression>();
-
-    static {
-        // Contingente Geral
-        CONTINGENT_TO_INGRESSION_CONVERSION.put("1", Ingression.CNA01);
-        // Contingente Açores
-        CONTINGENT_TO_INGRESSION_CONVERSION.put("2", Ingression.CNA02);
-        // Contingente Madeira
-        CONTINGENT_TO_INGRESSION_CONVERSION.put("3", Ingression.CNA03);
-        // Contingente Emigrantes
-        CONTINGENT_TO_INGRESSION_CONVERSION.put("5", Ingression.CNA05);
-        // Contingente Militar
-        CONTINGENT_TO_INGRESSION_CONVERSION.put("6", Ingression.CNA06);
-        // Contingente Deficientes
-        CONTINGENT_TO_INGRESSION_CONVERSION.put("D", Ingression.CNA07);
-    }
 
     protected DgesBaseProcess() {
         super();
