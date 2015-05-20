@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.Degree;
-import org.fenixedu.academic.util.Bundle;
+import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.bennu.core.annotation.GroupArgument;
 import org.fenixedu.bennu.core.annotation.GroupOperator;
 import org.fenixedu.bennu.core.domain.Bennu;
@@ -42,8 +42,11 @@ import com.google.common.base.Objects;
 public class DelegateGroup extends CustomGroup {
     private static final long serialVersionUID = -7261567414029131275L;
 
-    @GroupArgument("")
+    @GroupArgument
     private final Degree degree;
+
+    @GroupArgument
+    private final DegreeType degreeType;
 
     @GroupArgument
     private final Boolean yearDelegate;
@@ -52,12 +55,14 @@ public class DelegateGroup extends CustomGroup {
         super();
         this.degree = null;
         this.yearDelegate = null;
+        this.degreeType = null;
     }
 
-    private DelegateGroup(Degree degree, Boolean yearDelegate) {
+    private DelegateGroup(DegreeType degreeType, Degree degree, Boolean yearDelegate) {
         super();
-        this.degree = degree;
         this.yearDelegate = yearDelegate;
+        this.degreeType = degreeType;
+        this.degree = degree;
     }
 
     public static DelegateGroup get() {
@@ -65,43 +70,47 @@ public class DelegateGroup extends CustomGroup {
     }
 
     public static DelegateGroup get(Degree degree) {
-        return new DelegateGroup(degree, null);
+        return new DelegateGroup(null, degree, null);
     }
 
     public static DelegateGroup get(Boolean yearDelegate) {
-        return new DelegateGroup(null, (yearDelegate == null || yearDelegate == false) ? null : yearDelegate);
+        return new DelegateGroup(null, null, (yearDelegate == null || yearDelegate == false) ? null : yearDelegate);
     }
 
     public static DelegateGroup get(Degree degree, Boolean yearDelegate) {
-        return new DelegateGroup(degree, (yearDelegate == null || yearDelegate == false) ? null : yearDelegate);
+        return new DelegateGroup(null, degree, (yearDelegate == null || yearDelegate == false) ? null : yearDelegate);
+    }
+
+    public static DelegateGroup get(DegreeType degreeType, Boolean yearDelegate) {
+        return new DelegateGroup(degreeType, null, (yearDelegate == null || yearDelegate == false) ? null : yearDelegate);
     }
 
     @Override
     public String getPresentationName() {
-        if (yearDelegate != null && degree != null) {
-            return BundleUtil.getString("resources.FenixEduDelegatesResources", "label.name.DelegateGroup.yearDelegateOfDegree",
-                    degree.getPresentationName());
-        }
-        if (yearDelegate != null) {
-            return BundleUtil.getString("resources.FenixEduDelegatesResources", "label.name.DelegateGroup.yearDelegate");
-        }
-        if (degree != null) {
-            return BundleUtil.getString("resources.FenixEduDelegatesResources", "label.name.DelegateGroup.degreeDelegate",
-                    degree.getPresentationName());
-        }
-        return BundleUtil.getString("resources.FenixEduDelegatesResources", "label.name.DelegateGroup");
-    }
+        boolean yearDelegateValue = yearDelegate != null && yearDelegate.booleanValue();
+        String[] args;
+        String key;
+        if (!yearDelegateValue && degree == null && degreeType == null) {
+            key = "label.name.DelegateGroup";
+            args = new String[0];
+        } else {
+            key = "label.name.DelegateGroup.specific";
+            args = new String[2];
+            if (yearDelegateValue) {
+                args[0] = "label.name.DelegateGroup.year";
+            } else {
+                args[0] = "label.name.DelegateGroup.degree";
+            }
 
-    public String getPresentationNameBundle() {
-        return Bundle.GROUP;
-    }
-
-    public String getPresentationNameKey() {
-        return "label.name." + getClass().getSimpleName();
-    }
-
-    public String[] getPresentationNameKeyArgs() {
-        return new String[0];
+            if (degree != null) {
+                args[1] = degree.getPresentationName();
+            } else if (degreeType != null) {
+                args[1] = degreeType.getName().getContent();
+            } else {
+                args[1] = BundleUtil.getString("resources.FenixEduDelegatesResources", "label.name.DelegateGroup.allDegrees");
+            }
+        }
+        return BundleUtil.getString("resources.FenixEduDelegatesResources", key, args);
     }
 
     @Override
@@ -126,8 +135,11 @@ public class DelegateGroup extends CustomGroup {
     }
 
     private Stream<Delegate> filterMatches(Stream<Delegate> stream, DateTime when) {
-        if (yearDelegate != null) {
+        if (yearDelegate != null && yearDelegate.booleanValue()) {
             stream = stream.filter(d -> d instanceof YearDelegate);
+        }
+        if (degreeType != null) {
+            stream = stream.filter(d -> d.getDegree().getDegreeType().equals(degreeType));
         }
         if (degree != null) {
             stream = stream.filter(d -> d.getDegree().equals(degree));
@@ -137,20 +149,21 @@ public class DelegateGroup extends CustomGroup {
 
     @Override
     public PersistentGroup toPersistentGroup() {
-        return PersistentDelegateGroup.getInstance(degree, yearDelegate);
+        return PersistentDelegateGroup.getInstance(degreeType, degree, yearDelegate);
     }
 
     @Override
     public boolean equals(Object object) {
         if (object instanceof DelegateGroup) {
             DelegateGroup other = (DelegateGroup) object;
-            return Objects.equal(degree, other.degree) && Objects.equal(yearDelegate, other.yearDelegate);
+            return Objects.equal(degreeType, other.degreeType) && Objects.equal(degree, other.degree)
+                    && Objects.equal(yearDelegate, other.yearDelegate);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(degree, yearDelegate);
+        return Objects.hashCode(degreeType, degree, yearDelegate);
     }
 }
