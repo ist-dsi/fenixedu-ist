@@ -9,7 +9,7 @@
 	<parameter name="checkSum" class="java.lang.String" isForPrompting="false"/>
 	<field name="gradeValue" class="java.lang.String"/>
 	<field name="examDate" class="java.util.Date"/>
-	<field name="evaluationSeason.code" class="java.lang.String"/>
+	<textFieldExpression class="java.lang.String"><![CDATA[$F{evaluationSeason.acronym.content}]]></textFieldExpression>
 	<field name="enrolment.studentCurricularPlan.student.person.name" class="java.lang.String"/>
 	<field name="enrolment.studentCurricularPlan.student.number" class="java.lang.Integer"/>
 	<group name="dummy">
