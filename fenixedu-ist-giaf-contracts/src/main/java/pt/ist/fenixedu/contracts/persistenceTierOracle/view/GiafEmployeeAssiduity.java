@@ -19,9 +19,13 @@ import com.google.gson.JsonObject;
 public class GiafEmployeeAssiduity {
 
     public static JsonObject readAssiduityOfEmployee(final String username) {
-        final JsonObject result = new JsonObject();
         final User user = User.findByUsername(username);
-        result.addProperty("username", username);
+        return readAssiduityOfEmployee(user);
+    }
+
+    public static JsonObject readAssiduityOfEmployee(final User user) {
+        final JsonObject result = new JsonObject();
+        result.addProperty("username", user.getUsername());
         result.addProperty("name", user.getProfile().getDisplayName());
         result.addProperty("avatarUrl", user.getProfile().getAvatarUrl());
 
