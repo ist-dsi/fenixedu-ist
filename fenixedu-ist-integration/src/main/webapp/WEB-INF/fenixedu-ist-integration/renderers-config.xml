@@ -50,4 +50,7 @@
     <renderer mode="input" type="java.lang.String" layout="tag-cloud" class="pt.ist.fenixedu.integration.ui.renderers.TagInputCloudRenderer">
         <property name="textClasses" value="smalltxt color888"/>
     </renderer>
+
+    <!--@ Renders one or more (in case of group union) groups names. The group must support getName -->
+    <renderer type="org.fenixedu.bennu.core.groups.Group" layout="show-groups" class="pt.ist.fenixedu.integration.ui.renderers.GroupRenderer"/>
 </renderers-config>
