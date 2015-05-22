@@ -28,6 +28,7 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.QueueJobResult;
+import org.fenixedu.academic.util.FileUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
@@ -35,7 +36,6 @@ import org.slf4j.LoggerFactory;
 
 import pt.ist.fenixedu.parking.domain.ParkingParty;
 import pt.ist.fenixedu.parking.domain.Vehicle;
-import pt.utl.ist.fenix.tools.util.FileUtils;
 
 import com.google.common.io.Files;
 import com.healthmarketscience.jackcess.Database;

@@ -26,7 +26,7 @@
  * 
  * Autores : - Nuno Nunes (nmsn@rnl.ist.utl.pt) - Joana Mota
  * (jccm@rnl.ist.utl.pt)
- *  
+ * 
  */
 
 package org.fenixedu.academic.domain;
@@ -37,7 +37,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.studentCurricularPlan.Specialization;
 import org.fenixedu.academic.util.SituationName;
 import org.fenixedu.academic.util.State;
@@ -221,7 +220,7 @@ public class MasterDegreeCandidate extends MasterDegreeCandidate_Base {
     }
 
     public static MasterDegreeCandidate getMasterDegreeCandidate(StudentCurricularPlan studentCurricularPlan) {
-        if (studentCurricularPlan.getDegreeType().equals(DegreeType.MASTER_DEGREE)) {
+        if (studentCurricularPlan.getDegreeType().isPreBolonhaMasterDegree()) {
             if (studentCurricularPlan.getEnrolmentsSet().size() > 0) {
                 ExecutionDegree firstExecutionDegree =
                         studentCurricularPlan.getDegreeCurricularPlan().getExecutionDegreeByYear(

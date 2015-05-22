@@ -20,6 +20,7 @@ package pt.ist.fenixedu.parking.domain;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -30,8 +31,8 @@ import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
 import org.fenixedu.academic.domain.student.Student;
-import org.fenixedu.academic.util.FenixStringTools;
 import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.commons.StringNormalizer;
 
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalCategory;
 
@@ -120,14 +121,10 @@ public class ParkingRequestSearch implements Serializable {
     private boolean satisfiedPersonClassification(ParkingRequest request) {
         final ParkingParty parkingParty = request.getParkingParty();
         if (getPartyClassification() != null) {
-            DegreeType degreeType = null;
-            try {
-                degreeType = DegreeType.valueOf(getPartyClassification().name());
-            } catch (IllegalArgumentException e) {
-            }
+            DegreeType degreeType = PartyClassification.degreeTypeFor(getPartyClassification());
             if (degreeType != null && request.getRequestedAs() != null && request.getRequestedAs().equals(RoleType.STUDENT)) {
                 final Student student = ((Person) parkingParty.getParty()).getStudent();
-                if (degreeType.equals(DegreeType.BOLONHA_ADVANCED_SPECIALIZATION_DIPLOMA)) {
+                if (degreeType.isAdvancedSpecializationDiploma()) {
                     for (PhdIndividualProgramProcess phdIndividualProgramProcess : student.getPerson()
                             .getPhdIndividualProgramProcessesSet()) {
                         if (phdIndividualProgramProcess.getActiveState().isPhdActive()) {
@@ -135,7 +132,7 @@ public class ParkingRequestSearch implements Serializable {
                         }
                     }
                 }
-                return student.getActiveRegistrationByDegreeType(degreeType) != null;
+                return student.getActiveRegistrations().stream().anyMatch(reg -> reg.getDegreeType().equals(degreeType));
             } else if (PartyClassification.getPartyClassification(parkingParty.getParty()) == getPartyClassification()) {
                 if (getPartyClassification() == PartyClassification.TEACHER) {
                     final Teacher teacher = ((Person) parkingParty.getParty()).getTeacher();
@@ -151,7 +148,48 @@ public class ParkingRequestSearch implements Serializable {
 
     private boolean satisfiedPersonName(ParkingRequest request) {
         return org.apache.commons.lang.StringUtils.isEmpty(getPersonName())
-                || FenixStringTools.verifyContainsWithEquality(request.getParkingParty().getParty().getName(), getPersonName());
+                || verifyContainsWithEquality(request.getParkingParty().getParty().getName(), getPersonName());
+    }
+
+    public static boolean verifyContainsWithEquality(String originalString, String stringToCompare) {
+        if (originalString == null || stringToCompare == null) {
+            return false;
+        }
+        String[] stringOriginalArray = getStrings(originalString);
+        String[] stringToCompareArray = getStrings(stringToCompare);
+
+        if (stringToCompareArray == null) {
+            return true;
+        }
+
+        if (stringOriginalArray != null) {
+            int j, i;
+            for (i = 0; i < stringToCompareArray.length; i++) {
+                if (!stringToCompareArray[i].equals("")) {
+                    for (j = 0; j < stringOriginalArray.length; j++) {
+                        if (stringOriginalArray[j].equals(stringToCompareArray[i])) {
+                            break;
+                        }
+                    }
+                    if (j == stringOriginalArray.length) {
+                        return false;
+                    }
+                }
+            }
+            if (i == stringToCompareArray.length) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static String[] getStrings(String string) {
+        String[] strings = null;
+        if (string != null && !string.trim().equals("")) {
+            strings = string.trim().split(" ");
+            return Arrays.stream(strings).map(StringNormalizer::normalize).toArray(String[]::new);
+        }
+        return strings;
     }
 
     public List<ParkingRequest> getSearchResult() {

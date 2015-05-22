@@ -25,6 +25,7 @@ import java.io.Serializable;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.predicate.RolePredicates;
+import org.fenixedu.academic.util.MultiLanguageString;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixedu.quc.domain.CurricularCourseInquiryTemplate;
@@ -32,7 +33,6 @@ import pt.ist.fenixedu.quc.domain.InquiryResponsePeriodType;
 import pt.ist.fenixedu.quc.domain.InquiryTemplate;
 import pt.ist.fenixedu.quc.domain.StudentInquiryTemplate;
 import pt.ist.fenixframework.Atomic;
-import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;
 
 public class InquiryDefinitionPeriodBean implements Serializable {
 

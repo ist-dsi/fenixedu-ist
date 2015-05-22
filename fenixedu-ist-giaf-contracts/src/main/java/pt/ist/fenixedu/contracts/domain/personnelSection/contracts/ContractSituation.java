@@ -18,10 +18,10 @@
  */
 package pt.ist.fenixedu.contracts.domain.personnelSection.contracts;
 
+import org.fenixedu.academic.util.MultiLanguageString;
 import org.fenixedu.bennu.core.domain.Bennu;
 
 import pt.ist.fenixframework.Atomic;
-import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;
 
 public class ContractSituation extends ContractSituation_Base {
 

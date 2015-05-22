@@ -28,6 +28,8 @@ import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.TeacherCategory;
 import org.fenixedu.academic.domain.organizationalStructure.DepartmentUnit;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
+import org.fenixedu.commons.spreadsheet.Spreadsheet;
+import org.fenixedu.commons.spreadsheet.Spreadsheet.Row;
 import org.joda.time.LocalDate;
 import org.joda.time.Period;
 import org.joda.time.YearMonthDay;
@@ -40,8 +42,6 @@ import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalR
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalRelation;
 import pt.ist.fenixedu.contracts.domain.util.CategoryType;
 import pt.ist.fenixedu.teacher.domain.TeacherCredits;
-import pt.utl.ist.fenix.tools.util.excel.Spreadsheet;
-import pt.utl.ist.fenix.tools.util.excel.Spreadsheet.Row;
 
 public class TeachersListFromGiafReportFile extends TeachersListFromGiafReportFile_Base {
 

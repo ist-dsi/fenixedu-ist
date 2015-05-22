@@ -32,7 +32,7 @@ import org.fenixedu.academic.domain.EntryPhase;
 import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.candidacy.Ingression;
+import org.fenixedu.academic.domain.candidacy.IngressionType;
 import org.fenixedu.academic.domain.contacts.MobilePhone;
 import org.fenixedu.academic.domain.contacts.PartyContactType;
 import org.fenixedu.academic.domain.contacts.Phone;
@@ -43,16 +43,14 @@ import org.fenixedu.academic.domain.person.Gender;
 import org.fenixedu.academic.domain.person.HumanName;
 import org.fenixedu.academic.domain.person.IDDocumentType;
 import org.fenixedu.academic.domain.person.MaritalStatus;
+import org.fenixedu.academic.util.PhoneUtil;
 import org.fenixedu.academic.util.StringFormatter;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.UserProfile;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.YearMonthDay;
 
-import pt.utl.ist.fenix.tools.loaders.IFileLine;
-import pt.utl.ist.fenix.tools.util.PhoneUtil;
-
-public class DegreeCandidateDTO implements IFileLine {
+public class DegreeCandidateDTO {
 
     private static final SimpleDateFormat DATE_FORMAT;
 
@@ -83,7 +81,7 @@ public class DegreeCandidateDTO implements IFileLine {
 
     private String contigent;
 
-    private Ingression ingression;
+    private IngressionType ingressionType;
 
     private Integer placingOption;
 
@@ -115,7 +113,7 @@ public class DegreeCandidateDTO implements IFileLine {
         printField(result, "Gender ", this.gender.name());
         printField(result, "Date Of Birth", this.dateOfBirth.toString("dd-MM-yyyy"));
         printField(result, "Contigent", this.contigent);
-        printField(result, "Ingression", this.ingression.name());
+        printField(result, "IngressionType", this.ingressionType.getLocalizedName());
         printField(result, "Placing Option", this.placingOption.toString());
         printField(result, "Highschool Final Grade", this.highSchoolFinalGrade);
         printField(result, "Entry Grade", this.entryGrade.toString());
@@ -148,7 +146,6 @@ public class DegreeCandidateDTO implements IFileLine {
      * </pre>
      */
 
-    @Override
     public boolean fillWithFileLineData(String dataLine) {
 
         if (StringUtils.isEmpty(dataLine.trim()) || dataLine.startsWith("#")) {
@@ -167,7 +164,7 @@ public class DegreeCandidateDTO implements IFileLine {
         this.gender = String2Gender.convert(fields[13].trim());
         this.dateOfBirth = parseDate(fields[14].trim());
         this.contigent = fields[15].trim();
-        this.ingression = DgesBaseProcess.CONTINGENT_TO_INGRESSION_CONVERSION.get(this.contigent);
+        this.ingressionType = DgesIngressionTypeMapping.getIngressionType(this.contigent);
         this.placingOption = Integer.valueOf(fields[16].trim());
         this.highSchoolFinalGrade = new BigDecimal(fields[18].trim()).divide(BigDecimal.valueOf(10)).toPlainString();
         this.entryGrade = new BigDecimal(fields[19].trim().replace(',', '.')).doubleValue();
@@ -197,7 +194,6 @@ public class DegreeCandidateDTO implements IFileLine {
         }
     }
 
-    @Override
     public String getUniqueKey() {
         return this.documentIdNumber;
     }
@@ -290,12 +286,12 @@ public class DegreeCandidateDTO implements IFileLine {
         this.contigent = contigent;
     }
 
-    public Ingression getIngression() {
-        return ingression;
+    public IngressionType getIngressionType() {
+        return ingressionType;
     }
 
-    public void setIngression(Ingression ingression) {
-        this.ingression = ingression;
+    public void setIngressionType(IngressionType ingressionType) {
+        this.ingressionType = ingressionType;
     }
 
     public Integer getPlacingOption() {

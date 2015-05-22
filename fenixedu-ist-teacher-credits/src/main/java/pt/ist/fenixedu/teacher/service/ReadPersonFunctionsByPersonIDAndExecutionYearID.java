@@ -18,8 +18,6 @@
  */
 package pt.ist.fenixedu.teacher.service;
 
-import static org.fenixedu.academic.predicate.AccessControl.check;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -28,7 +26,6 @@ import java.util.List;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.organizationalStructure.AccountabilityTypeEnum;
-import org.fenixedu.academic.predicate.RolePredicates;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 import org.joda.time.YearMonthDay;
 
@@ -45,7 +42,6 @@ public class ReadPersonFunctionsByPersonIDAndExecutionYearID {
 
     @Atomic
     public static List<PersonFunction> run(String personID, String executionYearID) throws FenixServiceException {
-        check(RolePredicates.PERSON_PREDICATE);
         Person person = (Person) FenixFramework.getDomainObject(personID);
 
         List<PersonFunction> personFunctions = null;

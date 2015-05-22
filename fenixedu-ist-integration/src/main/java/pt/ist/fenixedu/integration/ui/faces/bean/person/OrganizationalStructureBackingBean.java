@@ -45,7 +45,6 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.organizationalStructure.AccountabilityTypeEnum;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.organizationalStructure.UnitUtils;
-import org.fenixedu.academic.service.services.commons.ReadExecutionYearsService;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 import org.fenixedu.academic.ui.faces.bean.base.FenixBackingBean;
 import org.fenixedu.academic.util.Bundle;
@@ -466,7 +465,7 @@ public class OrganizationalStructureBackingBean extends FenixBackingBean {
 
     public ExecutionYear getExecutionYear(String executionYear) throws FenixServiceException {
 
-        ExecutionYear iExecutionYear = ReadExecutionYearsService.run(executionYear);
+        ExecutionYear iExecutionYear = FenixFramework.getDomainObject(executionYear);
         return iExecutionYear;
     }
 

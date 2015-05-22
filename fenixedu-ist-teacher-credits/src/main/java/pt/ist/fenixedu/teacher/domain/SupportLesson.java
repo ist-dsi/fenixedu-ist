@@ -19,7 +19,6 @@
 package pt.ist.fenixedu.teacher.domain;
 
 import java.util.Comparator;
-import java.util.Date;
 
 import org.fenixedu.academic.domain.DomainObjectUtil;
 import org.fenixedu.academic.domain.ExecutionSemester;
@@ -27,7 +26,6 @@ import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.util.Bundle;
-import org.fenixedu.academic.util.CalendarUtil;
 import org.fenixedu.academic.util.DiaSemana;
 import org.fenixedu.academic.util.HourMinuteSecond;
 import org.fenixedu.academic.util.WeekDay;
@@ -106,9 +104,10 @@ public class SupportLesson extends SupportLesson_Base {
         for (SupportLesson supportLesson : teacherService.getSupportLessons()) {
             if (supportLesson != this) {
                 if (supportLesson.getWeekDay().equals(getWeekDay())) {
-                    Date supportLessonStart = supportLesson.getStartTime();
-                    Date supportLessonEnd = supportLesson.getEndTime();
-                    if (CalendarUtil.intersectTimes(getStartTime(), getEndTime(), supportLessonStart, supportLessonEnd)) {
+                    HourMinuteSecond supportLessonStart = supportLesson.getStartTimeHourMinuteSecond();
+                    HourMinuteSecond supportLessonEnd = supportLesson.getStartTimeHourMinuteSecond();
+                    if (supportLessonEnd.compareTo(getStartTimeHourMinuteSecond()) < 0
+                            || supportLessonStart.compareTo(getEndTimeHourMinuteSecond()) > 0) {
                         throw new DomainException("message.overlapping.support.lesson.period");
                     }
                 }

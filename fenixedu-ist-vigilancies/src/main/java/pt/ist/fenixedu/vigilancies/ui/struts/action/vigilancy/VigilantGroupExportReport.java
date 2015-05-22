@@ -30,13 +30,13 @@ import org.apache.struts.action.ActionMapping;
 import org.fenixedu.academic.domain.WrittenEvaluation;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.struts.annotations.Mapping;
+import org.fenixedu.commons.spreadsheet.Spreadsheet;
+import org.fenixedu.commons.spreadsheet.Spreadsheet.Row;
 
 import pt.ist.fenixedu.vigilancies.domain.VigilantGroup;
 import pt.ist.fenixedu.vigilancies.domain.VigilantWrapper;
 import pt.ist.fenixedu.vigilancies.dto.WrittenEvaluationVigilancyView;
 import pt.ist.fenixframework.FenixFramework;
-import pt.utl.ist.fenix.tools.util.excel.Spreadsheet;
-import pt.utl.ist.fenix.tools.util.excel.Spreadsheet.Row;
 
 @Mapping(module = "examCoordination", path = "/vigilancy/exportReport", functionality = VigilantGroupManagement.class)
 public class VigilantGroupExportReport extends VigilantGroupManagement {

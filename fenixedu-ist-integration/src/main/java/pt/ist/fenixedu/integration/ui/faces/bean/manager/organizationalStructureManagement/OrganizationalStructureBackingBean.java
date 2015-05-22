@@ -42,7 +42,6 @@ import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.administrativeOffice.AdministrativeOffice;
-import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.organizationalStructure.Accountability;
 import org.fenixedu.academic.domain.organizationalStructure.AccountabilityType;
@@ -55,6 +54,8 @@ import org.fenixedu.academic.domain.organizationalStructure.UnitUtils;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 import org.fenixedu.academic.ui.faces.bean.base.FenixBackingBean;
 import org.fenixedu.academic.util.Bundle;
+import org.fenixedu.academic.util.DateFormatUtil;
+import org.fenixedu.academic.util.MultiLanguageString;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.YearMonthDay;
@@ -74,8 +75,6 @@ import pt.ist.fenixedu.integration.service.services.manager.organizationalStruct
 import pt.ist.fenixedu.integration.service.services.manager.organizationalStructureManagement.RemoveParentInherentFunction;
 import pt.ist.fenixedu.integration.service.services.manager.organizationalStructureManagement.SetRootUnit;
 import pt.ist.fenixframework.FenixFramework;
-import pt.utl.ist.fenix.tools.util.DateFormatUtil;
-import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;
 
 public class OrganizationalStructureBackingBean extends FenixBackingBean {
 
@@ -466,23 +465,23 @@ public class OrganizationalStructureBackingBean extends FenixBackingBean {
             selectItem = new SelectItem();
 
             if (!degree.isBolonhaDegree()) {
-                if (degree.getDegreeType().equals(DegreeType.DEGREE)) {
+                if (degree.getDegreeType().isPreBolonhaDegree()) {
                     selectItem.setLabel("(L) " + degree.getNome());
-                } else if (degree.getDegreeType().equals(DegreeType.MASTER_DEGREE)) {
+                } else if (degree.getDegreeType().isPreBolonhaMasterDegree()) {
                     selectItem.setLabel("(M) " + degree.getNome());
                 }
             } else if (degree.isBolonhaDegree()) {
-                if (degree.getDegreeType().equals(DegreeType.BOLONHA_DEGREE)) {
+                if (degree.getDegreeType().isBolonhaDegree()) {
                     selectItem.setLabel("(L-B) " + degree.getNome());
-                } else if (degree.getDegreeType().equals(DegreeType.BOLONHA_MASTER_DEGREE)) {
+                } else if (degree.getDegreeType().isBolonhaMasterDegree()) {
                     selectItem.setLabel("(M-B) " + degree.getNome());
-                } else if (degree.getDegreeType().equals(DegreeType.BOLONHA_INTEGRATED_MASTER_DEGREE)) {
+                } else if (degree.getDegreeType().isIntegratedMasterDegree()) {
                     selectItem.setLabel("(MI) " + degree.getNome());
-                } else if (degree.getDegreeType().equals(DegreeType.BOLONHA_ADVANCED_FORMATION_DIPLOMA)) {
+                } else if (degree.getDegreeType().isAdvancedFormationDiploma()) {
                     selectItem.setLabel("(DFA) " + degree.getNome());
-                } else if (degree.getDegreeType().equals(DegreeType.BOLONHA_ADVANCED_SPECIALIZATION_DIPLOMA)) {
+                } else if (degree.getDegreeType().isAdvancedSpecializationDiploma()) {
                     selectItem.setLabel("(DEA) " + degree.getNome());
-                } else if (degree.getDegreeType().equals(DegreeType.BOLONHA_SPECIALIZATION_DEGREE)) {
+                } else if (degree.getDegreeType().isSpecializationDegree()) {
                     selectItem.setLabel("(SD) " + degree.getNome());
                 }
             }

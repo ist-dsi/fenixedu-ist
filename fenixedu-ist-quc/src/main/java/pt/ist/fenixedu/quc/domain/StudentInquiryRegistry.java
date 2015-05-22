@@ -116,7 +116,7 @@ public class StudentInquiryRegistry extends StudentInquiryRegistry_Base {
         Grade grade = null;
         for (Enrolment enrolment : enrolments) {
             if (getExecutionCourse() == enrolment.getExecutionCourseFor(getExecutionPeriod())) {
-                final EnrolmentEvaluation enrolmentEvaluation = enrolment.getLatestEnrolmentEvaluation();
+                final EnrolmentEvaluation enrolmentEvaluation = enrolment.getFinalEnrolmentEvaluation();
                 if (enrolmentEvaluation != null && (enrolmentEvaluation.isTemporary() || enrolmentEvaluation.isFinal())) {
                     grade = enrolmentEvaluation.getGrade();
                     break;

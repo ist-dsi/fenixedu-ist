@@ -26,6 +26,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.apache.commons.beanutils.BeanComparator;
 import org.apache.commons.lang.StringUtils;
@@ -238,8 +240,7 @@ public class ParkingParty extends ParkingParty_Base {
             }
             Student student = person.getStudent();
             if (student != null && RoleType.STUDENT.isMember(person.getUser())) {
-                DegreeType degreeType = student.getMostSignificantDegreeType();
-                Collection<Registration> registrations = student.getRegistrationsByDegreeType(degreeType);
+                Collection<Registration> registrations = bestRegistrationsFor(student);
                 for (Registration registration : registrations) {
                     StudentCurricularPlan scp = registration.getActiveStudentCurricularPlan();
                     if (scp != null) {
@@ -365,7 +366,7 @@ public class ParkingParty extends ParkingParty_Base {
                         } else {
                             stringBuilder.append(")");
                         }
-                        stringBuilder.append("<br/>Media: ").append(registration.getAverage());
+                        stringBuilder.append("<br/>Media: ").append(registration.getRawGrade().getValue());
                         stringBuilder.append("<br/>");
                     }
                 }
@@ -439,7 +440,7 @@ public class ParkingParty extends ParkingParty_Base {
                         if (isFirstTimeEnrolledInCurrentYear(registration)) {
                             stringBuilder.append(" - 1ª vez");
                         }
-                        stringBuilder.append(" - ").append(registration.getAverage());
+                        stringBuilder.append(" - ").append(registration.getRawGrade().getValue());
                         result.add(stringBuilder.toString());
                     }
                 }
@@ -530,8 +531,7 @@ public class ParkingParty extends ParkingParty_Base {
             final Student student = person.getStudent();
 
             if (student != null) {
-                DegreeType degreeType = student.getMostSignificantDegreeType();
-                Collection<Registration> registrations = student.getRegistrationsByDegreeType(degreeType);
+                Collection<Registration> registrations = bestRegistrationsFor(student);
                 for (Registration registration : registrations) {
                     StudentCurricularPlan scp = registration.getActiveStudentCurricularPlan();
                     if (scp != null) {
@@ -665,7 +665,7 @@ public class ParkingParty extends ParkingParty_Base {
             if (getParkingGroup().getGroupName().equalsIgnoreCase("3º ciclo")) {
                 if (person.getStudent() != null) {
                     Registration registration =
-                            getRegistrationByDegreeType(person.getStudent(), DegreeType.BOLONHA_ADVANCED_SPECIALIZATION_DIPLOMA);
+                            getRegistrationByDegreeType(person.getStudent(), DegreeType::isAdvancedSpecializationDiploma);
                     return registration != null && registration.isActive();
                 } else {
                     return Boolean.FALSE;
@@ -778,8 +778,8 @@ public class ParkingParty extends ParkingParty_Base {
                 .getCurricularYear(executionYear);
     }
 
-    private Registration getRegistrationByDegreeType(Student student, DegreeType degreeType) {
-        for (Registration registration : student.getRegistrationsByDegreeType(degreeType)) {
+    private Registration getRegistrationByDegreeType(Student student, Predicate<DegreeType> degreeType) {
+        for (Registration registration : student.getRegistrationsMatchingDegreeType(degreeType)) {
             if (registration.isActive()) {
                 StudentCurricularPlan scp = registration.getActiveStudentCurricularPlan();
                 if (scp != null) {
@@ -831,5 +831,34 @@ public class ParkingParty extends ParkingParty_Base {
         List<Vehicle> vehicles = new ArrayList<Vehicle>(getVehiclesSet());
         Collections.sort(vehicles, new BeanComparator("plateNumber"));
         return vehicles.size() > 1 ? vehicles.get(1) : null;
+    }
+
+    public static Collection<Registration> bestRegistrationsFor(Student student) {
+        DegreeType typeToChoose = mostSignificantDegreeType(student);
+        return student.getActiveRegistrations().stream().filter(reg -> reg.getDegreeType().equals(typeToChoose))
+                .collect(Collectors.toList());
+    }
+
+    private static final List<Predicate<DegreeType>> types;
+
+    static {
+        types = new ArrayList<>();
+        types.add(DegreeType::isSpecializationDegree);
+        types.add(DegreeType::isAdvancedFormationDiploma);
+        types.add(DegreeType::isAdvancedSpecializationDiploma);
+        types.add(DegreeType::isBolonhaMasterDegree);
+        types.add(DegreeType::isIntegratedMasterDegree);
+        types.add(DegreeType::isBolonhaDegree);
+    }
+
+    public static DegreeType mostSignificantDegreeType(Student student) {
+        for (Predicate<DegreeType> type : types) {
+            for (Registration reg : student.getActiveRegistrations()) {
+                if (type.test(reg.getDegreeType())) {
+                    return reg.getDegreeType();
+                }
+            }
+        }
+        return null;
     }
 }

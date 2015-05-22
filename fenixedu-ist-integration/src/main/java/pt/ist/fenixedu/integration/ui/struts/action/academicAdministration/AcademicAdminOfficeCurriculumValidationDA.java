@@ -35,13 +35,13 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.EnrolmentEvaluation;
+import org.fenixedu.academic.domain.EvaluationConfiguration;
+import org.fenixedu.academic.domain.EvaluationSeason;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.curricularRules.executors.RuleResult;
 import org.fenixedu.academic.domain.curricularRules.executors.ruleExecutors.CurricularRuleLevel;
-import org.fenixedu.academic.domain.curriculum.CurriculumValidationEvaluationPhase;
-import org.fenixedu.academic.domain.curriculum.EnrolmentEvaluationType;
 import org.fenixedu.academic.domain.enrolment.IDegreeModuleToEvaluate;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.exceptions.EnrollmentDomainException;
@@ -53,13 +53,11 @@ import org.fenixedu.academic.dto.degreeAdministrativeOffice.gradeSubmission.Mark
 import org.fenixedu.academic.dto.student.RegistrationConclusionBean;
 import org.fenixedu.academic.dto.student.StudentsSearchBean;
 import org.fenixedu.academic.dto.student.enrollment.bolonha.BolonhaStudentEnrollmentBean;
-import org.fenixedu.academic.predicate.IllegalDataAccessException;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 import org.fenixedu.academic.service.services.student.enrolment.bolonha.EnrolBolonhaStudent;
 import org.fenixedu.academic.service.services.student.enrolment.bolonha.EnrolBolonhaStudentInCurriculumValidationContext;
 import org.fenixedu.academic.ui.struts.FenixActionForm;
 import org.fenixedu.academic.ui.struts.action.administrativeOffice.student.EditCandidacyInformationDA.ChooseRegistrationOrPhd;
-import org.fenixedu.academic.ui.struts.action.administrativeOffice.studentEnrolment.bolonha.CurriculumValidationServicesHelper;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
@@ -176,7 +174,7 @@ public class AcademicAdminOfficeCurriculumValidationDA extends FenixDispatchActi
             HttpServletResponse response) {
         StudentCurricularPlan studentCurricularPlan = readStudentCurricularPlan(request);
         request.setAttribute("studentCurriculumValidationAllowed",
-                studentCurricularPlan.getEvaluationForCurriculumValidationAllowed());
+                PreBolognaEvaluationManagement.getEvaluationForCurriculumValidationAllowed(studentCurricularPlan));
         return mapping.findForward("show-curriculum-validation-options");
     }
 
@@ -427,21 +425,23 @@ public class AcademicAdminOfficeCurriculumValidationDA extends FenixDispatchActi
     public ActionForward doRegistrationConclusion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
             HttpServletResponse response) throws FenixServiceException {
 
-        final RegistrationConclusionBean registrationConclusionBean = getRegistrationConclusionBeanFromViewState();
+        throw new DomainException("error.operation.not.supported");
 
-        try {
-            new CurriculumValidationServicesHelper().concludeRegistration(registrationConclusionBean);
-            return prepareCurriculumValidation(mapping, form, request, response);
-        } catch (final IllegalDataAccessException e) {
-            addActionMessage("illegal.access", request, "error.not.authorized.to.registration.conclusion.process");
-            request.setAttribute("registrationConclusionBean", registrationConclusionBean);
-            return mapping.findForward("registrationConclusion");
-
-        } catch (final DomainException e) {
-            addActionMessage(request, e.getKey(), e.getArgs());
-            request.setAttribute("registrationConclusionBean", registrationConclusionBean);
-            return mapping.findForward("registrationConclusion");
-        }
+//        final RegistrationConclusionBean registrationConclusionBean = getRegistrationConclusionBeanFromViewState();
+//
+//        try {
+////            new CurriculumValidationServicesHelper().concludeRegistration(registrationConclusionBean);
+//            return prepareCurriculumValidation(mapping, form, request, response);
+//        } catch (final IllegalDataAccessException e) {
+//            addActionMessage("illegal.access", request, "error.not.authorized.to.registration.conclusion.process");
+//            request.setAttribute("registrationConclusionBean", registrationConclusionBean);
+//            return mapping.findForward("registrationConclusion");
+//
+//        } catch (final DomainException e) {
+//            addActionMessage(request, e.getKey(), e.getArgs());
+//            request.setAttribute("registrationConclusionBean", registrationConclusionBean);
+//            return mapping.findForward("registrationConclusion");
+//        }
     }
 
     private RegistrationConclusionBean buildRegistrationConclusionBean(final Registration registration) {
@@ -467,12 +467,6 @@ public class AcademicAdminOfficeCurriculumValidationDA extends FenixDispatchActi
         return (List<List<MarkSheetEnrolmentEvaluationBean>>) getObjectFromViewState("set.evaluations.form");
     }
 
-    private static final String[][] TYPE_AND_PHASE = new String[][] {
-            { EnrolmentEvaluationType.NORMAL.name(), CurriculumValidationEvaluationPhase.FIRST_SEASON.name() },
-            { EnrolmentEvaluationType.NORMAL.name(), CurriculumValidationEvaluationPhase.SECOND_SEASON.name() },
-            { EnrolmentEvaluationType.NORMAL.name(), null }, { EnrolmentEvaluationType.IMPROVEMENT.name(), null },
-            { EnrolmentEvaluationType.SPECIAL_SEASON.name(), null } };
-
     private void createTreeCurriculumModules(StudentCurricularPlan studentCurricularPlan, ExecutionSemester executionSemester,
             java.util.List<java.util.List<MarkSheetEnrolmentEvaluationBean>> enrolmentEvaluationBeanList,
             java.util.List<java.util.List<MarkSheetEnrolmentEvaluationBean>> finalEnrolmentEvaluationBeanList,
@@ -484,24 +478,8 @@ public class AcademicAdminOfficeCurriculumValidationDA extends FenixDispatchActi
         for (Enrolment enrolment : enrolments) {
             java.util.List<MarkSheetEnrolmentEvaluationBean> markSheetList =
                     new java.util.ArrayList<MarkSheetEnrolmentEvaluationBean>();
-            markSheetList.add(new MarkSheetEnrolmentEvaluationBean(enrolment, executionSemester, EnrolmentEvaluationType.NORMAL,
-                    CurriculumValidationEvaluationPhase.FIRST_SEASON));
-            markSheetList.add(new MarkSheetEnrolmentEvaluationBean(enrolment, executionSemester, EnrolmentEvaluationType.NORMAL,
-                    CurriculumValidationEvaluationPhase.SECOND_SEASON));
-            markSheetList.add(new MarkSheetEnrolmentEvaluationBean(enrolment, executionSemester,
-                    EnrolmentEvaluationType.SPECIAL_SEASON, null));
-            markSheetList.add(new MarkSheetEnrolmentEvaluationBean(enrolment, executionSemester,
-                    EnrolmentEvaluationType.IMPROVEMENT, null));
-
-            for (String[] element : TYPE_AND_PHASE) {
-                EnrolmentEvaluationType type = EnrolmentEvaluationType.valueOf(element[0]);
-                CurriculumValidationEvaluationPhase phase =
-                        element[1] != null ? CurriculumValidationEvaluationPhase.valueOf(element[1]) : null;
-                EnrolmentEvaluation evaluation = enrolment.getLatestEnrolmentEvaluationByTypeAndPhase(type, phase);
-                if (evaluation != null) {
-                    logger.debug(String.format("%s[%s][%s] State: %s", evaluation.getEnrolment().getName().getContent(), type,
-                            phase, evaluation.getEnrolmentEvaluationState().toString()));
-                }
+            for (EvaluationSeason season : EvaluationConfiguration.getInstance().getEvaluationSeasonSet()) {
+                markSheetList.add(new MarkSheetEnrolmentEvaluationBean(enrolment, executionSemester, season));
             }
 
             if (enrolment.hasAnyNonTemporaryEvaluations() && !forEdition) {

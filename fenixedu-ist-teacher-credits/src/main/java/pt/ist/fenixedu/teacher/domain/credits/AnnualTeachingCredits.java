@@ -244,7 +244,9 @@ public class AnnualTeachingCredits extends AnnualTeachingCredits_Base {
                         && thesis.hasFinalEnrolmentEvaluation()
                         && thesis.getEvaluation().getYear() == executionYear.getBeginCivilYear()
                         && (participant.getType() == ThesisParticipationType.ORIENTATOR || participant.getType() == ThesisParticipationType.COORIENTATOR)) {
-                    totalThesisValue = totalThesisValue + participant.getParticipationCredits();
+                    if (thesis.hasCredits()) {
+                        totalThesisValue = totalThesisValue + (participant.getPercentageDistribution() / 100);
+                    }
                 }
             }
         }

@@ -21,7 +21,6 @@ package pt.ist.fenixedu.tutorship.ui.Action.pedagogicalCouncil.studentLowPerform
 import java.math.BigDecimal;
 
 import org.fenixedu.academic.domain.ExecutionYear;
-import org.fenixedu.academic.domain.candidacy.Ingression;
 import org.fenixedu.academic.domain.student.Registration;
 
 abstract class PrescriptionRuleGenericMoment extends AbstractPrescriptionRule {
@@ -34,15 +33,6 @@ abstract class PrescriptionRuleGenericMoment extends AbstractPrescriptionRule {
             ExecutionYear executionYear) {
         return ects.compareTo(getMinimumEcts()) < 0
                 && numberOfEntriesStudentInSecretary == getNumberOfEntriesStudentInSecretary()
-                && isForAdmission(registration.getIngression()) && registration.isFullRegime(executionYear);
+                && registration.isFullRegime(executionYear);
     }
-
-    protected boolean isForAdmission(Ingression ingression) {
-        return ingression != null
-                && (ingression.equals(Ingression.CNA01) || ingression.equals(Ingression.CNA02)
-                        || ingression.equals(Ingression.CNA03) || ingression.equals(Ingression.CNA04)
-                        || ingression.equals(Ingression.CNA05) || ingression.equals(Ingression.CNA06) || ingression
-                            .equals(Ingression.CNA07));
-    }
-
 }

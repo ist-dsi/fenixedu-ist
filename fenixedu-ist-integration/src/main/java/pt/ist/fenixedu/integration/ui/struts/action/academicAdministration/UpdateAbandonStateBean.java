@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.Enrolment;
@@ -38,14 +39,13 @@ import org.fenixedu.academic.domain.studentCurriculum.CurriculumModule.Curriculu
 import org.fenixedu.academic.domain.util.email.Message;
 import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.academic.domain.util.email.SystemSender;
+import org.fenixedu.academic.util.predicates.AndPredicate;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.groups.UserGroup;
 import org.joda.time.YearMonthDay;
 
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
 import pt.ist.fenixframework.Atomic;
-import pt.utl.ist.fenix.tools.predicates.AndPredicate;
-import pt.utl.ist.fenix.tools.predicates.Predicate;
 
 public class UpdateAbandonStateBean implements Serializable {
 
@@ -63,7 +63,7 @@ public class UpdateAbandonStateBean implements Serializable {
         int total = 0;
         setLog(new StringBuilder());
         for (final DegreeCurricularPlan degreeCurricularPlan : DegreeCurricularPlan.readBolonhaDegreeCurricularPlans()) {
-            if (degreeCurricularPlan.getDegreeType().getAdministrativeOfficeType() != AdministrativeOfficeType.DEGREE) {
+            if (degreeCurricularPlan.getDegree().getAdministrativeOffice().getAdministrativeOfficeType() != AdministrativeOfficeType.DEGREE) {
                 continue;
             }
             if (degreeCurricularPlan.hasExecutionDegreeFor(getWhenToAbandon().getExecutionYear())
@@ -167,7 +167,7 @@ public class UpdateAbandonStateBean implements Serializable {
         return false;
     }
 
-    private class CurriculumLinePredicateByExecutionSemester extends Predicate<CurriculumModule> {
+    private class CurriculumLinePredicateByExecutionSemester implements Predicate<CurriculumModule> {
 
         private final ExecutionSemester semester;
 
@@ -176,7 +176,7 @@ public class UpdateAbandonStateBean implements Serializable {
         }
 
         @Override
-        public boolean eval(final CurriculumModule module) {
+        public boolean test(final CurriculumModule module) {
             if (!module.isCurriculumLine()) {
                 return false;
             }

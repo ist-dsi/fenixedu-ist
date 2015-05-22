@@ -18,7 +18,7 @@
  */
 /*
  * Created on 14/Mar/2003
- *  
+ * 
  */
 package org.fenixedu.academic.service.services.masterDegree.administrativeOffice;
 
@@ -47,7 +47,9 @@ public class ReadMasterDegrees {
         }
 
         // Read the degrees
-        final List result = ExecutionDegree.getAllByExecutionYearAndDegreeType(executionYear.getYear(), DegreeType.MASTER_DEGREE);
+        final List result =
+                ExecutionDegree.getAllByExecutionYearAndDegreeType(executionYear.getYear(),
+                        DegreeType.matching(DegreeType::isPreBolonhaMasterDegree).get());
         if (result == null || result.size() == 0) {
             throw new NonExistingServiceException();
         }

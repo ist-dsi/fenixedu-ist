@@ -120,7 +120,6 @@ public class EnrolmentStatistics extends CustomTask {
 
     private boolean isDegree(final DegreeCurricularPlan degreeCurricularPlan) {
         final DegreeType degreeType = degreeCurricularPlan.getDegreeType();
-        return degreeType == DegreeType.BOLONHA_DEGREE || degreeType == DegreeType.BOLONHA_MASTER_DEGREE
-                || degreeType == DegreeType.BOLONHA_INTEGRATED_MASTER_DEGREE;
+        return degreeType.isBolonhaDegree() || degreeType.isBolonhaMasterDegree() || degreeType.isIntegratedMasterDegree();
     }
 }

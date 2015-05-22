@@ -24,6 +24,7 @@ package pt.ist.fenixedu.quc.ui.renderers;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
+import org.fenixedu.academic.util.MultiLanguageString;
 
 import pt.ist.fenixWebFramework.renderers.InputRenderer;
 import pt.ist.fenixWebFramework.renderers.components.HtmlComponent;
@@ -49,7 +50,6 @@ import pt.ist.fenixedu.quc.domain.InquiryRadioGroupQuestion;
 import pt.ist.fenixedu.quc.domain.InquiryTextBoxQuestion;
 import pt.ist.fenixedu.quc.dto.InquiryGroupQuestionBean;
 import pt.ist.fenixedu.quc.dto.InquiryQuestionDTO;
-import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;
 
 /**
  * @author - Ricardo Rodrigues (ricardo.rodrigues@ist.utl.pt)

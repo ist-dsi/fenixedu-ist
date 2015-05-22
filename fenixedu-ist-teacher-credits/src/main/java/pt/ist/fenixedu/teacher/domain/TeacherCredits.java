@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.fenixedu.academic.FenixEduAcademicConfiguration;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.TeacherAuthorization;
@@ -42,6 +41,7 @@ import pt.ist.fenixedu.contracts.domain.organizationalStructure.PersonFunction;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonContractSituation;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalData;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalExemption;
+import pt.ist.fenixedu.teacher.TeacherCreditsConfiguration;
 import pt.ist.fenixedu.teacher.domain.teacher.TeacherService;
 
 public class TeacherCredits extends TeacherCredits_Base {
@@ -136,7 +136,8 @@ public class TeacherCredits extends TeacherCredits_Base {
             }
         }
         Collections.sort(participants, ThesisEvaluationParticipant.COMPARATOR_BY_STUDENT_NUMBER);
-        return round(participants.stream().mapToDouble(p -> p.getParticipationCredits()).sum());
+        return round(participants.stream().mapToDouble(p -> p.getThesis().hasCredits() ? p.getPercentageDistribution() / 100 : 0)
+                .sum());
     }
 
     public static double calculateManagementFunctionsCredits(Teacher teacher, ExecutionSemester executionSemester) {
@@ -292,8 +293,8 @@ public class TeacherCredits extends TeacherCredits_Base {
     }
 
     static public ExecutionSemester readStartExecutionSemesterForCredits() {
-        String yearString = FenixEduAcademicConfiguration.getConfiguration().getStartYearForCredits();
-        String semesterString = FenixEduAcademicConfiguration.getConfiguration().getStartSemesterForCredits();
+        String yearString = TeacherCreditsConfiguration.getConfiguration().getStartYearForCredits();
+        String semesterString = TeacherCreditsConfiguration.getConfiguration().getStartSemesterForCredits();
 
         if (yearString != null && yearString.length() != 0 && semesterString != null && semesterString.length() != 0) {
             return ExecutionSemester.readBySemesterAndExecutionYear(Integer.valueOf(semesterString), yearString);
@@ -302,8 +303,8 @@ public class TeacherCredits extends TeacherCredits_Base {
     }
 
     static public ExecutionSemester readLastExecutionSemesterForCredits() {
-        String yearString = FenixEduAcademicConfiguration.getConfiguration().getLastYearForCredits();
-        String semesterString = FenixEduAcademicConfiguration.getConfiguration().getLastSemesterForCredits();
+        String yearString = TeacherCreditsConfiguration.getConfiguration().getLastYearForCredits();
+        String semesterString = TeacherCreditsConfiguration.getConfiguration().getLastSemesterForCredits();
 
         if (yearString != null && yearString.length() != 0 && semesterString != null && semesterString.length() != 0) {
             return ExecutionSemester.readBySemesterAndExecutionYear(Integer.valueOf(semesterString), yearString);

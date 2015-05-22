@@ -22,6 +22,7 @@
  */
 package org.fenixedu.academic.ui.struts.action.masterDegree.administrativeOffice.candidate;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -306,13 +307,29 @@ public class EditCandidateDA extends FenixDispatchAction {
                 GenderHelper.getSexLabelValues((Locale) request.getAttribute(Globals.LOCALE_KEY)));
         request.setAttribute(PresentationConstants.MONTH_DAYS_KEY, Data.getMonthDays());
         request.setAttribute(PresentationConstants.MONTH_LIST_KEY, Data.getMonths());
-        request.setAttribute(PresentationConstants.YEARS_KEY, Data.getYears());
+        request.setAttribute(PresentationConstants.YEARS_KEY, getYears());
 
-        request.setAttribute(PresentationConstants.EXPIRATION_YEARS_KEY, Data.getExpirationYears());
+        request.setAttribute(PresentationConstants.EXPIRATION_YEARS_KEY, getExpirationYears());
 
         request.setAttribute(PresentationConstants.CANDIDATE_SITUATION_LIST, SituationName.toArrayList());
 
         return mapping.findForward("PrepareReady");
+    }
+
+    public static List<LabelValueBean> getYears() {
+        List<LabelValueBean> result = new ArrayList<>();
+        for (int i = LocalDate.now().getYear(); i > 1900; i--) {
+            result.add(new LabelValueBean(Integer.toString(i), Integer.toString(i)));
+        }
+        return result;
+    }
+
+    public static List<LabelValueBean> getExpirationYears() {
+        List<LabelValueBean> result = new ArrayList<>();
+        for (int i = LocalDate.now().getYear() - 10; i < LocalDate.now().getYear() + 20; i++) {
+            result.add(new LabelValueBean(Integer.toString(i), Integer.toString(i)));
+        }
+        return result;
     }
 
     private void populateForm(DynaActionForm editCandidateForm, InfoMasterDegreeCandidate infoMasterDegreeCandidate) {

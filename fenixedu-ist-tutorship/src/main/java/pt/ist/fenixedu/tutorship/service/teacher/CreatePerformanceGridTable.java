@@ -143,7 +143,7 @@ public class CreatePerformanceGridTable {
     }
 
     public void calculateStudentPerformanceInfo(PerformanceGridLine newLine) {
-        int max_years = (int) newLine.getRegistration().getDegreeType().getAcademicPeriod().getWeight();
+        int max_years = newLine.getRegistration().getLastStudentCurricularPlan().getDegreeCurricularPlan().getDurationInYears();
 
         PerformanceGridLineYearGroup[] studentPerformanceByYearArray = new PerformanceGridLineYearGroup[max_years];
 

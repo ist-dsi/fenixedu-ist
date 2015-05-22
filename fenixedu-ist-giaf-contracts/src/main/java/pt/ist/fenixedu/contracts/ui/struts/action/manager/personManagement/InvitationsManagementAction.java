@@ -43,6 +43,7 @@ import org.fenixedu.academic.service.services.person.SearchPerson.SearchParamete
 import org.fenixedu.academic.service.services.person.SearchPerson.SearchPersonPredicate;
 import org.fenixedu.academic.ui.struts.action.accounts.AccountManagementApp;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
+import org.fenixedu.academic.util.CollectionPager;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
@@ -58,7 +59,6 @@ import pt.ist.fenixedu.contracts.service.manager.CreateNewPersonInvitation;
 import pt.ist.fenixedu.contracts.service.manager.DeleteInvitation;
 import pt.ist.fenixedu.contracts.service.manager.EditInvitationHostUnit;
 import pt.ist.fenixedu.contracts.service.manager.EditInvitationResponsible;
-import pt.utl.ist.fenix.tools.util.CollectionPager;
 
 @StrutsFunctionality(app = AccountManagementApp.class, path = "invitations-management",
         titleKey = "title.manage.external.persons")

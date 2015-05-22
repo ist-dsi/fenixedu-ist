@@ -49,6 +49,7 @@ import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
 import org.fenixedu.bennu.struts.portal.EntryPoint;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
+import org.fenixedu.commons.spreadsheet.StyledExcelSpreadsheet;
 import org.joda.time.Duration;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
@@ -56,7 +57,6 @@ import org.joda.time.format.PeriodFormatterBuilder;
 import pt.ist.fenixedu.teacher.domain.credits.util.DepartmentCreditsBean;
 import pt.ist.fenixedu.teacher.domain.teacher.TeacherService;
 import pt.ist.fenixedu.teacher.ui.struts.action.DepartmentCreditsManagerApp;
-import pt.utl.ist.fenix.tools.util.excel.StyledExcelSpreadsheet;
 
 import com.google.common.collect.Sets;
 

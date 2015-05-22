@@ -49,7 +49,6 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Photograph;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.contacts.EmailAddress;
-import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.organizationalStructure.Party;
 import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.academic.domain.student.Registration;
@@ -71,6 +70,7 @@ import org.fenixedu.bennu.struts.portal.EntryPoint;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
 import org.fenixedu.commons.StringNormalizer;
 import org.fenixedu.commons.i18n.I18N;
+import org.fenixedu.commons.spreadsheet.StyledExcelSpreadsheet;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixWebFramework.renderers.components.state.IViewState;
@@ -90,7 +90,6 @@ import pt.ist.fenixedu.parking.dto.SearchParkingPartyBean;
 import pt.ist.fenixedu.parking.dto.VehicleBean;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
-import pt.utl.ist.fenix.tools.util.excel.StyledExcelSpreadsheet;
 
 @StrutsFunctionality(app = ParkingManagerApp.class, path = "parking", titleKey = "label.requests")
 @Mapping(path = "/parking", module = "parkingManager", formBean = "parkingForm")
@@ -426,8 +425,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
             return person.getEmployee().getEmployeeNumber();
         }
         if (person.getStudent() != null && !parkingGroup.getGroupName().equalsIgnoreCase("Bolseiros")) {
-            DegreeType degreeType = person.getStudent().getMostSignificantDegreeType();
-            Collection<Registration> registrations = person.getStudent().getRegistrationsByDegreeType(degreeType);
+            Collection<Registration> registrations = ParkingParty.bestRegistrationsFor(person.getStudent());
             for (Registration registration : registrations) {
                 StudentCurricularPlan scp = registration.getActiveStudentCurricularPlan();
                 if (scp != null) {

@@ -18,13 +18,13 @@
  */
 package pt.ist.fenixedu.teacher.evaluation.domain;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 
 import pt.ist.fenixframework.Atomic;
-import pt.utl.ist.fenix.tools.util.FileUtils;
+
+import com.google.common.io.ByteStreams;
 
 public class FileUploadBean implements Serializable {
 
@@ -92,9 +92,7 @@ public class FileUploadBean implements Serializable {
     }
 
     public void consumeInputStream() throws IOException {
-        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        FileUtils.copy(inputStream, byteArrayOutputStream);
-        bytes = byteArrayOutputStream.toByteArray();
+        bytes = ByteStreams.toByteArray(inputStream);
     }
 
     @Atomic

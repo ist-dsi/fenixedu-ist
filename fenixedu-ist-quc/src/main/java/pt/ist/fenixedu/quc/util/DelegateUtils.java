@@ -107,11 +107,16 @@ public class DelegateUtils {
                 }
             }
         }
-        for (int iter = 1; iter <= degree.getDegreeType().getYears(); iter++) {
-            YearDelegate yearDelegateForYear = getYearDelegate(otherYearDelegates, iter);
-            if (yearDelegateForYear == null) {
-                executionCoursesToInquiries.addAll(DelegateUtils.getExecutionCoursesToInquiries(yearDelegate, executionPeriod,
-                        executionDegree, iter));
+
+        List<DegreeCurricularPlan> dcps = degree.getDegreeCurricularPlansForYear(executionPeriod.getExecutionYear());
+
+        if (!dcps.isEmpty()) {
+            for (int iter = 1; iter <= dcps.get(0).getDurationInYears(); iter++) {
+                YearDelegate yearDelegateForYear = getYearDelegate(otherYearDelegates, iter);
+                if (yearDelegateForYear == null) {
+                    executionCoursesToInquiries.addAll(DelegateUtils.getExecutionCoursesToInquiries(yearDelegate,
+                            executionPeriod, executionDegree, iter));
+                }
             }
         }
     }

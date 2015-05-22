@@ -18,7 +18,7 @@
  */
 /*
  * Created on Dec 17, 2003 by jpvl
- *  
+ * 
  */
 package pt.ist.fenixedu.integration.service.services.teacher;
 
@@ -33,9 +33,9 @@ import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.dto.InfoCurricularCourse;
 import org.fenixedu.academic.dto.InfoProfessorship;
-import org.fenixedu.academic.dto.teacher.professorship.DetailedProfessorship;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 
+import pt.ist.fenixedu.integration.dto.DetailedProfessorship;
 import pt.ist.fenixframework.FenixFramework;
 
 /**
@@ -76,7 +76,7 @@ public class ReadDetailedTeacherProfessorshipsAbstractService {
                             CurricularCourse curricularCourse = (CurricularCourse) input;
                             InfoCurricularCourse infoCurricularCourse = InfoCurricularCourse.newInfoFromDomain(curricularCourse);
                             DegreeType degreeType = curricularCourse.getDegreeCurricularPlan().getDegree().getDegreeType();
-                            if (degreeType.equals(DegreeType.DEGREE)) {
+                            if (degreeType.isPreBolonhaDegree()) {
                                 detailedProfessorship.setMasterDegreeOnly(Boolean.FALSE);
                             }
                             return infoCurricularCourse;

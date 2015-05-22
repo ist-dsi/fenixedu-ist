@@ -50,6 +50,8 @@ import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
 import org.fenixedu.bennu.struts.portal.EntryPoint;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
+import org.fenixedu.commons.spreadsheet.Spreadsheet;
+import org.fenixedu.commons.spreadsheet.Spreadsheet.Row;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixedu.delegates.domain.student.Delegate;
@@ -57,8 +59,6 @@ import pt.ist.fenixedu.delegates.domain.student.YearDelegate;
 import pt.ist.fenixedu.quc.domain.DelegateInquiryTemplate;
 import pt.ist.fenixedu.quc.util.DelegateUtils;
 import pt.ist.fenixframework.FenixFramework;
-import pt.utl.ist.fenix.tools.util.excel.Spreadsheet;
-import pt.utl.ist.fenix.tools.util.excel.Spreadsheet.Row;
 
 @StrutsFunctionality(app = PedagogicalControlApp.class, path = "view-quc-delegates-status",
         titleKey = "title.inquiries.delegates.status", bundle = "InquiriesResources")
@@ -88,8 +88,8 @@ public class ViewQucDelegatesStatus extends FenixDispatchAction {
         Map<Degree, List<DelegateBean>> delegatesMap = new HashMap<Degree, List<DelegateBean>>();
         final ExecutionSemester executionPeriod = delegateInquiryTemplate.getExecutionPeriod();
         final List<Degree> degreeList =
-                Degree.readAllByDegreeType(DegreeType.BOLONHA_DEGREE, DegreeType.BOLONHA_INTEGRATED_MASTER_DEGREE,
-                        DegreeType.BOLONHA_MASTER_DEGREE);
+                Degree.readAllMatching(DegreeType.oneOf(DegreeType::isBolonhaDegree, DegreeType::isIntegratedMasterDegree,
+                        DegreeType::isBolonhaMasterDegree));
 
         for (Degree degree : degreeList) {
             Map<Integer, YearDelegate> yearDelegateByYear = new HashMap<Integer, YearDelegate>();
@@ -145,7 +145,7 @@ public class ViewQucDelegatesStatus extends FenixDispatchAction {
         for (Degree degree : delegatesMap.keySet()) {
             for (DelegateBean delegateBean : delegatesMap.get(degree)) {
                 Row row = spreadsheet.addRow();
-                row.setCell(degree.getDegreeType().getLocalizedName() + " - " + degree.getNameI18N().toString());
+                row.setCell(degree.getDegreeType().getName().getContent() + " - " + degree.getNameI18N().toString());
                 row.setCell(delegateBean.getYearDelegate().getUser().getPerson().getName());
                 row.setCell(delegateBean.getYearDelegate().getCurricularYear().getYear());
                 row.setCell(delegateBean.getYearDelegate().getUser().getPerson().getDefaultMobilePhoneNumber());

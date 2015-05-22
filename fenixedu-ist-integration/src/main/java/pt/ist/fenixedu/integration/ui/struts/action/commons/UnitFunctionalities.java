@@ -32,7 +32,9 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
+import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
+import org.fenixedu.academic.util.FileUtils;
 import org.fenixedu.bennu.struts.portal.EntryPoint;
 
 import pt.ist.fenixWebFramework.renderers.components.state.IViewState;
@@ -50,7 +52,6 @@ import pt.ist.fenixedu.integration.service.services.manager.EditUnitFile;
 import pt.ist.fenixedu.integration.ui.struts.action.research.researchUnit.PersistentGroupMembersBean;
 import pt.ist.fenixedu.integration.ui.struts.action.research.researchUnit.UnitFileBean;
 import pt.ist.fenixedu.integration.ui.struts.action.research.researchUnit.UnitFileUploadBean;
-import pt.utl.ist.fenix.tools.util.FileUtils;
 
 public abstract class UnitFunctionalities extends FenixDispatchAction {
 
@@ -160,7 +161,7 @@ public abstract class UnitFunctionalities extends FenixDispatchAction {
         UnitFileUploadBean bean = (UnitFileUploadBean) viewState.getMetaObject().getObject();
         RenderUtils.invalidateViewState();
 
-        if (!bean.getUnit().isCurrentUserAllowedToUploadFiles()) {
+        if (!bean.getUnit().getAllowedPeopleToUploadFilesSet().contains(AccessControl.getPerson())) {
             return manageFiles(mapping, form, request, response);
         }
 
@@ -183,7 +184,7 @@ public abstract class UnitFunctionalities extends FenixDispatchAction {
             HttpServletResponse response) throws Exception {
 
         UnitFile file = getUnitFile(request);
-        if (file != null && file.getUnit().isCurrentUserAllowedToUploadFiles()) {
+        if (file != null && file.getUnit().getAllowedPeopleToUploadFilesSet().contains(AccessControl.getPerson())) {
             DeleteUnitFile.run(file);
         }
         return manageFiles(mapping, form, request, response);

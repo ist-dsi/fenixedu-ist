@@ -31,11 +31,11 @@ import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.academic.domain.ShiftType;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.degree.DegreeType;
+import org.fenixedu.commons.spreadsheet.Spreadsheet;
+import org.fenixedu.commons.spreadsheet.Spreadsheet.Row;
 
 import pt.ist.fenixedu.teacher.domain.teacher.DegreeTeachingService;
 import pt.ist.fenixedu.teacher.domain.teacher.TeacherService;
-import pt.utl.ist.fenix.tools.util.excel.Spreadsheet;
-import pt.utl.ist.fenix.tools.util.excel.Spreadsheet.Row;
 
 public class TimetablesReportFile extends TimetablesReportFile_Base {
 

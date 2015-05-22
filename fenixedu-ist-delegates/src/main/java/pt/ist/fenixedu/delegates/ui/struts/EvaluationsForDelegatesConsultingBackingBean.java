@@ -48,11 +48,11 @@ import org.fenixedu.academic.domain.WrittenTest;
 import org.fenixedu.academic.ui.faces.bean.base.FenixBackingBean;
 import org.fenixedu.academic.ui.faces.components.util.CalendarLink;
 import org.fenixedu.academic.util.Bundle;
+import org.fenixedu.academic.util.MultiLanguageString;
 import org.fenixedu.academic.util.PeriodState;
 import org.fenixedu.commons.i18n.I18N;
 
 import pt.ist.fenixframework.FenixFramework;
-import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;
 
 public class EvaluationsForDelegatesConsultingBackingBean extends FenixBackingBean {
 

@@ -24,13 +24,13 @@ import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.predicate.RolePredicates;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
+import org.fenixedu.academic.util.MultiLanguageString;
 import org.joda.time.YearMonthDay;
 
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.Function;
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.FunctionType;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
-import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;
 
 public class CreateFunction {
 

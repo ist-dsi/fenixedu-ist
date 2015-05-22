@@ -26,13 +26,13 @@ import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Teacher;
+import org.fenixedu.commons.spreadsheet.Spreadsheet;
+import org.fenixedu.commons.spreadsheet.Spreadsheet.Row;
 
 import pt.ist.fenixedu.teacher.domain.teacher.DegreeTeachingService;
 import pt.ist.fenixedu.teacher.domain.teacher.DegreeTeachingServiceCorrection;
 import pt.ist.fenixedu.teacher.domain.teacher.OtherService;
 import pt.ist.fenixedu.teacher.domain.teacher.TeacherService;
-import pt.utl.ist.fenix.tools.util.excel.Spreadsheet;
-import pt.utl.ist.fenix.tools.util.excel.Spreadsheet.Row;
 
 public class EffectiveTeachingLoadReportFile extends EffectiveTeachingLoadReportFile_Base {
 

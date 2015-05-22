@@ -112,7 +112,7 @@ public class ViewTutorsDA extends FenixDispatchAction {
                 final ExecutionYear executionYear = executionPeriod.getExecutionYear();
                 for (ExecutionDegree executionDegree : executionYear.getExecutionDegreesSet()) {
                     DegreeType degreeType = executionDegree.getDegreeType();
-                    if (degreeType == DegreeType.BOLONHA_INTEGRATED_MASTER_DEGREE || degreeType == DegreeType.BOLONHA_DEGREE) {
+                    if (degreeType.isIntegratedMasterDegree() || degreeType.isBolonhaDegree()) {
                         executionDegrees.add(executionDegree);
                     }
                 }

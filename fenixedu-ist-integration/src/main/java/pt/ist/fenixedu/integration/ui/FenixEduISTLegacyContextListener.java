@@ -35,11 +35,13 @@ import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.thesis.Thesis;
+import org.fenixedu.academic.domain.thesis.ThesisParticipationType;
 import org.fenixedu.academic.thesis.domain.StudentThesisCandidacy;
 import org.fenixedu.academic.thesis.domain.ThesisProposal;
 import org.fenixedu.academic.thesis.domain.ThesisProposalParticipant;
 import org.fenixedu.academic.thesis.domain.ThesisProposalsConfiguration;
 import org.fenixedu.academic.util.Bundle;
+import org.fenixedu.academic.util.MultiLanguageString;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.signals.DomainObjectEvent;
@@ -51,7 +53,6 @@ import org.fenixedu.learning.domain.executionCourse.ExecutionCourseSite;
 
 import pt.ist.fenixframework.FenixFramework;
 import pt.ist.fenixframework.dml.runtime.RelationAdapter;
-import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;
 
 import com.google.common.collect.Sets;
 
@@ -74,6 +75,7 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
             for (; !unit.getUnitFileTagsSet().isEmpty(); unit.getUnitFileTagsSet().iterator().next().delete()) {
                 ;
             }
+            unit.getAllowedPeopleToUploadFilesSet().clear();
         });
 
         FenixFramework.getDomainModel().registerDeletionListener(Category.class, cat -> {
@@ -165,10 +167,10 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
                             for (ThesisProposalParticipant participant : proposal.getThesisProposalParticipantSet()) {
                                 String name = participant.getThesisProposalParticipantType().getName().getContent().toLowerCase();
                                 if (name.equals("orientador") || name.equals("advisor")) {
-                                    thesis.setOrientator(participant.getUser().getPerson());
+                                    thesis.addParticipant(participant.getUser().getPerson(), ThesisParticipationType.ORIENTATOR);
                                 }
                                 if (name.equals("co-orientador") || name.equals("co-advisor")) {
-                                    thesis.setCoorientator(participant.getUser().getPerson());
+                                    thesis.addParticipant(participant.getUser().getPerson(), ThesisParticipationType.ORIENTATOR);
                                 }
                             }
                         }

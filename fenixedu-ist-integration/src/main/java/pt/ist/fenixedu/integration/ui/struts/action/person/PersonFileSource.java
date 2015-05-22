@@ -23,8 +23,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.fenixedu.academic.domain.Person;
-
-import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;
+import org.fenixedu.academic.util.MultiLanguageString;
 
 public interface PersonFileSource extends Serializable {
 

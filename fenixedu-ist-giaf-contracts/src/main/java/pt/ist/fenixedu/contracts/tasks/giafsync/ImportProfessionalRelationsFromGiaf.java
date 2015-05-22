@@ -23,12 +23,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 import org.apache.commons.lang.StringUtils;
+import org.fenixedu.academic.util.MultiLanguageString;
 import org.slf4j.Logger;
 
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalRelation;
 import pt.ist.fenixedu.contracts.persistenceTierOracle.Oracle.PersistentSuportGiaf;
 import pt.ist.fenixedu.contracts.tasks.giafsync.GiafSync.MetadataProcessor;
-import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;
 
 class ImportProfessionalRelationsFromGiaf implements MetadataProcessor {
 

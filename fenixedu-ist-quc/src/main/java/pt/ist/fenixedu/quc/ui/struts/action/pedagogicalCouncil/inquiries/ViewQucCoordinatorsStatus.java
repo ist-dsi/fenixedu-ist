@@ -39,13 +39,13 @@ import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
 import org.fenixedu.bennu.struts.portal.EntryPoint;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
+import org.fenixedu.commons.spreadsheet.Spreadsheet;
+import org.fenixedu.commons.spreadsheet.Spreadsheet.Row;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixedu.quc.domain.CoordinatorInquiryTemplate;
 import pt.ist.fenixedu.quc.domain.InquiryCoordinatorAnswer;
 import pt.ist.fenixframework.FenixFramework;
-import pt.utl.ist.fenix.tools.util.excel.Spreadsheet;
-import pt.utl.ist.fenix.tools.util.excel.Spreadsheet.Row;
 
 @StrutsFunctionality(app = PedagogicalControlApp.class, path = "view-quc-coordinator-status",
         titleKey = "title.inquiries.coordinators.status", bundle = "InquiriesResources")
@@ -123,7 +123,7 @@ public class ViewQucCoordinatorsStatus extends FenixDispatchAction {
 
         for (Coordinator coordinator : coordinatorsSet) {
             Row row = spreadsheet.addRow();
-            row.setCell(coordinator.getExecutionDegree().getDegreeType().getFilteredName());
+            row.setCell(coordinator.getExecutionDegree().getDegreeType().getName().getContent());
             row.setCell(coordinator.getExecutionDegree().getDegree().getNameI18N().toString());
             row.setCell(coordinator.getPerson().getName());
             row.setCell(coordinator.getPerson().getUsername());

@@ -59,7 +59,10 @@ import org.fenixedu.academic.domain.phd.PhdParticipant;
 import org.fenixedu.academic.domain.phd.PhdProgram;
 import org.fenixedu.academic.domain.thesis.ThesisEvaluationParticipant;
 import org.fenixedu.academic.util.Bundle;
+import org.fenixedu.academic.util.MultiLanguageString;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.commons.spreadsheet.SheetData;
+import org.fenixedu.commons.spreadsheet.SpreadsheetBuilder;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -73,9 +76,6 @@ import pt.ist.fenixedu.teacher.dto.externalServices.TeacherCurricularInformation
 import pt.ist.fenixedu.teacher.dto.externalServices.TeacherCurricularInformation.LecturedCurricularUnit;
 import pt.ist.fenixedu.teacher.dto.externalServices.TeacherCurricularInformation.QualificationBean;
 import pt.ist.fenixedu.teacher.dto.externalServices.TeacherPublicationsInformation;
-import pt.utl.ist.fenix.tools.spreadsheet.SheetData;
-import pt.utl.ist.fenix.tools.spreadsheet.SpreadsheetBuilder;
-import pt.utl.ist.fenix.tools.util.i18n.MultiLanguageString;
 
 public class A3ESDegreeProcess implements Serializable {
     private static final String BASE_URL = "http://www.a3es.pt/si/iportal.php";

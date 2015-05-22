@@ -35,9 +35,53 @@ public class FenixEduIstIntegrationConfiguration {
                 defaultValue = "false")
         public Boolean barraAsAuthenticationBroker();
 
+        @ConfigurationProperty(key = "fenix.api.events.rss.url.pt")
+        public String getFenixApiEventsRSSUrlPt();
+
+        @ConfigurationProperty(key = "fenix.api.news.rss.url.pt")
+        public String getFenixApiNewsRSSUrlPt();
+
+        @ConfigurationProperty(key = "fenix.api.events.rss.url.en")
+        public String getFenixApiEventsRSSUrlEn();
+
+        @ConfigurationProperty(key = "fenix.api.news.rss.url.en")
+        public String getFenixApiNewsRSSUrlEn();
+
+        @ConfigurationProperty(key = "fenix.api.canteen.file",
+                description = "if is not defined it will fallback to the same property url", defaultValue = "")
+        public String getFenixApiCanteenFile();
+
+        @ConfigurationProperty(key = "fenix.api.shuttle.file",
+                description = "if is not defined it will fallback to the same property url", defaultValue = "")
+        public String getFenixApiShuttleFile();
+
+        @ConfigurationProperty(key = "fenix.api.contacts.file",
+                description = "if is not defined it will fallback to the same property url", defaultValue = "")
+        public String getFenixApiContactsFile();
+
+        @ConfigurationProperty(key = "fenix.api.canteen.url", defaultValue = "")
+        public String getFenixApiCanteenUrl();
+
+        @ConfigurationProperty(key = "fenix.api.shuttle.url", defaultValue = "")
+        public String getFenixApiShuttleUrl();
+
+        @ConfigurationProperty(key = "fenix.api.contacts.url", defaultValue = "")
+        public String getFenixApiContactsUrl();
+
+        @ConfigurationProperty(key = "fenix.api.canteen.user", defaultValue = "")
+        public String getFenixApiCanteenUser();
+
+        @ConfigurationProperty(key = "fenix.api.canteen.secret", defaultValue = "")
+        public String getFenixApiCanteenSecret();
+
         @ConfigurationProperty(key = "barra.loginUrl",
                 description = "Login URL to use when barra is set as authentication broker")
         public String barraLoginUrl();
+
+        @ConfigurationProperty(key = "dges.username.prefix",
+                description = "The prefix for the username of students created via the DGES Student Importation Process.",
+                defaultValue = "ist1")
+        public String dgesUsernamePrefix();
 
         @ConfigurationProperty(key = "ciistCostCenterCode", description = "Deprecated, to be removed", defaultValue = "8431")
         public Integer getCIISTCostCenterCode();

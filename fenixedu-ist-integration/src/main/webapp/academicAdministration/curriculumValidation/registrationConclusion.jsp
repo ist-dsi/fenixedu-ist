@@ -189,7 +189,7 @@
 			
 				<p class="mtop05">
 					<bean:define id="registrationId" name="registrationConclusionBean" property="registration.externalId" />		
-					<logic:empty name="registrationConclusionBean" property="cycleCurriculumGroup">
+					<logic:empty name="registrationConclusionBean" property="curriculumGroup">
 						<html:link action="<%="/registration.do?method=prepareRegistrationConclusionDocument&amp;registrationId=" + registrationId %>" target="_blank">
 							Folha de <bean:message key="student.registrationConclusionProcess" bundle="ACADEMIC_OFFICE_RESOURCES"/>
 						</html:link>
@@ -199,96 +199,6 @@
 	
 				<h3 class="mtop15 mbottom05"><bean:message key="registration.curriculum" bundle="ACADEMIC_OFFICE_RESOURCES"/></h3>
 	
-				<logic:equal name="registrationConclusionBean" property="curriculumForConclusion.studentCurricularPlan.boxStructure" value="false">
-					<bean:define id="curriculumEntries" name="registrationConclusionBean" property="curriculumForConclusion.curriculumEntries"/>
-					<table class="scplan">
-						<tr class="scplangroup">
-							<th class=" scplancolcurricularcourse" rowspan="2" colspan="2">
-								<bean:message bundle="ACADEMIC_OFFICE_RESOURCES" key="label.curricular.course.from.curriculum"/>
-							</th>
-							<th class=" scplancolgrade"colspan="3">
-								<bean:message bundle="ACADEMIC_OFFICE_RESOURCES" key="degree.average"/>
-							</th>
-							<th class=" scplancolgrade">
-								<bean:message key="curricular.year" bundle="ACADEMIC_OFFICE_RESOURCES"/>
-							</th>
-						</tr>
-						<tr class="scplangroup">
-							<td class=" scplancolgrade">
-								<bean:message bundle="APPLICATION_RESOURCES" key="label.grade"/>
-							</td>
-							<td class=" scplancolgrade">
-								<bean:message bundle="APPLICATION_RESOURCES" key="label.weight"/>
-							</td>
-							<td class=" scplancolgrade" style="width: 100px;">
-								(<bean:message bundle="APPLICATION_RESOURCES" key="label.weight"/> x <bean:message bundle="APPLICATION_RESOURCES" key="label.grade"/>)
-							</td>
-							<td  class=" scplancolgrade" style="width: 100px;">
-								<bean:message bundle="APPLICATION_RESOURCES" key="label.credits"/>
-							</td>
-						</tr>
-						<logic:iterate id="curriculumEntry" name="curriculumEntries">
-							<logic:equal name="curriculumEntry" property="class.name" value="org.fenixedu.academic.domain.student.curriculum.NotInDegreeCurriculumCurriculumEntry">
-								<tr class="scplanenrollment">
-									<td><bean:write name="curriculumEntry" property="enrolment.curricularCourse.code"/></td>
-									<td class=" scplancolcurricularcourse"><bean:write name="curriculumEntry" property="enrolment.curricularCourse.name"/></td>
-									<td class=" scplancolgrade"><bean:write name="curriculumEntry" property="enrolment.latestEnrolmentEvaluation.gradeValue"/></td>						
-									<td class=" scplancolweight"><bean:write name="curriculumEntry" property="weigthForCurriculum"/></td>
-									<td class=" scplancolweight">
-										<logic:empty name="curriculumEntry" property="weigthTimesGrade">
-											-
-										</logic:empty>
-										<logic:notEmpty name="curriculumEntry" property="weigthTimesGrade">
-											<bean:write name="curriculumEntry" property="weigthTimesGrade"/>
-										</logic:notEmpty>
-									</td>
-									<td class=" scplancolects">
-										<logic:empty name="curriculumEntry" property="ectsCreditsForCurriculum">
-											-
-										</logic:empty>
-										<logic:notEmpty name="curriculumEntry" property="ectsCreditsForCurriculum">
-											<bean:write name="curriculumEntry" property="ectsCreditsForCurriculum"/>
-										</logic:notEmpty>
-									</td>
-								</tr>
-							</logic:equal>
-						</logic:iterate>				
-						<logic:iterate id="curriculumEntry" name="curriculumEntries">
-							<logic:equal name="curriculumEntry" property="class.name" value="org.fenixedu.academic.domain.student.curriculum.GivenCreditsEntry">
-								<tr class="scplanenrollment">
-									<td class="acenter">-</td>
-									<td class=" scplancolcurricularcourse"><bean:message bundle="APPLICATION_RESOURCES" key="label.givenCredits"/></td>
-									<td class=" scplancolgrade">-</td>						
-									<td class=" scplancolweight">-</td>
-									<td class=" scplancolweight">-</td>
-									<td class=" scplancolects">
-										<logic:empty name="curriculumEntry" property="ectsCreditsForCurriculum">
-											-
-										</logic:empty>
-										<logic:notEmpty name="curriculumEntry" property="ectsCreditsForCurriculum">
-											<bean:write name="curriculumEntry" property="ectsCreditsForCurriculum"/>
-										</logic:notEmpty>
-									</td>
-								</tr>
-							</logic:equal>
-						</logic:iterate>				
-						<tr class="scplanenrollment">
-							<td colspan="3" style="text-align: right;">
-								Somatórios
-							</td>
-							<td class=" scplancolweight">
-								<bean:write name="registrationConclusionBean" property="curriculumForConclusion.sumPi"/>
-							</td>
-							<td class=" scplancolweight">
-								<bean:write name="registrationConclusionBean" property="curriculumForConclusion.sumPiCi"/>
-							</td>
-							<td class=" scplancolects">
-								<bean:write name="registrationConclusionBean" property="curriculumForConclusion.sumEctsCredits"/>
-							</td>
-						</tr>
-					</table>
-				</logic:equal>	
-		
 			
 			<%-- Form used to concluded process or to repeat --%>		
 			<logic:equal name="registrationConclusionBean" property="canBeConclusionProcessed" value="true">
@@ -307,7 +217,7 @@
 								<fr:property name="comment" value="label.registrationConclusionProcess.enteredConclusionDate.comment"/>
 								<fr:property name="commentLocation" value="right" />
 							</fr:slot>
-							<fr:slot 	name="calculatedAverage" 
+							<fr:slot 	name="calculatedRawGrade.value" 
 										readOnly="true"
 										key="label.curriculum.validation.calculatedAverage"  
 										bundle="ACADEMIC_OFFICE_RESOURCES">
@@ -318,7 +228,7 @@
 										key="label.curriculum.validation.enteredAverageGrade" 
 										bundle="ACADEMIC_OFFICE_RESOURCES">
 							</fr:slot>
-							<fr:slot 	name="calculatedFinalAverage" 
+							<fr:slot 	name="calculatedFinalAverage.value" 
 										readOnly="true"
 										key="label.curriculum.validation.calculatedFinalAverage"  
 										bundle="ACADEMIC_OFFICE_RESOURCES">

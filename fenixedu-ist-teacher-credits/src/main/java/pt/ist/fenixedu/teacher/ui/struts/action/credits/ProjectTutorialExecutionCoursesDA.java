@@ -42,13 +42,13 @@ import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
 import org.fenixedu.bennu.struts.portal.EntryPoint;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
+import org.fenixedu.commons.spreadsheet.StyledExcelSpreadsheet;
 
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.PersonFunction;
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.PersonFunctionShared;
 import pt.ist.fenixedu.teacher.domain.credits.util.DepartmentCreditsBean;
 import pt.ist.fenixedu.teacher.ui.struts.action.DepartmentCreditsManagerApp;
 import pt.ist.fenixframework.FenixFramework;
-import pt.utl.ist.fenix.tools.util.excel.StyledExcelSpreadsheet;
 
 @StrutsFunctionality(app = DepartmentCreditsManagerApp.class, path = "execution-course-types",
         titleKey = "label.executionCourses.types", bundle = "TeacherCreditsSheetResources")

@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 import org.fenixedu.academic.domain.Degree;
+import org.fenixedu.academic.domain.candidacy.IngressionType;
 import org.fenixedu.academic.domain.student.Student;
 
 public class StudentLowPerformanceBean implements Serializable {
@@ -34,9 +35,10 @@ public class StudentLowPerformanceBean implements Serializable {
     private String email;
     private String regime;
     private String registrationStart;
+    private IngressionType ingressionType;
 
     public StudentLowPerformanceBean(Student student, BigDecimal sumEcts, Degree degree, int numberOfEntriesStudentInSecretary,
-            String email, String regime, String registrationStart) {
+            String email, String regime, String registrationStart, IngressionType ingressionType) {
         super();
         this.student = student;
         this.sumEcts = sumEcts;
@@ -45,6 +47,7 @@ public class StudentLowPerformanceBean implements Serializable {
         this.email = email;
         this.regime = regime;
         this.registrationStart = registrationStart;
+        this.ingressionType = ingressionType;
     }
 
     public void setSumEcts(BigDecimal sumEcts) {
@@ -103,4 +106,11 @@ public class StudentLowPerformanceBean implements Serializable {
         this.registrationStart = registrationStart;
     }
 
+    public IngressionType getIngressionType() {
+        return ingressionType;
+    }
+
+    public void setIngressionType(IngressionType ingressionType) {
+        this.ingressionType = ingressionType;
+    }
 }

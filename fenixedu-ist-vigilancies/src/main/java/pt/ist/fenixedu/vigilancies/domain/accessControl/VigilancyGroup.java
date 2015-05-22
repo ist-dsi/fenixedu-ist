@@ -61,7 +61,7 @@ public class VigilancyGroup extends FenixGroup {
         return Joiner.on('\n').join(FluentIterable.from(getMembers()).transform(new Function<User, String>() {
             @Override
             public String apply(User user) {
-                return user.getPresentationName();
+                return user.getName();
             }
         }));
     }

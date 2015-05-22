@@ -34,9 +34,8 @@ import org.fenixedu.academic.domain.studentCurriculum.Credits;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.scheduler.annotation.Task;
 import org.fenixedu.bennu.scheduler.custom.CustomTask;
-
-import pt.utl.ist.fenix.tools.util.excel.Spreadsheet;
-import pt.utl.ist.fenix.tools.util.excel.Spreadsheet.Row;
+import org.fenixedu.commons.spreadsheet.Spreadsheet;
+import org.fenixedu.commons.spreadsheet.Spreadsheet.Row;
 
 @Task(englishTitle = "ExportOutoingStudentsInformation", readOnly = true)
 public class ExportOutoingStudentsInformation extends CustomTask {
