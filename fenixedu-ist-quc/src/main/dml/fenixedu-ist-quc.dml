@@ -18,6 +18,8 @@ valueType pt.ist.fenixedu.quc.domain.QuestionScale as QuestionScale {
 }
 
 class InquiriesRoot {
+	Long lastInquiryAnswerCode;
+	Long lastInquiryQuestionCode;
 }
 
 class InquiryTemplate  {
@@ -97,6 +99,7 @@ class InquiryQuestion  {
     Boolean hasClassification;
     Boolean presentResults;
     Integer questionOrder;
+    Long code (REQUIRED);
 }
 
     class InquiryCheckBoxQuestion extends InquiryQuestion {
@@ -140,6 +143,7 @@ class StudentInquiryExecutionPeriod  {
     
 class InquiryAnswer  {
     DateTime responseDateTime;
+    Long code (REQUIRED);
 }
     class InquiryCourseAnswer extends InquiryAnswer {
         Integer weeklyHoursSpentPercentage;
@@ -217,6 +221,22 @@ class ExecutionCourseAuditFile extends .org.fenixedu.academic.domain.File {
 }
 
 class QUCResultsLog extends .org.fenixedu.academic.domain.DegreeLog { }
+
+
+class reports.AvailableCoursesForQUCReportFile extends .org.fenixedu.academic.domain.reports.GepReportFile {
+}
+ 
+class reports.WorkloadSummaryBoardReportFile extends .org.fenixedu.academic.domain.reports.GepReportFile {
+}
+
+class reports.InitialAnswersReportFile extends .org.fenixedu.academic.domain.reports.GepReportFile {
+}
+
+class reports.CoursesAnswersReportFile extends .org.fenixedu.academic.domain.reports.GepReportFile {
+}
+
+class reports.QUCQuestionsReportFile extends .org.fenixedu.academic.domain.reports.GepReportFile {
+}
 
 relation InquiriesRootLink {
     InquiriesRoot playsRole inquiriesRoot {

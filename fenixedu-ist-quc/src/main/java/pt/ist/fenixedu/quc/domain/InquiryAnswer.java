@@ -28,6 +28,9 @@ public class InquiryAnswer extends InquiryAnswer_Base {
         super();
         setRootDomainObject(Bennu.getInstance());
         setResponseDateTime(new DateTime());
+        long code = InquiriesRoot.getInstance().getLastInquiryAnswerCode() + 1;
+        InquiriesRoot.getInstance().setLastInquiryAnswerCode(code);
+        setCode(code);
     }
 
     public QuestionAnswer getQuestionAnswer(InquiryQuestion inquiryQuestion) {

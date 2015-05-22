@@ -26,13 +26,16 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
+import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.ExecutionSemester;
+import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.academic.domain.ShiftType;
 import org.fenixedu.academic.domain.exceptions.DomainException;
+import org.fenixedu.academic.domain.reports.GepReportFile;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.joda.time.DateTime;
 
@@ -230,46 +233,118 @@ public class InquiryResult extends InquiryResult_Base {
     }
 
     private static void setExecutionSemester(String[] columns, InquiryResult inquiryResult) {
-        String executionPeriodOID = columns[3];
-        ExecutionSemester executionSemester = FenixFramework.getDomainObject(executionPeriodOID);
+        String executionPeriodCode = columns[3];
+        ExecutionSemester executionSemester = getExecutionSemester(executionPeriodCode);
         if (executionSemester == null) {
             throw new DomainException("executionPeriod: " + getPrintableColumns(columns));
         }
         inquiryResult.setExecutionPeriod(executionSemester);
     }
 
+    /**
+     * Receives a unique code that identifies a ExecutionSemester and returns the domain object
+     * 
+     * @param code - the semester plus the year
+     * @return the correspondent ExecutionSemester
+     */
+    private static ExecutionSemester getExecutionSemester(String code) {
+        String[] decodedParts = code.split(GepReportFile.CODE_SEPARATOR);
+        return ExecutionSemester.readBySemesterAndExecutionYear(Integer.valueOf(decodedParts[0]), decodedParts[1]);
+    }
+
+    /**
+     * Receives a unique code that identifies a ExecutionCourse and returns the domain object
+     * 
+     * @param code - the execution course sigla plus the execution semester code
+     * @return the correspondent ExecutionCourse
+     */
+    private static ExecutionCourse getExecutionCourse(String code) {
+        String[] decodedParts = code.split(GepReportFile.CODE_SEPARATOR);
+        return ExecutionCourse.readBySiglaAndExecutionPeriod(decodedParts[0], getExecutionSemester(decodedParts[1]
+                + GepReportFile.CODE_SEPARATOR + decodedParts[2]));
+    }
+
+    /**
+     * Receives a unique code that identifies a ExecutionDegree and returns the domain object
+     * 
+     * @param code - the code of the degree curricular plan plus the execution year code
+     * @return the correspondent ExecutionDegree
+     */
+    private static ExecutionDegree getExecutionDegree(String code) {
+        String[] decodedParts = code.split(GepReportFile.CODE_SEPARATOR);
+        DegreeCurricularPlan dcp = getDegreeCurricularPlan(decodedParts[0] + GepReportFile.CODE_SEPARATOR + decodedParts[1]);
+        ExecutionYear executionYear = getExecutionYear(decodedParts[2]);
+        return ExecutionDegree.getByDegreeCurricularPlanAndExecutionYear(dcp, executionYear);
+    }
+
+    /**
+     * Receives a unique code that identifies a DegreeCurricularPlan and returns the domain object
+     * 
+     * @param code - the name of the curricular plan plus the degree sigla
+     * @return the correspondent DegreeCurricularPlan
+     */
+    private static DegreeCurricularPlan getDegreeCurricularPlan(String code) {
+        String[] decodedParts = code.split(GepReportFile.CODE_SEPARATOR);
+        return DegreeCurricularPlan.readByNameAndDegreeSigla(decodedParts[0], decodedParts[1]);
+    }
+
+    private static ExecutionYear getExecutionYear(String code) {
+        return ExecutionYear.readExecutionYearByName(code);
+    }
+
+    /**
+     * Receives a unique code that identifies a Professorship and returns the domain object
+     * 
+     * @param code - the person username plus the execution course code
+     * @return the correspondent Professorship
+     */
+    private static Professorship getProfessorship(String code) {
+        String[] decodedParts = code.split(GepReportFile.CODE_SEPARATOR);
+        ExecutionCourse executionCourse = getExecutionCourse(decodedParts[1] + GepReportFile.CODE_SEPARATOR + decodedParts[2]);
+        return executionCourse.getProfessorship(Person.findByUsername(decodedParts[0]));
+    }
+    
     /*
      * OID_EXECUTION_DEGREE RESULT_TYPE OID_EXECUTION_COURSE OID_EXECUTION_PERIOD RESULT_CLASSIFICATION VALUE_ SCALE_VALUE
      * OID_INQUIRY_QUESTION OID_PROFESSORSHIP SHIFT_TYPE CONNECTION_TYPE
      */
     private static void setInquiryRelation(String[] columns, InquiryResult inquiryResult) {
-        String inquiryQuestionOID = columns[7];
-        String executionCourseOID = columns[2];
-        String executionDegreeOID = columns[0];
-        String professorshipOID = columns[8];
-        String shiftTypeString = columns[9];
-        ExecutionCourse executionCourse =
-                !StringUtils.isEmpty(executionCourseOID) ? (ExecutionCourse) FenixFramework.getDomainObject(executionCourseOID) : null;
-        ExecutionDegree executionDegree =
-                !StringUtils.isEmpty(executionDegreeOID) ? (ExecutionDegree) FenixFramework.getDomainObject(executionDegreeOID) : null;
-        Professorship professorship =
-                !StringUtils.isEmpty(professorshipOID) ? (Professorship) FenixFramework.getDomainObject(professorshipOID) : null;
-        ShiftType shiftType = !StringUtils.isEmpty(shiftTypeString) ? ShiftType.valueOf(shiftTypeString) : null;
-        inquiryResult.setExecutionCourse(executionCourse);
-        inquiryResult.setExecutionDegree(executionDegree);
-        inquiryResult.setProfessorship(professorship);
-        inquiryResult.setShiftType(shiftType);
-
-        if (!(StringUtils.isEmpty(inquiryQuestionOID) && ResultClassification.GREY
-                .equals(inquiryResult.getResultClassification()))) {
-            InquiryQuestion inquiryQuestion = FenixFramework.getDomainObject(inquiryQuestionOID);
-            if (inquiryQuestion == null) {
-                throw new DomainException("não tem question: " + getPrintableColumns(columns));
-            }
+        String inquiryQuestionCode = columns[7];
+        String executionCourseCode = columns[2];
+        String executionDegreeCode = columns[0];
+        String professorshipCode = columns[8];
+         String shiftTypeString = columns[9];
+         ExecutionCourse executionCourse =
+                !StringUtils.isEmpty(executionCourseCode) ? getExecutionCourse(executionCourseCode) : null;
+         ExecutionDegree executionDegree =
+                !StringUtils.isEmpty(executionDegreeCode) ? getExecutionDegree(executionDegreeCode) : null;
+         Professorship professorship =
+                !StringUtils.isEmpty(professorshipCode) ? (Professorship) getProfessorship(professorshipCode) : null;
+         ShiftType shiftType = !StringUtils.isEmpty(shiftTypeString) ? ShiftType.valueOf(shiftTypeString) : null;
+         inquiryResult.setExecutionCourse(executionCourse);
+         inquiryResult.setExecutionDegree(executionDegree);
+         inquiryResult.setProfessorship(professorship);
+         inquiryResult.setShiftType(shiftType);
+ 
+        if (!(StringUtils.isEmpty(inquiryQuestionCode) && ResultClassification.GREY.equals(inquiryResult
+                .getResultClassification()))) {
+            InquiryQuestion inquiryQuestion = getInquiryQuestion(Long.valueOf(inquiryQuestionCode));
+             if (inquiryQuestion == null) {
+                 throw new DomainException("não tem question: " + getPrintableColumns(columns));
+             }
             inquiryResult.setInquiryQuestion(inquiryQuestion);
         }
     }
 
+    private static InquiryQuestion getInquiryQuestion(Long inquiryQuestionCode) {
+        for (InquiryQuestion inquiryQuestion : Bennu.getInstance().getInquiryQuestionsSet()) {
+            if (inquiryQuestion.getCode().equals(inquiryQuestionCode)) {
+                return inquiryQuestion;
+            }
+        }
+        return null;
+    }
+    
     private static String getPrintableColumns(String[] columns) {
         StringBuilder stringBuilder = new StringBuilder();
         for (String value : columns) {
@@ -334,11 +409,9 @@ public class InquiryResult extends InquiryResult_Base {
             //columns[columns.length - 1] = columns[columns.length - 1].split("\r")[0];
             //meter aqui algumas validações
             //se vier com valor + classificação dá erro
-            String executionDegreeOID = row[0];
+            String executionDegreeCode = row[0];
             ExecutionDegree executionDegree =
-                    !StringUtils.isEmpty(executionDegreeOID) ? (ExecutionDegree) FenixFramework
-                            .getDomainObject(executionDegreeOID) : null;
-            setExecutionDegree(executionDegree);
+                    !StringUtils.isEmpty(executionDegreeCode) ? InquiryResult.getExecutionDegree(executionDegreeCode) : null;
 
             String resultTypeString = row[1];
             if (!StringUtils.isEmpty(resultTypeString)) {
@@ -349,14 +422,13 @@ public class InquiryResult extends InquiryResult_Base {
                 setResultType(inquiryResultType);
             }
 
-            String executionCourseOID = row[2];
+            String executionCourseCode = row[2];
             ExecutionCourse executionCourse =
-                    !StringUtils.isEmpty(executionCourseOID) ? (ExecutionCourse) FenixFramework
-                            .getDomainObject(executionCourseOID) : null;
+                    !StringUtils.isEmpty(executionCourseCode) ? InquiryResult.getExecutionCourse(executionCourseCode) : null;
             setExecutionCourse(executionCourse);
 
-            String executionPeriodOID = row[3];
-            ExecutionSemester executionSemester = FenixFramework.getDomainObject(executionPeriodOID);
+            String executionPeriodCode = row[3];
+            ExecutionSemester executionSemester = InquiryResult.getExecutionSemester(executionPeriodCode);
             if (executionSemester == null) {
                 throw new DomainException("executionPeriod resultType doesn't exists: " + getPrintableColumns(row));
             }
@@ -376,18 +448,18 @@ public class InquiryResult extends InquiryResult_Base {
             setValue(value);
             setScaleValue(scaleValue);
 
-            String inquiryQuestionOID = row[7];//TODO ver melhor
-            if (!(StringUtils.isEmpty(inquiryQuestionOID) && ResultClassification.GREY.equals(getResultClassification()))) {
-                InquiryQuestion inquiryQuestion = FenixFramework.getDomainObject(inquiryQuestionOID);
+            String inquiryQuestionCode = row[7];
+            if (!(StringUtils.isEmpty(inquiryQuestionCode) && ResultClassification.GREY.equals(getResultClassification()))) {
+                InquiryQuestion inquiryQuestion = InquiryResult.getInquiryQuestion(Long.valueOf(inquiryQuestionCode));
                 if (inquiryQuestion == null) {
                     throw new DomainException("não tem question: " + getPrintableColumns(row));
                 }
                 setInquiryQuestion(inquiryQuestion);
             }
 
-            String professorshipOID = row[8];
+            String professorshipCode = row[8];
             Professorship professorship =
-                    !StringUtils.isEmpty(professorshipOID) ? (Professorship) FenixFramework.getDomainObject(professorshipOID) : null;
+                    !StringUtils.isEmpty(professorshipCode) ? InquiryResult.getProfessorship(professorshipCode) : null;
             setProfessorship(professorship);
 
             String shiftTypeString = row[9];

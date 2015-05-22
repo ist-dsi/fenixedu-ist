@@ -33,6 +33,9 @@ public class InquiryQuestion extends InquiryQuestion_Base {
         setShowRequiredMark(false);
         setHasClassification(false);
         setPresentResults(true);
+        long code = InquiriesRoot.getInstance().getLastInquiryQuestionCode() + 1;
+        InquiriesRoot.getInstance().setLastInquiryQuestionCode(code);
+        setCode(code);
     }
 
     public boolean isVisible(StudentInquiryRegistry studentInquiryRegistry) {

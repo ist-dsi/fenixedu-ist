@@ -40,6 +40,11 @@ import org.fenixedu.academic.domain.reports.StatusAndApprovalReportFile;
 import org.fenixedu.academic.domain.reports.SummaryOccupancyReportFile;
 import org.fenixedu.academic.domain.reports.WrittenEvaluationReportFile;
 
+import pt.ist.fenixedu.quc.domain.reports.AvailableCoursesForQUCReportFile;
+import pt.ist.fenixedu.quc.domain.reports.CoursesAnswersReportFile;
+import pt.ist.fenixedu.quc.domain.reports.InitialAnswersReportFile;
+import pt.ist.fenixedu.quc.domain.reports.QUCQuestionsReportFile;
+import pt.ist.fenixedu.quc.domain.reports.WorkloadSummaryBoardReportFile;
 import pt.ist.fenixedu.teacher.domain.reports.EffectiveTeachingLoadReportFile;
 import pt.ist.fenixedu.teacher.domain.reports.TeacherCreditsReportFile;
 import pt.ist.fenixedu.teacher.domain.reports.TeachersByShiftReportFile;
@@ -270,5 +275,52 @@ public class ReportFileFactory {
         effectiveTeachingLoadReportFile.setDegreeType(degreeType);
         effectiveTeachingLoadReportFile.setExecutionYear(executionYear);
         return effectiveTeachingLoadReportFile;
+    }
+
+    @Atomic
+    public static GepReportFile createAvailableCoursesForQUCReportFile(String type, DegreeType degreeType,
+            ExecutionYear executionYear) {
+        final AvailableCoursesForQUCReportFile availableCoursesForQUCReportFile = new AvailableCoursesForQUCReportFile();
+        availableCoursesForQUCReportFile.setType(type);
+        availableCoursesForQUCReportFile.setDegreeType(degreeType);
+        availableCoursesForQUCReportFile.setExecutionYear(executionYear);
+        return availableCoursesForQUCReportFile;
+    }
+
+    @Atomic
+    public static GepReportFile createWorkloadSummaryBoardReportFile(String type, DegreeType degreeType,
+            ExecutionYear executionYear) {
+        final WorkloadSummaryBoardReportFile workloadSummaryBoardReportFile = new WorkloadSummaryBoardReportFile();
+        workloadSummaryBoardReportFile.setType(type);
+        workloadSummaryBoardReportFile.setDegreeType(degreeType);
+        workloadSummaryBoardReportFile.setExecutionYear(executionYear);
+        return workloadSummaryBoardReportFile;
+    }
+
+    @Atomic
+    public static GepReportFile createInitialAnswersReportFile(String type, DegreeType degreeType, ExecutionYear executionYear) {
+        final InitialAnswersReportFile initialAnswersReportFile = new InitialAnswersReportFile();
+        initialAnswersReportFile.setType(type);
+        initialAnswersReportFile.setDegreeType(degreeType);
+        initialAnswersReportFile.setExecutionYear(executionYear);
+        return initialAnswersReportFile;
+    }
+
+    @Atomic
+    public static GepReportFile createCoursesAnswersReportFile(String type, DegreeType degreeType, ExecutionYear executionYear) {
+        final CoursesAnswersReportFile coursesAnswersReportFile = new CoursesAnswersReportFile();
+        coursesAnswersReportFile.setType(type);
+        coursesAnswersReportFile.setDegreeType(degreeType);
+        coursesAnswersReportFile.setExecutionYear(executionYear);
+        return coursesAnswersReportFile;
+    }
+
+    @Atomic
+    public static GepReportFile createQUCQuestionsReportFile(String type, DegreeType degreeType, ExecutionYear executionYear) {
+        final QUCQuestionsReportFile qucQuestionsReportFile = new QUCQuestionsReportFile();
+        qucQuestionsReportFile.setType(type);
+        qucQuestionsReportFile.setDegreeType(degreeType);
+        qucQuestionsReportFile.setExecutionYear(executionYear);
+        return qucQuestionsReportFile;
     }
 }
