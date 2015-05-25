@@ -16,6 +16,7 @@ import org.fenixedu.bennu.scheduler.custom.CustomTask;
 
 import pt.ist.fenixedu.contracts.domain.Employee;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.GiafProfessionalData;
+import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonContractSituation;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalData;
 import pt.ist.fenixedu.contracts.domain.research.Researcher;
 import pt.ist.fenixedu.contracts.domain.util.CategoryType;
@@ -37,15 +38,12 @@ public class ExportEmployeeInfo extends CustomTask {
             final Person person = user.getPerson();
             if (person != null && user.getProfile() != null) {
                 final Teacher teacher = person.getTeacher();
-                final TeacherAuthorization authorization = teacher == null ? null : teacher.getTeacherAuthorization().orElse(null);
+                final TeacherAuthorization authorization =
+                        teacher == null ? null : teacher.getTeacherAuthorization().orElse(null);
                 final Employee employee = person.getEmployee();
                 final Researcher researcher = person.getResearcher();
-                if (authorization != null) {
-                    if (authorization.isContracted() && employee != null) {
-                        registerContractSituation(result, user, person, employee, CategoryType.TEACHER);
-                    } else {
-                        register(result, user, CategoryType.TEACHER, authorization.getDepartment().getDepartmentUnit().getCostCenterCode().toString(), "Técnico Lisboa");
-                    }
+                if (employee != null && isActiveContractedTeacher(person)) {
+                    registerContractSituation(result, user, person, employee, CategoryType.TEACHER);
                 }
                 if (researcher != null && researcher.isActiveContractedResearcher()) {
                     registerContractSituation(result, user, person, employee, CategoryType.RESEARCHER);
@@ -67,7 +65,17 @@ public class ExportEmployeeInfo extends CustomTask {
         }
     }
 
-    private void preloadData() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    public boolean isActiveContractedTeacher(final Person person) {
+        return getCurrentContractedTeacherContractSituation(person) != null;
+    }
+
+    public PersonContractSituation getCurrentContractedTeacherContractSituation(final Person person) {
+        final PersonProfessionalData data = person.getPersonProfessionalData();
+        return data != null ? data.getCurrentPersonContractSituationByCategoryType(CategoryType.TEACHER) : null;
+    }
+
+    private void preloadData() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException,
+            InvocationTargetException {
         Bennu.getInstance().getUserSet();
         loadProfiles(Bennu.getInstance());
         Bennu.getInstance().getTeachersSet();
@@ -79,13 +87,15 @@ public class ExportEmployeeInfo extends CustomTask {
     private boolean isGrantOwner(final Employee employee) {
         final PersonProfessionalData data = employee.getPerson().getPersonProfessionalData();
         if (data != null) {
-            final GiafProfessionalData giafProfessionalData = data.getGiafProfessionalDataByCategoryType(CategoryType.GRANT_OWNER);
+            final GiafProfessionalData giafProfessionalData =
+                    data.getGiafProfessionalDataByCategoryType(CategoryType.GRANT_OWNER);
             return giafProfessionalData != null && giafProfessionalData.isActive();
         }
         return false;
     }
 
-    private void registerContractSituation(final JsonArray result, final User user, final Person person, final Employee employee, final CategoryType type) {
+    private void registerContractSituation(final JsonArray result, final User user, final Person person, final Employee employee,
+            final CategoryType type) {
         final String employer = determineEmployer(person, type);
         if (employer != null) {
             final Unit workingPlace = employee.getCurrentWorkingPlace();
@@ -107,7 +117,8 @@ public class ExportEmployeeInfo extends CustomTask {
     private String determineEmployer(final Person person, final CategoryType type) {
         final PersonProfessionalData data = person.getPersonProfessionalData();
         if (data != null) {
-            final GiafProfessionalData giafProfessionalData = type == null ? null : data.getGiafProfessionalDataByCategoryType(type);
+            final GiafProfessionalData giafProfessionalData =
+                    type == null ? null : data.getGiafProfessionalDataByCategoryType(type);
             return giafProfessionalData == null ? null : giafProfessionalData.getEmployer();
 
         }
