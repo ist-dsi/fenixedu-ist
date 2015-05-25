@@ -34,14 +34,11 @@ import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
-import org.fenixedu.academic.domain.thesis.Thesis;
-import org.fenixedu.academic.domain.thesis.ThesisParticipationType;
 import org.fenixedu.academic.thesis.domain.StudentThesisCandidacy;
 import org.fenixedu.academic.thesis.domain.ThesisProposal;
-import org.fenixedu.academic.thesis.domain.ThesisProposalParticipant;
 import org.fenixedu.academic.thesis.domain.ThesisProposalsConfiguration;
+import org.fenixedu.academic.thesis.ui.service.ThesisProposalsService;
 import org.fenixedu.academic.util.Bundle;
-import org.fenixedu.academic.util.MultiLanguageString;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.signals.DomainObjectEvent;
@@ -158,21 +155,7 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
 
                         if (hit.isPresent()) {
                             StudentThesisCandidacy candidacy = hit.get();
-                            ThesisProposal proposal = candidacy.getThesisProposal();
-
-                            Thesis thesis =
-                                    new Thesis(enrolment.getRegistration().getDegree(), enrolment, new MultiLanguageString(
-                                            proposal.getTitle()));
-
-                            for (ThesisProposalParticipant participant : proposal.getThesisProposalParticipantSet()) {
-                                String name = participant.getThesisProposalParticipantType().getName().getContent().toLowerCase();
-                                if (name.equals("orientador") || name.equals("advisor")) {
-                                    thesis.addParticipant(participant.getUser().getPerson(), ThesisParticipationType.ORIENTATOR);
-                                }
-                                if (name.equals("co-orientador") || name.equals("co-advisor")) {
-                                    thesis.addParticipant(participant.getUser().getPerson(), ThesisParticipationType.ORIENTATOR);
-                                }
-                            }
+                            ThesisProposalsService.createThesisForStudent(candidacy);
                         }
                     }
                 }));
