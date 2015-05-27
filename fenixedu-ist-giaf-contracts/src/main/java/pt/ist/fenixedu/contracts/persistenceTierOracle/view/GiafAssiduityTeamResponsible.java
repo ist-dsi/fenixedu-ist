@@ -18,10 +18,9 @@ import com.google.gson.JsonObject;
 
 public class GiafAssiduityTeamResponsible {
 
-    public static JsonObject readListOfAssiduityEmployees(final String username) {
+    public static JsonObject readListOfAssiduityEmployees(final User user) {
         final JsonObject result = new JsonObject();
-        final User user = User.findByUsername(username);
-        result.addProperty("username", username);
+        result.addProperty("username", user.getUsername());
         result.addProperty("name", user.getProfile().getDisplayName());
         result.addProperty("avatarUrl", user.getProfile().getAvatarUrl());
 
@@ -48,7 +47,7 @@ public class GiafAssiduityTeamResponsible {
 
             @Override
             public void prepare(PreparedStatement statement) throws SQLException {
-                final String arg = username.toUpperCase();
+                final String arg = user.getUsername().toUpperCase();
                 statement.setString(1, arg);
                 statement.setString(2, arg);
             }
