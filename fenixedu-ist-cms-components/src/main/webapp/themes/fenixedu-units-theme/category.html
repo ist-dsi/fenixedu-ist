@@ -31,29 +31,30 @@
 
       {% if pagination.pages.size != 1 %}
       <center>
+
       <ul class="pagination pagination-sm">
-
-        {% if pagination.current != 1 %}
-          <li><a href="?p={{pagination.current - 1}}">&laquo;</a></li>
-        {% else %}
-          <li class="disabled"><a href="">&laquo;</a></li>
-        {% endif %}
-
         {% for i in pagination.pages %}
-          {% if loop.index + 1 == pagination.current %}
-            <li class="active"><a href="{{ i.url }}">{{loop.index + 1}}</a></li>
-          {% else %}
+          
+          <!-- Note: Comparisons using == 0 due to problem in boxing/unboxing that lead to x == x returning false for x bigger than 127 -->
+
+          {% if loop.index == 0 and pagination.current - 1 != 0 %}
+           <li><a href="{{ i.url }}">&laquo;</a></li>
+          {% endif %}
+          {% if loop.index - (pagination.current - 2) == 0 %}
             <li><a href="{{ i.url }}">{{loop.index + 1}}</a></li>
           {% endif %}
+          {% if loop.index + 1 - pagination.current == 0 %}
+            <li class="active"><a>{{loop.index + 1}}</a></li>
+          {% endif %}
+          {% if loop.index - pagination.current == 0 %}
+            <li><a href="{{ i.url }}">{{loop.index + 1}}</a></li>
+          {% endif %}
+          {% if loop.index - (pagination.pages.size - 1) == 0  and (pagination.current - pagination.pages.size != 0)%}
+            <li><a href="{{ i.url }}">&raquo;</a></li>
+          {% endif %}
         {% endfor %}
+        </ul>
 
-        {% if pagination.current != pagination.pages.size %}
-          <li><a href="?p={{pagination.current + 1}}">&raquo;</a></li>
-        {% else %}
-          <li class="disabled"><a href="">&raquo;</a></li>
-        {% endif %}
-
-      </ul>
       </center>
       {% endif %}
   {% else %}
