@@ -44,7 +44,7 @@ public class QUCQuestionsReportFile extends QUCQuestionsReportFile_Base {
 
         for (InquiryQuestion inquiryQuestion : Bennu.getInstance().getInquiryQuestionsSet()) {
             Row row = spreadsheet.addRow();
-            row.setCell(inquiryQuestion.getCode().toString());
+            row.setCell(String.valueOf(inquiryQuestion.getCode()));
             row.setCell(inquiryQuestion.getLabel().getContent());
             row.setCell(inquiryQuestion.getQuestionOrder());
             InquiryQuestionHeader inquiryQuestionHeader = inquiryQuestion.getInquiryGroupQuestion().getInquiryQuestionHeader();
