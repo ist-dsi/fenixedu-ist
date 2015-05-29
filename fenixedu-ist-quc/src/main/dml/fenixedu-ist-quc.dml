@@ -99,7 +99,7 @@ class InquiryQuestion  {
     Boolean hasClassification;
     Boolean presentResults;
     Integer questionOrder;
-    Long code (REQUIRED);
+    Long code;
 }
 
     class InquiryCheckBoxQuestion extends InquiryQuestion {
@@ -143,7 +143,7 @@ class StudentInquiryExecutionPeriod  {
     
 class InquiryAnswer  {
     DateTime responseDateTime;
-    Long code (REQUIRED);
+    Long code;
 }
     class InquiryCourseAnswer extends InquiryAnswer {
         Integer weeklyHoursSpentPercentage;

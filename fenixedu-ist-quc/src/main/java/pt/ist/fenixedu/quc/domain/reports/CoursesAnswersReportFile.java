@@ -73,7 +73,7 @@ public class CoursesAnswersReportFile extends CoursesAnswersReportFile_Base {
                         row.setCell("");
                         row.setCell(GepReportFile.getProfessorshipCode(studentTeacherAnswer.getProfessorship()));
                         row.setCell(studentTeacherAnswer.getShiftType().toString());
-                        row.setCell(questionAnswer.getInquiryQuestion().getCode().toString());
+                        row.setCell(String.valueOf(questionAnswer.getInquiryQuestion().getCode()));
                         row.setCell(questionAnswer.getAnswer());
                         row.setCell(inquiryAnswer.getCode().toString());
                     }
