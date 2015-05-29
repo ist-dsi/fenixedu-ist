@@ -39,6 +39,15 @@ relation DelegateGroupDegree {
     }
 }
 
+relation DelegateGroupDegreeType {
+    protected .org.fenixedu.academic.domain.degree.DegreeType playsRole degreeType {
+        multiplicity 0..1;
+    }
+    public accessControl.PersistentDelegateGroup playsRole delegatesGroup {
+        multiplicity *;
+    }
+}
+
 relation DelegateDegree{
     student.Delegate playsRole delegate{
         multiplicity *;

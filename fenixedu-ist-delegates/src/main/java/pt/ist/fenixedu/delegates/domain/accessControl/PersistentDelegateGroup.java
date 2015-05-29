@@ -21,14 +21,16 @@ package pt.ist.fenixedu.delegates.domain.accessControl;
 import java.util.Optional;
 
 import org.fenixedu.academic.domain.Degree;
+import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.bennu.core.groups.Group;
 
 import com.google.common.base.Objects;
 
 public class PersistentDelegateGroup extends PersistentDelegateGroup_Base {
 
-    protected PersistentDelegateGroup(Degree degree, Boolean yearDelegate) {
+    protected PersistentDelegateGroup(DegreeType degreeType, Degree degree, Boolean yearDelegate) {
         super();
+        setDegreeType(degreeType);
         setDegree(degree);
         setYearDelegate(yearDelegate);
         if (degree != null) {
@@ -38,22 +40,31 @@ public class PersistentDelegateGroup extends PersistentDelegateGroup_Base {
 
     @Override
     public Group toGroup() {
-        return DelegateGroup.get(getDegree(), getYearDelegate());
+        if (getDegree() != null) {
+            return DelegateGroup.get(getDegree(), getYearDelegate());
+        }
+        return DelegateGroup.get(getDegreeType(), getYearDelegate());
     }
 
     @Override
     protected void gc() {
+        setDegreeType(null);
         setDegree(null);
         super.gc();
     }
 
-    public static PersistentDelegateGroup getInstance(Degree degree, Boolean yearDelegate) {
-        return singleton(() -> select(degree, yearDelegate), () -> new PersistentDelegateGroup(degree, yearDelegate));
+    public static PersistentDelegateGroup getInstance(DegreeType degreeType, Degree degree, Boolean yearDelegate) {
+        return singleton(() -> select(degreeType, degree, yearDelegate), () -> new PersistentDelegateGroup(degreeType, degree,
+                yearDelegate));
     }
 
-    private static Optional<PersistentDelegateGroup> select(Degree degree, Boolean yearDelegate) {
+    private static Optional<PersistentDelegateGroup> select(DegreeType degreeType, Degree degree, Boolean yearDelegate) {
         if (degree != null) {
             return degree.getDelegatesGroupSet().stream().filter(g -> Objects.equal(g.getYearDelegate(), yearDelegate)).findAny();
+        }
+        if (degreeType != null) {
+            return degreeType.getDelegatesGroupSet().stream().filter(g -> Objects.equal(g.getYearDelegate(), yearDelegate))
+                    .findAny();
         }
         return filter(PersistentDelegateGroup.class).filter(g -> Objects.equal(g.getYearDelegate(), yearDelegate)).findAny();
     }
