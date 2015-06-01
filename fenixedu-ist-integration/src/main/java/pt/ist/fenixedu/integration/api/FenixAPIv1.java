@@ -84,6 +84,8 @@ import org.fenixedu.academic.domain.accounting.paymentCodes.AccountingEventPayme
 import org.fenixedu.academic.domain.contacts.EmailAddress;
 import org.fenixedu.academic.domain.contacts.WebAddress;
 import org.fenixedu.academic.domain.degreeStructure.BibliographicReferences.BibliographicReference;
+import org.fenixedu.academic.domain.degreeStructure.CourseGroup;
+import org.fenixedu.academic.domain.degreeStructure.DegreeModule;
 import org.fenixedu.academic.domain.degreeStructure.ProgramConclusion;
 import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.academic.domain.space.SpaceUtils;
@@ -97,7 +99,6 @@ import org.fenixedu.academic.domain.util.icalendar.CalendarFactory;
 import org.fenixedu.academic.domain.util.icalendar.ClassEventBean;
 import org.fenixedu.academic.domain.util.icalendar.EvaluationEventBean;
 import org.fenixedu.academic.domain.util.icalendar.EventBean;
-import org.fenixedu.academic.dto.ExecutionCourseView;
 import org.fenixedu.academic.dto.InfoExam;
 import org.fenixedu.academic.dto.InfoExecutionCourse;
 import org.fenixedu.academic.dto.InfoLesson;
@@ -1020,17 +1021,13 @@ public class FenixAPIv1 {
 
         ExecutionSemester[] executionSemesters = getExecutionSemesters(academicTerm).toArray(new ExecutionSemester[0]);
 
-        final Set<ExecutionCourseView> executionCoursesViews = new HashSet<ExecutionCourseView>();
-        for (final DegreeCurricularPlan degreeCurricularPlan : degree.getDegreeCurricularPlansSet()) {
-            if (degreeCurricularPlan.isActive()) {
-                degreeCurricularPlan.addExecutionCourses(executionCoursesViews, executionSemesters);
-            }
-        }
+        final Set<ExecutionCourse> executionCourses = new HashSet<ExecutionCourse>();
+        degree.getDegreeCurricularPlansSet().stream().filter(DegreeCurricularPlan::isActive)
+                .forEach(plan -> addExecutionCourses(plan.getRoot(), executionCourses, executionSemesters));
 
         List<FenixExecutionCourse> fenixExecutionCourses = new ArrayList<>();
 
-        for (ExecutionCourseView executionCourseView : executionCoursesViews) {
-            ExecutionCourse executionCourse = executionCourseView.getExecutionCourse();
+        for (ExecutionCourse executionCourse : executionCourses) {
             String sigla = executionCourse.getSigla();
             String credits = getCredits(executionCourse, degree);
             String name = executionCourse.getName();
@@ -1040,6 +1037,28 @@ public class FenixAPIv1 {
             fenixExecutionCourses.add(new FenixExecutionCourse(sigla, credits, name, id, academicTermValue));
         }
         return fenixExecutionCourses;
+    }
+
+    private void addExecutionCourses(final CourseGroup courseGroup, final Collection<ExecutionCourse> executionCourseViews,
+            final ExecutionSemester... executionPeriods) {
+        for (final org.fenixedu.academic.domain.degreeStructure.Context context : courseGroup.getChildContextsSet()) {
+            for (final ExecutionSemester executionSemester : executionPeriods) {
+                if (context.isValid(executionSemester)) {
+                    final DegreeModule degreeModule = context.getChildDegreeModule();
+                    if (degreeModule.isLeaf()) {
+                        final CurricularCourse curricularCourse = (CurricularCourse) degreeModule;
+                        for (final ExecutionCourse executionCourse : curricularCourse.getAssociatedExecutionCoursesSet()) {
+                            if (executionCourse.getExecutionPeriod() == executionSemester) {
+                                executionCourseViews.add(executionCourse);
+                            }
+                        }
+                    } else {
+                        final CourseGroup childCourseGroup = (CourseGroup) degreeModule;
+                        addExecutionCourses(childCourseGroup, executionCourseViews, executionPeriods);
+                    }
+                }
+            }
+        }
     }
 
     private String getCredits(ExecutionCourse ec, Degree degree) {
