@@ -81,7 +81,7 @@ public class TeacherCredits extends TeacherCredits_Base {
                 }
             } else {
                 TeacherService teacherService = TeacherService.getTeacherServiceByExecutionPeriod(teacher, executionSemester);
-                return teacherService == null ? 0 : teacherService.getTeachingDegreeCredits();
+                return teacherService == null ? 0 : teacherService.getTeachingDegreeHours();
             }
         }
         return 0.0;
