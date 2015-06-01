@@ -100,7 +100,8 @@ public class ProfessionalCategory extends ProfessionalCategory_Base implements C
         return isTeacherCategoryType()
                 && !isTeacherMonitorCategory()
                 && (getName().getContent(MultiLanguageString.pt).matches("(?i).*Convidado.*") || getName().getContent(
-                        MultiLanguageString.pt).matches("(?i).*Equip.*"));
+                        MultiLanguageString.pt).matches("(?i).*Equip.*")|| getName().getContent(
+                                MultiLanguageString.pt).matches("(?i).*Colaborador.*"));
     }
 
     public boolean isTeacherInvitedProfessorCategory() {
