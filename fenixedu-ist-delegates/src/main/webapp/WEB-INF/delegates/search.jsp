@@ -57,7 +57,7 @@
 	<div class="form-group">
 		<label for="degreeType" class="col-md-1 control-label"><spring:message code="label.delegates.select.degree.type"/></label>
 		<div class="col-md-11">
-			<form:select path="degreeType" items="${searchBean.degreeTypes}" itemLabel="localizedName" onchange="onchangeDegreeType(); submit();" class="form-control"/>
+			<form:select path="degreeType" items="${searchBean.degreeTypes}" itemLabel="name.content" itemValue="externalId" onchange="onchangeDegreeType(); submit();" class="form-control"/>
 		</div>
 	</div>
 	<div class="form-group">

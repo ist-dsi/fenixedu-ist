@@ -55,7 +55,7 @@
 		<div class="col-md-11">
 			<form:select path="degreeType" onchange="onchangeDegreeType(); submit();" class="form-control">
                 <form:option value=""><spring:message code="label.delegates.select.degree.type.all"/></form:option>
-                <form:options items="${searchBean.degreeTypes}" itemLabel="localizedName"/>
+                <form:options items="${searchBean.degreeTypes}" itemLabel="name.content" itemValue="externalId" />
             </form:select>
 		</div>
 	</div>
