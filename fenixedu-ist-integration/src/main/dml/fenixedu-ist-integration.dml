@@ -147,7 +147,7 @@ relation DgesIngressionTypeMappingIngressionType {
 }
 
 relation BennuDgesIngressionTypeMapping {
-    .org.fenixedu.bennu.core.domain.Bennu playsRole bennu {
+    .org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject {
         multiplicity 1..1;
     }
     student.importation.DgesIngressionTypeMapping playsRole dgesIngressionTypeMapping {

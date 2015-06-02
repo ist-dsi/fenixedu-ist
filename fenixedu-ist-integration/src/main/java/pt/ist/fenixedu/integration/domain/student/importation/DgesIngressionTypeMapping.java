@@ -7,6 +7,7 @@ public class DgesIngressionTypeMapping extends DgesIngressionTypeMapping_Base {
 
     public DgesIngressionTypeMapping() {
         super();
+        setRootDomainObject(Bennu.getInstance());
     }
 
     public static IngressionType getIngressionType(String dgesCode) {
