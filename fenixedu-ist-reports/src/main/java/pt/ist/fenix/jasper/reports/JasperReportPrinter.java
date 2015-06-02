@@ -41,12 +41,13 @@ import net.sf.jasperreports.engine.JRPrintPage;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.export.FontKey;
 import net.sf.jasperreports.engine.export.JRPdfExporter;
 import net.sf.jasperreports.engine.export.JRPrintServiceExporterParameter;
 import net.sf.jasperreports.engine.export.PdfFont;
+import net.sf.jasperreports.engine.fill.JRSubreportRunnerFactory;
 import net.sf.jasperreports.engine.util.JRLoader;
+import net.sf.jasperreports.engine.util.JRProperties;
 
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.util.report.ReportPrinter;
@@ -61,6 +62,8 @@ public class JasperReportPrinter implements ReportPrinter {
     private final Properties properties = new Properties();
 
     public JasperReportPrinter() {
+        JRProperties.setProperty(JRSubreportRunnerFactory.SUBREPORT_RUNNER_FACTORY,
+                JRTxThreadSubreportRunnerFactory.class.getName());
         try {
             properties.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("reports.properties"));
         } catch (IOException e) {
@@ -257,7 +260,7 @@ public class JasperReportPrinter implements ReportPrinter {
                 dataSource = Collections.singletonList(StringUtils.EMPTY);
             }
 
-            return JasperFillManager.fillReport(report, parameters, new JRBeanCollectionDataSource(dataSource));
+            return JasperFillManager.fillReport(report, parameters, new TransactionalDataSource(dataSource));
         }
 
         return null;

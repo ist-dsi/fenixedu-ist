@@ -22,7 +22,10 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -447,5 +450,17 @@ public class AnnualTeachingCreditsBean implements Serializable {
 
     public Boolean getAreCreditsOpen() {
         return !getAreCreditsCalculated();
+    }
+
+    public byte[] getAnnualTeacherCreditsDocument(boolean withConfidentionalInformation) {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("annualTeachingCreditsBean", this);
+        parameters.put("organization", org.fenixedu.academic.domain.organizationalStructure.Unit.getInstitutionAcronym());
+        parameters.put("withConfidentionalInformation", withConfidentionalInformation);
+
+        final ResourceBundle resourceBundle = ResourceBundle.getBundle("resources/TeacherCreditsSheetResources");
+        parameters.put("REPORT_RESOURCE_BUNDLE", resourceBundle);
+        return org.fenixedu.academic.util.report.ReportsUtils.generateReport(
+                "pt.ist.fenixedu.teacher.domain.credits.AnnualTeachingCredits.report", parameters, null).getData();
     }
 }
