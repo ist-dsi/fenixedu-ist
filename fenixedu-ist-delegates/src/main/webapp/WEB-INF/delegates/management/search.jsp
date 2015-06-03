@@ -88,6 +88,7 @@ td {
 	<th><spring:message code="label.delegates.username"/></th>
 	<th><spring:message code="delegates.messaging.table.name"/></th>
 	<th><spring:message code="label.delegates.email"/></th>
+	<th><spring:message code="label.delegates.phone"/></th>
 	<th><spring:message code="label.delegates.interval"/></th>
 	<th><spring:message code="label.delegates.operations"/></th>
 <c:forEach var="delegate" items="${delegates}">
@@ -101,6 +102,7 @@ td {
 	<td>${delegate.username}</td>
 	<td>${delegate.name}</td>
 	<td>${delegate.email}</td>
+	<td>${delegate.phone}</td>
 	<td>${delegate.interval}</td>
 	<spring:url var="delegateOID" value=""/>
 	<c:if test="${not empty delegate.delegateOID}">

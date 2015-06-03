@@ -23,8 +23,10 @@ import static org.fenixedu.bennu.FenixEduDelegatesConfiguration.BUNDLE;
 import java.util.Comparator;
 import java.util.Objects;
 
+import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.CurricularYear;
 import org.fenixedu.academic.domain.Degree;
+import org.fenixedu.academic.domain.contacts.MobilePhone;
 import org.fenixedu.academic.domain.degreeStructure.CycleType;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.format.DateTimeFormat;
@@ -44,6 +46,7 @@ public class DelegateBean {
     String email;
     String delegateTitle;
     String picture;
+    String phone;
     CurricularYear curricularYear;
     CycleType cycleType;
     Degree degree;
@@ -59,6 +62,12 @@ public class DelegateBean {
         this.email = delegate.getUser().getPerson().getEmailForSendingEmails();
         this.delegateTitle = delegate.getTitle();
         this.picture = delegate.getUser().getProfile().getAvatarUrl();
+        MobilePhone mobilePhone = delegate.getUser().getPerson().getDefaultMobilePhone();
+        if (mobilePhone != null && mobilePhone.isVisible()) {
+            this.phone = mobilePhone.getNumber();
+        } else {
+            this.phone = StringUtils.EMPTY;
+        }
         this.curricularYear = delegate.getCurricularYear();
         this.delegate = delegate;
         this.degree = delegate.getDegree();
@@ -100,6 +109,14 @@ public class DelegateBean {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public String getDelegateOID() {
