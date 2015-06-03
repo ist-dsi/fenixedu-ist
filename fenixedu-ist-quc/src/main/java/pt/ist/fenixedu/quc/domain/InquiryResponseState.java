@@ -21,7 +21,6 @@
  */
 package pt.ist.fenixedu.quc.domain;
 
-import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import pt.ist.fenixWebFramework.rendererExtensions.util.IPresentableEnum;
@@ -36,6 +35,6 @@ public enum InquiryResponseState implements IPresentableEnum {
 
     @Override
     public String getLocalizedName() {
-        return BundleUtil.getString(Bundle.ENUMERATION, this.getClass().getName() + "." + name());
+        return BundleUtil.getString("resources.FenixEduQucResources", this.getClass().getName() + "." + name());
     }
 }
