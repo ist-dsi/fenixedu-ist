@@ -59,7 +59,7 @@ public class TeacherCredits extends TeacherCredits_Base {
         TeacherCreditsDocument lastTeacherCreditsDocument = null;
         for (TeacherCreditsDocument teacherCreditsDocument : getTeacherCreditsDocumentSet()) {
             if (lastTeacherCreditsDocument == null
-                    || lastTeacherCreditsDocument.getUploadTime().isBefore(teacherCreditsDocument.getUploadTime())) {
+                    || lastTeacherCreditsDocument.getCreationDate().isBefore(teacherCreditsDocument.getCreationDate())) {
                 lastTeacherCreditsDocument = teacherCreditsDocument;
             }
         }

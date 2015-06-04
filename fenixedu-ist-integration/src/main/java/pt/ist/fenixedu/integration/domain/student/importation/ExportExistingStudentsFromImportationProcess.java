@@ -70,7 +70,7 @@ public class ExportExistingStudentsFromImportationProcess extends ExportExisting
             }
 
             final List<DegreeCandidateDTO> degreeCandidateDTOs =
-                    parseDgesFile(importationProcess.getDgesStudentImportationFile().getContents(),
+                    parseDgesFile(importationProcess.getDgesStudentImportationFile().getContent(),
                             importationProcess.getUniversityAcronym(), getEntryPhase());
 
             for (DegreeCandidateDTO dto : degreeCandidateDTOs) {

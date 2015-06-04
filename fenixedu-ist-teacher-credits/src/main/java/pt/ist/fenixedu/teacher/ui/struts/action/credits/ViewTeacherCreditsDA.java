@@ -121,7 +121,7 @@ public class ViewTeacherCreditsDA extends FenixDispatchAction {
                             response.setHeader("Content-disposition",
                                     "attachment; filename=" + lastTeacherCreditsDocument.getFilename());
                             final OutputStream outputStream = response.getOutputStream();
-                            outputStream.write(lastTeacherCreditsDocument.getContents());
+                            outputStream.write(lastTeacherCreditsDocument.getContent());
                             outputStream.close();
                             return null;
                         } else {

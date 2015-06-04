@@ -70,6 +70,7 @@ import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.UserProfile;
 import org.fenixedu.bennu.core.groups.DynamicGroup;
+import org.fenixedu.bennu.io.servlets.FileDownloadServlet;
 import org.joda.time.LocalDate;
 import org.joda.time.YearMonthDay;
 import org.json.simple.JSONArray;
@@ -502,7 +503,8 @@ public class JerseyServices {
                 phdInfo.addProperty("month", phdProcess.getConclusionDate().monthOfYear().getAsShortText());
 
                 try {
-                    phdInfo.addProperty("url", phdProcess.getThesisProcess().getProvisionalThesisDocument().getDownloadUrl());
+                    phdInfo.addProperty("url",
+                            FileDownloadServlet.getDownloadUrl(phdProcess.getThesisProcess().getProvisionalThesisDocument()));
                 } catch (NullPointerException e) {
                 }
                 phdInfo.addProperty("type", "phdthesis");
@@ -528,7 +530,7 @@ public class JerseyServices {
                 schools.add(new JsonPrimitive(Unit.getInstitutionName().getContent()));
                 mscInfo.add("schools", schools);
 
-                mscInfo.addProperty("url", t.getDissertation().getDownloadUrl());
+                mscInfo.addProperty("url", FileDownloadServlet.getDownloadUrl(t.getDissertation()));
                 mscInfo.addProperty("type", "mastersthesis");
                 infos.add(mscInfo);
             }

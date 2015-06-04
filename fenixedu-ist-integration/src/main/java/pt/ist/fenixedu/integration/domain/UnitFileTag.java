@@ -37,7 +37,7 @@ public class UnitFileTag extends UnitFileTag_Base {
     public Integer getFileTagCount(Person person) {
         int count = 0;
         for (UnitFile file : getTaggedFilesSet()) {
-            if (file.isPersonAllowedToAccess(person)) {
+            if (file.isAccessible(person != null ? person.getUser() : null)) {
                 count++;
             }
         }

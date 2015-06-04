@@ -116,7 +116,7 @@
 				<fr:property name="sortParameter" value="sort"/>
 				<fr:property name="sortIgnored" value="true"/>
 				<fr:property name="sortBy" value="<%= request.getParameter("sort") == null ? "displayName" : request.getParameter("sort")%>"/>
-				<fr:property name="sortableSlots" value="displayName,uploadTime"/>
+				<fr:property name="sortableSlots" value="displayName,creationDate"/>
 				<fr:property name="sortUrl" value="<%= URL + (request.getParameter("filePage") == null ? "" : "&filePage=" + request.getParameter("filePage"))%>"/>
 			</fr:layout>
 		</fr:view> 

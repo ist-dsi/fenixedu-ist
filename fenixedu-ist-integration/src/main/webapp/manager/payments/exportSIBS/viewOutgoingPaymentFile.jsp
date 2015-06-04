@@ -30,7 +30,7 @@
 <fr:view	name="sibsPaymentFile" >
 	<fr:schema bundle="MANAGER_RESOURCES" type="pt.ist.fenixedu.integration.domain.accounting.events.export.SIBSOutgoingPaymentFile">
 		<fr:slot name="filename" key="label.sibs.outgoing.payment.file.name" />
-		<fr:slot name="uploadTime" key="label.sibs.outgoing.payment.upload.time" />
+		<fr:slot name="creationDate" key="label.sibs.outgoing.payment.upload.time" />
 		<fr:slot name="successfulSentDate" key="label.sibs.outgoing.payment.successfulSent" />
 		<fr:slot name="this" key="label.sibs.outgoing.payment.file.view" layout="link"/>
 		<fr:slot name="errors" key="label.sibs.outgoing.payment.file.errors" />

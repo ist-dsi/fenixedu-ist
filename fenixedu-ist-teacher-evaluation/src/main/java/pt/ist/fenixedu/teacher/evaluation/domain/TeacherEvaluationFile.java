@@ -94,7 +94,7 @@ public class TeacherEvaluationFile extends TeacherEvaluationFile_Base {
     }
 
     public TeacherEvaluationFile copy(TeacherEvaluation evaluation) {
-        return new TeacherEvaluationFile(evaluation, getTeacherEvaluationFileType(), getFilename(), getContents(), getCreatedBy());
+        return new TeacherEvaluationFile(evaluation, getTeacherEvaluationFileType(), getFilename(), getContent(), getCreatedBy());
     }
 
 }

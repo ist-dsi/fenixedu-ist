@@ -197,8 +197,8 @@ public class AnnualTeachingCredits extends AnnualTeachingCredits_Base {
         for (AnnualTeachingCreditsDocument annualTeachingCreditsDocument : getAnnualTeachingCreditsDocumentSet()) {
             if (annualTeachingCreditsDocument.getHasConfidencialInformation() == withConfidencialInformation
                     && annualTeachingCreditsDocument.isAccessible(user)
-                    && (lastAnnualTeachingCreditsDocument == null || lastAnnualTeachingCreditsDocument.getUploadTime().isBefore(
-                            annualTeachingCreditsDocument.getUploadTime()))) {
+                    && (lastAnnualTeachingCreditsDocument == null || lastAnnualTeachingCreditsDocument.getCreationDate()
+                            .isBefore(annualTeachingCreditsDocument.getCreationDate()))) {
                 lastAnnualTeachingCreditsDocument = annualTeachingCreditsDocument;
             }
         }

@@ -39,7 +39,7 @@
 <fr:view	name="sibsOutgoingPaymentFiles" >
 	<fr:schema bundle="MANAGER_RESOURCES" type="pt.ist.fenixedu.integration.domain.accounting.events.export.SIBSOutgoingPaymentFile">
 		<fr:slot name="filename" key="label.sibs.outgoing.payment.file.name" />
-		<fr:slot name="uploadTime" key="label.sibs.outgoing.payment.upload.time" />
+		<fr:slot name="creationDate" key="label.sibs.outgoing.payment.upload.time" />
 		<fr:slot name="successfulSentDate" key="label.sibs.outgoing.payment.successfulSent" />
 		<fr:slot name="this" key="label.sibs.outgoing.payment.file.view" layout="link"/>
 		
@@ -52,8 +52,8 @@
 	
 		<fr:property name="sortParameter" value="sortBy"/>
         <fr:property name="sortUrl" value="/exportSIBSPayments.do?method=listOutgoingPaymentsFile" />
-	    <fr:property name="sortBy" value="uploadTime=desc"/>
-		<fr:property name="sortableSlots" value="filename, uploadTime, successfulSentDateTime" />
+	    <fr:property name="sortBy" value="creationDate=desc"/>
+		<fr:property name="sortableSlots" value="filename, creationDate, successfulSentDateTime" />
 		
 		<fr:link label="label.sibs.outgoing.payment.file.detail,MANAGER_RESOURCES" name="detail" 
 					link="/exportSIBSPayments.do?method=viewOutgoingPaymentFile&amp;paymentFileId=${externalId}"/>

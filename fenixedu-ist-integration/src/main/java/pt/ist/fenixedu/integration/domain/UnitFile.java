@@ -27,6 +27,7 @@ import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.bennu.core.groups.Group;
+import org.fenixedu.bennu.io.servlets.FileDownloadServlet;
 
 import pt.ist.fenixedu.integration.domain.accessControl.MembersLinkGroup;
 import pt.ist.fenixframework.dml.runtime.RelationAdapter;
@@ -68,6 +69,12 @@ public class UnitFile extends UnitFile_Base {
         }
     }
 
+    // Delete jsp usages and delete this method
+    @Deprecated
+    public String getDownloadUrl() {
+        return FileDownloadServlet.getDownloadUrl(this);
+    }
+
     @Override
     public void delete() {
         if (isEditableByCurrentUser()) {
@@ -101,7 +108,7 @@ public class UnitFile extends UnitFile_Base {
     public static List<UnitFile> getAccessibileFiles(Unit unit, Person person) {
         List<UnitFile> files = new ArrayList<UnitFile>();
         for (UnitFile file : unit.getFilesSet()) {
-            if (file.isPersonAllowedToAccess(person)) {
+            if (file.isAccessible(person != null ? person.getUser() : null)) {
                 files.add(file);
             }
         }
@@ -122,7 +129,7 @@ public class UnitFile extends UnitFile_Base {
         List<UnitFile> files = new ArrayList<UnitFile>();
         if (tag != null) {
             for (UnitFile file : tag.getTaggedFilesSet()) {
-                if (file.isPersonAllowedToAccess(person)) {
+                if (file.isAccessible(person != null ? person.getUser() : null)) {
                     files.add(file);
                 }
             }

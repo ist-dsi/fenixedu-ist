@@ -48,8 +48,8 @@ public class TeacherEvaluationFileBean implements Serializable {
         this.teacherEvaluation = teacherEvaluation;
         for (TeacherEvaluationFile teacherEvaluationFile : teacherEvaluation.getTeacherEvaluationFileSet()) {
             if (teacherEvaluationFile.getTeacherEvaluationFileType().equals(getTeacherEvaluationFileType())
-                    && (this.teacherEvaluationFile == null || this.teacherEvaluationFile.getUploadTime().isBefore(
-                            teacherEvaluationFile.getUploadTime()))) {
+                    && (this.teacherEvaluationFile == null || this.teacherEvaluationFile.getCreationDate().isBefore(
+                            teacherEvaluationFile.getCreationDate()))) {
                 this.teacherEvaluationFile = teacherEvaluationFile;
             }
         }
@@ -72,7 +72,7 @@ public class TeacherEvaluationFileBean implements Serializable {
     }
 
     public DateTime getTeacherEvaluationFileUploadDate() {
-        return hasTeacherEvaluationFile() ? teacherEvaluationFile.getUploadTime() : null;
+        return hasTeacherEvaluationFile() ? teacherEvaluationFile.getCreationDate() : null;
     }
 
     public boolean hasTeacherEvaluationFile() {

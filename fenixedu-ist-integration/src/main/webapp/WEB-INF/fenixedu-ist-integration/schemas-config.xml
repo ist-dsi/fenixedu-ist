@@ -91,7 +91,7 @@
         <slot name="description" key="label.fileDescription" layout="null-as-label">
             <property name="subLayout" value="short" />
         </slot>
-        <slot name="uploadTime" />
+        <slot name="creationDate" />
         <slot name="unitFileTags" layout="flowLayout">
             <property name="eachLayout" value="values" />
             <property name="eachSchema" value="unitFileTag.name" />
@@ -111,7 +111,7 @@
         <slot name="description" key="label.fileDescription" layout="null-as-label">
             <property name="subLayout" value="short" />
         </slot>
-        <slot name="uploadTime" />
+        <slot name="creationDate" />
         <slot name="unitFileTags" layout="flowLayout">
             <property name="eachLayout" value="values" />
             <property name="eachSchema" value="unitFileTag.name" />

@@ -18,6 +18,12 @@
  */
 package pt.ist.fenixedu.teacher.domain;
 
-public class TeacherCreditsDocument extends TeacherCreditsDocument_Base {
+import org.fenixedu.bennu.io.servlets.FileDownloadServlet;
 
+public class TeacherCreditsDocument extends TeacherCreditsDocument_Base {
+    // Delete jsp usages and delete this method
+    @Deprecated
+    public String getDownloadUrl() {
+        return FileDownloadServlet.getDownloadUrl(this);
+    }
 }

@@ -464,7 +464,7 @@ public class TeacherEvaluationDA extends FenixDispatchAction {
                                 zip.putNextEntry(new ZipEntry(department + fileSeparator + evaluationName + fileSeparator
                                         + teacherEvaluationFileBean.getTeacherEvaluationFileType() + fileNameSeparator
                                         + teacherEvaluationFileBean.getTeacherEvaluationFile().getFilename()));
-                                zip.write(teacherEvaluationFileBean.getTeacherEvaluationFile().getContents());
+                                zip.write(teacherEvaluationFileBean.getTeacherEvaluationFile().getContent());
                                 zip.closeEntry();
                             }
                         }
@@ -511,7 +511,7 @@ public class TeacherEvaluationDA extends FenixDispatchAction {
                                 zip.putNextEntry(new ZipEntry(department + fileSeparator + evaluationName + fileSeparator
                                         + teacherEvaluationFileBean.getTeacherEvaluationFileType() + fileNameSeparator
                                         + teacherEvaluationFileBean.getTeacherEvaluationFile().getFilename()));
-                                zip.write(teacherEvaluationFileBean.getTeacherEvaluationFile().getContents());
+                                zip.write(teacherEvaluationFileBean.getTeacherEvaluationFile().getContent());
                                 zip.closeEntry();
                             }
                         }

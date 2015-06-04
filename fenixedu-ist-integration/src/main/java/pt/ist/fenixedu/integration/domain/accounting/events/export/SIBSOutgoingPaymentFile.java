@@ -73,14 +73,14 @@ public class SIBSOutgoingPaymentFile extends SIBSOutgoingPaymentFile_Base {
 
                 @Override
                 public int compare(SIBSOutgoingPaymentFile o1, SIBSOutgoingPaymentFile o2) {
-                    if (o1.getUploadTime() == null && o2.getUploadTime() == null) {
+                    if (o1.getCreationDate() == null && o2.getCreationDate() == null) {
                         return o1.getExternalId().compareTo(o2.getExternalId());
-                    } else if (o1.getUploadTime() == null) {
+                    } else if (o1.getCreationDate() == null) {
                         return -1;
-                    } else if (o2.getUploadTime() == null) {
+                    } else if (o2.getCreationDate() == null) {
                         return 1;
                     } else {
-                        return o1.getUploadTime().compareTo(o2.getUploadTime());
+                        return o1.getCreationDate().compareTo(o2.getCreationDate());
                     }
                 }
             };

@@ -144,7 +144,7 @@ public class DgesStudentImportationProcess extends DgesStudentImportationProcess
     public void importCandidates(final PrintWriter LOG_WRITER) {
 
         final List<DegreeCandidateDTO> degreeCandidateDTOs =
-                parseDgesFile(getDgesStudentImportationFile().getContents(), getUniversityAcronym(), getEntryPhase());
+                parseDgesFile(getDgesStudentImportationFile().getContent(), getUniversityAcronym(), getEntryPhase());
 
         final Employee employee = Employee.readByNumber(4581);
 
