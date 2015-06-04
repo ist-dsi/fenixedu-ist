@@ -24,7 +24,6 @@ import java.util.List;
 import org.fenixedu.academic.domain.Attends;
 import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.academic.domain.exceptions.DomainException;
-import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 
@@ -49,7 +48,7 @@ public class DegreeProjectTutorialService extends DegreeProjectTutorialService_B
     public void setPercentageValue(Integer percentageValue) {
         checkPercentage(percentageValue);
         super.setPercentageValue(percentageValue);
-        new TeacherServiceLog(getTeacherService(), BundleUtil.getString(Bundle.TEACHER_CREDITS,
+        new TeacherServiceLog(getTeacherService(), BundleUtil.getString("resources.TeacherCreditsSheetResources",
                 "label.teacher.degreeProjectTutorialService.change", getProfessorship().getExecutionCourse().getName(),
                 getProfessorship().getTeacher().getPerson().getNickname(), getAttend().getRegistration().getNumber().toString(),
                 getPercentageValue().toString()));
@@ -95,7 +94,7 @@ public class DegreeProjectTutorialService extends DegreeProjectTutorialService_B
 
     @Override
     public void delete() {
-        new TeacherServiceLog(getTeacherService(), BundleUtil.getString(Bundle.TEACHER_CREDITS,
+        new TeacherServiceLog(getTeacherService(), BundleUtil.getString("resources.TeacherCreditsSheetResources",
                 "label.teacher.degreeProjectTutorialService.delete", getProfessorship().getExecutionCourse().getName(),
                 getProfessorship().getTeacher().getPerson().getNickname(), getAttend().getRegistration().getNumber().toString(),
                 getPercentageValue().toString()));

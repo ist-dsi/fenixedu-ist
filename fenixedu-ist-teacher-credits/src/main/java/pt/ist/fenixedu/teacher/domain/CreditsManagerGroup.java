@@ -23,7 +23,6 @@ import java.util.Set;
 
 import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.annotation.GroupOperator;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
@@ -36,7 +35,7 @@ public class CreditsManagerGroup extends GroupStrategy {
 
     @Override
     public String getPresentationName() {
-        return BundleUtil.getString(Bundle.TEACHER_CREDITS, "label.group.CreditsManagerGroup");
+        return BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.group.CreditsManagerGroup");
     }
 
     @Override

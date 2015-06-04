@@ -34,7 +34,6 @@ import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.academic.domain.Shift;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.exceptions.DomainException;
-import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
@@ -246,14 +245,14 @@ public class TeacherService extends TeacherService_Base {
     @Atomic
     public void lockTeacherCredits() {
         setTeacherServiceLock(new DateTime());
-        new TeacherServiceLog(this, BundleUtil.getString(Bundle.TEACHER_CREDITS, "label.teacher.lockTeacherCredits",
+        new TeacherServiceLog(this, BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.teacher.lockTeacherCredits",
                 getExecutionPeriod().getQualifiedName()));
     }
 
     @Atomic
     public void unlockTeacherCredits() {
         setTeacherServiceLock(null);
-        new TeacherServiceLog(this, BundleUtil.getString(Bundle.TEACHER_CREDITS, "label.teacher.unlockTeacherCredits",
+        new TeacherServiceLog(this, BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.teacher.unlockTeacherCredits",
                 getExecutionPeriod().getQualifiedName()));
     }
 

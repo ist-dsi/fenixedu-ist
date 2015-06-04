@@ -22,7 +22,6 @@ import java.util.Date;
 
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.person.RoleType;
-import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.academic.util.HourMinuteSecond;
 import org.fenixedu.academic.util.WeekDay;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
@@ -50,7 +49,7 @@ public class InstitutionWorkTime extends InstitutionWorkTime_Base {
 
     private void log(final String key) {
         final StringBuilder log = new StringBuilder();
-        log.append(BundleUtil.getString(Bundle.TEACHER_CREDITS, key));
+        log.append(BundleUtil.getString("resources.TeacherCreditsSheetResources", key));
         log.append(getWeekDay().getLabel());
         log.append(" ");
         log.append(getStartTime().getHours());

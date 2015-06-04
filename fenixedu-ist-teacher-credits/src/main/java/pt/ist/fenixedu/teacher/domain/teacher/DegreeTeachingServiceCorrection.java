@@ -23,7 +23,6 @@ import java.math.BigDecimal;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.academic.domain.exceptions.DomainException;
-import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 public class DegreeTeachingServiceCorrection extends DegreeTeachingServiceCorrection_Base {
@@ -44,7 +43,7 @@ public class DegreeTeachingServiceCorrection extends DegreeTeachingServiceCorrec
         }
         setCorrectedExecutionSemester(correctedExecutionSemester != null ? correctedExecutionSemester : teacherService
                 .getExecutionPeriod());
-        new TeacherServiceLog(getTeacherService(), BundleUtil.getString(Bundle.TEACHER_CREDITS,
+        new TeacherServiceLog(getTeacherService(), BundleUtil.getString("resources.TeacherCreditsSheetResources",
                 "label.teacher.schedule.correction", getProfessorship().getExecutionCourse().getName(), getProfessorship()
                         .getExecutionCourse().getDegreePresentationString(), getReason(), correctionString));
     }

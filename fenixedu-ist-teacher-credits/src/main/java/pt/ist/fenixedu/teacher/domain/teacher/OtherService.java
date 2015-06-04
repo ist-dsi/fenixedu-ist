@@ -20,7 +20,6 @@ package pt.ist.fenixedu.teacher.domain.teacher;
 
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.exceptions.DomainException;
-import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import pt.ist.fenixframework.Atomic;
@@ -52,14 +51,14 @@ public class OtherService extends OtherService_Base {
         setReason(reason);
         setCorrectedExecutionSemester(correctedExecutionSemester != null ? correctedExecutionSemester : teacherService
                 .getExecutionPeriod());
-        new TeacherServiceLog(teacherService, BundleUtil.getString(Bundle.TEACHER_CREDITS, "label.teacher.otherService",
+        new TeacherServiceLog(teacherService, BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.teacher.otherService",
                 credits.toString(), reason, getCorrectedExecutionSemester().getExecutionYear().getQualifiedName()));
     }
 
     @Override
     @Atomic
     public void delete() {
-        new TeacherServiceLog(getTeacherService(), BundleUtil.getString(Bundle.TEACHER_CREDITS,
+        new TeacherServiceLog(getTeacherService(), BundleUtil.getString("resources.TeacherCreditsSheetResources",
                 "label.teacher.otherService.delete", getCredits().toString(), getReason(), getCorrectedExecutionSemester()
                         .getExecutionYear().getQualifiedName()));
         setTeacherService(null);

@@ -165,13 +165,13 @@ public class ViewDepartmentTeacherServiceDA extends FenixDispatchAction {
             }
             spreadsheet.getSheet(department.getAcronym() + "_docentes");
             spreadsheet.newHeaderRow();
-            spreadsheet.addHeader(BundleUtil.getString(Bundle.TEACHER_CREDITS, "label.teacher.id"));
-            spreadsheet.addHeader(BundleUtil.getString(Bundle.TEACHER_CREDITS, "label.teacher.name"), 10000);
-            spreadsheet.addHeader(BundleUtil.getString(Bundle.TEACHER_CREDITS, "label.category"));
-            spreadsheet.addHeader(BundleUtil.getString(Bundle.TEACHER_CREDITS, "label.course"), 10000);
-            spreadsheet.addHeader(BundleUtil.getString(Bundle.TEACHER_CREDITS, "label.degrees"));
-            spreadsheet.addHeader(BundleUtil.getString(Bundle.TEACHER_CREDITS, "label.execution-period"));
-            spreadsheet.addHeader(BundleUtil.getString(Bundle.TEACHER_CREDITS, "label.hours"));
+            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.teacher.id"));
+            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.teacher.name"), 10000);
+            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.category"));
+            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.course"), 10000);
+            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.degrees"));
+            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.execution-period"));
+            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.hours"));
 
             Set<Teacher> allTeachers = Sets.newHashSet(department.getAllTeachers(departmentCreditsBean.getExecutionYear()));
             for (Teacher teacher : allTeachers) {

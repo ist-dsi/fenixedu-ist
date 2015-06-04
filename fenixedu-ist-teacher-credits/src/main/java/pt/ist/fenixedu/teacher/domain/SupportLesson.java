@@ -25,7 +25,6 @@ import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.exceptions.DomainException;
-import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.academic.util.DiaSemana;
 import org.fenixedu.academic.util.HourMinuteSecond;
 import org.fenixedu.academic.util.WeekDay;
@@ -181,7 +180,7 @@ public class SupportLesson extends SupportLesson_Base {
                         .getExecutionPeriod());
 
         final StringBuilder log = new StringBuilder();
-        log.append(BundleUtil.getString(Bundle.TEACHER_CREDITS, key));
+        log.append(BundleUtil.getString("resources.TeacherCreditsSheetResources", key));
 
         log.append(WeekDay.getWeekDay(getWeekDay()).getLabel());
         log.append(" ");

@@ -89,12 +89,12 @@ public class ProjectTutorialExecutionCoursesDA extends FenixDispatchAction {
             String sheetName = "Disciplinas_" + department.getAcronym();
             spreadsheet.getSheet(sheetName);
             spreadsheet.newHeaderRow();
-            spreadsheet.addHeader(BundleUtil.getString(Bundle.TEACHER_CREDITS, "label.course"), 10000);
-            spreadsheet.addHeader(BundleUtil.getString(Bundle.TEACHER_CREDITS, "label.degrees"));
+            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.course"), 10000);
+            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.degrees"));
             spreadsheet.addHeader(BundleUtil.getString(Bundle.ENUMERATION, "DISSERTATION"));
-            spreadsheet.addHeader(BundleUtil.getString(Bundle.TEACHER_CREDITS, "label.shift.type"));
-            spreadsheet.addHeader(BundleUtil.getString(Bundle.TEACHER_CREDITS, "label.hasSchedule"));
-            spreadsheet.addHeader(BundleUtil.getString(Bundle.TEACHER_CREDITS, "label.enrolmentsNumber"));
+            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.shift.type"));
+            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.hasSchedule"));
+            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.enrolmentsNumber"));
             for (ExecutionCourse executionCourse : department.getDepartmentUnit().getAllExecutionCoursesByExecutionPeriod(
                     departmentCreditsBean.getExecutionSemester())) {
                 spreadsheet.newRow();
@@ -132,12 +132,12 @@ public class ProjectTutorialExecutionCoursesDA extends FenixDispatchAction {
             String sheetName = "Cargos_" + department.getAcronym();
             spreadsheet.getSheet(sheetName);
             spreadsheet.newHeaderRow();
-            spreadsheet.addHeader(BundleUtil.getString(Bundle.TEACHER_CREDITS, "label.teacher.id", Unit.getInstitutionAcronym()));
-            spreadsheet.addHeader(BundleUtil.getString(Bundle.TEACHER_CREDITS, "label.name"), 10000);
-            spreadsheet.addHeader(BundleUtil.getString(Bundle.TEACHER_CREDITS, "label.managementPosition.position"), 10000);
-            spreadsheet.addHeader(BundleUtil.getString(Bundle.TEACHER_CREDITS, "label.managementPosition.unit"), 10000);
-            spreadsheet.addHeader(BundleUtil.getString(Bundle.TEACHER_CREDITS, "label.teacher-dfp-student.percentage"));
-            spreadsheet.addHeader(BundleUtil.getString(Bundle.TEACHER_CREDITS, "label.managementPosition.credits"));
+            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.teacher.id", Unit.getInstitutionAcronym()));
+            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.name"), 10000);
+            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.managementPosition.position"), 10000);
+            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.managementPosition.unit"), 10000);
+            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.teacher-dfp-student.percentage"));
+            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.managementPosition.credits"));
             for (Teacher teacher : department.getAllTeachers(departmentCreditsBean.getExecutionSemester())) {
 
                 for (PersonFunction personFunction : PersonFunction.getPersonFuntions(teacher.getPerson(), departmentCreditsBean

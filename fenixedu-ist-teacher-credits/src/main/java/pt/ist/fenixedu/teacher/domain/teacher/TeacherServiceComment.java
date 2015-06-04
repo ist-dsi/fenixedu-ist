@@ -18,7 +18,6 @@
  */
 package pt.ist.fenixedu.teacher.domain.teacher;
 
-import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.joda.time.DateTime;
@@ -34,7 +33,7 @@ public class TeacherServiceComment extends TeacherServiceComment_Base {
         setTeacherService(teacherService);
         setCreationDate(new DateTime());
         setCreatedBy(Authenticate.getUser().getPerson());
-        new TeacherServiceLog(getTeacherService(), BundleUtil.getString(Bundle.TEACHER_CREDITS,
+        new TeacherServiceLog(getTeacherService(), BundleUtil.getString("resources.TeacherCreditsSheetResources",
                 "label.teacher.teacherServiceComment.create", content, getCreationDate().toString("yyyy-MM-dd HH:mm")));
     }
 
@@ -42,7 +41,7 @@ public class TeacherServiceComment extends TeacherServiceComment_Base {
     public void setContent(String content) {
         super.setContent(content);
         setLastModifiedDate(new DateTime());
-        new TeacherServiceLog(getTeacherService(), BundleUtil.getString(Bundle.TEACHER_CREDITS,
+        new TeacherServiceLog(getTeacherService(), BundleUtil.getString("resources.TeacherCreditsSheetResources",
                 "label.teacher.teacherServiceComment.edit", content, getCreationDate().toString("yyyy-MM-dd HH:mm"),
                 getLastModifiedDate().toString("yyyy-MM-dd HH:mm")));
     }
@@ -54,7 +53,7 @@ public class TeacherServiceComment extends TeacherServiceComment_Base {
     @Atomic
     @Override
     public void delete() {
-        new TeacherServiceLog(getTeacherService(), BundleUtil.getString(Bundle.TEACHER_CREDITS,
+        new TeacherServiceLog(getTeacherService(), BundleUtil.getString("resources.TeacherCreditsSheetResources",
                 "label.teacher.teacherServiceComment.delete", getContent(), getCreationDate().toString("yyyy-MM-dd HH:mm"),
                 getLastModifiedDate().toString("yyyy-MM-dd HH:mm")));
         setCreatedBy(null);

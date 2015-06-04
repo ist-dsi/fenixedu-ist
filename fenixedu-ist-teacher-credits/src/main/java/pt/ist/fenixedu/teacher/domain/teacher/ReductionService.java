@@ -22,7 +22,6 @@ import java.math.BigDecimal;
 
 import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.exceptions.DomainException;
-import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
@@ -138,15 +137,15 @@ public class ReductionService extends ReductionService_Base {
 
     private void log(final String key, BigDecimal credits) {
         final StringBuilder log = new StringBuilder();
-        log.append(BundleUtil.getString(Bundle.TEACHER_CREDITS, key));
+        log.append(BundleUtil.getString("resources.TeacherCreditsSheetResources", key));
         log.append(credits);
         new TeacherServiceLog(getTeacherService(), log.toString());
     }
 
     private void log(final String key, Boolean requested) {
         final StringBuilder log = new StringBuilder();
-        log.append(BundleUtil.getString(Bundle.TEACHER_CREDITS, key));
-        log.append(BundleUtil.getString(Bundle.TEACHER_CREDITS, requested ? "message.yes" : "message.no"));
+        log.append(BundleUtil.getString("resources.TeacherCreditsSheetResources", key));
+        log.append(BundleUtil.getString("resources.TeacherCreditsSheetResources", requested ? "message.yes" : "message.no"));
         new TeacherServiceLog(getTeacherService(), log.toString());
     }
 

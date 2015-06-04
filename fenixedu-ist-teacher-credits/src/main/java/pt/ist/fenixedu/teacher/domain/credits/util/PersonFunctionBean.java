@@ -30,7 +30,6 @@ import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.organizationalStructure.PartyTypeEnum;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.organizationalStructure.UnitName;
-import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.Function;
@@ -168,7 +167,7 @@ public class PersonFunctionBean implements Serializable {
             } else {
                 thisPersonFunctionShared.setPercentage(getPercentage());
             }
-            log.append(BundleUtil.getString(Bundle.TEACHER_CREDITS, "label.teacher.personFunction.createOrEdit", getFunction()
+            log.append(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.teacher.personFunction.createOrEdit", getFunction()
                     .getName(), getUnit().getPresentationName(), getTeacher().getPerson().getNickname(), getPercentage()
                     .toString()));
         } else {
@@ -178,7 +177,7 @@ public class PersonFunctionBean implements Serializable {
             } else {
                 thisPersonFunction.setCredits(getCredits().doubleValue());
             }
-            log.append(BundleUtil.getString(Bundle.TEACHER_CREDITS, "label.teacher.personFunction.createOrEdit", getFunction()
+            log.append(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.teacher.personFunction.createOrEdit", getFunction()
                     .getName(), getUnit().getPresentationName(), getTeacher().getPerson().getNickname(), getCredits().toString()));
 
         }
@@ -212,11 +211,11 @@ public class PersonFunctionBean implements Serializable {
             teacherService = new TeacherService(getTeacher(), getExecutionSemester());
         }
         if (getFunction() instanceof SharedFunction) {
-            new TeacherServiceLog(teacherService, BundleUtil.getString(Bundle.TEACHER_CREDITS,
+            new TeacherServiceLog(teacherService, BundleUtil.getString("resources.TeacherCreditsSheetResources",
                     "label.teacher.personFunction.delete", getFunction().getName(), getUnit().getPresentationName(), getTeacher()
                             .getPerson().getNickname(), getPercentage().toString()));
         } else {
-            new TeacherServiceLog(teacherService, BundleUtil.getString(Bundle.TEACHER_CREDITS,
+            new TeacherServiceLog(teacherService, BundleUtil.getString("resources.TeacherCreditsSheetResources",
                     "label.teacher.personFunction.delete", getFunction().getName(), getUnit().getPresentationName(), getTeacher()
                             .getPerson().getNickname(), getCredits().toString()));
         }

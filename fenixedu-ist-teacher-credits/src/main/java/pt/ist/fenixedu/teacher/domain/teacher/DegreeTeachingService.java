@@ -25,7 +25,6 @@ import org.fenixedu.academic.domain.Lesson;
 import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.academic.domain.Shift;
 import org.fenixedu.academic.domain.exceptions.DomainException;
-import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.joda.time.DateTime;
@@ -72,7 +71,7 @@ public class DegreeTeachingService extends DegreeTeachingService_Base {
     @Override
     public void delete() {
         TeacherCreditsFillingCE.checkValidCreditsPeriod(getTeacherService().getExecutionPeriod(), Authenticate.getUser());
-        new TeacherServiceLog(getTeacherService(), BundleUtil.getString(Bundle.TEACHER_CREDITS, "label.teacher.schedule.delete",
+        new TeacherServiceLog(getTeacherService(), BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.teacher.schedule.delete",
                 getTeacherService().getTeacher().getPerson().getNickname(), getShift().getPresentationName(), getPercentage()
                         .toString()));
         setTeacherService(null);

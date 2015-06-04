@@ -28,7 +28,6 @@ import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.academic.domain.Shift;
 import org.fenixedu.academic.domain.Teacher;
-import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import pt.ist.fenixedu.teacher.domain.teacher.DegreeTeachingService;
@@ -75,7 +74,7 @@ public class DegreeTeachingServiceBean implements Serializable {
         }
 
         final StringBuilder log = new StringBuilder();
-        log.append(BundleUtil.getString(Bundle.TEACHER_CREDITS, "label.teacher.schedule.change"));
+        log.append(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.teacher.schedule.change"));
 
         for (ShiftServiceBean shiftServiceBean : shiftServiceSet) {
             DegreeTeachingService degreeTeachingService =
