@@ -388,8 +388,8 @@
     <slot name="aritmeticAverage" key="label.aritmeticAverage"/>
 </schema>
 
-<schema name="tutorship.tutorate.student.byTutor" bundle="APPLICATION_RESOURCES" type="pt.ist.fenixedu.tutorship.domain.Tutorship">
-    <slot name="studentCurricularPlan.registration" key="label.studentNumber" layout="link">
+<schema name="tutorship.tutorate.student.byTutor" bundle="APPLICATION_RESOURCES" type="pt.ist.fenixedu.tutorship.dto.teacher.tutor.TutorshipBean">
+    <slot name="tutorship.studentCurricularPlan.registration" key="label.studentNumber" layout="link">
         <property name="contextRelative" value="true"/>
         <property name="moduleRelative" value="true"/>
         <property name="blankTarget" value="false"/>
@@ -397,10 +397,10 @@
         <property name="subLayout" value="values"/>
         <property name="subSchema" value="registration.number"/>
     </slot>
-    <slot name="studentCurricularPlan.person.name" key="label.name" />
-    <slot name="studentCurricularPlan.registration.startExecutionYear.year" key="label.entryYear" />
-    <slot name="studentCurricularPlan.registration.degree.sigla" key="label.degreeCurricularPlan.degree.sigla" />
-    <slot name="studentCurricularPlan.person" key="label.email" layout="link">
+    <slot name="tutorship.studentCurricularPlan.person.name" key="label.name" />
+    <slot name="tutorship.studentCurricularPlan.registration.startExecutionYear.year" key="label.entryYear" />
+    <slot name="tutorship.studentCurricularPlan.registration.degree.sigla" key="label.degreeCurricularPlan.degree.sigla" />
+    <slot name="tutorship.studentCurricularPlan.person" key="label.email" layout="link">
         <property name="linkFormat" value="mailto:${institutionalOrDefaultEmailAddressValue}"/>
         <property name="subLayout" value="values" />
         <property name="subSchema" value="teacher.person.email" />
@@ -412,7 +412,7 @@
         <property name="key" value="link.delegates.changeDelegate" />
         <property name="bundle" value="PEDAGOGICAL_COUNCIL" />
         <property name="linkFormat"
-            value="/viewTutorship.do?method=prepareTutorship&amp;tutorshipId=${externalId}" />
+            value="/viewTutorship.do?method=prepareTutorship&amp;tutorshipId=${tutorship.externalId}" />
     </slot>
 </schema>
 
@@ -648,7 +648,7 @@
         <property name="contextRelative" value="true"/>
         <property name="moduleRelative" value="true"/>
         <property name="blankTarget" value="true"/>
-        <property name="linkFormat" value="/viewStudentCurriculum.do?method=prepare&amp;registrationOID=${externalId}"/>    
+        <property name="linkFormat" value="/studentTutorshipCurriculum.do?method=showStudentRegistration&amp;studentNumber=${student.number}"/>    
         <property name="subLayout" value="values"/>
         <property name="subSchema" value="registration.number"/>
     </slot>
