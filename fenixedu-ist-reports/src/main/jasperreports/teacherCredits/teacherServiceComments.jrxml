@@ -167,7 +167,7 @@
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font/>
 					</textElement>
-				<textFieldExpression   class="java.lang.String"><![CDATA[$F{creationDate}.toString("dd/mm/yyyy")]]></textFieldExpression>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{creationDate}.toString("dd/MM/yyyy")]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
 					<reportElement
@@ -188,7 +188,7 @@
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font/>
 					</textElement>
-				<textFieldExpression   class="java.lang.String"><![CDATA[$F{lastModifiedDate}.toString("dd/mm/yyyy")]]></textFieldExpression>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{lastModifiedDate}.toString("dd/MM/yyyy")]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
 					<reportElement

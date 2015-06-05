@@ -362,8 +362,7 @@ if(RoleType.SCIENTIFIC_COUNCIL.actualGroup().isMember(user)){
 				<fr:slot name="thesis.title" key="label.teacher-thesis-student.title"/>
 				<fr:slot name="thesis.evaluation" key="label.date"/>
 				<fr:slot name="type" key="label.teacher-thesis-student.function"/>
-				<fr:slot name="creditsDistribution" key="label.teacher-thesis-student.percentage"/>
-				<%-- <fr:slot name="participationCredits" key="label.credits"/> --%>
+				<fr:slot name="percentageDistribution" key="label.teacher-thesis-student.percentage"/>
 			</fr:schema>
 			<fr:layout name="tabular">
 				<fr:property name="classes" value="tstyle2 thlight thleft mtop05 mbottom05"/>

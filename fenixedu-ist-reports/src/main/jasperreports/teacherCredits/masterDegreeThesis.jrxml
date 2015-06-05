@@ -26,7 +26,7 @@
 
 	<field name="thesis" class="org.fenixedu.academic.domain.thesis.Thesis"/>
 	<field name="type" class="org.fenixedu.academic.domain.thesis.ThesisParticipationType"/>
-	<field name="creditsDistribution" class="java.lang.Double"/>
+	<field name="percentageDistribution" class="java.lang.Integer"/>
 
 		<background>
 			<band height="0"  isSplitAllowed="true" >
@@ -249,7 +249,7 @@
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font/>
 					</textElement>
-				<textFieldExpression   class="java.lang.Double"><![CDATA[$F{creditsDistribution}]]></textFieldExpression>
+				<textFieldExpression   class="java.lang.Integer"><![CDATA[$F{percentageDistribution}]]></textFieldExpression>
 				</textField>
 			</band>
 		</detail>
