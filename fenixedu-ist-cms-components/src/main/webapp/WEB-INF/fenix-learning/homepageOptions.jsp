@@ -200,12 +200,12 @@ ${portal.toolkit()}
                                             </c:when>
 
                                             <c:when test="${studentCurricularPlan.specialization.name!=STUDENT_CURRICULAR_PLAN_SPECIALIZATION}">
-                                                ${fr:message('resources.EnumerationResources', studentCurricularPlan.degree.tipoCurso.name)}
+                                                <c:out value="${studentCurricularPlan.degree.degreeType.name.content}"/>
                                             </c:when>
                                         </c:choose>
                                     </c:when>
                                     <c:otherwise>
-                                        ${fr:message('resources.EnumerationResources', studentCurricularPlan.degreeCurricularPlan.degree.tipoCurso.name)}
+					<c:out value="${studentCurricularPlan.degreeCurricularPlan.degree.degreeType.name.content}"/>
                                         </c:otherwise>
                                     </c:choose>
                                     <spring:message code="label.in" /> ${studentCurricularPlan.registration.degreeName}
@@ -253,12 +253,12 @@ ${portal.toolkit()}
                                                     ${fr:message('resources.EnumerationResources', studentCurricularPlan.specialization.name)}
                                                 </c:when>
                                                 <c:otherwise>
-                                                    ${fr:message('resources.EnumerationResources', studentCurricularPlan.degreeCurricularPlan.degree.tipoCurso.name)}
+						    <c:out value="${studentCurricularPlan.degreeCurricularPlan.degree.degreeType.name.content}"/>
                                                 </c:otherwise>
                                             </c:choose>
                                         </c:when>
                                         <c:otherwise>
-                                            ${fr:message('resources.EnumerationResources', studentCurricularPlan.degreeCurricularPlan.degree.tipoCurso.name)}
+					    <c:out value="${studentCurricularPlan.degreeCurricularPlan.degree.degreeType.name.content}"/>
                                         </c:otherwise>
                                     </c:choose>
                                     <spring:message code="label.in" />${studentCurricularPlan.degreeCurricularPlan.degree.name}

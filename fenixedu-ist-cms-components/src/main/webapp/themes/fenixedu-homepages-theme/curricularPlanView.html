@@ -19,12 +19,12 @@
 
 -->
 {% macro curricularPlanDegreeName(curricularPlan) %}
-	{{ 	i18n('resources.EnumerationResources', 
-			 curricularPlan.specialization.name equals 'STUDENT_CURRICULAR_PLAN_SPECIALIZATION' ? 
-				'STUDENT_CURRICULAR_PLAN_SPECIALIZATION' :
-				curricularPlan.degreeCurricularPlan.degree.tipoCurso.name)
-		+ ' ' + i18n('resources.HomepageResources','label.in')
-		+ ' ' + curricularPlan.degreeCurricularPlan.degree.name }}
+    {% if curricularPlan.specialization.name equals 'STUDENT_CURRICULAR_PLAN_SPECIALIZATION' %}
+        {{ i18n('resources.EnumerationResources', 'STUDENT_CURRICULAR_PLAN_SPECIALIZATION') }}
+    {% else %}
+        {{ curricularPlan.degreeCurricularPlan.degree.degreeType.name.content }}
+    {% endif %}
+    {{ i18n('resources.HomepageResources','label.in') + ' ' + curricularPlan.degreeCurricularPlan.degree.name }}
 {% endmacro %}
 
 {% macro curricularPlanDegreeLink(curricularPlan) %}
