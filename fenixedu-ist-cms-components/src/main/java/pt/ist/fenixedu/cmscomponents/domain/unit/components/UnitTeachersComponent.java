@@ -67,7 +67,7 @@ public class UnitTeachersComponent extends UnitSiteComponent {
         SortedMap<Unit, TreeSet<Teacher>> teachersByAreas = new TreeMap<>(Unit.COMPARATOR_BY_NAME_AND_ID);
         SortedSet<Teacher> teachersNoArea = new TreeSet<>(TEACHER_COMPARATOR);
 
-        for (Teacher teacher : unit.getDepartment().getAllCurrentTeachers()) {
+        for (Teacher teacher : unit.getDepartmentUnit().getDepartment().getAllCurrentTeachers()) {
             Unit area = getCurrentSectionOrScientificArea(teacher);
 
             if (area != null) {
