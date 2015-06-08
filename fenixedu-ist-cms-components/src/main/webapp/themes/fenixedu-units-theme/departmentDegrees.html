@@ -23,7 +23,7 @@
 {% macro degreesForTypes(degreesByType, types) %}
     {% if types is not empty %}
         {% for type in types %}
-            <h4>{{ i18n('resources.EnumerationResources', 'DegreeType.' + type.name) }}</h4>
+            <h4>{{ type.name.content }}</h4>
             <ul class="list-unstyled">
                 {% for degree in getValue(degreesByType, type) %}
                     {% if degree.siteUrl is not empty %}
