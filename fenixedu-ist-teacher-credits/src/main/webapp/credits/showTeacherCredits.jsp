@@ -124,8 +124,8 @@
 			
 			<fr:layout name="tabular-row">
 				<fr:property name="classes" value="tstyle1 printborder credits" />
-				<fr:property name="columnClasses" value="bgcolor3 acenter,bgcolor3 acenter,bgcolor3 acenter,bgcolor3 acenter,bgcolor3 acenter,bgcolor3 acenter,bgcolor3 acenter,bgcolor3 acenter,bgcolor3 acenter,bgcolor3 acenter,bgcolor3 acenter,bgcolor3 acenter,bgcolor3 acenter,tdclear tderror1,tdclear tderror1" />
-				<fr:property name="headerClasses" value="acenter,acenter,acenter,acenter,acenter,acenter,acenter,acenter,acenter,acenter total,acenter total,acenter total,acenter total,thclear,thclear" />
+				<fr:property name="columnClasses" value="bgcolor3 acenter,bgcolor3 acenter,bgcolor3 acenter,bgcolor3 acenter,bgcolor3 acenter,bgcolor3 acenter,bgcolor3 acenter,bgcolor3 acenter,bgcolor3 acenter,bgcolor3 acenter,bgcolor3 acenter,bgcolor3 acenter,bgcolor3 acenter,bgcolor3 acenter,tdclear tderror1,tdclear tderror1" />
+				<fr:property name="headerClasses" value="acenter,acenter,acenter,acenter,acenter,acenter,acenter,acenter,acenter,acenter,acenter total,acenter total,acenter total,acenter total,thclear,thclear" />
 			</fr:layout>
 		</fr:view>
 		
