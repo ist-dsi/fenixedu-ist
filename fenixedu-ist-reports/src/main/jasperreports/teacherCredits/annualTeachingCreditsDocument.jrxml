@@ -31,7 +31,7 @@
 		<group  name="professorshipsGRoup" >
 			<groupExpression><![CDATA[]]></groupExpression>
 			<groupHeader>
-			<band height="90"  isSplitAllowed="true" >
+			<band height="90"   >
 				<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
 					<reportElement
 						mode="Opaque"
@@ -108,14 +108,14 @@
 			</band>
 			</groupHeader>
 			<groupFooter>
-			<band height="0"  isSplitAllowed="true" >
+			<band height="0">
 			</band>
 			</groupFooter>
 		</group>
 		<group  name="institutionWorkingTime" >
 			<groupExpression><![CDATA[]]></groupExpression>
 			<groupHeader>
-			<band height="90"  isSplitAllowed="true" >
+			<band height="90"   >
 				<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
 					<reportElement
 						mode="Opaque"
@@ -192,14 +192,14 @@
 			</band>
 			</groupHeader>
 			<groupFooter>
-			<band height="0"  isSplitAllowed="true" >
+			<band height="0">
 			</band>
 			</groupFooter>
 		</group>
 		<group  name="masterDegreeTheses" >
 			<groupExpression><![CDATA[]]></groupExpression>
 			<groupHeader>
-			<band height="65"  isSplitAllowed="true" >
+			<band height="65"   >
 				<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
 					<reportElement
 						mode="Opaque"
@@ -253,14 +253,14 @@
 			</band>
 			</groupHeader>
 			<groupFooter>
-			<band height="0"  isSplitAllowed="true" >
+			<band height="0">
 			</band>
 			</groupFooter>
 		</group>
 		<group  name="phdDegreeTheses" >
 			<groupExpression><![CDATA[]]></groupExpression>
 			<groupHeader>
-			<band height="65"  isSplitAllowed="true" >
+			<band height="65"   >
 				<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
 					<reportElement
 						mode="Opaque"
@@ -314,14 +314,14 @@
 			</band>
 			</groupHeader>
 			<groupFooter>
-			<band height="0"  isSplitAllowed="true" >
+			<band height="0">
 			</band>
 			</groupFooter>
 		</group>
 		<group  name="projectsAndTutorials" >
 			<groupExpression><![CDATA[]]></groupExpression>
 			<groupHeader>
-			<band height="65"  isSplitAllowed="true" >
+			<band height="65"   >
 				<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
 					<reportElement
 						mode="Opaque"
@@ -375,14 +375,14 @@
 			</band>
 			</groupHeader>
 			<groupFooter>
-			<band height="0"  isSplitAllowed="true" >
+			<band height="0">
 			</band>
 			</groupFooter>
 		</group>
 		<group  name="managementPositionLines" >
 			<groupExpression><![CDATA[]]></groupExpression>
 			<groupHeader>
-			<band height="90"  isSplitAllowed="true" >
+			<band height="90"   >
 				<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
 					<reportElement
 						mode="Opaque"
@@ -459,14 +459,14 @@
 			</band>
 			</groupHeader>
 			<groupFooter>
-			<band height="0"  isSplitAllowed="true" >
+			<band height="0">
 			</band>
 			</groupFooter>
 		</group>
 		<group  name="otherTypeCreditLines" >
 			<groupExpression><![CDATA[]]></groupExpression>
 			<groupHeader>
-			<band height="90"  isSplitAllowed="true" >
+			<band height="90"   >
 				<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
 					<reportElement
 						mode="Opaque"
@@ -543,14 +543,14 @@
 			</band>
 			</groupHeader>
 			<groupFooter>
-			<band height="0"  isSplitAllowed="true" >
+			<band height="0">
 			</band>
 			</groupFooter>
 		</group>
 		<group  name="creditsReduction" >
 			<groupExpression><![CDATA[]]></groupExpression>
 			<groupHeader>
-			<band height="65"  isSplitAllowed="true" >
+			<band height="65"   >
 				<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
 					<reportElement
 						mode="Opaque"
@@ -607,14 +607,14 @@
 			</band>
 			</groupHeader>
 			<groupFooter>
-			<band height="0"  isSplitAllowed="true" >
+			<band height="0">
 			</band>
 			</groupFooter>
 		</group>
 		<group  name="serviceExemptionLines" >
 			<groupExpression><![CDATA[]]></groupExpression>
 			<groupHeader>
-			<band height="90"  isSplitAllowed="true" >
+			<band height="90"   >
 				<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
 					<reportElement
 						mode="Opaque"
@@ -691,14 +691,14 @@
 			</band>
 			</groupHeader>
 			<groupFooter>
-			<band height="0"  isSplitAllowed="true" >
+			<band height="0">
 			</band>
 			</groupFooter>
 		</group>
 		<group  name="notes" >
 			<groupExpression><![CDATA[]]></groupExpression>
 			<groupHeader>
-			<band height="65"  isSplitAllowed="true" >
+			<band height="65"   >
 				<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
 					<reportElement
 						mode="Opaque"
@@ -752,16 +752,16 @@
 			</band>
 			</groupHeader>
 			<groupFooter>
-			<band height="0"  isSplitAllowed="true" >
+			<band height="0">
 			</band>
 			</groupFooter>
 		</group>
 		<background>
-			<band height="0"  isSplitAllowed="true" >
+			<band height="0">
 			</band>
 		</background>
 		<title>
-			<band height="80"  isSplitAllowed="true" >
+			<band height="80"   >
 				<textField isStretchWithOverflow="false" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
 					<reportElement
 						x="0"
@@ -856,27 +856,27 @@
 			</band>
 		</title>
 		<pageHeader>
-			<band height="0"  isSplitAllowed="true" >
+			<band height="0">
 			</band>
 		</pageHeader>
 		<columnHeader>
-			<band height="0"  isSplitAllowed="true" >
+			<band height="0">
 			</band>
 		</columnHeader>
 		<detail>
-			<band height="0"  isSplitAllowed="true" >
+			<band height="0">
 			</band>
 		</detail>
 		<columnFooter>
-			<band height="0"  isSplitAllowed="true" >
+			<band height="0">
 			</band>
 		</columnFooter>
 		<pageFooter>
-			<band height="0"  isSplitAllowed="true" >
+			<band height="0">
 			</band>
 		</pageFooter>
 		<summary>
-			<band height="0"  isSplitAllowed="true" >
+			<band height="0">
 			</band>
 		</summary>
 </jasperReport>
