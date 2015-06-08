@@ -299,7 +299,7 @@ public class TeacherEvaluationProcess extends TeacherEvaluationProcess_Base {
             if (approvedEvaluationMark == null) {
                 stringBuilder.append("N/A");
             } else {
-                stringBuilder.append(BundleUtil.getString(Bundle.ENUMERATION, approvedEvaluationMark.name()));
+                stringBuilder.append(BundleUtil.getString(Bundle.ENUMERATION, "TeacherEvaluationMark." + approvedEvaluationMark.name()));
             }
         }
         return stringBuilder.length() == 0 ? null : stringBuilder.toString();
