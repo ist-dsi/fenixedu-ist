@@ -61,7 +61,7 @@
                                 </h5>
                             </c:when>
                             <c:otherwise>
-                                <h5>${i.getName().getContent()}</h5>
+                                <h5><c:out value="${i.getName().getContent()}"/></h5>
                             </c:otherwise>
                         </c:choose>
                         <div>
@@ -184,7 +184,7 @@
                     })
                 });
 
-                $('#site-layout[slug=${i.slug}] a[layout=${i.initialPage.template.type}]').addClass('active');
+                $('#site-layout[slug=${i.slug}] a[layout=<c:out value="${i.initialPage.template.type}]"/>"').addClass('active');
                 
                 $('#editLayoutModal-${i.externalId} #change-layout-btn').click(function(evt){
                     var selectedEl = $('#site-layout[slug=${i.slug}] a.active');
@@ -217,7 +217,7 @@
                             <select class="form-control" name="slug">
                                 <option value="">-</option>
                                 <c:forEach var="i" items="${sites}">
-                                    <option value="${i.slug}">${i.name.content}</option>
+                                    <option value="${i.slug}"><c:out value="${i.name.content}"/></option>
                                 </c:forEach>
                             </select>
                         </div>

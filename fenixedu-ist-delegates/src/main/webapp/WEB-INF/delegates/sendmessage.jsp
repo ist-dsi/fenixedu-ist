@@ -31,7 +31,7 @@
   <div class="form-group">
     <label for="inputEmail3" class="col-sm-1 control-label">Remetente</label>
     <div class="col-sm-11">
-	<label for="inputEmail3" class=" control-label"><strong>${message.selectedSender.title}</strong></label>
+	<label for="inputEmail3" class=" control-label"><strong><c:out value="${message.selectedSender.title}"/></strong></label>
     </div>
   </div>
   <div class="form-group">

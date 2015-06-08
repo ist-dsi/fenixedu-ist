@@ -30,6 +30,6 @@
 
 <ul>
 	<c:forEach var="unit" items="${units}">
-		<blockquote><a href="?unitId=${unit.externalId}">${unit.name} (${unit.acronym})</a></blockquote>
+		<blockquote><a href="?unitId=${unit.externalId}"><c:out value="${unit.name}"/> (<c:out value="${unit.acronym}"/>)</a></blockquote>
 	</c:forEach>
 </ul>

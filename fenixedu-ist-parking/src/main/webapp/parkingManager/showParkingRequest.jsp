@@ -66,7 +66,7 @@ function hideCardValidPeriod(toShow){
 	
 	<h3><bean:message key="label.parkUserInfo" /></h3>
 	<p>
-		<img src="${parkingParty.party.user.profile.avatarUrl}" alt="${parkingParty.party.name}" />
+		<img src="${parkingParty.party.user.profile.avatarUrl}" alt="<c:out value='${parkingParty.party.name}'/>" />
 	</p>
 	<logic:iterate id="occupation" name="parkingParty" property="occupations">
 		<p><bean:write name="occupation" filter="false"/></p>

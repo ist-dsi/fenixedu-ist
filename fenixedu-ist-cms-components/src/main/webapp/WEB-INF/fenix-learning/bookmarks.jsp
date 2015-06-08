@@ -40,8 +40,8 @@
 	<tbody>
 		<c:forEach var="category" items="${bookmarks}">
 			<tr>
-				<td>${category.site.name.content}</td>
-				<td>${category.name.content}</td>
+				<td><c:out value="${category.site.name.content}"/></td>
+				<td><c:out value="${category.name.content}"/></td>
 				<td>
 					<c:choose>
 						<c:when test="${bookmarks.contains(category)}">
@@ -53,7 +53,7 @@
 					</c:choose>
 				</td>
 				<td>
-					<a href="${category.rssUrl}" data-toggle="tooltip" title="${category.site.name.content} - ${category.name.content}" data-placement="left">
+					<a href="${category.rssUrl}" data-toggle="tooltip" title="<c:out value='${category.site.name.content}'/> - <c:out value='${category.name.content}'/>" data-placement="left">
 						<img src="${pageContext.request.contextPath}/image/rss.svg" width="15" height="15" />
 					</a>
 				</td>
@@ -78,8 +78,8 @@
 		<c:forEach var="course" items="${courses}">
 		<c:forEach var="category" items="${course.site.categoriesSet}">
 			<tr>
-				<td>${category.site.name.content}</td>
-				<td>${category.name.content}</td>
+				<td><c:out value="${category.site.name.content}"/>/td>
+				<td><c:out value="${category.name.content}"/></td>
 				<td>
 					<c:choose>
 						<c:when test="${bookmarks.contains(category)}">
@@ -91,7 +91,7 @@
 					</c:choose>
 				</td>
 				<td>
-					<a href="${category.rssUrl}" data-toggle="tooltip" title="${category.site.name.content} - ${category.name.content}" data-placement="left">
+					<a href="${category.rssUrl}" data-toggle="tooltip" title="<c:out value='${category.site.name.content}'/> - <c:out value='${category.name.content}'/>" data-placement="left">
 						<img src="${pageContext.request.contextPath}/image/rss.svg" width="15" height="15" />
 					</a>
 				</td>

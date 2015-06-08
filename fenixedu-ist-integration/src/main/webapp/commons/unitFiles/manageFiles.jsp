@@ -26,7 +26,7 @@
 <%@ taglib uri="http://fenix-ashes.ist.utl.pt/taglib/collection-pager" prefix="cp" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-<h2><bean:message key="label.manageFiles" bundle="RESEARCHER_RESOURCES"/> <span class="small">${unit.name}</span></h2>
+<h2><bean:message key="label.manageFiles" bundle="RESEARCHER_RESOURCES"/> <span class="small"><c:out value="${unit.name}"/></span></h2>
 
 <bean:define id="unitID" name="unit" property="externalId"/>
 <bean:define id="actionName" name="functionalityAction"/>

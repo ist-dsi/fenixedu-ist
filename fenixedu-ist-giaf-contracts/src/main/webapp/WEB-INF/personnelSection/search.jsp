@@ -40,32 +40,32 @@
 	<div class="form-group">
 		<label for="username" class="col-sm-2 control-label">${fr:message('resources.ApplicationResources', 'label.username')}:</label>
 		<div class="col-sm-10">
-			<input  id="username" name="username" class="form-control col-sm-11 user-search" value="${search.username}"/>
+			<input  id="username" name="username" class="form-control col-sm-11 user-search" value="<c:out value='${search.username}'/>"/>
 		</div>
 	</div>
 	<div class="form-group">
 		<label for="name" class="col-sm-2 control-label">${fr:message('resources.ApplicationResources', 'label.person.name')}</label>
 		<div class="col-sm-10">
-			<input id="name" name="name" class="form-control col-sm-11 user-search" value="${search.name}"/>
+			<input id="name" name="name" class="form-control col-sm-11 user-search" value="<c:out value='${search.name}'/>"/>
 		</div>
 	</div>
 	<div class="form-group">
 		<label for="documentIdNumber" class="col-sm-2 control-label">${fr:message('resources.ApplicationResources', 'label.person.identificationDocumentNumber')}</label>
 		<div class="col-sm-10">
-			<input id="documentIdNumber" name="documentIdNumber" class="form-control col-sm-11 user-search" value="${search.documentIdNumber}"/>
+			<input id="documentIdNumber" name="documentIdNumber" class="form-control col-sm-11 user-search" value="<c:out value='${search.documentIdNumber}'/>"/>
 		</div>
 	</div>
 	<div class="form-group">
 		<label for="email" class="col-sm-2 control-label">${fr:message('resources.ApplicationResources', 'label.person.email')}</label>
 		<div class="col-sm-10">
-			<input id="email" name="email" class="form-control col-sm-11 user-search" value="${search.email}"/>
+			<input id="email" name="email" class="form-control col-sm-11 user-search" value="<c:out value='${search.email}'/>"/>
 		</div>
 	</div>
 	
 	<div class="form-group">
 		<label for="employeeNumber" class="col-sm-2 control-label">${fr:message('resources.ApplicationResources', 'label.number')}:</label>
 		<div class="col-sm-10">
-			<input id="employeeNumber" name="employeeNumber" class="form-control col-sm-11 user-search" value="${search.employeeNumber}"/>
+			<input id="employeeNumber" name="employeeNumber" class="form-control col-sm-11 user-search" value="<c:out value='${search.employeeNumber}'/>"/>
 		</div>
 	</div>
 	<div class="form-group">
@@ -101,18 +101,18 @@
 				<c:forEach var="person" items="${searchResult}">
 					<c:set var="user" value="${person.user}"/>
 					<tr>
-						<td><img src="${user.profile.avatarUrl}" alt="${user.name}" /></td>
-						<td>${user.username}</td>
-						<td>${person.employee.employeeNumber}</td>  
-						<td>${user.name}</td>
-						<td>${person.documentIdNumber}</td>
-						<td>${person.emailForSendingEmails}</td>
+						<td><img src="${user.profile.avatarUrl}" alt="<c:out value='${user.name}'/>" /></td>
+						<td><c:out value="${user.username}"/></td>
+						<td><c:out value="${person.employee.employeeNumber}"/></td>  
+						<td><c:out value="${user.name}"/></td>
+						<td><c:out value="${person.documentIdNumber}"/></td>
+						<td<c:out value=">${person.emailForSendingEmails}"/></td>
 						<bean:define id="user" name="user" type="org.fenixedu.bennu.core.domain.User"/>
 						<td><%=LegacyRoleUtils.mainRolesStr(user) %></td>
 						<c:choose>
 							<c:when test="${person.employee == null}">
-								<td><a href="#" data-toggle="modal" data-target="#create-contract-dialog${person.username}"><span class="glyphicon glyphicon-edit"></span> <spring:message code="label.create.contract"/></a></td>
-								<div class="modal fade" id="create-contract-dialog${person.username}">
+								<td><a href="#" data-toggle="modal" data-target="#create-contract-dialog<c:out value='${person.username}'/>"><span class="glyphicon glyphicon-edit"></span> <spring:message code="label.create.contract"/></a></td>
+								<div class="modal fade" id="create-contract-dialog<c:out value='${person.username}'/>">
 									<div class="modal-dialog">
 										<div class="modal-content">
 											<div class="modal-header">
@@ -124,26 +124,26 @@
 												</h4>
 											</div>
 											<div class="modal-body">
-												<dl class="dl-horizontal"><dt>${fr:message('resources.ApplicationResources', 'label.username')}:</dt><dd>${person.user.username}&nbsp;</dd></dl>
-												<dl class="dl-horizontal"><dt>${fr:message('resources.ApplicationResources', 'label.name')}:</dt><dd>${person.name}&nbsp;</dd></dl>
-												<dl class="dl-horizontal"><dt>${fr:message('resources.ApplicationResources', 'label.person.email')}</dt><dd>${person.emailForSendingEmails}&nbsp;</dd></dl>
-												<dl class="dl-horizontal"><dt>${fr:message('resources.ApplicationResources', 'label.identification')}:</dt><dd>${person.documentIdNumber} (${person.idDocumentType.localizedName})</dd></dl>
-												<dl class="dl-horizontal"><dt>${fr:message('resources.ApplicationResources', 'label.person.contributorNumber')}</dt><dd>${person.socialSecurityNumber}&nbsp;</dd></dl>
-												<dl class="dl-horizontal"><dt>${fr:message('resources.ApplicationResources', 'label.person.maritalStatus')}</dt><dd>${person.maritalStatus.localizedName}&nbsp;</dd></dl>
-												<dl class="dl-horizontal"><dt>${fr:message('resources.ApplicationResources', 'label.person.birth')}</dt><dd>${person.dateOfBirthYearMonthDay}&nbsp;</dd></dl>
-												<dl class="dl-horizontal"><dt>${fr:message('resources.ApplicationResources', 'label.person.country')}:</dt><dd>${person.country.name}&nbsp;</dd></dl>
-												<dl class="dl-horizontal"><dt>${fr:message('resources.ApplicationResources', 'label.person.countryOfBirth')}</dt><dd>${person.countryOfBirth.name}&nbsp;</dd></dl>
-												<dl class="dl-horizontal"><dt>${fr:message('resources.ApplicationResources', 'label.person.addressParish')}</dt><dd>${person.parishOfBirth}&nbsp;</dd></dl>
-												<dl class="dl-horizontal"><dt>${fr:message('resources.ApplicationResources', 'label.person.addressMunicipality')}</dt><dd>${person.districtSubdivisionOfBirth}&nbsp;</dd></dl>
-												<dl class="dl-horizontal"><dt>${fr:message('resources.ApplicationResources', 'label.person.addressDistrict')}</dt><dd>${person.districtOfBirth}&nbsp;</dd></dl>
+												<dl class="dl-horizontal"><dt>${fr:message('resources.ApplicationResources', 'label.username')}:</dt><dd><c:out value="${person.user.username}"/>&nbsp;</dd></dl>
+												<dl class="dl-horizontal"><dt>${fr:message('resources.ApplicationResources', 'label.name')}:</dt><dd><c:out value="${person.name}"/>&nbsp;</dd></dl>
+												<dl class="dl-horizontal"><dt>${fr:message('resources.ApplicationResources', 'label.person.email')}</dt><dd><c:out value="${person.emailForSendingEmails}"/>&nbsp;</dd></dl>
+												<dl class="dl-horizontal"><dt>${fr:message('resources.ApplicationResources', 'label.identification')}:</dt><dd><c:out value="${person.documentIdNumber}"/> (<c:out value="${person.idDocumentType.localizedName}"/>)</dd></dl>
+												<dl class="dl-horizontal"><dt>${fr:message('resources.ApplicationResources', 'label.person.contributorNumber')}</dt><dd><c:out value="${person.socialSecurityNumber}"/>&nbsp;</dd></dl>
+												<dl class="dl-horizontal"><dt>${fr:message('resources.ApplicationResources', 'label.person.maritalStatus')}</dt><dd><c:out value="${person.maritalStatus.localizedName}"/>&nbsp;</dd></dl>
+												<dl class="dl-horizontal"><dt>${fr:message('resources.ApplicationResources', 'label.person.birth')}</dt><dd><c:out value="${person.dateOfBirthYearMonthDay}"/>&nbsp;</dd></dl>
+												<dl class="dl-horizontal"><dt>${fr:message('resources.ApplicationResources', 'label.person.country')}:</dt><dd><c:out value="${person.country.name}"/>&nbsp;</dd></dl>
+												<dl class="dl-horizontal"><dt>${fr:message('resources.ApplicationResources', 'label.person.countryOfBirth')}</dt><dd><c:out value="${person.countryOfBirth.name}"/>&nbsp;</dd></dl>
+												<dl class="dl-horizontal"><dt>${fr:message('resources.ApplicationResources', 'label.person.addressParish')}</dt><dd><c:out value="${person.parishOfBirth}"/>&nbsp;</dd></dl>
+												<dl class="dl-horizontal"><dt>${fr:message('resources.ApplicationResources', 'label.person.addressMunicipality')}</dt><dd><c:out value="${person.districtSubdivisionOfBirth}"/>&nbsp;</dd></dl>
+												<dl class="dl-horizontal"><dt>${fr:message('resources.ApplicationResources', 'label.person.addressDistrict')}</dt><dd><c:out value="${person.districtOfBirth}"/>&nbsp;</dd></dl>
 											</div>
 											<div class="modal-footer">
 												 <form:form role="form" method="GET" action="${createUrl}/${person.externalId}" modelAttribute="search">
-													 <input type="hidden" name="username" value="${search.username}"/>
-													 <input type="hidden" name="name" value="${search.name}"/>
-													 <input type="hidden" name="documentIdNumber" value="${search.documentIdNumber}"/>
-													 <input type="hidden" name="email" value="${search.email}"/>
-													 <input type="hidden" name="employeeNumber" value="${search.employeeNumber}"/>
+													 <input type="hidden" name="username" value="<c:out value='${search.username}'/>"/>
+													 <input type="hidden" name="name" value="<c:out value='${search.name}'/>"/>
+													 <input type="hidden" name="documentIdNumber" value="<c:out value='${search.documentIdNumber}'/>"/>
+													 <input type="hidden" name="email" value="<c:out value='${search.email}'/>"/>
+													 <input type="hidden" name="employeeNumber" value="<c:out value='${search.employeeNumber}'/>"/>
 													<button type="submit" class="btn btn-primary"><spring:message code="button.createEmployeeNumber" /></button>
 												</form:form>
 												<button type="button" class="btn btn-default" data-dismiss="modal">${fr:message('resources.ApplicationResources', 'button.cancel')}</button>

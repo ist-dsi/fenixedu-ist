@@ -82,7 +82,7 @@ ${portal.toolkit()}
                         </div>
                     </div>
                     <div class="col-sm-8">
-                        <p>${person.employee.currentWorkingContract.workingUnit.name}</p>
+                        <p><c:out value="${person.employee.currentWorkingContract.workingUnit.name}"/></p>
                     </div>
                 </div>
                 <hr/>
@@ -119,7 +119,7 @@ ${portal.toolkit()}
                     </div>
                     <div class="col-sm-8">
                         <c:if test="${not empty person.teacher.category}">
-                            ${person.teacher.category.name.content}
+                            <c:out value="${person.teacher.category.name.content}"/>
                         </c:if>
                     </div>
                 </div>
@@ -136,7 +136,7 @@ ${portal.toolkit()}
                     </div>
                     <div class="col-sm-8">
                         <c:forEach var="executionCourse" items="${person.teacher.currentExecutionCourses}">
-                            <a href="${executionCourse.site.fullUrl}" target="_blank">${executionCourse.nome}</a>
+                            <a href="${executionCourse.site.fullUrl}" target="_blank"><c:out value="${executionCourse.nome}"/></a>
                         </c:forEach>
                     </div>
                 </div>
@@ -158,7 +158,7 @@ ${portal.toolkit()}
                                     <spring:message code="label.homepage.research.unit.homepage" />:
                                 </label>
                                 <div class="col-sm-8">
-                                    <input type="url" name="researchUnitHomepage" class="form-control" value="${homepage.researchUnitHomepage}">
+                                    <input type="url" name="researchUnitHomepage" class="form-control" value="<c:out value='${homepage.researchUnitHomepage}'/>">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -208,7 +208,7 @@ ${portal.toolkit()}
 					<c:out value="${studentCurricularPlan.degreeCurricularPlan.degree.degreeType.name.content}"/>
                                         </c:otherwise>
                                     </c:choose>
-                                    <spring:message code="label.in" /> ${studentCurricularPlan.registration.degreeName}
+                                    <spring:message code="label.in" /> <c:out value="${studentCurricularPlan.registration.degreeName}"/>
                                 </c:if>
                             </c:forEach>
                         </div>
@@ -225,7 +225,7 @@ ${portal.toolkit()}
                         </div>
                         <div class="col-sm-8">
                             <c:forEach var="attend" items="${personAttends}">
-                                <a href="${attend.disciplinaExecucao.site.fullUrl}">${attend.disciplinaExecucao.nome}</a>
+                                <a href="${attend.disciplinaExecucao.site.fullUrl}"><c:out value="${attend.disciplinaExecucao.nome}"/></a>
                             </c:forEach>
                         </div>
                     </div>
@@ -261,7 +261,7 @@ ${portal.toolkit()}
 					    <c:out value="${studentCurricularPlan.degreeCurricularPlan.degree.degreeType.name.content}"/>
                                         </c:otherwise>
                                     </c:choose>
-                                    <spring:message code="label.in" />${studentCurricularPlan.degreeCurricularPlan.degree.name}
+                                    <spring:message code="label.in" /><c:out value="${studentCurricularPlan.degreeCurricularPlan.degree.name}"/>
                                 </a>
                             </c:forEach>
                         </div>
@@ -297,7 +297,7 @@ ${portal.toolkit()}
                                 <c:forEach var="page" items="${dynamicPages}">
                                     <div class="form-group">
                                         <label class="col-sm-6 control-label">
-                                                ${page.name.content}:
+                                                <c:out value="${page.name.content}"/>:
                                         </label>
 
                                         <div class="col-sm-6">
