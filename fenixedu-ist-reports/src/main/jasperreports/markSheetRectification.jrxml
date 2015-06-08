@@ -238,7 +238,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{REPORT_RESOURCE_BUNDLE}.getString($P{rectified}.getEvaluationSeason().getName().getContent())]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{rectified}.getEvaluationSeason().getAcronym().getContent()]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="false">
 				<reportElement key="textField-9" x="415" y="130" width="34" height="19"/>
@@ -322,7 +322,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{REPORT_RESOURCE_BUNDLE}.getString($P{rectification}.getEvaluationSeason().getName().getContent())]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{rectification}.getEvaluationSeason().getAcronym().getContent()]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="false">
 				<reportElement key="textField-17" x="415" y="158" width="34" height="19"/>
@@ -403,7 +403,7 @@
 				<text><![CDATA[Rectificação Efectuada por : ]]></text>
 			</staticText>
 			<textField isBlankWhenNull="false">
-				<reportElement key="textField-19" x="231" y="213" width="48" height="19"/>
+				<reportElement key="textField-19" x="231" y="213" width="70" height="19"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -416,7 +416,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{markSheet}.getCreator().getUsername()]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement key="staticText-16" x="283" y="213" width="31" height="19"/>
+				<reportElement key="staticText-16" x="305" y="213" width="31" height="19"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -429,7 +429,7 @@
 				<text><![CDATA[Em ]]></text>
 			</staticText>
 			<textField isBlankWhenNull="false">
-				<reportElement key="textField-20" x="318" y="213" width="75" height="19"/>
+				<reportElement key="textField-20" x="340" y="213" width="75" height="19"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
