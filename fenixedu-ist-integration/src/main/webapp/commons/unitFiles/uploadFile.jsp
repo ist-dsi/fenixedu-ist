@@ -29,7 +29,11 @@
 <bean:define id="unitID" name="unit" property="externalId"/>
 <bean:define id="actionName" name="functionalityAction"/>
 
-<logic:equal name="unit" property="currentUserAllowedToUploadFiles" value="true">
+<bean:define id="unit" name="unit" type="org.fenixedu.academic.domain.organizationalStructure.Unit" />
+<bean:define id="currentUserAllowedToUploadFiles">
+    <%= unit.getAllowedPeopleToUploadFilesSet().contains(org.fenixedu.bennu.core.security.Authenticate.getUser().getPerson()) %>
+</bean:define>
+<logic:equal name="currentUserAllowedToUploadFiles" value="true">
 <fr:edit id="upload" name="fileBean" schema="view.genericFileUpload" action="<%= "/" + actionName + ".do?method=uploadFile&unitId=" + unitID %>">
 	<fr:layout>
 		<fr:property name="classes" value="tstyle5 thlight thright"/>

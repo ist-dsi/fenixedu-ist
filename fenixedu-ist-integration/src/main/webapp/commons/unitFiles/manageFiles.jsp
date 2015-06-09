@@ -32,8 +32,12 @@
 <bean:define id="actionName" name="functionalityAction"/>
 <bean:define id="module" name="module"/>
 
+<bean:define id="unit" name="unit" type="org.fenixedu.academic.domain.organizationalStructure.Unit" />
+<bean:define id="currentUserAllowedToUploadFiles">
+    <%= unit.getAllowedPeopleToUploadFilesSet().contains(org.fenixedu.bennu.core.security.Authenticate.getUser().getPerson()) %>
+</bean:define>
 <ul>
-	<logic:equal name="unit" property="currentUserAllowedToUploadFiles" value="true">
+	<logic:equal name="currentUserAllowedToUploadFiles" value="true">
 		<li>
 			<html:link page="<%= "/" + actionName + ".do?method=prepareFileUpload&unitId=" + unitID %>"><bean:message key="label.addFile" bundle="RESEARCHER_RESOURCES"/></html:link>
 		</li>
