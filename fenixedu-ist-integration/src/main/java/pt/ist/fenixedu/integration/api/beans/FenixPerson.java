@@ -63,13 +63,14 @@ public class FenixPerson {
     }
 
     public enum FenixRoleType {
-        TEACHER, ALUMNI, STUDENT;
+        TEACHER, ALUMNI, STUDENT, EMPLOYEE;
     }
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
     @JsonSubTypes({ @JsonSubTypes.Type(value = TeacherFenixRole.class, name = "TEACHER"),
             @JsonSubTypes.Type(value = StudentFenixRole.class, name = "STUDENT"),
-            @JsonSubTypes.Type(value = AlumniFenixRole.class, name = "ALUMNI") })
+            @JsonSubTypes.Type(value = AlumniFenixRole.class, name = "ALUMNI"),
+            @JsonSubTypes.Type(value = EmployeeFenixRole.class, name = "EMPLOYEE") })
     public static abstract class FenixRole {
 
     }
@@ -204,6 +205,10 @@ public class FenixPerson {
         public List<FenixRegistration> getRegistrations() {
             return super.getRegistrations();
         }
+
+    }
+
+    public static class EmployeeFenixRole extends FenixRole {
 
     }
 
