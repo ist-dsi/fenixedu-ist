@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.fenixedu.bennu.core.domain.User;
+import org.joda.time.LocalDate;
 
 import pt.ist.fenixedu.contracts.persistenceTierOracle.DbConnector.ResultSetConsumer;
 import pt.ist.fenixedu.contracts.persistenceTierOracle.GiafDbConnector;
@@ -18,7 +19,12 @@ import com.google.gson.JsonObject;
 
 public class GiafAssiduityTeamResponsible {
 
+    @Deprecated
     public static JsonObject readListOfAssiduityEmployees(final User user) {
+        return readListOfAssiduityEmployees(user, new LocalDate());
+    }
+
+    public static JsonObject readListOfAssiduityEmployees(final User user, final LocalDate date) {
         final JsonObject result = new JsonObject();
         result.addProperty("username", user.getUsername());
         result.addProperty("name", user.getProfile().getDisplayName());
@@ -66,17 +72,18 @@ public class GiafAssiduityTeamResponsible {
         });
 
         final JsonArray unitInfos = new JsonArray();
-        employeeMap.entrySet().forEach(e -> addEmployeeRecords(unitInfos, e.getKey(), e.getValue()));
+        employeeMap.entrySet().forEach(e -> addEmployeeRecords(unitInfos, e.getKey(), e.getValue(), date));
         result.add("unitInfos", unitInfos);
 
         return result;
     }
 
-    private static void addEmployeeRecords(final JsonArray unitInfos, final String unitName, final Set<String> usernames) {
+    private static void addEmployeeRecords(final JsonArray unitInfos, final String unitName, final Set<String> usernames,
+            final LocalDate dateParam) {
         final JsonObject unitInfo = new JsonObject();
         unitInfo.addProperty("name", unitName);
         final JsonArray employeeAssiduity = new JsonArray();
-        usernames.forEach(u -> employeeAssiduity.add(GiafEmployeeAssiduity.readAssiduityOfEmployee(u)));
+        usernames.forEach(u -> employeeAssiduity.add(GiafEmployeeAssiduity.readAssiduityOfEmployee(u, dateParam)));
         unitInfo.add("employeeAssiduity", employeeAssiduity);
         unitInfos.add(unitInfo);
     }
