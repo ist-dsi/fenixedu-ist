@@ -22,8 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
@@ -87,7 +85,6 @@ import org.fenixedu.academic.domain.degreeStructure.BibliographicReferences.Bibl
 import org.fenixedu.academic.domain.degreeStructure.CourseGroup;
 import org.fenixedu.academic.domain.degreeStructure.DegreeModule;
 import org.fenixedu.academic.domain.degreeStructure.ProgramConclusion;
-import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.academic.domain.space.SpaceUtils;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
@@ -119,7 +116,6 @@ import org.fenixedu.academic.util.MultiLanguageString;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.security.Authenticate;
-import org.fenixedu.bennu.core.util.CoreConfiguration;
 import org.fenixedu.bennu.oauth.annotation.OAuthEndpoint;
 import org.fenixedu.commons.i18n.I18N;
 import org.fenixedu.spaces.domain.BlueprintFile;
@@ -131,6 +127,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import pt.ist.fenixedu.contracts.domain.LegacyRoleUtils;
 import pt.ist.fenixedu.integration.api.beans.FenixCalendar;
 import pt.ist.fenixedu.integration.api.beans.FenixCalendar.FenixCalendarEvent;
 import pt.ist.fenixedu.integration.api.beans.FenixCalendar.FenixClassEvent;
@@ -181,7 +178,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-@SuppressWarnings("unchecked")
 @Path("/fenix/v1")
 public class FenixAPIv1 {
 
@@ -195,16 +191,25 @@ public class FenixAPIv1 {
 
     public final static String JSON_UTF8 = "application/json; charset=utf-8";
 
-    DateTimeFormatter formatDayHour = DateTimeFormat.forPattern("dd/MM/yyyy HH:mm");
+    public final static String dayPattern = "dd/MM/yyyy";
+    public final static String dayHourPattern = "dd/MM/yyyy HH:mm";
+    public final static String hourPattern = "HH:mm";
+    public final static String dayHourSecondPattern = "yyyy-MM-dd HH:mm:ss";
 
-    public static final DateTimeFormatter formatDay = DateTimeFormat.forPattern("dd/MM/yyyy");
-    public static final SimpleDateFormat dataFormatDay = new SimpleDateFormat("dd/MM/yyyy");
-    public static final SimpleDateFormat dataFormatHour = new SimpleDateFormat("HH:mm");
+    public static final DateTimeFormatter formatDayHour = DateTimeFormat.forPattern(dayHourPattern);
+    public static final DateTimeFormatter formatDay = DateTimeFormat.forPattern(dayPattern);
+    public static final DateTimeFormatter formatHour = DateTimeFormat.forPattern(hourPattern);
+    public static final DateTimeFormatter formatDayHourSecond = DateTimeFormat.forPattern(dayHourSecondPattern);
 
     private static Gson gson;
 
     private static final String ENROL = "yes";
     private static final String UNENROL = "no";
+
+    public final static String ROLE_TEACHER = "TEACHER";
+    public final static String ROLE_STUDENT = "STUDENT";
+    public final static String ROLE_EMPLOYEE = "EMPLOYEE";
+    public final static String ROLE_ALUMNI = "ALUMNI";
 
     static {
         gson = new GsonBuilder().setPrettyPrinting().create();
@@ -255,25 +260,27 @@ public class FenixAPIv1 {
 
         final Person person = getPerson();
         PersonInformationBean pib = new PersonInformationBean(person, true);
-
         final Set<FenixRole> roles = new HashSet<FenixRole>();
+        List<String> roleList = LegacyRoleUtils.mainRoleKeys(person.getUser());
 
-        if (isTeacher(person) || RoleType.TEACHER.isMember(person.getUser())) {
+        if (roleList.contains(ROLE_TEACHER)) {
             roles.add(new FenixPerson.TeacherFenixRole(pib.getTeacherDepartment()));
         }
 
-        if (RoleType.STUDENT.isMember(person.getUser())) {
+        if (roleList.contains(ROLE_STUDENT)) {
             roles.add(new FenixPerson.StudentFenixRole(pib.getStudentRegistrations()));
-
         }
 
-        if (RoleType.ALUMNI.isMember(person.getUser())) {
-
+        if (roleList.contains(ROLE_ALUMNI)) {
             ArrayList<Registration> concludedRegistrations = new ArrayList<>();
             if (person.getStudent() != null) {
                 concludedRegistrations.addAll(person.getStudent().getConcludedRegistrations());
             }
             roles.add(new FenixPerson.AlumniFenixRole(concludedRegistrations));
+        }
+
+        if (roleList.contains(ROLE_EMPLOYEE)) {
+            roles.add(new FenixPerson.EmployeeFenixRole());
         }
 
         final String name = pib.getName();
@@ -311,7 +318,6 @@ public class FenixAPIv1 {
 
         final Person person = getPerson();
 
-        // PersonInformationBean pib = new PersonInformationBean(person);
         Set<ExecutionSemester> semesters = getExecutionSemesters(academicTerm);
 
         List<FenixEnrolment> enrolments = new ArrayList<FenixEnrolment>();
@@ -341,8 +347,6 @@ public class FenixAPIv1 {
     public void fillTeachingCourses(final Person person, List<FenixCourse> teachingCourses, ExecutionSemester executionSemester) {
         for (final Professorship professorship : person.getProfessorships(executionSemester)) {
             final ExecutionCourse executionCourse = professorship.getExecutionCourse();
-            // final ExecutionSemester executionCourseSemester =
-            // executionCourse.getExecutionPeriod();
             if (executionCourse.getExecutionPeriod().equals(executionSemester)) {
                 teachingCourses.add(new FenixCourse(executionCourse));
 
@@ -398,7 +402,6 @@ public class FenixAPIv1 {
                 break;
 
             case EVALUATION:
-
                 Set<FenixCourse> fenixCourses =
                         FluentIterable.from(((EvaluationEventBean) eventBean).getCourses())
                                 .transform(new Function<ExecutionCourse, FenixCourse>() {
@@ -469,7 +472,8 @@ public class FenixAPIv1 {
     public Response calendarEvaluation(@QueryParam("format") String format) {
         validateFormat(format);
         final Person person = getPerson();
-        if (!RoleType.STUDENT.isMember(person.getUser())) {
+
+        if (!LegacyRoleUtils.mainRoleKeys(person.getUser()).contains(ROLE_STUDENT)) {
             return Response.status(Status.OK).header(HttpHeaders.CONTENT_TYPE, JSON_UTF8).entity("{}").build();
         }
 
@@ -691,7 +695,8 @@ public class FenixAPIv1 {
 
         Person person = getPerson();
         final Student student = person.getStudent();
-        if (!RoleType.STUDENT.isMember(person.getUser()) || student == null) {
+
+        if (!LegacyRoleUtils.mainRoleKeys(person.getUser()).contains(ROLE_STUDENT) || student == null) {
             return new ArrayList<FenixCourseEvaluation.WrittenEvaluation>();
         }
 
@@ -739,7 +744,6 @@ public class FenixAPIv1 {
     public List<FenixCourseEvaluation.WrittenEvaluation> evaluations(@PathParam("id") String oid,
             @QueryParam("enrol") String enrol, @Context HttpServletResponse response, @Context HttpServletRequest request,
             @Context ServletContext context) {
-        // JSONObject jsonResult = new JSONObject();
         validateEnrol(enrol);
         try {
             WrittenEvaluation eval = getDomainObject(oid, WrittenEvaluation.class);
@@ -757,25 +761,6 @@ public class FenixAPIv1 {
         } catch (Exception e) {
             throw newApplicationError(Status.PRECONDITION_FAILED, e.getMessage(), e.getMessage());
         }
-    }
-
-    public boolean isTeacher(Person person) {
-        if (person == null) {
-            return false;
-        }
-
-        Set<Professorship> professorshipsSet = person.getProfessorshipsSet();
-        if (!professorshipsSet.isEmpty()) {
-            for (Professorship professorship : professorshipsSet) {
-                ExecutionCourse executionCourse = professorship.getExecutionCourse();
-                ExecutionSemester readActualExecutionSemester = ExecutionSemester.readActualExecutionSemester();
-                if (readActualExecutionSemester.equals(executionCourse.getExecutionPeriod())) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
     private final <T extends DomainObject> T getDomainObject(final String externalId, final Class<T> clazz) {
@@ -831,10 +816,6 @@ public class FenixAPIv1 {
         return gson.toJson(obj);
     }
 
-    /***
-     * DEGREES
-     *
-     */
     private List<String> getTeacherPublicMail(Teacher teacher) {
         final List<String> emails = new ArrayList<>();
         if (teacher != null) {
@@ -888,7 +869,7 @@ public class FenixAPIv1 {
     public String canteen(@QueryParam("day") String day) {
         validateDay(day);
         if (StringUtils.isBlank(day)) {
-            day = dataFormatDay.format(new Date());
+            day = formatDay.print(new DateTime());
         }
         return FenixAPIFromExternalServer.getCanteen(day);
     }
@@ -1068,10 +1049,6 @@ public class FenixAPIv1 {
             }
         }
         return "N/A";
-    }
-
-    private String getServerLink() {
-        return CoreConfiguration.getConfiguration().applicationUrl();
     }
 
     /**
@@ -1262,10 +1239,9 @@ public class FenixAPIv1 {
         String name = writtenEvaluation.getPresentationName();
         EvaluationType type = writtenEvaluation.getEvaluationType();
 
-        String day = dataFormatDay.format(writtenEvaluation.getDay().getTime());
-
-        String beginningTime = dataFormatHour.format(writtenEvaluation.getBeginning().getTime());
-        String endTime = dataFormatHour.format(writtenEvaluation.getEnd().getTime());
+        String day = formatDay.print(writtenEvaluation.getDay().getTimeInMillis());
+        String beginningTime = formatHour.print(writtenEvaluation.getBeginning().getTimeInMillis());
+        String endTime = formatHour.print(writtenEvaluation.getEnd().getTimeInMillis());
 
         FenixPeriod evaluationPeriod =
                 new FenixPeriod(Joiner.on(" ").join(day, beginningTime), Joiner.on(" ").join(day, endTime));
@@ -1274,8 +1250,9 @@ public class FenixAPIv1 {
 
         final DateTime start = writtenEvaluation.getEnrolmentPeriodStart();
         final DateTime end = writtenEvaluation.getEnrolmentPeriodEnd();
-        final String enrollmentPeriodStart = start == null ? null : start.toString("yyyy-MM-dd HH:mm:ss");
-        final String enrollmentPeriodEnd = end == null ? null : end.toString("yyyy-MM-dd HH:mm:ss");
+
+        final String enrollmentPeriodStart = start == null ? null : formatDayHourSecond.print(start);
+        final String enrollmentPeriodEnd = end == null ? null : formatDayHourSecond.print(end);
 
         Set<ExecutionCourse> courses = new HashSet<>();
         String writtenEvaluationId = writtenEvaluation.getExternalId();
@@ -1343,7 +1320,7 @@ public class FenixAPIv1 {
 
         List<FenixSpace> campi = new ArrayList<>();
 
-        for (Space campus : Space.getAllCampus()) {
+        for (Space campus : Space.getTopLevelSpaces()) {
             campi.add(FenixSpace.getSimpleSpace(campus));
         }
         return campi;
@@ -1437,7 +1414,7 @@ public class FenixAPIv1 {
                 InfoShowOccupation showOccupation = (InfoShowOccupation) occupation;
                 DateTime date = new DateTime(rightNow);
                 DateTime newDate = date.withDayOfWeek(showOccupation.getDiaSemana().getDiaSemanaInDayOfWeekJodaFormat());
-                String day = newDate.toString("dd/MM/yyyy");
+                String day = formatDay.print(newDate);
 
                 FenixRoomEvent roomEvent = null;
 
@@ -1445,8 +1422,8 @@ public class FenixAPIv1 {
                     InfoShowOccupation lesson = showOccupation;
                     InfoExecutionCourse infoExecutionCourse = lesson.getInfoShift().getInfoDisciplinaExecucao();
 
-                    String start = dataFormatHour.format(lesson.getInicio().getTime());
-                    String end = dataFormatHour.format(lesson.getFim().getTime());
+                    String start = formatHour.print(lesson.getInicio().getTimeInMillis());
+                    String end = formatHour.print(lesson.getFim().getTimeInMillis());
                     String weekday = lesson.getDiaSemana().getDiaSemanaString();
 
                     FenixPeriod period = new FenixPeriod(day + " " + start, day + " " + end);
@@ -1488,8 +1465,8 @@ public class FenixAPIv1 {
                     } else if (infoWrittenEvaluation instanceof InfoWrittenTest) {
                         InfoWrittenTest infoWrittenTest = (InfoWrittenTest) infoWrittenEvaluation;
                         String description = infoWrittenTest.getDescription();
-                        start = dataFormatHour.format(infoWrittenTest.getInicio().getTime());
-                        end = dataFormatHour.format(infoWrittenTest.getFim().getTime());
+                        start = formatHour.print(infoWrittenTest.getInicio().getTimeInMillis());
+                        end = formatHour.print(infoWrittenTest.getFim().getTimeInMillis());
                         weekday = infoWrittenTest.getDiaSemana().getDiaSemanaString();
 
                         FenixPeriod period = new FenixPeriod(day + " " + start, day + " " + end);
@@ -1504,8 +1481,8 @@ public class FenixAPIv1 {
                     InfoOccupation infoGenericEvent = (InfoOccupation) showOccupation;
                     String description = infoGenericEvent.getDescription();
                     String title = infoGenericEvent.getTitle();
-                    String start = dataFormatHour.format(infoGenericEvent.getInicio().getTime());
-                    String end = dataFormatHour.format(infoGenericEvent.getFim().getTime());
+                    String start = formatHour.print(infoGenericEvent.getInicio().getTimeInMillis());
+                    String end = formatHour.print(infoGenericEvent.getFim().getTimeInMillis());;
                     String weekday = infoGenericEvent.getDiaSemana().getDiaSemanaString();
                     FenixPeriod period = new FenixPeriod(day + " " + start, day + " " + end);
 
@@ -1530,12 +1507,9 @@ public class FenixAPIv1 {
         validateDay(day);
         java.util.Calendar rightNow = java.util.Calendar.getInstance();
         Date date = null;
-        try {
-            if (!StringUtils.isBlank(day)) {
-                date = dataFormatDay.parse(day);
-                rightNow.setTime(date);
-            }
-        } catch (ParseException e1) {
+        if (!StringUtils.isBlank(day)) {
+            date = formatDay.parseDateTime(day).toDate();
+            rightNow.setTime(date);
         }
         return rightNow;
     }
@@ -1574,7 +1548,7 @@ public class FenixAPIv1 {
                 invalid = true;
             } finally {
                 if (invalid) {
-                    throw newApplicationError(Status.BAD_REQUEST, "format_error", "day must be " + dataFormatDay.toPattern());
+                    throw newApplicationError(Status.BAD_REQUEST, "format_error", "day must be " + dayPattern);
                 }
             }
         }
