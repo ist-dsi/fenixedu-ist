@@ -39,7 +39,7 @@
        <div class="panel panel-default">
                <div class="panel-body clearfix">
                        <h3 class="panel-title pull-left">
-                               <strong><a href="${pageContext.request.contextPath}/cms/news/${post.site.slug}/${post.slug}">${post.name.content}</a></strong>
+                               <strong><a href="${pageContext.request.contextPath}/cms/news/${post.site.slug}/${post.slug}"><c:out value="${post.name.content}"/></a></strong>
                        </h3>
                        <small class="pull-right">
                                <em>
@@ -56,11 +56,11 @@
 							<small>
 								<em>
 									<c:if test="${not empty post.createdBy}">
-									${post.createdBy.profile.displayName} -
+									<c:out value="${post.createdBy.profile.displayName}"/> -
 									</c:if>
 
 									<a href="${post.site.fullUrl}" target="_blank">
-										${post.site.name.content} - ${post.categoriesString}
+										<c:out value="${post.site.name.content}"/> - <c:out value="${post.categoriesString}"/>
 									</a>
 								</em>
 							</small>

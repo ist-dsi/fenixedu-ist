@@ -40,7 +40,7 @@ ${portal.toolkit()}
         <c:forEach var="banner" items="${banners}">
             <div class="row">
                 <div class="col-md-8">
-                    <h5>${banner.name.content}
+                    <h5><c:out value="${banner.name.content}"/>
                         <small>${banner.post.creationDate}</small>
                     </h5>
                 </div>
@@ -70,7 +70,7 @@ ${portal.toolkit()}
                                     <span aria-hidden="true">&times;</span>
                                     <span class="sr-only"><spring:message code="action.cancel"/></span>
                                 </button>
-                                <h4>${banner.name.content}</h4>
+                                <h4><c:out value="${banner.name.content}"/></h4>
                             </div>
 
                             <div class="modal-body">
@@ -80,7 +80,7 @@ ${portal.toolkit()}
                                     <div class="col-sm-9">
                                         <input bennu-localized-string required-any type="text" name="name"
                                                placeholder="<spring:message code='label.name'/>"
-                                               value='${banner.name.json()}'/>
+                                               value='<c:out value="${banner.name.json()}"/>'/>
                                     </div>
                                 </div>
 

@@ -163,7 +163,7 @@
 						<bean:define
 							id="aa" value="<%= "aa" + personIndex %>" /> <bean:define
 							id="id" value="<%= "id" + (personIndex.intValue() + 40) %>" /> 
-							<span> <button type="button" alt="input.input" type="button" value="+" data-toggle="collapse" data-target="#collapse${personalInfo.username}">+</button>
+							<span> <button type="button" alt="input.input" type="button" value="+" data-toggle="collapse" data-target="#collapse<c:out value='${personalInfo.username}'/>">+</button>
 					</span> <!-- </td>--></td>
 				</tr>
 			</table>
@@ -200,7 +200,7 @@
 				</tr>
 			</table>
 
-			<div id="collapse${personalInfo.username}" class="collapse">
+			<div id="collapse<c:out value='${personalInfo.username}'/>" class="collapse">
 				<table class="ppdetails">
 
 					<logic:present name="personalInfo" property="employee">
@@ -244,7 +244,7 @@
 	 								<p><ol class="breadcrumb bcintable">
 	 									<bean:define id="thePath" name="space" property="path"/>
 		 								<logic:iterate id="spaceWay" name="thePath">
-		 									<li><a href="<%= request.getContextPath() %>/spaces-view/view/${spaceWay.externalId}">${spaceWay.name}</a></li>
+		 									<li><a href="<%= request.getContextPath() %>/spaces-view/view/${spaceWay.externalId}"><c:out value="${spaceWay.name}"/></a></li>
 		 								</logic:iterate>
 	 								</ol></p>
  								</logic:iterate>

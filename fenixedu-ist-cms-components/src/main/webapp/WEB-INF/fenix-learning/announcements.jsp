@@ -39,10 +39,10 @@
             <div class="row">
                 <div class="col-sm-10">
                     <h4>
-                        <a href="${announcement.address}" target="_blank">${announcement.name.content}</a>
+                        <a href="${announcement.address}" target="_blank"><c:out value="${announcement.name.content}"/></a>
                     </h4>
                     <small>
-                        <a href="mailto:${announcement.createdBy.email}">${announcement.createdBy.name}</a>
+                        <a href="mailto:<c:out value='${announcement.createdBy.email}'/>"><c:out value="${announcement.createdBy.name}"/></a>
                           -
                         ${announcement.creationDate.toString('dd MMMM yyyy, HH:mm', locale)}
                         <c:if test="${not empty announcement.publicationBegin && announcement.publicationBegin.isAfterNow()}">
@@ -79,7 +79,7 @@
                                     <span aria-hidden="true">&times;</span>
                                     <span class="sr-only"><spring:message code="action.close"/></span>
                                 </button>
-                                <h4>${announcement.name.content}</h4>
+                                <h4><c:out value="${announcement.name.content}"/></h4>
                             </div>
 
                             <div class="modal-body">

@@ -30,7 +30,7 @@
 			<select class="form-control" name="semester" onchange="this.form.submit()">
 				<option value="">- <spring:message code="channels.label.choose.an.option"/> -</option>
 				<c:forEach var="semester" items="${executions}">
-					<option value="${semester.externalId}" ${selectedSemester == semester ? 'selected' : ''}>${semester.qualifiedName}</option>
+					<option value="${semester.externalId}" ${selectedSemester == semester ? 'selected' : ''}><c:out value="${semester.qualifiedName}"/></option>
 				</c:forEach>
 			</select>
 		</div>
@@ -42,7 +42,7 @@
 			<select class="form-control" name="degree" onchange="this.form.submit()">
 				<option value="">- <spring:message code="channels.label.choose.an.option"/> -</option>
 				<c:forEach var="degree" items="${degrees}">
-					<option value="${degree.externalId}" ${selectedDegree == degree ? 'selected' : ''}>${degree.presentationName}</option>
+					<option value="${degree.externalId}" ${selectedDegree == degree ? 'selected' : ''}><c:out value="${degree.presentationName}"/></option>
 				</c:forEach>
 			</select>
 		</div>
@@ -63,8 +63,8 @@
 				<c:forEach var="slug" items="${slugs}">
 					<c:set var="category" value="${course.site.categoryForSlug(slug)}"/>
 					<tr>
-						<td>${course.name}</td>
-						<td>${category.name.content}</td>
+						<td><c:out value="${course.name}"/></td>
+						<td><c:out value="${category.name.content}"/></td>
 						<td>
 							<c:choose>
 								<c:when test="${bookmarks.contains(category)}">
@@ -76,7 +76,7 @@
 							</c:choose>
 						</td>
 						<td>
-							<a href="${category.rssUrl}" data-toggle="tooltip" title="${course.name} - ${category.name.content}" data-placement="left">
+							<a href="${category.rssUrl}" data-toggle="tooltip" title="<c:out value='${course.name}'/> - <c:out value='${category.name.content}'/>" data-placement="left">
 								<img src="${pageContext.request.contextPath}/image/rss.svg" width="15" height="15" />
 							</a>
 						</td>

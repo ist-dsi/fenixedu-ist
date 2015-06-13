@@ -31,7 +31,7 @@ ${portal.toolkit()}
 </div>
 
 <spring:url var="formActionUrl" value="${action}"/>
-<b><spring:message code="label.select.student.for.position"/> ${delegatePositionBean.delegateTitle}</b><p>
+<b><spring:message code="label.select.student.for.position"/> <c:out value="${delegatePositionBean.delegateTitle}"/></b><p>
 <div>
 <form:form modelAttribute="delegatePositionBean" role="form" method="post" action="${formActionUrl}" enctype="multipart/form-data">
 	<form:input type="hidden" class="form-control" id="cycleTypeInput" path="cycleType" value="${delegatePositionBean.cycleType}"/>

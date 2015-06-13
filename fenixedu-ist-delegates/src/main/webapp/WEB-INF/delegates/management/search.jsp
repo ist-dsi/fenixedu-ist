@@ -94,15 +94,15 @@ td {
 <c:forEach var="delegate" items="${delegates}">
 	<tr>
     <td>
-        ${delegate.degree.presentationName}
+        <c:out value="${delegate.degree.presentationName}"/>
     </td>
 	<td>
-		${delegate.delegateTitle}
+		<c:out value="${delegate.delegateTitle}"/>
 	</td>
-	<td>${delegate.username}</td>
-	<td>${delegate.name}</td>
-	<td>${delegate.email}</td>
-	<td>${delegate.phone}</td>
+	<td><c:out value="${delegate.username}"/></td>
+	<td><c:out value="${delegate.name}"/></td>
+	<td><c:out value="${delegate.email}"/></td>
+	<td><c:out value="${delegate.phone}"/></td>
 	<td>${delegate.interval}</td>
 	<spring:url var="delegateOID" value=""/>
 	<c:if test="${not empty delegate.delegateOID}">

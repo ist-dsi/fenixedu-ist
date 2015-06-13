@@ -97,9 +97,9 @@
 								<td class="col-sm-1"><form:checkbox
 										value="${execCourse.curricularCourse.externalId}"
 										path="selectedExecutionCourses" /></td>
-								<td class="col-sm-8">${execCourse.curricularCourse.name}</td>
-								<td class="col-sm-1">${execCourse.curricularYear}</td>
-								<td class="col-sm-1">${execCourse.semester}</td>
+								<td class="col-sm-8"><c:out value="${execCourse.curricularCourse.name}"/></td>
+								<td class="col-sm-1"><c:out value="${execCourse.curricularYear}"/></td>
+								<td class="col-sm-1"><c:out value="${execCourse.semester}"/></td>
 								<td class="col-sm-1">${execCourse.enrolledStudents.size()}</td>
 							</tr>
 						</c:forEach>

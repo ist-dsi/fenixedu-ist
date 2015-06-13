@@ -84,11 +84,11 @@ td {
 		</div>
 		<div class="col-md-3">
 			<div>
-				<b>${delegate.delegateTitle}</b>
+				<b><c:out value="${delegate.delegateTitle}"/></b>
 			</div>
-			<div>${delegate.name}</div>
-			<div>${delegate.username}</div>
-			<div>${delegate.email}</div>
+			<div><c:out value="${delegate.name}"/></div>
+			<div><c:out value="${delegate.username}"/></div>
+			<div><c:out value="${delegate.email}"/></div>
 		</div>
 	<c:set var="count" value="${count + 1}" scope="page"/>
 	<c:if test="${count % 3 == 0}">
