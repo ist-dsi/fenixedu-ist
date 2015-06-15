@@ -305,16 +305,18 @@ public class DepartmentCreditsPoolBean implements Serializable {
     protected BigDecimal setExecutionCourseUnitCredit(DepartmentExecutionCourse departmentExecutionCourse,
             boolean canEditUnitValue, BigDecimal newAssignedCredits, Boolean shared) {
         if (canEditUnitValue) {
-            BigDecimal newExecutionCourseCLE =
-                    departmentExecutionCourse.getDepartmentEffectiveLoad().multiply(
-                            departmentExecutionCourse.getUnitCreditValue());
-            newAssignedCredits = newAssignedCredits.add(newExecutionCourseCLE);
-            if ((!Objects.equals(departmentExecutionCourse.executionCourse.getUnitCreditValue(),
-                    departmentExecutionCourse.getUnitCreditValue()))
-                    || StringUtils.equals(departmentExecutionCourse.executionCourse.getUnitCreditValueNotes(),
-                            departmentExecutionCourse.getUnitCreditJustification())) {
-                departmentExecutionCourse.executionCourse.setUnitCreditValue(departmentExecutionCourse.getUnitCreditValue(),
-                        departmentExecutionCourse.getUnitCreditJustification());
+            if (departmentExecutionCourse.getUnitCreditValue() != null) {
+                BigDecimal newExecutionCourseCLE =
+                        departmentExecutionCourse.getDepartmentEffectiveLoad().multiply(
+                                departmentExecutionCourse.getUnitCreditValue());
+                newAssignedCredits = newAssignedCredits.add(newExecutionCourseCLE);
+                if ((!Objects.equals(departmentExecutionCourse.executionCourse.getUnitCreditValue(),
+                        departmentExecutionCourse.getUnitCreditValue()))
+                        || StringUtils.equals(departmentExecutionCourse.executionCourse.getUnitCreditValueNotes(),
+                                departmentExecutionCourse.getUnitCreditJustification())) {
+                    departmentExecutionCourse.executionCourse.setUnitCreditValue(departmentExecutionCourse.getUnitCreditValue(),
+                            departmentExecutionCourse.getUnitCreditJustification());
+                }
             }
         } else if (departmentExecutionCourse.executionCourse.getUnitCreditValue() != null) {
             BigDecimal oldExecutionCourseCLE =
