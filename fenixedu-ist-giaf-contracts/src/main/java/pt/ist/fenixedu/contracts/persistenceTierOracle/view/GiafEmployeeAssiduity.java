@@ -18,12 +18,22 @@ import com.google.gson.JsonObject;
 
 public class GiafEmployeeAssiduity {
 
+    @Deprecated
     public static JsonObject readAssiduityOfEmployee(final String username) {
-        final User user = User.findByUsername(username);
-        return readAssiduityOfEmployee(user);
+        return readAssiduityOfEmployee(username, new LocalDate());
     }
 
+    public static JsonObject readAssiduityOfEmployee(final String username, final LocalDate date) {
+        final User user = User.findByUsername(username);
+        return readAssiduityOfEmployee(user, date);
+    }
+
+    @Deprecated
     public static JsonObject readAssiduityOfEmployee(final User user) {
+        return readAssiduityOfEmployee(user, new LocalDate());
+    }
+
+    public static JsonObject readAssiduityOfEmployee(final User user, final LocalDate date) {
         final JsonObject result = new JsonObject();
         result.addProperty("username", user.getUsername());
         result.addProperty("name", user.getProfile().getDisplayName());
@@ -60,10 +70,10 @@ public class GiafEmployeeAssiduity {
             @Override
             public void prepare(final PreparedStatement statement) throws SQLException {
                 final String giafNumber = convertIntoGiafNumber(getEmployeeNumber(user));
-                final LocalDate date = new LocalDate();
+                final LocalDate ld = (date == null ? new LocalDate() : date);
                 statement.setString(1, giafNumber);
-                statement.setString(2, date.toString("yyyy-MM-dd"));
-                statement.setString(3, date.minusDays(1).toString("yyyy-MM-dd"));
+                statement.setString(2, ld.toString("yyyy-MM-dd"));
+                statement.setString(3, ld.minusDays(1).toString("yyyy-MM-dd"));
             }
 
             @Override

@@ -1,13 +1,18 @@
 package pt.ist.fenixedu.integration.api;
 
+import java.util.function.Function;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.oauth.annotation.OAuthEndpoint;
+import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
 
 import pt.ist.fenixedu.contracts.persistenceTierOracle.view.GiafAssiduityTeamResponsible;
 import pt.ist.fenixedu.contracts.persistenceTierOracle.view.GiafEmployeeAssiduity;
@@ -23,21 +28,25 @@ public class EmployeeAssiduityResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/employee")
     @OAuthEndpoint(ASSIDUITY_SCOPE)
-    public String getEmployeeAssiduityInformation() {
-        return respond(user -> GiafEmployeeAssiduity.readAssiduityOfEmployee(user));
+    public String getEmployeeAssiduityInformation(final @QueryParam("date") String date) {
+        return respond(user -> GiafEmployeeAssiduity.readAssiduityOfEmployee(user, parse(date)));
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/responsible")
     @OAuthEndpoint(ASSIDUITY_SCOPE)
-    public String getAssiduityInformationForEmployees() {
-        return respond(user -> GiafAssiduityTeamResponsible.readListOfAssiduityEmployees(user));
+    public String getAssiduityInformationForEmployees(final @QueryParam("date") String date) {
+        return respond(user -> GiafAssiduityTeamResponsible.readListOfAssiduityEmployees(user, parse(date)));
     }
 
-    private String respond(java.util.function.Function<User, JsonObject> function) {
+    private String respond(final Function<User, JsonObject> function) {
         final User user = Authenticate.getUser();
         return user == null ? "{}" : function.apply(user).getAsString();
+    }
+
+    private LocalDate parse(final String date) {
+        return DateTimeFormat.forPattern("yyyy-MM-dd").parseLocalDate(date);
     }
 
 }
