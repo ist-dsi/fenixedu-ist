@@ -76,6 +76,9 @@ import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.WrittenEvaluation;
 import org.fenixedu.academic.domain.WrittenEvaluationEnrolment;
+import org.fenixedu.academic.domain.accessControl.ActiveStudentsGroup;
+import org.fenixedu.academic.domain.accessControl.ActiveTeachersGroup;
+import org.fenixedu.academic.domain.accessControl.AllAlumniGroup;
 import org.fenixedu.academic.domain.accounting.Entry;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.paymentCodes.AccountingEventPaymentCode;
@@ -85,7 +88,6 @@ import org.fenixedu.academic.domain.degreeStructure.BibliographicReferences.Bibl
 import org.fenixedu.academic.domain.degreeStructure.CourseGroup;
 import org.fenixedu.academic.domain.degreeStructure.DegreeModule;
 import org.fenixedu.academic.domain.degreeStructure.ProgramConclusion;
-import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.academic.domain.space.SpaceUtils;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
@@ -128,6 +130,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import pt.ist.fenixedu.contracts.domain.accessControl.ActiveEmployees;
 import pt.ist.fenixedu.integration.api.beans.FenixCalendar;
 import pt.ist.fenixedu.integration.api.beans.FenixCalendar.FenixCalendarEvent;
 import pt.ist.fenixedu.integration.api.beans.FenixCalendar.FenixClassEvent;
@@ -206,6 +209,11 @@ public class FenixAPIv1 {
     private static final String ENROL = "yes";
     private static final String UNENROL = "no";
 
+    public final static String ROLE_TEACHER = "TEACHER";
+    public final static String ROLE_STUDENT = "STUDENT";
+    public final static String ROLE_EMPLOYEE = "EMPLOYEE";
+    public final static String ROLE_ALUMNI = "ALUMNI";
+
     static {
         gson = new GsonBuilder().setPrettyPrinting().create();
     }
@@ -254,26 +262,28 @@ public class FenixAPIv1 {
     public FenixPerson person() {
 
         final Person person = getPerson();
+        final User user = person.getUser();
         PersonInformationBean pib = new PersonInformationBean(person, true);
-
         final Set<FenixRole> roles = new HashSet<FenixRole>();
 
-        if (isTeacher(person) || RoleType.TEACHER.isMember(person.getUser())) {
+        if (new ActiveTeachersGroup().isMember(user)) {
             roles.add(new FenixPerson.TeacherFenixRole(pib.getTeacherDepartment()));
         }
 
-        if (RoleType.STUDENT.isMember(person.getUser())) {
+        if (new ActiveStudentsGroup().isMember(user)) {
             roles.add(new FenixPerson.StudentFenixRole(pib.getStudentRegistrations()));
-
         }
 
-        if (RoleType.ALUMNI.isMember(person.getUser())) {
-
+        if (new AllAlumniGroup().isMember(user)) {
             ArrayList<Registration> concludedRegistrations = new ArrayList<>();
             if (person.getStudent() != null) {
                 concludedRegistrations.addAll(person.getStudent().getConcludedRegistrations());
             }
             roles.add(new FenixPerson.AlumniFenixRole(concludedRegistrations));
+        }
+
+        if (new ActiveEmployees().isMember(user)) {
+            roles.add(new FenixPerson.EmployeeFenixRole());
         }
 
         final String name = pib.getName();
@@ -395,7 +405,6 @@ public class FenixAPIv1 {
                 break;
 
             case EVALUATION:
-
                 Set<FenixCourse> fenixCourses =
                         FluentIterable.from(((EvaluationEventBean) eventBean).getCourses())
                                 .transform(new Function<ExecutionCourse, FenixCourse>() {
@@ -466,7 +475,8 @@ public class FenixAPIv1 {
     public Response calendarEvaluation(@QueryParam("format") String format) {
         validateFormat(format);
         final Person person = getPerson();
-        if (!RoleType.STUDENT.isMember(person.getUser())) {
+
+        if (!new ActiveStudentsGroup().isMember(person.getUser())) {
             return Response.status(Status.OK).header(HttpHeaders.CONTENT_TYPE, JSON_UTF8).entity("{}").build();
         }
 
@@ -688,7 +698,8 @@ public class FenixAPIv1 {
 
         Person person = getPerson();
         final Student student = person.getStudent();
-        if (!RoleType.STUDENT.isMember(person.getUser()) || student == null) {
+
+        if (!new ActiveStudentsGroup().isMember(person.getUser()) || student == null) {
             return new ArrayList<FenixCourseEvaluation.WrittenEvaluation>();
         }
 
@@ -753,25 +764,6 @@ public class FenixAPIv1 {
         } catch (Exception e) {
             throw newApplicationError(Status.PRECONDITION_FAILED, e.getMessage(), e.getMessage());
         }
-    }
-
-    public boolean isTeacher(Person person) {
-        if (person == null) {
-            return false;
-        }
-
-        Set<Professorship> professorshipsSet = person.getProfessorshipsSet();
-        if (!professorshipsSet.isEmpty()) {
-            for (Professorship professorship : professorshipsSet) {
-                ExecutionCourse executionCourse = professorship.getExecutionCourse();
-                ExecutionSemester readActualExecutionSemester = ExecutionSemester.readActualExecutionSemester();
-                if (readActualExecutionSemester.equals(executionCourse.getExecutionPeriod())) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
     private final <T extends DomainObject> T getDomainObject(final String externalId, final Class<T> clazz) {
@@ -1331,7 +1323,7 @@ public class FenixAPIv1 {
 
         List<FenixSpace> campi = new ArrayList<>();
 
-        for (Space campus : Space.getAllCampus()) {
+        for (Space campus : Space.getTopLevelSpaces()) {
             campi.add(FenixSpace.getSimpleSpace(campus));
         }
         return campi;
