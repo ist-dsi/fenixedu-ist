@@ -50,7 +50,8 @@ public class DegreeTeachingServiceCorrection extends DegreeTeachingServiceCorrec
 
     @Override
     public Double getCredits() {
-        return getProfessorship().getExecutionCourse().getUnitCreditValue().multiply(getCorrection()).doubleValue();
+        return getProfessorship().getExecutionCourse().getUnitCreditValue() == null ? 0.0 : getProfessorship()
+                .getExecutionCourse().getUnitCreditValue().multiply(getCorrection()).doubleValue();
     }
 
 }
