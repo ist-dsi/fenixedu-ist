@@ -121,6 +121,7 @@ import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.oauth.annotation.OAuthEndpoint;
 import org.fenixedu.commons.i18n.I18N;
+import org.fenixedu.commons.stream.StreamUtils;
 import org.fenixedu.spaces.domain.BlueprintFile;
 import org.fenixedu.spaces.domain.Space;
 import org.fenixedu.spaces.services.SpaceBlueprintsDWGProcessor;
@@ -1021,6 +1022,26 @@ public class FenixAPIv1 {
             fenixExecutionCourses.add(new FenixExecutionCourse(sigla, credits, name, id, academicTermValue));
         }
         return fenixExecutionCourses;
+    }
+
+    @GET
+    @Produces(JSON_UTF8)
+    @Path("degrees/{id}/students")
+    @OAuthEndpoint(value = CURRICULAR_SCOPE, serviceOnly = true)
+    public String enrolledByDegreeAndCurricularYear(@PathParam("id") String degreeId, @QueryParam("curricularYear") Integer year) {
+        Degree degree = getDomainObject(degreeId, Degree.class);
+        Stream<Registration> registrations =
+                degree.getActiveDegreeCurricularPlans().stream().flatMap(dcp -> dcp.getStudentCurricularPlansSet().stream())
+                        .filter(StudentCurricularPlan::isActive).map(StudentCurricularPlan::getRegistration);
+        if (year != null) {
+            registrations = registrations.filter(r -> r.getCurricularYear() == year);
+        }
+        return registrations.map(r -> {
+            JsonObject object = new JsonObject();
+            object.addProperty("username", r.getPerson().getUsername());
+            object.addProperty("name", r.getPerson().getUser().getProfile().getDisplayName());
+            return object;
+        }).collect(StreamUtils.toJsonArray()).toString();
     }
 
     private void addExecutionCourses(final CourseGroup courseGroup, final Collection<ExecutionCourse> executionCourseViews,
