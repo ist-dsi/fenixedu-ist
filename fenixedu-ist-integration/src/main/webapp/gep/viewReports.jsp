@@ -63,7 +63,12 @@
 	<b><bean:message key="label.gep.degree.type" bundle="GEP_RESOURCES"/></b>: <bean:write name="degreeTypeName" /><br/>
 </logic:present>
 
-	<fr:view name="queueJobList" schema="latestJobsByType">
+	<fr:view name="queueJobList">
+		<fr:schema type="org.fenixedu.academic.domain.QueueJob" bundle="GEP_RESOURCES">
+			<fr:slot name="upperCaseType" key="label.gep.format"/>
+			<fr:slot name="requestDate" key="label.gep.date"/>
+			<fr:slot name="person.name" key="label.get.person"/>
+		</fr:schema>
     	<fr:layout name="tabular">
     		<fr:property name="classes" value="tstyle1 mtop05" />
     		<fr:property name="columnClasses" value=",,,acenter,,,,,," />

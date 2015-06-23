@@ -277,4 +277,8 @@
 			<property name="size" value="3" />
 		</slot>	
 	</schema>
+	
+	<schema name="degreeType.view" type="org.fenixedu.academic.domain.degree.DegreeType">
+		<slot name="name.content"/>
+	</schema>
 </schemas>
