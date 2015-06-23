@@ -21,6 +21,7 @@ package pt.ist.fenixedu.teacher.domain.reports;
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.Shift;
+import org.fenixedu.academic.domain.reports.GepReportFile;
 import org.fenixedu.commons.spreadsheet.Spreadsheet;
 import org.fenixedu.commons.spreadsheet.Spreadsheet.Row;
 
@@ -47,13 +48,12 @@ public class TeachersByShiftReportFile extends TeachersByShiftReportFile_Base {
     public void renderReport(Spreadsheet spreadsheet) {
 
         spreadsheet.setHeader("semestre");
-        spreadsheet.setHeader("id docente");
-        spreadsheet.setHeader("id turno");
+        spreadsheet.setHeader("docente");
+        spreadsheet.setHeader("código turno");
         spreadsheet.setHeader("nome turno");
-        spreadsheet.setHeader("id execution course");
+        spreadsheet.setHeader("código disciplina execução");
         spreadsheet.setHeader("% assegurada pelo docente");
-        spreadsheet.setHeader("OID execucao disciplina");
-        spreadsheet.setHeader("OID professorship");
+        spreadsheet.setHeader("código professorship");
 
         for (ExecutionSemester executionSemester : getExecutionYear().getExecutionPeriodsSet()) {
             for (TeacherService teacherService : executionSemester.getTeacherServicesSet()) {
@@ -68,13 +68,12 @@ public class TeachersByShiftReportFile extends TeachersByShiftReportFile_Base {
                     Row row = spreadsheet.addRow();
                     row.setCell(executionSemester.getSemester());
                     row.setCell(teacherService.getTeacher().getPerson().getUsername());
-                    row.setCell(shift.getExternalId());
+                    row.setCell(GepReportFile.getShiftCode(shift));
                     row.setCell(shift.getNome());
-                    row.setCell(shift.getExecutionCourse().getExternalId());
+                    row.setCell(GepReportFile.getExecutionCourseCode(shift.getExecutionCourse()));
                     row.setCell(degreeTeachingService.getPercentage() != null ? degreeTeachingService.getPercentage().toString()
                             .replace('.', ',') : StringUtils.EMPTY);
-                    row.setCell(String.valueOf(shift.getExecutionCourse().getOid()));
-                    row.setCell(String.valueOf(degreeTeachingService.getProfessorship().getOid()));
+                    row.setCell(GepReportFile.getProfessorshipCode(degreeTeachingService.getProfessorship()));
                 }
             }
         }

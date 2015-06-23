@@ -68,7 +68,6 @@ public class TeachersListFromGiafReportFile extends TeachersListFromGiafReportFi
         spreadsheet.setName("Docentes do " + Unit.getInstitutionAcronym() + " "
                 + executionYear.getQualifiedName().replace("/", ""));
         spreadsheet.setHeader("Identificação");
-        spreadsheet.setHeader("OID_PERSON");
         spreadsheet.setHeader("Tipo Docente");
         spreadsheet.setHeader("Nome");
         spreadsheet.setHeader("Data de nascimento");
@@ -176,8 +175,6 @@ public class TeachersListFromGiafReportFile extends TeachersListFromGiafReportFi
         final Row row = spreadsheet.addRow();
         // Coluna "Nr mecanográfico"
         row.setCell(teacher.getPerson().getUsername());
-        // Coluna "OID"
-        row.setCell(teacher.getPerson().getExternalId());
         // Coluna "Tipo"
         row.setCell(teacherType);
         // Coluna "Nome"

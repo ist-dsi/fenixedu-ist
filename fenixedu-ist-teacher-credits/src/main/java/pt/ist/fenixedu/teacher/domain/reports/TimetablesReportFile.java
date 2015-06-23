@@ -31,6 +31,7 @@ import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.academic.domain.ShiftType;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.degree.DegreeType;
+import org.fenixedu.academic.domain.reports.GepReportFile;
 import org.fenixedu.commons.spreadsheet.Spreadsheet;
 import org.fenixedu.commons.spreadsheet.Spreadsheet.Row;
 
@@ -64,9 +65,8 @@ public class TimetablesReportFile extends TimetablesReportFile_Base {
         spreadsheet.setHeader("Nome Docente");
         spreadsheet.setHeader("Ano Lectivo");
         spreadsheet.setHeader("Semestre");
-        spreadsheet.setHeader("ID Execution Course");
-        spreadsheet.setHeader("OID Execution Course");
-        spreadsheet.setHeader("ID Turno");
+        spreadsheet.setHeader("Código Disciplina Execução");
+        spreadsheet.setHeader("Código Turno");
         spreadsheet.setHeader("Nome Turno");
         spreadsheet.setHeader("Tipo Aula");
         spreadsheet.setHeader("Dia Semana");
@@ -116,14 +116,11 @@ public class TimetablesReportFile extends TimetablesReportFile_Base {
                                 // Semestre
                                 row.setCell(semester.getSemester());
 
-                                // ID Execution Course
-                                row.setCell(executionCourse.getExternalId());
+                                // Código Disciplina Execução
+                                row.setCell(GepReportFile.getExecutionCourseCode(executionCourse));
 
-                                // OID Execution Course
-                                row.setCell(String.valueOf(executionCourse.getOid()));
-
-                                // ID Turno
-                                row.setCell(service.getShift().getExternalId());
+                                // Código Turno
+                                row.setCell(GepReportFile.getShiftCode(service.getShift()));
 
                                 // Nome Turno
                                 row.setCell(service.getShift().getNome());
@@ -178,14 +175,11 @@ public class TimetablesReportFile extends TimetablesReportFile_Base {
                                 // Semestre
                                 row.setCell(semester.getSemester());
 
-                                // ID Execution Course
-                                row.setCell(executionCourse.getExternalId());
+                                // Código Disciplina Execução
+                                row.setCell(GepReportFile.getExecutionCourseCode(executionCourse));
 
-                                // OID Execution Course
-                                row.setCell(String.valueOf(executionCourse.getOid()));
-
-                                // ID Turno
-                                row.setCell(lesson.getShift().getExternalId());
+                                // Código Turno
+                                row.setCell(GepReportFile.getShiftCode(lesson.getShift()));
 
                                 // Nome Turno
                                 row.setCell(lesson.getShift().getNome());
