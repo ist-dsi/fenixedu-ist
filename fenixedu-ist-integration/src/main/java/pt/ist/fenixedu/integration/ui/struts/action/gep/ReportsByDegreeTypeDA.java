@@ -98,6 +98,10 @@ public class ReportsByDegreeTypeDA extends FenixDispatchAction {
             this.degreeType = degreeType;
         }
 
+        public String getDegreeTypeOID() {
+            return getDegreeType() != null ? getDegreeType().getExternalId() : null;
+        }
+
         public ExecutionYear getExecutionYear() {
             return executionYearReference;
         }

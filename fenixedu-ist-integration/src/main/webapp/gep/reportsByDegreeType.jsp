@@ -32,7 +32,18 @@
 
 	<h3 class="mtop15 mbottom05"><bean:message key="label.gep.latest.requests" bundle="GEP_RESOURCES" /></h3>
 	
-	<fr:view name="queueJobList" schema="latestJobs">
+	<fr:view name="queueJobList">
+		<fr:schema type="org.fenixedu.academic.domain.QueueJob" bundle="GEP_RESOURCES">
+			<fr:slot name="executionYear.name" key="label.gep.courseYear"/>
+			<fr:slot name="degreeType" key="label.gep.degree" layout="null-as-label">		       
+		        <fr:property name="subSchema" value="degreeType.view"/>
+		        <fr:property name="subLayout" value="values"/>
+		    </fr:slot>
+			<fr:slot name="jobName" key="label.gep.listing"/>
+			<fr:slot name="upperCaseType" key="label.gep.format"/>
+			<fr:slot name="requestDate" key="label.gep.date"/>
+			<fr:slot name="person.name" key="label.get.person"/>
+		</fr:schema>
     	<fr:layout name="tabular">
     		<fr:property name="classes" value="tstyle1 mtop05" />
     		<fr:property name="columnClasses" value=",,,acenter,,,,,," />
@@ -97,7 +108,7 @@
 		</div>
 </logic:present>
 
-<bean:define id="args" type="java.lang.String">degreeType=<bean:write name="reportBean" property="degreeType"/>&amp;executionYearID=<bean:write name="reportBean" property="executionYearOID"/></bean:define>
+<bean:define id="args" type="java.lang.String">degreeType=<bean:write name="reportBean" property="degreeTypeOID"/>&amp;executionYearID=<bean:write name="reportBean" property="executionYearOID"/></bean:define>
 
 <logic:present name="reportBean" property="executionYear">
 <logic:present name="reportBean" property="degreeType">
@@ -106,7 +117,7 @@
 <bean:define id="degreeType" name="reportBean" property="degreeType"/>
 
 
-<bean:define id="args" type="java.lang.String">degreeType=<bean:write name="degreeType"/>&amp;executionYearID=<bean:write name="executionYearID"/></bean:define>
+<bean:define id="args" type="java.lang.String">degreeType=<bean:write name="reportBean" property="degreeTypeOID"/>&amp;executionYearID=<bean:write name="executionYearID"/></bean:define>
  
 	<p class="mbottom05">
 		<bean:message key="label.available.reports" bundle="GEP_RESOURCES" />
@@ -386,7 +397,7 @@
 					</td>
 				</tr>
 
-                <c:if test="${degreeType == 'BOLONHA_DEGREE' || degreeType == 'BOLONHA_MASTER_DEGREE' || degreeType == 'BOLONHA_INTEGRATED_MASTER_DEGREE'}">
+                <c:if test="${degreeType.bolonhaDegree || degreeType.integratedMasterDegree || degreeType.bolonhaMasterDegree }">
                     <tr>
                         <td>
                             <bean:message key="label.report.raides.graduation" bundle="GEP_RESOURCES"/>
@@ -410,7 +421,7 @@
                     </tr>
                 </c:if>
 
-                <logic:equal value="BOLONHA_ADVANCED_FORMATION_DIPLOMA" name="degreeType" >
+				<c:if test="${degreeType.advancedFormationDiploma}">
                     <tr>
                         <td>
                             <bean:message key="label.report.raides.dfa" bundle="GEP_RESOURCES"/>
@@ -432,9 +443,9 @@
                             </html:link>
                         </td>
                     </tr>
-                </logic:equal>
+                </c:if>
                 
-                <logic:equal value="BOLONHA_ADVANCED_SPECIALIZATION_DIPLOMA" name="degreeType" >
+                <c:if test="${degreeType.advancedSpecializationDiploma}" >
                     <tr>
                         <td>
                             <bean:message key="label.report.raides.phd" bundle="GEP_RESOURCES"/>
@@ -456,8 +467,8 @@
                             </html:link>
                         </td>
                     </tr>
-                </logic:equal>
-                <logic:equal value="BOLONHA_SPECIALIZATION_DEGREE" name="degreeType" >
+                </c:if>
+                <c:if test="${degreeType.specializationCycle}" >
                     <tr>
                         <td>
                             <bean:message key="label.report.raides.specialization" bundle="GEP_RESOURCES"/>
@@ -479,7 +490,7 @@
                             </html:link>
                         </td>
                     </tr>
-                </logic:equal>
+                </c:if>
                 
 			</table>
 </logic:present>
