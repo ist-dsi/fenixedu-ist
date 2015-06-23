@@ -26,6 +26,7 @@ import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Teacher;
+import org.fenixedu.academic.domain.reports.GepReportFile;
 import org.fenixedu.commons.spreadsheet.Spreadsheet;
 import org.fenixedu.commons.spreadsheet.Spreadsheet.Row;
 
@@ -54,8 +55,7 @@ public class EffectiveTeachingLoadReportFile extends EffectiveTeachingLoadReport
     public void renderReport(Spreadsheet spreadsheet) throws Exception {
         ExecutionYear executionYear = getExecutionYear();
         spreadsheet.setName("CLE_" + executionYear.getQualifiedName().replace("/", ""));
-        spreadsheet.setHeader("OID_EXECUTION_COURSE");
-        spreadsheet.setHeader("OID_TEACHER");
+        spreadsheet.setHeader("Código Disciplina Execução");
         spreadsheet.setHeader("IstId");
         spreadsheet.setHeader("CLE");
 
@@ -64,8 +64,7 @@ public class EffectiveTeachingLoadReportFile extends EffectiveTeachingLoadReport
             Map<ExecutionCourse, BigDecimal> executionCourseLoad = teachingLoad.get(teacher);
             for (ExecutionCourse executionCourse : executionCourseLoad.keySet()) {
                 final Row row = spreadsheet.addRow();
-                row.setCell(executionCourse.getExternalId());
-                row.setCell(teacher.getExternalId());
+                row.setCell(GepReportFile.getExecutionCourseCode(executionCourse));
                 row.setCell(teacher.getPerson().getUsername());
                 row.setCell(executionCourseLoad.get(executionCourse));
             }
