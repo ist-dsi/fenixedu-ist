@@ -38,10 +38,10 @@
 </bean:define>
 </logic:present>
 <logic:present name="degreeType">
-<bean:define id="degreeType" name="degreeType"/>
-<bean:define id="degreeTypeName" name="degreeType" property="localizedName"/>
+<bean:define id="degreeTypeName" name="degreeType" property="name.content"/>
+<bean:define id="degreeTypeID" name="degreeType" property="externalId"/>
 <bean:define id="link" type="java.lang.String">
-	<bean:write name="link" />&degreeType=<%= degreeType %>
+	<bean:write name="link" />&degreeType=<%= degreeTypeID %>
 </bean:define>
 </logic:present>
 
