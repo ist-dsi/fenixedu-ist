@@ -102,7 +102,7 @@ public class PersonBean {
     public Set<Space> getActivePersonSpaces() {
         Set<Space> toRet = new HashSet<Space>();
         for (SharedOccupation so : person.getUser().getSharedOccupationSet()) {
-            if (so.isActive() && so.getSpaces().iterator().next() != null) {
+            if (so.isActive() && so.getSpaces().iterator().hasNext()) {
                 toRet.add(so.getSpaces().iterator().next());
             }
         }
