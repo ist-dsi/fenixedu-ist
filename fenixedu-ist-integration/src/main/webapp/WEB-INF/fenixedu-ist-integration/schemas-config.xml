@@ -222,7 +222,7 @@
     <schema name="elections.selectDegreeTypeAndExecutionYear" bundle="PEDAGOGICAL_COUNCIL" type="pt.ist.fenixedu.integration.ui.struts.action.pedagogicalCouncil.SendStudentEmailBean" >
         <slot name="degreeType" key="label.degreeType" layout="menu-select-postback" validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator">
             <property name="providerClass" value="org.fenixedu.academic.ui.renderers.providers.pedagogicalCouncil.DegreeTypesForBolonhaDegrees"/> 
-            <property name="format" value="${localizedName}"/>
+            <property name="format" value="${name.content}"/>
             <property name="sortBy" value="academicPeriod"/>
             <property name="saveOptions" value="true" />
             <property name="nullOptionHidden" value="true" />
