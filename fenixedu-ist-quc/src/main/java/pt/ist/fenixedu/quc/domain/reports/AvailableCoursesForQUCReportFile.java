@@ -44,6 +44,7 @@ public class AvailableCoursesForQUCReportFile extends AvailableCoursesForQUCRepo
     }
 
     public void renderReport(Spreadsheet spreadsheet) throws Exception {
+        spreadsheet.setHeader("Código Curso Execução");
         spreadsheet.setHeader("Curso");
         spreadsheet.setHeader("Nome disciplina");
         spreadsheet.setHeader("Semestre");
@@ -81,12 +82,15 @@ public class AvailableCoursesForQUCReportFile extends AvailableCoursesForQUCRepo
 
     private void addRow(final Spreadsheet spreadsheet, final Degree degree, final CurricularCourse curricularCourse,
             final ExecutionCourse executionCourse, final ExecutionSemester executionSemester) {
-        Row row = spreadsheet.addRow();
-        row.setCell(degree.getNameI18N().getContent());
-        row.setCell(curricularCourse.getName());
-        row.setCell(executionCourse.getExecutionPeriod().getName());
-        row.setCell(GepReportFile.getExecutionCourseCode(executionCourse));
-        row.setCell(InquiriesRoot.isAvailableForInquiry(executionCourse) == true ? "Sim" : "Não");
+        for (ExecutionDegree executionDegree : executionCourse.getExecutionDegrees()) {
+            Row row = spreadsheet.addRow();
+            row.setCell(GepReportFile.getExecutionDegreeCode(executionDegree));
+            row.setCell(degree.getNameI18N().getContent());
+            row.setCell(curricularCourse.getName());
+            row.setCell(executionCourse.getExecutionPeriod().getName());
+            row.setCell(GepReportFile.getExecutionCourseCode(executionCourse));
+            row.setCell(InquiriesRoot.isAvailableForInquiry(executionCourse) == true ? "Sim" : "Não");
+        }
     }
 
     private Set<ExecutionCourse> getExecutionCourses(CurricularCourse curricularCourse, Degree degree) {
