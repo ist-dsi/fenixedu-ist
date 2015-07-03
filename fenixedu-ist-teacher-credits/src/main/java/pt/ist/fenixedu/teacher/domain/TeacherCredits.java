@@ -71,14 +71,7 @@ public class TeacherCredits extends TeacherCredits_Base {
                 teacher.getTeacherAuthorization(executionSemester.getAcademicInterval()).orElse(null);
         if (teacherAuthorization != null) {
             if (teacherAuthorization.isContracted()) {
-                Interval semesterInterval =
-                        new Interval(executionSemester.getBeginDateYearMonthDay().toLocalDate().toDateTimeAtStartOfDay(),
-                                executionSemester.getEndDateYearMonthDay().toLocalDate().toDateTimeAtStartOfDay());
-                PersonContractSituation exemption =
-                        PersonContractSituation.getDominantTeacherServiceExemption(teacher, executionSemester);
-                if (exemption == null || exemption.countForCredits(semesterInterval)) {
-                    return teacherAuthorization.getLessonHours();
-                }
+                return teacherAuthorization.getLessonHours();
             } else {
                 TeacherService teacherService = TeacherService.getTeacherServiceByExecutionPeriod(teacher, executionSemester);
                 return teacherService == null ? 0 : teacherService.getTeachingDegreeHours();
