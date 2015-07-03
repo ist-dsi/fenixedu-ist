@@ -39,7 +39,9 @@ public class WorkloadSummaryBoardReportFile extends WorkloadSummaryBoardReportFi
     public void renderReport(Spreadsheet spreadsheet) throws Exception {
         spreadsheet.setHeader("Código Período Execução");
         spreadsheet.setHeader("Código Aluno");
+        spreadsheet.setHeader("Nº Aluno");
         spreadsheet.setHeader("Código Disciplina Execução");
+        spreadsheet.setHeader("Código Curso Execução");
         spreadsheet.setHeader("Estado Inquérito");
         spreadsheet.setHeader("ECTS Estimados");
         spreadsheet.setHeader("% Horas Semanais Gastas");
@@ -52,11 +54,13 @@ public class WorkloadSummaryBoardReportFile extends WorkloadSummaryBoardReportFi
             if ((inquiryExecutionPeriod != null && inquiryExecutionPeriod.getExecutionPeriod().getExecutionYear() == getExecutionYear())
                     || inquiryExecutionPeriod == null) {
                 Row row = spreadsheet.addRow();
-                row.setCell(inquiryExecutionPeriod != null ? GepReportFile.getExecutionSemesterCode(inquiryExecutionPeriod
-                        .getExecutionPeriod()) : null);
+                row.setCell(GepReportFile.getExecutionSemesterCode(inquiryRegistry.getExecutionCourse().getExecutionPeriod()));
                 row.setCell(inquiryRegistry.getStudent().getPerson().getUsername());
+                row.setCell(inquiryRegistry.getStudent().getNumber());
                 row.setCell(GepReportFile.getExecutionCourseCode(inquiryRegistry.getExecutionCourse()));
+                row.setCell(GepReportFile.getExecutionDegreeCode(inquiryRegistry.getExecutionDegree()));
                 row.setCell(inquiryRegistry.getState().name());
+                row.setCell(inquiryRegistry.getEstimatedECTS());
                 row.setCell(inquiryRegistry.getWeeklyHoursSpentPercentage());
                 row.setCell(inquiryRegistry.getStudyDaysSpentInExamsSeason());
                 row.setCell(inquiryRegistry.getAttendenceClassesPercentage());
