@@ -40,7 +40,6 @@ import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
-import org.joda.time.Interval;
 import org.springframework.stereotype.Service;
 
 import pt.ist.fenixedu.delegates.domain.student.Delegate;
@@ -81,7 +80,12 @@ public class DelegateService {
     }
 
     public List<DelegateBean> searchDelegates(DelegateSearchBean delegateSearchBean) {
-        Interval interval = delegateSearchBean.getExecutionYear().getAcademicInterval().toInterval();
+        DateTime activeWhen;
+        if (delegateSearchBean.getExecutionYear().equals(ExecutionYear.readCurrentExecutionYear())) {
+            activeWhen = DateTime.now();
+        } else {
+            activeWhen = delegateSearchBean.getExecutionYear().getAcademicInterval().toInterval().getEnd();
+        }
         List<Delegate> toRemove = new ArrayList<Delegate>();
         Stream<Delegate> stream;
         List<Delegate> withDuplicates;
@@ -90,7 +94,7 @@ public class DelegateService {
         } else {
             stream = Bennu.getInstance().getDelegatesSet().stream();
         }
-        withDuplicates = stream.filter(d -> interval.overlaps(d.getInterval())).collect(Collectors.toList());
+        withDuplicates = stream.filter(d -> d.isActive(activeWhen)).collect(Collectors.toList());
 
         for (Delegate delegate : withDuplicates) {
             for (Delegate delegate2 : withDuplicates) {
