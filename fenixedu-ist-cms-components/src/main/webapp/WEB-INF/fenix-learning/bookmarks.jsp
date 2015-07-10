@@ -78,7 +78,7 @@
 		<c:forEach var="course" items="${courses}">
 		<c:forEach var="category" items="${course.site.categoriesSet}">
 			<tr>
-				<td><c:out value="${category.site.name.content}"/>/td>
+				<td><c:out value="${category.site.name.content}"/></td>
 				<td><c:out value="${category.name.content}"/></td>
 				<td>
 					<c:choose>
