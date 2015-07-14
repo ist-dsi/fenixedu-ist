@@ -163,18 +163,25 @@ class ImportPersonProfessionalData extends ImportProcessor {
                 final GiafProfessionalData giafProfessionalData =
                         personProfessionalData.getGiafProfessionalDataByGiafPersonIdentification(personNumberString);
                 if (giafProfessionalData == null) {
-                    modifications.add(new Modification() {
-                        @Override
-                        public void execute() {
-                            new GiafProfessionalData(personProfessionalData, personNumberString, institutionEntryDate,
-                                    contractSituation, contractSituationGiafId, contractSituationDate, terminationSituationDate,
-                                    professionalRelation, professionalRelationGiafId, professionalRelationDate,
-                                    professionalContractType, professionalContractTypeGiafId, professionalCategory,
-                                    professionalCategoryGiafId, professionalCategoryDate, professionalRegime,
-                                    professionalRegimeGiafId, professionalRegimeDate, campus, creationDate, modifiedDate);
-                        }
-                    });
-                    novos++;
+                    if (personProfessionalData.getGiafProfessionalDatasSet().isEmpty()) {
+                        modifications.add(new Modification() {
+                            @Override
+                            public void execute() {
+                                new GiafProfessionalData(personProfessionalData, personNumberString, institutionEntryDate,
+                                        contractSituation, contractSituationGiafId, contractSituationDate,
+                                        terminationSituationDate, professionalRelation, professionalRelationGiafId,
+                                        professionalRelationDate, professionalContractType, professionalContractTypeGiafId,
+                                        professionalCategory, professionalCategoryGiafId, professionalCategoryDate,
+                                        professionalRegime, professionalRegimeGiafId, professionalRegimeDate, campus,
+                                        creationDate, modifiedDate);
+                            }
+                        });
+                        novos++;
+                    } else {
+                        logger.debug("Employee " + person.getUsername() + " already has a giafProfessionalData: "
+                                + personNumberString);
+                        notImported++;
+                    }
                 } else {
                     if (!hasDiferences(giafProfessionalData, institutionEntryDate, contractSituation, contractSituationGiafId,
                             contractSituationDate, terminationSituationDate, professionalRelation, professionalRelationGiafId,
