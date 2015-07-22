@@ -35,14 +35,17 @@ import pt.ist.fenixedu.quc.domain.InquiriesRoot;
 
 public class AvailableCoursesForQUCReportFile extends AvailableCoursesForQUCReportFile_Base {
 
+    @Override
     public String getJobName() {
         return "Disciplinas disponíveis para QUC";
     }
 
+    @Override
     protected String getPrefix() {
         return "qucAvailableCourses";
     }
 
+    @Override
     public void renderReport(Spreadsheet spreadsheet) throws Exception {
         spreadsheet.setHeader("Código Curso Execução");
         spreadsheet.setHeader("Curso");
@@ -82,7 +85,7 @@ public class AvailableCoursesForQUCReportFile extends AvailableCoursesForQUCRepo
 
     private void addRow(final Spreadsheet spreadsheet, final Degree degree, final CurricularCourse curricularCourse,
             final ExecutionCourse executionCourse, final ExecutionSemester executionSemester) {
-        for (ExecutionDegree executionDegree : executionCourse.getExecutionDegrees()) {
+        for (ExecutionDegree executionDegree : degree.getExecutionDegreesForExecutionYear(executionSemester.getExecutionYear())) {
             Row row = spreadsheet.addRow();
             row.setCell(GepReportFile.getExecutionDegreeCode(executionDegree));
             row.setCell(degree.getNameI18N().getContent());
