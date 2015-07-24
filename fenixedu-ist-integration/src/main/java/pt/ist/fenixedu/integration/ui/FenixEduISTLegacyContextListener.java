@@ -48,6 +48,7 @@ import org.fenixedu.cms.domain.Category;
 import org.fenixedu.cms.domain.Site;
 import org.fenixedu.learning.domain.executionCourse.ExecutionCourseSite;
 
+import pt.ist.fenixedu.integration.domain.student.AffinityCyclesManagement;
 import pt.ist.fenixframework.FenixFramework;
 import pt.ist.fenixframework.dml.runtime.RelationAdapter;
 
@@ -159,6 +160,12 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
                         }
                     }
                 }));
+
+        Signal.register(Enrolment.SIGNAL_CREATED, ((DomainObjectEvent<Enrolment> e) -> {
+            Enrolment enrolment = e.getInstance();
+            new AffinityCyclesManagement(enrolment.getRegistration().getLastStudentCurricularPlan())
+                    .createCycleOrRepeateSeparate();
+        }));
 
     }
 
