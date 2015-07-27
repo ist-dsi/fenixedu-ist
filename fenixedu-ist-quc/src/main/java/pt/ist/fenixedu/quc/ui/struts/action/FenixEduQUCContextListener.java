@@ -24,6 +24,7 @@ import javax.servlet.annotation.WebListener;
 
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.Professorship;
+import org.fenixedu.academic.domain.studentCurriculum.StudentCurricularPlanEnrolment;
 import org.fenixedu.academic.service.filter.enrollment.ClassEnrollmentAuthorizationFilter;
 import org.fenixedu.academic.service.services.manager.MergeExecutionCourses;
 import org.fenixedu.academic.util.Bundle;
@@ -45,6 +46,11 @@ public class FenixEduQUCContextListener implements ServletContextListener {
         MergeExecutionCourses.registerMergeHandler(FenixEduQUCContextListener::copyInquiries);
         ClassEnrollmentAuthorizationFilter.registerCondition(registration -> {
             if (StudentInquiryRegistry.hasInquiriesToRespond(registration.getStudent())) {
+                throw FenixEduQucDomainException.inquiriesNotAnswered();
+            }
+        });
+        StudentCurricularPlanEnrolment.registerCondition(scp -> {
+            if (StudentInquiryRegistry.hasInquiriesToRespond(scp.getRegistration().getStudent())) {
                 throw FenixEduQucDomainException.inquiriesNotAnswered();
             }
         });
