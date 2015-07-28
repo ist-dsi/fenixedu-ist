@@ -302,20 +302,17 @@ public class JerseyServices {
                 if (registration.hasAnyActiveState(currentExecutionYear)) {
                     registrations.add(registration);
                 } else {
-                    ProgramConclusion
-                            .conclusionsFor(registration)
-                            .filter(ProgramConclusion::isTerminal)
-                            .forEach(
-                                    programConclusion -> {
-                                        RegistrationConclusionBean registrationConclusionBean =
-                                                new RegistrationConclusionBean(registration, programConclusion);
-                                        if (registrationConclusionBean.isConcluded()) {
-                                            YearMonthDay conclusionDate = registrationConclusionBean.getConclusionDate();
-                                            if (conclusionDate != null && !conclusionDate.plusYears(1).isBefore(today)) {
-                                                registrations.add(registration);
-                                            }
-                                        }
-                                    });
+                    ProgramConclusion.conclusionsFor(registration).forEach(
+                            programConclusion -> {
+                                RegistrationConclusionBean registrationConclusionBean =
+                                        new RegistrationConclusionBean(registration, programConclusion);
+                                if (registrationConclusionBean.isConcluded()) {
+                                    YearMonthDay conclusionDate = registrationConclusionBean.getConclusionDate();
+                                    if (conclusionDate != null && !conclusionDate.plusYears(1).isBefore(today)) {
+                                        registrations.add(registration);
+                                    }
+                                }
+                            });
                 }
             }
         }
@@ -331,17 +328,9 @@ public class JerseyServices {
         Set<Registration> registrations = new HashSet<Registration>();
         for (Registration registration : student.getRegistrationsSet()) {
             if (registration.isBolonha() && !registration.getDegreeType().isEmpty()) {
-                if (registration.isActive()) {
+                if (registration.isActive() || registration.isConcluded()) {
                     registrations.add(registration);
-                } else {
-                    if (ProgramConclusion.conclusionsFor(registration).filter(ProgramConclusion::isTerminal).anyMatch(pc -> {
-                        RegistrationConclusionBean registrationConclusionBean = new RegistrationConclusionBean(registration, pc);
-                        return registrationConclusionBean.isConcluded();
-                    })) {
-                        registrations.add(registration);
-                    };
                 }
-
             }
         }
         String info = getRegistrationsAsJSON(registrations);
