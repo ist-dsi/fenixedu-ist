@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.fenixedu.academic.domain.CurricularCourse;
+import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.student.Registration;
@@ -65,19 +66,18 @@ public final class InquiriesRoot extends InquiriesRoot_Base {
     }
 
     public static boolean isAvailableDegreeTypeForInquiries(Registration registration) {
-        final DegreeType degreeType = registration.getDegreeType();
-        return degreeType.isBolonhaDegree() || degreeType.isIntegratedMasterDegree() || degreeType.isBolonhaMasterDegree()
-                || THIRD_CYCLE_AVAILABLE_INQUIRY_DEGREES.contains(registration.getDegree().getSigla().toLowerCase());
+        return isAvailableDegreeForInquiries(registration.getDegree());
+    }
+
+    private static boolean isAvailableDegreeForInquiries(Degree degree) {
+        return degree.getDegreeType().isBolonhaDegree() || degree.getDegreeType().isIntegratedMasterDegree()
+                || degree.getDegreeType().isBolonhaMasterDegree()
+                || THIRD_CYCLE_AVAILABLE_INQUIRY_DEGREES.contains(degree.getSigla().toLowerCase());
     }
 
     public static boolean isMasterDegreeDFAOnly(ExecutionCourse executionCourse) {
         for (final CurricularCourse curricularCourse : executionCourse.getAssociatedCurricularCoursesSet()) {
-            DegreeType degreeType = curricularCourse.getDegreeCurricularPlan().getDegree().getDegreeType();
-            if (!degreeType.isPreBolonhaDegree()
-                    && !degreeType.isAdvancedFormationDiploma()
-                    && !degreeType.isSpecializationDegree()
-                    && !THIRD_CYCLE_AVAILABLE_INQUIRY_DEGREES.contains(curricularCourse.getDegreeCurricularPlan().getDegree()
-                            .getSigla().toLowerCase())) {
+            if (isAvailableDegreeForInquiries(curricularCourse.getDegreeCurricularPlan().getDegree())) {
                 return false;
             }
         }
