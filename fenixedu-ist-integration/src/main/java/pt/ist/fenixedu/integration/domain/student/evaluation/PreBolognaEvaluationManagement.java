@@ -18,6 +18,7 @@
  */
 package pt.ist.fenixedu.integration.domain.student.evaluation;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.fenixedu.academic.domain.Enrolment;
@@ -39,8 +40,7 @@ public class PreBolognaEvaluationManagement {
     }
 
     @Atomic
-    public static void deleteEnrolmentEvaluationCurriculumValidationContext(EnrolmentEvaluation enrolmentEvaluation)
-            throws Exception {
+    public static void deleteEnrolmentEvaluationCurriculumValidationContext(EnrolmentEvaluation enrolmentEvaluation) {
         if (!getEvaluationForCurriculumValidationAllowed(enrolmentEvaluation.getEnrolment().getStudentCurricularPlan())) {
             throw new DomainException("error.curriculum.validation.enrolment.evaluatiom.removal.not.allowed");
         }
@@ -63,14 +63,20 @@ public class PreBolognaEvaluationManagement {
                     enrolmentEvaluation);
         }
         enrolmentEvaluation.setExecutionPeriod(null);
+        enrolmentEvaluation.setEvaluationSeason(null);
         enrolmentEvaluation.setRootDomainObject(null);
 
         //TODO refactor this hack to a general functionality that allows to change past data
-        Method deletedMethod =
-                enrolmentEvaluation.getClass().getSuperclass().getSuperclass().getDeclaredMethod("deleteDomainObject");
-        deletedMethod.setAccessible(true);
-        deletedMethod.invoke(enrolmentEvaluation);
-
+        Method deletedMethod;
+        try {
+            deletedMethod =
+                    enrolmentEvaluation.getClass().getSuperclass().getSuperclass().getDeclaredMethod("deleteDomainObject");
+            deletedMethod.setAccessible(true);
+            deletedMethod.invoke(enrolmentEvaluation);
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException e) {
+            throw new DomainException("error.curriculum.validation.cannot.delete.enrolment.evaluation", e.getLocalizedMessage());
+        }
         changeStateIfAprovedAndEvaluationsIsEmpty(enrolment);
     }
 
