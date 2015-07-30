@@ -366,7 +366,7 @@ public class AcademicAdminOfficeCurriculumValidationDA extends FenixDispatchActi
         try {
             PreBolognaEvaluationManagement.deleteEnrolmentEvaluationCurriculumValidationContext(evaluationToVoid);
         } catch (DomainException de) {
-            addActionMessage("error", request, de.getKey(), de.getArgs());
+            addActionMessage("grade-messages", request, de.getKey(), de.getArgs());
         }
 
         return prepareEditEvaluation(mapping, actionForm, request, response);
