@@ -42,7 +42,7 @@ public class EmployeeAssiduityResource {
 
     private String respond(final Function<User, JsonObject> function) {
         final User user = Authenticate.getUser();
-        return user == null ? "{}" : function.apply(user).getAsString();
+        return user == null ? "{}" : function.apply(user).toString();
     }
 
     private LocalDate parse(final String date) {
