@@ -38,7 +38,6 @@ import org.fenixedu.academic.domain.accessControl.AlumniGroup;
 import org.fenixedu.academic.domain.accounting.PaymentCode;
 import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.person.IDDocumentType;
-import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.util.CollectionPager;
@@ -423,7 +422,7 @@ public class SearchPerson implements Serializable {
         }
 
         protected boolean verifyActiveState(Boolean activePersons, Person person) {
-            return (activePersons == null || ((Boolean) RoleType.PERSON.isMember(person.getUser())).equals(activePersons));
+            return (activePersons == null || person.getUser().isLoginExpired() == !activePersons.booleanValue());
         }
 
         protected boolean verifyUsernameEquality(String usernameToSearch, Person person) {
