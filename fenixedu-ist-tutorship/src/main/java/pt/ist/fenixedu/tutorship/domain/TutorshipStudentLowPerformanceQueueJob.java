@@ -207,7 +207,8 @@ public class TutorshipStudentLowPerformanceQueueJob extends TutorshipStudentLowP
             row.setCell(studentLowPerformanceBean.getEmail());
             row.setCell(studentLowPerformanceBean.getNumberOfEntriesStudentInSecretary());
             row.setCell(studentLowPerformanceBean.getRegistrationStart());
-            row.setCell(studentLowPerformanceBean.getIngressionType().getLocalizedName());
+            row.setCell(studentLowPerformanceBean.getIngressionType() != null ? studentLowPerformanceBean.getIngressionType()
+                    .getLocalizedName() : "");
             List<Tutorship> tutorships = Tutorship.getActiveTutorships(studentLowPerformanceBean.getStudent());
             if (!tutorships.isEmpty()) {
                 row.setCell(tutorships.iterator().next().getTeacher().getPerson().getPresentationName());
