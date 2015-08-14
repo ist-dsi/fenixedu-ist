@@ -22,53 +22,65 @@
 <%@ taglib uri="http://struts.apache.org/tags-html" prefix="html"%>
 <%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean"%>
 <%@ taglib uri="http://fenix-ashes.ist.utl.pt/fenix-renderers" prefix="fr"%>
+
 <html:html xhtml="true">
-	<head>
-		<title>
-			<bean:message key="dot.title" bundle="GLOBAL_RESOURCES" /> - <bean:message key="message.inquiries.title" bundle="INQUIRIES_RESOURCES"/>
-		</title>
+    <head>
+        <title>
+            <bean:message key="message.inquiries.title" bundle="INQUIRIES_RESOURCES"/>
+        </title>
 
-		<link href="<%= request.getContextPath() %>/CSS/logdotist.css" rel="stylesheet" type="text/css" />
+        <link href="${pageContext.request.contextPath}/themes/<%= org.fenixedu.bennu.portal.domain.PortalConfiguration.getInstance().getTheme() %>/css/style.css" rel="stylesheet" type="text/css" />
 
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	</head>
-	<body>
-		<div id="container">
-			<div id="dotist_id">
-				<img alt="<%=org.fenixedu.bennu.portal.domain.PortalConfiguration.getInstance().getApplicationTitle().getContent() %>"
-						src="<bean:message key="dot.logo" bundle="GLOBAL_RESOURCES" arg0="<%= request.getContextPath() %>"/>" />
-			</div>
-			<div id="txt">
-				<h1><bean:message key="message.inquiries.title" bundle="INQUIRIES_RESOURCES"/></h1>
-				<div class="mtop1">
-					<bean:write name="inquiryTemplate" property="inquiryMessage" filter="false"/>
-				</div>
-			</div>
-			<br />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            .container {
+                background-color: #fefefe;
+                padding: 30px;
+                border-radius: 10px;
+                max-width: 760px;
+                margin-top: 30px;
+            }
+            .title {
+                border-bottom: 1px solid #eee;
+                padding-bottom: 5px;
+                font-size: 25px;
+                min-height: 35px;
+                margin-bottom: 20px;
+            }
+            @media (max-width: 768px) {
+                .title > * {
+                    text-align: center !important;
+                }
+                ul {
+                    padding-left: 20px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+    
+        <div class="container">
+            <div class="title row">
+                <div class="col-sm-4 text-right col-sm-push-8">
+                    <img src="${pageContext.request.contextPath}/api/bennu-portal/configuration/logo"/>
+                </div>
+                <div class="col-sm-8 col-sm-pull-4">
+                    <bean:message key="message.inquiries.title" bundle="INQUIRIES_RESOURCES"/>
+                </div>
+            </div>
 
-			<div align="center">
-				<table>
-					<tr>
-						<td>
-							<form method="post" action="<%= request.getContextPath() %>/respondToInquiriesQuestion.do">
-								<html:hidden property="method" value="respondNow"/>
-								<html:submit bundle="HTMLALT_RESOURCES" altKey="inquiries.respond.now" property="ok">
-									<bean:message key="button.inquiries.respond.now" />
-								</html:submit>
-							</form>
-						</td>
-						<td>
-							<form method="post" action="<%= request.getContextPath() %>/respondToInquiriesQuestion.do">
-								<html:hidden property="method" value="registerStudentResponseRespondLater"/>
-								<html:submit bundle="HTMLALT_RESOURCES" altKey="inquiries.respond.later" property="ok">
-									<bean:message key="button.inquiries.respond.later" />
-								</html:submit>
-							</form>
-						</td>
-					</tr>
-				</table>
-			</div>
+            <div id="txt">
+				<bean:write name="inquiryTemplate" property="inquiryMessage" filter="false"/>
+            </div>
 
-		</div>
-	</body>
+            <br />
+
+            <div align="center">
+            	<a tabindex="2" href="${pageContext.request.contextPath}/student/studentInquiry.do?method=showCoursesToAnswer" class="btn btn-default"><bean:message key="button.inquiries.respond.now" /></a>
+            	<a tabindex="1" href="${pageContext.request.contextPath}/home.do" class="btn btn-default"><bean:message key="button.inquiries.respond.later" /></a>
+            </div>
+        </div>
+        
+    </body>
 </html:html>
