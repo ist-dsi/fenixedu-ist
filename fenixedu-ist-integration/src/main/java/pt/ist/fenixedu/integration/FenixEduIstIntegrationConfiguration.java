@@ -78,6 +78,7 @@ public class FenixEduIstIntegrationConfiguration {
                 description = "Login URL to use when barra is set as authentication broker")
         public String barraLoginUrl();
 
+        @Deprecated
         @ConfigurationProperty(key = "dges.username.prefix",
                 description = "The prefix for the username of students created via the DGES Student Importation Process.",
                 defaultValue = "ist1")
