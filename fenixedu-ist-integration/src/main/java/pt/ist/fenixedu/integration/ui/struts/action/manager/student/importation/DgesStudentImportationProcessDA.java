@@ -53,10 +53,10 @@ import pt.ist.fenixedu.integration.domain.student.importation.ExportExistingStud
         titleKey = "title.dges.student.importation")
 @Mapping(path = "/dgesStudentImportationProcess", module = "manager")
 @Forwards({
-        @Forward(name = "list", path = "/manager/student/importation/list.jsp"),
-        @Forward(name = "prepare-create-new-process", path = "/manager/student/importation/prepareCreateNewProcess.jsp"),
+        @Forward(name = "list", path = "/manager/student/dges/list.jsp"),
+        @Forward(name = "prepare-create-new-process", path = "/manager/student/dges/prepareCreateNewProcess.jsp"),
         @Forward(name = "prepare-create-new-exportation-candidacies-for-password-generation-job",
-                path = "/manager/student/importation/prepareCreateNewExportationForPasswordGeneration.jsp") })
+                path = "/manager/student/dges/prepareCreateNewExportationForPasswordGeneration.jsp") })
 public class DgesStudentImportationProcessDA extends FenixDispatchAction {
 
     @EntryPoint
