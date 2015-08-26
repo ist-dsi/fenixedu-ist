@@ -70,7 +70,6 @@ import org.slf4j.LoggerFactory;
 
 import pt.ist.fenixedu.contracts.domain.Employee;
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveEmployees;
-import pt.ist.fenixedu.integration.FenixEduIstIntegrationConfiguration;
 import pt.ist.fenixedu.tutorship.domain.TutorshipIntention;
 
 public class DgesStudentImportationProcess extends DgesStudentImportationProcess_Base {
@@ -193,8 +192,6 @@ public class DgesStudentImportationProcess extends DgesStudentImportationProcess
         int processed = 0;
         int personsCreated = 0;
 
-        String prefix = FenixEduIstIntegrationConfiguration.getConfiguration().dgesUsernamePrefix();
-
         for (final DegreeCandidateDTO degreeCandidateDTO : degreeCandidateDTOs) {
 
             if (++processed % 150 == 0) {
@@ -210,10 +207,10 @@ public class DgesStudentImportationProcess extends DgesStudentImportationProcess
                 person = degreeCandidateDTO.getMatchingPerson();
                 // Person may not yet have a user, so we will create it
                 if (person.getUser() == null) {
-                    person.setUser(new User(prefix + studentNumber, person.getProfile()));
+                    person.setUser(new User(person.getProfile()));
                 }
             } catch (DegreeCandidateDTO.NotFoundPersonException e) {
-                person = degreeCandidateDTO.createPerson(prefix + studentNumber);
+                person = degreeCandidateDTO.createPerson();
                 logCreatedPerson(LOG_WRITER, person);
                 personsCreated++;
             } catch (DegreeCandidateDTO.TooManyMatchedPersonsException e) {
@@ -237,7 +234,6 @@ public class DgesStudentImportationProcess extends DgesStudentImportationProcess
                 logCandidateIsEmployee(LOG_WRITER, degreeCandidateDTO, person);
             }
 
-            RoleType.grant(RoleType.CANDIDATE, person.getUser());
             UserLoginPeriod.createOpenPeriod(person.getUser());
 
             if (person.getStudent() == null) {

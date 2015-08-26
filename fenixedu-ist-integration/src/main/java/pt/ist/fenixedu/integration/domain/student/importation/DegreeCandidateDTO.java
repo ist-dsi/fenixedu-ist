@@ -382,10 +382,15 @@ public class DegreeCandidateDTO {
         throw new NotFoundPersonException();
     }
 
+    @Deprecated
     public Person createPerson(String username) {
+        return createPerson();
+    }
+
+    public Person createPerson() {
         HumanName split = HumanName.decompose(StringFormatter.prettyPrint(getName()), false);
         UserProfile profile = new UserProfile(split.getGivenNames(), split.getFamilyNames(), null, null, null);
-        new User(username, profile);
+        new User(profile);
 
         final Person person = new Person(profile);
 
