@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -53,7 +54,6 @@ import net.fortuna.ical4j.model.Calendar;
 
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.AdHocEvaluation;
-import org.fenixedu.academic.domain.Attends;
 import org.fenixedu.academic.domain.CompetenceCourse;
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.Degree;
@@ -61,6 +61,7 @@ import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.DegreeInfo;
 import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.Evaluation;
+import org.fenixedu.academic.domain.Exam;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.ExecutionInterval;
@@ -112,7 +113,6 @@ import org.fenixedu.academic.dto.InfoWrittenTest;
 import org.fenixedu.academic.service.factory.RoomSiteComponentBuilder;
 import org.fenixedu.academic.service.services.student.EnrolStudentInWrittenEvaluation;
 import org.fenixedu.academic.service.services.student.UnEnrollStudentInWrittenEvaluation;
-import org.fenixedu.academic.ui.faces.bean.student.enrolment.DisplayEvaluationsForStudentToEnrol;
 import org.fenixedu.academic.ui.struts.action.ICalendarSyncPoint;
 import org.fenixedu.academic.util.ContentType;
 import org.fenixedu.academic.util.EvaluationType;
@@ -165,7 +165,6 @@ import pt.ist.fenixedu.integration.api.beans.publico.FenixRoomEvent;
 import pt.ist.fenixedu.integration.api.beans.publico.FenixSchedule;
 import pt.ist.fenixedu.integration.api.beans.publico.FenixSpace;
 import pt.ist.fenixedu.integration.api.infra.FenixAPIFromExternalServer;
-import pt.ist.fenixedu.integration.api.infra.JerseyFacesContext;
 import pt.ist.fenixedu.integration.dto.PersonInformationBean;
 import pt.ist.fenixframework.DomainObject;
 import pt.ist.fenixframework.FenixFramework;
@@ -710,29 +709,58 @@ public class FenixAPIv1 {
             return new ArrayList<FenixCourseEvaluation.WrittenEvaluation>();
         }
 
-        new JerseyFacesContext(context, request, response);
-
-        DisplayEvaluationsForStudentToEnrol manageEvaluationsForStudents = new DisplayEvaluationsForStudentToEnrol();
-
         List<FenixCourseEvaluation.WrittenEvaluation> evaluations = new ArrayList<>();
 
-        evaluations.addAll(processEvaluation(manageEvaluationsForStudents.getEnroledEvaluations(), true, student));
-        evaluations.addAll(processEvaluation(manageEvaluationsForStudents.getAllNotEnroledEvaluations(), false, student));
+        ExecutionYear executionYear = ExecutionYear.readCurrentExecutionYear();
+
+        for (Registration registration : student.getRegistrationsSet()) {
+            for (ExecutionSemester executionSemester : executionYear.getExecutionPeriodsSet()) {
+
+                List<ExecutionCourse> studentExecutionCourses = registration.getAttendingExecutionCoursesFor(executionSemester);
+
+                List<Evaluation> unenroledEvaluation = new ArrayList<Evaluation>();
+                unenroledEvaluation.addAll(registration.getUnenroledExams(executionSemester));
+                unenroledEvaluation.addAll(registration.getUnenroledWrittenTests(executionSemester));
+
+                List<Evaluation> enroledEvaluation = new ArrayList<Evaluation>();
+                enroledEvaluation.addAll(registration.getEnroledExams(executionSemester));
+                enroledEvaluation.addAll(registration.getEnroledWrittenTests(executionSemester));
+
+                for (Evaluation evaluation : unenroledEvaluation) {
+                    Set<ExecutionCourse> examExecutionCourses =
+                            new HashSet<ExecutionCourse>(evaluation.getAssociatedExecutionCoursesSet());
+                    examExecutionCourses.retainAll(studentExecutionCourses);
+                    evaluations.addAll(processEvaluation(evaluation, examExecutionCourses, false, student, executionSemester));
+                }
+
+                for (Evaluation evaluation : enroledEvaluation) {
+                    Set<ExecutionCourse> examExecutionCourses =
+                            new HashSet<ExecutionCourse>(evaluation.getAssociatedExecutionCoursesSet());
+                    examExecutionCourses.retainAll(studentExecutionCourses);
+                    evaluations.addAll(processEvaluation(evaluation, examExecutionCourses, true, student, executionSemester));
+                }
+            }
+        }
 
         return evaluations;
     }
 
-    private List<FenixCourseEvaluation.WrittenEvaluation> processEvaluation(List<Evaluation> listEvaluation,
-            final Boolean isEnrolled, final Student student) {
+    private List<FenixCourseEvaluation.WrittenEvaluation> processEvaluation(Evaluation evaluation,
+            Set<ExecutionCourse> executionCourses, final Boolean isEnrolled, final Student student,
+            final ExecutionSemester executionSemester) {
 
-        return FluentIterable.from(listEvaluation).transform(new Function<Evaluation, FenixCourseEvaluation.WrittenEvaluation>() {
+        List<FenixCourseEvaluation.WrittenEvaluation> evaluations = new ArrayList<FenixCourseEvaluation.WrittenEvaluation>();
 
-            @Override
-            public FenixCourseEvaluation.WrittenEvaluation apply(Evaluation writtenEvaluation) {
-                return getWrittenEvaluationJSON((WrittenEvaluation) writtenEvaluation, isEnrolled, student);
+        if (!executionSemester.equals(ExecutionSemester.readActualExecutionSemester())) {
+            if (!(evaluation instanceof Exam) || !((Exam) evaluation).isSpecialSeason()) {
+                return evaluations;
             }
+        }
 
-        }).toList();
+        for (ExecutionCourse executionCourse : executionCourses) {
+            evaluations.add(getWrittenEvaluationJSON((WrittenEvaluation) evaluation, executionCourse, isEnrolled, student));
+        }
+        return evaluations;
     }
 
     /**
@@ -1222,7 +1250,7 @@ public class FenixAPIv1 {
 
         for (Evaluation evaluation : executionCourse.getAssociatedEvaluationsSet()) {
             if (evaluation instanceof WrittenEvaluation) {
-                evals.add(getWrittenEvaluationJSON((WrittenEvaluation) evaluation));
+                evals.add(getWrittenEvaluationJSON((WrittenEvaluation) evaluation, executionCourse));
             } else if (evaluation instanceof Project) {
                 evals.add(getProjectEvaluationJSON((Project) evaluation));
             } else if (evaluation instanceof AdHocEvaluation) {
@@ -1260,12 +1288,13 @@ public class FenixAPIv1 {
         return new FenixCourseEvaluation.Project(name, new FenixPeriod(start, end));
     }
 
-    private FenixCourseEvaluation.WrittenEvaluation getWrittenEvaluationJSON(WrittenEvaluation writtenEvaluation) {
-        return getWrittenEvaluationJSON(writtenEvaluation, null, null);
+    private FenixCourseEvaluation.WrittenEvaluation getWrittenEvaluationJSON(WrittenEvaluation writtenEvaluation,
+            ExecutionCourse executionCourse) {
+        return getWrittenEvaluationJSON(writtenEvaluation, executionCourse, null, null);
     }
 
     private FenixCourseEvaluation.WrittenEvaluation getWrittenEvaluationJSON(WrittenEvaluation writtenEvaluation,
-            Boolean isEnrolled, Student student) {
+            ExecutionCourse executionCourse, Boolean isEnrolled, Student student) {
         String name = writtenEvaluation.getPresentationName();
         EvaluationType type = writtenEvaluation.getEvaluationType();
 
@@ -1284,17 +1313,9 @@ public class FenixAPIv1 {
         final String enrollmentPeriodStart = start == null ? null : formatDayHourSecond.print(start);
         final String enrollmentPeriodEnd = end == null ? null : formatDayHourSecond.print(end);
 
-        Set<ExecutionCourse> courses = new HashSet<>();
         String writtenEvaluationId = writtenEvaluation.getExternalId();
         if (student != null) {
             Space assignedRoom = null;
-            for (ExecutionCourse executionCourse : writtenEvaluation.getAssociatedExecutionCoursesSet()) {
-                final Registration registration = executionCourse.getRegistration(student.getPerson());
-                final Attends attendsByStudent = executionCourse.getAttendsByStudent(student);
-                if (registration != null || attendsByStudent != null) {
-                    courses.add(executionCourse);
-                }
-            }
 
             final WrittenEvaluationEnrolment evalEnrolment = writtenEvaluation.getWrittenEvaluationEnrolmentFor(student);
             if (evalEnrolment != null) {
@@ -1303,21 +1324,23 @@ public class FenixAPIv1 {
 
             if (type.equals(EvaluationType.EXAM_TYPE)) {
                 return new FenixCourseEvaluation.Exam(writtenEvaluationId, name, evaluationPeriod, isEnrolmentPeriod,
-                        enrollmentPeriodStart, enrollmentPeriodEnd, writtenEvaluation.getAssociatedRooms(), isEnrolled, courses,
-                        assignedRoom);
+                        enrollmentPeriodStart, enrollmentPeriodEnd, writtenEvaluation.getAssociatedRooms(), isEnrolled,
+                        Collections.singleton(executionCourse), assignedRoom);
             } else {
                 return new FenixCourseEvaluation.Test(writtenEvaluationId, name, evaluationPeriod, isEnrolmentPeriod,
-                        enrollmentPeriodStart, enrollmentPeriodEnd, writtenEvaluation.getAssociatedRooms(), isEnrolled, courses,
-                        assignedRoom);
+                        enrollmentPeriodStart, enrollmentPeriodEnd, writtenEvaluation.getAssociatedRooms(), isEnrolled,
+                        Collections.singleton(executionCourse), assignedRoom);
             }
         }
 
         if (type.equals(EvaluationType.EXAM_TYPE)) {
             return new FenixCourseEvaluation.Exam(writtenEvaluationId, name, evaluationPeriod, isEnrolmentPeriod,
-                    enrollmentPeriodStart, enrollmentPeriodEnd, writtenEvaluation.getAssociatedRooms(), isEnrolled, courses);
+                    enrollmentPeriodStart, enrollmentPeriodEnd, writtenEvaluation.getAssociatedRooms(), isEnrolled,
+                    Collections.singleton(executionCourse));
         } else {
             return new FenixCourseEvaluation.Test(writtenEvaluationId, name, evaluationPeriod, isEnrolmentPeriod,
-                    enrollmentPeriodStart, enrollmentPeriodEnd, writtenEvaluation.getAssociatedRooms(), isEnrolled, courses);
+                    enrollmentPeriodStart, enrollmentPeriodEnd, writtenEvaluation.getAssociatedRooms(), isEnrolled,
+                    Collections.singleton(executionCourse));
         }
 
     }
