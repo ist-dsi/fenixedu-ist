@@ -1,0 +1,24 @@
+{% extends "ashes-ist/default" %}
+
+{% block footer %}
+<footer class="clearfix" role="contentinfo" >
+		<div class="col-sm-2 text-center">
+			<a class="brand" href="http://fenixedu.org"><img src="{{contextPath}}/themes/ashes/img/logo_fenixedu_footer.svg" alt="Powered by FenixEdu"></a>
+		</div>
+		<p class="col-sm-10">
+			<span>{{config.applicationCopyright.content}}</span>
+			<a href="" onclick="openSupport(); return false;">
+				{{i18n('resources.ApplicationResources', 'support.Contact')}}
+			</a>
+		</p>
+</footer>
+<div class="modal fade" id="supportModal"></div>
+<script>
+openSupport = function() { $('#supportModal').load('{{contextPath}}/themes/ashes-ist/supportModal.jsp'); $('#supportModal').modal('show');
+	window.current$functionality = '{{functionality.externalId}}'; };
+</script>
+<style>
+    .nav-menu li { display: none; }
+    .nav-menu li.active  { display: inline; }
+</style>
+{% endblock %}
