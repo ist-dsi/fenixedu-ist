@@ -35,7 +35,7 @@ public class RespondToFirstTimeCycleInquiry extends FenixDispatchAction {
     public final ActionForward showQuestion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
             HttpServletResponse response) throws Exception {
 
-        return new ActionForward("/firstTimeCycleInquiryWarning.jsp");
+        return new ActionForward("/firstTimeCycleInquiry.jsp");
     }
 
     private ActionForward forward(final String path) {
