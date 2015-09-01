@@ -143,7 +143,9 @@ public class UpdateAbandonStateBean implements Serializable {
     }
 
     private boolean evaluateAndCheckEnrolments(final Registration registration, final ExecutionSemester semester) {
-        if (registration.getStartExecutionYear().isBeforeOrEquals(semester.getExecutionYear())) {
+        ExecutionSemester startExecutionSemester = ExecutionSemester.readByYearMonthDay(registration.getStartDate());
+        if (registration.getStartExecutionYear().isBeforeOrEquals(semester.getExecutionYear())
+                && startExecutionSemester.isBefore(semester)) {
             if (hasAnyCurriculumLines(registration, semester)) {
                 return true;
             }
