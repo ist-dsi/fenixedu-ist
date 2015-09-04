@@ -21,6 +21,8 @@ class cgd.CgdCardCounter {
 
 class cgd.CgdCard {
     int serialNumber;
+    boolean allowSendDetails;
+    DateTime successfulSentData;
 }
 
 class student.importation.DgesBaseProcess extends .org.fenixedu.academic.domain.QueueJobWithFile {
@@ -267,3 +269,4 @@ relation RemoteSystemDomainRoot {
     RemoteSystem playsRole remoteSystem;
     .pt.ist.fenixframework.DomainRoot playsRole domainRoot;
 }
+
