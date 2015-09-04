@@ -142,6 +142,12 @@ public class FenixEduIstIntegrationConfiguration {
 
         @ConfigurationProperty(key = "api.parking.password", description = "The password for parking information")
         public String getApiParkingPassword();
+
+        @ConfigurationProperty(key = "externalServices.AEIST.password")
+        public String getExternalServicesAEISTPassword();
+
+        @ConfigurationProperty(key = "externalServices.AEIST.username")
+        public String getExternalServicesAEISTUsername();
     }
 
     public static boolean barraLogin() {
