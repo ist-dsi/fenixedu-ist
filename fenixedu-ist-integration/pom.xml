@@ -106,6 +106,11 @@
             <artifactId>bennu-oauth</artifactId>
             <version>1.0.3</version>
         </dependency>
+        <dependency>
+          <groupId>pt.ist</groupId>
+          <artifactId>fenixedu-ulisboa-cgdIntegration</artifactId>
+          <version>1.0.0</version>
+        </dependency>
     </dependencies>
 
     <repositories>

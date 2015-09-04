@@ -41,23 +41,29 @@ public class CgdCardCounter extends CgdCardCounter_Base {
     }
 
     private String nextSerialNumber(final User user) {
-        return user.getCgdCardSet().stream().filter(c -> c.getCgdCardCounter() == this).findAny()
-                .orElse(createNewSerialNumber(user)).getSerialNumberForCard();
+        return user.getCgdCardSet().stream().filter(c -> c.getCgdCardCounter() == this)
+                .findAny()
+                .orElseGet(() -> createNewSerialNumber(user)).getSerialNumberForCard();
     }
 
-    private CgdCard createNewSerialNumber(User user) {
+    CgdCard createNewSerialNumber(User user) {
         final int count = getCount() + 1;
         setCount(count);
         return new CgdCard(this, user, count);
     }
 
-    private static CgdCardCounter getCounterForYear(final int year) {
+    static CgdCardCounter getCounterForYear(final int year) {
+        CgdCardCounter counter = findCounterForYear(year);
+        return counter == null ? new CgdCardCounter(year) : counter;
+    }
+
+    static CgdCardCounter findCounterForYear(final int year) {
         for (final CgdCardCounter counter : Bennu.getInstance().getCgdCardCounterSet()) {
             if (counter.getYear() == year) {
                 return counter;
             }
         }
-        return new CgdCardCounter(year);
+        return null;
     }
 
 }
