@@ -17,7 +17,7 @@
             <artifactId>fenixedu-academic</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.fenixedu</groupId>
+            <groupId>pt.ist</groupId>
             <artifactId>fenixedu-id-cards</artifactId>
         </dependency>
         <dependency>
