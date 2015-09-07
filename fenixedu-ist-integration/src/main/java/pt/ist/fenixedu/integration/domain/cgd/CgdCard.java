@@ -77,6 +77,16 @@ public class CgdCard extends CgdCard_Base {
         return null;
     }
 
+    public static boolean getGrantAccess() {
+        final User user = Authenticate.getUser();
+        if (user != null) {
+            final int year = Year.now().getValue();
+            final CgdCard card = findCardFor(user, year, false);
+            return card != null && card.getAllowSendDetails();
+        }
+        return false;
+    }
+
     private static CgdCard findCardFor(final User user, final int year, final boolean createIfNotExists) {
         final CgdCard card = user.getCgdCardSet().stream().filter(c -> c.getCgdCardCounter().getYear() == year).findAny().orElse(null);
         return card == null && createIfNotExists ? CgdCardCounter.findCounterForYear(year).createNewSerialNumber(user) : card;

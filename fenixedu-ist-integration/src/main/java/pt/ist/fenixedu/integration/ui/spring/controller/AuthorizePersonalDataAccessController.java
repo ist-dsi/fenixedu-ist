@@ -28,11 +28,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import pt.ist.fenixedu.integration.domain.cgd.CgdCard;
 
-@SpringApplication(group = "#logged", path = "authorize-personal-data-access", title = "authorize.personal.data.access.title")
+@SpringApplication(group = "logged", path = "authorize-personal-data-access", title = "authorize.personal.data.access.title")
 @SpringFunctionality(app = AuthorizePersonalDataAccessController.class, title = "authorize.personal.data.access.title")
 @Controller
 @RequestMapping("/authorize-personal-data-access")
 public class AuthorizePersonalDataAccessController {
+
+    @RequestMapping(method = RequestMethod.GET)
+    public String viewAuthorizationDetails(Model model) {
+        model.addAttribute("allowCGDAccess", CgdCard.getGrantAccess());
+        return "fenixedu-ist-integration/personalDataAccess/viewAuthorizationDetails";
+    }
 
     @RequestMapping(method = RequestMethod.POST)
     public String setCandiadteCGDAccess(@RequestParam(required = false) Boolean allowAccess, @RequestParam(required = false) String qs, Model model) {
