@@ -25,10 +25,13 @@ import static org.fenixedu.academic.predicate.AccessControl.getPerson;
 import static pt.ist.fenixframework.FenixFramework.atomic;
 
 import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.academic.ui.struts.action.teacher.ManageExecutionCourseDA;
@@ -105,7 +108,12 @@ public class TeacherPagesController extends ExecutionCourseController {
     }
 
     private Stream<ExecutionCourse> previousExecutionCourses(ExecutionCourse executionCourse) {
-        return executionCourse.getAssociatedCurricularCoursesSet().stream()
+        Set<Degree> degrees =
+                executionCourse.getAssociatedCurricularCoursesSet().stream().map(c -> c.getDegreeCurricularPlan().getDegree())
+                        .distinct().collect(Collectors.toSet());
+        return executionCourse.getCompetenceCourses().stream()
+                .flatMap(competence -> competence.getAssociatedCurricularCoursesSet().stream())
+                .filter(curricularCourse -> degrees.contains(curricularCourse.getDegreeCurricularPlan().getDegree()))
                 .flatMap(curricularCourse -> curricularCourse.getAssociatedExecutionCoursesSet().stream())
                 .filter(ec -> ec != executionCourse).filter(ec -> ec.getSite() != null).distinct()
                 .sorted(ExecutionCourse.EXECUTION_COURSE_COMPARATOR_BY_EXECUTION_PERIOD_AND_NAME.reversed());
