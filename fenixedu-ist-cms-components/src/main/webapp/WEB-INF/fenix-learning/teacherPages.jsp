@@ -112,7 +112,7 @@ window.tooltip = $.fn.tooltip;
                             <option value="">- <spring:message code="label.select.site"/> -</option>
                             <c:forEach var="ec" items="${previousExecutionCourses}">
                                 <option value="${ec.externalId}" ${ec.externalId == previousExecutionCourse ? 'selected' : ''}>
-                                        <c:out value="${ec.executionPeriod.qualifiedName}"/>
+                                        <c:out value="${ec.executionPeriod.qualifiedName} - ${ec.degreePresentationString}"/>
                                 </option>
                             </c:forEach>
                         </select>
