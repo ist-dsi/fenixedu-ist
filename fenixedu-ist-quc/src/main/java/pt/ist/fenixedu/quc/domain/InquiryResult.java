@@ -300,7 +300,9 @@ public class InquiryResult extends InquiryResult_Base {
      */
     private static Professorship getProfessorship(String code) {
         String[] decodedParts = code.split(GepReportFile.CODE_SEPARATOR);
-        ExecutionCourse executionCourse = getExecutionCourse(decodedParts[1] + GepReportFile.CODE_SEPARATOR + decodedParts[2]);
+        ExecutionCourse executionCourse =
+                getExecutionCourse(decodedParts[1] + GepReportFile.CODE_SEPARATOR + decodedParts[2]
+                        + GepReportFile.CODE_SEPARATOR + decodedParts[3]);
         return executionCourse.getProfessorship(Person.findByUsername(decodedParts[0]));
     }
     
