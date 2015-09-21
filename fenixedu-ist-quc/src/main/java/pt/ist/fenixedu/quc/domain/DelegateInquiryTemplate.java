@@ -19,8 +19,6 @@
 package pt.ist.fenixedu.quc.domain;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.ExecutionCourse;
@@ -100,15 +98,16 @@ public class DelegateInquiryTemplate extends DelegateInquiryTemplate_Base {
             return true;
         }
 
-        List<Boolean> asd =
-                yearDelegate
-                        .getDegree()
-                        .getExecutionDegrees(executionSemester.getAcademicInterval())
-                        .stream()
-                        .flatMap(
-                                ed -> DelegateUtils.getExecutionCoursesToInquiries(yearDelegate, executionSemester, ed).stream()
-                                        .map(ec -> hasMandatoryCommentsToMake(yearDelegate, ec, ed)).collect(Collectors.toList())
-                                        .stream()).collect(Collectors.toList());
+        final ExecutionDegree executionDegree =
+                ExecutionDegree.getByDegreeCurricularPlanAndExecutionYear(yearDelegate.getRegistration()
+                        .getStudentCurricularPlan(executionSemester).getDegreeCurricularPlan(),
+                        executionSemester.getExecutionYear());
+        for (ExecutionCourse executionCourse : DelegateUtils.getExecutionCoursesToInquiries(yearDelegate, executionSemester,
+                executionDegree)) {
+            if (hasMandatoryCommentsToMake(yearDelegate, executionCourse, executionDegree)) {
+                return true;
+            }
+        }
         return false;
     }
 
