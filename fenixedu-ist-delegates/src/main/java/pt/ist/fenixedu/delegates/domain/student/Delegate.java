@@ -65,7 +65,7 @@ public abstract class Delegate extends Delegate_Base {
     }
 
     public Registration getRegistration() {
-        return getUser().getPerson().getStudent().getActiveRegistrationFor(getDegree());
+        return getUser().getPerson().getStudent().readRegistrationByDegree(getDegree());
     }
 
     public CurricularYear getCurricularYear() {
