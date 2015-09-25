@@ -99,9 +99,9 @@ public class DelegateInquiryTemplate extends DelegateInquiryTemplate_Base {
         }
 
         final ExecutionDegree executionDegree =
-                ExecutionDegree.getByDegreeCurricularPlanAndExecutionYear(yearDelegate.getRegistration()
-                        .getStudentCurricularPlan(executionSemester).getDegreeCurricularPlan(),
-                        executionSemester.getExecutionYear());
+                yearDelegate.getDegree().getExecutionDegreesForExecutionYear(executionSemester.getExecutionYear()).stream()
+                        .findFirst().orElse(null);
+
         for (ExecutionCourse executionCourse : DelegateUtils.getExecutionCoursesToInquiries(yearDelegate, executionSemester,
                 executionDegree)) {
             if (hasMandatoryCommentsToMake(yearDelegate, executionCourse, executionDegree)) {
