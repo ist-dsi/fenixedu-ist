@@ -43,8 +43,10 @@ import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.academic.ui.struts.action.teacher.ManageExecutionCourseDA;
 import org.fenixedu.academic.ui.struts.action.teacher.executionCourse.ExecutionCourseBaseAction;
 import org.fenixedu.bennu.struts.annotations.Mapping;
+import org.joda.time.DateTime;
 
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
+import pt.ist.fenixedu.quc.domain.DelegateInquiryTemplate;
 import pt.ist.fenixedu.quc.domain.InquiryResponseState;
 import pt.ist.fenixedu.quc.domain.InquiryResult;
 import pt.ist.fenixedu.quc.domain.RegentInquiryTemplate;
@@ -78,7 +80,11 @@ public class TeachingInquiryDA extends ExecutionCourseBaseAction {
             request.setAttribute("readMode", "readMode");
         }
 
-        if (!TeacherInquiryTemplate.hasToAnswerTeacherInquiry(professorship.getPerson(), professorship)) {
+        DelegateInquiryTemplate delegateInquiry =
+                DelegateInquiryTemplate.getTemplateByExecutionPeriod(executionCourse.getExecutionPeriod());
+        DateTime today = new DateTime();
+        if (!TeacherInquiryTemplate.hasToAnswerTeacherInquiry(professorship.getPerson(), professorship)
+                || (delegateInquiry != null && delegateInquiry.getResponsePeriodEnd().isAfter(today))) {
             return forward(request, "/teacher/inquiries/inquiryUnavailable.jsp");
         }
 
