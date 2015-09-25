@@ -100,10 +100,8 @@ public class YearDelegateInquiryDA extends FenixDispatchAction {
             }
 
             final ExecutionDegree executionDegree =
-
-                    ExecutionDegree.getByDegreeCurricularPlanAndExecutionYear(yearDelegate.getRegistration()
-                            .getStudentCurricularPlan(executionPeriod).getDegreeCurricularPlan(),
-                            executionPeriod.getExecutionYear());
+                    yearDelegate.getDegree().getExecutionDegreesForExecutionYear(executionPeriod.getExecutionYear()).stream()
+                            .findFirst().orElse(null);
 
             Set<ExecutionCourse> executionCoursesToInquiries =
                     DelegateUtils.getExecutionCoursesToInquiries(yearDelegate, executionPeriod, executionDegree);
