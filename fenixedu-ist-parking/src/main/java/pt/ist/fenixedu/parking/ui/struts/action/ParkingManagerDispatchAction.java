@@ -172,7 +172,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
         request.setAttribute("parkingRequest", parkingRequest);
         request.setAttribute("parkingPartyBean", new ParkingPartyBean(parkingRequest.getParkingParty()));
         DynaActionForm dynaActionForm = (DynaActionForm) actionForm;
-        if (!StringUtils.isEmpty(dynaActionForm.getString("cardAlwaysValid"))) { // in case of error validation
+        if (!StringUtils.isEmpty(dynaActionForm.getString("cardAlwaysValid"))) {// in case of error validation
             dynaActionForm.set("cardAlwaysValid", dynaActionForm.getString("cardAlwaysValid"));
         } else {
             dynaActionForm.set("cardAlwaysValid", "no");
@@ -330,9 +330,8 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
                 request.setAttribute("externalId", parkingRequestID);
                 return showRequest(mapping, actionForm, request, response);
             }
-            Integer mostSignificantNumber =
-                    getMostSignificantNumber((Person) parkingRequest.getParkingParty().getParty(),
-                            FenixFramework.<ParkingGroup> getDomainObject(group));
+            Integer mostSignificantNumber = getMostSignificantNumber((Person) parkingRequest.getParkingParty().getParty(),
+                    FenixFramework.<ParkingGroup> getDomainObject(group));
             updateParkingParty(parkingRequest, ParkingRequestState.ACCEPTED, cardNumber,
                     FenixFramework.<ParkingGroup> getDomainObject(group), note, parkingPartyBean.getCardStartDate(),
                     parkingPartyBean.getCardEndDate(), mostSignificantNumber);
@@ -401,8 +400,8 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
         Integer number = getMostSignificantNumber(person, parkingGroup);
         if (number != null) {
             if ((person.getTeacher() != null && person.getTeacher().getDepartment() != null)
-                    || (person.getEmployee() != null && person.getEmployee().getCurrentWorkingContract() != null && !RoleType.TEACHER
-                            .isMember(person.getUser()))) {
+                    || (person.getEmployee() != null && person.getEmployee().getCurrentWorkingContract() != null
+                            && !RoleType.TEACHER.isMember(person.getUser()))) {
                 return "Nº Mec: " + number;
             } else {
                 return "Nº" + number;
@@ -434,15 +433,13 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
             }
         }
         if (person.getEmployee() != null) {
-            PersonContractSituation currentResearcherContractSituation =
-                    person.getPersonProfessionalData() != null ? person.getPersonProfessionalData()
-                            .getCurrentPersonContractSituationByCategoryType(CategoryType.RESEARCHER) : null;
+            PersonContractSituation currentResearcherContractSituation = person.getPersonProfessionalData() != null ? person
+                    .getPersonProfessionalData().getCurrentPersonContractSituationByCategoryType(CategoryType.RESEARCHER) : null;
             if (currentResearcherContractSituation != null) {
                 return person.getEmployee().getEmployeeNumber();
             }
-            PersonContractSituation currentGrantOwnerContractSituation =
-                    person.getPersonProfessionalData() != null ? person.getPersonProfessionalData()
-                            .getCurrentPersonContractSituationByCategoryType(CategoryType.GRANT_OWNER) : null;
+            PersonContractSituation currentGrantOwnerContractSituation = person.getPersonProfessionalData() != null ? person
+                    .getPersonProfessionalData().getCurrentPersonContractSituationByCategoryType(CategoryType.GRANT_OWNER) : null;
             if (currentGrantOwnerContractSituation != null) {
                 return person.getEmployee().getEmployeeNumber();
             }
@@ -492,9 +489,8 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
         if (SearchParkingPartyBean != null) {
             SearchParkingPartyBean.setParty(null);
 
-            List<Party> partyList =
-                    searchPartyCarPlate(SearchParkingPartyBean.getPartyName(), SearchParkingPartyBean.getCarPlateNumber(),
-                            SearchParkingPartyBean.getParkingCardNumber());
+            List<Party> partyList = searchPartyCarPlate(SearchParkingPartyBean.getPartyName(),
+                    SearchParkingPartyBean.getCarPlateNumber(), SearchParkingPartyBean.getParkingCardNumber());
             request.setAttribute("searchPartyBean", SearchParkingPartyBean);
             request.setAttribute("partyList", partyList);
 
@@ -552,7 +548,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
         DynaActionForm dynaActionForm = (DynaActionForm) actionForm;
         if (!parkingParty.getVehiclesSet().isEmpty()) {
             if (!StringUtils.isEmpty(dynaActionForm.getString("cardAlwaysValid"))) {
-                dynaActionForm.set("cardAlwaysValid", dynaActionForm.getString("cardAlwaysValid")); // in case of error validation
+                dynaActionForm.set("cardAlwaysValid", dynaActionForm.getString("cardAlwaysValid"));// in case of error validation
             } else {
                 if (parkingParty.getCardStartDate() == null) {
                     dynaActionForm.set("cardAlwaysValid", "yes");
@@ -561,7 +557,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
                 }
             }
         } else {
-            if (!StringUtils.isEmpty(dynaActionForm.getString("cardAlwaysValid"))) { // in case of error validation
+            if (!StringUtils.isEmpty(dynaActionForm.getString("cardAlwaysValid"))) {// in case of error validation
                 dynaActionForm.set("cardAlwaysValid", dynaActionForm.getString("cardAlwaysValid"));
             } else {
                 dynaActionForm.set("cardAlwaysValid", "no");
@@ -723,11 +719,10 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
         ParkingParty parkingParty = parkingRequest.getParkingParty();
 
         if (parkingRequestState == ParkingRequestState.ACCEPTED) {
-            if (parkingParty.getCardNumber() != null
-                    && (changedObject(parkingParty.getCardStartDate(), cardStartDate)
-                            || changedObject(parkingParty.getCardEndDate(), cardEndDate)
-                            || changedObject(parkingParty.getCardNumber(), cardCode) || changedObject(
-                                parkingParty.getParkingGroup(), parkingGroup))) {
+            if (parkingParty.getCardNumber() != null && (changedObject(parkingParty.getCardStartDate(), cardStartDate)
+                    || changedObject(parkingParty.getCardEndDate(), cardEndDate)
+                    || changedObject(parkingParty.getCardNumber(), cardCode)
+                    || changedObject(parkingParty.getParkingGroup(), parkingGroup))) {
                 new ParkingPartyHistory(parkingParty, true);
             }
             parkingParty.setCardStartDate(cardStartDate);
@@ -757,8 +752,8 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
     }
 
     private boolean changedObject(Object oldObject, Object newObject) {
-        return oldObject == null && newObject == null ? false : (oldObject != null && newObject != null ? (!oldObject
-                .equals(newObject)) : true);
+        return oldObject == null
+                && newObject == null ? false : (oldObject != null && newObject != null ? (!oldObject.equals(newObject)) : true);
     }
 
     @Atomic
@@ -788,14 +783,15 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
 
     private boolean satisfiedParkingCardNumber(ParkingParty parkingParty, Long parkingCardNumber) {
         if (parkingCardNumber != null) {
-            return (parkingParty.getCardNumber() != null && parkingParty.getCardNumber().toString()
-                    .contains(parkingCardNumber.toString())) ? true : false;
+            return (parkingParty.getCardNumber() != null
+                    && parkingParty.getCardNumber().toString().contains(parkingCardNumber.toString())) ? true : false;
         }
         return true;
     }
 
     private boolean satisfiedPlateNumber(ParkingParty parkingParty, String carPlateNumber) {
-        return !StringUtils.isEmpty(carPlateNumber) ? (parkingParty.hasVehicleContainingPlateNumber(carPlateNumber.trim())) : true;
+        return !StringUtils.isEmpty(carPlateNumber) ? (parkingParty
+                .hasVehicleContainingPlateNumber(carPlateNumber.trim())) : true;
     }
 
     private static boolean areNamesPresent(String name, String[] searchNameParts) {
@@ -807,5 +803,25 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
             }
         }
         return true;
+    }
+
+    public ActionForward unrejectParkingRequest(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+
+        ParkingRequest parkingRequest = getDomainObject(request, "parkingRequestOid");
+        if (parkingRequest != null) {
+            unrejectParkingRequest(parkingRequest);
+            request.setAttribute("externalId", parkingRequest.getExternalId());
+            return showRequest(mapping, actionForm, request, response);
+        }
+        return showParkingPartyRequests(mapping, actionForm, request, response);
+    }
+
+    @Atomic
+    private void unrejectParkingRequest(ParkingRequest parkingRequest) {
+        if (parkingRequest.getParkingRequestState().equals(ParkingRequestState.REJECTED)) {
+            parkingRequest.setParkingRequestState(ParkingRequestState.PENDING);
+        }
+
     }
 }

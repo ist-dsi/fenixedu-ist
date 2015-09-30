@@ -27,6 +27,7 @@ import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.organizationalStructure.Party;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 
+import pt.ist.fenixedu.contracts.domain.organizationalStructure.Invitation;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonContractSituation;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalData;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalCategory;
@@ -38,7 +39,7 @@ public enum PartyClassification {
     BOLONHA_ADVANCED_FORMATION_DIPLOMA(DegreeType::isAdvancedFormationDiploma), BOLONHA_MASTER_DEGREE(
             DegreeType::isBolonhaMasterDegree), BOLONHA_INTEGRATED_MASTER_DEGREE(DegreeType::isIntegratedMasterDegree),
     BOLONHA_ADVANCED_SPECIALIZATION_DIPLOMA(DegreeType::isAdvancedSpecializationDiploma), BOLONHA_DEGREE(
-            DegreeType::isBolonhaDegree), PERSON, UNIT;
+            DegreeType::isBolonhaDegree), INVITATION, PERSON, UNIT;
 
     private final Predicate<DegreeType> mapping;
 
@@ -100,6 +101,10 @@ public enum PartyClassification {
                     return PartyClassification.getClassificationByDegreeType(degreeType);
                 }
             }
+            if(!Invitation.getActiveInvitations(person).isEmpty()) {
+                return PartyClassification.INVITATION;
+            }
+            
             return PartyClassification.PERSON;
         }
         return PartyClassification.UNIT;

@@ -104,19 +104,37 @@
 						<bean:message key="message.canRenewToUnlimitedCard" bundle="PARKING_RESOURCES"/>
 					</div>
 					<ul class="mvert05">
-						<li>
-							<html:link page="/personParking.do?method=renewUnlimitedParkingRequest">
+					<bean:size id="size" name="parkingParty" property="submitAsRoles"/>
+						<logic:lessEqual name="size" value="1">
+							<li><html:link page="/personParking.do?method=renewUnlimitedParkingRequest">
 								<bean:message key="label.renewToUnlimitedCard" bundle="PARKING_RESOURCES" />
-							</html:link>
-						</li>
+							</html:link></li>
+						</logic:lessEqual>
+						<logic:greaterThan name="size" value="1">
+							<fr:form action="/personParking.do?method=renewUnlimitedParkingRequest">
+								<fr:edit id="renewUnlimitedParkingRequest" name="renewUnlimitedParkingRequest">
+									<fr:schema type="pt.ist.fenixedu.parking.domain.ParkingRequest$ParkingRequestFactoryCreator" bundle="PARKING_RESOURCES">
+										<fr:slot name="requestAs" key="label.renewToUnlimitedCardAs" bundle="PARKING_RESOURCES" layout="menu-select" validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator">
+											<fr:property name="providerClass" value="pt.ist.fenixedu.parking.ui.renderers.providers.parking.ParkingRequestAsProvider" />
+											<fr:property name="eachLayout" value="this-does-not-exist" />		
+										</fr:slot>
+									</fr:schema>
+									<fr:layout name="tabular">
+										<fr:property name="classes" value="form listInsideClear" />
+										<fr:property name="columnClasses" value="width100px,,tderror" />
+									</fr:layout>
+								</fr:edit>
+								<html:submit><bean:message key="label.submit" bundle="APPLICATION_RESOURCES"/></html:submit>	
+							</fr:form>
+						</logic:greaterThan>
 					</ul>
 				</div>
 			</logic:equal>
-			<logig:present name="renewUnlimitedParkingRequest.sucess">
+			<logic:present name="renewUnlimitedParkingRequest.sucess">
 				<logic:equal name="renewUnlimitedParkingRequest.sucess" value="true">
 				<p class="mtop15"><strong class="success0"><bean:message key="message.renewUnlimitedParkingRequest.sucess" bundle="PARKING_RESOURCES"/></strong></p>
 				</logic:equal>
-			</logig:present>
+			</logic:present>
 		</logic:equal>
 		
 		<%-- editar --%>
