@@ -404,11 +404,12 @@
 
 <schema name="show.parkingRequest.noDetail"
 	type="pt.ist.fenixedu.parking.domain.ParkingRequest">
+	<slot name="parkingParty.party.username" key="label.username" bundle="PARKING_RESOURCES"/>
 	<slot name="parkingParty.allNumbers" key="label.otherNumbers" bundle="PARKING_RESOURCES"/>
-	<slot name="parkingParty.mostSignificantNumber" key="label.number" bundle="PARKING_RESOURCES"/>
 	<slot name="parkingParty.party.name" key="label.name" bundle="PARKING_RESOURCES" />
 	<slot name="parkingRequestState" key="label.state" bundle="PARKING_RESOURCES" />
 	<slot name="parkingRequestType" key="label.type" bundle="PARKING_RESOURCES" />
+	<slot name="requestedAs" key="label.requestedAs" bundle="PARKING_RESOURCES" layout="null-as-label"/>
 	<slot name="limitlessAccessCard" key="label.limitlessAccessCard" bundle="PARKING_RESOURCES"/>
 	<slot name="creationDate" key="label.creationDate" bundle="PARKING_RESOURCES" />
 	<slot name="parkingParty.degreesInformation" key="label.aditionalInformation" bundle="PARKING_RESOURCES">

@@ -80,6 +80,9 @@ public class PersonParkingDA extends FenixDispatchAction {
                         .getParkingRequestState() == ParkingRequestState.REJECTED)) {
             canEdit = false;
         }
+        if (parkingParty.getFirstRequest() != null) {
+            request.setAttribute("renewUnlimitedParkingRequest", parkingParty.getFirstRequest().getParkingRequestFactoryEditor());
+        }
         request.setAttribute("canEdit", canEdit);
         request.setAttribute("parkingParty", parkingParty);
         return mapping.findForward("prepareParking");
@@ -664,15 +667,23 @@ public class PersonParkingDA extends FenixDispatchAction {
     public ActionForward renewUnlimitedParkingRequest(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
             HttpServletResponse response) throws Exception {
         User userView = Authenticate.getUser();
-        renewUnlimitedParkingRequest(userView.getPerson().getParkingParty().getFirstRequest(), Boolean.TRUE);
+        String requestedAs = null;
+        ParkingRequestFactoryEditor renewUnlimitedParkingRequest = getRenderedObject("renewUnlimitedParkingRequest");
+        if (renewUnlimitedParkingRequest != null) {
+            requestedAs = renewUnlimitedParkingRequest.getRequestAs();
+        } else {
+            requestedAs = userView.getPerson().getParkingParty().getRoleToRequestUnlimitedCard();
+        }
+        renewUnlimitedParkingRequest(userView.getPerson().getParkingParty().getFirstRequest(), Boolean.TRUE, requestedAs);
         request.setAttribute("renewUnlimitedParkingRequest.sucess", true);
         return prepareParking(mapping, actionForm, request, response);
     }
 
     @Atomic
-    public void renewUnlimitedParkingRequest(ParkingRequest oldParkingRequest, Boolean limitlessAccessCard) {
+    public void renewUnlimitedParkingRequest(ParkingRequest oldParkingRequest, Boolean limitlessAccessCard, String requestedAs) {
         if (oldParkingRequest.getParkingParty().getCanRequestUnlimitedCardAndIsInAnyRequestPeriod()) {
-            new ParkingRequest(oldParkingRequest, limitlessAccessCard);
+            ParkingRequest parkingRequest = new ParkingRequest(oldParkingRequest, limitlessAccessCard);
+            parkingRequest.setRequestedAs(requestedAs);
         }
     }
 

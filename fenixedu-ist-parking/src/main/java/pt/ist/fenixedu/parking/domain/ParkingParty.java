@@ -68,6 +68,7 @@ import pt.ist.fenixedu.parking.dto.VehicleBean;
 import pt.ist.fenixframework.dml.runtime.RelationAdapter;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 public class ParkingParty extends ParkingParty_Base {
@@ -265,7 +266,12 @@ public class ParkingParty extends ParkingParty_Base {
                     roles.add(BundleUtil.getString(Bundle.ENUMERATION, "GRANT_OWNER"));
                 }
             }
-
+            if (!Invitation.getActiveInvitations(person).isEmpty()) {
+                roles.add(BundleUtil.getString("resources.ParkingResources", "label.invited"));
+                roles.add(BundleUtil.getString("resources.ParkingResources", "label.invitedEmployee"));
+                roles.add(BundleUtil.getString("resources.ParkingResources", "label.invitedGrantOwner"));
+                roles.add(BundleUtil.getString("resources.ParkingResources", "label.invitedResearcher"));
+            }
         }
         if (roles.size() == 0) {
             roles.add(BundleUtil.getString(Bundle.ENUMERATION, RoleType.PERSON.name()));
@@ -695,21 +701,18 @@ public class ParkingParty extends ParkingParty_Base {
     }
 
     public boolean hasRolesToRequestUnlimitedCard() {
-        List<String> roles = getSubmitAsRoles();
-        if (roles.contains("GRANT_OWNER")) {
-            return Boolean.TRUE;
-        } else if (roles.contains("STUDENT") && canRequestUnlimitedCard(((Person) getParty()).getStudent())) {
-            return Boolean.TRUE;
-        }
-        return Boolean.FALSE;
+        return !Strings.isNullOrEmpty(getRoleToRequestUnlimitedCard());
     }
 
     public String getRoleToRequestUnlimitedCard() {
         List<String> roles = getSubmitAsRoles();
-        if (roles.contains("GRANT_OWNER")) {
-            return "GRANT_OWNER";
-        } else if (roles.contains("STUDENT") && canRequestUnlimitedCard(((Person) getParty()).getStudent())) {
-            return "STUDENT";
+        if (roles.contains(BundleUtil.getString(Bundle.ENUMERATION, "GRANT_OWNER"))) {
+            return BundleUtil.getString(Bundle.ENUMERATION, "GRANT_OWNER");
+        } else if (roles.contains(BundleUtil.getString(Bundle.ENUMERATION, RoleType.STUDENT.name()))
+                && canRequestUnlimitedCard(((Person) getParty()).getStudent())) {
+            return BundleUtil.getString(Bundle.ENUMERATION, RoleType.STUDENT.name());
+        } else if (roles.contains(BundleUtil.getString("resources.ParkingResources", "label.invited"))) {
+            return BundleUtil.getString("resources.ParkingResources", "label.invited");
         }
         return null;
     }

@@ -109,12 +109,18 @@ function hideCardValidPeriod(toShow){
 		<strong><bean:write name="cardTypeRequest"/></strong></span></p>
 	</logic:present>
 
+	<bean:define id="parkingRequestID" name="parkingRequest" property="externalId" />
 	<logic:notEqual name="parkingRequest" property="parkingRequestState" value="PENDING">		
+		<logic:equal name="parkingRequest" property="parkingRequestState" value="REJECTED">
+			<html:link page="<%="/parking.do?method=unrejectParkingRequest&parkingRequestOid="+parkingRequestID%>">
+					<bean:message key="label.unrejectParkingRequest" bundle="PARKING_RESOURCES" />
+			</html:link>
+		</logic:equal>
 		<jsp:include page="viewParkingPartyAndRequest.jsp"/>
 	</logic:notEqual>
 	<bean:define id="parkingPartyIdint" name="parkingRequest" property="parkingParty.externalId" />
 	<logic:equal name="parkingRequest" property="parkingRequestState" value="PENDING">
-		<bean:define id="parkingRequestID" name="parkingRequest" property="externalId" />	
+			
 		<bean:define id="groupName" value="" type="java.lang.String"/>		
 		<html:form action="/parking">
 			<html:hidden bundle="PARKING_RESOURCES" altKey="hidden.code" property="code" value="<%= parkingRequestID.toString()%>"/>

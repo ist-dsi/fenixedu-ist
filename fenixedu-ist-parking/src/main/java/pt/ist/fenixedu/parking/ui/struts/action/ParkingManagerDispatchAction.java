@@ -172,7 +172,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
         request.setAttribute("parkingRequest", parkingRequest);
         request.setAttribute("parkingPartyBean", new ParkingPartyBean(parkingRequest.getParkingParty()));
         DynaActionForm dynaActionForm = (DynaActionForm) actionForm;
-        if (!StringUtils.isEmpty(dynaActionForm.getString("cardAlwaysValid"))) { // in case of error validation
+        if (!StringUtils.isEmpty(dynaActionForm.getString("cardAlwaysValid"))) {// in case of error validation
             dynaActionForm.set("cardAlwaysValid", dynaActionForm.getString("cardAlwaysValid"));
         } else {
             dynaActionForm.set("cardAlwaysValid", "no");
@@ -552,7 +552,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
         DynaActionForm dynaActionForm = (DynaActionForm) actionForm;
         if (!parkingParty.getVehiclesSet().isEmpty()) {
             if (!StringUtils.isEmpty(dynaActionForm.getString("cardAlwaysValid"))) {
-                dynaActionForm.set("cardAlwaysValid", dynaActionForm.getString("cardAlwaysValid")); // in case of error validation
+                dynaActionForm.set("cardAlwaysValid", dynaActionForm.getString("cardAlwaysValid"));// in case of error validation
             } else {
                 if (parkingParty.getCardStartDate() == null) {
                     dynaActionForm.set("cardAlwaysValid", "yes");
@@ -561,7 +561,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
                 }
             }
         } else {
-            if (!StringUtils.isEmpty(dynaActionForm.getString("cardAlwaysValid"))) { // in case of error validation
+            if (!StringUtils.isEmpty(dynaActionForm.getString("cardAlwaysValid"))) {// in case of error validation
                 dynaActionForm.set("cardAlwaysValid", dynaActionForm.getString("cardAlwaysValid"));
             } else {
                 dynaActionForm.set("cardAlwaysValid", "no");
@@ -807,5 +807,25 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
             }
         }
         return true;
+    }
+
+    public ActionForward unrejectParkingRequest(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+
+        ParkingRequest parkingRequest = getDomainObject(request, "parkingRequestOid");
+        if (parkingRequest != null) {
+            unrejectParkingRequest(parkingRequest);
+            request.setAttribute("externalId", parkingRequest.getExternalId());
+            return showRequest(mapping, actionForm, request, response);
+        }
+        return showParkingPartyRequests(mapping, actionForm, request, response);
+    }
+
+    @Atomic
+    private void unrejectParkingRequest(ParkingRequest parkingRequest) {
+        if (parkingRequest.getParkingRequestState().equals(ParkingRequestState.REJECTED)) {
+            parkingRequest.setParkingRequestState(ParkingRequestState.PENDING);
+        }
+
     }
 }
