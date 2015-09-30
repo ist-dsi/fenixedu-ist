@@ -343,9 +343,9 @@
     </slot>
 </schema>
 
-<schema name="tutorship.tutorate.student" bundle="PEDAGOGICAL_COUNCIL" type="org.fenixedu.academic.domain.Person">
+<schema name="tutorship.tutorate.student" bundle="APPLICATION_RESOURCES" type="org.fenixedu.academic.domain.Person">
     <slot name="name" key="label.name" />
-    <slot name="documentIdNumber" key="label.documentId" />
+    <slot name="documentIdNumber" key="label.documentNumber" />
     <slot name="institutionalOrDefaultEmailAddressValue" key="label.email" />
     <slot name="defaultMobilePhone" key="label.phone" layout="null-as-label">
         <property name="subSchema" value="tutorate.phone.number" />
@@ -648,7 +648,7 @@
         <property name="contextRelative" value="true"/>
         <property name="moduleRelative" value="true"/>
         <property name="blankTarget" value="true"/>
-        <property name="linkFormat" value="/studentTutorshipCurriculum.do?method=showStudentRegistration&amp;studentNumber=${student.number}"/>    
+        <property name="linkFormat" value="/studentTutorshipCurriculum.do?method=showStudentCurriculum&amp;studentNumber=${student.number}"/>
         <property name="subLayout" value="values"/>
         <property name="subSchema" value="registration.number"/>
     </slot>

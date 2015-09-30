@@ -74,6 +74,11 @@ public class TutorshipStudentCurriculum extends FenixDispatchAction {
         NumberBean bean = (NumberBean) getObjectFromViewState("tutorateBean");
         if (bean == null) {
             bean = (NumberBean) request.getAttribute("tutorateBean");
+            if (bean == null) {
+                bean = new NumberBean();
+                bean.setNumber(getIntegerFromRequest(request, "studentNumber"));
+                request.setAttribute("tutorateBean", bean);
+            }
         }
 
         if (registrationOID != null) {

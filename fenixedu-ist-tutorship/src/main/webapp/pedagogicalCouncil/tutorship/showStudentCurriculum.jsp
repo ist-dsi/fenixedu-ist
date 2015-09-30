@@ -27,30 +27,36 @@
 <%@ page language="java" %>
 <%@page import="org.fenixedu.academic.domain.EvaluationSeason"%>
 <%@page import="org.fenixedu.academic.domain.EvaluationConfiguration"%>
-<%@ page import="org.fenixedu.commons.i18n.I18N"%>
+<%@page import="org.fenixedu.commons.i18n.I18N"%>
+<%@page import="org.fenixedu.bennu.core.domain.UserProfile"%>
+<%@page import="org.fenixedu.bennu.core.groups.DynamicGroup"%>
+<%@page import="org.fenixedu.bennu.core.security.Authenticate"%>
 <%@page import="org.fenixedu.academic.ui.renderers.student.curriculum.StudentCurricularPlanRenderer"%>
 <html:xhtml/>
 
 <!-- showStudentCurriculum.jsp -->
 
-<h2><bean:message key="title.tutorship.student.curriculum" bundle="PEDAGOGICAL_COUNCIL" /></h2>
+<h2><bean:message key="message.student.curriculum" bundle="APPLICATION_RESOURCES" /></h2>
 
-<fr:form action="/studentTutorshipCurriculum.do?method=showStudentCurriculum">
-	<fr:edit id="filterForm" name="tutorateBean" schema="tutorship.student.number">
-		<fr:edit id="tutorateBean" name="tutorateBean" visible="false" />
-		<fr:layout>
-			<fr:property name="classes" value="tstyle5 thnowrap_print thlight thleft mtop0"/>
-			<fr:property name="columnClasses" value=",,tdclear tderror1"/>
-		</fr:layout>
-		<fr:destination name="invalid" path="/studentTutorshipCurriculum.do?method=prepareStudentCurriculum" />
-	</fr:edit>
-	<html:submit>
-		<bean:message key="label.submit" bundle="PEDAGOGICAL_COUNCIL" />
-	</html:submit>
-</fr:form>
+<bean:define id="isPedagogicalCouncilMember" value="<%= ((java.lang.Boolean) DynamicGroup.get("pedagogicalCouncil").isMember(Authenticate.getUser())).toString() %>" />
+<logic:equal name="isPedagogicalCouncilMember" value="true">
+	<fr:form action="/studentTutorshipCurriculum.do?method=showStudentCurriculum">
+		<fr:edit id="filterForm" name="tutorateBean" schema="tutorship.student.number">
+			<fr:edit id="tutorateBean" name="tutorateBean" visible="false" />
+			<fr:layout>
+				<fr:property name="classes" value="tstyle5 thnowrap_print thlight thleft mtop0"/>
+				<fr:property name="columnClasses" value=",,tdclear tderror1"/>
+			</fr:layout>
+			<fr:destination name="invalid" path="/studentTutorshipCurriculum.do?method=prepareStudentCurriculum" />
+		</fr:edit>
+		<html:submit>
+			<bean:message key="label.submit" bundle="APPLICATION_RESOURCES" />
+		</html:submit>
+	</fr:form>
+</logic:equal>
 
 
-<html:messages id="message" message="true" bundle="PEDAGOGICAL_COUNCIL">
+<html:messages id="message" message="true" bundle="APPLICATION_RESOURCES">
 <br/><span class="error0"><!-- Error messages go here --><bean:write name="message" /></span>
 </html:messages>
 
