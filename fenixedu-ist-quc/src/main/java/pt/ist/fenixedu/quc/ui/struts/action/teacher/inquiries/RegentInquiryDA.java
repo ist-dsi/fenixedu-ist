@@ -191,7 +191,8 @@ public class RegentInquiryDA extends ExecutionCourseBaseAction {
             HttpServletResponse response) throws Exception {
 
         Professorship professorship = FenixFramework.getDomainObject(getFromRequest(request, "professorshipOID").toString());
-        RegentInquiryTemplate regentInquiryTemplate = RegentInquiryTemplate.getCurrentTemplate();
+        RegentInquiryTemplate regentInquiryTemplate =
+                RegentInquiryTemplate.getTemplateByExecutionPeriod(professorship.getExecutionCourse().getExecutionPeriod());
 
         RegentInquiryBean regentInquiryBean = new RegentInquiryBean(regentInquiryTemplate, professorship);
 
