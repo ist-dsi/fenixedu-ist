@@ -176,12 +176,15 @@ public class UpdateTeacherAuthorizations extends CronTask {
                 return compare == 0 ? ec1.getExternalId().compareTo(ec2.getExternalId()) : compare;
             }
         });
-        contracts.addAll(((Collection<EmployeeContract>) person.getParentAccountabilities(
-                AccountabilityTypeEnum.WORKING_CONTRACT, EmployeeContract.class)).stream()
-                .filter(ec -> ec.belongsToPeriod(semester.getBeginDateYearMonthDay(), semester.getEndDateYearMonthDay()))
-                .filter(Objects::nonNull).collect(Collectors.toSet()));
-
         Interval semesterInterval = semester.getAcademicInterval().toInterval();
+        contracts.addAll(((Collection<EmployeeContract>) person.getParentAccountabilities(AccountabilityTypeEnum.WORKING_CONTRACT,
+                EmployeeContract.class))
+                        .stream()
+                        .filter(ec -> ec.belongsToPeriod(semesterInterval.getStart().toYearMonthDay(),
+                                semesterInterval.getEnd().toYearMonthDay()))
+                        .filter(Objects::nonNull).collect(Collectors.toSet()));
+        
+        
         Department firstDepartmentUnit = null;
         for (EmployeeContract employeeContract : contracts) {
             Department employeeDepartmentUnit = getEmployeeDepartmentUnit(employeeContract.getUnit());
