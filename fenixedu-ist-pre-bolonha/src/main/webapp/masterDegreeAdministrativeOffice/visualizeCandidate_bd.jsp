@@ -99,7 +99,7 @@
     	<td width="30%"><bean:message key="label.person.identificationDocumentIssueDate" /></td>
             <logic:present name="personalInfo" property="dataEmissaoDocumentoIdentificacao" >
 	            <bean:define id="date" name="personalInfo" property="dataEmissaoDocumentoIdentificacao" />
-		<td class="greytxt"><%= Data.format2DayMonthYear((Date) date) 
+		<td class="greytxt"><%= date 
 %></td>   
 			</logic:present>
    	</tr>
@@ -108,7 +108,7 @@
     	<td width="30%"><bean:message key="label.person.identificationDocumentExpirationDate" /></td>
         	<logic:present name="personalInfo" property="dataValidadeDocumentoIdentificacao" >
 	    		<bean:define id="date" name="personalInfo" property="dataValidadeDocumentoIdentificacao" />
-		<td class="greytxt"><%= Data.format2DayMonthYear((Date) date) 
+		<td class="greytxt"><%= date 
 %></td> 
 			</logic:present>
    	</tr>
@@ -128,7 +128,7 @@
     	<td width="30%"><bean:message key="label.person.birth" /></td>
             <logic:present name="personalInfo" property="nascimento" >
 	            <bean:define id="date" name="personalInfo" property="nascimento" />
-		<td class="greytxt"><%= Data.format2DayMonthYear((Date) date) 
+		<td class="greytxt"><%= date 
 %></td> 
 			</logic:present>
      </tr>
@@ -294,7 +294,7 @@
 	 <tr>
        	<td width="30%"><bean:message key="label.masterDegree.administrativeOffice.situationDate" /></td>
         	<bean:define id="date" name="situation" property="date" />
-		<td class="greytxt"><%= Data.format2DayMonthYear((Date) date) 
+		<td class="greytxt"><%= date 
 %></td>             
 	 </tr>
 	 <tr>

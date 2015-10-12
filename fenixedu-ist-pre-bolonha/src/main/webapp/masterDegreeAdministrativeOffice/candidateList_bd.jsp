@@ -72,7 +72,7 @@
     		<td><bean:write name="candidate" property="infoCandidateSituation.situation" /></td>
 		    	<logic:present name="candidate" property="infoCandidateSituation.date" >
 	   	         	<bean:define id="date" name="candidate" property="infoCandidateSituation.date" />
-			<td><%= Data.format2DayMonthYear((Date) date) %></td>  
+			<td><%= date %></td>  
 				</logic:present>
     	</tr>
     		</logic:iterate>

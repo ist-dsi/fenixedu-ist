@@ -294,7 +294,7 @@
         <td width="30%"><bean:message key="label.masterDegree.administrativeOffice.situationDate" />:</td>
         <logic:present name="infoCandidate" property="infoCandidateSituation.date" >
 	        <bean:define id="date" name="infoCandidate" property="infoCandidateSituation.date" />
-			<td><%= Data.format2DayMonthYear((Date) date) %></td>          
+			<td><%= date %></td>          
 		</logic:present>
 	   </tr>
 	<%-- <tr>
