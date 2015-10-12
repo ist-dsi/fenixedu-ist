@@ -36,6 +36,11 @@
         </plugins>
     </build>
 
+    <properties>
+        <!-- This is required due to a bug in the JSP Compiler, which cannot properly identify integers in taglibs -->
+        <jspc.skip>true</jspc.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.fenixedu</groupId>

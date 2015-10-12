@@ -102,6 +102,21 @@
         </repository>
     </repositories>
 
+    <profiles>
+        <!-- This is here so that projects without JSP files don't have to run JSPC (such as the parent project). -->
+        <profile>
+            <id>ignore-jsp-compiler-on-projects-without-jsp-files</id>
+            <activation>
+                <file>
+                    <missing>src/main/webapp</missing>
+                </file>
+            </activation>
+            <properties>
+                <jspc.skip>true</jspc.skip>
+            </properties>
+        </profile>
+    </profiles>
+
     <modules>
         <module>fenixedu-ist-cms-components</module>
         <module>fenixedu-ist-delegates</module>
