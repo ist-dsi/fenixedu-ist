@@ -122,7 +122,7 @@ public class ParkingRequestSearch implements Serializable {
         final ParkingParty parkingParty = request.getParkingParty();
         if (getPartyClassification() != null) {
             DegreeType degreeType = PartyClassification.degreeTypeFor(getPartyClassification());
-            if (degreeType != null && request.getRequestedAs() != null && request.getRequestedAs().equals(RoleType.STUDENT)) {
+            if (degreeType != null && request.getRequestedAs() != null && request.getRequestedAs().equals(RoleType.STUDENT.getLocalizedName())) {
                 final Student student = ((Person) parkingParty.getParty()).getStudent();
                 if (degreeType.isAdvancedSpecializationDiploma()) {
                     for (PhdIndividualProgramProcess phdIndividualProgramProcess : student.getPerson()
