@@ -646,11 +646,16 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
                 Person person = (Person) parkingRequest.getParkingParty().getParty();
                 spreadsheet.newRow();
                 int firstRow = spreadsheet.getRow().getRowNum();
-                spreadsheet.addCell(enumerationBundle.getString(parkingRequestSearch.getPartyClassification().name()));
+                PartyClassification partyClassification =
+                        parkingRequestSearch.getPartyClassification() != null ? parkingRequestSearch
+                                .getPartyClassification() : PartyClassification.getPartyClassification(person);
+                spreadsheet.addCell(enumerationBundle.getString(partyClassification.name()));
+                spreadsheet.addCell(parkingRequest.getRequestedAs());
                 spreadsheet.addCell(parkingRequest.getParkingParty().getMostSignificantNumber());
                 spreadsheet.addCell(person.getName());
                 spreadsheet.addCell(enumerationBundle.getString(parkingRequest.getParkingRequestState().name()));
                 spreadsheet.addDateTimeCell(parkingRequest.getCreationDate());
+                spreadsheet.addCell(person.getEmailForSendingEmails());
                 if (!parkingRequest.getParkingParty().getDegreesInformation().isEmpty()) {
                     Iterator<String> iterator = parkingRequest.getParkingParty().getDegreesInformation().iterator();
                     String degreeInfo = iterator.next();
@@ -658,11 +663,11 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
                     while (iterator.hasNext()) {
                         spreadsheet.newRow();
                         degreeInfo = iterator.next();
-                        spreadsheet.addCell(degreeInfo, 5);
+                        spreadsheet.addCell(degreeInfo, 7);
                     }
                     int lastRow = firstRow + parkingRequest.getParkingParty().getDegreesInformation().size() - 1;
                     if (firstRow != lastRow) {
-                        for (int iter = 0; iter < 5; iter++) {
+                        for (int iter = 0; iter < 7; iter++) {
                             spreadsheet.getSheet().addMergedRegion(new Region(firstRow, (short) iter, lastRow, (short) iter));
                         }
                     }
