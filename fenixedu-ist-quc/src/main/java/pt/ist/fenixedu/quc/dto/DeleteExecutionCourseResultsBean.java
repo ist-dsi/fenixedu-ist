@@ -27,45 +27,35 @@ import org.fenixedu.academic.domain.exceptions.DomainException;
 import pt.ist.fenixedu.quc.domain.InquiryQuestion;
 import pt.ist.fenixedu.quc.domain.InquiryResult;
 import pt.ist.fenixframework.Atomic;
-import pt.ist.fenixframework.FenixFramework;
-import pt.ist.fenixframework.core.exception.MissingObjectException;
+
+import com.google.common.base.Strings;
 
 public class DeleteExecutionCourseResultsBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Long executionCourseOID;
-    private Long executionDegreeOID;
-    private Long inquiryQuestionOID;
+    private String executionCourseCode;
+    private String executionDegreeCode;
+    private Long inquiryQuestionCode;
 
     @Atomic
     public boolean deleteResults() {
-        ExecutionCourse executionCourse = null;
-        try {
-            executionCourse = FenixFramework.getDomainObject(getExecutionCourseOID().toString());
-        } catch (ClassCastException cce) {
-            throw new DomainException("error.executionCourse.dontExist", cce.getCause());
-        } catch (MissingObjectException moe) {
-            throw new DomainException("error.executionCourse.dontExist", moe.getCause());
+        ExecutionCourse executionCourse = InquiryResult.getExecutionCourse(getExecutionCourseCode());
+        if (executionCourse == null) {
+            throw new DomainException("error.executionCourse.dontExist");
         }
+
         boolean deletedResults = false;
-        if (getExecutionDegreeOID() != null) {
-            ExecutionDegree executionDegree = null;
-            try {
-                executionDegree = FenixFramework.getDomainObject(getExecutionDegreeOID().toString());
-            } catch (ClassCastException cce) {
-                throw new DomainException("error.executionDegree.dontExist", cce.getCause());
-            } catch (MissingObjectException moe) {
-                throw new DomainException("error.executionDegree.dontExist", moe.getCause());
+        if (!Strings.isNullOrEmpty(getExecutionDegreeCode())) {
+            ExecutionDegree executionDegree = InquiryResult.getExecutionDegree(getExecutionDegreeCode());
+            if (executionDegree == null) {
+                throw new DomainException("error.executionDegree.dontExist");
             }
             InquiryQuestion inquiryQuestion = null;
-            if (getInquiryQuestionOID() != null) {
-                try {
-                    inquiryQuestion = FenixFramework.getDomainObject(getInquiryQuestionOID().toString());
-                } catch (ClassCastException cce) {
-                    throw new DomainException("error.inquiryQuestion.dontExist", cce.getCause());
-                } catch (MissingObjectException moe) {
-                    throw new DomainException("error.inquiryQuestion.dontExist", moe.getCause());
+            if (getInquiryQuestionCode() != null) {
+                inquiryQuestion = InquiryResult.getInquiryQuestion(getInquiryQuestionCode());
+                if (inquiryQuestion == null) {
+                    throw new DomainException("error.inquiryQuestion.dontExist");
                 }
             }
             for (InquiryResult inquiryResult : executionCourse.getInquiryResultsSet()) {
@@ -78,7 +68,7 @@ public class DeleteExecutionCourseResultsBean implements Serializable {
                 }
             }
         } else {
-            setInquiryQuestionOID(null);
+            setInquiryQuestionCode(null);
             for (InquiryResult inquiryResult : executionCourse.getInquiryResultsSet()) {
                 if (inquiryResult.getProfessorship() == null) { // delete only the direct EC results
                     inquiryResult.delete();
@@ -89,27 +79,27 @@ public class DeleteExecutionCourseResultsBean implements Serializable {
         return deletedResults;
     }
 
-    public void setExecutionCourseOID(Long executionCourseOID) {
-        this.executionCourseOID = executionCourseOID;
+    public String getExecutionCourseCode() {
+        return executionCourseCode;
     }
 
-    public Long getExecutionCourseOID() {
-        return executionCourseOID;
+    public void setExecutionCourseCode(String executionCourseCode) {
+        this.executionCourseCode = executionCourseCode;
     }
 
-    public void setExecutionDegreeOID(Long executionDegreeOID) {
-        this.executionDegreeOID = executionDegreeOID;
+    public String getExecutionDegreeCode() {
+        return executionDegreeCode;
     }
 
-    public Long getExecutionDegreeOID() {
-        return executionDegreeOID;
+    public void setExecutionDegreeCode(String executionDegreeCode) {
+        this.executionDegreeCode = executionDegreeCode;
     }
 
-    public Long getInquiryQuestionOID() {
-        return inquiryQuestionOID;
+    public Long getInquiryQuestionCode() {
+        return inquiryQuestionCode;
     }
 
-    public void setInquiryQuestionOID(Long inquiryQuestionOID) {
-        this.inquiryQuestionOID = inquiryQuestionOID;
+    public void setInquiryQuestionCode(Long inquiryQuestionCode) {
+        this.inquiryQuestionCode = inquiryQuestionCode;
     }
 }

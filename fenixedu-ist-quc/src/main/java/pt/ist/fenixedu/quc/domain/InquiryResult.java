@@ -41,7 +41,6 @@ import org.joda.time.DateTime;
 
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
-import pt.ist.fenixframework.FenixFramework;
 
 public class InquiryResult extends InquiryResult_Base {
 
@@ -258,7 +257,7 @@ public class InquiryResult extends InquiryResult_Base {
      * @param code - the execution course sigla plus the execution semester code
      * @return the correspondent ExecutionCourse
      */
-    private static ExecutionCourse getExecutionCourse(String code) {
+    public static ExecutionCourse getExecutionCourse(String code) {
         String[] decodedParts = code.split(GepReportFile.CODE_SEPARATOR);
         return ExecutionCourse.readBySiglaAndExecutionPeriod(decodedParts[0], getExecutionSemester(decodedParts[1]
                 + GepReportFile.CODE_SEPARATOR + decodedParts[2]));
@@ -270,7 +269,7 @@ public class InquiryResult extends InquiryResult_Base {
      * @param code - the code of the degree curricular plan plus the execution year code
      * @return the correspondent ExecutionDegree
      */
-    private static ExecutionDegree getExecutionDegree(String code) {
+    public static ExecutionDegree getExecutionDegree(String code) {
         String[] decodedParts = code.split(GepReportFile.CODE_SEPARATOR);
         DegreeCurricularPlan dcp = getDegreeCurricularPlan(decodedParts[0] + GepReportFile.CODE_SEPARATOR + decodedParts[1]);
         ExecutionYear executionYear = getExecutionYear(decodedParts[2]);
@@ -298,7 +297,7 @@ public class InquiryResult extends InquiryResult_Base {
      * @param code - the person username plus the execution course code
      * @return the correspondent Professorship
      */
-    private static Professorship getProfessorship(String code) {
+    public static Professorship getProfessorship(String code) {
         String[] decodedParts = code.split(GepReportFile.CODE_SEPARATOR);
         ExecutionCourse executionCourse =
                 getExecutionCourse(decodedParts[1] + GepReportFile.CODE_SEPARATOR + decodedParts[2]
@@ -338,7 +337,7 @@ public class InquiryResult extends InquiryResult_Base {
         }
     }
 
-    private static InquiryQuestion getInquiryQuestion(Long inquiryQuestionCode) {
+    public static InquiryQuestion getInquiryQuestion(Long inquiryQuestionCode) {
         for (InquiryQuestion inquiryQuestion : Bennu.getInstance().getInquiryQuestionsSet()) {
             if (inquiryQuestion.getCode().equals(inquiryQuestionCode)) {
                 return inquiryQuestion;
@@ -366,10 +365,12 @@ public class InquiryResult extends InquiryResult_Base {
 
     public void delete() {
         if (!getInquiryResultCommentsSet().isEmpty()) {
-            throw new DomainException("error.inquiryResult.hasComments", getInquiryQuestion().getLabel().toString(),
-                    getExecutionCourse().getExternalId(),
-                    getExecutionDegree() != null ? getExecutionDegree().getExternalId() : StringUtils.EMPTY,
-                    getProfessorship() != null ? getProfessorship().getExternalId() : StringUtils.EMPTY);
+            throw new DomainException(
+                    "error.inquiryResult.hasComments",
+                    getInquiryQuestion().getLabel().toString(),
+                    GepReportFile.getExecutionCourseCode(getExecutionCourse()),
+                    getExecutionDegree() != null ? GepReportFile.getExecutionDegreeCode(getExecutionDegree()) : StringUtils.EMPTY,
+                    getProfessorship() != null ? GepReportFile.getProfessorshipCode(getProfessorship()) : StringUtils.EMPTY);
         }
         setExecutionCourse(null);
         setExecutionDegree(null);
