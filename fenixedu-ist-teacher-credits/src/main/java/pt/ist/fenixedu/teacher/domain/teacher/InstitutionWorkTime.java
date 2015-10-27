@@ -22,10 +22,10 @@ import java.util.Date;
 
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.person.RoleType;
-import org.fenixedu.academic.util.HourMinuteSecond;
 import org.fenixedu.academic.util.WeekDay;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.security.Authenticate;
+import org.joda.time.Interval;
 
 import pt.ist.fenixedu.teacher.domain.time.calendarStructure.TeacherCreditsFillingCE;
 import pt.ist.fenixedu.teacher.dto.teacher.workTime.InstitutionWorkTimeDTO;
@@ -99,17 +99,16 @@ public class InstitutionWorkTime extends InstitutionWorkTime_Base {
 
     private void verifyOverlappingWithOtherInstitutionWorkingTimes() {
         for (InstitutionWorkTime teacherInstitutionWorkTime : getTeacherService().getInstitutionWorkTimes()) {
-            if (this != teacherInstitutionWorkTime) {
-                if (teacherInstitutionWorkTime.getWeekDay().equals(getWeekDay())) {
-                    HourMinuteSecond supportLessonStart = teacherInstitutionWorkTime.getStartTimeHourMinuteSecond();
-                    HourMinuteSecond supportLessonEnd = teacherInstitutionWorkTime.getStartTimeHourMinuteSecond();
-                    if (supportLessonEnd.compareTo(getStartTimeHourMinuteSecond()) < 0
-                            || supportLessonStart.compareTo(getEndTimeHourMinuteSecond()) > 0) {
-                        throw new DomainException("message.overlapping.institution.working.period");
-                    }
-                }
+            if (this != teacherInstitutionWorkTime && teacherInstitutionWorkTime.getWeekDay().equals(getWeekDay())
+                    && getInterval().overlaps(teacherInstitutionWorkTime.getInterval())) {
+                throw new DomainException("message.overlapping.institution.working.period");
             }
         }
+    }
+
+    private Interval getInterval() {
+        return new Interval(getStartTimeHourMinuteSecond().toLocalTime().toDateTimeToday(),
+                getEndTimeHourMinuteSecond().toLocalTime().toDateTimeToday());
     }
 
     @Deprecated
