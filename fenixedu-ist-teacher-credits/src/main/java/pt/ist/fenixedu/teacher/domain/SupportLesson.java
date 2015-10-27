@@ -31,6 +31,7 @@ import org.fenixedu.academic.util.WeekDay;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.security.Authenticate;
+import org.joda.time.Interval;
 
 import pt.ist.fenixedu.teacher.domain.teacher.TeacherService;
 import pt.ist.fenixedu.teacher.domain.teacher.TeacherServiceLog;
@@ -101,17 +102,16 @@ public class SupportLesson extends SupportLesson_Base {
 
     private void verifyOverlappingWithOtherSupportLessons(TeacherService teacherService) {
         for (SupportLesson supportLesson : teacherService.getSupportLessons()) {
-            if (supportLesson != this) {
-                if (supportLesson.getWeekDay().equals(getWeekDay())) {
-                    HourMinuteSecond supportLessonStart = supportLesson.getStartTimeHourMinuteSecond();
-                    HourMinuteSecond supportLessonEnd = supportLesson.getStartTimeHourMinuteSecond();
-                    if (supportLessonEnd.compareTo(getStartTimeHourMinuteSecond()) < 0
-                            || supportLessonStart.compareTo(getEndTimeHourMinuteSecond()) > 0) {
-                        throw new DomainException("message.overlapping.support.lesson.period");
-                    }
-                }
+            if (supportLesson != this && supportLesson.getWeekDay().equals(getWeekDay())
+                    && getInterval().overlaps(supportLesson.getInterval())) {
+                throw new DomainException("message.overlapping.support.lesson.period");
             }
         }
+    }
+
+    private Interval getInterval() {
+        return new Interval(getStartTimeHourMinuteSecond().toLocalTime().toDateTimeToday(),
+                getEndTimeHourMinuteSecond().toLocalTime().toDateTimeToday());
     }
 
     @Override
@@ -175,9 +175,8 @@ public class SupportLesson extends SupportLesson_Base {
     }
 
     private void addLog(String key) {
-        TeacherService teacherService =
-                TeacherService.getTeacherService(getProfessorship().getTeacher(), getProfessorship().getExecutionCourse()
-                        .getExecutionPeriod());
+        TeacherService teacherService = TeacherService.getTeacherService(getProfessorship().getTeacher(),
+                getProfessorship().getExecutionCourse().getExecutionPeriod());
 
         final StringBuilder log = new StringBuilder();
         log.append(BundleUtil.getString("resources.TeacherCreditsSheetResources", key));
