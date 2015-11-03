@@ -155,12 +155,12 @@ public class ViewInquiriesResultsForCoordinatorDA extends ViewInquiriesResultsDA
             Coordinator coordinator = executionDegree.getCoordinatorByTeacher(AccessControl.getPerson());
             ExecutionSemester currentExecutionSemester = ExecutionSemester.readActualExecutionSemester();
             Coordinator currentCoordinator = null;
+            ExecutionDegree currentExecutionDegree =
+                    resultPageDTO.getDegreeCurricularPlan().getExecutionDegreeByAcademicInterval(
+                            currentExecutionSemester.getAcademicInterval());
             if (currentExecutionSemester.getExecutionYear() != executionSemester.getExecutionYear()
                     && currentExecutionSemester.isAfter(executionSemester)) {
-                ExecutionDegree currentExecutionDegree =
-                        resultPageDTO.getDegreeCurricularPlan().getExecutionDegreeByAcademicInterval(
-                                currentExecutionSemester.getAcademicInterval());
-                // check if the course has been opened this semester
+                // check if the degree has been opened this semester
                 if (currentExecutionDegree != null) {
                     currentCoordinator = currentExecutionDegree.getCoordinatorByTeacher(AccessControl.getPerson());
                 }
@@ -202,7 +202,9 @@ public class ViewInquiriesResultsForCoordinatorDA extends ViewInquiriesResultsDA
             if (sameExecutionYear) {
                 responsibleCoordinator = coordinator != null ? coordinator.isResponsible() : false;
             } else {
-                responsibleCoordinator = currentCoordinator != null ? currentCoordinator.isResponsible() : false;
+                responsibleCoordinator =
+                        currentCoordinator != null ? currentCoordinator.isResponsible() : currentExecutionDegree == null
+                                && coordinator != null ? coordinator.isResponsible() : false;
             }
             if (coordinator != null) {
                 finalCoordinatorToUse = coordinator;
