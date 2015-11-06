@@ -96,7 +96,6 @@ public class MergeExternalUnits {
         Collection<? extends Accountability> externalContracts =
                 fromUnit.getChildAccountabilitiesByAccountabilityClass(ExternalContract.class);
         destinationUnit.getChildsSet().addAll(externalContracts);
-        destinationUnit.getAssociatedNonAffiliatedTeachersSet().addAll(fromUnit.getAssociatedNonAffiliatedTeachersSet());
         destinationUnit.getPrecedentDegreeInformationsSet().addAll(fromUnit.getPrecedentDegreeInformationsSet());
 
         fromUnit.delete();
