@@ -121,6 +121,7 @@
         <module>fenixedu-ist-cms-components</module>
         <module>fenixedu-ist-delegates</module>
         <module>fenixedu-ist-giaf-contracts</module>
+        <module>fenixedu-ist-giaf-invoices</module>
         <module>fenixedu-ist-integration</module>
         <module>fenixedu-ist-libraryspace</module>
         <module>fenixedu-ist-parking</module>

@@ -1,0 +1,8 @@
+{
+  "resources": {
+    "bundles": [
+	"GiafInvoicesResources"
+    ],
+    "defaultBundle": "GiafInvoicesResources"
+  }
+}
