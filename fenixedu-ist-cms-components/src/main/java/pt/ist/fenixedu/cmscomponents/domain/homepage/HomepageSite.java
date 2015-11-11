@@ -25,6 +25,7 @@ import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.groups.AnyoneGroup;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.groups.LoggedGroup;
+import org.fenixedu.bennu.core.groups.NobodyGroup;
 import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.commons.i18n.I18N;
 import org.fenixedu.commons.i18n.LocalizedString;
@@ -38,6 +39,8 @@ public class HomepageSite extends HomepageSite_Base {
         super();
         setBennu(Bennu.getInstance());
         setSlug(person.getUser().getUsername());
+        setCanAdminGroup(NobodyGroup.get());
+        setCanPostGroup(NobodyGroup.get());
         setOwner(person);
     }
 
