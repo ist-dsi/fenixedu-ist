@@ -238,6 +238,21 @@ class reports.CoursesAnswersReportFile extends .org.fenixedu.academic.domain.rep
 class reports.QUCQuestionsReportFile extends .org.fenixedu.academic.domain.reports.GepReportFile {
 }
 
+class reports.DelegatesAnswersReportFile extends .org.fenixedu.academic.domain.reports.GepReportFile {
+}
+
+class reports.TeachersAnswersReportFile extends .org.fenixedu.academic.domain.reports.GepReportFile {
+}
+
+class reports.RegentsAnswersReportFile extends .org.fenixedu.academic.domain.reports.GepReportFile {
+}
+
+class reports.CoordinatorsAnswersReportFile extends .org.fenixedu.academic.domain.reports.GepReportFile {
+}
+
+class reports.FirstTimeCycleAnswersReportFile extends .org.fenixedu.academic.domain.reports.GepReportFile {
+}
+
 relation InquiriesRootLink {
     InquiriesRoot playsRole inquiriesRoot {
         multiplicity 0..1;

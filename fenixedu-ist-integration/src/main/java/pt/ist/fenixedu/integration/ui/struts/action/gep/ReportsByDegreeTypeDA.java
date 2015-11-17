@@ -65,9 +65,14 @@ import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
 import pt.ist.fenixedu.integration.domain.ReportFileFactory;
 import pt.ist.fenixedu.quc.domain.reports.AvailableCoursesForQUCReportFile;
+import pt.ist.fenixedu.quc.domain.reports.CoordinatorsAnswersReportFile;
 import pt.ist.fenixedu.quc.domain.reports.CoursesAnswersReportFile;
+import pt.ist.fenixedu.quc.domain.reports.DelegatesAnswersReportFile;
+import pt.ist.fenixedu.quc.domain.reports.FirstTimeCycleAnswersReportFile;
 import pt.ist.fenixedu.quc.domain.reports.InitialAnswersReportFile;
 import pt.ist.fenixedu.quc.domain.reports.QUCQuestionsReportFile;
+import pt.ist.fenixedu.quc.domain.reports.RegentsAnswersReportFile;
+import pt.ist.fenixedu.quc.domain.reports.TeachersAnswersReportFile;
 import pt.ist.fenixedu.quc.domain.reports.WorkloadSummaryBoardReportFile;
 import pt.ist.fenixedu.teacher.evaluation.domain.reports.EffectiveTeachingLoadReportFile;
 import pt.ist.fenixedu.teacher.evaluation.domain.reports.TeacherCreditsReportFile;
@@ -671,6 +676,76 @@ public class ReportsByDegreeTypeDA extends FenixDispatchAction {
         return selectDegreeType(mapping, actionForm, request, response);
     }
 
+    public ActionForward downloadDelegatesAnswersReportFile(ActionMapping mapping, ActionForm actionForm,
+            HttpServletRequest request, HttpServletResponse response) throws IOException {
+        if (isRepeatedJob(AccessControl.getPerson(), request, getClassForParameter(request.getParameter("type")))) {
+            return selectDegreeType(mapping, actionForm, request, response);
+        }
+        final DegreeType degreeType = getDegreeType(request);
+        final ExecutionYear executionYear = getExecutionYear(request);
+        final String format = getFormat(request);
+
+        prepareNewJobResponse(request, ReportFileFactory.createDelegatesAnswersReportFile(format, degreeType, executionYear));
+
+        return selectDegreeType(mapping, actionForm, request, response);
+    }
+
+    public ActionForward downloadTeachersAnswersReportFile(ActionMapping mapping, ActionForm actionForm,
+            HttpServletRequest request, HttpServletResponse response) throws IOException {
+        if (isRepeatedJob(AccessControl.getPerson(), request, getClassForParameter(request.getParameter("type")))) {
+            return selectDegreeType(mapping, actionForm, request, response);
+        }
+        final DegreeType degreeType = getDegreeType(request);
+        final ExecutionYear executionYear = getExecutionYear(request);
+        final String format = getFormat(request);
+
+        prepareNewJobResponse(request, ReportFileFactory.createTeachersAnswersReportFile(format, degreeType, executionYear));
+
+        return selectDegreeType(mapping, actionForm, request, response);
+    }
+
+    public ActionForward downloadRegentsAnswersReportFile(ActionMapping mapping, ActionForm actionForm,
+            HttpServletRequest request, HttpServletResponse response) throws IOException {
+        if (isRepeatedJob(AccessControl.getPerson(), request, getClassForParameter(request.getParameter("type")))) {
+            return selectDegreeType(mapping, actionForm, request, response);
+        }
+        final DegreeType degreeType = getDegreeType(request);
+        final ExecutionYear executionYear = getExecutionYear(request);
+        final String format = getFormat(request);
+
+        prepareNewJobResponse(request, ReportFileFactory.createRegentsAnswersReportFile(format, degreeType, executionYear));
+
+        return selectDegreeType(mapping, actionForm, request, response);
+    }
+
+    public ActionForward downloadCoordinatorsAnswersReportFile(ActionMapping mapping, ActionForm actionForm,
+            HttpServletRequest request, HttpServletResponse response) throws IOException {
+        if (isRepeatedJob(AccessControl.getPerson(), request, getClassForParameter(request.getParameter("type")))) {
+            return selectDegreeType(mapping, actionForm, request, response);
+        }
+        final DegreeType degreeType = getDegreeType(request);
+        final ExecutionYear executionYear = getExecutionYear(request);
+        final String format = getFormat(request);
+
+        prepareNewJobResponse(request, ReportFileFactory.createCoordinatorsAnswersReportFile(format, degreeType, executionYear));
+
+        return selectDegreeType(mapping, actionForm, request, response);
+    }
+
+    public ActionForward downloadFirstTimeCycleAnswersReportFile(ActionMapping mapping, ActionForm actionForm,
+            HttpServletRequest request, HttpServletResponse response) throws IOException {
+        if (isRepeatedJob(AccessControl.getPerson(), request, getClassForParameter(request.getParameter("type")))) {
+            return selectDegreeType(mapping, actionForm, request, response);
+        }
+        final DegreeType degreeType = getDegreeType(request);
+        final ExecutionYear executionYear = getExecutionYear(request);
+        final String format = getFormat(request);
+
+        prepareNewJobResponse(request, ReportFileFactory.createFirstTimeCycleAnswersReportFile(format, degreeType, executionYear));
+
+        return selectDegreeType(mapping, actionForm, request, response);
+    }
+
     private void prepareNewJobResponse(HttpServletRequest request, GepReportFile job) {
 
         ReportBean reportBean = getRenderedObject();
@@ -747,6 +822,16 @@ public class ReportsByDegreeTypeDA extends FenixDispatchAction {
             return CoursesAnswersReportFile.class;
         case 29:
             return QUCQuestionsReportFile.class;
+        case 30:
+            return DelegatesAnswersReportFile.class;
+        case 31:
+            return TeachersAnswersReportFile.class;
+        case 32:
+            return RegentsAnswersReportFile.class;
+        case 33:
+            return CoordinatorsAnswersReportFile.class;
+        case 34:
+            return FirstTimeCycleAnswersReportFile.class;
         default:
             return null;
         }

@@ -37,4 +37,8 @@ public class FenixEduQucDomainException extends DomainException {
     public static FenixEduQucDomainException inquiriesNotAnswered() {
         return new FenixEduQucDomainException("message.student.cannotEnroll.inquiriesNotAnswered");
     }
+
+    public static FenixEduQucDomainException questionAnwserDuplicateCreation() {
+        return new FenixEduQucDomainException("error.inquiry.questionAnswer.duplicateCreation");
+    }
 }
