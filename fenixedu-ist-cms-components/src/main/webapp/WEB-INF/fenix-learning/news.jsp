@@ -39,7 +39,7 @@
        <div class="panel panel-default">
                <div class="panel-body clearfix">
                        <h3 class="panel-title pull-left">
-                               <strong><a href="${pageContext.request.contextPath}/cms/news/${post.site.slug}/${post.slug}"><c:out value="${post.name.content}"/></a></strong>
+                               <strong><a href="${pageContext.request.contextPath}/cms/news/${post.site.slug}/${post.slug}">${post.name.content}</a></strong>
                        </h3>
                        <small class="pull-right">
                                <em>
