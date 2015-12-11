@@ -229,8 +229,8 @@ class ImportPersonProfessionalCategoriesFromGiaf extends ImportProcessor {
 
     private String getPersonProfessionalCategoryQuery(PersonProfessionalCategory personProfessionalCategory) {
         StringBuilder query = new StringBuilder();
-        query.append("select count(*) as cont from sldemp25 where emp_num=");
-        query.append(personProfessionalCategory.getGiafProfessionalData().getGiafPersonIdentification());
+        query.append("select count(*) as cont from sldemp25 where emp_num='");
+        query.append(personProfessionalCategory.getGiafProfessionalData().getGiafPersonIdentification()).append("'");
         if (personProfessionalCategory.getBeginDate() != null) {
             query.append(" and emp_dt_inicio=to_date('");
             query.append(dateFormat.print(personProfessionalCategory.getBeginDate()));
@@ -247,21 +247,21 @@ class ImportPersonProfessionalCategoriesFromGiaf extends ImportProcessor {
         }
 
         if (personProfessionalCategory.getProfessionalCategory() != null) {
-            query.append(" and emp_cat_func=");
-            query.append(personProfessionalCategory.getProfessionalCategoryGiafId());
+            query.append(" and emp_cat_func='");
+            query.append(personProfessionalCategory.getProfessionalCategoryGiafId()).append("'");
         } else {
             query.append(" and emp_cat_func is null");
         }
 
         if (personProfessionalCategory.getProfessionalRegime() != null) {
-            query.append(" and emp_regime=");
-            query.append(personProfessionalCategory.getProfessionalRegimeGiafId());
+            query.append(" and emp_regime='");
+            query.append(personProfessionalCategory.getProfessionalRegimeGiafId()).append("'");
         } else {
             query.append(" and emp_regime is null");
         }
         if (personProfessionalCategory.getProfessionalRelation() != null) {
-            query.append(" and emp_vinculo=");
-            query.append(personProfessionalCategory.getProfessionalRelationGiafId());
+            query.append(" and emp_vinculo='");
+            query.append(personProfessionalCategory.getProfessionalRelationGiafId()).append("'");
         } else {
             query.append(" and emp_vinculo is null");
         }

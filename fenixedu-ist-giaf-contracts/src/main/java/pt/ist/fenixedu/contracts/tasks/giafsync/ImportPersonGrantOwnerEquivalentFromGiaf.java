@@ -230,8 +230,8 @@ class ImportPersonGrantOwnerEquivalentFromGiaf extends ImportProcessor {
 
     private String getPersonGrantOwnerEquivalentQuery(PersonGrantOwnerEquivalent personGrantOwnerEquivalent) {
         StringBuilder query = new StringBuilder();
-        query.append("select count(*) as cont from SLDEQUIDISP where emp_num=");
-        query.append(personGrantOwnerEquivalent.getGiafProfessionalData().getGiafPersonIdentification());
+        query.append("select count(*) as cont from SLDEQUIDISP where emp_num='");
+        query.append(personGrantOwnerEquivalent.getGiafProfessionalData().getGiafPersonIdentification()).append("'");
         if (personGrantOwnerEquivalent.getBeginDate() != null) {
             query.append(" and DATA_INICIO=to_date('");
             query.append(dateFormat.print(personGrantOwnerEquivalent.getBeginDate()));
