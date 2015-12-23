@@ -96,8 +96,8 @@ class ImportPersonFunctionsAccumulationsFromGiaf extends ImportProcessor {
             final String functionsAccumulationGiafId = result.getString("TIPO");
             final FunctionsAccumulation functionsAccumulation = metadata.accumulation(functionsAccumulationGiafId);
             if (functionsAccumulation == null) {
-                logger.debug("Empty FunctionsAccumulation: " + functionsAccumulationGiafId + " for person number: "
-                        + numberString);
+                logger.debug(
+                        "Empty FunctionsAccumulation: " + functionsAccumulationGiafId + " for person number: " + numberString);
                 importedButInvalid.add(person);
             }
             String beginDateString = result.getString("DATA_INICIO");
@@ -227,8 +227,8 @@ class ImportPersonFunctionsAccumulationsFromGiaf extends ImportProcessor {
 
     private String getFunctionsAccumulationQuery(PersonFunctionsAccumulation personFunctionsAccumulation) {
         StringBuilder query = new StringBuilder();
-        query.append("select count(*) as cont from SLDACUMFUNC where emp_num=");
-        query.append(personFunctionsAccumulation.getGiafProfessionalData().getGiafPersonIdentification());
+        query.append("select count(*) as cont from SLDACUMFUNC where emp_num='");
+        query.append(personFunctionsAccumulation.getGiafProfessionalData().getGiafPersonIdentification()).append("'");
 
         if (personFunctionsAccumulation.getBeginDate() != null) {
             query.append(" and DATA_INICIO=to_date('");
@@ -245,14 +245,14 @@ class ImportPersonFunctionsAccumulationsFromGiaf extends ImportProcessor {
             query.append(" and DATA_FIM is null");
         }
         if (personFunctionsAccumulation.getFunctionsAccumulation() != null) {
-            query.append(" and TIPO=");
-            query.append(personFunctionsAccumulation.getFunctionsAccumulationGiafId());
+            query.append(" and TIPO='");
+            query.append(personFunctionsAccumulation.getFunctionsAccumulationGiafId()).append("'");
         } else {
             query.append(" and TIPO is null");
         }
         if (personFunctionsAccumulation.getProfessionalRegime() != null) {
-            query.append(" and EMP_REGIME=");
-            query.append(personFunctionsAccumulation.getProfessionalRegimeGiafId());
+            query.append(" and EMP_REGIME='");
+            query.append(personFunctionsAccumulation.getProfessionalRegimeGiafId()).append("'");
         } else {
             query.append(" and EMP_REGIME is null");
         }
@@ -280,8 +280,10 @@ class ImportPersonFunctionsAccumulationsFromGiaf extends ImportProcessor {
 
     private boolean hasPersonFunctionsAccumulations(GiafProfessionalData giafProfessionalData, LocalDate beginDate,
             LocalDate endDate, BigDecimal hours, FunctionsAccumulation functionsAccumulation, String functionsAccumulationGiafId,
-            ProfessionalRegime professionalRegime, String professionalRegimeGiafId, DateTime creationDate, DateTime modifiedDate) {
-        for (PersonFunctionsAccumulation personFunctionsAccumulation : giafProfessionalData.getPersonFunctionsAccumulationsSet()) {
+            ProfessionalRegime professionalRegime, String professionalRegimeGiafId, DateTime creationDate,
+            DateTime modifiedDate) {
+        for (PersonFunctionsAccumulation personFunctionsAccumulation : giafProfessionalData
+                .getPersonFunctionsAccumulationsSet()) {
             if (personFunctionsAccumulation.getAnulationDate() == null) {
                 if (Objects.equals(beginDate, personFunctionsAccumulation.getBeginDate())
                         && Objects.equals(endDate, personFunctionsAccumulation.getEndDate())

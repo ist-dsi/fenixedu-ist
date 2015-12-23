@@ -209,8 +209,8 @@ class ImportPersonProfessionalRegimesFromGiaf extends ImportProcessor {
 
     private String getPersonProfessionalRegimeQuery(PersonProfessionalRegime personProfessionalRegime) {
         StringBuilder query = new StringBuilder();
-        query.append("select count(*) as cont from sldemp26 where emp_num=");
-        query.append(personProfessionalRegime.getGiafProfessionalData().getGiafPersonIdentification());
+        query.append("select count(*) as cont from sldemp26 where emp_num='");
+        query.append(personProfessionalRegime.getGiafProfessionalData().getGiafPersonIdentification()).append("'");
         if (personProfessionalRegime.getBeginDate() != null) {
             query.append(" and emp_regime_dt=to_date('");
             query.append(dateFormat.print(personProfessionalRegime.getBeginDate()));
@@ -226,8 +226,8 @@ class ImportPersonProfessionalRegimesFromGiaf extends ImportProcessor {
             query.append(" and emp_regime_dt_fim is null");
         }
         if (personProfessionalRegime.getProfessionalRegime() != null) {
-            query.append(" and emp_regime=");
-            query.append(personProfessionalRegime.getProfessionalRegimeGiafId());
+            query.append(" and emp_regime='");
+            query.append(personProfessionalRegime.getProfessionalRegimeGiafId()).append("'");
         } else {
             query.append(" and emp_regime is null");
         }

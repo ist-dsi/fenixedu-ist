@@ -31,13 +31,18 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.accessControl.ActiveStudentsGroup;
+import org.fenixedu.academic.domain.accessControl.AllAlumniGroup;
 import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.core.domain.UserLoginPeriod;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 
+import pt.ist.fenixedu.contracts.domain.organizationalStructure.Invitation;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ContractSituation;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.GiafProfessionalData;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonContractSituation;
@@ -103,8 +108,8 @@ class ImportPersonContractSituationsFromGiaf extends ImportProcessor {
                 importedButInvalid.add(person);
             }
             if (category == null && (contractSituation == null || contractSituation.getEndSituation() == false)) {
-                logger.debug("Empty catefory on a non end situation: " + numberString + " . Situation: "
-                        + contractSituationGiafId);
+                logger.debug(
+                        "Empty catefory on a non end situation: " + numberString + " . Situation: " + contractSituationGiafId);
                 importedButInvalid.add(person);
             }
 
@@ -177,6 +182,31 @@ class ImportPersonContractSituationsFromGiaf extends ImportProcessor {
         }
 
         oracleConnection.closeConnection();
+        LocalDate today = new LocalDate();
+        for (GiafProfessionalData giafProfessionalData : Bennu.getInstance().getGiafProfessionalDataSet()) {
+            if (giafProfessionalData.getPersonProfessionalData().getPerson() != null) {
+                User user = giafProfessionalData.getPersonProfessionalData().getPerson().getUser();
+                if (giafProfessionalData.getValidPersonContractSituations().stream().filter(pcs -> pcs.isActive(today))
+                        .count() != 0) {
+                    modifications.add(new Modification() {
+                        @Override
+                        public void execute() {
+                            UserLoginPeriod.createOpenPeriod(user);
+                        }
+                    });
+                } else {
+                    if (!new ActiveStudentsGroup().isMember(user) && !new AllAlumniGroup().isMember(user)
+                            && Invitation.getActiveInvitations(user.getPerson()).size() == 0) {
+                        modifications.add(new Modification() {
+                            @Override
+                            public void execute() {
+                                UserLoginPeriod.closeOpenPeriod(user);
+                            }
+                        });
+                    }
+                }
+            }
+        }
         log.println("-- Contract situations --");
         log.println("Total GIAF: " + count);
         log.println("New: " + news);
@@ -205,8 +235,8 @@ class ImportPersonContractSituationsFromGiaf extends ImportProcessor {
                 if (count > 0) {
                     if (count > 1) {
                         logger.debug("---> " + count + " ---> "
-                                + personContractSituation.getGiafProfessionalData().getGiafPersonIdentification()
-                                + " Situation: " + personContractSituation.getContractSituation().getGiafId());
+                                + personContractSituation.getGiafProfessionalData().getGiafPersonIdentification() + " Situation: "
+                                + personContractSituation.getContractSituation().getGiafId());
                     }
                     return count;
                 }
@@ -225,8 +255,8 @@ class ImportPersonContractSituationsFromGiaf extends ImportProcessor {
         query.append("select count(*) as cont from sldemp24 emp, sltcatfunc cat, sltsit sit where ");
         query.append(" emp.emp_cat_func = cat.emp_cat_func(+) ");
         query.append("and emp.emp_sit = sit.emp_sit(+) ");
-        query.append("and emp.emp_num=");
-        query.append(personContractSituation.getGiafProfessionalData().getGiafPersonIdentification());
+        query.append("and emp.emp_num='");
+        query.append(personContractSituation.getGiafProfessionalData().getGiafPersonIdentification()).append("'");
         if (personContractSituation.getBeginDate() != null) {
             query.append(" and emp.dt_inic=to_date('");
             query.append(dateFormat.print(personContractSituation.getBeginDate()));
@@ -242,8 +272,8 @@ class ImportPersonContractSituationsFromGiaf extends ImportProcessor {
             query.append(" and emp.dt_fim is null");
         }
         if (!StringUtils.isEmpty(personContractSituation.getProfessionalCategoryGiafId())) {
-            query.append(" and emp.emp_cat_func=");
-            query.append(personContractSituation.getProfessionalCategoryGiafId());
+            query.append(" and emp.emp_cat_func='");
+            query.append(personContractSituation.getProfessionalCategoryGiafId()).append("'");
             if (personContractSituation.getProfessionalCategory() == null) {
                 query.append(" and cat.emp_cat_func is null");
             }
@@ -251,8 +281,8 @@ class ImportPersonContractSituationsFromGiaf extends ImportProcessor {
             query.append(" and emp.emp_cat_func is null");
         }
         if (!StringUtils.isEmpty(personContractSituation.getContractSituationGiafId())) {
-            query.append(" and emp.emp_sit=");
-            query.append(personContractSituation.getContractSituationGiafId());
+            query.append(" and emp.emp_sit='");
+            query.append(personContractSituation.getContractSituationGiafId()).append("'");
             if (personContractSituation.getContractSituation() == null) {
                 query.append(" and sit.emp_sit is null");
             }
