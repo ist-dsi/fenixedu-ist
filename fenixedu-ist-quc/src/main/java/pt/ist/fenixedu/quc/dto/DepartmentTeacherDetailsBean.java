@@ -49,6 +49,7 @@ public class DepartmentTeacherDetailsBean extends GlobalCommentsResultsBean {
         setTeacher(teacher);
         setExecutionSemester(executionSemester);
         initTeacherResults(teacher);
+        initResultComment(president, true);
     }
 
     private void initTeacherResults(Person teacher) {
