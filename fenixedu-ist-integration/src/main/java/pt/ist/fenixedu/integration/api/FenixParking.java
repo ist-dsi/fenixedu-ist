@@ -24,7 +24,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import pt.ist.fenixedu.integration.FenixEduIstIntegrationConfiguration;
@@ -39,7 +38,7 @@ public class FenixParking {
      */
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(FenixAPIv1.JSON_UTF8)
     public String parking() {
         try {
             return client.target(FenixEduIstIntegrationConfiguration.getConfiguration().getApiParkingUrl())
