@@ -39,7 +39,8 @@ public class DelegateBean {
     public static Comparator<DelegateBean> COMPARATOR_BY_DEGREE_FUNTION_AND_INTERVAL = Comparator
             .<DelegateBean, Degree> comparing(b -> b.getDegree(), Degree.COMPARATOR_BY_DEGREE_TYPE_AND_NAME_AND_ID.reversed())
             .thenComparing(b -> b.getCurricularYear(), Comparator.nullsLast(CurricularYear.CURRICULAR_YEAR_COMPARATORY_BY_YEAR))
-            .thenComparing(b -> b.getDelegate().getStart()).thenComparing(b -> b.getDelegate().getExternalId());
+            .thenComparing(b -> b.getDelegate() == null ? null : b.getDelegate().getStart(), Comparator.nullsLast(null))
+            .thenComparing(b -> b.getDelegate() == null ? null : b.getDelegate().getExternalId(), Comparator.nullsLast(null));
 
     String name;
     String username;
