@@ -27,15 +27,15 @@
 
 <html:xhtml />
 
-<em><bean:message bundle="RESEARCHER_RESOURCES" key="label.teacher.evaluation.title"/></em>
+<em><bean:message bundle="TEACHER_EVALUATION_RESOURCES" key="label.teacher.evaluation.title"/></em>
 
-<h2><bean:message bundle="RESEARCHER_RESOURCES"
+<h2><bean:message bundle="TEACHER_EVALUATION_RESOURCES"
 	key="label.teacher.evaluation.autoevaluation.changeEvaluationType.title" /></h2>
 
 <h3 class="mtop15"><fr:view name="typeSelection" property="process.facultyEvaluationProcess.title" /></h3>
 
 <fr:edit id="process-selection" name="typeSelection" action="/teacherEvaluation.do?method=selectEvaluationType">
-	<fr:schema bundle="RESEARCHER_RESOURCES"
+	<fr:schema bundle="TEACHER_EVALUATION_RESOURCES"
 		type="org.fenixedu.academic.ui.struts.action.teacher.evaluation.TeacherEvaluationTypeSelection">
 		<fr:slot name="type" key="label.teacher.evaluation.type">
 			<logic:equal name="typeSelection" property="process.facultyEvaluationProcess.allowNoEval" value="false">

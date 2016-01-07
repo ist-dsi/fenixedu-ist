@@ -69,11 +69,11 @@ import pt.ist.fenixedu.quc.domain.reports.CoursesAnswersReportFile;
 import pt.ist.fenixedu.quc.domain.reports.InitialAnswersReportFile;
 import pt.ist.fenixedu.quc.domain.reports.QUCQuestionsReportFile;
 import pt.ist.fenixedu.quc.domain.reports.WorkloadSummaryBoardReportFile;
-import pt.ist.fenixedu.teacher.domain.reports.EffectiveTeachingLoadReportFile;
-import pt.ist.fenixedu.teacher.domain.reports.TeacherCreditsReportFile;
-import pt.ist.fenixedu.teacher.domain.reports.TeachersByShiftReportFile;
-import pt.ist.fenixedu.teacher.domain.reports.TeachersListFromGiafReportFile;
-import pt.ist.fenixedu.teacher.domain.reports.TimetablesReportFile;
+import pt.ist.fenixedu.teacher.evaluation.domain.reports.EffectiveTeachingLoadReportFile;
+import pt.ist.fenixedu.teacher.evaluation.domain.reports.TeacherCreditsReportFile;
+import pt.ist.fenixedu.teacher.evaluation.domain.reports.TeachersByShiftReportFile;
+import pt.ist.fenixedu.teacher.evaluation.domain.reports.TeachersListFromGiafReportFile;
+import pt.ist.fenixedu.teacher.evaluation.domain.reports.TimetablesReportFile;
 import pt.ist.fenixedu.tutorship.domain.reports.TutorshipProgramReportFile;
 import pt.ist.fenixframework.FenixFramework;
 

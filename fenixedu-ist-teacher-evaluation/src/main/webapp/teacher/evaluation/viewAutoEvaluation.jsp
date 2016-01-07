@@ -28,19 +28,19 @@
 
 <html:xhtml />
 
-<em><bean:message bundle="RESEARCHER_RESOURCES" key="label.teacher.evaluation.title"/></em>
+<em><bean:message bundle="TEACHER_EVALUATION_RESOURCES" key="label.teacher.evaluation.title"/></em>
 
-<h2><bean:message bundle="RESEARCHER_RESOURCES" key="label.teacher.evaluation.autoevaluation.title" /></h2>
+<h2><bean:message bundle="TEACHER_EVALUATION_RESOURCES" key="label.teacher.evaluation.autoevaluation.title" /></h2>
 
 <div>
-	<bean:message bundle="RESEARCHER_RESOURCES" key="label.teacher.evaluation.autoevaluation.topHelpText" />
+	<bean:message bundle="TEACHER_EVALUATION_RESOURCES" key="label.teacher.evaluation.autoevaluation.topHelpText" />
 </div>
 
 <logic:iterate id="process" name="processes">
 	<h3 class="separator2 mtop15"><fr:view name="process" property="facultyEvaluationProcess.title" /></h3>
 
 	<fr:view name="process">
-		<fr:schema bundle="RESEARCHER_RESOURCES"
+		<fr:schema bundle="TEACHER_EVALUATION_RESOURCES"
 			type="pt.ist.fenixedu.teacher.evaluation.domain.TeacherEvaluationProcess">
 			<fr:slot name="facultyEvaluationProcess.autoEvaluationInterval"
 				key="label.teacher.evaluation.facultyEvaluationProcess.autoEvaluationInterval" layout="format">
@@ -55,7 +55,9 @@
 			</fr:slot>
 			<fr:slot name="type" key="label.teacher.evaluation.type" layout="null-as-label" />
 			<logic:equal name="process" property="evaluationLocked" value="true">
-				<fr:slot name="evaluationMark" key="label.teacher.evaluation.mark" layout="null-as-label" />
+				<fr:slot name="evaluationMark" key="label.teacher.evaluation.mark">
+					<fr:property name="bundle" value="TEACHER_EVALUATION_RESOURCES"/>
+				</fr:slot>
 				<fr:slot name="approvedEvaluationMarkAsString" key="label.teacher.evaluation.approvedMark" layout="null-as-label" />
 			</logic:equal>
 		</fr:schema>
@@ -70,16 +72,16 @@
 			<html:link action="/teacherEvaluation.do?method=changeEvaluationType" paramId="process" paramName="process"
 				paramProperty="externalId">
 				<logic:empty name="process" property="type">
-					<bean:message bundle="RESEARCHER_RESOURCES" key="label.teacher.evaluation.autoevaluation.setEvaluationType" />
+					<bean:message bundle="TEACHER_EVALUATION_RESOURCES" key="label.teacher.evaluation.autoevaluation.setEvaluationType" />
 				</logic:empty>
 				<logic:notEmpty name="process" property="type">
-					<bean:message bundle="RESEARCHER_RESOURCES" key="label.teacher.evaluation.autoevaluation.changeEvaluationType" />
+					<bean:message bundle="TEACHER_EVALUATION_RESOURCES" key="label.teacher.evaluation.autoevaluation.changeEvaluationType" />
 				</logic:notEmpty>
 			</html:link><logic:equal name="process" property="possibleToLockAutoEvaluation" value="true"> | <a href="#"
 					style="cursor: pointer;"
 					onclick="<%="check(document.getElementById('warning"
 									+ processId + "'));return false;"%>"> <bean:message
-					bundle="RESEARCHER_RESOURCES" key="label.teacher.evaluation.autoevaluation.lock" /> </a>
+					bundle="TEACHER_EVALUATION_RESOURCES" key="label.teacher.evaluation.autoevaluation.lock" /> </a>
 	
 			</logic:equal>
 		</p>
@@ -88,7 +90,7 @@
 	<div id="<%="warning" + processId%>" class="dnone">
 		<div class="warning1">
 			<p class="mvert05"><bean:message key="label.teacher.evaluation.autoevaluation.lock.confirm" arg0="<%=org.fenixedu.academic.domain.organizationalStructure.Unit.getInstitutionName().getContent()%>"
-				bundle="RESEARCHER_RESOURCES" /></p>
+				bundle="TEACHER_EVALUATION_RESOURCES" /></p>
 			<div class="mtop1 mbottom05">
 				<form method="post" id="lockMark"
 					action="<%=request.getContextPath()
@@ -119,7 +121,7 @@
 		<logic:notEmpty name="process" property="teacherAutoEvaluationFileBeanSet">
 			<bean:define id="externalId" name="process" property="externalId" />
 			<fr:view name="process" property="teacherAutoEvaluationFileBeanSet">
-				<fr:schema bundle="RESEARCHER_RESOURCES"
+				<fr:schema bundle="TEACHER_EVALUATION_RESOURCES"
 					type="pt.ist.fenixedu.teacher.evaluation.domain.TeacherEvaluationFileBean">
 					<fr:slot name="teacherEvaluationFileType" key="label.teacher.evaluation.empty" layout="null-as-label" />
 					<fr:slot name="teacherEvaluationFile" layout="link" key="label.teacher.evaluation.file" />
@@ -137,14 +139,14 @@
 						value="<%= "/teacherEvaluation.do?method=prepareUploadAutoEvaluationFile&OID="+externalId %>" />
 					<fr:property name="key(upload)" value="label.teacher.evaluation.upload" />
 					<fr:property name="param(upload)" value="teacherEvaluationFileType/type" />
-					<fr:property name="bundle(upload)" value="RESEARCHER_RESOURCES" />
+					<fr:property name="bundle(upload)" value="TEACHER_EVALUATION_RESOURCES" />
 					<fr:property name="visibleIf(upload)" value="canUploadAutoEvaluationFile" />
 				</fr:layout>
 			</fr:view>
 		</logic:notEmpty>
 
 		<logic:empty name="process" property="teacherAutoEvaluationFileBeanSet">
-			<p><bean:message bundle="RESEARCHER_RESOURCES" key="label.teacher.evaluation.noFilesNeeded.warning" /></p>
+			<p><bean:message bundle="TEACHER_EVALUATION_RESOURCES" key="label.teacher.evaluation.noFilesNeeded.warning" /></p>
 		</logic:empty>
 	</logic:present>
 </logic:iterate>

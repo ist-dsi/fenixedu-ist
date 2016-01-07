@@ -48,7 +48,7 @@ import pt.ist.fenixedu.quc.domain.StudentInquiryExecutionPeriod;
 import pt.ist.fenixedu.quc.domain.StudentInquiryRegistry;
 import pt.ist.fenixedu.quc.domain.StudentInquiryTemplate;
 import pt.ist.fenixedu.quc.domain.StudentTeacherInquiryTemplate;
-import pt.ist.fenixedu.teacher.domain.teacher.DegreeTeachingService;
+import pt.ist.fenixedu.teacher.evaluation.domain.teacher.DegreeTeachingService;
 import pt.ist.fenixframework.Atomic;
 
 public class StudentInquiryBean implements Serializable {

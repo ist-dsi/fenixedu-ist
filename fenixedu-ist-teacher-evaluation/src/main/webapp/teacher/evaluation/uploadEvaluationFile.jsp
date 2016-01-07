@@ -27,9 +27,9 @@
 
 <html:xhtml />
 
-<em><bean:message bundle="RESEARCHER_RESOURCES" key="label.teacher.evaluation.title"/></em>
+<em><bean:message bundle="TEACHER_EVALUATION_RESOURCES" key="label.teacher.evaluation.title"/></em>
 
-<h2><bean:message bundle="RESEARCHER_RESOURCES" key="label.teacher.evaluation.upload.title" /></h2>
+<h2><bean:message bundle="TEACHER_EVALUATION_RESOURCES" key="label.teacher.evaluation.upload.title" /></h2>
 
 <logic:present name="fileUploadBean">
 	<bean:define id="urlUploadInvalid">/teacherEvaluation.do?method=<bean:write name="backAction" />&evalueeOID=<bean:write

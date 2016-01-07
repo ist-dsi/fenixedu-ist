@@ -50,10 +50,10 @@ import pt.ist.fenixedu.quc.domain.InquiryStudentCycleAnswer;
 import pt.ist.fenixedu.quc.domain.RegentInquiryTemplate;
 import pt.ist.fenixedu.quc.domain.StudentInquiryRegistry;
 import pt.ist.fenixedu.quc.domain.TeacherInquiryTemplate;
-import pt.ist.fenixedu.teacher.domain.credits.AnnualCreditsState;
-import pt.ist.fenixedu.teacher.domain.teacher.ReductionService;
-import pt.ist.fenixedu.teacher.domain.teacher.TeacherService;
-import pt.ist.fenixedu.teacher.domain.time.calendarStructure.TeacherCreditsFillingCE;
+import pt.ist.fenixedu.teacher.evaluation.domain.credits.AnnualCreditsState;
+import pt.ist.fenixedu.teacher.evaluation.domain.teacher.ReductionService;
+import pt.ist.fenixedu.teacher.evaluation.domain.teacher.TeacherService;
+import pt.ist.fenixedu.teacher.evaluation.domain.time.calendarStructure.TeacherCreditsFillingCE;
 
 public abstract class BaseAuthenticationAction extends FenixAction {
 
