@@ -71,8 +71,15 @@ public final class InquiriesRoot extends InquiriesRoot_Base {
 
     private static boolean isAvailableDegreeForInquiries(Degree degree) {
         return degree.getDegreeType().isBolonhaDegree() || degree.getDegreeType().isIntegratedMasterDegree()
-                || degree.getDegreeType().isBolonhaMasterDegree()
-                || THIRD_CYCLE_AVAILABLE_INQUIRY_DEGREES.contains(degree.getSigla().toLowerCase());
+                || degree.getDegreeType().isBolonhaMasterDegree() || isAvailableDegree(degree);
+    }
+
+    private static boolean isAvailableDegree(Degree degree) {
+        if (getInstance().getDegreesAvailableForInquiriesSet().isEmpty()) {
+            return THIRD_CYCLE_AVAILABLE_INQUIRY_DEGREES.contains(degree.getSigla().toLowerCase());
+        } else {
+            return getInstance().getDegreesAvailableForInquiriesSet().contains(degree);
+        }
     }
 
     public static boolean isMasterDegreeDFAOnly(ExecutionCourse executionCourse) {

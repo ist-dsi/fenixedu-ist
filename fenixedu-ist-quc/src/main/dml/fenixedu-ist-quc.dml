@@ -247,6 +247,15 @@ relation InquiriesRootLink {
     }
 }
 
+relation AvailableDegreesForInquiries {
+    InquiriesRoot playsRole availableForInquiries {
+        multiplicity 0..1;
+    }
+    .org.fenixedu.academic.domain.Degree playsRole degreesAvailableForInquiries {
+        multiplicity *;
+    }
+}
+
 relation AvailableForInquiries {
     InquiriesRoot playsRole availableForInquiries {
         multiplicity 0..1;
