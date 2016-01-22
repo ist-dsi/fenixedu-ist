@@ -53,6 +53,11 @@
         </dependency>
         <dependency>
             <groupId>pt.ist</groupId>
+            <artifactId>fenixedu-ist-giaf-invoices</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>pt.ist</groupId>
             <artifactId>fenixedu-ist-libraryspace</artifactId>
             <version>${project.version}</version>
         </dependency>
