@@ -20,7 +20,6 @@ package pt.ist.fenixedu.integration;
 
 import java.util.Map;
 
-import org.fenixedu.bennu.portal.domain.PortalConfiguration;
 import org.fenixedu.commons.configuration.ConfigurationInvocationHandler;
 import org.fenixedu.commons.configuration.ConfigurationManager;
 import org.fenixedu.commons.configuration.ConfigurationProperty;
@@ -30,10 +29,6 @@ import pt.ist.fenixedu.integration.util.HostAccessControl;
 public class FenixEduIstIntegrationConfiguration {
     @ConfigurationManager(description = "FenixEdu IST Integration specific properties")
     public interface ConfigurationProperties {
-        @ConfigurationProperty(key = "barra.as.authentication.broker",
-                description = "CAS ticket validation through barra: https://fenix-ashes.ist.utl.pt/fenixWiki/Barra",
-                defaultValue = "false")
-        public Boolean barraAsAuthenticationBroker();
 
         @ConfigurationProperty(key = "fenix.api.events.rss.url.pt")
         public String getFenixApiEventsRSSUrlPt();
@@ -73,10 +68,6 @@ public class FenixEduIstIntegrationConfiguration {
 
         @ConfigurationProperty(key = "fenix.api.canteen.secret", defaultValue = "")
         public String getFenixApiCanteenSecret();
-
-        @ConfigurationProperty(key = "barra.loginUrl",
-                description = "Login URL to use when barra is set as authentication broker")
-        public String barraLoginUrl();
 
         @Deprecated
         @ConfigurationProperty(key = "dges.username.prefix",
@@ -150,10 +141,6 @@ public class FenixEduIstIntegrationConfiguration {
         public String getExternalServicesAEISTUsername();
     }
 
-    public static boolean barraLogin() {
-        return barraLogin && "ashes-ist".equals(PortalConfiguration.getInstance().getTheme());
-    }
-
     public static ConfigurationProperties getConfiguration() {
         return ConfigurationInvocationHandler.getConfiguration(ConfigurationProperties.class);
     }
@@ -163,13 +150,7 @@ public class FenixEduIstIntegrationConfiguration {
         return hostAccessControl;
     }
 
-    public static void setBarraLogin(boolean state) {
-        barraLogin = state;
-    }
-
     @Deprecated
     private static HostAccessControl hostAccessControl = new HostAccessControl(getConfiguration().getHostControlName());
-
-    private static boolean barraLogin = getConfiguration().barraAsAuthenticationBroker();
 
 }

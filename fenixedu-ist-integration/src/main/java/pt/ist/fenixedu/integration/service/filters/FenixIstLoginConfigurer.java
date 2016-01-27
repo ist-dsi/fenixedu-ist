@@ -30,11 +30,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.core.util.CoreConfiguration;
 import org.fenixedu.bennu.core.util.CoreConfiguration.CasConfig;
+import org.fenixedu.bennu.portal.domain.PortalConfiguration;
 import org.fenixedu.bennu.portal.servlet.PortalLoginServlet;
 import org.fenixedu.bennu.portal.servlet.PortalLoginServlet.LocalLoginStrategy;
 import org.fenixedu.bennu.portal.servlet.PortalLoginServlet.PortalLoginStrategy;
-
-import pt.ist.fenixedu.integration.FenixEduIstIntegrationConfiguration;
 
 import com.google.common.base.Strings;
 
@@ -82,11 +81,15 @@ public class FenixIstLoginConfigurer implements ServletContextListener {
                     callback = casConfig.getCasServiceUrl();
                 }
                 String casLoginUrl = casConfig.getCasLoginUrl(callback);
-                if (FenixEduIstIntegrationConfiguration.barraLogin()) {
-                    casLoginUrl = FenixEduIstIntegrationConfiguration.getConfiguration().barraLoginUrl() + "?next=" + casLoginUrl;
+                if (barraLogin()) {
+                    casLoginUrl = "https://barra.tecnico.ulisboa.pt/login/?next=" + casLoginUrl;
                 }
                 resp.sendRedirect(casLoginUrl);
             }
+        }
+
+        private static boolean barraLogin() {
+            return "ashes-ist-barra".equals(PortalConfiguration.getInstance().getTheme());
         }
     }
 
