@@ -18,9 +18,6 @@
  */
 package pt.ist.fenixedu.quc.domain;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionCourse;
@@ -32,19 +29,6 @@ import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
 
 public final class InquiriesRoot extends InquiriesRoot_Base {
-    public static final List<String> THIRD_CYCLE_AVAILABLE_INQUIRY_DEGREES = new ArrayList<String>();
-
-    static {
-        THIRD_CYCLE_AVAILABLE_INQUIRY_DEGREES.add("celssbb");
-        THIRD_CYCLE_AVAILABLE_INQUIRY_DEGREES.add("degest");
-        THIRD_CYCLE_AVAILABLE_INQUIRY_DEGREES.add("deft");
-        THIRD_CYCLE_AVAILABLE_INQUIRY_DEGREES.add("deaa");
-        THIRD_CYCLE_AVAILABLE_INQUIRY_DEGREES.add("dec");
-        THIRD_CYCLE_AVAILABLE_INQUIRY_DEGREES.add("deec");
-        THIRD_CYCLE_AVAILABLE_INQUIRY_DEGREES.add("den");
-        THIRD_CYCLE_AVAILABLE_INQUIRY_DEGREES.add("dfaerm");
-    }
-
     private InquiriesRoot() {
         super();
         setRoot(Bennu.getInstance());
@@ -75,11 +59,7 @@ public final class InquiriesRoot extends InquiriesRoot_Base {
     }
 
     private static boolean isAvailableDegree(Degree degree) {
-        if (getInstance().getDegreesAvailableForInquiriesSet().isEmpty()) {
-            return THIRD_CYCLE_AVAILABLE_INQUIRY_DEGREES.contains(degree.getSigla().toLowerCase());
-        } else {
-            return getInstance().getDegreesAvailableForInquiriesSet().contains(degree);
-        }
+        return getInstance().getDegreesAvailableForInquiriesSet().contains(degree);
     }
 
     public static boolean isMasterDegreeDFAOnly(ExecutionCourse executionCourse) {
@@ -97,8 +77,7 @@ public final class InquiriesRoot extends InquiriesRoot_Base {
             if (degreeType.isBolonhaDegree() || degreeType.isBolonhaMasterDegree() || degreeType.isIntegratedMasterDegree()) {
                 return true;
             }
-            if (THIRD_CYCLE_AVAILABLE_INQUIRY_DEGREES.contains(curricularCourse.getDegreeCurricularPlan().getDegree().getSigla()
-                    .toLowerCase())) {
+            if (isAvailableDegree(curricularCourse.getDegreeCurricularPlan().getDegree())) {
                 return true;
             }
         }
