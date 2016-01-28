@@ -28,39 +28,33 @@ import org.fenixedu.academic.domain.exceptions.DomainException;
 import pt.ist.fenixedu.quc.domain.InquiryQuestion;
 import pt.ist.fenixedu.quc.domain.InquiryResult;
 import pt.ist.fenixframework.Atomic;
-import pt.ist.fenixframework.FenixFramework;
-import pt.ist.fenixframework.core.exception.MissingObjectException;
 
 public class DeleteProfessorshipResultsBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Long professorshipOID;
+    private String professorshipCode;
     private ShiftType shiftType;
-    private Long inquiryQuestionOID;
-    private Long executionCourseOID;
+    private Long inquiryQuestionCode;
+    private String executionCourseCode;
 
     @Atomic
     public boolean deleteResults() {
-        Professorship professorship = null;
-        try {
-            professorship = FenixFramework.getDomainObject(getProfessorshipOID().toString());
-        } catch (ClassCastException cce) {
-            throw new DomainException("error.professorship.dontExist", cce.getCause());
-        } catch (MissingObjectException moe) {
-            throw new DomainException("error.professorship.dontExist", moe.getCause());
+        Professorship professorship = InquiryResult.getProfessorship(getProfessorshipCode());
+        if (professorship == null) {
+            throw new DomainException("error.professorship.dontExist");
         }
-        setExecutionCourseOID(null);
+
+        setExecutionCourseCode(null);
         boolean deletedResults = false;
         if (getShiftType() != null) {
             InquiryQuestion inquiryQuestion = null;
-            if (getInquiryQuestionOID() != null) {
-                try {
-                    inquiryQuestion = FenixFramework.getDomainObject(getInquiryQuestionOID().toString());
-                } catch (ClassCastException cce) {
-                    throw new DomainException("error.inquiryQuestion.dontExist", cce.getCause());
-                } catch (MissingObjectException moe) {
-                    throw new DomainException("error.inquiryQuestion.dontExist", moe.getCause());
+            if (getInquiryQuestionCode() != null) {
+                if (inquiryQuestion == null) {
+                    inquiryQuestion = InquiryResult.getInquiryQuestion(getInquiryQuestionCode());
+                    if (inquiryQuestion == null) {
+                        throw new DomainException("error.inquiryQuestion.dontExist");
+                    }
                 }
             }
             for (InquiryResult inquiryResult : InquiryResult.getInquiryResults(professorship, getShiftType())) {
@@ -70,7 +64,7 @@ public class DeleteProfessorshipResultsBean implements Serializable {
                 }
             }
         } else {
-            setInquiryQuestionOID(null);
+            setInquiryQuestionCode(null);
             for (InquiryResult inquiryResult : professorship.getInquiryResultsSet()) {
                 inquiryResult.delete();
                 deletedResults = true;
@@ -81,17 +75,14 @@ public class DeleteProfessorshipResultsBean implements Serializable {
 
     @Atomic
     public boolean deleteAllTeachersResults() {
-        ExecutionCourse executionCourse = null;
-        try {
-            executionCourse = FenixFramework.getDomainObject(getExecutionCourseOID().toString());
-        } catch (ClassCastException cce) {
-            throw new DomainException("error.executionCourse.dontExist", cce.getCause());
-        } catch (MissingObjectException moe) {
-            throw new DomainException("error.executionCourse.dontExist", moe.getCause());
+        ExecutionCourse executionCourse = InquiryResult.getExecutionCourse(getExecutionCourseCode());
+        if (executionCourse == null) {
+            throw new DomainException("error.executionCourse.dontExist");
         }
-        setProfessorshipOID(null);
+
+        setProfessorshipCode(null);
         setShiftType(null);
-        setInquiryQuestionOID(null);
+        setInquiryQuestionCode(null);
         boolean deletedResults = false;
         for (InquiryResult inquiryResult : executionCourse.getInquiryResultsSet()) {
             if (inquiryResult.getProfessorship() != null) {
@@ -102,12 +93,12 @@ public class DeleteProfessorshipResultsBean implements Serializable {
         return deletedResults;
     }
 
-    public Long getProfessorshipOID() {
-        return professorshipOID;
+    public String getProfessorshipCode() {
+        return professorshipCode;
     }
 
-    public void setProfessorshipOID(Long professorshipOID) {
-        this.professorshipOID = professorshipOID;
+    public void setProfessorshipCode(String professorshipCode) {
+        this.professorshipCode = professorshipCode;
     }
 
     public ShiftType getShiftType() {
@@ -118,19 +109,19 @@ public class DeleteProfessorshipResultsBean implements Serializable {
         this.shiftType = shiftType;
     }
 
-    public Long getInquiryQuestionOID() {
-        return inquiryQuestionOID;
+    public Long getInquiryQuestionCode() {
+        return inquiryQuestionCode;
     }
 
-    public void setInquiryQuestionOID(Long inquiryQuestionOID) {
-        this.inquiryQuestionOID = inquiryQuestionOID;
+    public void setInquiryQuestionCode(Long inquiryQuestionCode) {
+        this.inquiryQuestionCode = inquiryQuestionCode;
     }
 
-    public void setExecutionCourseOID(Long executionCourseOID) {
-        this.executionCourseOID = executionCourseOID;
+    public String getExecutionCourseCode() {
+        return executionCourseCode;
     }
 
-    public Long getExecutionCourseOID() {
-        return executionCourseOID;
+    public void setExecutionCourseCode(String executionCourseCode) {
+        this.executionCourseCode = executionCourseCode;
     }
 }
