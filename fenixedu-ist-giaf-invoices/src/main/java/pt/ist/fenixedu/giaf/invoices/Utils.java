@@ -711,11 +711,16 @@ public class Utils {
                 }
                 builder.append(exemption.getDescription().toString());
             }
-            e.addProperty("observation", builder.toString());
+            e.addProperty("observation", max80(builder.toString()));
             a.add(e);
         }
         o.add("entries", a);
         return o;
+    }
+
+    private static String max80(final String s) {
+        final int l = s.length();
+        return l > 80 ? s.substring(0, 80) : s;
     }
 
     public static Money discountsAndExcemptions(final Event event) {
