@@ -3,7 +3,6 @@ package pt.ist.fenixedu.integration.ui.struts.action.externalServices;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -15,6 +14,8 @@ import org.fenixedu.bennu.struts.annotations.Mapping;
 import org.json.simple.JSONObject;
 
 import pt.ist.fenixedu.integration.FenixEduIstIntegrationConfiguration;
+
+import com.google.common.base.Strings;
 
 @Mapping(module = "external", path = "/userForAEIST")
 public class AEISTUserInformationDA extends ExternalInterfaceDispatchAction {
@@ -28,8 +29,8 @@ public class AEISTUserInformationDA extends ExternalInterfaceDispatchAction {
         final String password = (String) getFromRequest(request, "password");
         final String usernameProp = FenixEduIstIntegrationConfiguration.getConfiguration().getExternalServicesAEISTUsername();
         final String passwordProp = FenixEduIstIntegrationConfiguration.getConfiguration().getExternalServicesAEISTPassword();
-        if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password) || StringUtils.isEmpty(usernameProp)
-                || StringUtils.isEmpty(passwordProp)) {
+        if (Strings.isNullOrEmpty(username) || Strings.isNullOrEmpty(password) || Strings.isNullOrEmpty(usernameProp)
+                || Strings.isNullOrEmpty(passwordProp)) {
             return false;
         }
         return username.equals(usernameProp) && password.equals(passwordProp);

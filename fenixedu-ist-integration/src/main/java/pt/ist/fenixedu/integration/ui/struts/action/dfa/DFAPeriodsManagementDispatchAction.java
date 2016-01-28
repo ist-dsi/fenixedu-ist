@@ -24,7 +24,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -40,6 +39,8 @@ import org.fenixedu.bennu.struts.portal.EntryPoint;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
 
 import pt.ist.fenixframework.FenixFramework;
+
+import com.google.common.base.Strings;
 
 @StrutsFunctionality(app = DFAApplication.class, path = "manage-periods", titleKey = "link.candidacy.dfa.periodsManagement")
 @Mapping(module = "masterDegreeAdministrativeOffice", path = "/dfaPeriodsManagement", formBean = "chooseExecutionYearForm")
@@ -73,7 +74,7 @@ public class DFAPeriodsManagementDispatchAction extends FenixDispatchAction {
     }
 
     private ExecutionYear getExecutionYear(final HttpServletRequest request, final DynaActionForm dynaActionForm) {
-        if (!StringUtils.isEmpty(dynaActionForm.getString("executionYear"))) {
+        if (!Strings.isNullOrEmpty(dynaActionForm.getString("executionYear"))) {
             return FenixFramework.getDomainObject(dynaActionForm.getString("executionYear"));
         } else if (request.getParameter("executionYearId") != null) {
             return getDomainObject(request, "executionYearId");

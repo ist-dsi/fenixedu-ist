@@ -20,11 +20,12 @@ package pt.ist.fenixedu.quc.domain;
 
 import java.util.Collection;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.bennu.core.domain.Bennu;
+
+import com.google.common.base.Strings;
 
 public class InquiryResultComment extends InquiryResultComment_Base {
 
@@ -67,10 +68,10 @@ public class InquiryResultComment extends InquiryResultComment_Base {
                             && !inquiryResult.getInquiryQuestion().isResultQuestion(inquiryResult.getExecutionPeriod())) {
                         InquiryResultComment inquiryResultComment =
                                 inquiryResult.getInquiryResultComment(sibling.getPerson(), ResultPersonCategory.REGENT);
-                        if (inquiryResultComment == null || StringUtils.isEmpty(inquiryResultComment.getComment())) {
+                        if (inquiryResultComment == null || Strings.isNullOrEmpty(inquiryResultComment.getComment())) {
                             inquiryResultComment =
                                     inquiryResult.getInquiryResultComment(sibling.getPerson(), ResultPersonCategory.TEACHER);
-                            if (inquiryResultComment == null || StringUtils.isEmpty(inquiryResultComment.getComment())) {
+                            if (inquiryResultComment == null || Strings.isNullOrEmpty(inquiryResultComment.getComment())) {
                                 return true;
                             }
                         }
@@ -89,7 +90,7 @@ public class InquiryResultComment extends InquiryResultComment_Base {
                         && !inquiryResult.getInquiryQuestion().isResultQuestion(inquiryResult.getExecutionPeriod())) {
                     InquiryResultComment inquiryResultComment =
                             inquiryResult.getInquiryResultComment(professorship.getPerson(), ResultPersonCategory.TEACHER);
-                    if (inquiryResultComment == null || StringUtils.isEmpty(inquiryResultComment.getComment())) {
+                    if (inquiryResultComment == null || Strings.isNullOrEmpty(inquiryResultComment.getComment())) {
                         return true;
                     }
                 }
@@ -108,7 +109,7 @@ public class InquiryResultComment extends InquiryResultComment_Base {
                             inquiryResult.getInquiryResultComment(person, ResultPersonCategory.REGENT);
                     if (inquiryResultComment == null) {
                         inquiryResultComment = inquiryResult.getInquiryResultComment(person, ResultPersonCategory.TEACHER);
-                        if (inquiryResultComment == null || StringUtils.isEmpty(inquiryResultComment.getComment())) {
+                        if (inquiryResultComment == null || Strings.isNullOrEmpty(inquiryResultComment.getComment())) {
                             return true;
                         }
                     }

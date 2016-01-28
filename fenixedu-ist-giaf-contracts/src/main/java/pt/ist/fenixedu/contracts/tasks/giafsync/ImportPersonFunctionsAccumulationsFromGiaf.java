@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.joda.time.DateTime;
@@ -47,6 +46,8 @@ import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalR
 import pt.ist.fenixedu.contracts.persistenceTierOracle.Oracle.PersistentSuportGiaf;
 import pt.ist.fenixedu.contracts.tasks.giafsync.GiafSync.ImportProcessor;
 import pt.ist.fenixedu.contracts.tasks.giafsync.GiafSync.Modification;
+
+import com.google.common.base.Strings;
 
 class ImportPersonFunctionsAccumulationsFromGiaf extends ImportProcessor {
     final static DateTimeFormatter dateFormat = DateTimeFormat.forPattern("yyyy-MM-dd");
@@ -102,14 +103,15 @@ class ImportPersonFunctionsAccumulationsFromGiaf extends ImportProcessor {
             }
             String beginDateString = result.getString("DATA_INICIO");
             final LocalDate beginDate =
-                    StringUtils.isEmpty(beginDateString) ? null : new LocalDate(Timestamp.valueOf(beginDateString));
+                    Strings.isNullOrEmpty(beginDateString) ? null : new LocalDate(Timestamp.valueOf(beginDateString));
             if (beginDate == null) {
                 logger.debug("Empty beginDate: " + numberString + " FunctionsAccumulation: " + functionsAccumulationGiafId);
                 importedButInvalid.add(person);
             }
 
             String endDateString = result.getString("DATA_FIM");
-            final LocalDate endDate = StringUtils.isEmpty(endDateString) ? null : new LocalDate(Timestamp.valueOf(endDateString));
+            final LocalDate endDate =
+                    Strings.isNullOrEmpty(endDateString) ? null : new LocalDate(Timestamp.valueOf(endDateString));
             if (beginDate != null && endDate != null) {
                 if (beginDate != null && beginDate.isAfter(endDate)) {
                     logger.debug("BeginDate after EndDate. Person number: " + numberString + ". begin: " + beginDate + " end:"
@@ -126,7 +128,7 @@ class ImportPersonFunctionsAccumulationsFromGiaf extends ImportProcessor {
                 importedButInvalid.add(person);
             }
             String creationDateString = result.getString("data_criacao");
-            if (StringUtils.isEmpty(creationDateString)) {
+            if (Strings.isNullOrEmpty(creationDateString)) {
                 logger.debug("Empty creation Date. Person number: " + numberString + " FunctionsAccumulation: "
                         + functionsAccumulationGiafId);
                 notImported++;
@@ -136,7 +138,7 @@ class ImportPersonFunctionsAccumulationsFromGiaf extends ImportProcessor {
 
             String modifiedDateString = result.getString("data_alteracao");
             final DateTime modifiedDate =
-                    StringUtils.isEmpty(modifiedDateString) ? null : new DateTime(Timestamp.valueOf(modifiedDateString));
+                    Strings.isNullOrEmpty(modifiedDateString) ? null : new DateTime(Timestamp.valueOf(modifiedDateString));
 
             if (!hasPersonFunctionsAccumulations(giafProfessionalData, beginDate, endDate, hours, functionsAccumulation,
                     functionsAccumulationGiafId, professionalRegime, professionalRegimeGiafId, creationDate, modifiedDate)) {

@@ -18,7 +18,7 @@
  */
 package pt.ist.fenixframework.plugins.remote.domain;
 
-import org.apache.commons.lang.StringUtils;
+import com.google.common.base.Strings;
 
 public class RemoteHost extends RemoteHost_Base {
 
@@ -47,7 +47,7 @@ public class RemoteHost extends RemoteHost_Base {
     }
 
     public boolean matches(final String username, final String password) {
-        if (StringUtils.isBlank(username) || StringUtils.isBlank(password)) {
+        if (Strings.isNullOrEmpty(username) || Strings.isNullOrEmpty(password)) {
             return false;
         }
         return username.equalsIgnoreCase(getUsername()) && password.equals(getPassword());

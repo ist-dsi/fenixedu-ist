@@ -23,7 +23,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.beanutils.BeanComparator;
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.candidacy.StudentCandidacy;
 import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
 import org.fenixedu.academic.domain.student.Registration;
@@ -37,6 +36,8 @@ import pt.ist.fenixedu.quc.domain.QuestionAnswer;
 import pt.ist.fenixedu.quc.domain.QuestionCondition;
 import pt.ist.fenixedu.quc.domain.StudentCycleInquiryTemplate;
 import pt.ist.fenixframework.Atomic;
+
+import com.google.common.base.Strings;
 
 public class StudentFirstTimeCycleInquiryBean implements Serializable {
 
@@ -131,7 +132,7 @@ public class StudentFirstTimeCycleInquiryBean implements Serializable {
         for (InquiryBlockDTO blockDTO : getStudentInquiryBlocks()) {
             for (InquiryGroupQuestionBean groupQuestionBean : blockDTO.getInquiryGroups()) {
                 for (InquiryQuestionDTO questionDTO : groupQuestionBean.getInquiryQuestions()) {
-                    if (!StringUtils.isEmpty(questionDTO.getResponseValue()) || questionDTO.getQuestionAnswer() != null) {
+                    if (!Strings.isNullOrEmpty(questionDTO.getResponseValue()) || questionDTO.getQuestionAnswer() != null) {
                         if (inquiryStudentCycleAnswer == null) {
                             inquiryStudentCycleAnswer = createInquiryStudentCycleAnswer();
                             inquiryStudentCycleAnswer.setResponseDateTime(new DateTime());

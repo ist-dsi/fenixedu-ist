@@ -28,7 +28,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.beanutils.BeanComparator;
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.Person;
@@ -46,6 +45,8 @@ import pt.ist.fenixedu.quc.domain.InquiryResultComment;
 import pt.ist.fenixedu.quc.domain.QuestionAnswer;
 import pt.ist.fenixedu.quc.domain.ResultPersonCategory;
 import pt.ist.fenixframework.Atomic;
+
+import com.google.common.base.Strings;
 
 public class DelegateInquiryBean implements Serializable {
 
@@ -179,7 +180,7 @@ public class DelegateInquiryBean implements Serializable {
         for (InquiryBlockDTO blockDTO : getDelegateInquiryBlocks()) {
             for (InquiryGroupQuestionBean groupQuestionBean : blockDTO.getInquiryGroups()) {
                 for (InquiryQuestionDTO questionDTO : groupQuestionBean.getInquiryQuestions()) {
-                    if (!StringUtils.isEmpty(questionDTO.getResponseValue()) || questionDTO.getQuestionAnswer() != null) {
+                    if (!Strings.isNullOrEmpty(questionDTO.getResponseValue()) || questionDTO.getQuestionAnswer() != null) {
                         if (questionDTO.getQuestionAnswer() != null) {
                             questionDTO.getQuestionAnswer().setAnswer(questionDTO.getResponseValue());
                             questionDTO.getQuestionAnswer().getInquiryAnswer().setResponseDateTime(new DateTime());
@@ -206,7 +207,8 @@ public class DelegateInquiryBean implements Serializable {
                     if (questionResult != null) {
                         InquiryResultComment inquiryResultComment =
                                 questionResultsSummaryBean.getQuestionResult().getInquiryResultComment(person, delegate);
-                        if (!StringUtils.isEmpty(questionResultsSummaryBean.getEditableComment()) || inquiryResultComment != null) {
+                        if (!Strings.isNullOrEmpty(questionResultsSummaryBean.getEditableComment())
+                                || inquiryResultComment != null) {
                             if (inquiryResultComment == null) {
                                 inquiryResultComment =
                                         new InquiryResultComment(questionResult, person, delegate, questionResultsSummaryBean

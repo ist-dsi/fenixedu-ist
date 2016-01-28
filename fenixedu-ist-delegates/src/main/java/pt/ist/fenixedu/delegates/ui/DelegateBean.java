@@ -23,7 +23,6 @@ import static org.fenixedu.bennu.FenixEduDelegatesConfiguration.BUNDLE;
 import java.util.Comparator;
 import java.util.Objects;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.CurricularYear;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.contacts.MobilePhone;
@@ -67,7 +66,7 @@ public class DelegateBean {
         if (mobilePhone != null && mobilePhone.isVisible()) {
             this.phone = mobilePhone.getNumber();
         } else {
-            this.phone = StringUtils.EMPTY;
+            this.phone = "";
         }
         this.curricularYear = delegate.getCurricularYear();
         this.delegate = delegate;

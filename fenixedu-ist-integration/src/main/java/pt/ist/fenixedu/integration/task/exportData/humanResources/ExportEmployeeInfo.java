@@ -4,7 +4,6 @@ import java.io.FileOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.bennu.core.domain.Bennu;
@@ -19,6 +18,7 @@ import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfess
 import pt.ist.fenixedu.contracts.domain.research.Researcher;
 import pt.ist.fenixedu.contracts.domain.util.CategoryType;
 
+import com.google.common.base.Strings;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -104,7 +104,7 @@ public class ExportEmployeeInfo extends CustomTask {
         final JsonObject object = new JsonObject();
         object.addProperty("user", user.getUsername());
         object.addProperty("role", type.name());
-        object.addProperty("wp", StringUtils.leftPad(wp, 4, '0'));
+        object.addProperty("wp", Strings.padStart(wp, 4, '0'));
         object.addProperty("employer", employer);
         result.add(object);
     }

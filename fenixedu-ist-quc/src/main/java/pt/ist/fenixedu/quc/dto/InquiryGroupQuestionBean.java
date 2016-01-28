@@ -24,7 +24,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.commons.beanutils.BeanComparator;
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.util.MultiLanguageString;
 
 import pt.ist.fenixedu.quc.domain.InquiryAnswer;
@@ -33,6 +32,8 @@ import pt.ist.fenixedu.quc.domain.InquiryQuestion;
 import pt.ist.fenixedu.quc.domain.MandatoryCondition;
 import pt.ist.fenixedu.quc.domain.QuestionCondition;
 import pt.ist.fenixedu.quc.domain.StudentInquiryRegistry;
+
+import com.google.common.base.Strings;
 
 public class InquiryGroupQuestionBean implements Serializable {
 
@@ -90,7 +91,7 @@ public class InquiryGroupQuestionBean implements Serializable {
             boolean isGroupFilledIn = false;
             for (InquiryQuestionDTO inquiryQuestionDTO : questions) {
                 InquiryQuestion inquiryQuestion = inquiryQuestionDTO.getInquiryQuestion();
-                if (StringUtils.isEmpty(inquiryQuestionDTO.getResponseValue())) {
+                if (Strings.isNullOrEmpty(inquiryQuestionDTO.getResponseValue())) {
                     if (inquiryQuestion.getRequired()) {
                         return Boolean.toString(false);
                     }
@@ -118,7 +119,7 @@ public class InquiryGroupQuestionBean implements Serializable {
             boolean isGroupFilledIn = false;
             for (InquiryQuestionDTO inquiryQuestionDTO : getInquiryQuestions()) {
                 InquiryQuestion inquiryQuestion = inquiryQuestionDTO.getInquiryQuestion();
-                if (StringUtils.isEmpty(inquiryQuestionDTO.getResponseValue())) {
+                if (Strings.isNullOrEmpty(inquiryQuestionDTO.getResponseValue())) {
                     String questionConditionsValidation = validateQuestionConditions(inquiryQuestion, inquiryBlocks);
                     if (questionConditionsValidation != null) {
                         return questionConditionsValidation;
@@ -170,7 +171,7 @@ public class InquiryGroupQuestionBean implements Serializable {
             int endIndex = label.toString().indexOf(" ");
             return label.toString().substring(0, endIndex);
         }
-        return StringUtils.EMPTY;
+        return "";
     }
 
     private InquiryQuestionDTO getInquiryQuestionBean(InquiryQuestion inquiryQuestion, Set<InquiryBlockDTO> inquiryBlocks) {

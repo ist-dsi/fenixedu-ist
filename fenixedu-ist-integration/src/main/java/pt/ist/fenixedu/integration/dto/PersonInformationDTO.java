@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Photograph;
 import org.fenixedu.academic.domain.contacts.EmailAddress;
@@ -126,23 +125,22 @@ public class PersonInformationDTO {
         }
 
         final Phone defaultPhone = person.getDefaultPhone();
-        this.phone = defaultPhone != null ? defaultPhone.getPresentationValue() : StringUtils.EMPTY;
+        this.phone = defaultPhone != null ? defaultPhone.getPresentationValue() : "";
 
         final MobilePhone defaultMobilePhone = person.getDefaultMobilePhone();
-        this.mobile = defaultMobilePhone != null ? defaultMobilePhone.getPresentationValue() : StringUtils.EMPTY;
+        this.mobile = defaultMobilePhone != null ? defaultMobilePhone.getPresentationValue() : "";
 
         final WebAddress defaultWebAddress = person.getDefaultWebAddress();
-        this.webAddress = defaultWebAddress != null ? defaultWebAddress.getPresentationValue() : StringUtils.EMPTY;
+        this.webAddress = defaultWebAddress != null ? defaultWebAddress.getPresentationValue() : "";
 
         final EmailAddress defaultEmailAddress = person.getDefaultEmailAddress();
-        this.email = defaultEmailAddress != null ? defaultEmailAddress.getPresentationValue() : StringUtils.EMPTY;
+        this.email = defaultEmailAddress != null ? defaultEmailAddress.getPresentationValue() : "";
 
         this.gender = person.getGender() != null ? person.getGender().name() : null;
         this.userUID = person.getUsername();
 
         this.identificationDocumentNumber = person.getDocumentIdNumber();
-        this.identificationDocumentType =
-                person.getIdDocumentType() != null ? person.getIdDocumentType().name() : StringUtils.EMPTY;
+        this.identificationDocumentType = person.getIdDocumentType() != null ? person.getIdDocumentType().name() : "";
         this.identificationDocumentExtraDigit = person.getIdentificationDocumentExtraDigitValue();
         this.identificationDocumentSeriesNumber = person.getIdentificationDocumentSeriesNumberValue();
 

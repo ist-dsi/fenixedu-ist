@@ -20,19 +20,20 @@ package pt.ist.fenixedu.teacher.evaluation.ui.struts.action.credits;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.fenixedu.academic.domain.CurricularCourse;
+import org.fenixedu.academic.domain.Degree;
+import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
@@ -211,10 +212,7 @@ public class ViewDepartmentTeacherServiceDA extends FenixDispatchAction {
     }
 
     public String getDegreeSiglas(ExecutionCourse executionCourse) {
-        Set<String> degreeSiglas = new HashSet<String>();
-        for (CurricularCourse curricularCourse : executionCourse.getAssociatedCurricularCoursesSet()) {
-            degreeSiglas.add(curricularCourse.getDegreeCurricularPlan().getDegree().getSigla());
-        }
-        return StringUtils.join(degreeSiglas, ", ");
+        return executionCourse.getAssociatedCurricularCoursesSet().stream().map(CurricularCourse::getDegreeCurricularPlan)
+                .map(DegreeCurricularPlan::getDegree).map(Degree::getSigla).collect(Collectors.joining(", "));
     }
 }

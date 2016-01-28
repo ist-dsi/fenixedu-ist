@@ -4,7 +4,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.bennu.core.domain.User;
 import org.joda.time.LocalDate;
@@ -13,6 +12,7 @@ import pt.ist.fenixedu.contracts.domain.Employee;
 import pt.ist.fenixedu.contracts.persistenceTierOracle.DbConnector.ResultSetConsumer;
 import pt.ist.fenixedu.contracts.persistenceTierOracle.GiafDbConnector;
 
+import com.google.common.base.Strings;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -90,7 +90,8 @@ public class GiafEmployeeAssiduity {
     }
 
     private static String convertIntoGiafNumber(final String employeeNumber) {
-        return StringUtils.leftPad(employeeNumber, 6, '0');
+        return Strings.padStart(employeeNumber, 6, '0');
+
     }
 
     private static String getEmployeeNumber(final User user) throws SQLException {

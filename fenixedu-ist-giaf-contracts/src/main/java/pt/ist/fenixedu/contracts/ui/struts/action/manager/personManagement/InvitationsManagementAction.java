@@ -25,7 +25,6 @@ import java.util.TreeSet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -59,6 +58,8 @@ import pt.ist.fenixedu.contracts.service.manager.CreateNewPersonInvitation;
 import pt.ist.fenixedu.contracts.service.manager.DeleteInvitation;
 import pt.ist.fenixedu.contracts.service.manager.EditInvitationHostUnit;
 import pt.ist.fenixedu.contracts.service.manager.EditInvitationResponsible;
+
+import com.google.common.base.Strings;
 
 @StrutsFunctionality(app = AccountManagementApp.class, path = "invitations-management",
         titleKey = "title.manage.external.persons")
@@ -320,7 +321,7 @@ public class InvitationsManagementAction extends FenixDispatchAction {
     }
 
     private boolean isSpecified(final String string) {
-        return !StringUtils.isEmpty(string);
+        return !Strings.isNullOrEmpty(string);
     }
 
 }

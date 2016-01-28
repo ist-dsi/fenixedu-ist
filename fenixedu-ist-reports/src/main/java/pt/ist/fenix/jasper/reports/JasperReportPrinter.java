@@ -49,7 +49,6 @@ import net.sf.jasperreports.engine.fill.JRSubreportRunnerFactory;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.engine.util.JRProperties;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.util.report.ReportPrinter;
 import org.fenixedu.academic.util.report.ReportsUtils;
 
@@ -257,7 +256,7 @@ public class JasperReportPrinter implements ReportPrinter {
             if (dataSource == null || dataSource.isEmpty()) {
                 // dummy, engine seems to work not very well with empty data
                 // sources
-                dataSource = Collections.singletonList(StringUtils.EMPTY);
+                dataSource = Collections.singletonList("");
             }
 
             return JasperFillManager.fillReport(report, parameters, new TransactionalDataSource(dataSource));

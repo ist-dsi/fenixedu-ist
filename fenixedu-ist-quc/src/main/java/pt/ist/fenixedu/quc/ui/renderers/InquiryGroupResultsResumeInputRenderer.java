@@ -21,8 +21,6 @@
  */
 package pt.ist.fenixedu.quc.ui.renderers;
 
-import org.apache.commons.lang.StringUtils;
-
 import pt.ist.fenixWebFramework.renderers.components.HtmlBlockContainer;
 import pt.ist.fenixWebFramework.renderers.components.HtmlComponent;
 import pt.ist.fenixWebFramework.renderers.components.HtmlTable;
@@ -39,6 +37,8 @@ import pt.ist.fenixedu.quc.domain.InquiryResultComment;
 import pt.ist.fenixedu.quc.domain.ResultPersonCategory;
 import pt.ist.fenixedu.quc.dto.GroupResultsSummaryBean;
 import pt.ist.fenixedu.quc.dto.QuestionResultsSummaryBean;
+
+import com.google.common.base.Strings;
 
 /**
  * @author - Ricardo Rodrigues (ricardo.rodrigues@ist.utl.pt)
@@ -129,7 +129,7 @@ public class InquiryGroupResultsResumeInputRenderer extends InquiryGroupResultsR
             InquiryResultComment resultComment =
                     questionResultsSummaryBean.getQuestionResult().getInquiryResultComment(
                             questionResultsSummaryBean.getCommentPerson(), ResultPersonCategory.TEACHER);
-            if (resultComment != null && !StringUtils.isEmpty(resultComment.getComment())) {
+            if (resultComment != null && !Strings.isNullOrEmpty(resultComment.getComment())) {
                 commentHeader = "Se desejar, pode acrescentar um comentário (opcional)";
             }
         }

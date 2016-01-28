@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionDegree;
@@ -41,6 +40,8 @@ import org.joda.time.DateTime;
 
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
+
+import com.google.common.base.Strings;
 
 public class InquiryResult extends InquiryResult_Base {
 
@@ -202,7 +203,7 @@ public class InquiryResult extends InquiryResult_Base {
 
     private static void setConnectionType(String[] columns, InquiryResult inquiryResult) {
         String connectionTypeString = columns[10];
-        if (StringUtils.isEmpty(connectionTypeString)) {
+        if (Strings.isNullOrEmpty(connectionTypeString)) {
             throw new DomainException("connectionType: " + getPrintableColumns(columns));
         }
         InquiryConnectionType connectionType = InquiryConnectionType.valueOf(connectionTypeString);
@@ -211,7 +212,7 @@ public class InquiryResult extends InquiryResult_Base {
 
     private static void setResultType(String[] columns, InquiryResult inquiryResult) {
         String resultTypeString = columns[1];
-        if (!StringUtils.isEmpty(resultTypeString)) {
+        if (!Strings.isNullOrEmpty(resultTypeString)) {
             InquiryResultType inquiryResultType = InquiryResultType.valueOf(resultTypeString);
             if (inquiryResultType == null) {
                 throw new DomainException("resultType: " + getPrintableColumns(columns));
@@ -222,7 +223,7 @@ public class InquiryResult extends InquiryResult_Base {
 
     private static void setClassification(String[] columns, InquiryResult inquiryResult) {
         String resultClassificationString = columns[4];
-        if (!StringUtils.isEmpty(resultClassificationString)) {
+        if (!Strings.isNullOrEmpty(resultClassificationString)) {
             ResultClassification classification = ResultClassification.valueOf(resultClassificationString);
             if (classification == null) {
                 throw new DomainException("classification: " + getPrintableColumns(columns));
@@ -316,18 +317,18 @@ public class InquiryResult extends InquiryResult_Base {
         String professorshipCode = columns[8];
         String shiftTypeString = columns[9];
         ExecutionCourse executionCourse =
-                !StringUtils.isEmpty(executionCourseCode) ? getExecutionCourse(executionCourseCode) : null;
+                !Strings.isNullOrEmpty(executionCourseCode) ? getExecutionCourse(executionCourseCode) : null;
         ExecutionDegree executionDegree =
-                !StringUtils.isEmpty(executionDegreeCode) ? getExecutionDegree(executionDegreeCode) : null;
+                !Strings.isNullOrEmpty(executionDegreeCode) ? getExecutionDegree(executionDegreeCode) : null;
         Professorship professorship =
-                !StringUtils.isEmpty(professorshipCode) ? (Professorship) getProfessorship(professorshipCode) : null;
-        ShiftType shiftType = !StringUtils.isEmpty(shiftTypeString) ? ShiftType.valueOf(shiftTypeString) : null;
+                !Strings.isNullOrEmpty(professorshipCode) ? (Professorship) getProfessorship(professorshipCode) : null;
+        ShiftType shiftType = !Strings.isNullOrEmpty(shiftTypeString) ? ShiftType.valueOf(shiftTypeString) : null;
         inquiryResult.setExecutionCourse(executionCourse);
         inquiryResult.setExecutionDegree(executionDegree);
         inquiryResult.setProfessorship(professorship);
         inquiryResult.setShiftType(shiftType);
 
-        if (!(StringUtils.isEmpty(inquiryQuestionCode) && ResultClassification.GREY.equals(inquiryResult
+        if (!(Strings.isNullOrEmpty(inquiryQuestionCode) && ResultClassification.GREY.equals(inquiryResult
                 .getResultClassification()))) {
             InquiryQuestion inquiryQuestion = getInquiryQuestion(Long.valueOf(inquiryQuestionCode));
             if (inquiryQuestion == null) {
@@ -365,12 +366,10 @@ public class InquiryResult extends InquiryResult_Base {
 
     public void delete() {
         if (!getInquiryResultCommentsSet().isEmpty()) {
-            throw new DomainException(
-                    "error.inquiryResult.hasComments",
-                    getInquiryQuestion().getLabel().toString(),
+            throw new DomainException("error.inquiryResult.hasComments", getInquiryQuestion().getLabel().toString(),
                     GepReportFile.getExecutionCourseCode(getExecutionCourse()),
-                    getExecutionDegree() != null ? GepReportFile.getExecutionDegreeCode(getExecutionDegree()) : StringUtils.EMPTY,
-                    getProfessorship() != null ? GepReportFile.getProfessorshipCode(getProfessorship()) : StringUtils.EMPTY);
+                    getExecutionDegree() != null ? GepReportFile.getExecutionDegreeCode(getExecutionDegree()) : "",
+                    getProfessorship() != null ? GepReportFile.getProfessorshipCode(getProfessorship()) : "");
         }
         setExecutionCourse(null);
         setExecutionDegree(null);
@@ -414,7 +413,7 @@ public class InquiryResult extends InquiryResult_Base {
             //se vier com valor + classificação dá erro
 
             String resultTypeString = row[1];
-            if (!StringUtils.isEmpty(resultTypeString)) {
+            if (!Strings.isNullOrEmpty(resultTypeString)) {
                 InquiryResultType inquiryResultType = InquiryResultType.valueOf(resultTypeString);
                 if (inquiryResultType == null) {
                     throw new DomainException("resultType doesn't exists: " + getPrintableColumns(row));
@@ -424,7 +423,7 @@ public class InquiryResult extends InquiryResult_Base {
 
             String executionCourseCode = row[2];
             ExecutionCourse executionCourse =
-                    !StringUtils.isEmpty(executionCourseCode) ? InquiryResult.getExecutionCourse(executionCourseCode) : null;
+                    !Strings.isNullOrEmpty(executionCourseCode) ? InquiryResult.getExecutionCourse(executionCourseCode) : null;
             setExecutionCourse(executionCourse);
 
             String executionPeriodCode = row[3];
@@ -435,7 +434,7 @@ public class InquiryResult extends InquiryResult_Base {
             setExecutionSemester(executionSemester);
 
             String resultClassificationString = row[4];
-            if (!StringUtils.isEmpty(resultClassificationString)) {
+            if (!Strings.isNullOrEmpty(resultClassificationString)) {
                 ResultClassification classification = ResultClassification.valueOf(resultClassificationString);
                 if (classification == null) {
                     throw new DomainException("classification doesn't exists: : " + getPrintableColumns(row));
@@ -449,7 +448,7 @@ public class InquiryResult extends InquiryResult_Base {
             setScaleValue(scaleValue);
 
             String inquiryQuestionCode = row[7];
-            if (!(StringUtils.isEmpty(inquiryQuestionCode) && ResultClassification.GREY.equals(getResultClassification()))) {
+            if (!(Strings.isNullOrEmpty(inquiryQuestionCode) && ResultClassification.GREY.equals(getResultClassification()))) {
                 InquiryQuestion inquiryQuestion = InquiryResult.getInquiryQuestion(Long.valueOf(inquiryQuestionCode));
                 if (inquiryQuestion == null) {
                     throw new DomainException("não tem question: " + getPrintableColumns(row));
@@ -459,15 +458,15 @@ public class InquiryResult extends InquiryResult_Base {
 
             String professorshipCode = row[8];
             Professorship professorship =
-                    !StringUtils.isEmpty(professorshipCode) ? InquiryResult.getProfessorship(professorshipCode) : null;
+                    !Strings.isNullOrEmpty(professorshipCode) ? InquiryResult.getProfessorship(professorshipCode) : null;
             setProfessorship(professorship);
 
             String shiftTypeString = row[9];
-            ShiftType shiftType = !StringUtils.isEmpty(shiftTypeString) ? ShiftType.valueOf(shiftTypeString) : null;
+            ShiftType shiftType = !Strings.isNullOrEmpty(shiftTypeString) ? ShiftType.valueOf(shiftTypeString) : null;
             setShiftType(shiftType);
 
             String connectionTypeString = row[10];
-            if (StringUtils.isEmpty(connectionTypeString)) {
+            if (Strings.isNullOrEmpty(connectionTypeString)) {
                 throw new DomainException("connectionType doesn't exists: " + getPrintableColumns(row));
             }
             InquiryConnectionType connectionType = InquiryConnectionType.valueOf(connectionTypeString);

@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.beanutils.BeanComparator;
-import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -66,6 +65,8 @@ import pt.ist.fenixedu.quc.dto.InquiryQuestionDTO;
 import pt.ist.fenixedu.quc.dto.StudentInquiryBean;
 import pt.ist.fenixedu.quc.dto.StudentTeacherInquiryBean;
 import pt.ist.fenixframework.FenixFramework;
+
+import com.google.common.base.Strings;
 
 /**
  * @author - Ricardo Rodrigues (ricardo.rodrigues@ist.utl.pt)
@@ -189,7 +190,7 @@ public class StudentInquiryDA extends FenixDispatchAction {
         DynaActionForm form = (DynaActionForm) actionForm;
         StudentInquiryRegistry inquiryRegistry = FenixFramework.getDomainObject(form.getString("inquiryRegistryID"));
         String notAnsweredJustification = (String) form.get("notAnsweredJustification");
-        if (StringUtils.isEmpty(notAnsweredJustification)) {
+        if (Strings.isNullOrEmpty(notAnsweredJustification)) {
             addActionMessage(request, "error.inquiries.notAnsweredFillAtLeastOneField");
             return handleDontRespondError(actionMapping, request, inquiryRegistry);
         }
@@ -203,7 +204,7 @@ public class StudentInquiryDA extends FenixDispatchAction {
         String notAnsweredOtherJustification = form.getString("notAnsweredOtherJustification");
 
         if (justification == InquiryNotAnsweredJustification.OTHER) {
-            if (StringUtils.isEmpty(notAnsweredOtherJustification)) {
+            if (Strings.isNullOrEmpty(notAnsweredOtherJustification)) {
                 addActionMessage(request, "error.inquiries.fillOtherJustification");
                 request.setAttribute("textAreaReadOnly", "false");
                 return handleDontRespondError(actionMapping, request, inquiryRegistry);

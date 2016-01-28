@@ -24,7 +24,6 @@ package pt.ist.fenixedu.integration.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Attends;
 import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.ExecutionSemester;
@@ -36,6 +35,8 @@ import org.fenixedu.academic.domain.contacts.PartyContact;
 import org.fenixedu.academic.domain.contacts.PartyContactType;
 import org.fenixedu.academic.domain.contacts.WebAddress;
 import org.fenixedu.academic.domain.student.Registration;
+
+import com.google.common.base.Strings;
 
 public class PersonInformationBean {
 
@@ -106,7 +107,7 @@ public class PersonInformationBean {
     }
 
     private String getContactValue(final PartyContact contact, final boolean checkIfPublic) {
-        String value = StringUtils.EMPTY;
+        String value = "";
         if (contact != null) {
             if (!checkIfPublic || contact.getVisibleToPublic() != null) {
                 value = contact.getPresentationValue();
@@ -120,12 +121,12 @@ public class PersonInformationBean {
         for (final PartyContact partyContact : contacts) {
             if (partyContact.getType() == PartyContactType.PERSONAL) {
                 String value = getContactValue(partyContact, checkIfPublic);
-                if (!StringUtils.isBlank(value)) {
+                if (!Strings.isNullOrEmpty(value)) {
                     personalContacts.add(value);
                 }
             } else if (partyContact.getType() == PartyContactType.WORK) {
                 String value = getContactValue(partyContact, checkIfPublic);
-                if (!StringUtils.isBlank(value)) {
+                if (!Strings.isNullOrEmpty(value)) {
                     workContacts.add(value);
                 }
             }

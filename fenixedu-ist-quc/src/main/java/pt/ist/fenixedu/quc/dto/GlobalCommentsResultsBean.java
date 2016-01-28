@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.beanutils.BeanComparator;
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Professorship;
@@ -40,6 +39,8 @@ import pt.ist.fenixedu.quc.domain.InquiryResult;
 import pt.ist.fenixedu.quc.domain.InquiryResultComment;
 import pt.ist.fenixedu.quc.domain.ResultPersonCategory;
 import pt.ist.fenixframework.Atomic;
+
+import com.google.common.base.Strings;
 
 public abstract class GlobalCommentsResultsBean implements Serializable {
 
@@ -129,7 +130,7 @@ public abstract class GlobalCommentsResultsBean implements Serializable {
 
     @Atomic
     public void saveComment() {
-        if (!StringUtils.isEmpty(getComment())) {
+        if (!Strings.isNullOrEmpty(getComment())) {
             if (getInquiryGlobalComment() != null) {
                 if (getInquiryResultComment() == null) {
                     initResultComment(getPerson(), false);

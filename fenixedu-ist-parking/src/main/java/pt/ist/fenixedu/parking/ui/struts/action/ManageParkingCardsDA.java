@@ -25,7 +25,6 @@ import java.util.ResourceBundle;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -58,6 +57,8 @@ import pt.ist.fenixedu.parking.dto.ParkingCardSearchBean.ParkingCardSearchPeriod
 import pt.ist.fenixedu.parking.dto.ParkingCardSearchBean.ParkingCardUserState;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
+
+import com.google.common.base.Strings;
 
 @StrutsFunctionality(app = ParkingManagerApp.class, path = "manage-parking-cards", titleKey = "link.parkingCards")
 @Mapping(module = "parkingManager", path = "/manageParkingCards", input = "/exportParkingDB.do?method=prepareExportFile",
@@ -101,20 +102,20 @@ public class ManageParkingCardsDA extends FenixDispatchAction {
     private ParkingCardSearchBean getSearchParameters(HttpServletRequest request) {
         ParkingCardSearchBean parkingCardSearchBean = new ParkingCardSearchBean();
         String parkingCardUserState = request.getParameter("parkingCardUserState");
-        if (!StringUtils.isEmpty(parkingCardUserState)) {
+        if (!Strings.isNullOrEmpty(parkingCardUserState)) {
             parkingCardSearchBean.setParkingCardUserState(ParkingCardUserState.valueOf(parkingCardUserState));
         }
         String parkingGroupID = request.getParameter("parkingGroupID");
-        if (!StringUtils.isEmpty(parkingGroupID)) {
+        if (!Strings.isNullOrEmpty(parkingGroupID)) {
             parkingCardSearchBean.setParkingGroup(FenixFramework.<ParkingGroup> getDomainObject(parkingGroupID));
         }
         String actualEndDate = request.getParameter("actualEndDate");
-        if (!StringUtils.isEmpty(actualEndDate)) {
+        if (!Strings.isNullOrEmpty(actualEndDate)) {
             DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd");
             parkingCardSearchBean.setActualEndDate(dtf.parseDateTime(actualEndDate).toYearMonthDay());
         }
         String parkingCardSearchPeriod = request.getParameter("parkingCardSearchPeriod");
-        if (!StringUtils.isEmpty(parkingCardSearchPeriod)) {
+        if (!Strings.isNullOrEmpty(parkingCardSearchPeriod)) {
             parkingCardSearchBean.setParkingCardSearchPeriod(ParkingCardSearchPeriod.valueOf(parkingCardSearchPeriod));
         }
         return parkingCardSearchBean;

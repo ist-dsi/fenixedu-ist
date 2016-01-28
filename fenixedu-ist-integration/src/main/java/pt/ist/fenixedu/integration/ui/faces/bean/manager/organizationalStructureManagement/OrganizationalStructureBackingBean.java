@@ -37,7 +37,6 @@ import javax.faces.component.html.HtmlInputHidden;
 import javax.faces.model.SelectItem;
 
 import org.apache.commons.beanutils.BeanComparator;
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.Department;
@@ -75,6 +74,8 @@ import pt.ist.fenixedu.integration.service.services.manager.organizationalStruct
 import pt.ist.fenixedu.integration.service.services.manager.organizationalStructureManagement.RemoveParentInherentFunction;
 import pt.ist.fenixedu.integration.service.services.manager.organizationalStructureManagement.SetRootUnit;
 import pt.ist.fenixframework.FenixFramework;
+
+import com.google.common.base.Strings;
 
 public class OrganizationalStructureBackingBean extends FenixBackingBean {
 
@@ -114,22 +115,22 @@ public class OrganizationalStructureBackingBean extends FenixBackingBean {
     private final String NOT_SELECTED_DESCRIPTION = "Seleccione um item";
 
     public OrganizationalStructureBackingBean() {
-        if (!StringUtils.isEmpty(getRequestParameter("unitID"))) {
+        if (!Strings.isNullOrEmpty(getRequestParameter("unitID"))) {
             getUnitIDHidden().setValue(getRequestParameter("unitID").toString());
         }
-        if (!StringUtils.isEmpty(getRequestParameter("chooseUnitID"))) {
+        if (!Strings.isNullOrEmpty(getRequestParameter("chooseUnitID"))) {
             getChooseUnitIDHidden().setValue(getRequestParameter("chooseUnitID").toString());
         }
-        if (!StringUtils.isEmpty(getRequestParameter("functionID"))) {
+        if (!Strings.isNullOrEmpty(getRequestParameter("functionID"))) {
             getFunctionIDHidden().setValue(getRequestParameter("functionID").toString());
         }
-        if (!StringUtils.isEmpty(getRequestParameter("principalFunctionID"))) {
+        if (!Strings.isNullOrEmpty(getRequestParameter("principalFunctionID"))) {
             this.principalFunctionID = getRequestParameter("principalFunctionID").toString();
         }
-        if (!StringUtils.isEmpty(getRequestParameter("accountabilityID"))) {
+        if (!Strings.isNullOrEmpty(getRequestParameter("accountabilityID"))) {
             this.accountabilityID = getRequestParameter("accountabilityID").toString();
         }
-        if (!StringUtils.isEmpty(getRequestParameter("isToRemoveParentUnit"))) {
+        if (!Strings.isNullOrEmpty(getRequestParameter("isToRemoveParentUnit"))) {
             this.toRemoveParentUnit = Boolean.valueOf(getRequestParameter("isToRemoveParentUnit").toString());
         } else {
             this.toRemoveParentUnit = false;

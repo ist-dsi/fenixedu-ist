@@ -30,7 +30,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.commons.beanutils.BeanComparator;
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
@@ -114,10 +113,10 @@ public class ParkingParty extends ParkingParty_Base {
     }
 
     public boolean getHasAllNecessaryPersonalInfo() {
-        return ((getParty().getDefaultPhone() != null && !StringUtils.isEmpty(getParty().getDefaultPhone().getNumber())) || (getParty()
-                .getDefaultMobilePhone() != null && !StringUtils.isEmpty(getParty().getDefaultMobilePhone().getNumber())))
+        return ((getParty().getDefaultPhone() != null && !Strings.isNullOrEmpty(getParty().getDefaultPhone().getNumber())) || (getParty()
+                .getDefaultMobilePhone() != null && !Strings.isNullOrEmpty(getParty().getDefaultMobilePhone().getNumber())))
                 && (isEmployee() || (getParty().getDefaultEmailAddress() != null
-                        && getParty().getDefaultEmailAddress().hasValue() && !StringUtils.isEmpty(getParty()
+                        && getParty().getDefaultEmailAddress().hasValue() && !Strings.isNullOrEmpty(getParty()
                         .getDefaultEmailAddress().getValue())));
     }
 
@@ -219,7 +218,7 @@ public class ParkingParty extends ParkingParty_Base {
 
     public String getWorkPhone() {
         if (getParty().isPerson()) {
-            return getParty().getDefaultPhone() != null ? getParty().getDefaultPhone().getNumber() : StringUtils.EMPTY;
+            return getParty().getDefaultPhone() != null ? getParty().getDefaultPhone().getNumber() : "";
         }
         return null;
     }
@@ -410,7 +409,7 @@ public class ParkingParty extends ParkingParty_Base {
         StringBuilder stringBuilder =
                 new StringBuilder(BundleUtil.getString("resources.ParkingResources", "message.person.identification",
                         new String[] { type, identification }));
-        if (!StringUtils.isBlank(workingPlace)) {
+        if (!Strings.isNullOrEmpty(workingPlace)) {
             stringBuilder.append(workingPlace).append("<br/>");
         }
         return stringBuilder.toString();

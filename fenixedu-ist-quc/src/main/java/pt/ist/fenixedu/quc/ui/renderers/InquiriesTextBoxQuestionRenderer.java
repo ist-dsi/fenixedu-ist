@@ -21,8 +21,6 @@
  */
 package pt.ist.fenixedu.quc.ui.renderers;
 
-import org.apache.commons.lang.StringUtils;
-
 import pt.ist.fenixWebFramework.renderers.InputRenderer;
 import pt.ist.fenixWebFramework.renderers.components.HtmlComponent;
 import pt.ist.fenixWebFramework.renderers.components.HtmlSimpleValueComponent;
@@ -64,7 +62,7 @@ public class InquiriesTextBoxQuestionRenderer extends InputRenderer {
                     ((HtmlTextInput) htmlTextInput).setMaxLength(getMaxLength());
                 }
 
-                htmlTextInput.setValue(object != null ? object.toString() : StringUtils.EMPTY);
+                htmlTextInput.setValue(object != null ? object.toString() : "");
                 return htmlTextInput;
             }
         };

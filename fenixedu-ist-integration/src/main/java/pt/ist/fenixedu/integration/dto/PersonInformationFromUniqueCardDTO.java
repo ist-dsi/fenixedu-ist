@@ -23,7 +23,6 @@ package pt.ist.fenixedu.integration.dto;
 
 import java.text.ParseException;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.PhotoType;
@@ -39,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import pt.ist.fenixframework.Atomic;
 
+import com.google.common.base.Strings;
 import com.google.common.io.BaseEncoding;
 
 /**
@@ -314,7 +314,7 @@ public class PersonInformationFromUniqueCardDTO {
         person.getProfile().changeName(StringFormatter.prettyPrint(getGivenNames()),
                 StringFormatter.prettyPrint(getFamilyNames()), null);
 
-        if (!StringUtils.isEmpty(getGender())) {
+        if (!Strings.isNullOrEmpty(getGender())) {
             person.setGender(getGender().equalsIgnoreCase("m") ? Gender.MALE : Gender.FEMALE);
         }
 
@@ -325,30 +325,30 @@ public class PersonInformationFromUniqueCardDTO {
             person.setIdentificationDocumentSeriesNumber(getIdentificationDocumentSeriesNumber().replaceAll("\\s", "")); //remove white spaces
         }
 
-        if (!StringUtils.isEmpty(getDocumentIdEmissionLocation())) {
+        if (!Strings.isNullOrEmpty(getDocumentIdEmissionLocation())) {
             person.setEmissionLocationOfDocumentId(getDocumentIdEmissionLocation());
         }
-        if (!StringUtils.isEmpty(getDocumentIdEmissionDate())) {
+        if (!Strings.isNullOrEmpty(getDocumentIdEmissionDate())) {
             person.setEmissionDateOfDocumentIdYearMonthDay(YearMonthDay.fromDateFields(DateFormatUtil.parse(dateFormat,
                     getDocumentIdEmissionDate())));
         }
-        if (!StringUtils.isEmpty(getDocumentIdExpirationDate())) {
+        if (!Strings.isNullOrEmpty(getDocumentIdExpirationDate())) {
             person.setExpirationDateOfDocumentIdYearMonthDay(YearMonthDay.fromDateFields(DateFormatUtil.parse(dateFormat,
                     getDocumentIdExpirationDate())));
         }
-        if (!StringUtils.isEmpty(getFiscalNumber())) {
+        if (!Strings.isNullOrEmpty(getFiscalNumber())) {
             person.setSocialSecurityNumber(getFiscalNumber());
         }
-        if (!StringUtils.isEmpty(getBirthDate())) {
+        if (!Strings.isNullOrEmpty(getBirthDate())) {
             person.setDateOfBirthYearMonthDay(YearMonthDay.fromDateFields(DateFormatUtil.parse(dateFormat, getBirthDate())));
         }
-        if (!StringUtils.isEmpty(getNationality())) {
+        if (!Strings.isNullOrEmpty(getNationality())) {
             person.setNationality(Country.readByThreeLetterCode(getNationality()));
         }
-        if (!StringUtils.isEmpty(getMotherName())) {
+        if (!Strings.isNullOrEmpty(getMotherName())) {
             person.setNameOfMother(StringFormatter.prettyPrint(getMotherName()));
         }
-        if (!StringUtils.isEmpty(getFatherName())) {
+        if (!Strings.isNullOrEmpty(getFatherName())) {
             person.setNameOfFather(StringFormatter.prettyPrint(getFatherName()));
         }
 

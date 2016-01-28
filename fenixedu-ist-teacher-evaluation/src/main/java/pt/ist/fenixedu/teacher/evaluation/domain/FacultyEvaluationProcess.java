@@ -24,7 +24,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.exceptions.DomainException;
@@ -37,6 +36,9 @@ import org.joda.time.Interval;
 
 import pt.ist.fenixedu.contracts.domain.Employee;
 import pt.ist.fenixframework.Atomic;
+
+import com.google.common.base.CharMatcher;
+import com.google.common.base.Strings;
 
 public class FacultyEvaluationProcess extends FacultyEvaluationProcess_Base implements Comparable<FacultyEvaluationProcess> {
 
@@ -188,7 +190,7 @@ public class FacultyEvaluationProcess extends FacultyEvaluationProcess_Base impl
             if (user != null) {
                 return user.getPerson();
             }
-            if (!string.isEmpty() && StringUtils.isNumeric(string)) {
+            if (!string.isEmpty() && CharMatcher.DIGIT.matchesAllOf(string)) {
                 final int number = Integer.parseInt(string);
                 if (number > 0) {
                     Employee employee = Employee.readByNumber(new Integer(number));
@@ -282,7 +284,7 @@ public class FacultyEvaluationProcess extends FacultyEvaluationProcess_Base impl
     }
 
     private TeacherEvaluationMark parseMark(final String mark) {
-        if (!StringUtils.isEmpty(mark)) {
+        if (!Strings.isNullOrEmpty(mark)) {
             String trimmedMark = mark.trim();
             if ("Excelente".equals(trimmedMark)) {
                 return TeacherEvaluationMark.EXCELLENT;

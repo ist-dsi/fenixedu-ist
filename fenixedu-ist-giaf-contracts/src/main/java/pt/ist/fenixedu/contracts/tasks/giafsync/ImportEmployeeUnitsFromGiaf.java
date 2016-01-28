@@ -26,7 +26,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.organizationalStructure.AccountabilityTypeEnum;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.joda.time.LocalDate;
@@ -42,6 +41,8 @@ import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonContrac
 import pt.ist.fenixedu.contracts.persistenceTierOracle.Oracle.PersistentSuportGiaf;
 import pt.ist.fenixedu.contracts.tasks.giafsync.GiafSync.ImportProcessor;
 import pt.ist.fenixedu.contracts.tasks.giafsync.GiafSync.Modification;
+
+import com.google.common.base.Strings;
 
 class ImportEmployeeUnitsFromGiaf extends ImportProcessor {
     @Override
@@ -84,7 +85,7 @@ class ImportEmployeeUnitsFromGiaf extends ImportProcessor {
 
             String ccDateString = result.getString("cc_date");
             LocalDate beginDate = today;
-            if (!StringUtils.isEmpty(ccDateString)) {
+            if (!Strings.isNullOrEmpty(ccDateString)) {
                 beginDate = new LocalDate(Timestamp.valueOf(ccDateString));
             }
 
@@ -119,7 +120,7 @@ class ImportEmployeeUnitsFromGiaf extends ImportProcessor {
                                     modifications.addAll(createEmployeeContract(employee, new YearMonthDay(beginDate), null,
                                             unit, accountabilityTypeEnum, workingContractOnDate, log, logger));
                                 } else if (!workingContractOnDate.getBeginDate().equals(beginDate)
-                                        && !StringUtils.isEmpty(ccDateString)) {
+                                        && !Strings.isNullOrEmpty(ccDateString)) {
                                     modifications.add(changeEmployeeContractDates(accountabilityTypeEnum, new YearMonthDay(
                                             beginDate), workingContractOnDate, log, logger));
                                 } else if (workingContractOnDate.getEndDate() != null && contractSituation != null

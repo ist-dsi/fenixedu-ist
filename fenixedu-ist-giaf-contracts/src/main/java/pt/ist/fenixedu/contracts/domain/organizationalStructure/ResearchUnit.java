@@ -26,7 +26,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.Person;
@@ -53,6 +52,8 @@ import pt.ist.fenixedu.contracts.domain.Employee;
 import pt.ist.fenixedu.contracts.domain.util.email.ResearchUnitBasedSender;
 import pt.ist.fenixframework.Atomic;
 
+import com.google.common.base.Strings;
+
 public class ResearchUnit extends ResearchUnit_Base {
 
     private ResearchUnit() {
@@ -76,7 +77,7 @@ public class ResearchUnit extends ResearchUnit_Base {
 
     @Override
     public void setAcronym(String acronym) {
-        if (StringUtils.isEmpty(acronym)) {
+        if (Strings.isNullOrEmpty(acronym)) {
             throw new DomainException("acronym.cannot.be.null");
         }
         super.setAcronym(acronym);

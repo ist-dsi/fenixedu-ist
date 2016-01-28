@@ -23,8 +23,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.groups.PersistentGroup;
@@ -77,7 +77,7 @@ public class TeacherEvaluationFile extends TeacherEvaluationFile_Base {
             parts.add(teacherEvaluation.getTeacherEvaluationProcess().getEvaluee().getUsername());
         }
         parts.add(teacherEvaluation.getTeacherEvaluationProcess().getFacultyEvaluationProcess().getSuffix());
-        return StringUtils.join(parts, "_") + "." + extension;
+        return parts.stream().collect(Collectors.joining("_")) + "." + extension;
     }
 
     @Override

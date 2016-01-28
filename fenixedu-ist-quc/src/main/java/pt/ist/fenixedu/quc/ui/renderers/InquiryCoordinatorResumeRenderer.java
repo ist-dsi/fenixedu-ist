@@ -23,7 +23,6 @@ package pt.ist.fenixedu.quc.ui.renderers;
 
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.Person;
@@ -47,6 +46,8 @@ import pt.ist.fenixedu.quc.domain.ResultPersonCategory;
 import pt.ist.fenixedu.quc.dto.BlockResumeResult;
 import pt.ist.fenixedu.quc.dto.CurricularCourseResumeResult;
 import pt.ist.fenixedu.quc.dto.TeacherShiftTypeResultsBean;
+
+import com.google.common.base.Strings;
 
 /**
  * @author - Ricardo Rodrigues (ricardo.rodrigues@ist.utl.pt)
@@ -128,7 +129,7 @@ public class InquiryCoordinatorResumeRenderer extends InquiryBlocksResumeRendere
         if (inquiryGlobalComment != null) {
             for (InquiryResultComment resultComment : inquiryGlobalComment.getInquiryResultCommentsSet()) {
                 if (resultComment.getPerson() == person && personCategory.equals(resultComment.getPersonCategory())
-                        && !StringUtils.isEmpty(resultComment.getComment())) {
+                        && !Strings.isNullOrEmpty(resultComment.getComment())) {
                     return true;
                 }
             }

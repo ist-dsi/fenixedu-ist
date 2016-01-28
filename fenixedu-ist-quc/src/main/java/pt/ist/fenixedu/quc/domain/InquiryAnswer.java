@@ -22,9 +22,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.joda.time.DateTime;
+
+import com.google.common.base.Strings;
 
 public class InquiryAnswer extends InquiryAnswer_Base {
 
@@ -50,7 +51,7 @@ public class InquiryAnswer extends InquiryAnswer_Base {
         Map<InquiryGroupQuestion, Integer> groupQuestions = new HashMap<InquiryGroupQuestion, Integer>();
         int count = 0;
         for (QuestionAnswer questionAnswer : getQuestionAnswersSet()) {
-            if (!StringUtils.isEmpty(questionAnswer.getAnswer()) && questionAnswer.getInquiryQuestion().getRequired()) {
+            if (!Strings.isNullOrEmpty(questionAnswer.getAnswer()) && questionAnswer.getInquiryQuestion().getRequired()) {
                 count++;
                 InquiryGroupQuestion inquiryGroupQuestion = questionAnswer.getInquiryQuestion().getInquiryGroupQuestion();
                 if (inquiryGroupQuestion.isCheckbox()) {
@@ -70,7 +71,7 @@ public class InquiryAnswer extends InquiryAnswer_Base {
         Map<InquiryGroupQuestion, Integer> groupQuestions = new HashMap<InquiryGroupQuestion, Integer>();
         int count = 0;
         for (QuestionAnswer questionAnswer : getQuestionAnswersSet()) {
-            if (!StringUtils.isEmpty(questionAnswer.getAnswer())) {
+            if (!Strings.isNullOrEmpty(questionAnswer.getAnswer())) {
                 count++;
                 InquiryGroupQuestion inquiryGroupQuestion = questionAnswer.getInquiryQuestion().getInquiryGroupQuestion();
                 if (inquiryGroupQuestion.isCheckbox()) {

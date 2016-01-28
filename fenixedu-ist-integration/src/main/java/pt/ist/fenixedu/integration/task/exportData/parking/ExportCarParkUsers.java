@@ -39,7 +39,6 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
 
-import org.apache.commons.lang.WordUtils;
 import org.fenixedu.academic.FenixEduAcademicConfiguration;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.exceptions.DomainException;
@@ -87,7 +86,7 @@ public class ExportCarParkUsers extends CustomTask {
     private void appendTestUserInfo(PrintStream printStream) {
         printStream.print(invert("4f86bb68"));
         printStream.print("=a");
-        printStream.print(truncate(20, WordUtils.capitalizeFully(StringNormalizer.normalize("Utilizador Teste"))));
+        printStream.print(truncate(20, StringNormalizer.normalize("Utilizador Teste")));
         printStream.print(date(new DateTime(2015, 2, 27, 0, 0, 0)));
         printStream.print(date(new DateTime(2015, 4, 1, 0, 0, 0)));
         printStream.print("\r\n");
@@ -98,8 +97,7 @@ public class ExportCarParkUsers extends CustomTask {
         if (rfid != null) {
             printStream.print(toHex(rfid.trim()));
             printStream.print("=a");
-            printStream.print(truncate(20,
-                    WordUtils.capitalizeFully(StringNormalizer.normalize(user.getProfile().getDisplayName()))));
+            printStream.print(truncate(20, StringNormalizer.normalize(user.getProfile().getDisplayName())));
             printStream.print(date(getStartDate(user)));
             printStream.print(date(getEndDate(user)));
             printStream.print("\r\n");

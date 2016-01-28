@@ -26,7 +26,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections.Predicate;
-import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -81,6 +80,8 @@ import pt.ist.fenixedu.teacher.evaluation.domain.reports.TeachersListFromGiafRep
 import pt.ist.fenixedu.teacher.evaluation.domain.reports.TimetablesReportFile;
 import pt.ist.fenixedu.tutorship.domain.reports.TutorshipProgramReportFile;
 import pt.ist.fenixframework.FenixFramework;
+
+import com.google.common.base.Strings;
 
 @StrutsFunctionality(app = GepPortalApp.class, path = "reports", titleKey = "link.reports")
 @Mapping(module = "gep", path = "/reportsByDegreeType")
@@ -252,12 +253,12 @@ public class ReportsByDegreeTypeDA extends FenixDispatchAction {
 
     private DegreeType getDegreeType(final HttpServletRequest httpServletRequest) {
         final String degreeTypeString = httpServletRequest.getParameter("degreeType");
-        return StringUtils.isEmpty(degreeTypeString) ? null : FenixFramework.getDomainObject(degreeTypeString);
+        return Strings.isNullOrEmpty(degreeTypeString) ? null : FenixFramework.getDomainObject(degreeTypeString);
     }
 
     private ExecutionYear getExecutionYear(final HttpServletRequest httpServletRequest) {
         final String OIDString = httpServletRequest.getParameter("executionYearID");
-        return StringUtils.isEmpty(OIDString) ? null : FenixFramework.<ExecutionYear> getDomainObject(OIDString);
+        return Strings.isNullOrEmpty(OIDString) ? null : FenixFramework.<ExecutionYear> getDomainObject(OIDString);
     }
 
     private String getFormat(final HttpServletRequest httpServletRequest) {

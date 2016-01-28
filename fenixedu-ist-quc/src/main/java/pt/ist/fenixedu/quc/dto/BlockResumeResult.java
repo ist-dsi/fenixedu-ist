@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 
@@ -36,6 +35,8 @@ import pt.ist.fenixedu.quc.domain.InquiryResponseState;
 import pt.ist.fenixedu.quc.domain.InquiryResult;
 import pt.ist.fenixedu.quc.domain.InquiryResultComment;
 import pt.ist.fenixedu.quc.domain.ResultPersonCategory;
+
+import com.google.common.base.Strings;
 
 public abstract class BlockResumeResult implements Serializable {
 
@@ -89,7 +90,7 @@ public abstract class BlockResumeResult implements Serializable {
         } else {
             InquiryResultComment resultComment = inquiryResultQuestion.getInquiryResultComment(getPerson(), getPersonCategory());
             if (inquiryResultQuestion != null && inquiryResultQuestion.getResultClassification().isMandatoryComment()
-                    && (resultComment == null || StringUtils.isEmpty(resultComment.getComment()))) {
+                    && (resultComment == null || Strings.isNullOrEmpty(resultComment.getComment()))) {
                 return true;
             }
             return false;
@@ -108,7 +109,7 @@ public abstract class BlockResumeResult implements Serializable {
                                 inquiryResultQuestion != null ? inquiryResultQuestion.getInquiryResultComment(getPerson(),
                                         getPersonCategory()) : null;
                         if (inquiryResultQuestion != null && inquiryResultQuestion.getResultClassification().isMandatoryComment()
-                                && inquiryResultComment != null && !StringUtils.isEmpty(inquiryResultComment.getComment())) {
+                                && inquiryResultComment != null && !Strings.isNullOrEmpty(inquiryResultComment.getComment())) {
                             count++;
                         }
                     }

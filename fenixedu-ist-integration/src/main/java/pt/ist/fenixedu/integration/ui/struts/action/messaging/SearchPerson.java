@@ -26,7 +26,6 @@ import java.util.TreeSet;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.Person;
@@ -50,6 +49,8 @@ import pt.ist.fenixedu.contracts.domain.accessControl.ActiveGrantOwner;
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveResearchers;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
+
+import com.google.common.base.Strings;
 
 public class SearchPerson implements Serializable {
 
@@ -105,7 +106,7 @@ public class SearchPerson implements Serializable {
             setEmail(email);
             setUsername(username);
             setDocumentIdNumber(documentIdNumber);
-            if (!StringUtils.isEmpty(idDocumentType)) {
+            if (!Strings.isNullOrEmpty(idDocumentType)) {
                 setIdDocumentType(IDDocumentType.valueOf(idDocumentType));
             }
             setStudentNumber(studentNumber);
@@ -116,7 +117,7 @@ public class SearchPerson implements Serializable {
                 role = roleType;
             }
 
-            if (!StringUtils.isEmpty(degreeId)) {
+            if (!Strings.isNullOrEmpty(degreeId)) {
                 degree = FenixFramework.getDomainObject(degreeId);
             }
 
@@ -124,22 +125,22 @@ public class SearchPerson implements Serializable {
                 degreeType = FenixFramework.getDomainObject(degreeTypeString);
             }
 
-            if (!StringUtils.isEmpty(departmentId)) {
+            if (!Strings.isNullOrEmpty(departmentId)) {
                 department = FenixFramework.getDomainObject(departmentId);
             }
         }
 
         public boolean emptyParameters() {
-            return StringUtils.isEmpty(this.email) && StringUtils.isEmpty(this.username)
-                    && StringUtils.isEmpty(this.documentIdNumber) && this.role == null && this.degree == null
+            return Strings.isNullOrEmpty(this.email) && Strings.isNullOrEmpty(this.username)
+                    && Strings.isNullOrEmpty(this.documentIdNumber) && this.role == null && this.degree == null
                     && this.department == null && this.degreeType == null && this.nameWords == null && this.studentNumber == null
                     && this.mechanoGraphicalNumber == null && this.idDocumentType == null
-                    && this.showOnlySearchableResearchers == null && StringUtils.isEmpty(this.getPaymentCode());
+                    && this.showOnlySearchableResearchers == null && Strings.isNullOrEmpty(this.getPaymentCode());
         }
 
         private static String[] getNameWords(String name) {
             String[] nameWords = null;
-            if (name != null && !StringUtils.isEmpty(name.trim())) {
+            if (name != null && !Strings.isNullOrEmpty(name.trim())) {
                 nameWords = StringNormalizer.normalize(name).trim().split(" ");
             }
             return nameWords;
@@ -342,7 +343,7 @@ public class SearchPerson implements Serializable {
                 }
             }
 
-        } else if (!StringUtils.isEmpty(searchParameters.getPaymentCode())) {
+        } else if (!Strings.isNullOrEmpty(searchParameters.getPaymentCode())) {
             persons = new ArrayList<Person>();
 
             PaymentCode paymentCode = PaymentCode.readByCode(searchParameters.getPaymentCode());
@@ -467,7 +468,7 @@ public class SearchPerson implements Serializable {
         }
 
         protected static boolean verifyPaymentCodes(String paymentCode, final Person person) {
-            return StringUtils.isEmpty(paymentCode) || person.getPaymentCodeBy(paymentCode) != null;
+            return Strings.isNullOrEmpty(paymentCode) || person.getPaymentCodeBy(paymentCode) != null;
         }
 
         public SearchParameters getSearchParameters() {

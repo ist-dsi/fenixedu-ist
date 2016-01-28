@@ -27,7 +27,6 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Locale;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.EntryPhase;
 import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.ExecutionYear;
@@ -49,6 +48,8 @@ import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.UserProfile;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.YearMonthDay;
+
+import com.google.common.base.Strings;
 
 public class DegreeCandidateDTO {
 
@@ -148,7 +149,7 @@ public class DegreeCandidateDTO {
 
     public boolean fillWithFileLineData(String dataLine) {
 
-        if (StringUtils.isEmpty(dataLine.trim()) || dataLine.startsWith("#")) {
+        if (Strings.isNullOrEmpty(dataLine.trim()) || dataLine.startsWith("#")) {
             return false;
         }
 

@@ -21,8 +21,8 @@ package pt.ist.fenixedu.teacher.evaluation.domain.credits.util;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Attends;
 import org.fenixedu.academic.domain.Professorship;
 
@@ -96,6 +96,6 @@ public class ProjectTutorialServiceBean implements Serializable {
             result.add(degreeProjectTutorialService.getProfessorship().getTeacher().getPerson().getPresentationName() + " - "
                     + degreeProjectTutorialService.getPercentageValue() + "%");
         }
-        return StringUtils.join(result, "<br/>");
+        return result.stream().collect(Collectors.joining("<br/>"));
     }
 }

@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.beanutils.BeanComparator;
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
@@ -38,6 +37,8 @@ import pt.ist.fenixedu.quc.domain.InquiryResultComment;
 import pt.ist.fenixedu.quc.domain.InquiryResultType;
 import pt.ist.fenixedu.quc.domain.ResultClassification;
 import pt.ist.fenixedu.quc.domain.ResultPersonCategory;
+
+import com.google.common.base.Strings;
 
 public class QuestionResultsSummaryBean implements Serializable {
 
@@ -111,7 +112,7 @@ public class QuestionResultsSummaryBean implements Serializable {
     private void initNumberOfResponses(List<InquiryResult> questionResults) {
         for (InquiryResult inquiryResult : questionResults) {
             if (InquiryResultType.ABSOLUTE.equals(inquiryResult.getResultType())
-                    && StringUtils.isEmpty(inquiryResult.getScaleValue())) {
+                    && Strings.isNullOrEmpty(inquiryResult.getScaleValue())) {
                 setNumberOfResponses(inquiryResult);
                 break;
             }
@@ -122,7 +123,7 @@ public class QuestionResultsSummaryBean implements Serializable {
         setAbsoluteScaleValues(new ArrayList<InquiryResult>());
         for (InquiryResult inquiryResult : questionResults) {
             if (InquiryResultType.ABSOLUTE.equals(inquiryResult.getResultType())
-                    && !StringUtils.isEmpty(inquiryResult.getScaleValue())) {
+                    && !Strings.isNullOrEmpty(inquiryResult.getScaleValue())) {
                 getAbsoluteScaleValues().add(inquiryResult);
             }
         }
@@ -133,7 +134,7 @@ public class QuestionResultsSummaryBean implements Serializable {
         setScaleValues(new ArrayList<InquiryResult>());
         for (InquiryResult inquiryResult : questionResults) {
             if (InquiryResultType.PERCENTAGE.equals(inquiryResult.getResultType())
-                    && !StringUtils.isEmpty(inquiryResult.getScaleValue())) {
+                    && !Strings.isNullOrEmpty(inquiryResult.getScaleValue())) {
                 getScaleValues().add(inquiryResult);
             }
         }

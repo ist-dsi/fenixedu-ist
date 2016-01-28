@@ -30,7 +30,6 @@ import java.util.Map;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.struts.util.MessageResources;
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.CurricularYear;
@@ -52,6 +51,8 @@ import org.fenixedu.academic.util.PeriodState;
 import org.fenixedu.commons.i18n.I18N;
 
 import pt.ist.fenixframework.FenixFramework;
+
+import com.google.common.base.Strings;
 
 public class EvaluationsForDelegatesConsultingBackingBean extends FenixBackingBean {
 
@@ -154,7 +155,7 @@ public class EvaluationsForDelegatesConsultingBackingBean extends FenixBackingBe
 
     public CurricularYear getCurricularYear() {
         final String curricularYearID = getCurricularYearID();
-        if (!StringUtils.isEmpty(curricularYearID)) {
+        if (!Strings.isNullOrEmpty(curricularYearID)) {
             return FenixFramework.getDomainObject(curricularYearID);
         } else {
             return null;

@@ -23,7 +23,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.beanutils.BeanComparator;
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ShiftType;
 
@@ -32,6 +31,8 @@ import pt.ist.fenixedu.quc.domain.InquiryQuestion;
 import pt.ist.fenixedu.quc.domain.MandatoryCondition;
 import pt.ist.fenixedu.quc.domain.QuestionCondition;
 import pt.ist.fenixedu.quc.domain.StudentInquiryTemplate;
+
+import com.google.common.base.Strings;
 
 public class StudentTeacherInquiryBean implements Serializable {
 
@@ -113,7 +114,7 @@ public class StudentTeacherInquiryBean implements Serializable {
         for (InquiryBlockDTO inquiryBlockDTO : getTeacherInquiryBlocks()) {
             for (InquiryGroupQuestionBean groupQuestionBean : inquiryBlockDTO.getInquiryGroups()) {
                 for (InquiryQuestionDTO questionDTO : groupQuestionBean.getInquiryQuestions()) {
-                    if (!StringUtils.isEmpty(questionDTO.getResponseValue())) {
+                    if (!Strings.isNullOrEmpty(questionDTO.getResponseValue())) {
                         return true;
                     }
                 }

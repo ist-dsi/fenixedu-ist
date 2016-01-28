@@ -25,7 +25,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.exceptions.DomainException;
@@ -47,6 +46,8 @@ import pt.ist.fenixWebFramework.renderers.components.converters.Converter;
 import pt.ist.fenixWebFramework.renderers.converters.EnumConverter;
 import pt.ist.fenixedu.libraryattendance.space.SpaceAttendances;
 import pt.ist.fenixframework.Atomic;
+
+import com.google.common.base.Strings;
 
 public class LibraryAttendance implements Serializable {
     public static class PlaceProvider extends AbstractDomainObjectProvider {
@@ -273,7 +274,7 @@ public class LibraryAttendance implements Serializable {
 
     public void search() {
         this.matches = null;
-        if (!StringUtils.isEmpty(getPersonId())) {
+        if (!Strings.isNullOrEmpty(getPersonId())) {
             setPerson(Person.readPersonByUsername(getPersonId()));
         } else {
             setPerson(null);

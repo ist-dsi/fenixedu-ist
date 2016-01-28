@@ -20,7 +20,6 @@ package pt.ist.fenixedu.quc.domain;
 
 import java.util.Collection;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.ExecutionSemester;
@@ -31,6 +30,8 @@ import org.joda.time.DateTime;
 import pt.ist.fenixedu.delegates.domain.student.Delegate;
 import pt.ist.fenixedu.delegates.domain.student.YearDelegate;
 import pt.ist.fenixedu.quc.util.DelegateUtils;
+
+import com.google.common.base.Strings;
 
 public class DelegateInquiryTemplate extends DelegateInquiryTemplate_Base {
 
@@ -84,7 +85,7 @@ public class DelegateInquiryTemplate extends DelegateInquiryTemplate_Base {
                     InquiryResultComment inquiryResultComment =
                             inquiryResult.getInquiryResultComment(yearDelegate.getUser().getPerson(),
                                     ResultPersonCategory.DELEGATE);
-                    if (inquiryResultComment == null || StringUtils.isEmpty(inquiryResultComment.getComment())) {
+                    if (inquiryResultComment == null || Strings.isNullOrEmpty(inquiryResultComment.getComment())) {
                         return true;
                     }
                 }

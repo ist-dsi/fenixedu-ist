@@ -29,7 +29,6 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -69,6 +68,8 @@ import pt.ist.fenixedu.contracts.domain.util.CategoryType;
 import pt.ist.fenixedu.integration.FenixEduIstIntegrationConfiguration;
 import pt.ist.fenixedu.integration.ui.struts.action.externalServices.ExternalInterfaceDispatchAction;
 
+import com.google.common.base.Strings;
+
 @Mapping(module = "external", path = "/exportUserInfoForKoha", scope = "request", parameter = "method")
 public class ExportUserInfoForKoha extends ExternalInterfaceDispatchAction {
 
@@ -78,8 +79,8 @@ public class ExportUserInfoForKoha extends ExternalInterfaceDispatchAction {
         final String usernameProp = FenixEduIstIntegrationConfiguration.getConfiguration().getExternalServicesKohaUsername();
         final String passwordProp = FenixEduIstIntegrationConfiguration.getConfiguration().getExternalServicesKohaPassword();
 
-        return !StringUtils.isEmpty(username) && !StringUtils.isEmpty(password) && !StringUtils.isEmpty(usernameProp)
-                && !StringUtils.isEmpty(passwordProp) && username.equals(usernameProp) && password.equals(passwordProp);
+        return !Strings.isNullOrEmpty(username) && !Strings.isNullOrEmpty(password) && !Strings.isNullOrEmpty(usernameProp)
+                && !Strings.isNullOrEmpty(passwordProp) && username.equals(usernameProp) && password.equals(passwordProp);
     }
 
     @Override

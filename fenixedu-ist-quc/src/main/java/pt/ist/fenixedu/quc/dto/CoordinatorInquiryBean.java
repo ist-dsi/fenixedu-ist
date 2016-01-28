@@ -23,7 +23,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.beanutils.BeanComparator;
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Coordinator;
 import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.ExecutionSemester;
@@ -34,6 +33,8 @@ import pt.ist.fenixedu.quc.domain.InquiryBlock;
 import pt.ist.fenixedu.quc.domain.InquiryCoordinatorAnswer;
 import pt.ist.fenixedu.quc.domain.QuestionAnswer;
 import pt.ist.fenixframework.Atomic;
+
+import com.google.common.base.Strings;
 
 public class CoordinatorInquiryBean implements Serializable {
 
@@ -79,7 +80,7 @@ public class CoordinatorInquiryBean implements Serializable {
         for (InquiryBlockDTO blockDTO : getCoordinatorInquiryBlocks()) {
             for (InquiryGroupQuestionBean groupQuestionBean : blockDTO.getInquiryGroups()) {
                 for (InquiryQuestionDTO questionDTO : groupQuestionBean.getInquiryQuestions()) {
-                    if (!StringUtils.isEmpty(questionDTO.getResponseValue()) || questionDTO.getQuestionAnswer() != null) {
+                    if (!Strings.isNullOrEmpty(questionDTO.getResponseValue()) || questionDTO.getQuestionAnswer() != null) {
                         if (questionDTO.getQuestionAnswer() != null) {
                             questionDTO.getQuestionAnswer().setAnswer(questionDTO.getResponseValue());
                             questionDTO.getQuestionAnswer().getInquiryAnswer().setResponseDateTime(new DateTime());

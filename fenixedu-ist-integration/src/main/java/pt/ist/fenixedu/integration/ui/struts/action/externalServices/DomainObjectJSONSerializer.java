@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -57,7 +56,7 @@ public class DomainObjectJSONSerializer {
         }
         for (Slot slot : getAllSlots(domainClass)) {
             final String slotName = slot.getName();
-            final Method method = clazz.getMethod("get" + StringUtils.capitalize(slotName));
+            final Method method = clazz.getMethod("get" + capitalize(slotName));
             final Object result = method.invoke(obj);
             jsonObject.put(slotName, result == null ? null : result.toString());
         }
@@ -65,7 +64,7 @@ public class DomainObjectJSONSerializer {
         for (Role roleSlot : getAllRoleSlots(domainClass)) {
             final String slotName = roleSlot.getName();
             if (roleSlot.getMultiplicityUpper() == 1) {
-                final Method method = clazz.getMethod("get" + StringUtils.capitalize(slotName));
+                final Method method = clazz.getMethod("get" + capitalize(slotName));
                 final AbstractDomainObject singleRelationObj = (AbstractDomainObject) method.invoke(obj);
                 final JSONArray oneRelation = new JSONArray();
                 if (singleRelationObj != null) {
@@ -73,7 +72,7 @@ public class DomainObjectJSONSerializer {
                 }
                 jsonObject.put(slotName, oneRelation);
             } else {
-                final Method method = clazz.getMethod("get" + StringUtils.capitalize(slotName) + "Set");
+                final Method method = clazz.getMethod("get" + capitalize(slotName) + "Set");
                 final Set<? extends AbstractDomainObject> result = (Set<? extends AbstractDomainObject>) method.invoke(obj);
                 jsonObject.put(slotName, serializeRelation(result));
             }
@@ -118,4 +117,11 @@ public class DomainObjectJSONSerializer {
         return slots;
     }
 
+    private static String capitalize(String str) {
+        if ((str == null) || Character.isUpperCase(str.charAt(0))) {
+            return str;
+        } else {
+            return Character.toUpperCase(str.charAt(0)) + str.substring(1);
+        }
+    }
 }

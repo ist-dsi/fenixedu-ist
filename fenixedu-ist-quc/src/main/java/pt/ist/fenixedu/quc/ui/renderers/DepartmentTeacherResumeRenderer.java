@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.ExecutionSemester;
@@ -48,6 +47,8 @@ import pt.ist.fenixedu.quc.domain.ResultPersonCategory;
 import pt.ist.fenixedu.quc.dto.BlockResumeResult;
 import pt.ist.fenixedu.quc.dto.DepartmentTeacherResultsResume;
 import pt.ist.fenixedu.quc.dto.TeacherShiftTypeGroupsResumeResult;
+
+import com.google.common.base.Strings;
 
 public class DepartmentTeacherResumeRenderer extends InquiryBlocksResumeRenderer {
 
@@ -238,7 +239,7 @@ public class DepartmentTeacherResumeRenderer extends InquiryBlocksResumeRenderer
         if (globalComment != null) {
             for (final InquiryResultComment resultComment : globalComment.getInquiryResultCommentsSet()) {
                 if (resultComment.getPerson() == commenter && personCategory.equals(resultComment.getPersonCategory())
-                        && !StringUtils.isEmpty(resultComment.getComment())) {
+                        && !Strings.isNullOrEmpty(resultComment.getComment())) {
                     return true;
                 }
             }

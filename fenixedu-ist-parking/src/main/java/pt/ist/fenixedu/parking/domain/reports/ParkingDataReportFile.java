@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.QueueJobResult;
 import org.fenixedu.academic.util.FileUtils;
@@ -130,9 +129,9 @@ public class ParkingDataReportFile extends ParkingDataReportFile_Base {
         newRow[8] = now;
         newRow[9] = now;
         newRow[10] = person != null ? getName(person.getNickname()) : getName(parkingParty.getParty().getName());
-        newRow[11] = StringUtils.EMPTY;
-        String vehicle1PlateNumber = StringUtils.EMPTY;
-        String vehicle2PlateNumber = StringUtils.EMPTY;
+        newRow[11] = "";
+        String vehicle1PlateNumber = "";
+        String vehicle2PlateNumber = "";
         int counter = 1;
         for (Vehicle vehicle : parkingParty.getVehiclesSet()) {
             if (counter == 1) {
@@ -147,12 +146,12 @@ public class ParkingDataReportFile extends ParkingDataReportFile_Base {
         newRow[12] = vehicle1PlateNumber;
         newRow[13] = vehicle2PlateNumber;
         newRow[14] =
-                person != null && person.getPersonWorkPhone() != null ? getString(person.getPersonWorkPhone().getNumber(), 19) : StringUtils.EMPTY;
+                person != null && person.getPersonWorkPhone() != null ? getString(person.getPersonWorkPhone().getNumber(), 19) : "";
         newRow[15] =
                 person != null && person.getDefaultMobilePhone() != null ? getString(person.getDefaultMobilePhone().getNumber(),
-                        19) : StringUtils.EMPTY;
-        newRow[16] = StringUtils.EMPTY;
-        newRow[17] = StringUtils.EMPTY;
+                        19) : "";
+        newRow[16] = "";
+        newRow[17] = "";
         newRow[18] = _0;
         newRow[19] = parkingParty.getCardEndDate() == null ? null : parkingParty.getCardEndDate().toDate();
         newRow[20] = DATE;
@@ -200,7 +199,7 @@ public class ParkingDataReportFile extends ParkingDataReportFile_Base {
 
     private String getString(String string, int maxSize) {
         if (string == null) {
-            return StringUtils.EMPTY;
+            return "";
         }
         if (string.length() > maxSize) {
             return string.substring(0, maxSize - 1);

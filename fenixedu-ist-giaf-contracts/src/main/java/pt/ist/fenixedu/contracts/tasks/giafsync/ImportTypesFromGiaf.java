@@ -22,7 +22,6 @@ import java.io.PrintWriter;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.util.MultiLanguageString;
 import org.slf4j.Logger;
 
@@ -33,6 +32,8 @@ import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalC
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ServiceExemption;
 import pt.ist.fenixedu.contracts.persistenceTierOracle.Oracle.PersistentSuportGiaf;
 import pt.ist.fenixedu.contracts.tasks.giafsync.GiafSync.MetadataProcessor;
+
+import com.google.common.base.Strings;
 
 class ImportTypesFromGiaf implements MetadataProcessor {
     private static final String SERVICE_EXEMPTION = "71";
@@ -77,7 +78,7 @@ class ImportTypesFromGiaf implements MetadataProcessor {
             String type = result.getString("TAB_NUM");
             final String giafId = result.getString("tab_cod");
             String nameString = result.getString("tab_cod_alg");
-            if (StringUtils.isEmpty(nameString)) {
+            if (Strings.isNullOrEmpty(nameString)) {
                 nameString = result.getString("tab_cod_dsc");
             }
             final MultiLanguageString name = new MultiLanguageString(MultiLanguageString.pt, nameString);

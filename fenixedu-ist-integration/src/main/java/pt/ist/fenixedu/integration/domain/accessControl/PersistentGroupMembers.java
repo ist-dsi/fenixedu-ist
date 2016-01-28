@@ -22,7 +22,6 @@ import static org.fenixedu.academic.predicate.AccessControl.check;
 
 import java.util.Collection;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
@@ -35,6 +34,8 @@ import org.fenixedu.bennu.core.domain.Bennu;
 
 import pt.ist.fenixedu.integration.domain.UnitFile;
 import pt.ist.fenixframework.Atomic;
+
+import com.google.common.base.Strings;
 
 public class PersistentGroupMembers extends PersistentGroupMembers_Base {
 
@@ -98,7 +99,7 @@ public class PersistentGroupMembers extends PersistentGroupMembers_Base {
 
     @Override
     public void setName(String name) {
-        if (StringUtils.isEmpty(name)) {
+        if (Strings.isNullOrEmpty(name)) {
             throw new DomainException("error.PersistentGroupMembers.empty.name");
         }
         super.setName(name);

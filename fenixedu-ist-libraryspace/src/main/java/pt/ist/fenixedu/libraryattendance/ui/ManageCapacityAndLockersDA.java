@@ -21,7 +21,6 @@ package pt.ist.fenixedu.libraryattendance.ui;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -41,6 +40,8 @@ import org.joda.time.DateTime;
 
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
 import pt.ist.fenixframework.Atomic;
+
+import com.google.common.base.Strings;
 
 @StrutsFunctionality(app = LibraryApplication.class, path = "manage-capacity-and-lockers",
         titleKey = "label.manage.capacity.lockers")
@@ -127,8 +128,7 @@ public class ManageCapacityAndLockersDA extends FenixDispatchAction {
         if (highestLocker < lockers) {
             for (int i = highestLocker + 1; i <= lockers; i++) {
                 final InformationBean bean =
-                        Information.builder()
-                                .name(StringUtils.leftPad(Integer.toString(i), String.valueOf(lockers).length(), '0'))
+                        Information.builder().name(Strings.padStart(Integer.toString(i), String.valueOf(lockers).length(), '0'))
                                 .classification(SpaceClassification.getByName(SpaceUtils.ROOM_SUBDIVISION)).validFrom(today)
                                 .allocatableCapacity(1).bean();
                 new Space(library, bean);

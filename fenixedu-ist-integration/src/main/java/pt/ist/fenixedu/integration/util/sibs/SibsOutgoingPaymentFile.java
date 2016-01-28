@@ -25,13 +25,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.accounting.PaymentCode;
 import org.fenixedu.academic.util.Money;
 import org.joda.time.DateTime;
 import org.joda.time.YearMonthDay;
 
 import pt.ist.fenixedu.integration.domain.accounting.events.export.PrintedPaymentCodes;
+
+import com.google.common.base.Strings;
 
 /**
  * 
@@ -42,7 +43,7 @@ public class SibsOutgoingPaymentFile {
 
     private static final String DATE_FORMAT = "yyyyMMdd";
 
-    private static final String NUMBER_FILLER = "0";
+    private static final char NUMBER_FILLER = '0';
 
     private static final String LINE_TERMINATOR = "\r\n";
 
@@ -93,7 +94,7 @@ public class SibsOutgoingPaymentFile {
             header.append(OMISSION_SEQUENCE_NUMBER);
             header.append(this.entityCode);
             header.append(CURRENCY_CODE);
-            header.append(StringUtils.leftPad("", WHITE_SPACES_IN_HEADER));
+            header.append(Strings.padStart("", WHITE_SPACES_IN_HEADER, ' '));
             header.append(LINE_TERMINATOR);
 
             return header.toString();
@@ -114,8 +115,8 @@ public class SibsOutgoingPaymentFile {
         public String render(int totalLines) {
             final StringBuilder footer = new StringBuilder();
             footer.append(FOOTER_REGISTER_TYPE);
-            footer.append(StringUtils.leftPad(String.valueOf(totalLines), NUMBER_OF_LINES_DESCRIPTOR_LENGTH, NUMBER_FILLER));
-            footer.append(StringUtils.leftPad("", WHITE_SPACES_IN_FOOTER));
+            footer.append(Strings.padStart(String.valueOf(totalLines), NUMBER_OF_LINES_DESCRIPTOR_LENGTH, NUMBER_FILLER));
+            footer.append(Strings.padStart("", WHITE_SPACES_IN_FOOTER, ' '));
             footer.append(LINE_TERMINATOR);
 
             return footer.toString();
@@ -176,14 +177,14 @@ public class SibsOutgoingPaymentFile {
             result.append(leftPadAmount(this.maxAmount));
             result.append(this.startDate.toString(DATE_FORMAT));
             result.append(leftPadAmount(this.minAmount));
-            result.append(StringUtils.leftPad("", WHITE_SPACES_IN_LINE));
+            result.append(Strings.padStart("", WHITE_SPACES_IN_LINE, ' '));
             result.append(LINE_TERMINATOR);
 
             return result.toString();
         }
 
         private String leftPadAmount(final Money amount) {
-            return StringUtils.leftPad(String.valueOf(amount.multiply(BigDecimal.valueOf(DECIMAL_PLACES_FACTOR)).longValue()),
+            return Strings.padStart(String.valueOf(amount.multiply(BigDecimal.valueOf(DECIMAL_PLACES_FACTOR)).longValue()),
                     AMOUNT_LENGTH, NUMBER_FILLER);
         }
     }

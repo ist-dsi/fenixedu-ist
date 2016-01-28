@@ -25,7 +25,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
@@ -312,7 +311,7 @@ public class DepartmentCreditsPoolBean implements Serializable {
                 newAssignedCredits = newAssignedCredits.add(newExecutionCourseCLE);
                 if ((!Objects.equals(departmentExecutionCourse.executionCourse.getUnitCreditValue(),
                         departmentExecutionCourse.getUnitCreditValue()))
-                        || StringUtils.equals(departmentExecutionCourse.executionCourse.getUnitCreditValueNotes(),
+                        || Objects.equals(departmentExecutionCourse.executionCourse.getUnitCreditValueNotes(),
                                 departmentExecutionCourse.getUnitCreditJustification())) {
                     departmentExecutionCourse.executionCourse.setUnitCreditValue(departmentExecutionCourse.getUnitCreditValue(),
                             departmentExecutionCourse.getUnitCreditJustification());

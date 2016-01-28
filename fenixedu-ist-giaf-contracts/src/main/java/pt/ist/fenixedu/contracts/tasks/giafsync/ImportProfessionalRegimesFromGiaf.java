@@ -24,7 +24,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Objects;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.util.MultiLanguageString;
 import org.slf4j.Logger;
 
@@ -32,6 +31,8 @@ import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalR
 import pt.ist.fenixedu.contracts.domain.util.CategoryType;
 import pt.ist.fenixedu.contracts.persistenceTierOracle.Oracle.PersistentSuportGiaf;
 import pt.ist.fenixedu.contracts.tasks.giafsync.GiafSync.MetadataProcessor;
+
+import com.google.common.base.Strings;
 
 class ImportProfessionalRegimesFromGiaf implements MetadataProcessor {
     public ImportProfessionalRegimesFromGiaf() {
@@ -54,7 +55,7 @@ class ImportProfessionalRegimesFromGiaf implements MetadataProcessor {
             BigDecimal fullTimeEquivalent = result.getBigDecimal("valor_eti");
 
             CategoryType categoryType = null;
-            if (!StringUtils.isBlank(regimeName)) {
+            if (!Strings.isNullOrEmpty(regimeName)) {
                 if (regimeName.contains("Bolseiro")) {
                     categoryType = CategoryType.GRANT_OWNER;
                 } else if (regimeName.contains("Investigador")) {

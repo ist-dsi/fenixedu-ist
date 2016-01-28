@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.accessControl.ActiveStudentsGroup;
 import org.fenixedu.academic.domain.accessControl.AllAlumniGroup;
@@ -51,6 +50,8 @@ import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalC
 import pt.ist.fenixedu.contracts.persistenceTierOracle.Oracle.PersistentSuportGiaf;
 import pt.ist.fenixedu.contracts.tasks.giafsync.GiafSync.ImportProcessor;
 import pt.ist.fenixedu.contracts.tasks.giafsync.GiafSync.Modification;
+
+import com.google.common.base.Strings;
 
 class ImportPersonContractSituationsFromGiaf extends ImportProcessor {
     final static DateTimeFormatter dateFormat = DateTimeFormat.forPattern("yyyy-MM-dd");
@@ -103,7 +104,7 @@ class ImportPersonContractSituationsFromGiaf extends ImportProcessor {
 
             final String categoryGiafId = result.getString("emp_cat_func");
             final ProfessionalCategory category = metadata.category(categoryGiafId);
-            if (category == null && (!StringUtils.isEmpty(categoryGiafId))) {
+            if (category == null && (!Strings.isNullOrEmpty(categoryGiafId))) {
                 logger.debug("Empty category: " + categoryGiafId + ". Person number: " + numberString);
                 importedButInvalid.add(person);
             }
@@ -115,13 +116,14 @@ class ImportPersonContractSituationsFromGiaf extends ImportProcessor {
 
             String beginDateString = result.getString("dt_inic");
             final LocalDate beginDate =
-                    StringUtils.isEmpty(beginDateString) ? null : new LocalDate(Timestamp.valueOf(beginDateString));
+                    Strings.isNullOrEmpty(beginDateString) ? null : new LocalDate(Timestamp.valueOf(beginDateString));
             if (beginDate == null) {
                 logger.debug("Empty beginDate: " + numberString + " . Situation: " + contractSituationGiafId);
                 importedButInvalid.add(person);
             }
             String endDateString = result.getString("dt_fim");
-            final LocalDate endDate = StringUtils.isEmpty(endDateString) ? null : new LocalDate(Timestamp.valueOf(endDateString));
+            final LocalDate endDate =
+                    Strings.isNullOrEmpty(endDateString) ? null : new LocalDate(Timestamp.valueOf(endDateString));
             if (endDate != null) {
                 if (beginDate != null && beginDate.isAfter(endDate)) {
                     logger.debug("BeginDate after EndDate: " + numberString + " begin: " + beginDate + " end:" + endDate);
@@ -129,7 +131,7 @@ class ImportPersonContractSituationsFromGiaf extends ImportProcessor {
                 }
             }
             String creationDateString = result.getString("data_criacao");
-            if (StringUtils.isEmpty(creationDateString)) {
+            if (Strings.isNullOrEmpty(creationDateString)) {
                 logger.debug("Empty creationDate: " + numberString + " . Situation: " + contractSituationGiafId);
                 notImported++;
                 continue;
@@ -138,7 +140,7 @@ class ImportPersonContractSituationsFromGiaf extends ImportProcessor {
 
             String modifiedDateString = result.getString("data_alteracao");
             final DateTime modifiedDate =
-                    StringUtils.isEmpty(modifiedDateString) ? null : new DateTime(Timestamp.valueOf(modifiedDateString));
+                    Strings.isNullOrEmpty(modifiedDateString) ? null : new DateTime(Timestamp.valueOf(modifiedDateString));
 
             final String step = result.getString("emp_escalao");
 
@@ -270,7 +272,7 @@ class ImportPersonContractSituationsFromGiaf extends ImportProcessor {
         } else {
             query.append(" and emp.dt_fim is null");
         }
-        if (!StringUtils.isEmpty(personContractSituation.getProfessionalCategoryGiafId())) {
+        if (!Strings.isNullOrEmpty(personContractSituation.getProfessionalCategoryGiafId())) {
             query.append(" and emp.emp_cat_func='");
             query.append(personContractSituation.getProfessionalCategoryGiafId()).append("'");
             if (personContractSituation.getProfessionalCategory() == null) {
@@ -279,7 +281,7 @@ class ImportPersonContractSituationsFromGiaf extends ImportProcessor {
         } else {
             query.append(" and emp.emp_cat_func is null");
         }
-        if (!StringUtils.isEmpty(personContractSituation.getContractSituationGiafId())) {
+        if (!Strings.isNullOrEmpty(personContractSituation.getContractSituationGiafId())) {
             query.append(" and emp.emp_sit='");
             query.append(personContractSituation.getContractSituationGiafId()).append("'");
             if (personContractSituation.getContractSituation() == null) {

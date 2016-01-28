@@ -24,8 +24,6 @@ package pt.ist.fenixedu.quc.ui.renderers;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-import org.apache.commons.lang.StringUtils;
-
 import pt.ist.fenixWebFramework.renderers.InputRenderer;
 import pt.ist.fenixWebFramework.renderers.components.HtmlBlockContainer;
 import pt.ist.fenixWebFramework.renderers.components.HtmlComponent;
@@ -41,6 +39,9 @@ import pt.ist.fenixedu.quc.domain.InquiryResultComment;
 import pt.ist.fenixedu.quc.domain.ResultClassification;
 import pt.ist.fenixedu.quc.dto.GroupResultsSummaryBean;
 import pt.ist.fenixedu.quc.dto.QuestionResultsSummaryBean;
+
+import com.google.common.base.CharMatcher;
+import com.google.common.base.Strings;
 
 /**
  * @author - Ricardo Rodrigues (ricardo.rodrigues@ist.utl.pt)
@@ -163,7 +164,7 @@ public class InquiryGroupResultsResumeRenderer extends InputRenderer {
                             + QuestionResultsSummaryBean.getMadeCommentHeader(inquiryResultComment) + " : </b></p>");
             madeCommentHeaderText.setEscaped(false);
             String commentMade = inquiryResultComment.getComment();
-            if (StringUtils.isBlank(commentMade)) {
+            if (Strings.isNullOrEmpty(commentMade)) {
                 commentMade = "<em>Sem comentário</em>";
             }
             HtmlText madeCommentText = new HtmlText("<p class=\"mtop05\">" + commentMade + "</p>");
@@ -363,7 +364,7 @@ public class InquiryGroupResultsResumeRenderer extends InputRenderer {
             int endAt = getPercentageScaleSize(questionResultsSummaryBean, questionHeader);
             for (int iter = 0, startAt = 1; iter < questionHeader.getScaleHeaders().getScaleValues().length; iter++) {
                 String value = questionHeader.getScaleHeaders().getScaleValues()[iter];
-                if (StringUtils.isNumeric(value) && Integer.valueOf(value) > 0) {
+                if (CharMatcher.DIGIT.matchesAllOf(value) && Integer.valueOf(value) > 0) {
                     StringBuilder builder = new StringBuilder("<span class=\"legend-bar\">");
                     builder.append(questionHeader.getScaleHeaders().getScale()[iter]);
                     builder.append("&nbsp;<span class=\"legend-bar-1");

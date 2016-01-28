@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.joda.time.DateTime;
@@ -46,6 +45,8 @@ import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalR
 import pt.ist.fenixedu.contracts.persistenceTierOracle.Oracle.PersistentSuportGiaf;
 import pt.ist.fenixedu.contracts.tasks.giafsync.GiafSync.ImportProcessor;
 import pt.ist.fenixedu.contracts.tasks.giafsync.GiafSync.Modification;
+
+import com.google.common.base.Strings;
 
 class ImportPersonProfessionalRelationsFromGiaf extends ImportProcessor {
     final static DateTimeFormatter dateFormat = DateTimeFormat.forPattern("yyyy-MM-dd");
@@ -98,13 +99,14 @@ class ImportPersonProfessionalRelationsFromGiaf extends ImportProcessor {
             }
             String beginDateString = result.getString("emp_dt_inic");
             final LocalDate beginDate =
-                    StringUtils.isEmpty(beginDateString) ? null : new LocalDate(Timestamp.valueOf(beginDateString));
+                    Strings.isNullOrEmpty(beginDateString) ? null : new LocalDate(Timestamp.valueOf(beginDateString));
             if (beginDate == null) {
                 logger.debug("Empty beginDate. Person number: " + numberString + " Relation: " + professionalRelationGiafId);
                 importedButInvalid.add(person);
             }
             String endDateString = result.getString("emp_dt_fim");
-            final LocalDate endDate = StringUtils.isEmpty(endDateString) ? null : new LocalDate(Timestamp.valueOf(endDateString));
+            final LocalDate endDate =
+                    Strings.isNullOrEmpty(endDateString) ? null : new LocalDate(Timestamp.valueOf(endDateString));
             if (endDate != null) {
                 if (beginDate != null && beginDate.isAfter(endDate)) {
                     logger.debug("BeginDate after endDate. Person number: " + numberString + " begin: " + beginDate + " end:"
@@ -115,13 +117,13 @@ class ImportPersonProfessionalRelationsFromGiaf extends ImportProcessor {
 
             final String professionalCategoryGiafId = result.getString("emp_cat_func");
             final ProfessionalCategory professionalCategory = metadata.category(professionalCategoryGiafId);
-            if ((!StringUtils.isEmpty(professionalCategoryGiafId)) && professionalCategory == null) {
+            if ((!Strings.isNullOrEmpty(professionalCategoryGiafId)) && professionalCategory == null) {
                 logger.debug("Empty category " + professionalCategoryGiafId + ". Person number: " + numberString);
                 importedButInvalid.add(person);
             }
 
             String creationDateString = result.getString("data_criacao");
-            if (StringUtils.isEmpty(creationDateString)) {
+            if (Strings.isNullOrEmpty(creationDateString)) {
                 logger.debug("Empty creationDate. Person number: " + numberString + " Relation: " + professionalRelationGiafId);
                 continue;
             }
@@ -129,7 +131,7 @@ class ImportPersonProfessionalRelationsFromGiaf extends ImportProcessor {
 
             String modifiedDateString = result.getString("data_alteracao");
             final DateTime modifiedDate =
-                    StringUtils.isEmpty(modifiedDateString) ? null : new DateTime(Timestamp.valueOf(modifiedDateString));
+                    Strings.isNullOrEmpty(modifiedDateString) ? null : new DateTime(Timestamp.valueOf(modifiedDateString));
 
             if (!hasPersonProfessionalRelation(giafProfessionalData, beginDate, endDate, professionalRelation,
                     professionalRelationGiafId, professionalCategory, professionalCategoryGiafId, creationDate, modifiedDate)) {

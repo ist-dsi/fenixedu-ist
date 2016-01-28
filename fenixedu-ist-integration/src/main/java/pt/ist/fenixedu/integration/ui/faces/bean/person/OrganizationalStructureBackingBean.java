@@ -39,7 +39,6 @@ import javax.faces.component.html.HtmlInputHidden;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.organizationalStructure.AccountabilityTypeEnum;
@@ -58,6 +57,8 @@ import pt.ist.fenixedu.contracts.domain.organizationalStructure.EmployeeContract
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.Function;
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.PersonFunction;
 import pt.ist.fenixframework.FenixFramework;
+
+import com.google.common.base.Strings;
 
 public class OrganizationalStructureBackingBean extends FenixBackingBean {
 
@@ -235,7 +236,7 @@ public class OrganizationalStructureBackingBean extends FenixBackingBean {
     private void addUnitToMap(Map<String, Set<Unit>> resultMap, Unit subUnit) {
 
         String typeName = subUnit.getClassification() != null ? subUnit.getClassification().getName() : null;
-        if (StringUtils.isEmpty(typeName)) {
+        if (Strings.isNullOrEmpty(typeName)) {
             typeName = subUnit.getType() != null ? subUnit.getType().getName() : null;
         }
 
@@ -294,13 +295,13 @@ public class OrganizationalStructureBackingBean extends FenixBackingBean {
         buffer.append(chooseUnit.getExternalId()).append("'>");
         buffer.append(chooseUnit.getName()).append("</strong>");
 
-        if (StringUtils.isEmpty(getListType()) || getListType().equals("#") || getListType().equals("0")) {
+        if (Strings.isNullOrEmpty(getListType()) || getListType().equals("#") || getListType().equals("0")) {
             printUnitWorkingEmployees(chooseUnit, iExecutionYear, buffer);
         }
 
         for (Function function : getSortFunctionList(chooseUnit)) {
             if (function.belongsToPeriod(iExecutionYear.getBeginDateYearMonthDay(), iExecutionYear.getEndDateYearMonthDay())) {
-                if (StringUtils.isEmpty(getListType()) || getListType().equals("#") || getListType().equals("1")) {
+                if (Strings.isNullOrEmpty(getListType()) || getListType().equals("#") || getListType().equals("1")) {
                     buffer.append("<ul><li class='tree_label'>").append(function.getName()).append(": ");
                     buffer.append((function.getParentInherentFunction() != null) ? " (Cargo Inerente)" : "");
                     getPersonFunctionsList(chooseUnit, function, buffer, iExecutionYear);
@@ -329,13 +330,13 @@ public class OrganizationalStructureBackingBean extends FenixBackingBean {
         buffer.append("<strong id='aa").append(subUnit.getExternalId()).append("' >").append(subUnit.getName())
                 .append("</strong>");
 
-        if (StringUtils.isEmpty(getListType()) || getListType().equals("#") || getListType().equals("0")) {
+        if (Strings.isNullOrEmpty(getListType()) || getListType().equals("#") || getListType().equals("0")) {
             printUnitWorkingEmployees(subUnit, iExecutionYear, buffer);
         }
 
         for (Function function : getSortFunctionList(subUnit)) {
             if (function.belongsToPeriod(iExecutionYear.getBeginDateYearMonthDay(), iExecutionYear.getEndDateYearMonthDay())) {
-                if (StringUtils.isEmpty(getListType()) || getListType().equals("#") || getListType().equals("1")) {
+                if (Strings.isNullOrEmpty(getListType()) || getListType().equals("#") || getListType().equals("1")) {
                     buffer.append("<ul><li class='tree_label'>").append(function.getName()).append(": ");
                     buffer.append((function.getParentInherentFunction() != null) ? " (Cargo Inerente)" : "");
                     getPersonFunctionsList(subUnit, function, buffer, iExecutionYear);
@@ -357,7 +358,7 @@ public class OrganizationalStructureBackingBean extends FenixBackingBean {
 
     private void printPersonHomePage(Person person, StringBuilder buffer) {
         String homePageUrl = getHomePageUrl(person);
-        if (!StringUtils.isEmpty(homePageUrl)) {
+        if (!Strings.isNullOrEmpty(homePageUrl)) {
             buffer.append("<a href='").append(homePageUrl).append("' target='_blank'>").append(person.getNickname())
                     .append("</a>");
             // buffer.append(" <image

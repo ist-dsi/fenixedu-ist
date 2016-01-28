@@ -29,7 +29,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.beanutils.BeanComparator;
-import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -44,6 +43,8 @@ import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
 import pt.ist.fenixedu.quc.dto.DepartmentExecutionSemester;
 import pt.ist.fenixedu.quc.ui.struts.action.departmentMember.ViewQUCResultsDA;
 import pt.ist.fenixframework.FenixFramework;
+
+import com.google.common.base.Strings;
 
 @StrutsFunctionality(app = PedagogicalControlApp.class, path = "view-quc-results", titleKey = "link.inquiry.results.version2",
         bundle = "InquiriesResources")
@@ -82,7 +83,7 @@ public class ViewQUCResultsPedagogicalCouncilDA extends ViewQUCResultsDA {
     @Override
     protected DepartmentUnit getDepartmentUnit(HttpServletRequest request) {
         String departmentUnitOID = request.getParameter("departmentUnitOID");
-        if (StringUtils.isEmpty(departmentUnitOID)) {
+        if (Strings.isNullOrEmpty(departmentUnitOID)) {
             DepartmentExecutionSemester departmentExecutionSemester = getRenderedObject("executionSemesterBean");
             departmentUnitOID = departmentExecutionSemester.getDepartmentUnitOID();
         }

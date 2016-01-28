@@ -22,9 +22,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.CharSetUtils;
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
@@ -201,7 +201,7 @@ public class TeacherCreditsReportFile extends TeacherCreditsReportFile_Base {
         for (OtherService otherService : teacherService.getOtherServices()) {
             others.add(CharSetUtils.delete(otherService.getReason(), "\r\n") + " (" + otherService.getCredits() + " créditos)");
         }
-        return StringUtils.join(others, ", ");
+        return others.stream().collect(Collectors.joining(", "));
     }
 
     public String getServiceExemptionDescription(ExecutionSemester executionSemester, Teacher teacher) {
@@ -213,6 +213,6 @@ public class TeacherCreditsReportFile extends TeacherCreditsReportFile_Base {
             serviceExemption.add(personContractSituation.getContractSituation().getName().getContent());
         }
 
-        return StringUtils.join(serviceExemption, ", ");
+        return serviceExemption.stream().collect(Collectors.joining(", "));
     }
 }

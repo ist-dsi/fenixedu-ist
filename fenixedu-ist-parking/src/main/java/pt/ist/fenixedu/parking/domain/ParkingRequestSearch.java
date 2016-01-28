@@ -36,6 +36,8 @@ import org.fenixedu.commons.StringNormalizer;
 
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalCategory;
 
+import com.google.common.base.Strings;
+
 public class ParkingRequestSearch implements Serializable {
     private ParkingRequestState parkingRequestState;
 
@@ -108,7 +110,7 @@ public class ParkingRequestSearch implements Serializable {
     }
 
     private boolean satisfiedCarPlateNumber(ParkingRequest request) {
-        if (org.apache.commons.lang.StringUtils.isEmpty(getCarPlateNumber())) {
+        if (Strings.isNullOrEmpty(getCarPlateNumber())) {
             return true;
         }
         return request.hasVehicleContainingPlateNumber(getCarPlateNumber());
@@ -148,7 +150,7 @@ public class ParkingRequestSearch implements Serializable {
     }
 
     private boolean satisfiedPersonName(ParkingRequest request) {
-        return org.apache.commons.lang.StringUtils.isEmpty(getPersonName())
+        return Strings.isNullOrEmpty(getPersonName())
                 || verifyContainsWithEquality(request.getParkingParty().getParty().getName(), getPersonName());
     }
 

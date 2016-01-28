@@ -24,12 +24,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Teacher;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -57,7 +57,7 @@ public class TeacherPublicationsInformation implements Serializable {
             teacherIds.add(teacher.getTeacherId());
         }
 
-        resource = resource.path(CURRICULUM_PATH).queryParam("istids", StringUtils.join(teacherIds, ","));
+        resource = resource.path(CURRICULUM_PATH).queryParam("istids", teacherIds.stream().collect(Collectors.joining(",")));
         try {
             String allPublications = resource.request().get(String.class);
             JSONParser parser = new JSONParser();

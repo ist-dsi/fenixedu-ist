@@ -22,13 +22,14 @@ import java.io.PrintWriter;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.util.MultiLanguageString;
 import org.slf4j.Logger;
 
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalRelation;
 import pt.ist.fenixedu.contracts.persistenceTierOracle.Oracle.PersistentSuportGiaf;
 import pt.ist.fenixedu.contracts.tasks.giafsync.GiafSync.MetadataProcessor;
+
+import com.google.common.base.Strings;
 
 class ImportProfessionalRelationsFromGiaf implements MetadataProcessor {
 
@@ -49,7 +50,7 @@ class ImportProfessionalRelationsFromGiaf implements MetadataProcessor {
         while (result.next()) {
             String giafId = result.getString("tab_cod");
             String nameString = result.getString("tab_cod_alg");
-            if (StringUtils.isEmpty(nameString)) {
+            if (Strings.isNullOrEmpty(nameString)) {
                 nameString = result.getString("tab_cod_dsc");
             }
             Boolean fullTimeEquivalent = getBoolean(result.getString("eti"));
@@ -73,7 +74,7 @@ class ImportProfessionalRelationsFromGiaf implements MetadataProcessor {
     }
 
     private Boolean getBoolean(String booleanString) {
-        return ((!StringUtils.isEmpty(booleanString)) && booleanString.equalsIgnoreCase(TRUE_STRING));
+        return ((!Strings.isNullOrEmpty(booleanString)) && booleanString.equalsIgnoreCase(TRUE_STRING));
     }
 
     protected String getQuery() {

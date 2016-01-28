@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.ExecutionYear;
@@ -58,6 +57,9 @@ import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonContrac
 import pt.ist.fenixedu.contracts.domain.util.CategoryType;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
+
+import com.google.common.base.CharMatcher;
+import com.google.common.base.Strings;
 
 public class SantanderBatchFillerWorker {
     private static String recordEnd = "*";
@@ -230,7 +232,7 @@ public class SantanderBatchFillerWorker {
     }
 
     private String purgeString(final String name) {
-        if (!StringUtils.isAlphaSpace(name)) {
+        if (!CharMatcher.JAVA_LETTER.or(CharMatcher.WHITESPACE).matchesAllOf(name)) {
             final char[] ca = new char[name.length()];
             int j = 0;
             for (int i = 0; i < name.length(); i++) {
@@ -247,7 +249,7 @@ public class SantanderBatchFillerWorker {
     private String[] harvestNames(String name) {
         String[] result = new String[3];
         String purgedName = purgeString(name);
-        String cleanedName = StringUtils.trimToEmpty(purgedName);
+        String cleanedName = Strings.nullToEmpty(purgedName).trim();
         String[] names = cleanedName.split(" ");
         result[0] = names[0].length() > 15 ? names[0].substring(0, 15) : names[0];
         result[1] = names[names.length - 1].length() > 15 ? names[names.length - 1].substring(0, 15) : names[names.length - 1];

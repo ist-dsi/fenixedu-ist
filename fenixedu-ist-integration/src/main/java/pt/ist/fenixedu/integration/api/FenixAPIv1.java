@@ -52,7 +52,6 @@ import javax.ws.rs.core.StreamingOutput;
 
 import net.fortuna.ical4j.model.Calendar;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.AdHocEvaluation;
 import org.fenixedu.academic.domain.CompetenceCourse;
 import org.fenixedu.academic.domain.CurricularCourse;
@@ -172,6 +171,7 @@ import pt.ist.fenixframework.FenixFramework;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Ordering;
 import com.google.common.io.ByteStreams;
@@ -221,7 +221,7 @@ public class FenixAPIv1 {
 
     private String mls(MultiLanguageString mls) {
         if (mls == null) {
-            return StringUtils.EMPTY;
+            return "";
         }
         return mls.getContent();
     }
@@ -785,7 +785,7 @@ public class FenixAPIv1 {
         validateEnrol(enrol);
         try {
             WrittenEvaluation eval = getDomainObject(oid, WrittenEvaluation.class);
-            if (!StringUtils.isBlank(enrol)) {
+            if (enrol != null && !Strings.isNullOrEmpty(enrol.trim())) {
                 if (enrol.equalsIgnoreCase(ENROL)) {
                     EnrolStudentInWrittenEvaluation.runEnrolStudentInWrittenEvaluation(getPerson().getUsername(),
                             eval.getExternalId());
@@ -906,7 +906,7 @@ public class FenixAPIv1 {
     @Path("canteen")
     public String canteen(@QueryParam("day") String day) {
         validateDay(day);
-        if (StringUtils.isBlank(day)) {
+        if (day == null || Strings.isNullOrEmpty(day.trim())) {
             day = formatDay.print(new DateTime());
         }
         return FenixAPIFromExternalServer.getCanteen(day);
@@ -1560,7 +1560,7 @@ public class FenixAPIv1 {
         validateDay(day);
         java.util.Calendar rightNow = java.util.Calendar.getInstance();
         Date date = null;
-        if (!StringUtils.isBlank(day)) {
+        if (day != null && !Strings.isNullOrEmpty(day.trim())) {
             date = formatDay.parseDateTime(day).toDate();
             rightNow.setTime(date);
         }
@@ -1577,7 +1577,7 @@ public class FenixAPIv1 {
 
     private AcademicInterval getAcademicInterval(String academicTerm, Boolean nullDefault) {
 
-        if (StringUtils.isEmpty(academicTerm)) {
+        if (Strings.isNullOrEmpty(academicTerm)) {
             return nullDefault ? null : getDefaultAcademicTerm();
         }
 
@@ -1592,7 +1592,7 @@ public class FenixAPIv1 {
     }
 
     private void validateDay(String day) {
-        if (!StringUtils.isBlank(day)) {
+        if (day != null && !Strings.isNullOrEmpty(day.trim())) {
             boolean invalid = false;
             try {
                 DateTime parse = formatDay.parseDateTime(day);
@@ -1608,7 +1608,7 @@ public class FenixAPIv1 {
     }
 
     private void validateFormat(String format) {
-        if (!StringUtils.isBlank(format)) {
+        if (format != null && !Strings.isNullOrEmpty(format.trim())) {
             if (!("calendar".equals(format) || "json".equals(format))) {
                 throw newApplicationError(Status.BAD_REQUEST, "format_error", "format must be calendar or json");
             }
@@ -1616,7 +1616,7 @@ public class FenixAPIv1 {
     }
 
     private void validateEnrol(String enrol) {
-        if (StringUtils.isBlank(enrol) || !(ENROL.equals(enrol) || UNENROL.equals(enrol))) {
+        if (enrol == null || Strings.isNullOrEmpty(enrol.trim()) || !(ENROL.equals(enrol) || UNENROL.equals(enrol))) {
             throw newApplicationError(Status.BAD_REQUEST, "format_error", "enrol must be yes or no");
         }
     }

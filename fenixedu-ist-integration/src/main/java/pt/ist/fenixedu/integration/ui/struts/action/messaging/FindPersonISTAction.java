@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -49,6 +48,8 @@ import pt.ist.fenixedu.integration.ui.struts.action.messaging.FindPersonBean.Sea
 import pt.ist.fenixedu.integration.ui.struts.action.messaging.SearchPerson.SearchParameters;
 import pt.ist.fenixedu.integration.ui.struts.action.messaging.SearchPerson.SearchPersonPredicate;
 import pt.ist.fenixframework.FenixFramework;
+
+import com.google.common.base.Strings;
 
 @StrutsFunctionality(app = MessagingSearchApp.class, path = "search-person", titleKey = "label.person.findPerson")
 @Forwards(@Forward(name = "findPerson", path = "/messaging/findPersonIST.jsp"))
@@ -122,7 +123,7 @@ public class FindPersonISTAction extends FenixDispatchAction {
 
         final String pageNumberString = request.getParameter("pageNumber");
         final Integer pageNumber =
-                !StringUtils.isEmpty(pageNumberString) ? Integer.valueOf(pageNumberString) : Integer.valueOf(1);
+                !Strings.isNullOrEmpty(pageNumberString) ? Integer.valueOf(pageNumberString) : Integer.valueOf(1);
 
         request.setAttribute("pageNumber", pageNumber);
         request.setAttribute("numberOfPages", Integer.valueOf(result.getNumberOfPages()));
@@ -155,16 +156,16 @@ public class FindPersonISTAction extends FenixDispatchAction {
             bean = new FindPersonBean();
             bean.setName(name);
             bean.setViewPhoto(viewPhoto);
-            if (!StringUtils.isEmpty(roleType)) {
+            if (!Strings.isNullOrEmpty(roleType)) {
                 bean.setRoleType(SearchRoleType.valueOf(roleType));
             }
-            if (!StringUtils.isEmpty(degreeId)) {
+            if (!Strings.isNullOrEmpty(degreeId)) {
                 bean.setDegree(FenixFramework.<Degree> getDomainObject(degreeId));
             }
-            if (!StringUtils.isEmpty(degreeType)) {
+            if (!Strings.isNullOrEmpty(degreeType)) {
                 bean.setDegreeType(FenixFramework.getDomainObject(degreeType));
             }
-            if (!StringUtils.isEmpty(departmentId)) {
+            if (!Strings.isNullOrEmpty(departmentId)) {
                 bean.setDepartment(FenixFramework.<Department> getDomainObject(departmentId));
             }
         }

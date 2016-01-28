@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.beanutils.BeanComparator;
 import org.apache.commons.collections.comparators.ReverseComparator;
-import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -69,6 +68,8 @@ import pt.ist.fenixedu.quc.dto.DepartmentUCResultsBean;
 import pt.ist.fenixedu.quc.dto.TeacherShiftTypeGroupsResumeResult;
 import pt.ist.fenixedu.quc.ui.struts.action.publico.ViewTeacherInquiryPublicResults;
 import pt.ist.fenixframework.FenixFramework;
+
+import com.google.common.base.Strings;
 
 public abstract class ViewQUCResultsDA extends FenixDispatchAction {
 
@@ -275,7 +276,7 @@ public abstract class ViewQUCResultsDA extends FenixDispatchAction {
         } else {
             String executionSemesterOID = request.getParameter("executionSemesterOID");
             String departmentUnitOID = request.getParameter("departmentUnitOID");
-            if (StringUtils.isEmpty(executionSemesterOID)) {
+            if (Strings.isNullOrEmpty(executionSemesterOID)) {
                 executionSemester = ExecutionSemester.readActualExecutionSemester().getPreviousExecutionPeriod();
             } else {
                 executionSemester = FenixFramework.getDomainObject(executionSemesterOID);

@@ -21,8 +21,6 @@
  */
 package pt.ist.fenixedu.quc.ui.renderers;
 
-import org.apache.commons.lang.StringUtils;
-
 import pt.ist.fenixWebFramework.renderers.InputRenderer;
 import pt.ist.fenixWebFramework.renderers.components.HtmlComponent;
 import pt.ist.fenixWebFramework.renderers.components.HtmlRadioButton;
@@ -32,6 +30,8 @@ import pt.ist.fenixedu.quc.domain.InquiryQuestionHeader;
 import pt.ist.fenixedu.quc.domain.InquiryRadioGroupQuestion;
 import pt.ist.fenixedu.quc.domain.QuestionScale;
 import pt.ist.fenixedu.quc.dto.InquiryQuestionDTO;
+
+import com.google.common.base.Strings;
 
 /**
  * @author - Ricardo Rodrigues (ricardo.rodrigues@ist.utl.pt)
@@ -69,7 +69,7 @@ public class InquiryRadioGroupQuestionRenderer extends InputRenderer {
                     if (!((InquiryRadioGroupQuestion) radioQuestion.getInquiryQuestion()).getIsMatrix()) {
                         button.setText(choices.getScale()[iter].toString());
                     }
-                    if (!StringUtils.isEmpty(radioQuestion.getResponseValue())
+                    if (!Strings.isNullOrEmpty(radioQuestion.getResponseValue())
                             && choices.getScaleValues()[iter].equals(radioQuestion.getResponseValue())) {
                         button.setChecked(true);
                     }

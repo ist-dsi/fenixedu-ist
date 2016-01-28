@@ -23,7 +23,6 @@ package pt.ist.fenixedu.quc.ui.renderers;
 
 import java.util.Properties;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.util.MultiLanguageString;
 
 import pt.ist.fenixWebFramework.renderers.InputRenderer;
@@ -285,11 +284,11 @@ public class InquiryGroupQuestionRenderer extends InputRenderer {
         }
 
         private String getQuestionToolTip(final MultiLanguageString multiLanguageString) {
-            return multiLanguageString != null ? "<a href=\"#\" class=\"help\"> [?] <span>" + multiLanguageString + "</span></a>" : StringUtils.EMPTY;
+            return multiLanguageString != null ? "<a href=\"#\" class=\"help\"> [?] <span>" + multiLanguageString + "</span></a>" : "";
         }
 
         private String getQuestionRequiredIndication(final InquiryQuestion inquiryQuestion) {
-            return inquiryQuestion.getRequired() && inquiryQuestion.getShowRequiredMark() ? "<span class=\"required\"> * </span>" : StringUtils.EMPTY;
+            return inquiryQuestion.getRequired() && inquiryQuestion.getShowRequiredMark() ? "<span class=\"required\"> * </span>" : "";
         }
 
         private void createHeaderRow(final InquiryQuestionHeader inquiryQuestionHeader, final HtmlTable mainTable,

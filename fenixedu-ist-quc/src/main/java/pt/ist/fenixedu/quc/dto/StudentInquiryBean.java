@@ -30,7 +30,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.commons.beanutils.BeanComparator;
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.Person;
@@ -50,6 +49,8 @@ import pt.ist.fenixedu.quc.domain.StudentInquiryTemplate;
 import pt.ist.fenixedu.quc.domain.StudentTeacherInquiryTemplate;
 import pt.ist.fenixedu.teacher.evaluation.domain.teacher.DegreeTeachingService;
 import pt.ist.fenixframework.Atomic;
+
+import com.google.common.base.Strings;
 
 public class StudentInquiryBean implements Serializable {
 
@@ -275,7 +276,7 @@ public class StudentInquiryBean implements Serializable {
         for (InquiryBlockDTO inquiryBlockDTO : getCurricularCourseBlocks()) {
             for (InquiryGroupQuestionBean groupQuestionBean : inquiryBlockDTO.getInquiryGroups()) {
                 for (InquiryQuestionDTO questionDTO : groupQuestionBean.getInquiryQuestions()) {
-                    if (!StringUtils.isEmpty(questionDTO.getResponseValue())) {
+                    if (!Strings.isNullOrEmpty(questionDTO.getResponseValue())) {
                         new QuestionAnswer(inquiryCourseAnswer, questionDTO.getInquiryQuestion(), questionDTO.getFinalValue());
                     }
                 }

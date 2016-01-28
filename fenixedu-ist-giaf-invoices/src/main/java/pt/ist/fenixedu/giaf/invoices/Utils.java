@@ -13,7 +13,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionYear;
@@ -80,6 +79,7 @@ import org.joda.time.YearMonthDay;
 
 import pt.ist.fenixframework.DomainObject;
 
+import com.google.common.base.CharMatcher;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -982,8 +982,8 @@ public class Utils {
     private static boolean isValidPostCode(final String postalCode) {
         if (postalCode != null) {
             final String v = postalCode.trim();
-            return v.length() == 8 && v.charAt(4) == '-' && StringUtils.isNumeric(v.substring(0, 4))
-                    && StringUtils.isNumeric(v.substring(5));
+            return v.length() == 8 && v.charAt(4) == '-' && CharMatcher.DIGIT.matchesAllOf(v.substring(0, 4))
+                    && CharMatcher.DIGIT.matchesAllOf(v.substring(5));
         }
         return false;
     }

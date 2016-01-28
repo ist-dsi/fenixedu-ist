@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.spaces.domain.Space;
@@ -46,6 +45,8 @@ import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalR
 import pt.ist.fenixedu.contracts.persistenceTierOracle.Oracle.PersistentSuportGiaf;
 import pt.ist.fenixedu.contracts.tasks.giafsync.GiafSync.ImportProcessor;
 import pt.ist.fenixedu.contracts.tasks.giafsync.GiafSync.Modification;
+
+import com.google.common.base.Strings;
 
 class ImportPersonProfessionalData extends ImportProcessor {
     @Override
@@ -76,7 +77,7 @@ class ImportPersonProfessionalData extends ImportProcessor {
 
             String institutionEntryDateString = result.getString("emp_adm_emp_dt");
             final LocalDate institutionEntryDate =
-                    StringUtils.isEmpty(institutionEntryDateString) ? null : new LocalDate(
+                    Strings.isNullOrEmpty(institutionEntryDateString) ? null : new LocalDate(
                             Timestamp.valueOf(institutionEntryDateString));
 
             final String contractSituationGiafId = result.getString("emp_sit");
@@ -87,17 +88,17 @@ class ImportPersonProfessionalData extends ImportProcessor {
             }
             String contractSituationDateString = result.getString("emp_sit_dt");
             final LocalDate contractSituationDate =
-                    StringUtils.isEmpty(contractSituationDateString) ? null : new LocalDate(
+                    Strings.isNullOrEmpty(contractSituationDateString) ? null : new LocalDate(
                             Timestamp.valueOf(contractSituationDateString));
 
             String terminationSituationDateString = result.getString("emp_rz_dem_dt");
-            if ((!StringUtils.isEmpty(terminationSituationDateString) || !StringUtils.isEmpty(terminationSituationDateString))
+            if ((!Strings.isNullOrEmpty(terminationSituationDateString) || !Strings.isNullOrEmpty(terminationSituationDateString))
                     && (contractSituation == null || !contractSituation.getEndSituation())) {
                 logger.debug("Non end situation with endSituationDate: " + contractSituationGiafId + " for person number: "
                         + personNumberString);
             }
             final LocalDate terminationSituationDate =
-                    StringUtils.isEmpty(terminationSituationDateString) ? null : new LocalDate(
+                    Strings.isNullOrEmpty(terminationSituationDateString) ? null : new LocalDate(
                             Timestamp.valueOf(terminationSituationDateString));
 
             final String professionalRelationGiafId = result.getString("EMP_VINCULO");
@@ -108,7 +109,7 @@ class ImportPersonProfessionalData extends ImportProcessor {
             }
             String professionalRelationDateString = result.getString("EMP_VINCULO_DT");
             final LocalDate professionalRelationDate =
-                    StringUtils.isEmpty(professionalRelationDateString) ? null : new LocalDate(
+                    Strings.isNullOrEmpty(professionalRelationDateString) ? null : new LocalDate(
                             Timestamp.valueOf(professionalRelationDateString));
 
             final String professionalContractTypeGiafId = result.getString("EMP_TP_FUNC");
@@ -122,7 +123,7 @@ class ImportPersonProfessionalData extends ImportProcessor {
             }
             String professionalCategoryDateString = result.getString("EMP_CAT_FUNC_DT");
             final LocalDate professionalCategoryDate =
-                    StringUtils.isEmpty(professionalCategoryDateString) ? null : new LocalDate(
+                    Strings.isNullOrEmpty(professionalCategoryDateString) ? null : new LocalDate(
                             Timestamp.valueOf(professionalCategoryDateString));
 
             final String professionalRegimeGiafId = result.getString("EMP_REGIME");
@@ -133,16 +134,16 @@ class ImportPersonProfessionalData extends ImportProcessor {
             }
             String professionalRegimeDateString = result.getString("EMP_REGIME_DT");
             final LocalDate professionalRegimeDate =
-                    StringUtils.isEmpty(professionalRegimeDateString) ? null : new LocalDate(
+                    Strings.isNullOrEmpty(professionalRegimeDateString) ? null : new LocalDate(
                             Timestamp.valueOf(professionalRegimeDateString));
 
             String creationDateString = result.getString("data_criacao");
             final DateTime creationDate =
-                    StringUtils.isEmpty(creationDateString) ? null : new DateTime(Timestamp.valueOf(creationDateString));
+                    Strings.isNullOrEmpty(creationDateString) ? null : new DateTime(Timestamp.valueOf(creationDateString));
 
             String modifiedDateString = result.getString("data_alteracao");
             final DateTime modifiedDate =
-                    StringUtils.isEmpty(modifiedDateString) ? null : new DateTime(Timestamp.valueOf(modifiedDateString));
+                    Strings.isNullOrEmpty(modifiedDateString) ? null : new DateTime(Timestamp.valueOf(modifiedDateString));
 
             final PersonProfessionalData personProfessionalData = person.getPersonProfessionalData();
             if (personProfessionalData == null) {

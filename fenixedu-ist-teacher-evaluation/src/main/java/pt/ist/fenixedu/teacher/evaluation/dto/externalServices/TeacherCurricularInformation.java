@@ -29,12 +29,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections.comparators.ReverseComparator;
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.CourseLoad;
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.Degree;
+import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
@@ -249,7 +250,7 @@ public class TeacherCurricularInformation implements Serializable {
 
     private List<String> addUntil5Elements(List<String> top5) {
         for (int i = top5.size(); i < 5; i++) {
-            top5.add(StringUtils.EMPTY);
+            top5.add("");
         }
         return top5;
     }
@@ -297,11 +298,8 @@ public class TeacherCurricularInformation implements Serializable {
     }
 
     public String getDegreeSiglas(ExecutionCourse executionCourse) {
-        Set<String> degreeSiglas = new HashSet<String>();
-        for (CurricularCourse curricularCourse : executionCourse.getAssociatedCurricularCoursesSet()) {
-            degreeSiglas.add(curricularCourse.getDegreeCurricularPlan().getDegree().getSigla());
-        }
-        return StringUtils.join(degreeSiglas, ", ");
+        return executionCourse.getAssociatedCurricularCoursesSet().stream().map(CurricularCourse::getDegreeCurricularPlan)
+                .map(DegreeCurricularPlan::getDegree).map(Degree::getSigla).collect(Collectors.joining(", "));
     }
 
     protected void getLecturedCurricularUnitForProfessorship(Professorship professorship, ExecutionSemester executionSemester) {
@@ -315,11 +313,11 @@ public class TeacherCurricularInformation implements Serializable {
                 for (CourseLoad courseLoad : degreeTeachingService.getShift().getCourseLoadsSet()) {
                     final ShiftType type = courseLoad.getType();
                     appendShiftType(shiftTypeDescription, type);
-                    Float duration = hoursByTypeMap.get(StringUtils.EMPTY);
+                    Float duration = hoursByTypeMap.get("");
                     Float weeklyHours =
                             courseLoad.getTotalQuantity().floatValue()
                                     * (degreeTeachingService.getPercentage().floatValue() / 100);
-                    hoursByTypeMap.put(StringUtils.EMPTY, duration == null ? weeklyHours : duration + weeklyHours);
+                    hoursByTypeMap.put("", duration == null ? weeklyHours : duration + weeklyHours);
                 }
             }
 
@@ -330,9 +328,9 @@ public class TeacherCurricularInformation implements Serializable {
                     if (degreeTeachingServiceCorrection.getProfessorship().equals(professorship)
                             && (!degreeTeachingServiceCorrection.getProfessorship().getExecutionCourse()
                                     .getProjectTutorialCourse())) {
-                        Float duration = hoursByTypeMap.get(StringUtils.EMPTY);
+                        Float duration = hoursByTypeMap.get("");
                         Float weeklyHours = degreeTeachingServiceCorrection.getCorrection().floatValue();
-                        hoursByTypeMap.put(StringUtils.EMPTY, duration == null ? weeklyHours : duration + weeklyHours);
+                        hoursByTypeMap.put("", duration == null ? weeklyHours : duration + weeklyHours);
                     }
                 }
             }
@@ -344,7 +342,7 @@ public class TeacherCurricularInformation implements Serializable {
         } else {
             for (String shiftType : hoursByTypeMap.keySet()) {
                 addLecturedCurricularUnit(professorship.getExecutionCourse().getDegreePresentationString(), name, /*shiftType*/
-                        shiftTypeDescription.toString(), hoursByTypeMap.get(StringUtils.EMPTY));
+                        shiftTypeDescription.toString(), hoursByTypeMap.get(""));
             }
         }
     }
@@ -473,8 +471,8 @@ public class TeacherCurricularInformation implements Serializable {
                 return "PL";
             } else if (shiftType.equals("PB")) {
                 return "TP";
-            } else if (shiftType.equals(StringUtils.EMPTY)) {
-                return StringUtils.EMPTY;
+            } else if (shiftType.equals("")) {
+                return "";
             } else if (shiftType.indexOf(',') > 0) {
                 return shiftType;
             }
@@ -490,7 +488,7 @@ public class TeacherCurricularInformation implements Serializable {
         }
 
         public String getDegree() {
-            return StringUtils.join(degrees, ", ");
+            return degrees.stream().collect(Collectors.joining(", "));
         }
 
         @Override

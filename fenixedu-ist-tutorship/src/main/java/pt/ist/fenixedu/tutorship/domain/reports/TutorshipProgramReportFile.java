@@ -21,7 +21,6 @@ package pt.ist.fenixedu.tutorship.domain.reports;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.ExecutionSemester;
@@ -110,7 +109,7 @@ public class TutorshipProgramReportFile extends TutorshipProgramReportFile_Base 
                             }
                             row.setCell(Integer.toString(enrolmentCounter));
                             row.setCell(Integer.toString(aprovalCounter));
-                            row.setCell(registration.getEntryGrade() != null ? registration.getEntryGrade().toString() : StringUtils.EMPTY);
+                            row.setCell(registration.getEntryGrade() != null ? registration.getEntryGrade().toString() : "");
                             Boolean dislocated = null;
                             if (registration.getStudentCandidacy() != null) {
                                 dislocated = registration.getStudentCandidacy().getDislocatedFromPermanentResidence();

@@ -18,7 +18,6 @@
     along with FenixEdu IST Integration.  If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@page import="org.apache.commons.lang.StringUtils"%>
 <%@page import="com.google.common.base.Strings"%>
 <%@page import="com.google.common.base.Joiner"%>
 <%@page import="org.fenixedu.bennu.core.domain.User"%>
@@ -149,7 +148,7 @@
 			Integer studentNumber = personalInfo.getStudent() != null ? personalInfo.getStudent().getNumber() : null;
 			Integer employeeNumber = personalInfo.getEmployee() != null ? personalInfo.getEmployee().getEmployeeNumber() : null;
 			String personalIds = Joiner.on(", ").skipNulls().join(username, studentNumber, employeeNumber);
-			personalIds = StringUtils.isNotBlank(personalIds) ? "(" + personalIds + ")" : "";
+			personalIds = Strings.isNullOrEmpty(personalIds) ? "(" + personalIds + ")" : "";
 		%>
 		<div class="pp">
 			<table class="ppid" cellpadding="0" cellspacing="0">

@@ -24,7 +24,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -40,6 +39,7 @@ import pt.ist.fenixedu.contracts.domain.LegacyRoleUtils;
 import pt.ist.fenixedu.integration.FenixEduIstIntegrationConfiguration;
 import pt.ist.fenixframework.FenixFramework;
 
+import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -55,8 +55,8 @@ public class ISTConnectDA extends ExternalInterfaceDispatchAction {
                 FenixEduIstIntegrationConfiguration.getConfiguration().getExternalServicesISTConnectUsername();
         final String passwordProp =
                 FenixEduIstIntegrationConfiguration.getConfiguration().getExternalServicesISTConnectPassword();
-        if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password) || StringUtils.isEmpty(usernameProp)
-                || StringUtils.isEmpty(passwordProp)) {
+        if (Strings.isNullOrEmpty(username) || Strings.isNullOrEmpty(password) || Strings.isNullOrEmpty(usernameProp)
+                || Strings.isNullOrEmpty(passwordProp)) {
             return false;
         }
         return username.equals(usernameProp) && password.equals(passwordProp);

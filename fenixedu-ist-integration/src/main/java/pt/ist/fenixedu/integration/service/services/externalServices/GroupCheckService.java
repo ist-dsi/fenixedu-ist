@@ -20,7 +20,6 @@ package pt.ist.fenixedu.integration.service.services.externalServices;
 
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.CompetenceCourse;
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.Degree;
@@ -43,6 +42,8 @@ import org.fenixedu.bennu.core.groups.Group;
 
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveEmployees;
 import pt.ist.fenixframework.Atomic;
+
+import com.google.common.base.Strings;
 
 /**
  * 
@@ -295,7 +296,7 @@ public class GroupCheckService {
 
     private static Unit getUnit(String[] unitAcronyms, int maxIndex) throws NonExistingServiceException {
         Unit unit = UnitUtils.readInstitutionUnit();
-        if (unit == null || StringUtils.isEmpty(unit.getAcronym()) || !unit.getAcronym().equals(unitAcronyms[0])) {
+        if (unit == null || Strings.isNullOrEmpty(unit.getAcronym()) || !unit.getAcronym().equals(unitAcronyms[0])) {
             throw new NonExistingServiceException();
         }
 

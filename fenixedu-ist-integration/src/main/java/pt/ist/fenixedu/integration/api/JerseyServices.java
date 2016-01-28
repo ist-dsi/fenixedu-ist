@@ -43,7 +43,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
@@ -134,9 +133,9 @@ public class JerseyServices {
         if (person != null) {
             final Method personMethod = Person.class.getMethod(method);
             Object result = personMethod.invoke(person);
-            return result == null ? StringUtils.EMPTY : result.toString();
+            return result == null ? "" : result.toString();
         }
-        return StringUtils.EMPTY;
+        return "";
     }
 
     @GET
@@ -144,7 +143,7 @@ public class JerseyServices {
     @Path("readAllUserData")
     public static String readAllUserData(@QueryParam("types") final String types) {
         String[] roles;
-        if (types != null && StringUtils.isNotBlank(types)) {
+        if (!Strings.isNullOrEmpty(types)) {
             roles = new String[types.split("-").length];
             int i = 0;
             for (String typeString : types.split("-")) {
@@ -156,7 +155,7 @@ public class JerseyServices {
         }
         final StringBuilder builder = new StringBuilder();
         for (final User user : Bennu.getInstance().getUserSet()) {
-            if (!StringUtils.isEmpty(user.getUsername())) {
+            if (!Strings.isNullOrEmpty(user.getUsername())) {
                 final Person person = user.getPerson();
                 if (roles.length == 0 || hasAnyRole(person, roles)) {
                     builder.append(user.getUsername());
@@ -215,7 +214,7 @@ public class JerseyServices {
     public String readUsers() {
         JsonArray users = new JsonArray();
         for (final User user : Bennu.getInstance().getUserSet()) {
-            if (!StringUtils.isEmpty(user.getUsername()) && user.getPerson() != null) {
+            if (!Strings.isNullOrEmpty(user.getUsername()) && user.getPerson() != null) {
                 JsonObject json = new JsonObject();
                 json.addProperty("istId", user.getUsername());
                 json.addProperty("name", user.getPerson().getName());
@@ -237,7 +236,7 @@ public class JerseyServices {
         final Map<User, Set<Unit>> researchUnitMap = new HashMap<User, Set<Unit>>();
         for (final User user : Bennu.getInstance().getUserSet()) {
             Person person = user.getPerson();
-            if (!StringUtils.isEmpty(user.getUsername()) && person != null
+            if (!Strings.isNullOrEmpty(user.getUsername()) && person != null
                     && (RoleType.TEACHER.isMember(user) || RoleType.RESEARCHER.isMember(user) || person.isPhdStudent())) {
                 researchUnitMap.put(user, new HashSet<Unit>());
             }
@@ -317,7 +316,7 @@ public class JerseyServices {
             }
         }
         String info = getRegistrationsAsJSON(registrations);
-        return student != null ? info : StringUtils.EMPTY;
+        return student != null ? info : "";
     }
 
     @GET
@@ -334,7 +333,7 @@ public class JerseyServices {
             }
         }
         String info = getRegistrationsAsJSON(registrations);
-        return student != null ? info : StringUtils.EMPTY;
+        return student != null ? info : "";
     }
 
     protected static String getRegistrationsAsJSON(Set<Registration> registrations) {
@@ -634,7 +633,7 @@ public class JerseyServices {
             }
             return builder.toString();
         }
-        return StringUtils.EMPTY;
+        return "";
     }
 
     private void addAliass(final StringBuilder builder, final Integer aliass) {

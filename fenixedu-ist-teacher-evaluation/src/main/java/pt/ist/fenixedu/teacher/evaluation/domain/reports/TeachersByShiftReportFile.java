@@ -18,7 +18,6 @@
  */
 package pt.ist.fenixedu.teacher.evaluation.domain.reports;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.Shift;
 import org.fenixedu.academic.domain.reports.GepReportFile;
@@ -72,7 +71,7 @@ public class TeachersByShiftReportFile extends TeachersByShiftReportFile_Base {
                     row.setCell(shift.getNome());
                     row.setCell(GepReportFile.getExecutionCourseCode(shift.getExecutionCourse()));
                     row.setCell(degreeTeachingService.getPercentage() != null ? degreeTeachingService.getPercentage().toString()
-                            .replace('.', ',') : StringUtils.EMPTY);
+                            .replace('.', ',') : "");
                     row.setCell(GepReportFile.getProfessorshipCode(degreeTeachingService.getProfessorship()));
                 }
             }

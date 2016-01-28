@@ -29,6 +29,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -37,7 +38,6 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Attends;
 import org.fenixedu.academic.domain.CompetenceCourse;
 import org.fenixedu.academic.domain.CourseLoad;
@@ -346,7 +346,8 @@ public class A3ESDegreeProcess implements Serializable {
                         references.add(extractReference(reference));
                     }
                 }
-                json.put("q-6.2.1.9", cut("Referências Bibliográficas", StringUtils.join(references, "; "), output, 1000));
+                json.put("q-6.2.1.9",
+                        cut("Referências Bibliográficas", references.stream().collect(Collectors.joining("; ")), output, 1000));;
                 jsons.put(json, output.toString());
             }
         }
@@ -354,9 +355,8 @@ public class A3ESDegreeProcess implements Serializable {
     }
 
     private static String extractReference(BibliographicReference reference) {
-        return StringUtils.join(
-                new String[] { reference.getTitle(), reference.getAuthors(), reference.getYear(), reference.getReference() },
-                ", ");
+        return reference.getTitle() + ", " + reference.getAuthors() + ", " + reference.getYear() + ", "
+                + reference.getReference();
     }
 
     private String cut(String field, String content, StringBuilder output, int size) {
@@ -435,7 +435,7 @@ public class A3ESDegreeProcess implements Serializable {
             }
         }
 
-        return StringUtils.join(responsibles, ", ");
+        return responsibles.stream().collect(Collectors.joining(", "));
     }
 
     private Double getHours(Professorship professorhip) {
@@ -625,11 +625,11 @@ public class A3ESDegreeProcess implements Serializable {
                     }
                     for (int j = i; j < 3; j++) {
                         JSONObject academic = new JSONObject();
-                        academic.put("year", StringUtils.EMPTY);
-                        academic.put("degree", StringUtils.EMPTY);
-                        academic.put("area", StringUtils.EMPTY);
-                        academic.put("ies", StringUtils.EMPTY);
-                        academic.put("rank", StringUtils.EMPTY);
+                        academic.put("year", "");
+                        academic.put("degree", "");
+                        academic.put("area", "");
+                        academic.put("ies", "");
+                        academic.put("rank", "");
                         academicArray.add(academic);
                     }
                     file.put("form-academic", academicArray);
@@ -684,10 +684,10 @@ public class A3ESDegreeProcess implements Serializable {
                 }
                 for (int lecturedCurricularUnitIndex = Math.min(10, lecturedUCs.size()); lecturedCurricularUnitIndex < 10; lecturedCurricularUnitIndex++) {
                     JSONObject lecture = new JSONObject();
-                    lecture.put("curricularUnit", StringUtils.EMPTY);
-                    lecture.put("studyCycle", StringUtils.EMPTY);
-                    lecture.put("type", StringUtils.EMPTY);
-                    lecture.put("hoursPerWeek", StringUtils.EMPTY);
+                    lecture.put("curricularUnit", "");
+                    lecture.put("studyCycle", "");
+                    lecture.put("type", "");
+                    lecture.put("hoursPerWeek", "");
                     insideLectures.add(lecture);
                 }
 
@@ -731,10 +731,12 @@ public class A3ESDegreeProcess implements Serializable {
                             qualificationString.append(otherQualification.getClassification());
                             otherQualificationStrings.add(qualificationString.toString());
                         }
-                        addCell("Outras Qualificações", StringUtils.join(otherQualificationStrings, "\n"));
-                        addCell("Publicações", StringUtils.join(teacherCurricularInformation.getTop5ResultParticipation(), "\n"));
-                        addCell("Experiência Profissional",
-                                StringUtils.join(teacherCurricularInformation.getTop5ProfessionalCareer(), "\n"));
+                        addCell("Outras Qualificações", otherQualificationStrings.stream().collect(Collectors.joining("\n")));
+                        addCell("Publicações",
+                                teacherCurricularInformation.getTop5ResultParticipation().stream()
+                                        .collect(Collectors.joining("\n")));
+                        addCell("Experiência Profissional", teacherCurricularInformation.getTop5ProfessionalCareer().stream()
+                                .collect(Collectors.joining("\n")));
 
                         List<String> lectured = new ArrayList<String>();
                         for (LecturedCurricularUnit lecturedCurricularUnit : teacherCurricularInformation.getLecturedUCs()) {
@@ -745,7 +747,7 @@ public class A3ESDegreeProcess implements Serializable {
                             lecturedString.append(lecturedCurricularUnit.getHours());
                             lectured.add(lecturedString.toString());
                         }
-                        addCell("UCs", StringUtils.join(lectured, "\n"));
+                        addCell("UCs", lectured.stream().collect(Collectors.joining("\n")));
                     }
                 };
         return new SpreadsheetBuilder().addSheet(degree.getSigla(), sheet);

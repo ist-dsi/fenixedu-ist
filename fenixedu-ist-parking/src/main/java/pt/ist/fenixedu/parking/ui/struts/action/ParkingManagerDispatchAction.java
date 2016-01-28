@@ -36,7 +36,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.beanutils.BeanComparator;
-import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.util.Region;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -91,6 +90,8 @@ import pt.ist.fenixedu.parking.dto.VehicleBean;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
 
+import com.google.common.base.Strings;
+
 @StrutsFunctionality(app = ParkingManagerApp.class, path = "parking", titleKey = "label.requests")
 @Mapping(path = "/parking", module = "parkingManager", formBean = "parkingForm")
 @Forwards({ @Forward(name = "searchParty", path = "/parkingManager/searchParty.jsp"),
@@ -136,20 +137,20 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
 
     private void setSearchCriteria(HttpServletRequest request, ParkingRequestSearch parkingRequestSearch) {
         String parkingRequestState = request.getParameter("parkingRequestState");
-        if (!StringUtils.isEmpty(parkingRequestState)) {
+        if (!Strings.isNullOrEmpty(parkingRequestState)) {
             parkingRequestSearch.setParkingRequestState(ParkingRequestState.valueOf(parkingRequestState));
         }
         String partyClassification = request.getParameter("partyClassification");
-        if (!StringUtils.isEmpty(partyClassification)) {
+        if (!Strings.isNullOrEmpty(partyClassification)) {
             parkingRequestSearch.setPartyClassification(PartyClassification.valueOf(partyClassification));
         }
         String personName = request.getParameter("personName");
-        if (!StringUtils.isEmpty(personName)) {
+        if (!Strings.isNullOrEmpty(personName)) {
             parkingRequestSearch.setPersonName(personName);
         }
 
         String carPlateNumber = request.getParameter("carPlateNumber");
-        if (!StringUtils.isEmpty(carPlateNumber)) {
+        if (!Strings.isNullOrEmpty(carPlateNumber)) {
             parkingRequestSearch.setCarPlateNumber(carPlateNumber);
         }
     }
@@ -172,7 +173,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
         request.setAttribute("parkingRequest", parkingRequest);
         request.setAttribute("parkingPartyBean", new ParkingPartyBean(parkingRequest.getParkingParty()));
         DynaActionForm dynaActionForm = (DynaActionForm) actionForm;
-        if (!StringUtils.isEmpty(dynaActionForm.getString("cardAlwaysValid"))) {// in case of error validation
+        if (!Strings.isNullOrEmpty(dynaActionForm.getString("cardAlwaysValid"))) {// in case of error validation
             dynaActionForm.set("cardAlwaysValid", dynaActionForm.getString("cardAlwaysValid"));
         } else {
             dynaActionForm.set("cardAlwaysValid", "no");
@@ -262,7 +263,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
         request.setAttribute("carPlateNumber", carPlateNumber);
 
         DynaActionForm dynaForm = (DynaActionForm) actionForm;
-        if (!StringUtils.isEmpty((String) dynaForm.get("accepted")) || request.getParameter("acceptPrint") != null) {
+        if (!Strings.isNullOrEmpty((String) dynaForm.get("accepted")) || request.getParameter("acceptPrint") != null) {
             Long cardNumber = null;
             String group = null;
             try {
@@ -316,7 +317,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
                 parkingPartyBean.setCardEndDate(null);
             }
 
-            if (!StringUtils.isEmpty(note) && note.length() > MAX_NOTE_LENGTH) {
+            if (!Strings.isNullOrEmpty(note) && note.length() > MAX_NOTE_LENGTH) {
                 ActionMessages actionMessages = getMessages(request);
                 actionMessages.add("note", new ActionMessage("error.maxLengthExceeded", MAX_NOTE_LENGTH));
                 saveMessages(request, actionMessages);
@@ -503,7 +504,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
             final String carPlateNumber = request.getParameter("plateNumber");
             final String parkingCardNumberString = request.getParameter("parkingCardNumber");
             Long parkingCardNumber = null;
-            if (!org.apache.commons.lang.StringUtils.isEmpty(parkingCardNumberString)) {
+            if (!Strings.isNullOrEmpty(parkingCardNumberString)) {
                 parkingCardNumber = new Long(parkingCardNumberString);
             }
             Party party = FenixFramework.getDomainObject(externalId);
@@ -534,7 +535,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
 
         ParkingParty parkingParty = null;
         ParkingPartyBean parkingPartyBean = (ParkingPartyBean) getFactoryObject();
-        if ((!StringUtils.isEmpty(request.getParameter("addVehicle")) && request.getParameter("addVehicle").equals("yes"))
+        if ((!Strings.isNullOrEmpty(request.getParameter("addVehicle")) && request.getParameter("addVehicle").equals("yes"))
                 && parkingPartyBean != null) {
             parkingPartyBean.addVehicle();
             parkingParty = parkingPartyBean.getParkingParty();
@@ -551,7 +552,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
 
         DynaActionForm dynaActionForm = (DynaActionForm) actionForm;
         if (!parkingParty.getVehiclesSet().isEmpty()) {
-            if (!StringUtils.isEmpty(dynaActionForm.getString("cardAlwaysValid"))) {
+            if (!Strings.isNullOrEmpty(dynaActionForm.getString("cardAlwaysValid"))) {
                 dynaActionForm.set("cardAlwaysValid", dynaActionForm.getString("cardAlwaysValid"));// in case of error validation
             } else {
                 if (parkingParty.getCardStartDate() == null) {
@@ -561,7 +562,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
                 }
             }
         } else {
-            if (!StringUtils.isEmpty(dynaActionForm.getString("cardAlwaysValid"))) {// in case of error validation
+            if (!Strings.isNullOrEmpty(dynaActionForm.getString("cardAlwaysValid"))) {// in case of error validation
                 dynaActionForm.set("cardAlwaysValid", dynaActionForm.getString("cardAlwaysValid"));
             } else {
                 dynaActionForm.set("cardAlwaysValid", "no");
@@ -598,7 +599,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
             VehicleBean vehicle = iter.next();
             if (!vehicle.getDeleteVehicle()) {
                 deleteAllVehicles = false;
-                if (StringUtils.isEmpty(vehicle.getVehicleMake()) || StringUtils.isEmpty(vehicle.getVehiclePlateNumber())) {
+                if (Strings.isNullOrEmpty(vehicle.getVehicleMake()) || Strings.isNullOrEmpty(vehicle.getVehiclePlateNumber())) {
                     vehicleDataCorrect = false;
                     break;
                 }
@@ -769,7 +770,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
     @Atomic
     private List<Party> searchPartyCarPlate(String nameSearch, String carPlateNumber, Long parkingCardNumber) {
         List<Party> result = new ArrayList<Party>();
-        if (!StringUtils.isEmpty(carPlateNumber) || !StringUtils.isEmpty(nameSearch) || parkingCardNumber != null) {
+        if (!Strings.isNullOrEmpty(carPlateNumber) || !Strings.isNullOrEmpty(nameSearch) || parkingCardNumber != null) {
             Collection<ParkingParty> parkingParties = Bennu.getInstance().getParkingPartiesSet();
             for (ParkingParty parkingParty : parkingParties) {
                 if (parkingParty.getParty() != null) {
@@ -784,7 +785,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
     }
 
     private boolean satisfiedName(ParkingParty parkingParty, String nameSearch) {
-        if (!StringUtils.isEmpty(nameSearch)) {
+        if (!Strings.isNullOrEmpty(nameSearch)) {
             String[] nameValues = StringNormalizer.normalize(nameSearch).split("\\p{Space}+");
             return areNamesPresent(parkingParty.getParty().getName(), nameValues);
         }
@@ -800,7 +801,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
     }
 
     private boolean satisfiedPlateNumber(ParkingParty parkingParty, String carPlateNumber) {
-        return !StringUtils.isEmpty(carPlateNumber) ? (parkingParty.hasVehicleContainingPlateNumber(carPlateNumber.trim())) : true;
+        return !Strings.isNullOrEmpty(carPlateNumber) ? (parkingParty.hasVehicleContainingPlateNumber(carPlateNumber.trim())) : true;
     }
 
     private static boolean areNamesPresent(String name, String[] searchNameParts) {
