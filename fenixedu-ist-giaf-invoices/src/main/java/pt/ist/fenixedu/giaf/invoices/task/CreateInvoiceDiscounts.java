@@ -65,6 +65,7 @@ public class CreateInvoiceDiscounts extends CustomTask {
                 .filter(e -> !hasFile(e))
                 .filter(e -> Utils.validate(consumer, e))
                 .filter(e -> validValue(e))
+                .filter(e -> hasInvoice(e))
                 .forEach(e -> process(e, consumer, log));
         }
 
@@ -87,6 +88,11 @@ public class CreateInvoiceDiscounts extends CustomTask {
         return executionYear.isCurrent() || event.getWhenOccured().isAfter(THRESHOLD);
     }
 
+    private boolean hasInvoice(final Event event) {
+        final JsonObject json = Utils.toJsonDiscount(event);
+        return json.get("invoiceId") != null && !json.get("invoiceId").isJsonNull();
+    }
+
     private void process(final Event event, final ErrorConsumer<Event> consumer, final Json2Csv log) {
         try {
             final JsonObject jo = GiafInvoice.createInvoiceDiscount(consumer, event);
@@ -100,17 +106,29 @@ public class CreateInvoiceDiscounts extends CustomTask {
                     && message.indexOf("violated") > 0
                     ) {
                 taskLog("Skipping event: %s because: %s%n", event.getExternalId(), message);
+            } else if (message.indexOf("PK_2012.GC_DOC_ORIGEM_PK") > 0
+                        && message.indexOf("unique constraint") > 0
+                        && message.indexOf("violated") > 0
+                        ) {
+                taskLog("Skipping event: %s because: %s%n", event.getExternalId(), message);
+            } else if (message.indexOf("O valor da factura") > 0
+                    && message.indexOf("inferior") > 0
+                    && message.indexOf("nota de crdito ou no foi possvel encontrar a factura") > 0
+                    ) {
+                taskLog("Skipping event: %s because: %s%n", event.getExternalId(), message);
+            } else if (message.indexOf("Valor dos crédito") > 0
+                    && message.indexOf("superior ao valor do documento") > 0
+                    ) {
+                taskLog("Skipping event: %s because: %s%n", event.getExternalId(), message);
+            } else if (message.indexOf("digo de Entidade") > 0
+                    && message.indexOf("invlido") > 0
+                    && message.indexOf("inexistente") > 0
+                    ) {
+                taskLog("Skipping event: %s because: %s%n", event.getExternalId(), message);
             } else {
                 throw e;
             }
         }
-
-//        if (Utils.validate(consumer, event)) {
-//            final JsonObject json = Utils.toJsonDiscount(event);
-//            if (json != null) {
-//                log.write(json, true);
-//            }
-//        }
     }
 
     private boolean hasFile(final Event e) {
