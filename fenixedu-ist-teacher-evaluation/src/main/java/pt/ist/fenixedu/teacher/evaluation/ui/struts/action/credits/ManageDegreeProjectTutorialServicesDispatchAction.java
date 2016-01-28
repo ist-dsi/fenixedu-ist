@@ -42,7 +42,8 @@ import pt.ist.fenixframework.FenixFramework;
 
 @Mapping(path = "/degreeProjectTutorialService", functionality = ViewTeacherCreditsDA.class)
 @Forwards(value = {
-        @Forward(name = "show-project-tutorial-service", path = "/teacher/evaluation/credits/degreeTeachingService/showProjectTutorialService.jsp"),
+        @Forward(name = "show-project-tutorial-service",
+                path = "/teacher/evaluation/credits/degreeTeachingService/showProjectTutorialService.jsp"),
         @Forward(name = "viewAnnualTeachingCredits", path = "/credits.do?method=viewAnnualTeachingCredits") })
 public class ManageDegreeProjectTutorialServicesDispatchAction extends FenixDispatchAction {
 

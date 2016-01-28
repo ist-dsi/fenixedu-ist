@@ -43,7 +43,8 @@ import pt.ist.fenixframework.FenixFramework;
         accessGroup = "#scientificCouncil", bundle = "TeacherCreditsSheetResources")
 @Mapping(path = "/defineCreditsPeriods")
 @Forwards({
-        @Forward(name = "edit-teacher-credits-periods", path = "/teacher/evaluation/scientificCouncil/credits/periods/editTeacherCreditsPeriod.jsp"),
+        @Forward(name = "edit-teacher-credits-periods",
+                path = "/teacher/evaluation/scientificCouncil/credits/periods/editTeacherCreditsPeriod.jsp"),
         @Forward(name = "show-credits-periods", path = "/teacher/evaluation/scientificCouncil/credits/periods/showPeriods.jsp") })
 public class ManageCreditsPeriods extends FenixDispatchAction {
 

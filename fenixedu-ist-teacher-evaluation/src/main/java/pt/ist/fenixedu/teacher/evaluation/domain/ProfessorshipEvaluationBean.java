@@ -13,10 +13,10 @@ import java.util.stream.Collectors;
 import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.academic.domain.ShiftType;
 
-import com.google.common.base.Joiner;
-
 import pt.ist.fenixedu.teacher.evaluation.domain.teacher.DegreeTeachingService;
 import pt.ist.fenixedu.teacher.evaluation.service.external.ProfessorshipEvaluation;
+
+import com.google.common.base.Joiner;
 
 public class ProfessorshipEvaluationBean implements Serializable, Comparable<ProfessorshipEvaluationBean> {
 
@@ -30,28 +30,33 @@ public class ProfessorshipEvaluationBean implements Serializable, Comparable<Pro
 
     public ProfessorshipEvaluationBean(Professorship professorship, List<DegreeTeachingService> degreeTeachingServices) {
         this.professorship = professorship;
-        hours = new BigDecimal(degreeTeachingServices.stream().mapToDouble(d -> d.getEfectiveLoad()).sum()).setScale(2,
-                BigDecimal.ROUND_HALF_UP);
+        hours =
+                new BigDecimal(degreeTeachingServices.stream().mapToDouble(d -> d.getEfectiveLoad()).sum()).setScale(2,
+                        BigDecimal.ROUND_HALF_UP);
         enrolmentsNumber = degreeTeachingServices.stream().mapToInt(d -> d.getShift().getStudentsSet().size()).sum();
 
         shiftTypesPrettyPrint = degreeTeachingServices.iterator().next().getShift().getShiftTypesPrettyPrint();
-        String shiftTypesString = Joiner.on(", ").join(
-                degreeTeachingServices.iterator().next().getShift().getSortedTypes().stream().map(st -> st.getName()).iterator());
+        String shiftTypesString =
+                Joiner.on(", ").join(
+                        degreeTeachingServices.iterator().next().getShift().getSortedTypes().stream().map(st -> st.getName())
+                                .iterator());
         ShiftType shiftType = ShiftType.valueOf(shiftTypesString);
         if (shiftType != null) {
             professorshipEvaluationValue = professorshipEvaluation.getProfessorshipEvaluation(getProfessorship(), shiftType);
         }
-        this.description = Joiner.on(", ").join(getProfessorship().getExecutionCourse().getExecutionPeriod().getQualifiedName(),
-                getProfessorship().getExecutionCourse().getName(),
-                getProfessorship().getExecutionCourse().getDegreePresentationString(), shiftTypesPrettyPrint);
+        this.description =
+                Joiner.on(", ").join(getProfessorship().getExecutionCourse().getExecutionPeriod().getQualifiedName(),
+                        getProfessorship().getExecutionCourse().getName(),
+                        getProfessorship().getExecutionCourse().getDegreePresentationString(), shiftTypesPrettyPrint);
     }
 
     public static Set<ProfessorshipEvaluationBean> getProfessorshipEvaluationBeanSet(Professorship professorship) {
         Set<ProfessorshipEvaluationBean> result = new TreeSet<ProfessorshipEvaluationBean>();
-        Map<SortedSet<ShiftType>, List<DegreeTeachingService>> degreeTeachingServiceMap = professorship
-                .getDegreeTeachingServicesSet().stream().collect(Collectors.groupingBy(dts -> dts.getShift().getSortedTypes()));
-        degreeTeachingServiceMap
-                .forEach((shidtTypeSet, dtsSet) -> result.add(new ProfessorshipEvaluationBean(professorship, dtsSet)));
+        Map<SortedSet<ShiftType>, List<DegreeTeachingService>> degreeTeachingServiceMap =
+                professorship.getDegreeTeachingServicesSet().stream()
+                        .collect(Collectors.groupingBy(dts -> dts.getShift().getSortedTypes()));
+        degreeTeachingServiceMap.forEach((shidtTypeSet, dtsSet) -> result.add(new ProfessorshipEvaluationBean(professorship,
+                dtsSet)));
         return result;
     }
 
@@ -113,14 +118,17 @@ public class ProfessorshipEvaluationBean implements Serializable, Comparable<Pro
 
     @Override
     public int compareTo(ProfessorshipEvaluationBean o) {
-        int compare = getProfessorship().getExecutionCourse().getExecutionPeriod()
-                .compareTo(o.getProfessorship().getExecutionCourse().getExecutionPeriod());
+        int compare =
+                getProfessorship().getExecutionCourse().getExecutionPeriod()
+                        .compareTo(o.getProfessorship().getExecutionCourse().getExecutionPeriod());
         if (compare == 0) {
-            compare = Collator.getInstance().compare(getProfessorship().getExecutionCourse().getNome(),
-                    o.getProfessorship().getExecutionCourse().getNome());
+            compare =
+                    Collator.getInstance().compare(getProfessorship().getExecutionCourse().getNome(),
+                            o.getProfessorship().getExecutionCourse().getNome());
             if (compare == 0) {
-                compare = getProfessorship().getExecutionCourse().getDegreePresentationString()
-                        .compareTo(o.getProfessorship().getExecutionCourse().getDegreePresentationString());
+                compare =
+                        getProfessorship().getExecutionCourse().getDegreePresentationString()
+                                .compareTo(o.getProfessorship().getExecutionCourse().getDegreePresentationString());
             }
         }
         return compare == 0 ? getShiftTypesPrettyPrint().compareTo(o.getShiftTypesPrettyPrint()) : compare;

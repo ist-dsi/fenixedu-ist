@@ -304,7 +304,7 @@ public class InquiryResult extends InquiryResult_Base {
                         + GepReportFile.CODE_SEPARATOR + decodedParts[3]);
         return executionCourse.getProfessorship(Person.findByUsername(decodedParts[0]));
     }
-    
+
     /*
      * OID_EXECUTION_DEGREE RESULT_TYPE OID_EXECUTION_COURSE OID_EXECUTION_PERIOD RESULT_CLASSIFICATION VALUE_ SCALE_VALUE
      * OID_INQUIRY_QUESTION OID_PROFESSORSHIP SHIFT_TYPE CONNECTION_TYPE
@@ -314,25 +314,25 @@ public class InquiryResult extends InquiryResult_Base {
         String executionCourseCode = columns[2];
         String executionDegreeCode = columns[0];
         String professorshipCode = columns[8];
-         String shiftTypeString = columns[9];
-         ExecutionCourse executionCourse =
+        String shiftTypeString = columns[9];
+        ExecutionCourse executionCourse =
                 !StringUtils.isEmpty(executionCourseCode) ? getExecutionCourse(executionCourseCode) : null;
-         ExecutionDegree executionDegree =
+        ExecutionDegree executionDegree =
                 !StringUtils.isEmpty(executionDegreeCode) ? getExecutionDegree(executionDegreeCode) : null;
-         Professorship professorship =
+        Professorship professorship =
                 !StringUtils.isEmpty(professorshipCode) ? (Professorship) getProfessorship(professorshipCode) : null;
-         ShiftType shiftType = !StringUtils.isEmpty(shiftTypeString) ? ShiftType.valueOf(shiftTypeString) : null;
-         inquiryResult.setExecutionCourse(executionCourse);
-         inquiryResult.setExecutionDegree(executionDegree);
-         inquiryResult.setProfessorship(professorship);
-         inquiryResult.setShiftType(shiftType);
- 
+        ShiftType shiftType = !StringUtils.isEmpty(shiftTypeString) ? ShiftType.valueOf(shiftTypeString) : null;
+        inquiryResult.setExecutionCourse(executionCourse);
+        inquiryResult.setExecutionDegree(executionDegree);
+        inquiryResult.setProfessorship(professorship);
+        inquiryResult.setShiftType(shiftType);
+
         if (!(StringUtils.isEmpty(inquiryQuestionCode) && ResultClassification.GREY.equals(inquiryResult
                 .getResultClassification()))) {
             InquiryQuestion inquiryQuestion = getInquiryQuestion(Long.valueOf(inquiryQuestionCode));
-             if (inquiryQuestion == null) {
-                 throw new DomainException("não tem question: " + getPrintableColumns(columns));
-             }
+            if (inquiryQuestion == null) {
+                throw new DomainException("não tem question: " + getPrintableColumns(columns));
+            }
             inquiryResult.setInquiryQuestion(inquiryQuestion);
         }
     }
@@ -345,7 +345,7 @@ public class InquiryResult extends InquiryResult_Base {
         }
         return null;
     }
-    
+
     private static String getPrintableColumns(String[] columns) {
         StringBuilder stringBuilder = new StringBuilder();
         for (String value : columns) {

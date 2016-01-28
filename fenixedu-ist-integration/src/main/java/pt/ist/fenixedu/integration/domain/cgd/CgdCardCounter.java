@@ -41,8 +41,7 @@ public class CgdCardCounter extends CgdCardCounter_Base {
     }
 
     private String nextSerialNumber(final User user) {
-        return user.getCgdCardSet().stream().filter(c -> c.getCgdCardCounter() == this)
-                .findAny()
+        return user.getCgdCardSet().stream().filter(c -> c.getCgdCardCounter() == this).findAny()
                 .orElseGet(() -> createNewSerialNumber(user)).getSerialNumberForCard();
     }
 

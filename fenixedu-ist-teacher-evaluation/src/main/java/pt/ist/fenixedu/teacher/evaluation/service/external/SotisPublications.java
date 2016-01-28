@@ -74,8 +74,10 @@ public class SotisPublications {
             if (publication.has("author")) {
                 JsonElement jsonElement = publication.get("author");
                 if (jsonElement.isJsonArray()) {
-                    List<String> authors = StreamUtils.of(jsonElement.getAsJsonArray())
-                            .map(author -> author.getAsJsonObject().get("name").getAsString()).collect(Collectors.toList());
+                    List<String> authors =
+                            StreamUtils.of(jsonElement.getAsJsonArray())
+                                    .map(author -> author.getAsJsonObject().get("name").getAsString())
+                                    .collect(Collectors.toList());
                     parts.add(Joiner.on(", ").join(authors));
                     authorsNumber += authors.size();
                 } else {
@@ -114,8 +116,8 @@ public class SotisPublications {
 
         public boolean isYearBetween(Integer beginYear, Integer endYear) {
             try {
-                return (!Strings.isNullOrEmpty(getYear()) && Integer.parseInt(getYear()) >= beginYear
-                        && Integer.parseInt(getYear()) <= endYear);
+                return (!Strings.isNullOrEmpty(getYear()) && Integer.parseInt(getYear()) >= beginYear && Integer
+                        .parseInt(getYear()) <= endYear);
             } catch (NumberFormatException e) {
                 return false;
             }

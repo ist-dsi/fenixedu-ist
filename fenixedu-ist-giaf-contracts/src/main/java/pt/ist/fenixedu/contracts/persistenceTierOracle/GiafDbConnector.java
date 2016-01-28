@@ -1,6 +1,5 @@
 package pt.ist.fenixedu.contracts.persistenceTierOracle;
 
-
 public class GiafDbConnector extends DbConnector {
 
     private static GiafDbConnector instance = null;

@@ -647,8 +647,8 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
                 spreadsheet.newRow();
                 int firstRow = spreadsheet.getRow().getRowNum();
                 PartyClassification partyClassification =
-                        parkingRequestSearch.getPartyClassification() != null ? parkingRequestSearch
-                                .getPartyClassification() : PartyClassification.getPartyClassification(person);
+                        parkingRequestSearch.getPartyClassification() != null ? parkingRequestSearch.getPartyClassification() : PartyClassification
+                                .getPartyClassification(person);
                 spreadsheet.addCell(enumerationBundle.getString(partyClassification.name()));
                 spreadsheet.addCell(parkingRequest.getRequestedAs());
                 spreadsheet.addCell(parkingRequest.getParkingParty().getMostSignificantNumber());

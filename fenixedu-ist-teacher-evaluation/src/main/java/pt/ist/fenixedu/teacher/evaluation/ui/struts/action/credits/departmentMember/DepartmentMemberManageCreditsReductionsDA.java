@@ -48,17 +48,23 @@ import pt.ist.fenixedu.teacher.evaluation.domain.credits.AnnualCreditsState;
 import pt.ist.fenixedu.teacher.evaluation.domain.credits.util.ReductionServiceBean;
 import pt.ist.fenixedu.teacher.evaluation.domain.teacher.ReductionService;
 import pt.ist.fenixedu.teacher.evaluation.domain.teacher.TeacherService;
-import pt.ist.fenixedu.teacher.evaluation.ui.struts.action.departmentMember.DepartmentMemberPresidentApp;
 import pt.ist.fenixedu.teacher.evaluation.ui.struts.action.credits.ManageCreditsReductionsDispatchAction;
+import pt.ist.fenixedu.teacher.evaluation.ui.struts.action.departmentMember.DepartmentMemberPresidentApp;
 import pt.ist.fenixframework.FenixFramework;
 
 @StrutsFunctionality(app = DepartmentMemberPresidentApp.class, path = "credits-reductions",
         titleKey = "label.credits.creditsReduction", bundle = "TeacherCreditsSheetResources")
 @Mapping(module = "departmentMember", path = "/creditsReductions")
-@Forwards(value = { @Forward(name = "editReductionService", path = "/teacher/evaluation/credits/degreeTeachingService/editCreditsReduction.jsp"),
-        @Forward(name = "viewAnnualTeachingCredits", path = "/departmentMember/credits.do?method=viewAnnualTeachingCredits"),
-        @Forward(name = "showReductionServices", path = "/teacher/evaluation/credits/reductionService/showReductionServices.jsp"),
-        @Forward(name = "showReductionService", path = "/teacher/evaluation/credits/reductionService/showReductionService.jsp") })
+@Forwards(
+        value = {
+                @Forward(name = "editReductionService",
+                        path = "/teacher/evaluation/credits/degreeTeachingService/editCreditsReduction.jsp"),
+                @Forward(name = "viewAnnualTeachingCredits",
+                        path = "/departmentMember/credits.do?method=viewAnnualTeachingCredits"),
+                @Forward(name = "showReductionServices",
+                        path = "/teacher/evaluation/credits/reductionService/showReductionServices.jsp"),
+                @Forward(name = "showReductionService",
+                        path = "/teacher/evaluation/credits/reductionService/showReductionService.jsp") })
 public class DepartmentMemberManageCreditsReductionsDA extends ManageCreditsReductionsDispatchAction {
 
     @EntryPoint

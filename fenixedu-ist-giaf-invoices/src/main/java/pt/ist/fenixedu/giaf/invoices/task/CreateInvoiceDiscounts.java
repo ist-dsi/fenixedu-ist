@@ -15,13 +15,13 @@ import org.fenixedu.commons.spreadsheet.Spreadsheet;
 import org.fenixedu.commons.spreadsheet.Spreadsheet.Row;
 import org.joda.time.DateTime;
 
-import com.google.gson.JsonObject;
-
 import pt.ist.fenixedu.giaf.invoices.DebtCycleType;
 import pt.ist.fenixedu.giaf.invoices.ErrorConsumer;
 import pt.ist.fenixedu.giaf.invoices.GiafInvoice;
 import pt.ist.fenixedu.giaf.invoices.Json2Csv;
 import pt.ist.fenixedu.giaf.invoices.Utils;
+
+import com.google.gson.JsonObject;
 
 public class CreateInvoiceDiscounts extends CustomTask {
 
@@ -61,12 +61,8 @@ public class CreateInvoiceDiscounts extends CustomTask {
         };
         try (final Json2Csv log = new Json2Csv(outputFileName(), "\t")) {
             final Stream<Event> eventStream = Bennu.getInstance().getAccountingEventsSet().stream();
-            eventStream.filter(this::needsProcessing)
-                .filter(e -> !hasFile(e))
-                .filter(e -> Utils.validate(consumer, e))
-                .filter(e -> validValue(e))
-                .filter(e -> hasInvoice(e))
-                .forEach(e -> process(e, consumer, log));
+            eventStream.filter(this::needsProcessing).filter(e -> !hasFile(e)).filter(e -> Utils.validate(consumer, e))
+                    .filter(e -> validValue(e)).filter(e -> hasInvoice(e)).forEach(e -> process(e, consumer, log));
         }
 
         output("errors.xls", Utils.toBytes(sheet));
@@ -101,29 +97,19 @@ public class CreateInvoiceDiscounts extends CustomTask {
             }
         } catch (final Error e) {
             final String message = e.getMessage();
-            if (message.indexOf("PK_2012.GC_FACTURA_DET_I99") > 0
-                    && message.indexOf("unique constraint") > 0
-                    && message.indexOf("violated") > 0
-                    ) {
+            if (message.indexOf("PK_2012.GC_FACTURA_DET_I99") > 0 && message.indexOf("unique constraint") > 0
+                    && message.indexOf("violated") > 0) {
                 taskLog("Skipping event: %s because: %s%n", event.getExternalId(), message);
-            } else if (message.indexOf("PK_2012.GC_DOC_ORIGEM_PK") > 0
-                        && message.indexOf("unique constraint") > 0
-                        && message.indexOf("violated") > 0
-                        ) {
+            } else if (message.indexOf("PK_2012.GC_DOC_ORIGEM_PK") > 0 && message.indexOf("unique constraint") > 0
+                    && message.indexOf("violated") > 0) {
                 taskLog("Skipping event: %s because: %s%n", event.getExternalId(), message);
-            } else if (message.indexOf("O valor da factura") > 0
-                    && message.indexOf("inferior") > 0
-                    && message.indexOf("nota de crdito ou no foi possvel encontrar a factura") > 0
-                    ) {
+            } else if (message.indexOf("O valor da factura") > 0 && message.indexOf("inferior") > 0
+                    && message.indexOf("nota de crdito ou no foi possvel encontrar a factura") > 0) {
                 taskLog("Skipping event: %s because: %s%n", event.getExternalId(), message);
-            } else if (message.indexOf("Valor dos crédito") > 0
-                    && message.indexOf("superior ao valor do documento") > 0
-                    ) {
+            } else if (message.indexOf("Valor dos crédito") > 0 && message.indexOf("superior ao valor do documento") > 0) {
                 taskLog("Skipping event: %s because: %s%n", event.getExternalId(), message);
-            } else if (message.indexOf("digo de Entidade") > 0
-                    && message.indexOf("invlido") > 0
-                    && message.indexOf("inexistente") > 0
-                    ) {
+            } else if (message.indexOf("digo de Entidade") > 0 && message.indexOf("invlido") > 0
+                    && message.indexOf("inexistente") > 0) {
                 taskLog("Skipping event: %s because: %s%n", event.getExternalId(), message);
             } else {
                 throw e;

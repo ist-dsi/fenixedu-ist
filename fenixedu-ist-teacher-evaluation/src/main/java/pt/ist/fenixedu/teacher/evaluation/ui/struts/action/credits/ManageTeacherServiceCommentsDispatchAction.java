@@ -39,7 +39,8 @@ import pt.ist.fenixframework.FenixFramework;
 
 @Mapping(path = "/teacherServiceComments", functionality = ViewTeacherCreditsDA.class)
 @Forwards(value = {
-        @Forward(name = "editTeacherServiceComment", path = "/teacher/evaluation/credits/degreeTeachingService/editTeacherServiceComment.jsp"),
+        @Forward(name = "editTeacherServiceComment",
+                path = "/teacher/evaluation/credits/degreeTeachingService/editTeacherServiceComment.jsp"),
         @Forward(name = "viewAnnualTeachingCredits", path = "/credits.do?method=viewAnnualTeachingCredits") })
 public class ManageTeacherServiceCommentsDispatchAction extends FenixDispatchAction {
 

@@ -99,8 +99,8 @@ public class UnitSiteManagementController {
     private List<BannerBean> getBanners(Site unitSite) {
         Category category = unitSite.categoryForSlug("banner");
         if (category != null) {
-            return category.getPostsSet().stream()
-                    .filter(post -> post.getMetadata() != null).map(BannerBean::new).collect(toList());
+            return category.getPostsSet().stream().filter(post -> post.getMetadata() != null).map(BannerBean::new)
+                    .collect(toList());
         }
         return ImmutableList.of();
     }
@@ -167,7 +167,6 @@ public class UnitSiteManagementController {
         Bennu.getInstance().setDefaultSite(s);
     }
 
-
     private RedirectView defaultRedirect(Site unitSite) {
         return new RedirectView(String.format("/unit/sites/%s", unitSite.getSlug()), true);
     }
@@ -184,7 +183,6 @@ public class UnitSiteManagementController {
         }
         return site;
     }
-
 
     public static class BannerBean {
         private LocalizedString name;
@@ -242,7 +240,9 @@ public class UnitSiteManagementController {
         private PostMetadata uploadImage(Post post, PostMetadata postMetadata, String name, MultipartFile multipartFile) {
             if (!Strings.isNullOrEmpty(name) && multipartFile != null && !multipartFile.isEmpty()) {
                 try {
-                    GroupBasedFile file = new GroupBasedFile(multipartFile.getOriginalFilename(), multipartFile.getOriginalFilename(), multipartFile.getBytes(), AnyoneGroup.get());
+                    GroupBasedFile file =
+                            new GroupBasedFile(multipartFile.getOriginalFilename(), multipartFile.getOriginalFilename(),
+                                    multipartFile.getBytes(), AnyoneGroup.get());
                     post.getPostFiles().putFile(file);
                     postMetadata = postMetadata.with(name, getDownloadUrl(file));
                 } catch (IOException e) {
@@ -267,7 +267,6 @@ public class UnitSiteManagementController {
         public void setPost(Post post) {
             this.post = post;
         }
-
 
         public LocalizedString getName() {
             return name;
@@ -324,7 +323,6 @@ public class UnitSiteManagementController {
         public void setMainImage(MultipartFile mainImage) {
             this.mainImage = mainImage;
         }
-
 
         public String getMainImageUrl() {
             return mainImageUrl;

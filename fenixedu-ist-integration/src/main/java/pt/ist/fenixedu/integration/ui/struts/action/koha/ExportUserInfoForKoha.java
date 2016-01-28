@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -167,17 +166,15 @@ public class ExportUserInfoForKoha extends ExternalInterfaceDispatchAction {
 
         return sendXls(response, spreadsheet);
     }
-    
 
     public ActionForward getOfficialsNotTeachers(final ActionMapping mapping, final ActionForm actionForm,
             final HttpServletRequest request, final HttpServletResponse response) throws Exception {
         final Spreadsheet spreadsheet = new Spreadsheet("OfficialsNotTeachers");
-        spreadsheet.setHeader("IST-ID").setHeader("nome").setHeader("email").setHeader("telefone")
-                .setHeader("cgdCode");
-        
-        Bennu.getInstance().getEmployeesSet().stream().filter(Employee::isActive)
-                .map(employee -> employee.getPerson()).forEach(p -> addEmployeeInformationOfficialsNotTeachers(spreadsheet, p));
-        
+        spreadsheet.setHeader("IST-ID").setHeader("nome").setHeader("email").setHeader("telefone").setHeader("cgdCode");
+
+        Bennu.getInstance().getEmployeesSet().stream().filter(Employee::isActive).map(employee -> employee.getPerson())
+                .forEach(p -> addEmployeeInformationOfficialsNotTeachers(spreadsheet, p));
+
         return sendXls(response, spreadsheet);
     }
 
@@ -189,8 +186,8 @@ public class ExportUserInfoForKoha extends ExternalInterfaceDispatchAction {
 
     private void addEmployeeInformationOfficialsNotTeachers(final Spreadsheet spreadsheet, final Person person) {
         final Row row = spreadsheet.addRow();
-        row.setCell(person.getUsername()).setCell(person.getName())
-                .setCell(getEmail(person)).setCell(getTelefone(person)).setCell(getCGDCode(person));
+        row.setCell(person.getUsername()).setCell(person.getName()).setCell(getEmail(person)).setCell(getTelefone(person))
+                .setCell(getCGDCode(person));
     }
 
     public ActionForward getStudents(final ActionMapping mapping, final ActionForm actionForm, final HttpServletRequest request,

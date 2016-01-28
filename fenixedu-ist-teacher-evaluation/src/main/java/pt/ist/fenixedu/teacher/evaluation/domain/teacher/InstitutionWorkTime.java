@@ -107,8 +107,8 @@ public class InstitutionWorkTime extends InstitutionWorkTime_Base {
     }
 
     private Interval getInterval() {
-        return new Interval(getStartTimeHourMinuteSecond().toLocalTime().toDateTimeToday(),
-                getEndTimeHourMinuteSecond().toLocalTime().toDateTimeToday());
+        return new Interval(getStartTimeHourMinuteSecond().toLocalTime().toDateTimeToday(), getEndTimeHourMinuteSecond()
+                .toLocalTime().toDateTimeToday());
     }
 
     @Deprecated

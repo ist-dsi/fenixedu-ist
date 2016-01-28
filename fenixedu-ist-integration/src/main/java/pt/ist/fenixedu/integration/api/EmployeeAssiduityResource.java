@@ -13,10 +13,10 @@ import org.fenixedu.bennu.oauth.annotation.OAuthEndpoint;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 
-import com.google.gson.JsonObject;
-
 import pt.ist.fenixedu.contracts.persistenceTierOracle.view.GiafAssiduityTeamResponsible;
 import pt.ist.fenixedu.contracts.persistenceTierOracle.view.GiafEmployeeAssiduity;
+
+import com.google.gson.JsonObject;
 
 @Path("/fenix/v1/employeeAssiduity")
 public class EmployeeAssiduityResource {

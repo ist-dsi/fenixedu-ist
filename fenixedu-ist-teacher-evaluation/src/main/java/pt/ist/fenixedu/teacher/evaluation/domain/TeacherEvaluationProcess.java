@@ -27,7 +27,6 @@ import java.util.TreeSet;
 
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.predicate.AccessControl;
-import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.groups.DynamicGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
@@ -299,7 +298,8 @@ public class TeacherEvaluationProcess extends TeacherEvaluationProcess_Base {
             if (approvedEvaluationMark == null) {
                 stringBuilder.append("N/A");
             } else {
-                stringBuilder.append(BundleUtil.getString("resources.TeacherEvaluationResources", "TeacherEvaluationMark." + approvedEvaluationMark.name()));
+                stringBuilder.append(BundleUtil.getString("resources.TeacherEvaluationResources", "TeacherEvaluationMark."
+                        + approvedEvaluationMark.name()));
             }
         }
         return stringBuilder.length() == 0 ? null : stringBuilder.toString();

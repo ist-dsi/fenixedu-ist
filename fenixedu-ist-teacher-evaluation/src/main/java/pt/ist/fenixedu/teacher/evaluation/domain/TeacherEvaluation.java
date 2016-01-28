@@ -27,7 +27,6 @@ import org.fenixedu.academic.domain.util.email.Message;
 import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.academic.domain.util.email.SystemSender;
 import org.fenixedu.academic.predicate.AccessControl;
-import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
@@ -95,7 +94,9 @@ public abstract class TeacherEvaluation extends TeacherEvaluation_Base {
             final Recipient ccRecipient = new Recipient(Collections.singletonList(evaluator));
             final FacultyEvaluationProcess facultyEvaluationProcess = teacherEvaluationProcess.getFacultyEvaluationProcess();
             final String title = facultyEvaluationProcess.getTitle().getContent();
-            final String body = BundleUtil.getString("resources.TeacherEvaluationResources", "message.email.stamp.teacher.evaluation.process", title);
+            final String body =
+                    BundleUtil.getString("resources.TeacherEvaluationResources",
+                            "message.email.stamp.teacher.evaluation.process", title);
             final SystemSender systemSender = Bennu.getInstance().getSystemSender();
             final Message message =
                     new Message(systemSender, Collections.EMPTY_LIST, Collections.EMPTY_LIST, title, body, new EmailAddressList(

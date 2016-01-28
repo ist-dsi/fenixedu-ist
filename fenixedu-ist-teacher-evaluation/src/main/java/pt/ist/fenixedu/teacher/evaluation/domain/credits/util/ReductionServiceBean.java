@@ -31,13 +31,13 @@ import org.joda.time.Interval;
 import org.joda.time.PeriodType;
 import org.joda.time.YearMonthDay;
 
-import pt.ist.fenixedu.teacher.evaluation.domain.DepartmentCreditsPool;
-import pt.ist.fenixedu.teacher.evaluation.domain.teacher.ReductionService;
-import pt.ist.fenixedu.teacher.evaluation.domain.teacher.TeacherService;
 import pt.ist.fenixedu.teacher.evaluation.domain.ApprovedTeacherEvaluationProcessMark;
+import pt.ist.fenixedu.teacher.evaluation.domain.DepartmentCreditsPool;
 import pt.ist.fenixedu.teacher.evaluation.domain.FacultyEvaluationProcessYear;
 import pt.ist.fenixedu.teacher.evaluation.domain.TeacherEvaluationMark;
 import pt.ist.fenixedu.teacher.evaluation.domain.TeacherEvaluationProcess;
+import pt.ist.fenixedu.teacher.evaluation.domain.teacher.ReductionService;
+import pt.ist.fenixedu.teacher.evaluation.domain.teacher.TeacherService;
 import pt.ist.fenixframework.Atomic;
 
 public class ReductionServiceBean implements Serializable {

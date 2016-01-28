@@ -51,8 +51,9 @@ public class OtherService extends OtherService_Base {
         setReason(reason);
         setCorrectedExecutionSemester(correctedExecutionSemester != null ? correctedExecutionSemester : teacherService
                 .getExecutionPeriod());
-        new TeacherServiceLog(teacherService, BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.teacher.otherService",
-                credits.toString(), reason, getCorrectedExecutionSemester().getExecutionYear().getQualifiedName()));
+        new TeacherServiceLog(teacherService, BundleUtil.getString("resources.TeacherCreditsSheetResources",
+                "label.teacher.otherService", credits.toString(), reason, getCorrectedExecutionSemester().getExecutionYear()
+                        .getQualifiedName()));
     }
 
     @Override

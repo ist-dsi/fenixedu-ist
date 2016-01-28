@@ -1,4 +1,4 @@
-package pt.ist.fenixedu.teacher.task;
+package pt.ist.fenixedu.teacher.evaluation.task;
 
 import java.io.PrintWriter;
 

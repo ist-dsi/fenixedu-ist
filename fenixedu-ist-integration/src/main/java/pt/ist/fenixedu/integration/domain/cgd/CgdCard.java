@@ -26,10 +26,10 @@ import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.security.Authenticate;
 
-import com.qubit.solution.fenixedu.integration.cgd.services.form43.CgdForm43Sender;
-
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
+
+import com.qubit.solution.fenixedu.integration.cgd.services.form43.CgdForm43Sender;
 
 public class CgdCard extends CgdCard_Base {
 
@@ -88,7 +88,8 @@ public class CgdCard extends CgdCard_Base {
     }
 
     private static CgdCard findCardFor(final User user, final int year, final boolean createIfNotExists) {
-        final CgdCard card = user.getCgdCardSet().stream().filter(c -> c.getCgdCardCounter().getYear() == year).findAny().orElse(null);
+        final CgdCard card =
+                user.getCgdCardSet().stream().filter(c -> c.getCgdCardCounter().getYear() == year).findAny().orElse(null);
         return card == null && createIfNotExists ? CgdCardCounter.findCounterForYear(year).createNewSerialNumber(user) : card;
     }
 
@@ -101,6 +102,7 @@ public class CgdCard extends CgdCard_Base {
     private static class Sender extends Thread {
 
         private final String cardId;
+
         public Sender(final String externalId) {
             this.cardId = externalId;
         }
@@ -127,7 +129,7 @@ public class CgdCard extends CgdCard_Base {
                         }
                     }
                 }
-            }            
+            }
         }
 
     }

@@ -57,7 +57,8 @@ import pt.ist.fenixedu.teacher.evaluation.domain.teacher.TeacherService;
 @Forwards({
         @Forward(name = "viewAnnualTeachingCredits", path = "/credits.do?method=viewAnnualTeachingCredits",
                 contextRelative = false),
-        @Forward(name = "edit-institution-work-time", path = "/teacher/evaluation/credits/workingTime/editTeacherInstitutionWorkTime.jsp") })
+        @Forward(name = "edit-institution-work-time",
+                path = "/teacher/evaluation/credits/workingTime/editTeacherInstitutionWorkTime.jsp") })
 public class ManageTeacherInstitutionWorkingTimeDispatchAction extends FenixDispatchAction {
 
     public ActionForward create(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)

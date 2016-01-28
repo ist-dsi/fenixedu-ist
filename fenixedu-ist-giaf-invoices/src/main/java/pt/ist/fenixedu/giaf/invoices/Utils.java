@@ -78,14 +78,15 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.YearMonthDay;
 
+import pt.ist.fenixframework.DomainObject;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import pt.ist.fenixframework.DomainObject;
-
 public class Utils {
 
-    public static boolean validate(final ErrorConsumer<AccountingTransactionDetail> consumer, final AccountingTransactionDetail detail) {
+    public static boolean validate(final ErrorConsumer<AccountingTransactionDetail> consumer,
+            final AccountingTransactionDetail detail) {
         final AccountingTransaction transaction = detail.getTransaction();
         final Event event = transaction.getEvent();
         if (!validateEvent(consumer, detail, event)) {
@@ -140,7 +141,7 @@ public class Utils {
             return false;
         } catch (final NullPointerException ex) {
             consumer.accept(t, "Unable to Determine Amount", ex.getMessage());
-            return false;            
+            return false;
         }
         final String articleCode = Utils.mapToArticleCode(event, eventDescription);
         if (articleCode == null) {
@@ -225,7 +226,7 @@ public class Utils {
         jo.addProperty("address", street);
         jo.addProperty("locality", locality);
         jo.addProperty("postCode", postCode);
-        jo.addProperty("countryOfAddress",country);
+        jo.addProperty("countryOfAddress", country);
         jo.addProperty("phone", "");
         jo.addProperty("fax", "");
         jo.addProperty("email", "");
@@ -316,8 +317,8 @@ public class Utils {
         final ExecutionYear debtYear = executionYearOf(event);
         final DebtCycleType cycleType = cycleTypeFor(event, debtYear);
         final String eventDescription = event.getDescription().toString();
-        final String articleCode = isPenalty ? "7242" /* MULTAS */ : mapToArticleCode(event, eventDescription);
-        final String rubrica = isPenalty ? "0036" /* MULTAS */ : mapToRubrica(event, eventDescription);
+        final String articleCode = isPenalty ? "7242" /* MULTAS */: mapToArticleCode(event, eventDescription);
+        final String rubrica = isPenalty ? "0036" /* MULTAS */: mapToRubrica(event, eventDescription);
         final String costCenter = costCenterFor(event);
         final String clientId = toClientCode(person);
         final String paymentDate = toString(tx.getWhenRegistered().toDate());
@@ -354,7 +355,7 @@ public class Utils {
             e.addProperty("line", 1);
             e.addProperty("type", "2");
             e.addProperty("article", articleCode);
-            e.addProperty("description", eventDescription); 
+            e.addProperty("description", eventDescription);
             e.addProperty("unitType", "UN");
             e.addProperty("quantity", BigDecimal.ONE);
 
@@ -366,7 +367,7 @@ public class Utils {
             e.addProperty("responsible", "9910");
             e.addProperty("subCenter", "RP" + costCenter);
             e.addProperty("legalArticle", "M99");
-            e.addProperty("rubrica", rubrica); 
+            e.addProperty("rubrica", rubrica);
             e.addProperty("observation", "");
             o.addProperty("reference", debtYear.getName());
             a.add(e);
@@ -388,10 +389,13 @@ public class Utils {
 
     private static Money call(final PostingRule rule, final Event event, final DateTime when, final boolean applyDiscount) {
         try {
-            final Method method = PostingRule.class.getDeclaredMethod("doCalculationForAmountToPay", Event.class, DateTime.class, boolean.class);
+            final Method method =
+                    PostingRule.class
+                            .getDeclaredMethod("doCalculationForAmountToPay", Event.class, DateTime.class, boolean.class);
             method.setAccessible(true);
             return (Money) method.invoke(rule, event, when, applyDiscount);
-        } catch (final NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+        } catch (final NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException e) {
             throw new Error(e);
         }
     }
@@ -463,11 +467,9 @@ public class Utils {
     };
 
     public static Money calculateAmountPayed(final Event event, final DateTime threshold) {
-        return event.getAccountingTransactionsSet().stream()
-            .filter(t -> t.getWhenRegistered().isBefore(threshold))
-            .filter(t -> validate(VOID_CONSUMER, t.getTransactionDetail()))
-            .map(t-> t.getAmountWithAdjustment())
-            .reduce(Money.ZERO, Money::add);
+        return event.getAccountingTransactionsSet().stream().filter(t -> t.getWhenRegistered().isBefore(threshold))
+                .filter(t -> validate(VOID_CONSUMER, t.getTransactionDetail())).map(t -> t.getAmountWithAdjustment())
+                .reduce(Money.ZERO, Money::add);
     }
 
     public static JsonObject toJson(final AccountingTransactionDetail detail, final boolean accountForValue,
@@ -516,7 +518,7 @@ public class Utils {
         o.addProperty("paymentDate", toString(transaction.getWhenRegistered().toDate()));
         o.addProperty("paymentMethod", toPaymentMethod(transaction.getPaymentMode()));
         o.addProperty("documentNumber", toPaymentDocumentNumber(detail));
-        
+
         final JsonArray a = new JsonArray();
         {
             final JsonObject e = new JsonObject();
@@ -526,7 +528,8 @@ public class Utils {
             e.addProperty("description", eventDescription);
             e.addProperty("unitType", "UN");
             e.addProperty("quantity", BigDecimal.ONE);
-            e.addProperty("unitPrice", getValueForInvoiceAndIncCounter(transaction, event, eventsByInvoiceNumber, invoiceId).getAmount());
+            e.addProperty("unitPrice", getValueForInvoiceAndIncCounter(transaction, event, eventsByInvoiceNumber, invoiceId)
+                    .getAmount());
             e.addProperty("vat", BigDecimal.ZERO);
             e.addProperty("discount", BigDecimal.ZERO);
             e.addProperty("costCenter", costCenter);
@@ -542,7 +545,8 @@ public class Utils {
         return o;
     }
 
-    public static JsonObject toJsonOverpayment(final AccountingTransaction tx, final Money value, final LocalDate dueDate, final String invoiceId) {
+    public static JsonObject toJsonOverpayment(final AccountingTransaction tx, final Money value, final LocalDate dueDate,
+            final String invoiceId) {
         final Event event = tx.getEvent();
 
         final boolean isPenalty = isPenalty(tx, dueDate);
@@ -551,8 +555,8 @@ public class Utils {
         final ExecutionYear debtYear = executionYearOf(event);
         final DebtCycleType cycleType = cycleTypeFor(event, debtYear);
         final String eventDescription = event.getDescription().toString();
-        final String articleCode = isPenalty ? "7242" /* MULTAS */ : mapToArticleCode(event, eventDescription);
-        final String rubrica = isPenalty ? "0036" /* MULTAS */ : mapToRubrica(event, eventDescription);
+        final String articleCode = isPenalty ? "7242" /* MULTAS */: mapToArticleCode(event, eventDescription);
+        final String rubrica = isPenalty ? "0036" /* MULTAS */: mapToRubrica(event, eventDescription);
         final String costCenter = costCenterFor(event);
         final String clientId = toClientCode(person);
 
@@ -588,7 +592,7 @@ public class Utils {
         o.addProperty("paymentDate", toString(tx.getWhenRegistered().toDate()));
         o.addProperty("paymentMethod", toPaymentMethod(tx.getPaymentMode()));
         o.addProperty("documentNumber", toPaymentDocumentNumber(tx.getTransactionDetail()));
-        
+
         final JsonArray a = new JsonArray();
         {
             final JsonObject e = new JsonObject();
@@ -748,8 +752,8 @@ public class Utils {
     }
 
     public static ExecutionYear executionYearOf(final Event event) {
-        return event instanceof AnnualEvent ? ((AnnualEvent) event).getExecutionYear()
-                : ExecutionYear.readByDateTime(event.getWhenOccured());
+        return event instanceof AnnualEvent ? ((AnnualEvent) event).getExecutionYear() : ExecutionYear.readByDateTime(event
+                .getWhenOccured());
     }
 
     private static DebtCycleType getCycleType(Collection<CycleType> cycleTypes) {
@@ -1121,7 +1125,8 @@ public class Utils {
     }
 
     private static DateTime getDueDateByPaymentCodes(final Event event) {
-        final YearMonthDay ymd = event.getPaymentCodesSet().stream().map(pc -> pc.getEndDate()).max((c1, c2) -> c1.compareTo(c2)).orElse(null);
+        final YearMonthDay ymd =
+                event.getPaymentCodesSet().stream().map(pc -> pc.getEndDate()).max((c1, c2) -> c1.compareTo(c2)).orElse(null);
         return ymd != null ? ymd.plusDays(1).toDateTimeAtMidnight() : event.getWhenOccured();
     }
 
@@ -1147,7 +1152,8 @@ public class Utils {
     }
 
     private static String hackAreaCode(final String areaCode, final Country countryOfResidence, final Person person) {
-        return countryOfResidence != null && !"PT".equals(countryOfResidence.getCode()) ? "0" : hackAreaCodePT(areaCode, countryOfResidence);
+        return countryOfResidence != null && !"PT".equals(countryOfResidence.getCode()) ? "0" : hackAreaCodePT(areaCode,
+                countryOfResidence);
     }
 
     private static String hackAreaCodePT(final String areaCode, final Country countryOfResidence) {

@@ -18,6 +18,17 @@
  */
 package pt.ist.fenixedu.cmscomponents.domain.unit.components;
 
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toCollection;
+
+import java.util.Comparator;
+import java.util.Optional;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.function.Supplier;
+
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.TeacherAuthorization;
@@ -26,22 +37,17 @@ import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.cms.domain.Page;
 import org.fenixedu.cms.domain.component.ComponentType;
 import org.fenixedu.cms.rendering.TemplateContext;
+
 import pt.ist.fenixedu.contracts.domain.Employee;
-
-import java.util.*;
-import java.util.function.Supplier;
-
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toCollection;
 
 @ComponentType(name = "Unit Teachers", description = "Teachers information for a Department")
 public class UnitTeachersComponent extends UnitSiteComponent {
 
-    private static final Supplier<TreeMap<TeacherCategory, TreeSet<Teacher>>> categoryFactory =
-            () -> new TreeMap<>(Comparator.reverseOrder());
+    private static final Supplier<TreeMap<TeacherCategory, TreeSet<Teacher>>> categoryFactory = () -> new TreeMap<>(
+            Comparator.reverseOrder());
 
-    private static final Comparator<Teacher> TEACHER_CATEGORY_COMPARATOR = (t1, t2) ->
-            t1.getCategory() != null && t2.getCategory() != null ? t1.getCategory().compareTo(t2.getCategory()) : 0;
+    private static final Comparator<Teacher> TEACHER_CATEGORY_COMPARATOR = (t1, t2) -> t1.getCategory() != null
+            && t2.getCategory() != null ? t1.getCategory().compareTo(t2.getCategory()) : 0;
 
     private static final Comparator<Teacher> TEACHER_COMPARATOR = (t1, t2) -> {
         int result = TEACHER_CATEGORY_COMPARATOR.reversed().compare(t1, t2);

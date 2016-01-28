@@ -209,21 +209,21 @@ public class ExportCarParkUsers extends CustomTask {
 
         || name.equals("IPSFL")
 
-                || name.equals("3º ciclo")
+        || name.equals("3º ciclo")
 
-                || name.equals("Investigadores")
+        || name.equals("Investigadores")
 
-                || name.equals("Bolseiros")
+        || name.equals("Bolseiros")
 
-                || name.equals("Especiais")
+        || name.equals("Especiais")
 
-                || name.equals("Não Docentes")
+        || name.equals("Não Docentes")
 
-                || name.equals("Docentes")
+        || name.equals("Docentes")
 
-                || name.equals("ADIST - Informática")
+        || name.equals("ADIST - Informática")
 
-                || name.equals("2º ciclo")
+        || name.equals("2º ciclo")
 
 //                || name.equals("Limitados")
 

@@ -10,10 +10,13 @@ public abstract class DbConnector {
 
     private static final String ORACLE_DRIVER_NAME = "oracle.jdbc.driver.OracleDriver";
     private static final String MYSQL_DRIVER_NAME = "com.mysql.jdbc.Driver";
-    
+
     public static interface ResultSetConsumer {
         String query();
-        default void prepare(final PreparedStatement statement)  throws SQLException {}
+
+        default void prepare(final PreparedStatement statement) throws SQLException {
+        }
+
         void accept(final ResultSet resultSet) throws SQLException;
     }
 
@@ -29,8 +32,7 @@ public abstract class DbConnector {
     private Connection getConnection() {
         final Connection connection;
         try {
-            connection =
-                    DriverManager.getConnection(dbProtocol() + dbAlias(), dbUser(), dbPass());
+            connection = DriverManager.getConnection(dbProtocol() + dbAlias(), dbUser(), dbPass());
         } catch (final SQLException e) {
             throw new Error(e);
         }
@@ -48,8 +50,11 @@ public abstract class DbConnector {
     }
 
     protected abstract String dbProtocol();
+
     protected abstract String dbAlias();
+
     protected abstract String dbUser();
+
     protected abstract String dbPass();
 
     public void executeQuery(final ResultSetConsumer consumer) {

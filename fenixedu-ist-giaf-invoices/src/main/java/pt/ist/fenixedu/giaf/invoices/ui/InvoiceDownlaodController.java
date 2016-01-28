@@ -19,7 +19,7 @@ import pt.ist.fenixedu.giaf.invoices.GiafInvoice;
 @RequestMapping("/giaf-invoice-downloader")
 public class InvoiceDownlaodController {
 
-    @RequestMapping(value = "/{detail}", method = RequestMethod.GET, produces="application/pdf")
+    @RequestMapping(value = "/{detail}", method = RequestMethod.GET, produces = "application/pdf")
     public void invoice(@PathVariable AccountingTransactionDetail detail, final HttpServletResponse response) {
         final String id = detail.getExternalId();
         final String invoiceNumber = InvoiceController.toInvoiceNumber(id);

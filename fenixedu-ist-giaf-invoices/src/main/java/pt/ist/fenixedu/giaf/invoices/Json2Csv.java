@@ -73,7 +73,7 @@ public class Json2Csv implements Closeable {
                 throw new Error("Unreachable code.");
             }
         }
-        stream.println();        
+        stream.println();
         isFirstLine = false;
     }
 

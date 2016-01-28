@@ -15,14 +15,14 @@ import org.fenixedu.commons.spreadsheet.Spreadsheet;
 import org.fenixedu.commons.spreadsheet.Spreadsheet.Row;
 import org.joda.time.DateTime;
 
-import com.google.gson.JsonObject;
-
 import pt.ist.fenixedu.giaf.invoices.DebtCycleType;
 import pt.ist.fenixedu.giaf.invoices.ErrorConsumer;
 import pt.ist.fenixedu.giaf.invoices.GiafInvoice;
 import pt.ist.fenixedu.giaf.invoices.Json2Csv;
 import pt.ist.fenixedu.giaf.invoices.Utils;
 import pt.ist.giaf.client.financialDocuments.ClientClient;
+
+import com.google.gson.JsonObject;
 
 public class CreateInvoices extends CustomTask {
 
@@ -62,12 +62,8 @@ public class CreateInvoices extends CustomTask {
         };
         try (final Json2Csv log = new Json2Csv(outputFileName(), "\t")) {
             final Stream<Event> eventStream = Bennu.getInstance().getAccountingEventsSet().stream();
-            eventStream
-                .filter(this::needsProcessing)
-                .filter(e -> !hasFile(e))
-                .filter(e -> Utils.validate(consumer, e))
-                .filter(e -> validValueAfterSubtract(e))
-                .forEach(e -> process(e, consumer, log));
+            eventStream.filter(this::needsProcessing).filter(e -> !hasFile(e)).filter(e -> Utils.validate(consumer, e))
+                    .filter(e -> validValueAfterSubtract(e)).forEach(e -> process(e, consumer, log));
         }
 
         output("errors.xls", Utils.toBytes(sheet));
@@ -88,8 +84,7 @@ public class CreateInvoices extends CustomTask {
 
     private boolean needsProcessing(final Event event) {
         final ExecutionYear executionYear = Utils.executionYearOf(event);
-        return (executionYear.isCurrent() || event.getWhenOccured().isAfter(THRESHOLD))
-                && !event.isCancelled();
+        return (executionYear.isCurrent() || event.getWhenOccured().isAfter(THRESHOLD)) && !event.isCancelled();
     }
 
     private void process(final Event event, final ErrorConsumer<Event> consumer, final Json2Csv log) {
@@ -101,14 +96,10 @@ public class CreateInvoices extends CustomTask {
             }
         } catch (final Error e) {
             final String message = e.getMessage();
-            if (message.indexOf("PK_2012.GC_FACTURA_DET_I99") > 0
-                    && message.indexOf("unique constraint") > 0
-                    && message.indexOf("violated") > 0
-                    ) {
+            if (message.indexOf("PK_2012.GC_FACTURA_DET_I99") > 0 && message.indexOf("unique constraint") > 0
+                    && message.indexOf("violated") > 0) {
                 taskLog("Skipping event: %s because: %s%n", event.getExternalId(), message);
-            } else if (message.indexOf("Cdigo de Entidade ") >= 0
-                    && message.indexOf(" invlido/inexistente!") > 0
-                    ) {
+            } else if (message.indexOf("Cdigo de Entidade ") >= 0 && message.indexOf(" invlido/inexistente!") > 0) {
                 taskLog("Skipping event: %s because: %s%n", event.getExternalId(), message);
             } else {
                 throw e;

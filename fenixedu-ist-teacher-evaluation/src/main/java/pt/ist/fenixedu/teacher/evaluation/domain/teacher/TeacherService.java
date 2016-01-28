@@ -245,15 +245,15 @@ public class TeacherService extends TeacherService_Base {
     @Atomic
     public void lockTeacherCredits() {
         setTeacherServiceLock(new DateTime());
-        new TeacherServiceLog(this, BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.teacher.lockTeacherCredits",
-                getExecutionPeriod().getQualifiedName()));
+        new TeacherServiceLog(this, BundleUtil.getString("resources.TeacherCreditsSheetResources",
+                "label.teacher.lockTeacherCredits", getExecutionPeriod().getQualifiedName()));
     }
 
     @Atomic
     public void unlockTeacherCredits() {
         setTeacherServiceLock(null);
-        new TeacherServiceLog(this, BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.teacher.unlockTeacherCredits",
-                getExecutionPeriod().getQualifiedName()));
+        new TeacherServiceLog(this, BundleUtil.getString("resources.TeacherCreditsSheetResources",
+                "label.teacher.unlockTeacherCredits", getExecutionPeriod().getQualifiedName()));
     }
 
     public static Double getHoursLecturedOnExecutionCourse(Teacher teacher, ExecutionCourse executionCourse) {

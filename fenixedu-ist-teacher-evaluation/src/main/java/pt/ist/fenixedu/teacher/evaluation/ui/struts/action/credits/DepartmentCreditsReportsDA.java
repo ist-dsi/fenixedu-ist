@@ -80,25 +80,36 @@ public class DepartmentCreditsReportsDA extends FenixDispatchAction {
             spreadsheet.getSheet(department.getAcronym());
             spreadsheet.newHeaderRow();
 
-            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.teacher.id", Unit.getInstitutionAcronym()));
+            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.teacher.id",
+                    Unit.getInstitutionAcronym()));
             spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.name"), 10000);
 
-            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.credits.teachingCredits.simpleCode"));
+            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources",
+                    "label.credits.teachingCredits.simpleCode"));
             //spreadsheet.addHeader("CL correcções");
-            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.credits.masterDegreeTheses.simpleCode"));
-            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.credits.phdDegreeTheses.simpleCode"));
-            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.credits.projectsAndTutorials.simpleCode"));
+            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources",
+                    "label.credits.masterDegreeTheses.simpleCode"));
+            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources",
+                    "label.credits.phdDegreeTheses.simpleCode"));
+            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources",
+                    "label.credits.projectsAndTutorials.simpleCode"));
 
-            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.credits.managementPositions.simpleCode"));
-            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.credits.otherCredits.simpleCode"));
-            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.credits.creditsReduction.simpleCode"));
+            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources",
+                    "label.credits.managementPositions.simpleCode"));
+            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources",
+                    "label.credits.otherCredits.simpleCode"));
+            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources",
+                    "label.credits.creditsReduction.simpleCode"));
             spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources",
                     "label.credits.serviceExemptionSituations.simpleCode"));
             spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources",
                     "label.credits.normalizedAcademicCredits.simpleCode"));
-            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.credits.yearCredits.simpleCode"));
-            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.credits.finalCredits.simpleCode"));
-            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.credits.accumulatedCredits.simpleCode"));
+            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources",
+                    "label.credits.yearCredits.simpleCode"));
+            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources",
+                    "label.credits.finalCredits.simpleCode"));
+            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources",
+                    "label.credits.accumulatedCredits.simpleCode"));
 
             AnnualCreditsState annualCreditsState =
                     AnnualCreditsState.getAnnualCreditsState(departmentCreditsBean.getExecutionYear());

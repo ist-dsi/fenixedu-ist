@@ -101,8 +101,8 @@ public class TutorshipProgramReportFile extends TutorshipProgramReportFile_Base 
                             final Row row = spreadsheet.addRow();
                             row.setCell(registration.getNumber().toString());
                             row.setCell(registration.getPerson().getGender().toLocalizedString());
-                            row.setCell((executionYear == null && registration.isRegistrationConclusionProcessed() ? registration.getRawGrade() : registration.getCurriculum(executionYear)
-                            .getRawGrade()).getValue());
+                            row.setCell((executionYear == null && registration.isRegistrationConclusionProcessed() ? registration
+                                    .getRawGrade() : registration.getCurriculum(executionYear).getRawGrade()).getValue());
                             if (bigDecimal == null) {
                                 row.setCell("");
                             } else {

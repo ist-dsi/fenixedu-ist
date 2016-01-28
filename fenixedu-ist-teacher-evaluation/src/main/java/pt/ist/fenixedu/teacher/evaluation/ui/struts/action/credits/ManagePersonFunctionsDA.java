@@ -46,10 +46,14 @@ import pt.ist.fenixframework.FenixFramework;
 @StrutsFunctionality(app = DepartmentCreditsManagerApp.class, path = "person-functions",
         titleKey = "label.managementFunctionNote")
 @Mapping(path = "/managePersonFunctionsShared")
-@Forwards(value = { @Forward(name = "addPersonFunctionShared", path = "/teacher/evaluation/credits/personFunction/addPersonFunctionShared.jsp"),
-        @Forward(name = "addPersonFunction", path = "/teacher/evaluation/credits/personFunction/addPersonFunction.jsp"),
-        @Forward(name = "viewAnnualTeachingCredits", path = "/credits.do?method=viewAnnualTeachingCredits"),
-        @Forward(name = "showDepartmentPersonFunctions", path = "/teacher/evaluation/credits/showDepartmentPersonFunctions.jsp") })
+@Forwards(
+        value = {
+                @Forward(name = "addPersonFunctionShared",
+                        path = "/teacher/evaluation/credits/personFunction/addPersonFunctionShared.jsp"),
+                @Forward(name = "addPersonFunction", path = "/teacher/evaluation/credits/personFunction/addPersonFunction.jsp"),
+                @Forward(name = "viewAnnualTeachingCredits", path = "/credits.do?method=viewAnnualTeachingCredits"),
+                @Forward(name = "showDepartmentPersonFunctions",
+                        path = "/teacher/evaluation/credits/showDepartmentPersonFunctions.jsp") })
 public class ManagePersonFunctionsDA extends FenixDispatchAction {
 
     @EntryPoint

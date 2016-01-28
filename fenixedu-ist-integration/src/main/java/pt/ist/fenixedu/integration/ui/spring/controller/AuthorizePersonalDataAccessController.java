@@ -41,7 +41,8 @@ public class AuthorizePersonalDataAccessController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public String setCandiadteCGDAccess(@RequestParam(required = false) Boolean allowAccess, @RequestParam(required = false) String qs, Model model) {
+    public String setCandiadteCGDAccess(@RequestParam(required = false) Boolean allowAccess,
+            @RequestParam(required = false) String qs, Model model) {
         final boolean authorize = allowAccess != null && allowAccess.booleanValue();
         final CgdCard card = CgdCard.setGrantAccess(authorize);
         if (card != null) {
@@ -49,5 +50,5 @@ public class AuthorizePersonalDataAccessController {
         }
         return "redirect:" + qs;
     }
-    
+
 }

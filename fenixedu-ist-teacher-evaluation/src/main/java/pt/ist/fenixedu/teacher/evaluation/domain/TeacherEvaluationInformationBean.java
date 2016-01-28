@@ -22,17 +22,16 @@ import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
-import org.joda.time.YearMonthDay;
+
+import pt.ist.fenixedu.contracts.domain.organizationalStructure.PersonFunction;
+import pt.ist.fenixedu.teacher.evaluation.service.external.SotisPublications;
+import pt.ist.fenixedu.teacher.evaluation.service.external.SotisPublications.Publication;
 
 import com.google.common.base.Joiner;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
-import pt.ist.fenixedu.contracts.domain.organizationalStructure.PersonFunction;
-import pt.ist.fenixedu.teacher.evaluation.service.external.SotisPublications;
-import pt.ist.fenixedu.teacher.evaluation.service.external.SotisPublications.Publication;
 
 public class TeacherEvaluationInformationBean implements Serializable {
 
@@ -54,18 +53,17 @@ public class TeacherEvaluationInformationBean implements Serializable {
                     new LocalDate(teacherEvaluationProcess.getFacultyEvaluationProcess().getBeginEvaluationYear(), 1, 1);
             LocalDate endDate =
                     new LocalDate(teacherEvaluationProcess.getFacultyEvaluationProcess().getEndEvaluationYear(), 12, 31);
-            setTeacherAuthorization(
-                    teacherEvaluationProcess.getEvaluee().getTeacher()
-                            .getLatestTeacherAuthorizationInInterval(
-                                    new Interval(beginDate.toDateTimeAtStartOfDay(), endDate.toDateTimeAtStartOfDay()))
-                            .orElse(null));
+            setTeacherAuthorization(teacherEvaluationProcess
+                    .getEvaluee()
+                    .getTeacher()
+                    .getLatestTeacherAuthorizationInInterval(
+                            new Interval(beginDate.toDateTimeAtStartOfDay(), endDate.toDateTimeAtStartOfDay())).orElse(null));
 
             for (Professorship professorship : getTeacherEvaluationProcess().getEvaluee().getTeacher().getProfessorships()) {
-                if (professorship.getExecutionCourse().getExecutionPeriod().getBeginLocalDate()
-                        .getYear() >= getTeacherEvaluationProcess().getFacultyEvaluationProcess().getBeginEvaluationYear()
-                        && professorship.getExecutionCourse().getExecutionPeriod().getBeginLocalDate()
-                                .getYear() <= getTeacherEvaluationProcess().getFacultyEvaluationProcess()
-                                        .getEndEvaluationYear()) {
+                if (professorship.getExecutionCourse().getExecutionPeriod().getBeginLocalDate().getYear() >= getTeacherEvaluationProcess()
+                        .getFacultyEvaluationProcess().getBeginEvaluationYear()
+                        && professorship.getExecutionCourse().getExecutionPeriod().getBeginLocalDate().getYear() <= getTeacherEvaluationProcess()
+                                .getFacultyEvaluationProcess().getEndEvaluationYear()) {
                     professorships.addAll(ProfessorshipEvaluationBean.getProfessorshipEvaluationBeanSet(professorship));
                 }
             }
@@ -73,7 +71,8 @@ public class TeacherEvaluationInformationBean implements Serializable {
             for (ThesisEvaluationParticipant participant : teacherEvaluationProcess.getEvaluee()
                     .getThesisEvaluationParticipantsSet()) {
                 Thesis thesis = participant.getThesis();
-                if (thesis.isEvaluated() && thesis.hasFinalEnrolmentEvaluation()
+                if (thesis.isEvaluated()
+                        && thesis.hasFinalEnrolmentEvaluation()
                         && thesis.getDiscussed().getYear() >= getTeacherEvaluationProcess().getFacultyEvaluationProcess()
                                 .getBeginEvaluationYear()
                         && thesis.getDiscussed().getYear() <= getTeacherEvaluationProcess().getFacultyEvaluationProcess()
@@ -87,11 +86,12 @@ public class TeacherEvaluationInformationBean implements Serializable {
 
                         String descrition =
                                 Joiner.on(", ").join(
-                                        BundleUtil.getString("resources.TeacherEvaluationResources",
-                                                participant.getClass().getName() + "."
-                                                        + ThesisParticipationType.PRESIDENT.name()),
-                                participant.getThesis().getTitle(), participant.getThesis().getStudent().getPerson().getName(),
-                                participant.getThesis().getStudent().getNumber(), thesis.getDiscussed().toLocalDate().toString());
+                                        BundleUtil.getString("resources.TeacherEvaluationResources", participant.getClass()
+                                                .getName() + "." + ThesisParticipationType.PRESIDENT.name()),
+                                        participant.getThesis().getTitle(),
+                                        participant.getThesis().getStudent().getPerson().getName(),
+                                        participant.getThesis().getStudent().getNumber(),
+                                        thesis.getDiscussed().toLocalDate().toString());
 
                         functions.add(new OrientationBean(descrition, thesis.getDiscussed().toLocalDate()));
                     }
@@ -113,32 +113,31 @@ public class TeacherEvaluationInformationBean implements Serializable {
                     }
                     ThesisJuryElement thesisJuryElement = getThesisJuryElement(internalPhdParticipant);
                     if (thesisJuryElement != null) {
-                        String descrition = Joiner.on(", ").join(
-                                BundleUtil.getString("resources.TeacherEvaluationResources",
-                                        internalPhdParticipant.getClass().getName() + "."
-                                                + ThesisParticipationType.PRESIDENT.name()),
-                                internalPhdParticipant.getIndividualProcess().getThesisTitle(),
-                                internalPhdParticipant.getIndividualProcess().getStudent().getPerson().getName(),
-                                internalPhdParticipant.getIndividualProcess().getStudent().getNumber(),
-                                internalPhdParticipant.getIndividualProcess().getConclusionDate().toString());
+                        String descrition =
+                                Joiner.on(", ").join(
+                                        BundleUtil.getString("resources.TeacherEvaluationResources", internalPhdParticipant
+                                                .getClass().getName() + "." + ThesisParticipationType.PRESIDENT.name()),
+                                        internalPhdParticipant.getIndividualProcess().getThesisTitle(),
+                                        internalPhdParticipant.getIndividualProcess().getStudent().getPerson().getName(),
+                                        internalPhdParticipant.getIndividualProcess().getStudent().getNumber(),
+                                        internalPhdParticipant.getIndividualProcess().getConclusionDate().toString());
 
-                        functions.add(new OrientationBean(descrition,
-                                internalPhdParticipant.getIndividualProcess().getConclusionDate()));
+                        functions.add(new OrientationBean(descrition, internalPhdParticipant.getIndividualProcess()
+                                .getConclusionDate()));
                     }
                 }
             }
 
             publications.addAll(new SotisPublications().getPublications(getTeacherEvaluationProcess().getEvaluee().getUser(),
-                    teacherEvaluationProcess.getFacultyEvaluationProcess().getBeginEvaluationYear(),
-                    teacherEvaluationProcess.getFacultyEvaluationProcess().getEndEvaluationYear()));
+                    teacherEvaluationProcess.getFacultyEvaluationProcess().getBeginEvaluationYear(), teacherEvaluationProcess
+                            .getFacultyEvaluationProcess().getEndEvaluationYear()));
 
             for (PersonFunction personFunction : (Collection<PersonFunction>) teacherEvaluationProcess.getEvaluee()
                     .getParentAccountabilities(AccountabilityTypeEnum.MANAGEMENT_FUNCTION, PersonFunction.class)) {
                 if (personFunction.getBeginDate().getYear() >= getTeacherEvaluationProcess().getFacultyEvaluationProcess()
                         .getBeginEvaluationYear()
                         && personFunction.getBeginDate().getYear() <= getTeacherEvaluationProcess().getFacultyEvaluationProcess()
-                                .getEndEvaluationYear()
-                        && !personFunction.getFunction().isVirtual()) {
+                                .getEndEvaluationYear() && !personFunction.getFunction().isVirtual()) {
                     functions.add(new OrientationBean(personFunction));
                 }
             }
@@ -252,15 +251,17 @@ public class TeacherEvaluationInformationBean implements Serializable {
         public OrientationBean(ThesisEvaluationParticipant participant) {
             participationType = participant.getClass().getName();
             responsabilityType = participant.getClass().getName() + "." + participant.getType().name();
-            coorientationNumber = (int) participant.getThesis().getParticipationsSet().stream()
-                    .filter(p -> p.getType() == ThesisParticipationType.COORIENTATOR).count();
+            coorientationNumber =
+                    (int) participant.getThesis().getParticipationsSet().stream()
+                            .filter(p -> p.getType() == ThesisParticipationType.COORIENTATOR).count();
             credits = participant.getThesis().getEnrolment().getEctsCredits();
             date = participant.getThesis().getDiscussed().toLocalDate();
-            this.description = Joiner.on(", ")
-                    .join(BundleUtil.getString(Bundle.ENUMERATION, participant.getType().name()) + " ("
-                            + participant.getPercentageDistribution() + "%)", participant.getThesis().getTitle(),
-                    participant.getThesis().getStudent().getPerson().getName(), participant.getThesis().getStudent().getNumber(),
-                    date.toString());
+            this.description =
+                    Joiner.on(", ").join(
+                            BundleUtil.getString(Bundle.ENUMERATION, participant.getType().name()) + " ("
+                                    + participant.getPercentageDistribution() + "%)", participant.getThesis().getTitle(),
+                            participant.getThesis().getStudent().getPerson().getName(),
+                            participant.getThesis().getStudent().getNumber(), date.toString());
         }
 
         public OrientationBean(InternalPhdParticipant internalPhdParticipant) {
@@ -276,19 +277,22 @@ public class TeacherEvaluationInformationBean implements Serializable {
 
             coorientationNumber = internalPhdParticipant.getIndividualProcess().getAssistantGuidingsSet().size();
             date = internalPhdParticipant.getIndividualProcess().getConclusionDate();
-            this.description = Joiner.on(", ").join(internalPhdParticipant.getRoleOnProcess(),
-                    internalPhdParticipant.getIndividualProcess().getThesisTitle(),
-                    internalPhdParticipant.getIndividualProcess().getStudent().getPerson().getName(),
-                    internalPhdParticipant.getIndividualProcess().getStudent().getNumber(), date.toString());
+            this.description =
+                    Joiner.on(", ").join(internalPhdParticipant.getRoleOnProcess(),
+                            internalPhdParticipant.getIndividualProcess().getThesisTitle(),
+                            internalPhdParticipant.getIndividualProcess().getStudent().getPerson().getName(),
+                            internalPhdParticipant.getIndividualProcess().getStudent().getNumber(), date.toString());
         }
 
         public OrientationBean(PersonFunction personFunction) {
             participationType = personFunction.getFunction().getName();
-            credits = MANAGEMENT_FUNCTION_COEFICIENT.multiply(BigDecimal.valueOf(personFunction.getCredits()))
-                    .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+            credits =
+                    MANAGEMENT_FUNCTION_COEFICIENT.multiply(BigDecimal.valueOf(personFunction.getCredits()))
+                            .setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
             date = personFunction.getBeginDate().toLocalDate();
-            this.description = Joiner.on(", ").join(personFunction.getFunction().getName(), personFunction.getUnit().getName(),
-                    personFunction.getBeginDate().toString(), personFunction.getEndDate().toString());
+            this.description =
+                    Joiner.on(", ").join(personFunction.getFunction().getName(), personFunction.getUnit().getName(),
+                            personFunction.getBeginDate().toString(), personFunction.getEndDate().toString());
 
         }
 

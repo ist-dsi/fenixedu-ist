@@ -108,8 +108,8 @@ class ImportPersonContractSituationsFromGiaf extends ImportProcessor {
                 importedButInvalid.add(person);
             }
             if (category == null && (contractSituation == null || contractSituation.getEndSituation() == false)) {
-                logger.debug(
-                        "Empty catefory on a non end situation: " + numberString + " . Situation: " + contractSituationGiafId);
+                logger.debug("Empty catefory on a non end situation: " + numberString + " . Situation: "
+                        + contractSituationGiafId);
                 importedButInvalid.add(person);
             }
 
@@ -186,8 +186,7 @@ class ImportPersonContractSituationsFromGiaf extends ImportProcessor {
         for (GiafProfessionalData giafProfessionalData : Bennu.getInstance().getGiafProfessionalDataSet()) {
             if (giafProfessionalData.getPersonProfessionalData().getPerson() != null) {
                 User user = giafProfessionalData.getPersonProfessionalData().getPerson().getUser();
-                if (giafProfessionalData.getValidPersonContractSituations().stream().filter(pcs -> pcs.isActive(today))
-                        .count() != 0) {
+                if (giafProfessionalData.getValidPersonContractSituations().stream().filter(pcs -> pcs.isActive(today)).count() != 0) {
                     modifications.add(new Modification() {
                         @Override
                         public void execute() {
@@ -235,8 +234,8 @@ class ImportPersonContractSituationsFromGiaf extends ImportProcessor {
                 if (count > 0) {
                     if (count > 1) {
                         logger.debug("---> " + count + " ---> "
-                                + personContractSituation.getGiafProfessionalData().getGiafPersonIdentification() + " Situation: "
-                                + personContractSituation.getContractSituation().getGiafId());
+                                + personContractSituation.getGiafProfessionalData().getGiafPersonIdentification()
+                                + " Situation: " + personContractSituation.getContractSituation().getGiafId());
                     }
                     return count;
                 }

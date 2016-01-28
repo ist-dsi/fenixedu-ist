@@ -17,11 +17,11 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-
 import pt.ist.fenixframework.DomainObject;
 import pt.ist.giaf.client.financialDocuments.InvoiceClient;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 public class GiafInvoice {
 
@@ -40,11 +40,13 @@ public class GiafInvoice {
 
     public static JsonObject createInvoice(final ErrorConsumer<AccountingTransactionDetail> consumer,
             final AccountingTransactionDetail detail, final boolean accountForValue) {
-        return createInvoice(detail, (d) -> Utils.validate(consumer, d), (d) -> Utils.toJson(d, accountForValue, null), (e) -> Utils.idFor(e));
+        return createInvoice(detail, (d) -> Utils.validate(consumer, d), (d) -> Utils.toJson(d, accountForValue, null),
+                (e) -> Utils.idFor(e));
     }
 
     public static JsonObject createInvoiceDiscount(final ErrorConsumer<Event> consumer, final Event event) {
-        return createInvoice(event, (e) -> Utils.validate(consumer, e), (e) -> Utils.toJsonDiscount(event), (e) -> Utils.idForDiscount(e));
+        return createInvoice(event, (e) -> Utils.validate(consumer, e), (e) -> Utils.toJsonDiscount(event),
+                (e) -> Utils.idForDiscount(e));
     }
 
     public static InputStream invoiceStream(final Event event) throws IOException {
@@ -74,7 +76,8 @@ public class GiafInvoice {
         return new FileInputStream(file);
     }
 
-    public static <T extends DomainObject> JsonObject createInvoice(final T t, final Predicate<T> p, final Function<T, JsonObject> f, final Function<T, String> toId) {
+    public static <T extends DomainObject> JsonObject createInvoice(final T t, final Predicate<T> p,
+            final Function<T, JsonObject> f, final Function<T, String> toId) {
         final String id = toId.apply(t);
         final File file = fileForDocumentNumber(id);
         if (!file.exists() && p.test(t)) {
@@ -107,7 +110,7 @@ public class GiafInvoice {
     }
 
     private static void writeFileWithoutFailuer(final Path path, final byte[] content) {
-        for (int c = 0; ; c++) {
+        for (int c = 0;; c++) {
             try {
                 Files.write(path, content);
                 return;
@@ -128,8 +131,7 @@ public class GiafInvoice {
         final JsonElement errorMessage = result.get("errorMessage");
         if (errorMessage != null) {
             final String message = errorMessage.getAsString();
-            if (message.indexOf("PK_2012.GC_FACTURA_DET_I99") > 0
-                    && message.indexOf("unique constraint") > 0
+            if (message.indexOf("PK_2012.GC_FACTURA_DET_I99") > 0 && message.indexOf("unique constraint") > 0
                     && message.indexOf("violated") > 0) {
                 jo.addProperty("id", jo.get("id").getAsString() + "_1");
                 return produceInvoice(jo);

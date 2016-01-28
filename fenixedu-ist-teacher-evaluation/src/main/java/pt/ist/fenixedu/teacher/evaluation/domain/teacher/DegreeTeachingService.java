@@ -71,9 +71,9 @@ public class DegreeTeachingService extends DegreeTeachingService_Base {
     @Override
     public void delete() {
         TeacherCreditsFillingCE.checkValidCreditsPeriod(getTeacherService().getExecutionPeriod(), Authenticate.getUser());
-        new TeacherServiceLog(getTeacherService(), BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.teacher.schedule.delete",
-                getTeacherService().getTeacher().getPerson().getNickname(), getShift().getPresentationName(), getPercentage()
-                        .toString()));
+        new TeacherServiceLog(getTeacherService(), BundleUtil.getString("resources.TeacherCreditsSheetResources",
+                "label.teacher.schedule.delete", getTeacherService().getTeacher().getPerson().getNickname(), getShift()
+                        .getPresentationName(), getPercentage().toString()));
         setTeacherService(null);
         setShift(null);
         setProfessorship(null);

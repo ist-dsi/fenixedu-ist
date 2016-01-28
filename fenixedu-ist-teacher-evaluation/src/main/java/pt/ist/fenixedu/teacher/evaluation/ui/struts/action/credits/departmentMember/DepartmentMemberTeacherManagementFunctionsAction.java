@@ -44,7 +44,8 @@ import pt.ist.fenixedu.contracts.domain.organizationalStructure.PersonFunction;
 @StrutsFunctionality(app = DepartmentMemberTeacherApp.class, path = "management-functions",
         titleKey = "label.teacher.details.functionsInformation")
 @Mapping(path = "/teacherManagementFunctions", module = "departmentMember")
-@Forwards(@Forward(name = "showTeacherCreditsManagementFunctions", path = "/teacher/evaluation/credits/showTeacherCreditsManagementFunctions.jsp"))
+@Forwards(@Forward(name = "showTeacherCreditsManagementFunctions",
+        path = "/teacher/evaluation/credits/showTeacherCreditsManagementFunctions.jsp"))
 public class DepartmentMemberTeacherManagementFunctionsAction extends FenixAction {
 
     @Override

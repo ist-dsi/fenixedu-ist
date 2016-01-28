@@ -27,7 +27,8 @@ import pt.ist.fenixedu.teacher.evaluation.ui.struts.action.credits.ManageDegreeP
 @Mapping(module = "departmentMember", path = "/degreeProjectTutorialService",
         functionality = DepartmentMemberViewTeacherCreditsDA.class)
 @Forwards(value = {
-        @Forward(name = "show-project-tutorial-service", path = "/teacher/evaluation/credits/degreeTeachingService/showProjectTutorialService.jsp"),
+        @Forward(name = "show-project-tutorial-service",
+                path = "/teacher/evaluation/credits/degreeTeachingService/showProjectTutorialService.jsp"),
         @Forward(name = "viewAnnualTeachingCredits", path = "/departmentMember/credits.do?method=viewAnnualTeachingCredits") })
 public class DepartmentMemberManageDegreeProjectTutorialServicesDA extends ManageDegreeProjectTutorialServicesDispatchAction {
 

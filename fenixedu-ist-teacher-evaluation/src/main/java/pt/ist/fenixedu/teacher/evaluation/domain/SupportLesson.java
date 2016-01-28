@@ -110,8 +110,8 @@ public class SupportLesson extends SupportLesson_Base {
     }
 
     private Interval getInterval() {
-        return new Interval(getStartTimeHourMinuteSecond().toLocalTime().toDateTimeToday(),
-                getEndTimeHourMinuteSecond().toLocalTime().toDateTimeToday());
+        return new Interval(getStartTimeHourMinuteSecond().toLocalTime().toDateTimeToday(), getEndTimeHourMinuteSecond()
+                .toLocalTime().toDateTimeToday());
     }
 
     @Override
@@ -175,8 +175,9 @@ public class SupportLesson extends SupportLesson_Base {
     }
 
     private void addLog(String key) {
-        TeacherService teacherService = TeacherService.getTeacherService(getProfessorship().getTeacher(),
-                getProfessorship().getExecutionCourse().getExecutionPeriod());
+        TeacherService teacherService =
+                TeacherService.getTeacherService(getProfessorship().getTeacher(), getProfessorship().getExecutionCourse()
+                        .getExecutionPeriod());
 
         final StringBuilder log = new StringBuilder();
         log.append(BundleUtil.getString("resources.TeacherCreditsSheetResources", key));

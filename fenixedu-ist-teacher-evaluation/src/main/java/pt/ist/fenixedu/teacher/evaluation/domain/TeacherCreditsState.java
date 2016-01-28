@@ -23,8 +23,6 @@ import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.joda.time.DateTime;
 
-import pt.ist.fenixedu.teacher.evaluation.domain.CreditsState;
-
 public class TeacherCreditsState extends TeacherCreditsState_Base {
 
     public TeacherCreditsState(ExecutionSemester executionSemester) {

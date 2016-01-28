@@ -96,8 +96,8 @@ class ImportPersonFunctionsAccumulationsFromGiaf extends ImportProcessor {
             final String functionsAccumulationGiafId = result.getString("TIPO");
             final FunctionsAccumulation functionsAccumulation = metadata.accumulation(functionsAccumulationGiafId);
             if (functionsAccumulation == null) {
-                logger.debug(
-                        "Empty FunctionsAccumulation: " + functionsAccumulationGiafId + " for person number: " + numberString);
+                logger.debug("Empty FunctionsAccumulation: " + functionsAccumulationGiafId + " for person number: "
+                        + numberString);
                 importedButInvalid.add(person);
             }
             String beginDateString = result.getString("DATA_INICIO");
@@ -280,10 +280,8 @@ class ImportPersonFunctionsAccumulationsFromGiaf extends ImportProcessor {
 
     private boolean hasPersonFunctionsAccumulations(GiafProfessionalData giafProfessionalData, LocalDate beginDate,
             LocalDate endDate, BigDecimal hours, FunctionsAccumulation functionsAccumulation, String functionsAccumulationGiafId,
-            ProfessionalRegime professionalRegime, String professionalRegimeGiafId, DateTime creationDate,
-            DateTime modifiedDate) {
-        for (PersonFunctionsAccumulation personFunctionsAccumulation : giafProfessionalData
-                .getPersonFunctionsAccumulationsSet()) {
+            ProfessionalRegime professionalRegime, String professionalRegimeGiafId, DateTime creationDate, DateTime modifiedDate) {
+        for (PersonFunctionsAccumulation personFunctionsAccumulation : giafProfessionalData.getPersonFunctionsAccumulationsSet()) {
             if (personFunctionsAccumulation.getAnulationDate() == null) {
                 if (Objects.equals(beginDate, personFunctionsAccumulation.getBeginDate())
                         && Objects.equals(endDate, personFunctionsAccumulation.getEndDate())

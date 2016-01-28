@@ -18,15 +18,16 @@ import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-
 import pt.ist.fenixedu.giaf.invoices.DebtCycleType;
 import pt.ist.fenixedu.giaf.invoices.GiafInvoice;
 import pt.ist.fenixedu.giaf.invoices.Utils;
 
-@SpringApplication(group = "logged", path = "giaf-invoice-viewer", title = "title.giaf.invoice.viewer", hint = "giaf-invoice-viewer")
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+@SpringApplication(group = "logged", path = "giaf-invoice-viewer", title = "title.giaf.invoice.viewer",
+        hint = "giaf-invoice-viewer")
 @SpringFunctionality(app = InvoiceController.class, title = "title.giaf.invoice.viewer")
 @RequestMapping("/giaf-invoice-viewer")
 public class InvoiceController {
@@ -36,12 +37,9 @@ public class InvoiceController {
         final User user = Authenticate.getUser();
         final Person person = user.getPerson();
 
-        final JsonArray details = person.getEventsSet().stream()
-            .flatMap(e -> e.getAccountingTransactionsSet().stream())
-            .map(tx -> tx.getTransactionDetail())
-            .map(this::toJson)
-            .collect(toJsonArray())
-            ;
+        final JsonArray details =
+                person.getEventsSet().stream().flatMap(e -> e.getAccountingTransactionsSet().stream())
+                        .map(tx -> tx.getTransactionDetail()).map(this::toJson).collect(toJsonArray());
         model.addAttribute("details", details);
 
         return "giaf-invoice-viewer/home";

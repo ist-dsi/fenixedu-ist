@@ -3,7 +3,6 @@ package pt.ist.fenixedu.giaf.invoices.task;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -26,10 +25,6 @@ import org.fenixedu.commons.spreadsheet.Spreadsheet.Row;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-
 import pt.ist.fenixedu.giaf.invoices.DebtCycleType;
 import pt.ist.fenixedu.giaf.invoices.ErrorConsumer;
 import pt.ist.fenixedu.giaf.invoices.EventWrapper;
@@ -37,6 +32,10 @@ import pt.ist.fenixedu.giaf.invoices.GiafInvoice;
 import pt.ist.fenixedu.giaf.invoices.Json2Csv;
 import pt.ist.fenixedu.giaf.invoices.Utils;
 import pt.ist.giaf.client.financialDocuments.ClientClient;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 public class CreateInvoiceReceipts extends CustomTask {
 
@@ -73,11 +72,8 @@ public class CreateInvoiceReceipts extends CustomTask {
         try (final Json2Csv log = new Json2Csv(outputFileName(), "\t")) {
             final int year = 2015;
             final Stream<AccountingTransactionDetail> stream = Bennu.getInstance().getAccountingTransactionDetailsSet().stream();
-            stream
-                .filter(atd -> atd.getWhenRegistered().getYear() == year)
-                .filter(this::needsProcessing)
-                .filter(atd -> Utils.validate(consumer, atd))
-                .forEach(d -> process(d, consumer, log, eventsByInvoiceNumber));
+            stream.filter(atd -> atd.getWhenRegistered().getYear() == year).filter(this::needsProcessing)
+                    .filter(atd -> Utils.validate(consumer, atd)).forEach(d -> process(d, consumer, log, eventsByInvoiceNumber));
 
             taskLog("Competed processing normal invoices.");
 
@@ -116,26 +112,23 @@ public class CreateInvoiceReceipts extends CustomTask {
         return GiafInvoice.fileForDocument(id).exists();
     }
 
-    private void process(final AccountingTransactionDetail detail, final ErrorConsumer<AccountingTransactionDetail> consumer, final Json2Csv log,
-            final Map<String, EventWrapper> eventsByInvoiceNumber) {
+    private void process(final AccountingTransactionDetail detail, final ErrorConsumer<AccountingTransactionDetail> consumer,
+            final Json2Csv log, final Map<String, EventWrapper> eventsByInvoiceNumber) {
         final boolean accountForValue = accountForValue(detail);
 
         ClientClient.createClient(Utils.toJson(detail.getEvent().getPerson()));
         try {
-            final JsonObject jo = GiafInvoice.createInvoice(consumer, detail, (d) -> toJson(d, accountForValue, eventsByInvoiceNumber));
+            final JsonObject jo =
+                    GiafInvoice.createInvoice(consumer, detail, (d) -> toJson(d, accountForValue, eventsByInvoiceNumber));
             if (jo != null) {
                 log.write(jo, true);
             }
         } catch (final Error e) {
             final String message = e.getMessage();
-            if (message.indexOf("PK_2012.GC_FACTURA_DET_I99") > 0
-                    && message.indexOf("unique constraint") > 0
-                    && message.indexOf("violated") > 0
-                    ) {
+            if (message.indexOf("PK_2012.GC_FACTURA_DET_I99") > 0 && message.indexOf("unique constraint") > 0
+                    && message.indexOf("violated") > 0) {
                 taskLog("Skipping event: %s because: %s%n", detail.getExternalId(), message);
-            } else if (message.indexOf("Cdigo de Entidade ") >= 0
-                    && message.indexOf(" invlido/inexistente!") > 0
-                    ) {
+            } else if (message.indexOf("Cdigo de Entidade ") >= 0 && message.indexOf(" invlido/inexistente!") > 0) {
                 taskLog("Skipping event: %s because: %s%n", detail.getExternalId(), message);
             } else {
                 throw e;
@@ -226,7 +219,8 @@ public class CreateInvoiceReceipts extends CustomTask {
         ew.overPayments.forEach((at, m) -> generateOverPaymentStuff(at, m, ew.dueDate, log, logEvents));
     }
 
-    private void generateOverPaymentStuff(final AccountingTransaction tx, final Money v, final LocalDate dueDate, final Json2Csv log, final Json2Csv logEvents) {
+    private void generateOverPaymentStuff(final AccountingTransaction tx, final Money v, final LocalDate dueDate,
+            final Json2Csv log, final Json2Csv logEvents) {
         final JsonObject joEvent = Utils.toJsonEventForOverpayment(tx, v, dueDate);
         final Function<AccountingTransaction, String> toEventId = (atx) -> joEvent.get("id").getAsString();
         try {
@@ -236,14 +230,10 @@ public class CreateInvoiceReceipts extends CustomTask {
             }
         } catch (final Error e) {
             final String message = e.getMessage();
-            if (message.indexOf("PK_2012.GC_FACTURA_DET_I99") > 0
-                    && message.indexOf("unique constraint") > 0
-                    && message.indexOf("violated") > 0
-                    ) {
+            if (message.indexOf("PK_2012.GC_FACTURA_DET_I99") > 0 && message.indexOf("unique constraint") > 0
+                    && message.indexOf("violated") > 0) {
                 taskLog("Skipping event: %s because: %s%n", tx.getExternalId(), message);
-            } else if (message.indexOf("Cdigo de Entidade ") >= 0
-                    && message.indexOf(" invlido/inexistente!") > 0
-                    ) {
+            } else if (message.indexOf("Cdigo de Entidade ") >= 0 && message.indexOf(" invlido/inexistente!") > 0) {
                 taskLog("Skipping event: %s because: %s%n", tx.getExternalId(), message);
             } else {
                 throw e;
@@ -253,7 +243,8 @@ public class CreateInvoiceReceipts extends CustomTask {
         final String invoiceId = readInvoiceId(toEventId.apply(tx));
         if (invoiceId != null && !invoiceId.isEmpty()) {
             final JsonObject joTx = Utils.toJsonOverpayment(tx, v, dueDate, invoiceId);
-            final Function<AccountingTransaction, String> toId = (atx) -> atx.getEvent().getExternalId() + "_" + atx.getExternalId();
+            final Function<AccountingTransaction, String> toId =
+                    (atx) -> atx.getEvent().getExternalId() + "_" + atx.getExternalId();
             try {
                 final JsonObject jo = GiafInvoice.createInvoice(tx, (atx) -> true, (atx) -> joTx, toId);
                 if (jo != null) {
@@ -261,14 +252,10 @@ public class CreateInvoiceReceipts extends CustomTask {
                 }
             } catch (final Error e) {
                 final String message = e.getMessage();
-                if (message.indexOf("PK_2012.GC_FACTURA_DET_I99") > 0
-                        && message.indexOf("unique constraint") > 0
-                        && message.indexOf("violated") > 0
-                        ) {
+                if (message.indexOf("PK_2012.GC_FACTURA_DET_I99") > 0 && message.indexOf("unique constraint") > 0
+                        && message.indexOf("violated") > 0) {
                     taskLog("Skipping event: %s because: %s%n", tx.getExternalId(), message);
-                } else if (message.indexOf("Cdigo de Entidade ") >= 0
-                        && message.indexOf(" invlido/inexistente!") > 0
-                        ) {
+                } else if (message.indexOf("Cdigo de Entidade ") >= 0 && message.indexOf(" invlido/inexistente!") > 0) {
                     taskLog("Skipping event: %s because: %s%n", tx.getExternalId(), message);
                 } else {
                     throw e;
