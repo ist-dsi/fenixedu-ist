@@ -276,9 +276,7 @@ public class StudentInquiryBean implements Serializable {
             for (InquiryGroupQuestionBean groupQuestionBean : inquiryBlockDTO.getInquiryGroups()) {
                 for (InquiryQuestionDTO questionDTO : groupQuestionBean.getInquiryQuestions()) {
                     if (!StringUtils.isEmpty(questionDTO.getResponseValue())) {
-                        QuestionAnswer questionAnswer =
-                                new QuestionAnswer(inquiryCourseAnswer, questionDTO.getInquiryQuestion(),
-                                        questionDTO.getFinalValue());
+                        new QuestionAnswer(inquiryCourseAnswer, questionDTO.getInquiryQuestion(), questionDTO.getFinalValue());
                     }
                 }
             }
@@ -297,9 +295,8 @@ public class StudentInquiryBean implements Serializable {
                     for (InquiryBlockDTO inquiryBlockDTO : teacherInquiryBean.getTeacherInquiryBlocks()) {
                         for (InquiryGroupQuestionBean groupQuestionBean : inquiryBlockDTO.getInquiryGroups()) {
                             for (InquiryQuestionDTO questionDTO : groupQuestionBean.getInquiryQuestions()) {
-                                QuestionAnswer questionAnswer =
-                                        new QuestionAnswer(inquiryTeacherAnswer, questionDTO.getInquiryQuestion(),
-                                                questionDTO.getFinalValue());
+                                new QuestionAnswer(inquiryTeacherAnswer, questionDTO.getInquiryQuestion(),
+                                        questionDTO.getFinalValue());
                             }
                         }
                     }

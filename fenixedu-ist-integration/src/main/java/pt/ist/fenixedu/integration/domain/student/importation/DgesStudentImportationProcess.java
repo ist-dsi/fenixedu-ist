@@ -190,8 +190,6 @@ public class DgesStudentImportationProcess extends DgesStudentImportationProcess
     private void createDegreeCandidacies(final PrintWriter LOG_WRITER, final Employee employee,
             final List<DegreeCandidateDTO> degreeCandidateDTOs) {
         int processed = 0;
-        int personsCreated = 0;
-
         for (final DegreeCandidateDTO degreeCandidateDTO : degreeCandidateDTOs) {
 
             if (++processed % 150 == 0) {
@@ -212,7 +210,6 @@ public class DgesStudentImportationProcess extends DgesStudentImportationProcess
             } catch (DegreeCandidateDTO.NotFoundPersonException e) {
                 person = degreeCandidateDTO.createPerson();
                 logCreatedPerson(LOG_WRITER, person);
-                personsCreated++;
             } catch (DegreeCandidateDTO.TooManyMatchedPersonsException e) {
                 logTooManyMatchsForCandidate(LOG_WRITER, degreeCandidateDTO);
                 continue;

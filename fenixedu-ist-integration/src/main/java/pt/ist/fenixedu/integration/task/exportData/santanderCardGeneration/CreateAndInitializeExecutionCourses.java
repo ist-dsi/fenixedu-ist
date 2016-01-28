@@ -398,7 +398,6 @@ public class CreateAndInitializeExecutionCourses extends CustomTask {
 
         final ExecutionCourse executionCourse = lesson.getExecutionCourse();
         final YearMonthDay firstPossibleLessonDay = executionCourse.getMaxLessonsPeriod().getLeft();
-        final YearMonthDay lastPossibleLessonDay = executionCourse.getMaxLessonsPeriod().getRight();
         for (final Interval interval : lesson.getAllLessonIntervals()) {
             final Integer week = Weeks.weeksBetween(firstPossibleLessonDay, interval.getStart().toLocalDate()).getWeeks() + 1;
             weeks.add(week);

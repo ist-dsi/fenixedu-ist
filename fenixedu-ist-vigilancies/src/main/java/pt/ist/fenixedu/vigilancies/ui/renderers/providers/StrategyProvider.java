@@ -19,7 +19,6 @@
 package pt.ist.fenixedu.vigilancies.ui.renderers.providers;
 
 import java.util.ArrayList;
-import java.util.Set;
 
 import pt.ist.fenixWebFramework.renderers.DataProvider;
 import pt.ist.fenixWebFramework.renderers.components.converters.Converter;
@@ -31,7 +30,6 @@ public class StrategyProvider implements DataProvider {
     public Object provide(Object source, Object currentValue) {
 
         StrategyFactory factory = StrategyFactory.getInstance();
-        Set<String> availableStrategies = factory.getAvailableStrategies();
 
         return new ArrayList<String>(factory.getAvailableStrategies());
 

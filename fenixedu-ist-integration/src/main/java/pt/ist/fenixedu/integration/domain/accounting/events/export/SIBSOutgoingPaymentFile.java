@@ -379,10 +379,7 @@ public class SIBSOutgoingPaymentFile extends SIBSOutgoingPaymentFile_Base {
                     DgesStudentImportationProcess.readDoneJobs(ExecutionYear.readCurrentExecutionYear());
 
             for (DgesStudentImportationProcess process : processList) {
-                int i = 0;
                 for (StudentCandidacy studentCandidacy : process.getStudentCandidacySet()) {
-                    i++;
-
                     for (PaymentCode paymentCode : studentCandidacy.getAvailablePaymentCodesSet()) {
                         try {
                             if (paymentCode.isCancelled()) {

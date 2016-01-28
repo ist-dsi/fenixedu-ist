@@ -192,9 +192,7 @@ public class UnitSiteManagementController {
         private Boolean showBanner;
         private String color;
         private MultipartFile mainImage;
-        private MultipartFile backgroundImage;
         private String mainImageUrl;
-        private String backgroundImageUrl;
         private Post post;
         private String bannerUrl;
 
@@ -210,7 +208,6 @@ public class UnitSiteManagementController {
             this.showBanner = post.getMetadata().getAsBoolean("showBanner").orElse(true);
             this.color = post.getMetadata().getAsString("color").orElse("white");
             this.mainImageUrl = post.getMetadata().getAsString("mainImage").orElse(null);
-            this.backgroundImageUrl = post.getMetadata().getAsString("backgroundImage").orElse(null);
             this.bannerUrl = post.getMetadata().getAsString("link").orElse(null);
         }
 

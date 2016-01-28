@@ -35,10 +35,7 @@ import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.commons.spreadsheet.Spreadsheet;
 import org.fenixedu.commons.spreadsheet.Spreadsheet.Row;
 import org.joda.time.Interval;
-import org.joda.time.PeriodType;
-import org.joda.time.YearMonthDay;
 
-import pt.ist.fenixedu.contracts.domain.organizationalStructure.Contract;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.GiafProfessionalData;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonContractSituation;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalData;
@@ -197,17 +194,6 @@ public class TeacherCreditsReportFile extends TeacherCreditsReportFile_Base {
                 giafProfessionalData != null ? giafProfessionalData.getPersonProfessionalData() : null;
         return personProfessionalData != null ? personProfessionalData.getDominantProfessionalRegime(giafProfessionalData,
                 interval, CategoryType.TEACHER) : null;
-    }
-
-    private int getDaysIn(Contract contract, ExecutionSemester executionSemester) {
-        YearMonthDay begin =
-                contract.getBeginDate().isBefore(executionSemester.getBeginDateYearMonthDay()) ? executionSemester
-                        .getBeginDateYearMonthDay() : contract.getBeginDate();
-        YearMonthDay end =
-                contract.getEndDate() == null || contract.getEndDate().isAfter(executionSemester.getEndDateYearMonthDay()) ? executionSemester
-                        .getEndDateYearMonthDay() : contract.getEndDate();
-        return new Interval(begin.toLocalDate().toDateTimeAtStartOfDay(), end.toLocalDate().toDateTimeAtStartOfDay()).toPeriod(
-                PeriodType.days()).getDays() + 1;
     }
 
     private String getOthersDesciption(TeacherService teacherService) {

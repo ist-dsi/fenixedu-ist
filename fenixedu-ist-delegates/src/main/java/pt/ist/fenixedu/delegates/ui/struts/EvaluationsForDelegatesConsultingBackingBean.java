@@ -44,7 +44,6 @@ import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Project;
 import org.fenixedu.academic.domain.WrittenEvaluation;
-import org.fenixedu.academic.domain.WrittenTest;
 import org.fenixedu.academic.ui.faces.bean.base.FenixBackingBean;
 import org.fenixedu.academic.ui.faces.components.util.CalendarLink;
 import org.fenixedu.academic.util.Bundle;
@@ -57,8 +56,6 @@ import pt.ist.fenixframework.FenixFramework;
 public class EvaluationsForDelegatesConsultingBackingBean extends FenixBackingBean {
 
     private static final MessageResources messages = MessageResources.getMessageResources(Bundle.DELEGATE);
-
-    private static final DateFormat yearFormat = new SimpleDateFormat("yyyy");
 
     private static final DateFormat hourFormat = new SimpleDateFormat("HH:mm");
 
@@ -306,20 +303,6 @@ public class EvaluationsForDelegatesConsultingBackingBean extends FenixBackingBe
         stringBuilder.append(hourFormat.format(time));
         stringBuilder.append(") ");
         stringBuilder.append(tail);
-        return stringBuilder.toString();
-    }
-
-    private String constructCalendarPresentation(final ExecutionCourse executionCourse, final WrittenEvaluation writtenEvaluation) {
-        final StringBuilder stringBuilder = new StringBuilder();
-        if (writtenEvaluation instanceof WrittenTest) {
-            stringBuilder.append(messages.getMessage("label.evaluation.shortname.test"));
-        } else if (writtenEvaluation instanceof Exam) {
-            stringBuilder.append(messages.getMessage("label.evaluation.shortname.exam"));
-        }
-        stringBuilder.append(executionCourse.getSigla());
-        stringBuilder.append(" (");
-        stringBuilder.append(hourFormat.format(writtenEvaluation.getBeginningDate()));
-        stringBuilder.append(")");
         return stringBuilder.toString();
     }
 

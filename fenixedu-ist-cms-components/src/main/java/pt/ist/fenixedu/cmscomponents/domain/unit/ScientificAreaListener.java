@@ -23,7 +23,6 @@ import static org.fenixedu.cms.domain.component.Component.forType;
 
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.bennu.core.domain.User;
-import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.cms.domain.Menu;
 import org.fenixedu.cms.domain.Page;
@@ -43,10 +42,6 @@ import pt.ist.fenixedu.cmscomponents.domain.unit.components.UnitTeachersComponen
 public class ScientificAreaListener {
     private static final String BUNDLE = "resources.FenixEduLearningResources";
     private static final LocalizedString MENU_TITLE = getLocalizedString("resources.FenixEduLearningResources", "label.menu");
-    private static final LocalizedString ANNOUNCEMENTS_TITLE = getLocalizedString(BUNDLE, "label.announcements");
-    private static final LocalizedString EVENTS_TITLE = getLocalizedString(BUNDLE, "label.events");
-    private static final LocalizedString HOMEPAGE_TITLE = BundleUtil.getLocalizedString(BUNDLE, "researchUnit.homepage");
-    private static final LocalizedString VIEW_POST_TITLE = getLocalizedString(BUNDLE, "label.viewPost");
     private static final LocalizedString TITLE_EMPLOYEES = getLocalizedString(BUNDLE, "department.staff");
     private static final LocalizedString TITLE_TEACHERS = getLocalizedString(BUNDLE, "department.faculty");
     private static final LocalizedString TITLE_SUBUNITS = getLocalizedString(BUNDLE, "researchUnit.subunits");

@@ -217,15 +217,6 @@ public class A3ESDegreeProcess implements Serializable {
         return result;
     }
 
-    private Set<ExecutionYear> getSelectedExecutionYears() {
-        Set<ExecutionYear> result = new HashSet<ExecutionYear>();
-        if (getExecutionSemester() != null) {
-            result.add(getExecutionSemester().getExecutionYear());
-            result.add(getExecutionSemester().getPreviousExecutionPeriod().getExecutionYear());
-        }
-        return result;
-    }
-
     public List<String> uploadCompetenceCourses() {
         List<String> output = new ArrayList<String>();
         for (Object object : invoke(webResource().path(API_FOLDER).queryParam("formId", formId))) {
@@ -318,7 +309,6 @@ public class A3ESDegreeProcess implements Serializable {
                 json.put("q-6.2.1.1", competence.getName(executionSemester));
                 json.put("q-6.2.1.2", cut("Docente responsavel", getTeachersAndTeachingHours(course, true), output, 100));
 
-                JSONObject q6213 = new JSONObject();
                 String teachersAndTeachingHours = getTeachersAndTeachingHours(course, false);
                 json.put("q-6.2.1.3", teachersAndTeachingHours);
 

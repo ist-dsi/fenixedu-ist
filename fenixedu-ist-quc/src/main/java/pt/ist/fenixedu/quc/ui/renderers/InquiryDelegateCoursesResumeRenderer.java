@@ -71,7 +71,7 @@ public class InquiryDelegateCoursesResumeRenderer extends InquiryBlocksResumeRen
         HtmlMenu menu = new HtmlMenu();
         menu.setOnChange("var value=this.options[this.selectedIndex].value; this.selectedIndex=0; if(value!= ''){ window.open(value,'_blank'); }");
         menu.setStyle("width: 150px");
-        HtmlMenuOption optionEmpty = menu.createOption("-- Ver resultados --");
+        menu.createOption("-- Ver resultados --");
         HtmlMenuOption optionUC = menu.createOption("Resultados UC");
         String calculatedUrl = link.calculateUrl();
 

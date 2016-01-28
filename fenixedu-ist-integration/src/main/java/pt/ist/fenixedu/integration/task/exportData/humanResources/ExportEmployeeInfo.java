@@ -6,8 +6,6 @@ import java.lang.reflect.Method;
 
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.Teacher;
-import org.fenixedu.academic.domain.TeacherAuthorization;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
@@ -37,9 +35,6 @@ public class ExportEmployeeInfo extends CustomTask {
         for (final User user : Bennu.getInstance().getUserSet()) {
             final Person person = user.getPerson();
             if (person != null && user.getProfile() != null) {
-                final Teacher teacher = person.getTeacher();
-                final TeacherAuthorization authorization =
-                        teacher == null ? null : teacher.getTeacherAuthorization().orElse(null);
                 final Employee employee = person.getEmployee();
                 final Researcher researcher = person.getResearcher();
                 if (employee != null && isActiveContractedTeacher(person)) {

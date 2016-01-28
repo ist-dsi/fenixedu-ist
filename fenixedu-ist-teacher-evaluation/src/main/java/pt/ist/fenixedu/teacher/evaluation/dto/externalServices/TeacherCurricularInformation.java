@@ -254,47 +254,6 @@ public class TeacherCurricularInformation implements Serializable {
         return top5;
     }
 
-    private static String formatParticipant(String name) {
-        String[] parts = name.split("\\s+");
-        return name.charAt(0) + ". " + parts[parts.length - 1];
-    }
-
-    private String filter(String... text) {
-        Set<String> parts = new HashSet<String>();
-        for (String string : text) {
-            if (StringUtils.isNotBlank(string)) {
-                parts.add(string.replace('\n', ' ').replace('\r', ' ').trim());
-            }
-        }
-        return StringUtils.join(parts, ", ");
-    }
-
-    private String join(String journal, String volume, Integer year) {
-        StringBuilder builder = new StringBuilder();
-        if (StringUtils.isNotBlank(journal)) {
-            builder.append(journal);
-        }
-        if (StringUtils.isNotBlank(volume)) {
-            builder.append(" - " + volume);
-        }
-        if (year != null) {
-            builder.append(" " + year);
-        }
-        return builder.toString();
-    }
-
-    private void insert(List<String> publication, Integer part) {
-        if (part != null) {
-            publication.add(Integer.toString(part));
-        }
-    }
-
-    private void insert(List<String> publication, String part) {
-        if (StringUtils.isNotBlank(part)) {
-            publication.add(part);
-        }
-    }
-
     public void setlecturedUCs() {
         for (ExecutionSemester executionSemester : executionSemesters) {
             for (Professorship professorship : teacher.getProfessorships(executionSemester)) {

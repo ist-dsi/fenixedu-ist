@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.Degree;
-import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.bennu.core.domain.User;
@@ -80,12 +79,10 @@ public class DegreeDelegate extends DegreeDelegate_Base {
 
     @Override
     public List<CurricularCourse> getDelegateCourses() {
-        ExecutionCourse ec;
         ExecutionYear executionYearByDate = ExecutionYear.getExecutionYearByDate(getStart().toYearMonthDay());
 
         return getDegree().getDegreeCurricularPlansForYear(executionYearByDate).stream()
                 .flatMap(p -> p.getCurricularCoursesSet().stream()).distinct().collect(Collectors.toList());
-
     }
 
     @Override

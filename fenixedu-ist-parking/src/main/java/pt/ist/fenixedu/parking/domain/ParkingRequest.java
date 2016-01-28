@@ -45,9 +45,6 @@ import pt.ist.fenixframework.FenixFramework;
 import com.google.common.io.ByteStreams;
 
 public class ParkingRequest extends ParkingRequest_Base {
-
-    private static final Logger logger = LoggerFactory.getLogger(ParkingRequest.class);
-
     public ParkingRequest(ParkingRequestFactoryCreator creator) {
         super();
         setRootDomainObject(Bennu.getInstance());
@@ -114,9 +111,6 @@ public class ParkingRequest extends ParkingRequest_Base {
     }
 
     public static abstract class ParkingRequestFactory implements Serializable, FactoryExecutor {
-
-        private static final Logger logger = LoggerFactory.getLogger(ParkingRequest.ParkingRequestFactory.class);
-
         private ParkingParty parkingParty;
 
         private String firstVechicleID;

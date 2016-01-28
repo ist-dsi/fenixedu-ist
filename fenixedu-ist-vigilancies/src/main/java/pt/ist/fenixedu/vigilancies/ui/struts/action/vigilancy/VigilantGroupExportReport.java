@@ -50,7 +50,6 @@ public class VigilantGroupExportReport extends VigilantGroupManagement {
         response.setContentType("text/plain");
         response.setHeader("Content-disposition", "attachment; filename=\"" + group.getName() + ".xls\"");
 
-        List<WrittenEvaluationVigilancyView> beans = getStatsViewForVigilantGroup(group);
         Boolean withNames = Boolean.valueOf(request.getParameter("showVigilants"));
         final Spreadsheet spreadsheet = getSpreadsheet(withNames);
 

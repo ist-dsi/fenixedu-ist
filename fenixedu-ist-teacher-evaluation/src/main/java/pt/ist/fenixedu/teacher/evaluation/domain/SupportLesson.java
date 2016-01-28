@@ -123,11 +123,6 @@ public class SupportLesson extends SupportLesson_Base {
         super.setPlace(place);
     }
 
-    private SupportLesson() {
-        super();
-        setRootDomainObject(Bennu.getInstance());
-    }
-
     @Atomic
     public void delete() {
         TeacherCreditsFillingCE.checkValidCreditsPeriod(getProfessorship().getExecutionCourse().getExecutionPeriod(),

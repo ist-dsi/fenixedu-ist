@@ -64,8 +64,6 @@ import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
 import org.fenixedu.bennu.struts.portal.EntryPoint;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
 import pt.ist.fenixedu.integration.domain.student.evaluation.PreBolognaEvaluationManagement;
@@ -90,9 +88,6 @@ import pt.ist.fenixframework.FenixFramework;
                 path = "/academicAdministration/curriculumValidation/viewPreBolognaRegistrationDetails.jsp"),
         @Forward(name = "search", path = "/academicAdministration/curriculumValidation/searchStudents.jsp") })
 public class AcademicAdminOfficeCurriculumValidationDA extends FenixDispatchAction {
-
-    private static final Logger logger = LoggerFactory.getLogger(AcademicAdminOfficeCurriculumValidationDA.class);
-
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
             HttpServletResponse response) throws Exception {
@@ -273,7 +268,6 @@ public class AcademicAdminOfficeCurriculumValidationDA extends FenixDispatchActi
         List<List<MarkSheetEnrolmentEvaluationBean>> evaluationsList = getCurriculumEntries();
 
         StudentCurricularPlan studentCurricularPlan = readStudentCurricularPlan(request);
-        ExecutionSemester selectedSemester = readExecutionSemester(request);
 
         try {
             studentCurricularPlan.setEvaluationsForCurriculumValidation(evaluationsList);
@@ -321,7 +315,6 @@ public class AcademicAdminOfficeCurriculumValidationDA extends FenixDispatchActi
 
             StudentCurricularPlan studentCurricularPlan = readStudentCurricularPlan(request);
 
-            ExecutionSemester executionSemester = readExecutionSemester(request);
             studentCurricularPlan.setEvaluationsForCurriculumValidation(evaluationsList);
 
             return prepareSetEvaluations(mapping, actionForm, request, response);
@@ -416,10 +409,6 @@ public class AcademicAdminOfficeCurriculumValidationDA extends FenixDispatchActi
 
         request.setAttribute("registrationConclusionBean", buildRegistrationConclusionBean(registration));
         return mapping.findForward("registrationConclusion");
-    }
-
-    private RegistrationConclusionBean getRegistrationConclusionBeanFromViewState() {
-        return (RegistrationConclusionBean) getObjectFromViewState("registrationConclusionBean");
     }
 
     public ActionForward doRegistrationConclusion(ActionMapping mapping, ActionForm form, HttpServletRequest request,

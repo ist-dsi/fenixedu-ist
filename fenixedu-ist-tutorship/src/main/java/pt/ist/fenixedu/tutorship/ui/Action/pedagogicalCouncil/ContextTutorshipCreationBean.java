@@ -209,7 +209,6 @@ public class ContextTutorshipCreationBean implements Serializable {
                 for (final ExecutionCourse executionCourse : course.getAssociatedExecutionCoursesSet()) {
                     if (executionSemester == executionCourse.getExecutionPeriod()) {
                         for (final DegreeModuleScope scope : course.getDegreeModuleScopes()) {
-                            String fields[] = execYear.getYear().split("/");
                             if (scope.isActiveForExecutionPeriod(executionSemester) && scope.isActiveForExecutionYear(execYear)
                                     && scope.getCurricularSemester() == executionSemester.getSemester()
                                     && scope.getCurricularYear() == YEAR) {

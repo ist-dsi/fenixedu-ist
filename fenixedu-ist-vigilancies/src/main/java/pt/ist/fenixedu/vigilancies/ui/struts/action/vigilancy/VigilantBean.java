@@ -21,7 +21,6 @@ package pt.ist.fenixedu.vigilancies.ui.struts.action.vigilancy;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 
 import org.fenixedu.academic.domain.ExecutionYear;
@@ -58,8 +57,6 @@ public class VigilantBean implements Serializable {
     private boolean showOwnVigilancies = Boolean.FALSE;
 
     public List<Vigilancy> activeOtherCourseVigilancies;
-
-    private final HashMap<String, String> schemas = new HashMap<String, String>();
 
     public boolean isShowStartPoints() {
         return showStartPoints;

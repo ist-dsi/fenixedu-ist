@@ -45,7 +45,6 @@ import pt.ist.fenixedu.quc.domain.InquiryRegentAnswer;
 import pt.ist.fenixedu.quc.domain.InquiryTeacherAnswer;
 import pt.ist.fenixedu.quc.domain.RegentInquiryTemplate;
 import pt.ist.fenixedu.quc.domain.TeacherInquiryTemplate;
-import pt.ist.fenixedu.quc.dto.CoordinatorInquiryBean;
 import pt.ist.fenixedu.quc.dto.InquiryBlockDTO;
 import pt.ist.fenixframework.FenixFramework;
 
@@ -69,10 +68,6 @@ public class ViewQUCInquiryAnswers extends FenixDispatchAction {
             inquiryCoordinatorAnswer = InquiryCoordinatorAnswer.getInquiryCoordinatorAnswer(coordinator, executionSemester);
             request.setAttribute("person", coordinator.getPerson());
         }
-
-        CoordinatorInquiryBean coordinatorInquiryBean =
-                new CoordinatorInquiryBean(coordinatorInquiryTemplate, coordinator, inquiryCoordinatorAnswer, executionSemester,
-                        executionDegree);
 
         Set<InquiryBlockDTO> coordinatorInquiryBlocks =
                 new TreeSet<InquiryBlockDTO>(new BeanComparator("inquiryBlock.blockOrder"));

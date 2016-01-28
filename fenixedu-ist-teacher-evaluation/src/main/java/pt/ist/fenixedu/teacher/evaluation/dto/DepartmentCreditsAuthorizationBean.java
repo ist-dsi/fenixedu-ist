@@ -35,7 +35,6 @@ public class DepartmentCreditsAuthorizationBean implements Serializable {
     private static final long serialVersionUID = 1L;
     private Department department;
     private Person person;
-    private Set<Department> availableDepartments;
 
     public DepartmentCreditsAuthorizationBean() {
 

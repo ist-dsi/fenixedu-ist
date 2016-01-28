@@ -39,25 +39,6 @@ public class Researcher extends Researcher_Base {
         super.deleteDomainObject();
     }
 
-    private String normalizeKeywords(String keywordList) {
-        String[] keys = keywordList.split(",");
-
-        StringBuilder sb = new StringBuilder();
-        for (String key : keys) {
-            String[] dtd = key.split(" ");
-
-            for (String eee : dtd) {
-                if (eee.trim().length() > 0) {
-                    sb.append(eee.trim()).append(" ");
-                }
-            }
-            sb.deleteCharAt(sb.length() - 1);
-            sb.append(",");
-        }
-
-        return sb.substring(0, sb.length() - 1);
-    }
-
     public boolean isActiveContractedResearcher() {
         PersonContractSituation currentResearcherContractSituation = getCurrentContractedResearcherContractSituation();
         return currentResearcherContractSituation != null;

@@ -30,8 +30,6 @@ import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.scheduler.CronTask;
 
 public class DBField2Cap extends CronTask {
-    private static DBField2Cap field = new DBField2Cap();
-
     private static String specialChars = "/:-,.()'+";
     private static Set<String> allLowerSet = new HashSet<String>();
     private static Set<String> allCapSet = new HashSet<String>();

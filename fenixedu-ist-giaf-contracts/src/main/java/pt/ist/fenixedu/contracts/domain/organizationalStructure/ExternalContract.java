@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.organizationalStructure.Accountability;
@@ -72,35 +71,6 @@ public class ExternalContract extends ExternalContract_Base {
 
     public boolean hasInstitutionUnit() {
         return getParentParty() != null;
-    }
-
-    private boolean externalPersonsAlreadyExists(final String name, final String address, final Unit institution) {
-
-        for (final Accountability accountability : Bennu.getInstance().getAccountabilitysSet()) {
-            if (accountability instanceof ExternalContract) {
-                final ExternalContract externalPerson = (ExternalContract) accountability;
-                if (externalPerson.hasPerson()) {
-                    final Person person = externalPerson.getPerson();
-
-                    if (isNameCorrect(person, name) && isAddressFieldCorrect(person, address)
-                            && externalPerson.getInstitutionUnit() == institution && externalPerson != this) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    private boolean isNameCorrect(final Person person, final String name) {
-        return (person.getName() != null && person.getName().equalsIgnoreCase(name))
-                || (StringUtils.isEmpty(person.getName()) && name.length() == 0);
-    }
-
-    private boolean isAddressFieldCorrect(final Person person, final String address) {
-        final String personAddress = person.getAddress();
-        return (personAddress != null && personAddress.equalsIgnoreCase(address))
-                || (StringUtils.isEmpty(personAddress) && address.length() == 0);
     }
 
     public static List<ExternalContract> readByPersonName(String name) {

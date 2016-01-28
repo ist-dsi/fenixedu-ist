@@ -339,7 +339,6 @@ public class JerseyServices {
 
     protected static String getRegistrationsAsJSON(Set<Registration> registrations) {
         JSONArray infos = new JSONArray();
-        int i = 0;
         for (Registration registration : registrations) {
             JSONObject studentInfoForJobBank = new JSONObject();
             studentInfoForJobBank.put("username", registration.getPerson().getUsername());

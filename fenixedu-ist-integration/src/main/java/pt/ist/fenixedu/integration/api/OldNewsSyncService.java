@@ -41,8 +41,6 @@ import org.joda.time.Interval;
 @Path("/fenix-ist/oldNewsSyncService")
 public class OldNewsSyncService extends BennuRestResource {
     private static final String EVENTS = "678604861135";
-    private static final String NEWS = "678604861136";
-
     final static Locale PT = new Locale("pt");
     final static Locale EN = new Locale("en");
 

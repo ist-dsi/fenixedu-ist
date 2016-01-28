@@ -78,9 +78,6 @@ import pt.ist.fenixframework.FenixFramework;
 
 public class OrganizationalStructureBackingBean extends FenixBackingBean {
 
-    private static final String ORG_UNIT_PACKAGE =
-            "org.fenixedu.academic.service.services.manager.organizationalStructureManagement";
-
     private String unitName, unitCostCenter, unitTypeName, unitBeginDate, unitEndDate, unitAcronym, administrativeOfficeID;
 
     private String functionName, functionTypeName, functionBeginDate, functionEndDate, unitWebAddress, unitRelationTypeValue;

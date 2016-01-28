@@ -46,7 +46,6 @@ import pt.ist.fenixedu.quc.domain.InquiryResult;
 import pt.ist.fenixedu.quc.domain.InquiryResultComment;
 import pt.ist.fenixedu.quc.domain.ResultPersonCategory;
 import pt.ist.fenixedu.quc.dto.BlockResumeResult;
-import pt.ist.fenixedu.quc.dto.CurricularCourseResumeResult;
 import pt.ist.fenixedu.quc.dto.DepartmentTeacherResultsResume;
 import pt.ist.fenixedu.quc.dto.TeacherShiftTypeGroupsResumeResult;
 
@@ -183,14 +182,6 @@ public class DepartmentTeacherResumeRenderer extends InquiryBlocksResumeRenderer
         }
 
         competenceCell.setBody(inlineContainer);
-    }
-
-    private String buildParametersForResults(CurricularCourseResumeResult courseResumeResult) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("degreeCurricularPlanOID=").append(
-                courseResumeResult.getExecutionDegree().getDegreeCurricularPlan().getExternalId());
-        builder.append("&executionCourseOID=").append(courseResumeResult.getExecutionCourse().getExternalId());
-        return builder.toString();
     }
 
     @Override

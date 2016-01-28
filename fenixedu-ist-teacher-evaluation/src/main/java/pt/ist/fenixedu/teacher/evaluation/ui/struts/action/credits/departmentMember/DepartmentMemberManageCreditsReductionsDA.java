@@ -121,8 +121,6 @@ public class DepartmentMemberManageCreditsReductionsDA extends ManageCreditsRedu
         } else {
             reductionServiceBean = getRenderedObject("reductionServiceBean");
             if (reductionServiceBean != null && reductionServiceBean.getTeacher() != null) {
-                User userView = Authenticate.getUser();
-                Department department = userView.getPerson().getTeacher().getDepartment();
                 if (reductionServiceBean.getReductionService() == null) {
                     TeacherService teacherService =
                             TeacherService.getTeacherServiceByExecutionPeriod(reductionServiceBean.getTeacher(),

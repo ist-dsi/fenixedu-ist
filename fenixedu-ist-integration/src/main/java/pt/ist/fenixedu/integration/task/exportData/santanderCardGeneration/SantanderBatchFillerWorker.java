@@ -46,7 +46,6 @@ import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.idcards.domain.SantanderBatch;
 import org.fenixedu.idcards.domain.SantanderEntry;
-import org.fenixedu.idcards.domain.SantanderProblem;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.DateTime;
 import org.joda.time.YearMonthDay;
@@ -264,30 +263,12 @@ public class SantanderBatchFillerWorker {
         return result;
     }
 
-    private String getHomeCountry(Person person) {
-        String countryName = person.getCountryOfBirth().getName();
-        if (countryName.length() > 10) {
-            return person.getCountryOfBirth().getThreeLetterCode();
-        }
-        return countryName;
-    }
-
     private String getExpireDate(ExecutionYear year) {
         String result = "";
         int beginYear = year.getBeginCivilYear();
         int endYear = beginYear + 3;
         result = beginYear + "/" + endYear;
         return result;
-    }
-
-    private String getDegreeCode(SantanderBatch batch, Person person) {
-        final PhdIndividualProgramProcess process = getPhdProcess(person);
-        if (process != null) {
-            logger.debug("phdProcess: " + process.getExternalId());
-            return process.getPhdProgram().getAcronym();
-        }
-        final Degree degree = getDegree(batch, person);
-        return degree == null ? null : degree.getSigla();
     }
 
     private Degree getDegree(SantanderBatch batch, Person person) {
@@ -574,16 +555,6 @@ public class SantanderBatchFillerWorker {
         return event != null && event.isClosed() ? find(person.getPhdIndividualProgramProcessesSet()) : null;
     }
 
-    private Degree getDegree(final Student student) {
-        Degree degree = null;
-        for (final Registration registration : student.getRegistrationsSet()) {
-            if (registration.isActive() && (degree == null || degree.getDegreeType().compareTo(registration.getDegreeType()) < 0)) {
-                degree = registration.getDegree();
-            }
-        }
-        return degree;
-    }
-
     private String buildChip1Block(SantanderBatch batch, Person person, String role) {
         StringBuilder chip1String = new StringBuilder(185);
 
@@ -686,10 +657,6 @@ public class SantanderBatchFillerWorker {
         chip1String.append(filler);
 
         return chip1String.toString();
-    }
-
-    private void generateProblem(SantanderBatch batch, Person person, String cause) {
-        new SantanderProblem(batch, person, cause);
     }
 
     private class CampusAddress {

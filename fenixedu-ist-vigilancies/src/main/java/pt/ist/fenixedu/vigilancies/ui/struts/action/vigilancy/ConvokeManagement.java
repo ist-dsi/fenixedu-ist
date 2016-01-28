@@ -252,8 +252,6 @@ public class ConvokeManagement extends FenixDispatchAction {
     public ActionForward confirmConvokes(ActionMapping mapping, ActionForm form, HttpServletRequest request,
             HttpServletResponse response) throws Exception {
 
-        Boolean havingVigilantsThatAreTeachers = false;
-
         ConvokeBean beanWithTeachers = null;
 
         if (RenderUtils.getViewState("selectVigilantsThatAreTeachers") != null) {

@@ -46,12 +46,8 @@ import pt.ist.fenixedu.cmscomponents.domain.unit.components.UnitTeachersComponen
 public class DepartmentListener {
     private static final String BUNDLE = "resources.FenixEduLearningResources";
     private static final LocalizedString MENU_TITLE = getLocalizedString("resources.FenixEduLearningResources", "label.menu");
-    private static final LocalizedString TITLE_HOMEPAGE = getLocalizedString(BUNDLE, "researchUnit.homepage");
-    private static final LocalizedString TITLE_EVENTS = getLocalizedString(BUNDLE, "label.events");
-    private static final LocalizedString TITLE_ANNOUNCEMENTS = getLocalizedString(BUNDLE, "label.announcements");
     private static final LocalizedString TITLE_ORGANIZATION = getLocalizedString(BUNDLE, "researchUnit.organization");
     private static final LocalizedString TITLE_SUBUNITS = getLocalizedString(BUNDLE, "researchUnit.subunits");
-    private static final LocalizedString TITLE_VIEW_POST = getLocalizedString(BUNDLE, "label.viewPost");
     private static final LocalizedString TITLE_THESES = getLocalizedString(BUNDLE, "department.theses");
     private static final LocalizedString TITLE_THESIS = getLocalizedString(BUNDLE, "department.thesis");
     private static final LocalizedString TITLE_PUBLICATIONS = getLocalizedString(BUNDLE, "department.publications");
@@ -60,7 +56,6 @@ public class DepartmentListener {
     private static final LocalizedString TITLE_COURSE = getLocalizedString(BUNDLE, "department.course");
     private static final LocalizedString TITLE_EMPLOYEES = getLocalizedString(BUNDLE, "department.staff");
     private static final LocalizedString TITLE_TEACHERS = getLocalizedString(BUNDLE, "department.faculty");
-    private static final LocalizedString TITLE_DEPARTMENT = getLocalizedString(BUNDLE, "department");
 
     public static UnitSite create(Department department) {
         final UnitSite newSite = new UnitSite(department.getDepartmentUnit());

@@ -412,9 +412,6 @@ public class InquiryResult extends InquiryResult_Base {
             //columns[columns.length - 1] = columns[columns.length - 1].split("\r")[0];
             //meter aqui algumas validações
             //se vier com valor + classificação dá erro
-            String executionDegreeCode = row[0];
-            ExecutionDegree executionDegree =
-                    !StringUtils.isEmpty(executionDegreeCode) ? InquiryResult.getExecutionDegree(executionDegreeCode) : null;
 
             String resultTypeString = row[1];
             if (!StringUtils.isEmpty(resultTypeString)) {
@@ -535,10 +532,6 @@ public class InquiryResult extends InquiryResult_Base {
 
         public ExecutionDegree getExecutionDegree() {
             return executionDegree;
-        }
-
-        public void setExecutionDegree(ExecutionDegree executionDegree) {
-            this.executionDegree = executionDegree;
         }
 
         public ExecutionCourse getExecutionCourse() {

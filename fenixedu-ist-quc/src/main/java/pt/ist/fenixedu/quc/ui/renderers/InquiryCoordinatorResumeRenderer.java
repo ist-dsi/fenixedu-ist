@@ -67,8 +67,7 @@ public class InquiryCoordinatorResumeRenderer extends InquiryBlocksResumeRendere
         HtmlMenu menu = new HtmlMenu();
         menu.setOnChange("var value=this.options[this.selectedIndex].value; this.selectedIndex=0; if(value!= ''){ window.open(value,'_blank'); }");
         menu.setStyle("width: 150px");
-        HtmlMenuOption optionEmpty =
-                menu.createOption(RenderUtils.getResourceString("INQUIRIES_RESOURCES", "label.inquiry.emptyOption"));
+        menu.createOption(RenderUtils.getResourceString("INQUIRIES_RESOURCES", "label.inquiry.emptyOption"));
 
         createResultsGroup(courseResumeResult, menu);
         createReportsGroup(courseResumeResult, menu);

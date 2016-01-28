@@ -19,20 +19,17 @@
 package pt.ist.fenixedu.tutorship.ui.Action.pedagogicalCouncil;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections.comparators.ReverseComparator;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.ExecutionDegree;
-import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
@@ -43,7 +40,6 @@ import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 import org.fenixedu.academic.service.services.exceptions.NotAuthorizedException;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
-import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
@@ -92,7 +88,6 @@ public class ViewTutorshipDA extends FenixDispatchAction {
 
         Tutorship tutorship = provideTutorship(request);
         ExecutionDegree executionDegree = getExecutionDegree(tutorship);
-        final List<ExecutionSemester> executionSemesters = provideSemesters(tutorship);
 
         RenderUtils.invalidateViewState();
         request.setAttribute("periodBean", new TutorshipPeriodPartialBean(tutorship, executionDegree));
@@ -206,8 +201,6 @@ public class ViewTutorshipDA extends FenixDispatchAction {
         ChangeTutorshipBean tutorshipBean = initializeChangeBean(tutorship, tutorshipPeriodPartialBean.getEndDate());
         changeTutorshipBeans.add(tutorshipBean);
         if (request.getParameter("cancel") == null) {
-            Object[] args = new Object[] { executionDegree.getExternalId(), changeTutorshipBeans };
-
             List<TutorshipErrorBean> tutorshipsNotChanged = new ArrayList<TutorshipErrorBean>();
             try {
                 tutorshipsNotChanged = ChangeTutorship.runChangeTutorship(executionDegree.getExternalId(), changeTutorshipBeans);
@@ -291,32 +284,6 @@ public class ViewTutorshipDA extends FenixDispatchAction {
         ExecutionDegree executionDegree =
                 ExecutionDegree.getByDegreeCurricularPlanAndExecutionYear(degreeCurricularPlan, executionYear);
         return executionDegree;
-    }
-
-    /**
-     * 
-     * @return
-     */
-    private List<ExecutionSemester> provideSemesters(Tutorship tutorship) {
-        final List<ExecutionSemester> executionSemestersFinal =
-                new ArrayList<ExecutionSemester>(Bennu.getInstance().getExecutionPeriodsSet());
-        Collections.sort(executionSemestersFinal, new ReverseComparator());
-        List<ExecutionSemester> executionSemesters = new ArrayList<ExecutionSemester>();
-
-        // for each existing ExecutionSemester
-        for (ExecutionSemester executionSemester : executionSemestersFinal) {
-            ExecutionYear semesterExecutionYear = executionSemester.getExecutionYear();
-            // filter for years that tutorship has
-            for (ExecutionYear executionYear : tutorship.getCoveredExecutionYears()) {
-                if (semesterExecutionYear.isAfter(executionYear)) {
-                    executionSemesters.add(executionSemester);
-                    break;
-                }
-            }
-
-        }
-
-        return executionSemesters;
     }
 
     /**

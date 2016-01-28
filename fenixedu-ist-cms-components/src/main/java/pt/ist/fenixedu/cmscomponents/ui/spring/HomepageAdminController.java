@@ -18,7 +18,6 @@
  */
 package pt.ist.fenixedu.cmscomponents.ui.spring;
 
-import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static pt.ist.fenixframework.FenixFramework.atomic;
 
@@ -140,9 +139,4 @@ public class HomepageAdminController {
         AccessControl.check((obj) -> AccessControl.getPerson() != null);
         return AccessControl.getPerson();
     }
-
-    private HomepageSite getOrCreateHomepage() {
-        return ofNullable(loggedPerson().getHomepage()).orElseGet(() -> HomepageListener.create(loggedPerson()));
-    }
-
 }

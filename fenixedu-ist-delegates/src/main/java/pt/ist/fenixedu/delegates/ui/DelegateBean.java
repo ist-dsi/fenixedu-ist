@@ -85,13 +85,6 @@ public class DelegateBean {
         return name;
     }
 
-    private String optCurricularYearString(CurricularYear cy) {
-        if (cy == null) {
-            return "-";
-        }
-        return cy.toString();
-    }
-
     public void setName(String name) {
         this.name = name;
     }
