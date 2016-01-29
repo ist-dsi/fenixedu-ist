@@ -71,6 +71,7 @@ import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.UserProfile;
 import org.fenixedu.bennu.core.groups.DynamicGroup;
 import org.fenixedu.bennu.io.servlets.FileDownloadServlet;
+import org.fenixedu.commons.stream.StreamUtils;
 import org.joda.time.LocalDate;
 import org.joda.time.YearMonthDay;
 import org.json.simple.JSONArray;
@@ -79,7 +80,6 @@ import org.json.simple.JSONObject;
 import pt.ist.fenixedu.contracts.domain.Employee;
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveEmployees;
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.ResearchUnit;
-import pt.ist.fenixedu.integration.util.JsonUtils;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
 
@@ -111,7 +111,7 @@ public class JerseyServices {
     public String readAllProfileData(@QueryParam("method") final String method) throws NoSuchMethodException, SecurityException,
             IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         return Bennu.getInstance().getUserSet().stream().filter(u -> u.getProfile() != null)
-                .map(u -> toJsonObject(u.getProfile())).collect(JsonUtils.toJsonArray()).toString();
+                .map(u -> toJsonObject(u.getProfile())).collect(StreamUtils.toJsonArray()).toString();
     }
 
     private JsonObject toJsonObject(final UserProfile up) {

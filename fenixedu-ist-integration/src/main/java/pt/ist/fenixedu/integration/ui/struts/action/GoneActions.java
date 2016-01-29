@@ -108,4 +108,12 @@ public class GoneActions extends Action {
     @Mapping(path = "/searchScormContent", module = "publico")
     public static class OldSearchScormContentDA extends GoneActions {
     }
+
+    @Mapping(path = "/summariesRSS", module = "publico")
+    public static class LegacySummaryRSSAction extends GoneActions {
+    }
+
+    @Mapping(path = "/announcementsRSS", module = "external")
+    public static class LegacyRSSAction extends GoneActions {
+    }
 }

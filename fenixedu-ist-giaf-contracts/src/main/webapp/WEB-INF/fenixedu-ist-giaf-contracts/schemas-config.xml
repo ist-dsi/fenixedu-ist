@@ -196,15 +196,6 @@
     <slot name="responsiblePerson" layout="username-as-person" key="label.responsibility.person.username" validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator"/>             
 </schema>
 
-
-<schema name="personManagement.merge.chooseObjects"
-        type="pt.ist.fenixedu.integration.ui.struts.action.manager.personManagement.MergePersonsDA$MergePersonsBean"
-        bundle="MANAGER_RESOURCES">
-    <slot name="leftOid" key="label.personManagement.merge.destiny.oid"/>
-    <slot name="rightOid" key="label.personManagement.merge.remove.oid"/> 
-</schema>
-
-
 <schema name="show.personAndEmployee" type="org.fenixedu.academic.domain.Person" bundle="CONTRACTS_RESOURCES">
     <slot name="this" key="label.empty" layout="view-as-image">
 		<fr:property name="classes" value="column3" />

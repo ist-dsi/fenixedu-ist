@@ -18,13 +18,9 @@
  */
 package pt.ist.fenixedu.integration;
 
-import java.util.Map;
-
 import org.fenixedu.commons.configuration.ConfigurationInvocationHandler;
 import org.fenixedu.commons.configuration.ConfigurationManager;
 import org.fenixedu.commons.configuration.ConfigurationProperty;
-
-import pt.ist.fenixedu.integration.util.HostAccessControl;
 
 public class FenixEduIstIntegrationConfiguration {
     @ConfigurationManager(description = "FenixEdu IST Integration specific properties")
@@ -69,15 +65,6 @@ public class FenixEduIstIntegrationConfiguration {
         @ConfigurationProperty(key = "fenix.api.canteen.secret", defaultValue = "")
         public String getFenixApiCanteenSecret();
 
-        @Deprecated
-        @ConfigurationProperty(key = "dges.username.prefix",
-                description = "The prefix for the username of students created via the DGES Student Importation Process.",
-                defaultValue = "ist1")
-        public String dgesUsernamePrefix();
-
-        @ConfigurationProperty(key = "ciistCostCenterCode", description = "Deprecated, to be removed", defaultValue = "8431")
-        public Integer getCIISTCostCenterCode();
-
         @ConfigurationProperty(key = "externalServices.ISTConnect.password")
         public String getExternalServicesISTConnectPassword();
 
@@ -89,12 +76,6 @@ public class FenixEduIstIntegrationConfiguration {
 
         @ConfigurationProperty(key = "externalServices.koha.username")
         public String getExternalServicesKohaUsername();
-
-        @Deprecated
-        @ConfigurationProperty(
-                key = "host.control.name.*",
-                description = "Comma separated hostname values that are allowed to access the url host.control.name. See HostAccessControl.isAllowed(name, request)")
-        public Map<String, String> getHostControlName();
 
         @ConfigurationProperty(
                 key = "sibs.destinationInstitutionId",
@@ -116,10 +97,6 @@ public class FenixEduIstIntegrationConfiguration {
 
         @ConfigurationProperty(key = "legacyFilesRedirectMapLocation", defaultValue = "")
         public String legacyFilesRedirectMapLocation();
-
-        @ConfigurationProperty(key = "merge.units.emails",
-                description = "comma separated emails of persons who want to receive emails about merge of units.")
-        public String getMergeUnitsEmails();
 
         @ConfigurationProperty(key = "store.quota.warning.email",
                 description = "The email address to send notifications about the AFS store quotas.")
@@ -144,13 +121,5 @@ public class FenixEduIstIntegrationConfiguration {
     public static ConfigurationProperties getConfiguration() {
         return ConfigurationInvocationHandler.getConfiguration(ConfigurationProperties.class);
     }
-
-    @Deprecated
-    public static HostAccessControl getHostAccessControl() {
-        return hostAccessControl;
-    }
-
-    @Deprecated
-    private static HostAccessControl hostAccessControl = new HostAccessControl(getConfiguration().getHostControlName());
 
 }

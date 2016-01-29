@@ -110,15 +110,6 @@ public class DelegateService {
         return withDuplicates.stream().map(p -> p.getBean()).collect(Collectors.toList());
     }
 
-    /**
-     * @deprecated use {@link #search(DelegateSearchBean, DateTime)} instead
-     */
-    //TODO: remove in the next major
-    @Deprecated
-    public List<DelegateBean> searchDelegates(DelegateSearchBean delegateSearchBean, DateTime when) {
-        return search(delegateSearchBean, when).collect(Collectors.toList());
-    }
-
     public Stream<DelegateBean> search(DelegateSearchBean delegateSearchBean, DateTime when) {
         Stream<Delegate> delegateStream;
         if (delegateSearchBean.getDegree() != null) {
