@@ -18,11 +18,6 @@
  */
 package pt.ist.fenixedu.integration.util.sibs;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -255,27 +250,6 @@ public class SibsOutgoingPaymentFile {
     @Override
     public String toString() {
         return render();
-    }
-
-    public void save(final File destinationFile) {
-        BufferedOutputStream outputStream = null;
-        try {
-            outputStream = new BufferedOutputStream(new FileOutputStream(destinationFile));
-            outputStream.write(render().getBytes());
-            outputStream.flush();
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } finally {
-            if (outputStream != null) {
-                try {
-                    outputStream.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
     }
 
 }

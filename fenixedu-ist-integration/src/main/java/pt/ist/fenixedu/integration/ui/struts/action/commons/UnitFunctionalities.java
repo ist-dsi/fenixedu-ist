@@ -18,7 +18,7 @@
  */
 package pt.ist.fenixedu.integration.ui.struts.action.commons;
 
-import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.List;
@@ -34,8 +34,9 @@ import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
-import org.fenixedu.academic.util.FileUtils;
 import org.fenixedu.bennu.struts.portal.EntryPoint;
+
+import com.google.common.io.ByteStreams;
 
 import pt.ist.fenixWebFramework.renderers.components.state.IViewState;
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
@@ -165,17 +166,11 @@ public abstract class UnitFunctionalities extends FenixDispatchAction {
             return manageFiles(mapping, form, request, response);
         }
 
-        InputStream formFileInputStream = null;
-        File file = null;
-        try {
-            formFileInputStream = bean.getUploadFile();
-            file = FileUtils.copyToTemporaryFile(formFileInputStream);
-            CreateUnitFile.run(file, bean.getFileName(), bean.getName(), bean.getDescription(), bean.getTags(), bean.getGroup(),
-                    getUnit(request), getLoggedPerson(request));
-        } catch (DomainException e) {
+        try (InputStream stream = bean.getUploadFile()) {
+            CreateUnitFile.run(ByteStreams.toByteArray(stream), bean.getFileName(), bean.getName(), bean.getDescription(),
+                    bean.getTags(), bean.getGroup(), getUnit(request), getLoggedPerson(request));
+        } catch (DomainException | IOException e) {
             addActionMessage(request, e.getMessage());
-        } finally {
-            file.delete();
         }
         return manageFiles(mapping, form, request, response);
     }
