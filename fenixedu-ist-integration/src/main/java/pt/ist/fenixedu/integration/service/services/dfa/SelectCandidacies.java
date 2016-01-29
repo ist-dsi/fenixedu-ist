@@ -19,7 +19,7 @@
 /**
  * 
  */
-package org.fenixedu.academic.service.services;
+package pt.ist.fenixedu.integration.service.services.dfa;
 
 import static org.fenixedu.academic.predicate.AccessControl.check;
 

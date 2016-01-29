@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu IST Pre Bolonha.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.academic.ui.struts.action.administrativeOffice.candidacy;
+package pt.ist.fenixedu.integration.ui.struts.action.dfa;
 
 import java.util.Set;
 
@@ -28,7 +28,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.fenixedu.academic.domain.candidacy.DFACandidacy;
 import org.fenixedu.academic.dto.administrativeOffice.candidacy.DFACandidacyBean;
-import org.fenixedu.academic.ui.struts.action.masterDegree.administrativeOffice.MasterDegreeOfficeApplication.MasterDegreeDfaApp;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
@@ -37,7 +36,7 @@ import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
 
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
 
-@StrutsFunctionality(app = MasterDegreeDfaApp.class, path = "list-candidacies",
+@StrutsFunctionality(app = DFAApplication.class, path = "list-candidacies",
         titleKey = "link.masterDegree.administrativeOffice.dfaCandidacy.listCandidacies")
 @Mapping(path = "/listDFACandidacy", module = "masterDegreeAdministrativeOffice", input = "/candidacy/listCandidacies.jsp")
 @Forwards(@Forward(name = "listCandidacies", path = "/masterDegreeAdministrativeOffice/candidacy/listCandidacies.jsp"))

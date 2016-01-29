@@ -16,16 +16,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu IST Pre Bolonha.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.academic.ui.struts.action.masterDegree.administrativeOffice;
+package pt.ist.fenixedu.integration.ui.struts.action.dfa;
 
 import org.fenixedu.bennu.struts.portal.StrutsApplication;
 
-public class MasterDegreeOfficeApplication {
-
-    @StrutsApplication(
-            bundle = "AdminOffice", path = "dfa", titleKey = "link.masterDegree.administrativeOffice.dfaCandidacyManagement",
-            hint = "Master Degree Office", accessGroup = "role(MASTER_DEGREE_ADMINISTRATIVE_OFFICE)")
-    public static class MasterDegreeDfaApp {
-    }
-
+@StrutsApplication(bundle = "AdminOffice", path = "dfa",
+        titleKey = "link.masterDegree.administrativeOffice.dfaCandidacyManagement", hint = "Master Degree Office",
+        accessGroup = "#masterDegreeAdmOffice")
+public class DFAApplication {
 }
