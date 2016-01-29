@@ -23,7 +23,7 @@
 	<import value="net.sf.jasperreports.engine.*" />
 	<import value="net.sf.jasperreports.engine.data.*" />
 
-	<parameter name="annualTeachingCreditsBean" isForPrompting="false" class="pt.ist.fenixedu.teacher.domain.credits.util.AnnualTeachingCreditsBean"/>
+	<parameter name="annualTeachingCreditsBean" isForPrompting="false" class="pt.ist.fenixedu.teacher.evaluation.domain.credits.util.AnnualTeachingCreditsBean"/>
 	<parameter name="organization" isForPrompting="false" class="java.lang.String"/>
 	<parameter name="withConfidentionalInformation" isForPrompting="false" class="java.lang.Boolean"/>
 

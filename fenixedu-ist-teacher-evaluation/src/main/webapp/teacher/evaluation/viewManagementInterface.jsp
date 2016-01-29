@@ -30,10 +30,10 @@
 
 <html:xhtml/>
 
-<em><bean:message bundle="RESEARCHER_RESOURCES" key="label.teacher.evaluation.title"/></em>
+<em><bean:message bundle="TEACHER_EVALUATION_RESOURCES" key="label.teacher.evaluation.title"/></em>
 
 <h2>
-	<bean:message bundle="RESEARCHER_RESOURCES" key="label.teacher.evaluation.management.title"/>
+	<bean:message bundle="TEACHER_EVALUATION_RESOURCES" key="label.teacher.evaluation.management.title"/>
 </h2>
 
 <span class="warning0"><!-- Error messages go here --><html:errors /></span>
@@ -46,7 +46,7 @@
 <logic:present name="facultyEvaluationProcessCreationBean">
 	<fr:form action="/teacherEvaluation.do?method=createFacultyEvaluationProcess">
 		<fr:edit id="facultyEvaluationProcessCreationBean" name="facultyEvaluationProcessCreationBean">
-			<fr:schema bundle="RESEARCHER_RESOURCES" type="pt.ist.fenixedu.teacher.evaluation.domain.FacultyEvaluationProcessBean">
+			<fr:schema bundle="TEACHER_EVALUATION_RESOURCES" type="pt.ist.fenixedu.teacher.evaluation.domain.FacultyEvaluationProcessBean">
 				<fr:slot name="title" key="label.teacher.evaluation.facultyEvaluationProcess.title" validator="pt.ist.fenixWebFramework.rendererExtensions.validators.RequiredLocalizedStringValidator">
 					<fr:property name="size" value="40"/>
 				</fr:slot>
@@ -76,7 +76,7 @@
 	<bean:define id="urlEditInvalid">/teacherEvaluation.do?method=prepareEditFacultyEvaluationProcess&amp;facultyEvaluationProcessOID=<bean:write name="facultyEvaluationProcessEditnBean" property="facultyEvaluationProcess.externalId"/></bean:define>
 	<fr:form action="/teacherEvaluation.do?method=editFacultyEvaluationProcess">
 		<fr:edit id="facultyEvaluationProcessEditnBean" name="facultyEvaluationProcessEditnBean">
-			<fr:schema bundle="RESEARCHER_RESOURCES" type="pt.ist.fenixedu.teacher.evaluation.domain.FacultyEvaluationProcessBean">
+			<fr:schema bundle="TEACHER_EVALUATION_RESOURCES" type="pt.ist.fenixedu.teacher.evaluation.domain.FacultyEvaluationProcessBean">
 				<fr:slot name="title" key="label.teacher.evaluation.facultyEvaluationProcess.title" validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator">
 					<fr:property name="size" value="40"/>
 				</fr:slot>
@@ -108,7 +108,7 @@
 	<table class="tstyle2 thlight thleft mtop05">
 		<tr>
 			<th>
-				<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.autoEvaluationInterval" bundle="RESEARCHER_RESOURCES"/>
+				<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.autoEvaluationInterval" bundle="TEACHER_EVALUATION_RESOURCES"/>
 			</th>
 			<td>
 				<fr:view name="facultyEvaluationProcess" property="autoEvaluationInterval.start"/>
@@ -118,7 +118,7 @@
 		</tr>
 		<tr>
 			<th>
-				<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.evaluationInterval" bundle="RESEARCHER_RESOURCES"/>
+				<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.evaluationInterval" bundle="TEACHER_EVALUATION_RESOURCES"/>
 			</th>
 			<td>
 				<fr:view name="facultyEvaluationProcess" property="evaluationInterval.start"/>
@@ -133,17 +133,17 @@
 		<% if (AccessControl.getPerson().isTeacherEvaluationCoordinatorCouncilMember() || DynamicGroup.get("managers").isMember(Authenticate.getUser())) { %>
 		<li>
 			<html:link page="/teacherEvaluation.do?method=prepareEditFacultyEvaluationProcess" paramId="facultyEvaluationProcessOID" paramName="facultyEvaluationProcess" paramProperty="OID">
-				<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.edit" bundle="RESEARCHER_RESOURCES"/>
+				<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.edit" bundle="TEACHER_EVALUATION_RESOURCES"/>
 			</html:link>
 		</li>
 		<li>
 			<html:link page="/teacherEvaluation.do?method=prepareUploadEvaluators" paramId="facultyEvaluationProcessOID" paramName="facultyEvaluationProcess" paramProperty="OID">
-				<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.upload" bundle="RESEARCHER_RESOURCES"/>
+				<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.upload" bundle="TEACHER_EVALUATION_RESOURCES"/>
 			</html:link>
 		</li>
 		<li>
 			<html:link page="/teacherEvaluation.do?method=prepareUploadApprovedMarks" paramId="facultyEvaluationProcessOID" paramName="facultyEvaluationProcess" paramProperty="OID">
-				<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.load.approved.marks" bundle="RESEARCHER_RESOURCES"/>
+				<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.load.approved.marks" bundle="TEACHER_EVALUATION_RESOURCES"/>
 			</html:link>
 		</li>
 		<% } %>
@@ -160,33 +160,33 @@
 	
 	<p class="mtop15 mbottom05">
 		<bean:size id="count" name="teacherEvaluationProcesses"/>
-		<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.teacherEvaluationProcess.count" bundle="RESEARCHER_RESOURCES"/>:
+		<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.teacherEvaluationProcess.count" bundle="TEACHER_EVALUATION_RESOURCES"/>:
 		<%= count %>
 	</p>
 	<p class="mvert05">
-		<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.teacherEvaluationProcess.autoEvaluation.locked.count" bundle="RESEARCHER_RESOURCES"/>:
+		<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.teacherEvaluationProcess.autoEvaluation.locked.count" bundle="TEACHER_EVALUATION_RESOURCES"/>:
 		<bean:write name="autoEvaluatedCount"/>
 	</p>
 	<p class="mvert05">
-		<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.teacherEvaluationProcess.evaluation.locked.count" bundle="RESEARCHER_RESOURCES"/>:
+		<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.teacherEvaluationProcess.evaluation.locked.count" bundle="TEACHER_EVALUATION_RESOURCES"/>:
 		<bean:write name="evaluatedCount"/>
 	</p>
 	<p class="mvert05">
-		<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.teacherEvaluationProcess.evaluation.approved.count" bundle="RESEARCHER_RESOURCES"/>:
+		<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.teacherEvaluationProcess.evaluation.approved.count" bundle="TEACHER_EVALUATION_RESOURCES"/>:
 		<bean:write name="approvedEvaluatedCount"/>
 	</p>
 	<% if (AccessControl.getPerson().isTeacherEvaluationCoordinatorCouncilMember() || DynamicGroup.get("managers").isMember(Authenticate.getUser())) { %>
 	<p class="mtop05 mbottom15">
 		<logic:equal name="facultyEvaluationProcess" property="areApprovedMarksPublished" value="true">
-			<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.areApprovedMarksPublished.yes" bundle="RESEARCHER_RESOURCES"/>
+			<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.areApprovedMarksPublished.yes" bundle="TEACHER_EVALUATION_RESOURCES"/>
 			<html:link page="/teacherEvaluation.do?method=unPublish" paramId="facultyEvaluationProcessOID" paramName="facultyEvaluationProcess" paramProperty="OID">
-				<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.approved.marks.unPublish" bundle="RESEARCHER_RESOURCES"/>
+				<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.approved.marks.unPublish" bundle="TEACHER_EVALUATION_RESOURCES"/>
 			</html:link>
 		</logic:equal>
 		<logic:notEqual name="facultyEvaluationProcess" property="areApprovedMarksPublished" value="true">
-			<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.areApprovedMarksPublished.no" bundle="RESEARCHER_RESOURCES"/>
+			<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.areApprovedMarksPublished.no" bundle="TEACHER_EVALUATION_RESOURCES"/>
 			<html:link page="/teacherEvaluation.do?method=publish" paramId="facultyEvaluationProcessOID" paramName="facultyEvaluationProcess" paramProperty="OID">
-				<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.approved.marks.publish" bundle="RESEARCHER_RESOURCES"/>
+				<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.approved.marks.publish" bundle="TEACHER_EVALUATION_RESOURCES"/>
 			</html:link>
 		</logic:notEqual>
 	</p>
@@ -196,22 +196,22 @@
 		<table class="tstyle2 thlight thleft">
 			<tr>
 				<th>
-					<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.teacherEvaluationProcess.evaluee" bundle="RESEARCHER_RESOURCES"/>
+					<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.teacherEvaluationProcess.evaluee" bundle="TEACHER_EVALUATION_RESOURCES"/>
 				</th>
 				<th>
-					<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.teacherEvaluationProcess.evaluator" bundle="RESEARCHER_RESOURCES"/>
+					<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.teacherEvaluationProcess.evaluator" bundle="TEACHER_EVALUATION_RESOURCES"/>
 				</th>
 				<th>
-					<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.teacherEvaluationProcess.coevaluators" bundle="RESEARCHER_RESOURCES"/>
+					<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.teacherEvaluationProcess.coevaluators" bundle="TEACHER_EVALUATION_RESOURCES"/>
 				</th>
 				<th>
-					<bean:message key="label.teacher.evaluation.state" bundle="RESEARCHER_RESOURCES"/>
+					<bean:message key="label.teacher.evaluation.state" bundle="TEACHER_EVALUATION_RESOURCES"/>
 				</th>
 				<th>
-					<bean:message key="label.teacher.evaluation.mark" bundle="RESEARCHER_RESOURCES"/>
+					<bean:message key="label.teacher.evaluation.mark" bundle="TEACHER_EVALUATION_RESOURCES"/>
 				</th>
 				<th>
-					<bean:message key="label.teacher.evaluation.mark.approved" bundle="RESEARCHER_RESOURCES"/>
+					<bean:message key="label.teacher.evaluation.mark.approved" bundle="TEACHER_EVALUATION_RESOURCES"/>
 				</th>
 				<th>
 				</th>
@@ -234,28 +234,23 @@
 					</td>
 					<td>
 						<logic:present name="teacherEvaluationProcess" property="evaluationMark">
-							<fr:view name="teacherEvaluationProcess" property="evaluationMark" layout="null-as-label"/>
+							<fr:view name="teacherEvaluationProcess" property="evaluationMark">
+								<fr:layout><fr:property name="bundle" value="TEACHER_EVALUATION_RESOURCES"/></fr:layout>
+							</fr:view>
 						</logic:present>
 					</td>
 					<td>
-						<logic:iterate id="approvedTeacherEvaluationProcessMark" name="teacherEvaluationProcess" property="orderedApprovedTeacherEvaluationProcessMark" length="1">
+						<logic:iterate id="approvedTeacherEvaluationProcessMark" name="teacherEvaluationProcess" property="orderedApprovedTeacherEvaluationProcessMark">
 							<bean:write name="approvedTeacherEvaluationProcessMark" property="facultyEvaluationProcessYear.year"/>
 							<logic:present name="approvedTeacherEvaluationProcessMark" property="approvedEvaluationMark">
-								<fr:view name="approvedTeacherEvaluationProcessMark" property="approvedEvaluationMark" layout="null-as-label"/>
+								<fr:view name="approvedTeacherEvaluationProcessMark" property="approvedEvaluationMark">
+									<fr:layout><fr:property name="bundle" value="TEACHER_EVALUATION_RESOURCES"/></fr:layout>
+								</fr:view>
 							</logic:present>
 							<logic:notPresent name="approvedTeacherEvaluationProcessMark" property="approvedEvaluationMark">
 								N/A
 							</logic:notPresent>
-						</logic:iterate>
-						<logic:iterate id="approvedTeacherEvaluationProcessMark" name="teacherEvaluationProcess" property="orderedApprovedTeacherEvaluationProcessMark" offset="1">
 							<br/>
-							<bean:write name="approvedTeacherEvaluationProcessMark" property="facultyEvaluationProcessYear.year"/>
-							<logic:present name="approvedTeacherEvaluationProcessMark" property="approvedEvaluationMark">
-								<fr:view name="approvedTeacherEvaluationProcessMark" property="approvedEvaluationMark" layout="null-as-label"/>
-							</logic:present>
-							<logic:notPresent name="approvedTeacherEvaluationProcessMark" property="approvedEvaluationMark">
-								N/A
-							</logic:notPresent>
 						</logic:iterate>
 					</td>
 					<td>
@@ -277,14 +272,14 @@
 	<% if (AccessControl.getPerson().isTeacherEvaluationCoordinatorCouncilMember()) { %>
 	<p class="mtop15">
 		<html:link page="/teacherEvaluation.do?method=prepareCreateFacultyEvaluationProcess">
-			<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.create" bundle="RESEARCHER_RESOURCES"/>
+			<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.create" bundle="TEACHER_EVALUATION_RESOURCES"/>
 		</html:link>
 	</p>
 	<% } %>
 	<logic:empty name="facultyEvaluationProcessSet">
 		<p class="mtop1">
 			<em>
-				<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.none" bundle="RESEARCHER_RESOURCES"/>
+				<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.none" bundle="TEACHER_EVALUATION_RESOURCES"/>
 			</em>
 		</p>
 	</logic:empty>
@@ -292,13 +287,13 @@
 		<table class="tstyle2 thlight thleft mtop05">
 			<tr>
 				<th>
-					<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.process" bundle="RESEARCHER_RESOURCES"/>
+					<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.process" bundle="TEACHER_EVALUATION_RESOURCES"/>
 				</th>
 				<th>
-					<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.autoEvaluationInterval" bundle="RESEARCHER_RESOURCES"/>
+					<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.autoEvaluationInterval" bundle="TEACHER_EVALUATION_RESOURCES"/>
 				</th>
 				<th>
-					<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.evaluationInterval" bundle="RESEARCHER_RESOURCES"/>
+					<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.evaluationInterval" bundle="TEACHER_EVALUATION_RESOURCES"/>
 				</th>
 				<th>
 				</th>
@@ -320,7 +315,7 @@
 				</td>
 				<td>
 					<html:link page="/teacherEvaluation.do?method=viewFacultyEvaluationProcess" paramId="facultyEvaluationProcessOID" paramName="facultyEvaluationProcess" paramProperty="OID">
-						<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.view" bundle="RESEARCHER_RESOURCES"/>
+						<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.view" bundle="TEACHER_EVALUATION_RESOURCES"/>
 					</html:link>
 					<logic:present role="(role(MANAGER) | role(OPERATOR))">
 						<html:link page="/teacherEvaluation.do?method=deleteFacultyEvaluationProcess" paramId="facultyEvaluationProcessOID" paramName="facultyEvaluationProcess" paramProperty="OID">
@@ -336,10 +331,10 @@
 
 <logic:present name="fileUploadBean">
 	<h3 class="mtop15 mbottom05">
-		<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.add.list.of.evaluees" bundle="RESEARCHER_RESOURCES"/>
+		<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.add.list.of.evaluees" bundle="TEACHER_EVALUATION_RESOURCES"/>
 	</h3>
 	<p class="mbottom1">
-		<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.add.list.of.evaluees.instruction" bundle="RESEARCHER_RESOURCES"/>
+		<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.add.list.of.evaluees.instruction" bundle="TEACHER_EVALUATION_RESOURCES"/>
 	</p>
 	<bean:define id="urlUploadInvalid">/teacherEvaluation.do?method=viewFacultyEvaluationProcess&facultyEvaluationProcessOID=<bean:write name="fileUploadBean" property="facultyEvaluationProcess.externalId"/></bean:define>
 	<fr:edit id="fileUploadBean" name="fileUploadBean" action="/teacherEvaluation.do?method=uploadEvaluators">
@@ -359,10 +354,10 @@
 
 <logic:present name="fileUploadBeanForApprovedMarks">
 	<h3 class="mtop15 mbottom05">
-		<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.load.approved.marks" bundle="RESEARCHER_RESOURCES"/>
+		<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.load.approved.marks" bundle="TEACHER_EVALUATION_RESOURCES"/>
 	</h3>
 	<p class="mbottom1">
-		<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.load.approved.marks.instruction" bundle="RESEARCHER_RESOURCES"/>
+		<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.load.approved.marks.instruction" bundle="TEACHER_EVALUATION_RESOURCES"/>
 	</p>
 	<bean:define id="urlUploadInvalid">/teacherEvaluation.do?method=viewFacultyEvaluationProcess&facultyEvaluationProcessOID=<bean:write name="fileUploadBeanForApprovedMarks" property="facultyEvaluationProcess.externalId"/></bean:define>
 	<fr:edit id="fileUploadBeanForApprovedMarks" name="fileUploadBeanForApprovedMarks" action="/teacherEvaluation.do?method=uploadApprovedEvaluations">

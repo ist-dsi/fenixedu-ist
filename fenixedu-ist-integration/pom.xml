@@ -83,11 +83,6 @@
         </dependency>
         <dependency>
             <groupId>pt.ist</groupId>
-            <artifactId>fenixedu-ist-teacher-credits</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>pt.ist</groupId>
             <artifactId>fenixedu-ist-teacher-evaluation</artifactId>
             <version>${project.version}</version>
         </dependency>

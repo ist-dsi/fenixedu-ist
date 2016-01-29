@@ -27,10 +27,10 @@
 
 <html:xhtml/>
 
-<em><bean:message bundle="RESEARCHER_RESOURCES" key="label.teacher.evaluation.title"/></em>
+<em><bean:message bundle="TEACHER_EVALUATION_RESOURCES" key="label.teacher.evaluation.title"/></em>
 
 <h2>
-	<bean:message bundle="RESEARCHER_RESOURCES" key="label.teacher.evaluation.evaluees.title"/>
+	<bean:message bundle="TEACHER_EVALUATION_RESOURCES" key="label.teacher.evaluation.evaluees.title"/>
 </h2>
 
 

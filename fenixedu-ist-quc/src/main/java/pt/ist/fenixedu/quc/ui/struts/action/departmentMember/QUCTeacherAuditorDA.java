@@ -30,7 +30,7 @@ import org.fenixedu.bennu.struts.annotations.Mapping;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
 
 import pt.ist.fenixedu.quc.domain.ExecutionCourseAudit;
-import pt.ist.fenixedu.teacher.ui.struts.action.credits.departmentMember.DepartmentMemberTeacherApp;
+import pt.ist.fenixedu.teacher.evaluation.ui.struts.action.credits.departmentMember.DepartmentMemberTeacherApp;
 
 @StrutsFunctionality(app = DepartmentMemberTeacherApp.class, path = "quc-audit", titleKey = "title.inquiry.quc.auditProcesses",
         bundle = "InquiriesResources")

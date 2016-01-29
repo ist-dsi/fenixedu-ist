@@ -33,7 +33,7 @@ import org.fenixedu.bennu.core.domain.Bennu;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalCategory;
-import pt.ist.fenixedu.teacher.domain.teacher.DegreeTeachingService;
+import pt.ist.fenixedu.teacher.evaluation.domain.teacher.DegreeTeachingService;
 
 public class TeacherInquiryTemplate extends TeacherInquiryTemplate_Base {
 
