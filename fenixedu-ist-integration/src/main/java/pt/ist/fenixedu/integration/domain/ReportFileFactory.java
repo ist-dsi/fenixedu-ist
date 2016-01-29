@@ -41,9 +41,14 @@ import org.fenixedu.academic.domain.reports.SummaryOccupancyReportFile;
 import org.fenixedu.academic.domain.reports.WrittenEvaluationReportFile;
 
 import pt.ist.fenixedu.quc.domain.reports.AvailableCoursesForQUCReportFile;
+import pt.ist.fenixedu.quc.domain.reports.CoordinatorsAnswersReportFile;
 import pt.ist.fenixedu.quc.domain.reports.CoursesAnswersReportFile;
+import pt.ist.fenixedu.quc.domain.reports.DelegatesAnswersReportFile;
+import pt.ist.fenixedu.quc.domain.reports.FirstTimeCycleAnswersReportFile;
 import pt.ist.fenixedu.quc.domain.reports.InitialAnswersReportFile;
 import pt.ist.fenixedu.quc.domain.reports.QUCQuestionsReportFile;
+import pt.ist.fenixedu.quc.domain.reports.RegentsAnswersReportFile;
+import pt.ist.fenixedu.quc.domain.reports.TeachersAnswersReportFile;
 import pt.ist.fenixedu.quc.domain.reports.WorkloadSummaryBoardReportFile;
 import pt.ist.fenixedu.teacher.evaluation.domain.reports.EffectiveTeachingLoadReportFile;
 import pt.ist.fenixedu.teacher.evaluation.domain.reports.TeacherCreditsReportFile;
@@ -322,5 +327,52 @@ public class ReportFileFactory {
         qucQuestionsReportFile.setDegreeType(degreeType);
         qucQuestionsReportFile.setExecutionYear(executionYear);
         return qucQuestionsReportFile;
+    }
+
+    @Atomic
+    public static GepReportFile createDelegatesAnswersReportFile(String type, DegreeType degreeType, ExecutionYear executionYear) {
+        final DelegatesAnswersReportFile delegatesAnswersReportFile = new DelegatesAnswersReportFile();
+        delegatesAnswersReportFile.setType(type);
+        delegatesAnswersReportFile.setDegreeType(degreeType);
+        delegatesAnswersReportFile.setExecutionYear(executionYear);
+        return delegatesAnswersReportFile;
+    }
+
+    @Atomic
+    public static GepReportFile createTeachersAnswersReportFile(String type, DegreeType degreeType, ExecutionYear executionYear) {
+        final TeachersAnswersReportFile teachersAnswersReportFile = new TeachersAnswersReportFile();
+        teachersAnswersReportFile.setType(type);
+        teachersAnswersReportFile.setDegreeType(degreeType);
+        teachersAnswersReportFile.setExecutionYear(executionYear);
+        return teachersAnswersReportFile;
+    }
+
+    @Atomic
+    public static GepReportFile createRegentsAnswersReportFile(String type, DegreeType degreeType, ExecutionYear executionYear) {
+        final RegentsAnswersReportFile regentsAnswersReportFile = new RegentsAnswersReportFile();
+        regentsAnswersReportFile.setType(type);
+        regentsAnswersReportFile.setDegreeType(degreeType);
+        regentsAnswersReportFile.setExecutionYear(executionYear);
+        return regentsAnswersReportFile;
+    }
+
+    @Atomic
+    public static GepReportFile createCoordinatorsAnswersReportFile(String type, DegreeType degreeType,
+            ExecutionYear executionYear) {
+        final CoordinatorsAnswersReportFile coordinatorsAnswersReportFile = new CoordinatorsAnswersReportFile();
+        coordinatorsAnswersReportFile.setType(type);
+        coordinatorsAnswersReportFile.setDegreeType(degreeType);
+        coordinatorsAnswersReportFile.setExecutionYear(executionYear);
+        return coordinatorsAnswersReportFile;
+    }
+
+    @Atomic
+    public static GepReportFile createFirstTimeCycleAnswersReportFile(String type, DegreeType degreeType,
+            ExecutionYear executionYear) {
+        final FirstTimeCycleAnswersReportFile firstTimeCycleAnswersReportFile = new FirstTimeCycleAnswersReportFile();
+        firstTimeCycleAnswersReportFile.setType(type);
+        firstTimeCycleAnswersReportFile.setDegreeType(degreeType);
+        firstTimeCycleAnswersReportFile.setExecutionYear(executionYear);
+        return firstTimeCycleAnswersReportFile;
     }
 }

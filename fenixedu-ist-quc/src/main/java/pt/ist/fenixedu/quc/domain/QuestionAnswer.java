@@ -18,14 +18,24 @@
  */
 package pt.ist.fenixedu.quc.domain;
 
+import pt.ist.fenixedu.quc.domain.exceptions.FenixEduQucDomainException;
 
 public class QuestionAnswer extends QuestionAnswer_Base {
 
     public QuestionAnswer(InquiryAnswer inquiryAnswer, InquiryQuestion inquiryQuestion, String value) {
         super();
+        check(inquiryAnswer, inquiryQuestion);
         setInquiryAnswer(inquiryAnswer);
         setInquiryQuestion(inquiryQuestion);
         setAnswer(value);
+    }
+
+    private void check(InquiryAnswer inquiryAnswer, InquiryQuestion inquiryQuestion) {
+        for (QuestionAnswer questionAnswer : inquiryAnswer.getQuestionAnswersSet()) {
+            if (questionAnswer.getInquiryQuestion() == inquiryQuestion) {
+                throw FenixEduQucDomainException.questionAnwserDuplicateCreation();
+            }
+        }
     }
 
     public void delete() {

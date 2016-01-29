@@ -21,21 +21,15 @@ package pt.ist.fenixedu.quc.ui.struts.action.pedagogicalCouncil.inquiries;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.fenixedu.academic.domain.Department;
-import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Professorship;
@@ -51,6 +45,7 @@ import org.fenixedu.commons.spreadsheet.Spreadsheet;
 import org.fenixedu.commons.spreadsheet.Spreadsheet.Row;
 import org.joda.time.DateTime;
 
+import pt.ist.fenixedu.quc.domain.InquiryResult;
 import pt.ist.fenixedu.quc.domain.InquiryResultComment;
 import pt.ist.fenixedu.quc.domain.RegentInquiryTemplate;
 import pt.ist.fenixframework.FenixFramework;
@@ -82,44 +77,42 @@ public class ViewQucRegentsStatus extends FenixDispatchAction {
 
         final ExecutionSemester executionPeriod = regentInquiryTemplate.getExecutionPeriod();
 
-        final Map<Person, RegentBean> regentsMap = new HashMap<Person, RegentBean>();
+        final List<RegentBean> regentsList = new ArrayList<RegentBean>();
         for (Professorship professorship : Bennu.getInstance().getProfessorshipsSet()) {
             if (professorship.getExecutionCourse().getExecutionPeriod() == executionPeriod) {
-                Person person = professorship.getPerson();
+                Person regent = professorship.getPerson();
                 boolean isToAnswer = RegentInquiryTemplate.hasToAnswerRegentInquiry(professorship);
                 if (isToAnswer) {
                     boolean hasMandatoryCommentsToMake =
                             InquiryResultComment.hasMandatoryCommentsToMakeAsResponsible(professorship);
-                    boolean inquiryToAnswer =
-                            professorship.getInquiryRegentAnswer() == null
-                                    || professorship.getInquiryRegentAnswer().hasRequiredQuestionsToAnswer(regentInquiryTemplate);
-                    if (inquiryToAnswer || hasMandatoryCommentsToMake) {
-                        RegentBean regentBean = regentsMap.get(person);
-                        if (regentBean == null) {
-                            Department department = null;
-                            if (person.getEmployee() != null) {
-                                department =
-                                        person.getEmployee().getLastDepartmentWorkingPlace(
-                                                regentInquiryTemplate.getExecutionPeriod().getBeginDateYearMonthDay(),
-                                                regentInquiryTemplate.getExecutionPeriod().getEndDateYearMonthDay());
-                            }
-                            regentBean = new RegentBean(department, person, new ArrayList<ExecutionCourse>());
-                            regentBean.setCommentsToMake(hasMandatoryCommentsToMake);
-                            regentBean.setInquiryToAnswer(inquiryToAnswer);
-                            regentsMap.put(person, regentBean);
-                        } else {
-                            regentBean.setCommentsToMake(hasMandatoryCommentsToMake || regentBean.isCommentsToMake());
-                            regentBean.setInquiryToAnswer(inquiryToAnswer || regentBean.isInquiryToAnswer());
-                        }
-                        List<ExecutionCourse> executionCourseList = regentsMap.get(person).getCoursesToComment();
-                        executionCourseList.add(professorship.getExecutionCourse());
+                    Department department = null;
+                    if (regent.getEmployee() != null) {
+                        department =
+                                regent.getEmployee().getLastDepartmentWorkingPlace(
+                                        regentInquiryTemplate.getExecutionPeriod().getBeginDateYearMonthDay(),
+                                        regentInquiryTemplate.getExecutionPeriod().getEndDateYearMonthDay());
                     }
+                    int questionsToAnswer =
+                            professorship.getInquiryRegentAnswer() != null ? regentInquiryTemplate.getNumberOfQuestions()
+                                    - professorship.getInquiryRegentAnswer().getNumberOfAnsweredQuestions() : regentInquiryTemplate
+                                    .getNumberOfQuestions();
+                    int mandatoryQuestionsToAnswer =
+                            professorship.getInquiryRegentAnswer() != null ? regentInquiryTemplate.getNumberOfRequiredQuestions()
+                                    - professorship.getInquiryRegentAnswer().getNumberOfAnsweredRequiredQuestions() : regentInquiryTemplate
+                                    .getNumberOfRequiredQuestions();
+                    RegentBean regentBean = new RegentBean(department, regent, professorship);
+                    //there are conditions that make appear a new set of questions and some can be mandatory, 
+                    //thus the number of mandatory answered questions can be greater than the default number of mandatory questions
+                    regentBean.setMandatoryQuestionsToAnswer(Math.abs(mandatoryQuestionsToAnswer));
+                    regentBean.setQuestionsToAnswer(questionsToAnswer);
+                    regentBean.setCommentsToMake(hasMandatoryCommentsToMake);
+                    regentsList.add(regentBean);
                 }
             }
         }
 
-        Spreadsheet spreadsheet = createReport(regentsMap.values());
-        StringBuilder filename = new StringBuilder("Regentes_em_falta_");
+        Spreadsheet spreadsheet = createReport(regentsList);
+        StringBuilder filename = new StringBuilder("Relatório_preenchimento_Regentes_");
         filename.append(new DateTime().toString("yyyy_MM_dd_HH_mm"));
 
         response.setContentType("application/vnd.ms-excel");
@@ -132,32 +125,31 @@ public class ViewQucRegentsStatus extends FenixDispatchAction {
         return null;
     }
 
-    private Spreadsheet createReport(Collection<RegentBean> regentsList) throws IOException {
+    private Spreadsheet createReport(List<RegentBean> regentsList) throws IOException {
         Spreadsheet spreadsheet = new Spreadsheet("Regentes em falta");
         spreadsheet.setHeader("Departamento");
         spreadsheet.setHeader("Regente");
         spreadsheet.setHeader("Nº Mec");
         spreadsheet.setHeader("Telefone");
         spreadsheet.setHeader("Email");
-        spreadsheet.setHeader("Comentários por fazer");
-        spreadsheet.setHeader("Inquérito por responder");
-        spreadsheet.setHeader("Disciplinas");
+        spreadsheet.setHeader("Comentários obrigatórios por fazer");
+        spreadsheet.setHeader("Perguntas obrigatórias por responder");
+        spreadsheet.setHeader("Perguntas por responder");
+        spreadsheet.setHeader("Disciplina");
+        spreadsheet.setHeader("Disciplina sujeita auditoria?");
 
         for (RegentBean regentBean : regentsList) {
             Row row = spreadsheet.addRow();
             row.setCell(regentBean.getDepartment() != null ? regentBean.getDepartment().getName() : "-");
             row.setCell(regentBean.getRegent().getName());
-            row.setCell(regentBean.getRegent().getTeacher() != null ? regentBean.getRegent().getTeacher().getTeacherId()
-                    .toString() : regentBean.getRegent().getUsername());
+            row.setCell(regentBean.getRegent().getUsername());
             row.setCell(regentBean.getRegent().getDefaultMobilePhoneNumber());
             row.setCell(regentBean.getRegent().getDefaultEmailAddressValue());
             row.setCell(regentBean.isCommentsToMake() ? "Sim" : "Não");
-            row.setCell(regentBean.isInquiryToAnswer() ? "Sim" : "Não");
-            StringBuilder sb = new StringBuilder();
-            for (ExecutionCourse executionCourse : regentBean.getOrderedCoursesToComment()) {
-                sb.append(executionCourse.getName()).append(", ");
-            }
-            row.setCell(sb.toString());
+            row.setCell(regentBean.getMandatoryQuestionsToAnswer());
+            row.setCell(regentBean.getQuestionsToAnswer());
+            row.setCell(regentBean.getProfessorship().getExecutionCourse().getName());
+            row.setCell(InquiryResult.canBeSubjectToQucAudit(regentBean.getProfessorship().getExecutionCourse()) ? "Sim" : "Não");
         }
 
         return spreadsheet;
@@ -166,19 +158,15 @@ public class ViewQucRegentsStatus extends FenixDispatchAction {
     class RegentBean {
         private Department department;
         private Person regent;
-        private List<ExecutionCourse> coursesToComment;
+        private Professorship professorship;
         private boolean commentsToMake;
-        private boolean inquiryToAnswer;
+        private int questionsToAnswer;
+        private int mandatoryQuestionsToAnswer;
 
-        public RegentBean(Department department, Person regent, List<ExecutionCourse> coursesToComment) {
+        public RegentBean(Department department, Person regent, Professorship professorship) {
             setDepartment(department);
             setRegent(regent);
-            setCoursesToComment(coursesToComment);
-        }
-
-        public List<ExecutionCourse> getOrderedCoursesToComment() {
-            Collections.sort(getCoursesToComment(), new BeanComparator("name"));
-            return getCoursesToComment();
+            setProfessorship(professorship);
         }
 
         public void setDepartment(Department department) {
@@ -197,14 +185,6 @@ public class ViewQucRegentsStatus extends FenixDispatchAction {
             return regent;
         }
 
-        public List<ExecutionCourse> getCoursesToComment() {
-            return coursesToComment;
-        }
-
-        public void setCoursesToComment(List<ExecutionCourse> coursesToComment) {
-            this.coursesToComment = coursesToComment;
-        }
-
         public void setCommentsToMake(boolean commentsToMake) {
             this.commentsToMake = commentsToMake;
         }
@@ -213,12 +193,28 @@ public class ViewQucRegentsStatus extends FenixDispatchAction {
             return commentsToMake;
         }
 
-        public void setInquiryToAnswer(boolean inquiryToAnswer) {
-            this.inquiryToAnswer = inquiryToAnswer;
+        public int getQuestionsToAnswer() {
+            return questionsToAnswer;
         }
 
-        public boolean isInquiryToAnswer() {
-            return inquiryToAnswer;
+        public void setQuestionsToAnswer(int questionsToAnswer) {
+            this.questionsToAnswer = questionsToAnswer;
+        }
+
+        public int getMandatoryQuestionsToAnswer() {
+            return mandatoryQuestionsToAnswer;
+        }
+
+        public void setMandatoryQuestionsToAnswer(int mandatoryQuestionsToAnswer) {
+            this.mandatoryQuestionsToAnswer = mandatoryQuestionsToAnswer;
+        }
+
+        public Professorship getProfessorship() {
+            return professorship;
+        }
+
+        public void setProfessorship(Professorship professorship) {
+            this.professorship = professorship;
         }
     }
 }

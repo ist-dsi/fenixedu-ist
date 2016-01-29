@@ -18,6 +18,10 @@
  */
 package pt.ist.fenixedu.quc.domain;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.joda.time.DateTime;
@@ -43,23 +47,43 @@ public class InquiryAnswer extends InquiryAnswer_Base {
     }
 
     public int getNumberOfAnsweredRequiredQuestions() {
+        Map<InquiryGroupQuestion, Integer> groupQuestions = new HashMap<InquiryGroupQuestion, Integer>();
         int count = 0;
         for (QuestionAnswer questionAnswer : getQuestionAnswersSet()) {
             if (!StringUtils.isEmpty(questionAnswer.getAnswer()) && questionAnswer.getInquiryQuestion().getRequired()) {
                 count++;
+                InquiryGroupQuestion inquiryGroupQuestion = questionAnswer.getInquiryQuestion().getInquiryGroupQuestion();
+                if (inquiryGroupQuestion.isCheckbox()) {
+                    groupQuestions.compute(inquiryGroupQuestion, (k, v) -> v == null ? 1 : v + 1);
+                }
             }
         }
-        return count;
+        //when there are group questions, it only matters if the group is answered and not all the choices chosen in the group
+        int optionAnswers = 0;
+        for (Entry<InquiryGroupQuestion, Integer> entry : groupQuestions.entrySet()) {
+            optionAnswers += (entry.getValue() > 1 ? entry.getValue() - 1 : 0);
+        }
+        return count - optionAnswers;
     }
 
     public int getNumberOfAnsweredQuestions() {
+        Map<InquiryGroupQuestion, Integer> groupQuestions = new HashMap<InquiryGroupQuestion, Integer>();
         int count = 0;
         for (QuestionAnswer questionAnswer : getQuestionAnswersSet()) {
             if (!StringUtils.isEmpty(questionAnswer.getAnswer())) {
                 count++;
+                InquiryGroupQuestion inquiryGroupQuestion = questionAnswer.getInquiryQuestion().getInquiryGroupQuestion();
+                if (inquiryGroupQuestion.isCheckbox()) {
+                    groupQuestions.compute(inquiryGroupQuestion, (k, v) -> v == null ? 1 : v + 1);
+                }
             }
         }
-        return count;
+        //when there are group questions, it only matters if the group is answered and not all the choices chosen in the group
+        int optionAnswers = 0;
+        for (Entry<InquiryGroupQuestion, Integer> entry : groupQuestions.entrySet()) {
+            optionAnswers += (entry.getValue() > 1 ? entry.getValue() - 1 : 0);
+        }
+        return count - optionAnswers;
     }
 
     public boolean hasRequiredQuestionsToAnswer(InquiryTemplate inquiryTemplate) {
