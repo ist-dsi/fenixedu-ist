@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang.CharSetUtils;
 import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
@@ -199,7 +198,8 @@ public class TeacherCreditsReportFile extends TeacherCreditsReportFile_Base {
     private String getOthersDesciption(TeacherService teacherService) {
         List<String> others = new ArrayList<String>();
         for (OtherService otherService : teacherService.getOtherServices()) {
-            others.add(CharSetUtils.delete(otherService.getReason(), "\r\n") + " (" + otherService.getCredits() + " créditos)");
+            others.add(otherService.getReason().replace("\r", "").replace("\n", "") + " (" + otherService.getCredits()
+                    + " créditos)");
         }
         return others.stream().collect(Collectors.joining(", "));
     }

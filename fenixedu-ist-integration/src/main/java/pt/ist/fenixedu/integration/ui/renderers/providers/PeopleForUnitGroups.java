@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.beanutils.MethodUtils;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 
@@ -30,6 +29,7 @@ import pt.ist.fenixWebFramework.renderers.DataProvider;
 import pt.ist.fenixWebFramework.renderers.components.converters.Converter;
 import pt.ist.fenixedu.contracts.domain.Employee;
 import pt.ist.fenixedu.integration.domain.accessControl.PersistentGroupMembers;
+import pt.ist.fenixedu.integration.ui.struts.action.research.researchUnit.PersistentGroupMembersBean;
 
 public class PeopleForUnitGroups implements DataProvider {
 
@@ -44,11 +44,7 @@ public class PeopleForUnitGroups implements DataProvider {
         if (source instanceof Unit) {
             unit = (Unit) source;
         } else {
-            try {
-                unit = (Unit) MethodUtils.invokeMethod(source, "getUnit", null);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+            unit = ((PersistentGroupMembersBean) source).getUnit();
         }
         return getPeopleForUnit(unit);
     }

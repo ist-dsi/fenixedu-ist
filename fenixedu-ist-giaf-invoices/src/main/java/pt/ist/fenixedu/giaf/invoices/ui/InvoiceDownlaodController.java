@@ -6,7 +6,6 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.IOUtils;
 import org.fenixedu.academic.domain.accounting.AccountingTransactionDetail;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import pt.ist.fenixedu.giaf.invoices.GiafInvoice;
+
+import com.google.common.io.ByteStreams;
 
 @SpringFunctionality(app = InvoiceController.class, title = "title.giaf.invoice.viewer")
 @RequestMapping("/giaf-invoice-downloader")
@@ -27,7 +28,7 @@ public class InvoiceDownlaodController {
         if (file.exists()) {
             try (final FileInputStream inputStream = new FileInputStream(file)) {
                 response.setHeader("Content-Disposition", "attachment; filename=" + invoiceNumber + ".pdf");
-                IOUtils.copy(inputStream, response.getOutputStream());
+                ByteStreams.copy(inputStream, response.getOutputStream());
                 response.flushBuffer();
             } catch (final IOException e) {
                 throw new Error(e);

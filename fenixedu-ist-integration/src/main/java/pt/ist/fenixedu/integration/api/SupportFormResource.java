@@ -30,6 +30,7 @@ import javax.mail.Message;
 import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.Transport;
+import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
@@ -43,7 +44,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.commons.validator.EmailValidator;
 import org.fenixedu.academic.FenixEduAcademicConfiguration;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.predicate.AccessControl;
@@ -82,6 +82,16 @@ public class SupportFormResource extends BennuRestResource {
         }
     }
 
+    private static boolean validateEmail(String email) {
+        try {
+            InternetAddress address = new InternetAddress(email);
+            address.validate();
+            return true;
+        } catch (AddressException e) {
+            return false;
+        }
+    }
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response sendSupportForm(String jsonStr, @Context HttpServletRequest request) {
@@ -95,8 +105,8 @@ public class SupportFormResource extends BennuRestResource {
         if (CoreConfiguration.getConfiguration().developmentMode()) {
             logger.warn("Submitted error form from {}: '{}'\n{}", email, mailSubject, mailBody);
         } else {
-            sendEmail(EmailValidator.getInstance().isValid(email) ? email : CoreConfiguration.getConfiguration()
-                    .defaultSupportEmailAddress(), mailSubject, mailBody, bean);
+            sendEmail(validateEmail(email) ? email : CoreConfiguration.getConfiguration().defaultSupportEmailAddress(),
+                    mailSubject, mailBody, bean);
         }
         return Response.ok().build();
     }

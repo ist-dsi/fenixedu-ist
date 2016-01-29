@@ -8,14 +8,14 @@ import net.sf.jasperreports.engine.fill.JRSubreportRunResult;
 import net.sf.jasperreports.engine.fill.JRSubreportRunnable;
 import net.sf.jasperreports.engine.fill.JRSubreportRunner;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import pt.ist.fenixframework.FenixFramework;
 
 public class JRTxThreadSubreportRunner extends JRSubreportRunnable implements JRSubreportRunner {
 
-    private static final Log log = LogFactory.getLog(JRTxThreadSubreportRunner.class);
+    private static final Logger log = LoggerFactory.getLogger(JRTxThreadSubreportRunner.class);
 
     private final JRBaseFiller subreportFiller;
 

@@ -20,11 +20,11 @@ package pt.ist.fenixedu.quc.domain;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionDegree;
@@ -54,8 +54,8 @@ public class InquiryResult extends InquiryResult_Base {
                 questionHeader = iq1.getInquiryQuestion().getInquiryGroupQuestion().getInquiryQuestionHeader();
             }
             String[] scale = questionHeader.getScaleHeaders().getScaleValues();
-            Integer index1 = ArrayUtils.indexOf(scale, iq1.getScaleValue());
-            Integer index2 = ArrayUtils.indexOf(scale, iq2.getScaleValue());
+            Integer index1 = Arrays.asList(scale).indexOf(iq1.getScaleValue());
+            Integer index2 = Arrays.asList(scale).indexOf(iq2.getScaleValue());
             return index1.compareTo(index2);
         }
 

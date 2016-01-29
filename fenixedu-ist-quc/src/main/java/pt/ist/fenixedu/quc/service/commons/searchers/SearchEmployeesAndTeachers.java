@@ -21,10 +21,10 @@ package pt.ist.fenixedu.quc.service.commons.searchers;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.bennu.core.presentationTier.renderers.autoCompleteProvider.AutoCompleteProvider;
 import org.fenixedu.commons.StringNormalizer;
@@ -34,8 +34,6 @@ public class SearchEmployeesAndTeachers implements AutoCompleteProvider<Person> 
     @Override
     public Collection<Person> getSearchResults(Map<String, String> argsMap, String value, int maxCount) {
         List<Person> result = new ArrayList<Person>();
-
-        String slotName = argsMap.get("slot");
 
         if (value == null) {
             result = new ArrayList<Person>(Person.findPerson(""));
@@ -48,7 +46,7 @@ public class SearchEmployeesAndTeachers implements AutoCompleteProvider<Person> 
             }
         }
 
-        Collections.sort(result, new BeanComparator(slotName));
+        Collections.sort(result, Comparator.comparing(Person::getName));
         return result;
     }
 }
