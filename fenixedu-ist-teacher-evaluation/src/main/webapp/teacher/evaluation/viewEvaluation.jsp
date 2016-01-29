@@ -84,7 +84,7 @@
 							<div class="mtop1 mbottom05">
 								<form method="post" id="lockMark"
 									action="<%=request.getContextPath()
-															+ "/researcher/teacherEvaluation.do?method=lockEvaluation&process="
+															+ "/teacher/teacherEvaluation.do?method=lockEvaluation&process="
 															+ processId%>">
 								<html:submit> Lacrar</html:submit> <input value="Cancelar"
 									onclick="check(document.getElementById('<%="warning" + processId%>'));return false;" type="button"></form>

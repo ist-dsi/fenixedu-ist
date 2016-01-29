@@ -67,6 +67,7 @@ import pt.ist.fenixedu.teacher.evaluation.domain.TeacherEvaluation;
 import pt.ist.fenixedu.teacher.evaluation.domain.TeacherEvaluationFile;
 import pt.ist.fenixedu.teacher.evaluation.domain.TeacherEvaluationFileBean;
 import pt.ist.fenixedu.teacher.evaluation.domain.TeacherEvaluationFileType;
+import pt.ist.fenixedu.teacher.evaluation.domain.TeacherEvaluationInformationBean;
 import pt.ist.fenixedu.teacher.evaluation.domain.TeacherEvaluationProcess;
 
 @StrutsFunctionality(app = TeacherTeachingApp.class, path = "teacher-evaluation", titleKey = "label.teacher.evaluation.title",
@@ -80,7 +81,8 @@ import pt.ist.fenixedu.teacher.evaluation.domain.TeacherEvaluationProcess;
         @Forward(name = "viewEvaluation", path = "/teacher/evaluation/viewEvaluation.jsp"),
         @Forward(name = "viewEvaluationByCCAD", path = "/teacher/evaluation/viewEvaluationByCCAD.jsp"),
         @Forward(name = "uploadEvaluationFile", path = "/teacher/evaluation/uploadEvaluationFile.jsp"),
-        @Forward(name = "viewManagementInterface", path = "/teacher/evaluation/viewManagementInterface.jsp") })
+        @Forward(name = "viewManagementInterface", path = "/teacher/evaluation/viewManagementInterface.jsp"),
+        @Forward(name = "viewEvalueeInformation", path = "/teacher/evaluation/viewEvalueeInformation.jsp") })
 public class TeacherEvaluationDA extends FenixDispatchAction {
 
     private static final Logger logger = LoggerFactory.getLogger(TeacherEvaluationDA.class);
@@ -566,6 +568,13 @@ public class TeacherEvaluationDA extends FenixDispatchAction {
         final FacultyEvaluationProcess facultyEvaluationProcess = getDomainObject(request, "facultyEvaluationProcessOID");
         FacultyEvaluationProcessServices.unPublish(facultyEvaluationProcess);
         return viewFacultyEvaluationProcess(mapping, form, request, response);
+    }
+
+    public ActionForward viewEvalueeInformation(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        TeacherEvaluationProcess process = getDomainObject(request, "process");
+        request.setAttribute("informationBean", new TeacherEvaluationInformationBean(process));
+        return mapping.findForward("viewEvalueeInformation");
     }
 
 }

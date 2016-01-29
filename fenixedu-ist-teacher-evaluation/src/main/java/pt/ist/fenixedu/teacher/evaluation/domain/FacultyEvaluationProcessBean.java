@@ -39,6 +39,8 @@ public class FacultyEvaluationProcessBean implements Serializable {
     private String suffix;
     private byte[] evaluatorListFileContent;
     private FacultyEvaluationProcess facultyEvaluationProcess;
+    private Integer beginEvaluationYear;
+    private Integer endEvaluationYear;
 
     public FacultyEvaluationProcessBean() {
     }
@@ -52,6 +54,8 @@ public class FacultyEvaluationProcessBean implements Serializable {
         setEvaluationIntervalEnd(facultyEvaluationProcess.getEvaluationInterval().getEnd());
         setAllowNoEval(facultyEvaluationProcess.getAllowNoEval());
         setSuffix(facultyEvaluationProcess.getSuffix());
+        setBeginEvaluationYear(facultyEvaluationProcess.getBeginEvaluationYear());
+        setEndEvaluationYear(facultyEvaluationProcess.getEndEvaluationYear());
         setFacultyEvaluationProcess(facultyEvaluationProcess);
     }
 
@@ -135,12 +139,29 @@ public class FacultyEvaluationProcessBean implements Serializable {
         return new Interval(getEvaluationIntervalStart(), getEvaluationIntervalEnd());
     }
 
+    public Integer getBeginEvaluationYear() {
+        return beginEvaluationYear;
+    }
+
+    public void setBeginEvaluationYear(Integer beginEvaluationYear) {
+        this.beginEvaluationYear = beginEvaluationYear;
+    }
+
+    public Integer getEndEvaluationYear() {
+        return endEvaluationYear;
+    }
+
+    public void setEndEvaluationYear(Integer endEvaluationYear) {
+        this.endEvaluationYear = endEvaluationYear;
+    }
+
     @Atomic
     public FacultyEvaluationProcess create() {
         FacultyEvaluationProcess process =
                 new FacultyEvaluationProcess(getTitle(), getAutoEvaluationInterval(), getEvaluationInterval());
         process.setAllowNoEval(isAllowNoEval());
         process.setSuffix(getSuffix());
+        process.setEvaluationYears(getBeginEvaluationYear(), getEndEvaluationYear());
         return process;
     }
 
@@ -151,6 +172,7 @@ public class FacultyEvaluationProcessBean implements Serializable {
         facultyEvaluationProcess.setEvaluationInterval(getEvaluationInterval());
         facultyEvaluationProcess.setAllowNoEval(isAllowNoEval());
         facultyEvaluationProcess.setSuffix(getSuffix());
+        facultyEvaluationProcess.setEvaluationYears(getBeginEvaluationYear(), getEndEvaluationYear());
     }
 
 }

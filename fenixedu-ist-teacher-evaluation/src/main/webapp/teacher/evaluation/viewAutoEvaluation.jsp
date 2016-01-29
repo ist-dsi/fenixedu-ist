@@ -84,6 +84,10 @@
 					bundle="TEACHER_EVALUATION_RESOURCES" key="label.teacher.evaluation.autoevaluation.lock" /> </a>
 	
 			</logic:equal>
+			| <html:link action="/teacherEvaluation.do?method=viewEvalueeInformation" paramId="process" paramName="process" paramProperty="externalId">
+				<bean:message bundle="TEACHER_EVALUATION_RESOURCES" key="label.teacher.evaluation.showTeacherInformation" />
+			</html:link>
+			
 		</p>
 	</logic:equal>
 
@@ -94,7 +98,7 @@
 			<div class="mtop1 mbottom05">
 				<form method="post" id="lockMark"
 					action="<%=request.getContextPath()
-											+ "/researcher/teacherEvaluation.do?method=lockAutoEvaluation&process="
+											+ "/teacher/teacherEvaluation.do?method=lockAutoEvaluation&process="
 											+ processId%>">
 				<html:submit> Lacrar</html:submit> <input value="Cancelar"
 					onclick="check(document.getElementById('<%="warning" + processId%>'));return false;" type="button"></form>

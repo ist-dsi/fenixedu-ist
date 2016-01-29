@@ -36,7 +36,7 @@
 
 <fr:edit id="process-selection" name="typeSelection" action="/teacherEvaluation.do?method=selectEvaluationType">
 	<fr:schema bundle="TEACHER_EVALUATION_RESOURCES"
-		type="org.fenixedu.academic.ui.struts.action.teacher.evaluation.TeacherEvaluationTypeSelection">
+		type="pt.ist.fenixedu.teacher.evaluation.ui.struts.action.teacher.evaluation.TeacherEvaluationTypeSelection">
 		<fr:slot name="type" key="label.teacher.evaluation.type">
 			<logic:equal name="typeSelection" property="process.facultyEvaluationProcess.allowNoEval" value="false">
 				<fr:property name="excludedValues" value="NO_EVALUATION" />
