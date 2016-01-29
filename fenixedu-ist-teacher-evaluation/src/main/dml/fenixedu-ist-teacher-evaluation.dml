@@ -10,6 +10,8 @@ class FacultyEvaluationProcess  {
     boolean allowNoEval;
     String suffix;
     boolean areApprovedMarksPublished;
+    Integer beginEvaluationYear;
+    Integer endEvaluationYear;
 }
 
 class FacultyEvaluationProcessYear  {

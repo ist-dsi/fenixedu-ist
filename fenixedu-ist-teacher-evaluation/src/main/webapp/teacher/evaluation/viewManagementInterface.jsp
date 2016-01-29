@@ -56,6 +56,8 @@
 				<fr:slot name="evaluationIntervalEnd" key="label.teacher.evaluation.facultyEvaluationProcess.evaluationIntervalEnd" validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator"/>
 				<fr:slot name="allowNoEval" key="label.teacher.evaluation.facultyEvaluationProcess.allowNoEval" validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator"/>
 				<fr:slot name="suffix" key="label.teacher.evaluation.facultyEvaluationProcess.suffix" validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator"/>
+				<fr:slot name="beginEvaluationYear" key="label.teacher.evaluation.facultyEvaluationProcess.beginEvaluationYear" validator="pt.ist.fenixWebFramework.renderers.validators.NumberValidator" required="true"/>
+               	<fr:slot name="endEvaluationYear" key="label.teacher.evaluation.facultyEvaluationProcess.endEvaluationYear" validator="pt.ist.fenixWebFramework.renderers.validators.NumberValidator" required="true"/>
 			</fr:schema>
 			<fr:layout name="tabular">
 				<fr:property name="classes" value="tstyle5 thlight thright"/>
@@ -86,6 +88,8 @@
 				<fr:slot name="evaluationIntervalEnd" key="label.teacher.evaluation.facultyEvaluationProcess.evaluationIntervalEnd" validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator"/>
 				<fr:slot name="allowNoEval" key="label.teacher.evaluation.facultyEvaluationProcess.allowNoEval" validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator"/>
 				<fr:slot name="suffix" key="label.teacher.evaluation.facultyEvaluationProcess.suffix" validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator"/>
+				<fr:slot name="beginEvaluationYear" key="label.teacher.evaluation.facultyEvaluationProcess.beginEvaluationYear" validator="pt.ist.fenixWebFramework.renderers.validators.NumberValidator" required="true"/>
+               	<fr:slot name="endEvaluationYear" key="label.teacher.evaluation.facultyEvaluationProcess.endEvaluationYear" validator="pt.ist.fenixWebFramework.renderers.validators.NumberValidator" required="true"/>
 			</fr:schema>
 			<fr:layout name="tabular">
 				<fr:property name="classes" value="tstyle5 thlight thright"/>

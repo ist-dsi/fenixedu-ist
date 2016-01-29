@@ -70,6 +70,17 @@ public class FacultyEvaluationProcess extends FacultyEvaluationProcess_Base impl
         setEvaluationInterval(evaluationInterval);
     }
 
+    public void setEvaluationYears(Integer beginEvaluationYear, Integer endEvaluationYear) {
+        if (beginEvaluationYear == null || endEvaluationYear == null) {
+            throw new DomainException("error.evaluationYears.cannot.be.null");
+        }
+        if (beginEvaluationYear >= endEvaluationYear) {
+            throw new DomainException("error.invalid.evaluation.years");
+        }
+        setBeginEvaluationYear(beginEvaluationYear);
+        setEndEvaluationYear(endEvaluationYear);
+    }
+
     public void uploadEvaluators(final byte[] bytes) {
         final String contents = new String(bytes);
         final String[] lines = contents.split("[\\r\\n]+");
@@ -164,9 +175,8 @@ public class FacultyEvaluationProcess extends FacultyEvaluationProcess_Base impl
 
     private void appendMessage(final StringBuilder stringBuilder, final int lineNumber, final String key, final String[] args) {
         final String description = BundleUtil.getString("resources.TeacherEvaluationResources", key, args);
-        final String message =
-                BundleUtil.getString(Bundle.APPLICATION, "error.invalid.file.contents.line", Integer.toString(lineNumber),
-                        description);
+        final String message = BundleUtil.getString(Bundle.APPLICATION, "error.invalid.file.contents.line",
+                Integer.toString(lineNumber), description);
         stringBuilder.append("\n\t");
         stringBuilder.append(message);
     }
@@ -257,7 +267,8 @@ public class FacultyEvaluationProcess extends FacultyEvaluationProcess_Base impl
                                 teacherEvaluationMark);
                     }
                 } else {
-                    final String message = BundleUtil.getString("resources.TeacherEvaluationResources", "error.evaluee.has.no.process", evaluee);
+                    final String message =
+                            BundleUtil.getString("resources.TeacherEvaluationResources", "error.evaluee.has.no.process", evaluee);
                     stringBuilder.append(message);
                     stringBuilder.append('\n');
                 }

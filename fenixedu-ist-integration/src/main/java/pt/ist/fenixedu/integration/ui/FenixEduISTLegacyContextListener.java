@@ -41,11 +41,13 @@ import org.fenixedu.cms.domain.Category;
 import org.fenixedu.cms.domain.Site;
 import org.fenixedu.learning.domain.executionCourse.ExecutionCourseSite;
 
+import com.google.common.collect.Sets;
+
 import pt.ist.fenixedu.integration.domain.student.AffinityCyclesManagement;
+import pt.ist.fenixedu.integration.dto.QucProfessorshipEvaluation;
+import pt.ist.fenixedu.teacher.evaluation.domain.ProfessorshipEvaluationBean;
 import pt.ist.fenixframework.FenixFramework;
 import pt.ist.fenixframework.dml.runtime.RelationAdapter;
-
-import com.google.common.collect.Sets;
 
 @WebListener
 public class FenixEduISTLegacyContextListener implements ServletContextListener {
@@ -113,7 +115,7 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
             new AffinityCyclesManagement(enrolment.getRegistration().getLastStudentCurricularPlan())
                     .createCycleOrRepeateSeparate();
         }));
-
+        ProfessorshipEvaluationBean.professorshipEvaluation = new QucProfessorshipEvaluation();
     }
 
     private static boolean partOf(Set<ExecutionCourse> degrees, StudentThesisCandidacy studentThesisCandidacy) {

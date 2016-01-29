@@ -97,7 +97,7 @@
 							<bean:message key="label.teacher.evaluation.evaluation.lock.confirm" arg0="<%=org.fenixedu.academic.domain.organizationalStructure.Unit.getInstitutionName().getContent()%>" bundle="TEACHER_EVALUATION_RESOURCES" />
 						</p>
 						<div class="mtop1 mbottom05">
-							<form method="post" id="lockMark" action="<%=request.getContextPath() + "/researcher/teacherEvaluation.do?method=lockEvaluation&process=" + processId%>">
+							<form method="post" id="lockMark" action="<%=request.getContextPath() + "/teacher/teacherEvaluation.do?method=lockEvaluation&process=" + processId%>">
 								<html:submit> Lacrar</html:submit> <input value="Cancelar" onclick="check(document.getElementById('<%="warning" + processId%>'));return false;" type="button">
 							</form>
 						</div>
@@ -180,7 +180,7 @@
 				<div class="mtop1 mbottom05">
 					<form method="post" id="lockMark"
 						action="<%=request.getContextPath()
-											+ "/researcher/teacherEvaluation.do?method=lockAutoEvaluation&process="
+											+ "/teacher/teacherEvaluation.do?method=lockAutoEvaluation&process="
 											+ processId%>">
 						<html:submit> Lacrar</html:submit> <input value="Cancelar"
 							onclick="check(document.getElementById('<%="warning" + processId%>'));return false;" type="button"></form>
@@ -223,7 +223,6 @@
 	</logic:present>
 
 	<% } %>
-
 <% } %>
 <logic:equal name="process" property="readyForCCADConsideration" value="true">
 	<logic:notEmpty name="process" property="teacherEvaluationFileBeanSet">
