@@ -20,6 +20,7 @@ package pt.ist.fenixedu.tutorship.ui.Action.pedagogicalCouncil;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -221,7 +221,8 @@ public class TutorManagementDispatchAction extends FenixDispatchAction {
             TutorBean historyBean = new TutorBean(bean.getExecutionDegreeID(), bean.getDegreeCurricularPlanID(), teacher);
             tutorHistoryBeans.add(historyBean);
         }
-        Collections.sort(tutorHistoryBeans, new BeanComparator("teacher.teacherId"));
+        Collections.sort(tutorHistoryBeans,
+                Comparator.comparing(TutorBean::getTeacher, Comparator.comparing(Teacher::getTeacherId)));
         return tutorHistoryBeans;
     }
 
@@ -233,7 +234,8 @@ public class TutorManagementDispatchAction extends FenixDispatchAction {
                 tutorHistoryBeans.add(historyBean);
             }
         }
-        Collections.sort(tutorHistoryBeans, new BeanComparator("teacher.teacherId"));
+        Collections.sort(tutorHistoryBeans,
+                Comparator.comparing(TutorBean::getTeacher, Comparator.comparing(Teacher::getTeacherId)));
         return tutorHistoryBeans;
     }
 
@@ -258,7 +260,7 @@ public class TutorManagementDispatchAction extends FenixDispatchAction {
 
         ArrayList<TutorshipManagementByEntryYearBean> beans =
                 new ArrayList<TutorshipManagementByEntryYearBean>(tutorshipManagementBeansByEntryYear.values());
-        Collections.sort(beans, new BeanComparator("executionYear"));
+        Collections.sort(beans, Comparator.comparing(TutorshipManagementByEntryYearBean::getExecutionYear));
         Collections.reverse(beans);
 
         return beans;

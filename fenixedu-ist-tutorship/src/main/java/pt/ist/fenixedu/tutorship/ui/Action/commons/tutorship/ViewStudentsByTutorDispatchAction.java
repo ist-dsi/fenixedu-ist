@@ -20,13 +20,13 @@ package pt.ist.fenixedu.tutorship.ui.Action.commons.tutorship;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
@@ -76,7 +76,7 @@ public abstract class ViewStudentsByTutorDispatchAction extends FenixDispatchAct
         }
 
         List<StudentsByTutorBean> tutorshipsByEntryYear = new ArrayList<StudentsByTutorBean>(tutorshipsMapByEntryYear.values());
-        Collections.sort(tutorshipsByEntryYear, new BeanComparator("studentsEntryYear"));
+        Collections.sort(tutorshipsByEntryYear, Comparator.comparing(StudentsByTutorBean::getStudentsEntryYear));
         Collections.reverse(tutorshipsByEntryYear);
 
         return tutorshipsByEntryYear;

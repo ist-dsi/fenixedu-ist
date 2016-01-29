@@ -19,12 +19,10 @@
 package pt.ist.fenixedu.quc.dto;
 
 import java.io.Serializable;
+import java.util.Comparator;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
-import org.apache.commons.beanutils.BeanComparator;
-import org.apache.commons.collections.comparators.ComparatorChain;
 
 import pt.ist.fenixedu.quc.domain.InquiryAnswer;
 import pt.ist.fenixedu.quc.domain.InquiryBlock;
@@ -63,10 +61,9 @@ public class InquiryBlockDTO implements Serializable {
 
     private void initBlock(InquiryBlock inquiryBlock) {
         setInquiryBlock(inquiryBlock);
-        ComparatorChain comparatorChain = new ComparatorChain();
-        comparatorChain.addComparator(new BeanComparator("inquiryGroupQuestion.groupOrder"));
-        comparatorChain.addComparator(new BeanComparator("order"));
-        setInquiryGroups(new TreeSet<InquiryGroupQuestionBean>(comparatorChain));
+
+        setInquiryGroups(new TreeSet<InquiryGroupQuestionBean>(Comparator.comparing(
+                InquiryGroupQuestionBean::getInquiryGroupQuestion).thenComparing(InquiryGroupQuestionBean::getOrder)));
     }
 
     public InquiryBlock getInquiryBlock() {

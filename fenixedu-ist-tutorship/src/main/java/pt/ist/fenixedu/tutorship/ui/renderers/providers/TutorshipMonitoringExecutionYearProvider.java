@@ -20,9 +20,9 @@ package pt.ist.fenixedu.tutorship.ui.renderers.providers;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
-import org.apache.commons.collections.comparators.ReverseComparator;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.bennu.core.domain.Bennu;
 
@@ -46,7 +46,7 @@ public class TutorshipMonitoringExecutionYearProvider implements DataProvider {
                 executionYears.add(year);
             }
         }
-        Collections.sort(executionYears, new ReverseComparator());
+        Collections.sort(executionYears, Comparator.reverseOrder());
         return executionYears;
     }
 

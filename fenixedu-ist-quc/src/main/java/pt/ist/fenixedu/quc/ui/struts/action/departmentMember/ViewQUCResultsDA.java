@@ -21,6 +21,7 @@ package pt.ist.fenixedu.quc.ui.struts.action.departmentMember;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -30,8 +31,6 @@ import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.beanutils.BeanComparator;
-import org.apache.commons.collections.comparators.ReverseComparator;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -109,11 +108,17 @@ public abstract class ViewQUCResultsDA extends FenixDispatchAction {
                 }
             }
         }
-        Collections.sort(competenceCoursesToAudit, new BeanComparator("competenceCourse.name"));
+        Collections.sort(
+                competenceCoursesToAudit,
+                Comparator.comparing(CompetenceCourseResultsResume::getCompetenceCourse,
+                        Comparator.comparing(CompetenceCourse::getName)));
 
         List<DepartmentTeacherResultsResume> teachersResumeToImprove =
                 getDepartmentTeachersResume(departmentUnit, executionSemester, false, true);
-        Collections.sort(teachersResumeToImprove, new BeanComparator("teacher.person.name"));
+        Collections.sort(
+                teachersResumeToImprove,
+                Comparator.comparing(DepartmentTeacherResultsResume::getTeacher,
+                        Comparator.comparing(Teacher::getPerson, Comparator.comparing(Person::getName))));
 
         request.setAttribute("competenceCoursesToAudit", competenceCoursesToAudit);
         request.setAttribute("teachersResumeToImprove", teachersResumeToImprove);
@@ -132,7 +137,8 @@ public abstract class ViewQUCResultsDA extends FenixDispatchAction {
         ExecutionSemester executionSemester = getExecutionSemester(request);
 
         Map<ScientificAreaUnit, List<CompetenceCourseResultsResume>> competenceCoursesByScientificArea =
-                new TreeMap<ScientificAreaUnit, List<CompetenceCourseResultsResume>>(new BeanComparator("name"));
+                new TreeMap<ScientificAreaUnit, List<CompetenceCourseResultsResume>>(
+                        Comparator.comparing(ScientificAreaUnit::getName));
         for (ScientificAreaUnit scientificAreaUnit : departmentUnit.getScientificAreaUnits()) {
             for (CompetenceCourseGroupUnit competenceCourseGroupUnit : scientificAreaUnit.getCompetenceCourseGroupUnits()) {
                 for (CompetenceCourse competenceCourse : competenceCourseGroupUnit.getCompetenceCourses()) {
@@ -167,8 +173,10 @@ public abstract class ViewQUCResultsDA extends FenixDispatchAction {
         }
 
         for (ScientificAreaUnit scientificAreaUnit : competenceCoursesByScientificArea.keySet()) {
-            Collections.sort(competenceCoursesByScientificArea.get(scientificAreaUnit), new BeanComparator(
-                    "competenceCourse.name"));
+            Collections.sort(
+                    competenceCoursesByScientificArea.get(scientificAreaUnit),
+                    Comparator.comparing(CompetenceCourseResultsResume::getCompetenceCourse,
+                            Comparator.comparing(CompetenceCourse::getName)));
         }
         request.setAttribute("competenceCoursesByScientificArea", competenceCoursesByScientificArea);
         ViewTeacherInquiryPublicResults.setTeacherScaleColorException(executionSemester, request);
@@ -183,7 +191,10 @@ public abstract class ViewQUCResultsDA extends FenixDispatchAction {
 
         List<DepartmentTeacherResultsResume> teachersResume =
                 getDepartmentTeachersResume(departmentUnit, executionSemester, true, false);
-        Collections.sort(teachersResume, new BeanComparator("teacher.person.name"));
+        Collections.sort(
+                teachersResume,
+                Comparator.comparing(DepartmentTeacherResultsResume::getTeacher,
+                        Comparator.comparing(Teacher::getPerson, Comparator.comparing(Person::getName))));
 
         request.setAttribute("teachersResume", teachersResume);
         ViewTeacherInquiryPublicResults.setTeacherScaleColorException(executionSemester, request);
@@ -308,7 +319,7 @@ public abstract class ViewQUCResultsDA extends FenixDispatchAction {
                     executionSemesters.add(executionSemester);
                 }
             }
-            Collections.sort(executionSemesters, new ReverseComparator());
+            Collections.sort(executionSemesters, Comparator.reverseOrder());
             return executionSemesters;
         }
 

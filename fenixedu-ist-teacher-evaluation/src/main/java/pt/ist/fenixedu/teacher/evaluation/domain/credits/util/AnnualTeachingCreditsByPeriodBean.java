@@ -23,11 +23,11 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.beanutils.BeanComparator;
-import org.apache.commons.collections.comparators.ComparatorChain;
+import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.academic.domain.Teacher;
@@ -93,7 +93,8 @@ public class AnnualTeachingCreditsByPeriodBean implements Serializable {
             }
         }
 
-        Collections.sort(professorships, new BeanComparator("executionCourse.name"));
+        Collections.sort(professorships,
+                Comparator.comparing(Professorship::getExecutionCourse, Comparator.comparing(ExecutionCourse::getName)));
 
         return professorships;
     }
@@ -105,14 +106,12 @@ public class AnnualTeachingCreditsByPeriodBean implements Serializable {
             institutionWorkingTimes.addAll(teacherService.getInstitutionWorkTimes());
         }
 
-        ComparatorChain comparatorChain = new ComparatorChain();
-        BeanComparator semesterComparator = new BeanComparator("teacherService.executionPeriod");
-        BeanComparator weekDayComparator = new BeanComparator("weekDay");
-        BeanComparator startTimeComparator = new BeanComparator("startTime");
-        comparatorChain.addComparator(semesterComparator);
-        comparatorChain.addComparator(weekDayComparator);
-        comparatorChain.addComparator(startTimeComparator);
-        Collections.sort(institutionWorkingTimes, comparatorChain);
+        Collections.sort(
+                institutionWorkingTimes,
+                Comparator
+                        .comparing(InstitutionWorkTime::getTeacherService,
+                                Comparator.comparing(TeacherService::getExecutionPeriod))
+                        .thenComparing(InstitutionWorkTime::getWeekDay).thenComparing(InstitutionWorkTime::getStartTime));
         return institutionWorkingTimes;
     }
 

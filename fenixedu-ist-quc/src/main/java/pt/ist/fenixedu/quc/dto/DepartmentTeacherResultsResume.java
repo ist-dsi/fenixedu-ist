@@ -22,11 +22,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.beanutils.BeanComparator;
+import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.academic.domain.Teacher;
@@ -75,8 +76,11 @@ public class DepartmentTeacherResultsResume implements Serializable {
     }
 
     public List<TeacherShiftTypeGroupsResumeResult> getOrderedTeacherShiftResumes() {
-        Collections.sort(getTeacherShiftTypeGroupsResumeResults(), new BeanComparator("professorship.executionCourse.name"));
-        Collections.sort(getTeacherShiftTypeGroupsResumeResults(), new BeanComparator("shiftType"));
+        Collections.sort(
+                getTeacherShiftTypeGroupsResumeResults(),
+                Comparator.comparing(TeacherShiftTypeGroupsResumeResult::getProfessorship,
+                        Comparator.comparing(Professorship::getExecutionCourse, Comparator.comparing(ExecutionCourse::getName)))
+                        .thenComparing(TeacherShiftTypeGroupsResumeResult::getShiftType));
         return getTeacherShiftTypeGroupsResumeResults();
     }
 

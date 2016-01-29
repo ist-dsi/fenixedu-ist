@@ -28,6 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +37,6 @@ import java.util.Set;
 import javax.faces.component.html.HtmlInputHidden;
 import javax.faces.model.SelectItem;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.Department;
@@ -390,7 +390,7 @@ public class OrganizationalStructureBackingBean extends FenixBackingBean {
             selectItem.setValue(type.getName());
             list.add(selectItem);
         }
-        Collections.sort(list, new BeanComparator("label"));
+        Collections.sort(list, Comparator.comparing(SelectItem::getLabel));
 
         addDefaultSelectedItem(list);
 
@@ -407,7 +407,7 @@ public class OrganizationalStructureBackingBean extends FenixBackingBean {
             selectItem.setValue(classification.getName());
             list.add(selectItem);
         }
-        Collections.sort(list, new BeanComparator("label"));
+        Collections.sort(list, Comparator.comparing(SelectItem::getLabel));
 
         addDefaultSelectedItem(list);
 
@@ -427,7 +427,7 @@ public class OrganizationalStructureBackingBean extends FenixBackingBean {
             list.add(selectItem);
         }
 
-        Collections.sort(list, new BeanComparator("label"));
+        Collections.sort(list, Comparator.comparing(SelectItem::getLabel));
         addDefaultSelectedItem(list);
         return list;
     }
@@ -448,7 +448,7 @@ public class OrganizationalStructureBackingBean extends FenixBackingBean {
             list.add(selectItem);
         }
 
-        Collections.sort(list, new BeanComparator("label"));
+        Collections.sort(list, Comparator.comparing(SelectItem::getLabel));
         addDefaultSelectedItem(list);
         return list;
     }
@@ -488,7 +488,7 @@ public class OrganizationalStructureBackingBean extends FenixBackingBean {
             list.add(selectItem);
         }
 
-        Collections.sort(list, new BeanComparator("label"));
+        Collections.sort(list, Comparator.comparing(SelectItem::getLabel));
         addDefaultSelectedItem(list);
         return list;
     }
@@ -518,7 +518,7 @@ public class OrganizationalStructureBackingBean extends FenixBackingBean {
             selectItem.setValue(campus.getExternalId().toString());
             list.add(selectItem);
         }
-        Collections.sort(list, new BeanComparator("label"));
+        Collections.sort(list, Comparator.comparing(SelectItem::getLabel));
         addDefaultSelectedItem(list);
         return list;
     }
@@ -549,7 +549,7 @@ public class OrganizationalStructureBackingBean extends FenixBackingBean {
             selectItem.setValue(type.getName());
             list.add(selectItem);
         }
-        Collections.sort(list, new BeanComparator("label"));
+        Collections.sort(list, Comparator.comparing(SelectItem::getLabel));
 
         addDefaultSelectedItem(list);
 
@@ -572,7 +572,7 @@ public class OrganizationalStructureBackingBean extends FenixBackingBean {
                 list.add(selectItem);
             }
         }
-        Collections.sort(list, new BeanComparator("label"));
+        Collections.sort(list, Comparator.comparing(SelectItem::getLabel));
 
         addDefaultSelectedItem(list);
 
@@ -1495,7 +1495,7 @@ public class OrganizationalStructureBackingBean extends FenixBackingBean {
         List<SelectItem> selectedCountriesItems = new ArrayList<SelectItem>();
 
         List<Country> countryList = new ArrayList<Country>(Country.readDistinctCountries());
-        Collections.sort(countryList, new BeanComparator("localizedName.content"));
+        Collections.sort(countryList, Comparator.comparing(Country::getLocalizedName));
 
         selectedCountriesItems.add(new SelectItem(NOT_SELECTED_VALUE, NOT_SELECTED_DESCRIPTION));
         for (Country country : countryList) {

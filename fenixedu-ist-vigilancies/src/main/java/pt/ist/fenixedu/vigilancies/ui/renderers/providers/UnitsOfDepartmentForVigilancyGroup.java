@@ -20,9 +20,9 @@ package pt.ist.fenixedu.vigilancies.ui.renderers.providers;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 
@@ -46,7 +46,7 @@ public class UnitsOfDepartmentForVigilancyGroup implements DataProvider {
             unitsOfDepartment.add(department.getDepartmentUnit());
         }
 
-        Collections.sort(unitsOfDepartment, new BeanComparator("name"));
+        Collections.sort(unitsOfDepartment, Comparator.comparing(Unit::getName));
         return unitsOfDepartment;
     }
 

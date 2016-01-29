@@ -20,10 +20,10 @@ package pt.ist.fenixedu.quc.dto;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.academic.domain.ShiftType;
 
@@ -57,7 +57,7 @@ public class TeacherShiftTypeGroupsResumeResult extends BlockResumeResult implem
 
     @Override
     protected void initResultBlocks() {
-        setResultBlocks(new TreeSet<InquiryResult>(new BeanComparator("inquiryQuestion.questionOrder")));
+        setResultBlocks(new TreeSet<InquiryResult>(Comparator.comparing(InquiryResult::getInquiryQuestion)));
         for (InquiryResult inquiryResult : InquiryResult.getInquiryResults(getProfessorship(), getShiftType())) {
             if (InquiryConnectionType.GROUP.equals(inquiryResult.getConnectionType())
                     && !inquiryResult.getInquiryQuestion().getAssociatedBlocksSet().isEmpty()) { //change to TEACHER_SHIFT_EVALUATION

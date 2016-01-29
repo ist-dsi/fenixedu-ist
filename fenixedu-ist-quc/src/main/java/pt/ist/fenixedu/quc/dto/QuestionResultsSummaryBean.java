@@ -21,9 +21,9 @@ package pt.ist.fenixedu.quc.dto;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
@@ -86,7 +86,7 @@ public class QuestionResultsSummaryBean implements Serializable {
             if (inquiryResultComment != null) {
                 setEditableComment(inquiryResultComment.getComment());
             }
-            Collections.sort(getResultComments(), new BeanComparator("personCategory"));
+            Collections.sort(getResultComments(), Comparator.comparing(InquiryResultComment::getPersonCategory));
         }
     }
 

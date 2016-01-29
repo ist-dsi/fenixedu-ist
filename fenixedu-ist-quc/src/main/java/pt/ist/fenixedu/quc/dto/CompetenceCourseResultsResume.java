@@ -21,9 +21,9 @@ package pt.ist.fenixedu.quc.dto;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.fenixedu.academic.domain.CompetenceCourse;
 
 public class CompetenceCourseResultsResume implements Serializable {
@@ -50,7 +50,8 @@ public class CompetenceCourseResultsResume implements Serializable {
     }
 
     public List<CurricularCourseResumeResult> getOrderedCurricularCourseResumes() {
-        Collections.sort(getCurricularCourseResumeResults(), new BeanComparator("firstPresentationName"));
+        Collections.sort(getCurricularCourseResumeResults(),
+                Comparator.comparing(CurricularCourseResumeResult::getFirstPresentationName));
         return getCurricularCourseResumeResults();
     }
 

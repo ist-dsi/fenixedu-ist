@@ -24,6 +24,7 @@ package pt.ist.fenixedu.quc.ui.struts.action.student.inquiries;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -31,11 +32,11 @@ import java.util.TreeSet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
+import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.student.Student;
@@ -114,7 +115,10 @@ public class StudentInquiryDA extends FenixDispatchAction {
         }
 
         request.setAttribute("executionSemester", executionSemester);
-        Collections.sort(courses, new BeanComparator("curricularCourse.name"));
+        Collections.sort(
+                courses,
+                Comparator.comparing(CurricularCourseInquiriesRegistryDTO::getCurricularCourse,
+                        Comparator.comparing(CurricularCourse::getName)));
         request.setAttribute("courses", courses);
         request.setAttribute("student", student);
         final VariantBean weeklySpentHours = new VariantBean();
@@ -162,7 +166,10 @@ public class StudentInquiryDA extends FenixDispatchAction {
         }
 
         request.setAttribute("executionSemester", executionSemester);
-        Collections.sort(courses, new BeanComparator("curricularCourse.name"));
+        Collections.sort(
+                courses,
+                Comparator.comparing(CurricularCourseInquiriesRegistryDTO::getCurricularCourse,
+                        Comparator.comparing(CurricularCourse::getName)));
         request.setAttribute("courses", courses);
         request.setAttribute("student", AccessControl.getPerson().getStudent());
         final VariantBean wsh = new VariantBean();
@@ -240,7 +247,8 @@ public class StudentInquiryDA extends FenixDispatchAction {
             String inquiryRegistryID = (String) getFromRequest(request, "inquiryRegistryID");
             StudentInquiryRegistry inquiryRegistry = FenixFramework.getDomainObject(inquiryRegistryID);
 
-            Set<InquiryBlockDTO> inquiryBlocks = new TreeSet<InquiryBlockDTO>(new BeanComparator("inquiryBlock.blockOrder"));
+            Set<InquiryBlockDTO> inquiryBlocks =
+                    new TreeSet<InquiryBlockDTO>(Comparator.comparing(InquiryBlockDTO::getInquiryBlock));
             for (InquiryBlock inquiryBlock : studentInquiryTemplate.getInquiryBlocksSet()) {
                 inquiryBlocks.add(new InquiryBlockDTO(inquiryBlock, inquiryRegistry));
             }

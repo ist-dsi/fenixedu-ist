@@ -21,12 +21,12 @@ package pt.ist.fenixedu.tutorship.ui.Action.pedagogicalCouncil;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections.comparators.ReverseComparator;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -132,7 +132,7 @@ public class ViewTutorsDA extends FenixDispatchAction {
                     executionSemesters.add(executionSemester);
                 }
             }
-            Collections.sort(executionSemesters, new ReverseComparator());
+            Collections.sort(executionSemesters, Comparator.reverseOrder());
             return executionSemesters;
         }
 

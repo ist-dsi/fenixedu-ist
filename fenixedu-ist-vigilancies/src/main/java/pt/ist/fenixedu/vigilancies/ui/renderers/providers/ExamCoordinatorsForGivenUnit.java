@@ -20,10 +20,11 @@ package pt.ist.fenixedu.vigilancies.ui.renderers.providers;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 
 import pt.ist.fenixWebFramework.rendererExtensions.converters.DomainObjectKeyArrayConverter;
@@ -49,7 +50,7 @@ public class ExamCoordinatorsForGivenUnit implements DataProvider {
             coordinators.removeAll(group.getExamCoordinatorsSet());
         }
 
-        Collections.sort(coordinators, new BeanComparator("person.name"));
+        Collections.sort(coordinators, Comparator.comparing(ExamCoordinator::getPerson, Comparator.comparing(Person::getName)));
         return coordinators;
 
     }

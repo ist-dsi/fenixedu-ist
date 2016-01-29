@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.collections.comparators.ComparatorChain;
 import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
@@ -322,12 +321,11 @@ public class VigilantGroupBean extends VigilantBean implements Serializable {
         for (VigilantGroup group : groups) {
             vigilantWrappers.addAll(group.getVigilantWrappersSet());
         }
-        ComparatorChain chain = new ComparatorChain();
-        chain.addComparator(VigilantWrapper.POINTS_COMPARATOR);
-        chain.addComparator(VigilantWrapper.CATEGORY_COMPARATOR);
-        chain.addComparator(VigilantWrapper.USERNAME_COMPARATOR);
         List<VigilantWrapper> vigilantWrappersList = new ArrayList<VigilantWrapper>(vigilantWrappers);
-        Collections.sort(vigilantWrappersList, chain);
+        Collections.sort(
+                vigilantWrappersList,
+                VigilantWrapper.POINTS_COMPARATOR.thenComparing(VigilantWrapper.CATEGORY_COMPARATOR).thenComparing(
+                        VigilantWrapper.USERNAME_COMPARATOR));
         return vigilantWrappersList;
     }
 

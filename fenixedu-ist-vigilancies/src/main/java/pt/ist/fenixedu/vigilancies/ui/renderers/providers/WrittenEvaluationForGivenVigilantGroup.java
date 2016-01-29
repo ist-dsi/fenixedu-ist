@@ -20,9 +20,9 @@ package pt.ist.fenixedu.vigilancies.ui.renderers.providers;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.fenixedu.academic.domain.WrittenEvaluation;
 import org.joda.time.YearMonthDay;
 
@@ -44,7 +44,7 @@ public class WrittenEvaluationForGivenVigilantGroup implements DataProvider {
             List<WrittenEvaluation> writtenEvaluationsForExecutionCourse = selectedGroup.getAllAssociatedWrittenEvaluations();
             List<WrittenEvaluation> writtenEvaluations = getOpenWrittenEvaluations(writtenEvaluationsForExecutionCourse);
             evaluationsAfterCurrentDate.addAll(writtenEvaluations);
-            Collections.sort(evaluationsAfterCurrentDate, new BeanComparator("name"));
+            Collections.sort(evaluationsAfterCurrentDate, Comparator.comparing(WrittenEvaluation::getName));
         }
 
         return evaluationsAfterCurrentDate;

@@ -21,12 +21,12 @@ package pt.ist.fenixedu.quc.ui.struts.action.publico;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -35,6 +35,8 @@ import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.ExecutionSemester;
+import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.bennu.portal.servlet.PortalLayoutInjector;
 import org.fenixedu.bennu.struts.annotations.Mapping;
 
@@ -96,7 +98,10 @@ public class ViewCourseInquiryPublicResults extends ViewInquiryPublicResults {
         GroupResultsSummaryBean nonAnswersResultsSummaryBean =
                 getGeneralResults(results, resultBlocks, GroupResultType.COURSE_NON_ANSWERS);
         if (InquiriesRoot.getAvailableForInquiries(executionCourse)) {
-            Collections.sort(nonAnswersResultsSummaryBean.getQuestionsResults(), new BeanComparator("questionResult.value"));
+            Collections.sort(
+                    nonAnswersResultsSummaryBean.getQuestionsResults(),
+                    Comparator.comparing(QuestionResultsSummaryBean::getQuestionResult,
+                            Comparator.comparing(InquiryResult::getValue)));
             Collections.reverse(nonAnswersResultsSummaryBean.getQuestionsResults());
         }
 
@@ -124,8 +129,11 @@ public class ViewCourseInquiryPublicResults extends ViewInquiryPublicResults {
                         .iterator().next()));
 
         List<TeacherShiftTypeGeneralResultBean> teachersSummaryBeans = getTeachersShiftsResults(executionCourse);
-        Collections.sort(teachersSummaryBeans, new BeanComparator("professorship.person.name"));
-        Collections.sort(teachersSummaryBeans, new BeanComparator("shiftType"));
+        Collections.sort(
+                teachersSummaryBeans,
+                Comparator.comparing(TeacherShiftTypeGeneralResultBean::getProfessorship,
+                        Comparator.comparing(Professorship::getPerson, Comparator.comparing(Person::getName))).thenComparing(
+                        TeacherShiftTypeGeneralResultBean::getShiftType));
 
         ResultClassification auditResult = getAuditResult(results);
         if (auditResult != null) {
@@ -148,7 +156,7 @@ public class ViewCourseInquiryPublicResults extends ViewInquiryPublicResults {
         for (InquiryBlock inquiryBlock : courseInquiryTemplate.getInquiryBlocksSet()) {
             blockResultsSummaryBeans.add(new BlockResultsSummaryBean(inquiryBlock, results, null, null));
         }
-        Collections.sort(blockResultsSummaryBeans, new BeanComparator("inquiryBlock.blockOrder"));
+        Collections.sort(blockResultsSummaryBeans, Comparator.comparing(BlockResultsSummaryBean::getInquiryBlock));
 
         request.setAttribute("hasNotRelevantData", hasNotRelevantData);
         request.setAttribute("executionCourse", executionCourse);

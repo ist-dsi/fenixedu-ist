@@ -19,10 +19,10 @@
 package pt.ist.fenixedu.quc.dto;
 
 import java.io.Serializable;
+import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.fenixedu.academic.domain.Coordinator;
 import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.ExecutionSemester;
@@ -57,7 +57,7 @@ public class CoordinatorInquiryBean implements Serializable {
 
     private void initCoordinatorInquiryBlocks(CoordinatorInquiryTemplate coordinatorInquiryTemplate,
             InquiryCoordinatorAnswer inquiryCoordinatorAnswer) {
-        setCoordinatorInquiryBlocks(new TreeSet<InquiryBlockDTO>(new BeanComparator("inquiryBlock.blockOrder")));
+        setCoordinatorInquiryBlocks(new TreeSet<InquiryBlockDTO>(Comparator.comparing(InquiryBlockDTO::getInquiryBlock)));
         setInquiryCoordinatorAnswer(inquiryCoordinatorAnswer);
         for (InquiryBlock inquiryBlock : coordinatorInquiryTemplate.getInquiryBlocksSet()) {
             getCoordinatorInquiryBlocks().add(new InquiryBlockDTO(inquiryCoordinatorAnswer, inquiryBlock));

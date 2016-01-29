@@ -22,6 +22,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -29,7 +30,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
@@ -136,7 +136,7 @@ public class ParkingParty extends ParkingParty_Base {
 
     public List<ParkingRequest> getOrderedParkingRequests() {
         List<ParkingRequest> requests = new ArrayList<ParkingRequest>(getParkingRequestsSet());
-        Collections.sort(requests, new BeanComparator("creationDate"));
+        Collections.sort(requests, Comparator.comparing(ParkingRequest::getCreationDate));
         return requests;
     }
 
@@ -825,13 +825,13 @@ public class ParkingParty extends ParkingParty_Base {
 
     public Vehicle getFirstVehicle() {
         List<Vehicle> vehicles = new ArrayList<Vehicle>(getVehiclesSet());
-        Collections.sort(vehicles, new BeanComparator("plateNumber"));
+        Collections.sort(vehicles, Comparator.comparing(Vehicle::getPlateNumber));
         return vehicles.size() > 0 ? vehicles.iterator().next() : null;
     }
 
     public Vehicle getSecondVehicle() {
         List<Vehicle> vehicles = new ArrayList<Vehicle>(getVehiclesSet());
-        Collections.sort(vehicles, new BeanComparator("plateNumber"));
+        Collections.sort(vehicles, Comparator.comparing(Vehicle::getPlateNumber));
         return vehicles.size() > 1 ? vehicles.get(1) : null;
     }
 

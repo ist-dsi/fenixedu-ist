@@ -21,6 +21,7 @@ package pt.ist.fenixedu.quc.dto;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +30,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.Person;
@@ -60,7 +60,8 @@ public class StudentInquiryBean implements Serializable {
     private Set<InquiryBlockDTO> curricularCourseBlocks;
     private StudentInquiryRegistry inquiryRegistry;
     Map<AffiliatedTeacherDTO, List<? extends StudentTeacherInquiryBean>> teachersInquiries =
-            new TreeMap<AffiliatedTeacherDTO, List<? extends StudentTeacherInquiryBean>>(new BeanComparator("name"));
+            new TreeMap<AffiliatedTeacherDTO, List<? extends StudentTeacherInquiryBean>>(
+                    Comparator.comparing(AffiliatedTeacherDTO::getName));
 
     public StudentInquiryBean(StudentTeacherInquiryTemplate studentTeacherInquiryTemplate, StudentInquiryRegistry inquiryRegistry) {
         setInquiryRegistry(inquiryRegistry);
@@ -131,7 +132,7 @@ public class StudentInquiryBean implements Serializable {
         for (Entry<Person, Map<ShiftType, StudentTeacherInquiryBean>> entry : teachersShifts.entrySet()) {
             ArrayList<StudentTeacherInquiryBean> studentTeachers =
                     new ArrayList<StudentTeacherInquiryBean>(entry.getValue().values());
-            Collections.sort(studentTeachers, new BeanComparator("shiftType"));
+            Collections.sort(studentTeachers, Comparator.comparing(StudentTeacherInquiryBean::getShiftType));
             if (!studentTeachers.isEmpty()) {
                 getTeachersInquiries().put(new AffiliatedTeacherDTO(entry.getKey()), studentTeachers);
             }
@@ -158,10 +159,14 @@ public class StudentInquiryBean implements Serializable {
 
     public List<AffiliatedTeacherDTO> getOrderedTeachers() {
         List<AffiliatedTeacherDTO> finalResult = new ArrayList<AffiliatedTeacherDTO>();
-        Set<AffiliatedTeacherDTO> theoricalShiftType = new TreeSet<AffiliatedTeacherDTO>(new BeanComparator("name"));
-        Set<AffiliatedTeacherDTO> praticalShiftType = new TreeSet<AffiliatedTeacherDTO>(new BeanComparator("name"));
-        Set<AffiliatedTeacherDTO> laboratoryShiftType = new TreeSet<AffiliatedTeacherDTO>(new BeanComparator("name"));
-        Set<AffiliatedTeacherDTO> otherShiftTypes = new TreeSet<AffiliatedTeacherDTO>(new BeanComparator("name"));
+        Set<AffiliatedTeacherDTO> theoricalShiftType =
+                new TreeSet<AffiliatedTeacherDTO>(Comparator.comparing(AffiliatedTeacherDTO::getName));
+        Set<AffiliatedTeacherDTO> praticalShiftType =
+                new TreeSet<AffiliatedTeacherDTO>(Comparator.comparing(AffiliatedTeacherDTO::getName));
+        Set<AffiliatedTeacherDTO> laboratoryShiftType =
+                new TreeSet<AffiliatedTeacherDTO>(Comparator.comparing(AffiliatedTeacherDTO::getName));
+        Set<AffiliatedTeacherDTO> otherShiftTypes =
+                new TreeSet<AffiliatedTeacherDTO>(Comparator.comparing(AffiliatedTeacherDTO::getName));
         for (AffiliatedTeacherDTO teacherDTO : getTeachersInquiries().keySet()) {
             if (containsShiftType(teacherDTO, ShiftType.TEORICA)) {
                 theoricalShiftType.add(teacherDTO);

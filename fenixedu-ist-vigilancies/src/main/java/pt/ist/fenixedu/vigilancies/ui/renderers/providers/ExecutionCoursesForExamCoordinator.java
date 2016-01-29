@@ -19,9 +19,9 @@
 package pt.ist.fenixedu.vigilancies.ui.renderers.providers;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.fenixedu.academic.domain.ExecutionCourse;
 
 import pt.ist.fenixWebFramework.rendererExtensions.converters.DomainObjectKeyConverter;
@@ -38,7 +38,7 @@ public class ExecutionCoursesForExamCoordinator implements DataProvider {
         ExamCoordinator coordinator = bean.getExamCoordinator();
         List<ExecutionCourse> courses = coordinator.getAssociatedExecutionCourses();
 
-        Collections.sort(courses, new BeanComparator("nome"));
+        Collections.sort(courses, Comparator.comparing(ExecutionCourse::getNome));
         return courses;
     }
 

@@ -22,12 +22,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.academic.domain.ShiftType;
@@ -63,7 +63,7 @@ public class TeacherInquiryBean implements Serializable {
     }
 
     private void initTeacherInquiry(TeacherInquiryTemplate teacherInquiryTemplate, Professorship professorship) {
-        setTeacherInquiryBlocks(new TreeSet<InquiryBlockDTO>(new BeanComparator("inquiryBlock.blockOrder")));
+        setTeacherInquiryBlocks(new TreeSet<InquiryBlockDTO>(Comparator.comparing(InquiryBlockDTO::getInquiryBlock)));
         for (InquiryBlock inquiryBlock : teacherInquiryTemplate.getInquiryBlocksSet()) {
             getTeacherInquiryBlocks().add(new InquiryBlockDTO(getInquiryTeacherAnswer(), inquiryBlock));
         }
@@ -83,8 +83,11 @@ public class TeacherInquiryBean implements Serializable {
                 }
             }
         }
-        Collections.sort(getTeachersResults(), new BeanComparator("professorship.person.name"));
-        Collections.sort(getTeachersResults(), new BeanComparator("shiftType"));
+        Collections.sort(
+                getTeachersResults(),
+                Comparator.comparing(TeacherShiftTypeResultsBean::getProfessorship,
+                        Comparator.comparing(Professorship::getPerson, Comparator.comparing(Person::getName))).thenComparing(
+                        TeacherShiftTypeResultsBean::getShiftType));
     }
 
     private Set<ShiftType> getShiftTypes(Collection<InquiryResult> professorshipResults) {

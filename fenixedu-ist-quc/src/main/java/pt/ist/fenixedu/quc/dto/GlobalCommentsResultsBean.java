@@ -22,13 +22,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Professorship;
@@ -107,8 +107,11 @@ public abstract class GlobalCommentsResultsBean implements Serializable {
                                 .getExecutionCourse().getExecutionPeriod(), teacherShiftResults, person, getPersonCategory()));
                     }
                 }
-                Collections.sort(teachersResults, new BeanComparator("professorship.person.name"));
-                Collections.sort(teachersResults, new BeanComparator("shiftType"));
+                Collections.sort(
+                        teachersResults,
+                        Comparator.comparing(TeacherShiftTypeResultsBean::getProfessorship,
+                                Comparator.comparing(Professorship::getPerson, Comparator.comparing(Person::getName)))
+                                .thenComparing(TeacherShiftTypeResultsBean::getShiftType));
                 getTeachersResultsMap().put(teacherProfessorship, teachersResults);
             }
         }

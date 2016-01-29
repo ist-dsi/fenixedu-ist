@@ -21,7 +21,6 @@ package pt.ist.fenixedu.contracts.domain.personnelSection.contracts;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.collections.comparators.ReverseComparator;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.OccupationPeriod;
 import org.fenixedu.academic.domain.Teacher;
@@ -198,7 +197,7 @@ public class ProfessionalCategory extends ProfessionalCategory_Base implements C
         }
         if (professionalCategory == null) {
             List<ExecutionSemester> executionSemesters = ExecutionSemester.readExecutionPeriodsInTimePeriod(begin, end);
-            Collections.sort(executionSemesters, new ReverseComparator(ExecutionSemester.COMPARATOR_BY_SEMESTER_AND_YEAR));
+            Collections.sort(executionSemesters, ExecutionSemester.COMPARATOR_BY_SEMESTER_AND_YEAR.reversed());
             for (ExecutionSemester executionSemester : executionSemesters) {
                 professionalCategory =
                         teacher.getTeacherAuthorization(executionSemester.getAcademicInterval())

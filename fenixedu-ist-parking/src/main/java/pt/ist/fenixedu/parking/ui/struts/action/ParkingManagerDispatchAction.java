@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -35,7 +36,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.apache.poi.hssf.util.Region;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -697,7 +697,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
         List<ParkingPartyHistory> parkingPartyHistories =
                 new ArrayList<ParkingPartyHistory>(parkingRequest.getParkingParty().getParty().getParkingPartyHistoriesSet());
 
-        Collections.sort(parkingPartyHistories, new BeanComparator("historyDate"));
+        Collections.sort(parkingPartyHistories, Comparator.comparing(ParkingPartyHistory::getHistoryDate));
         request.setAttribute("parkingPartyHistories", parkingPartyHistories);
         request.setAttribute("parkingParty", parkingRequest.getParkingParty());
         return mapping.findForward("showParkingHistories");
@@ -716,7 +716,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
         List<ParkingPartyHistory> parkingPartyHistories =
                 new ArrayList<ParkingPartyHistory>(parkingParty.getParty().getParkingPartyHistoriesSet());
 
-        Collections.sort(parkingPartyHistories, new BeanComparator("historyDate"));
+        Collections.sort(parkingPartyHistories, Comparator.comparing(ParkingPartyHistory::getHistoryDate));
         request.setAttribute("parkingPartyHistories", parkingPartyHistories);
         request.setAttribute("parkingParty", parkingParty);
         return mapping.findForward("showParkingHistories");

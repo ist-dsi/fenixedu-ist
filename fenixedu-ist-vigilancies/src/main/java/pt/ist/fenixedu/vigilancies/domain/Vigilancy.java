@@ -25,7 +25,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
@@ -41,8 +40,8 @@ public abstract class Vigilancy extends Vigilancy_Base {
 
     protected static final int POINTS_WON_FOR_CONVOKE_YET_TO_HAPPEN = 0;
 
-    public static final Comparator<Vigilancy> COMPARATOR_BY_WRITTEN_EVALUATION_BEGGINING = new BeanComparator(
-            "writtenEvaluation.dayDateYearMonthDay");
+    public static final Comparator<Vigilancy> COMPARATOR_BY_WRITTEN_EVALUATION_BEGGINING = Comparator.comparing(
+            Vigilancy::getWrittenEvaluation, Comparator.comparing(WrittenEvaluation::getDayDateYearMonthDay));
 
     public static final Comparator<Vigilancy> COMPARATOR_BY_VIGILANT_CATEGORY = new Comparator<Vigilancy>() {
         @Override

@@ -23,6 +23,7 @@ package pt.ist.fenixedu.quc.ui.struts.action.coordinator.inquiries;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -32,7 +33,6 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -270,7 +270,10 @@ public class ViewInquiriesResultsForCoordinatorDA extends ViewInquiriesResultsDA
             List<CurricularCourseResumeResult> list = coursesResultResumeMap.get(curricularYear);
             Set<CurricularCourseResumeResult> set = new HashSet<CurricularCourseResumeResult>(list);
             List<CurricularCourseResumeResult> noRepetitionsList = new ArrayList<CurricularCourseResumeResult>(set);
-            Collections.sort(noRepetitionsList, new BeanComparator("executionCourse.name"));
+            Collections.sort(
+                    noRepetitionsList,
+                    Comparator.comparing(CurricularCourseResumeResult::getExecutionCourse,
+                            Comparator.comparing(ExecutionCourse::getName)));
             coursesResultResumeMap.put(curricularYear, noRepetitionsList);
         }
 

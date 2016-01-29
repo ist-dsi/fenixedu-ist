@@ -20,13 +20,12 @@ package pt.ist.fenixedu.vigilancies.ui.struts.action.teacher;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections.comparators.ComparatorChain;
-import org.apache.commons.collections.comparators.ReverseComparator;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -61,9 +60,8 @@ public class ListVigilanciesForEvaluationDispatchAction extends ExecutionCourseB
         String writtenEvaluationID = request.getParameter("evaluationOID");
         WrittenEvaluation evaluation = (WrittenEvaluation) FenixFramework.getDomainObject(writtenEvaluationID);
 
-        ComparatorChain comparator = new ComparatorChain();
-        comparator.addComparator(Vigilancy.COMPARATOR_BY_VIGILANT_CATEGORY);
-        comparator.addComparator(Vigilancy.COMPARATOR_BY_VIGILANT_USERNAME);
+        Comparator<Vigilancy> comparator =
+                Vigilancy.COMPARATOR_BY_VIGILANT_CATEGORY.thenComparing(Vigilancy.COMPARATOR_BY_VIGILANT_USERNAME);
 
         List<Vigilancy> vigilancies = new ArrayList<Vigilancy>(Vigilancy.getOthersVigilancies(evaluation));
         Collections.sort(vigilancies, comparator);
@@ -137,7 +135,7 @@ public class ListVigilanciesForEvaluationDispatchAction extends ExecutionCourseB
                 return viewVigilants(mapping, form, request, response);
             }
 
-            Collections.sort(vigilancies, new ReverseComparator(Vigilancy.COMPARATOR_BY_VIGILANT_SORT_CRITERIA));
+            Collections.sort(vigilancies, Vigilancy.COMPARATOR_BY_VIGILANT_SORT_CRITERIA.reversed());
 
             for (Vigilancy vigilancy : vigilancies.subList(0, numberOfVigilantsToUnconvoke)) {
                 try {

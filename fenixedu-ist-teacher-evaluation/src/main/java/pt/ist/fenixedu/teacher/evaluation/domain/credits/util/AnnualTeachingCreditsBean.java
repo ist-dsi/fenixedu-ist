@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
@@ -161,7 +161,8 @@ public class AnnualTeachingCreditsBean implements Serializable {
     }
 
     public List<AnnualTeachingCreditsByPeriodBean> getAnnualTeachingCreditsByPeriodBeans() {
-        Collections.sort(annualTeachingCreditsByPeriodBeans, new BeanComparator("executionPeriod"));
+        Collections.sort(annualTeachingCreditsByPeriodBeans,
+                Comparator.comparing(AnnualTeachingCreditsByPeriodBean::getExecutionPeriod));
         return annualTeachingCreditsByPeriodBeans;
     }
 
@@ -229,7 +230,7 @@ public class AnnualTeachingCreditsBean implements Serializable {
                 teacherServiceComments.addAll(teacherService.getTeacherServiceComments());
             }
         }
-        Collections.sort(teacherServiceComments, new BeanComparator("lastModifiedDate"));
+        Collections.sort(teacherServiceComments, Comparator.comparing(TeacherServiceComment::getLastModifiedDate));
         return teacherServiceComments;
     }
 

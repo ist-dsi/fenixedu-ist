@@ -21,11 +21,11 @@ package pt.ist.fenixedu.quc.dto;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Professorship;
@@ -66,8 +66,11 @@ public class DepartmentTeacherDetailsBean extends GlobalCommentsResultsBean {
                                 .getExecutionCourse().getExecutionPeriod(), teacherShiftResults, teacher, getPersonCategory()));
                     }
                 }
-                Collections.sort(teachersResults, new BeanComparator("professorship.person.name"));
-                Collections.sort(teachersResults, new BeanComparator("shiftType"));
+                Collections.sort(
+                        teachersResults,
+                        Comparator.comparing(TeacherShiftTypeResultsBean::getProfessorship,
+                                Comparator.comparing(Professorship::getPerson, Comparator.comparing(Person::getName)))
+                                .thenComparing(TeacherShiftTypeResultsBean::getShiftType));
                 if (InquiryResult.hasResultsToImprove(teacherProfessorship)) {
                     getTeachersResultsToImproveMap().put(teacherProfessorship, teachersResults);
                 } else {
@@ -84,7 +87,8 @@ public class DepartmentTeacherDetailsBean extends GlobalCommentsResultsBean {
                 resultComments.addAll(globalComment.getInquiryResultCommentsSet());
             }
         }
-        Collections.sort(resultComments, new BeanComparator("person.name"));
+        Collections.sort(resultComments,
+                Comparator.comparing(InquiryResultComment::getPerson, Comparator.comparing(Person::getName)));
         return resultComments;
     }
 

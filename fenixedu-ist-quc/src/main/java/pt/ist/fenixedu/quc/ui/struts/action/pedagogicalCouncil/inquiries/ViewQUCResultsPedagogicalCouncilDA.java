@@ -23,12 +23,12 @@ package pt.ist.fenixedu.quc.ui.struts.action.pedagogicalCouncil.inquiries;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -67,7 +67,7 @@ public class ViewQUCResultsPedagogicalCouncilDA extends ViewQUCResultsDA {
                 departmentUnits.add(departmentUnit);
             }
         }
-        Collections.sort(departmentUnits, new BeanComparator("name"));
+        Collections.sort(departmentUnits, Comparator.comparing(DepartmentUnit::getName));
         request.setAttribute("departments", departmentUnits);
         return mapping.findForward("chooseDepartment");
     }

@@ -42,8 +42,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.apache.commons.beanutils.BeanComparator;
-import org.apache.commons.collections.comparators.ComparatorChain;
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.ExecutionSemester;
@@ -61,14 +59,9 @@ public class DelegateCurricularCourseBean {
 
     private Integer curricularYear;
 
-    static final public Comparator CURRICULAR_COURSE_COMPARATOR_BY_CURRICULAR_YEAR_AND_CURRICULAR_SEMESTER =
-            new ComparatorChain();
-    static {
-        ((ComparatorChain) CURRICULAR_COURSE_COMPARATOR_BY_CURRICULAR_YEAR_AND_CURRICULAR_SEMESTER)
-                .addComparator(new BeanComparator("curricularYear"));
-        ((ComparatorChain) CURRICULAR_COURSE_COMPARATOR_BY_CURRICULAR_YEAR_AND_CURRICULAR_SEMESTER)
-                .addComparator(new BeanComparator("curricularSemester"));
-    }
+    static final public Comparator<DelegateCurricularCourseBean> CURRICULAR_COURSE_COMPARATOR_BY_CURRICULAR_YEAR_AND_CURRICULAR_SEMESTER =
+            Comparator.comparing(DelegateCurricularCourseBean::getCurricularYear).thenComparing(
+                    DelegateCurricularCourseBean::getCurricularSemester);
 
     public DelegateCurricularCourseBean(CurricularCourse curricularCourse, ExecutionYear executionYear, Integer curricularYear,
             ExecutionSemester executionSemester) {

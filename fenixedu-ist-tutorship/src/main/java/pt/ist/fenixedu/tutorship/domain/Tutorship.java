@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.ExecutionDegree;
@@ -46,11 +45,13 @@ import org.joda.time.YearMonthDay;
 
 public class Tutorship extends Tutorship_Base {
 
-    public static final Comparator<Tutorship> TUTORSHIP_COMPARATOR_BY_STUDENT_NUMBER = new BeanComparator(
-            "studentCurricularPlan.registration.number");
+    public static final Comparator<Tutorship> TUTORSHIP_COMPARATOR_BY_STUDENT_NUMBER = Comparator.comparing(
+            Tutorship::getStudentCurricularPlan,
+            Comparator.comparing(StudentCurricularPlan::getRegistration, Comparator.comparing(Registration::getNumber)));
 
-    public static final Comparator<Tutorship> TUTORSHIP_COMPARATOR_BY_ENTRY_YEAR = new BeanComparator(
-            "studentCurricularPlan.registration.startDate");
+    public static final Comparator<Tutorship> TUTORSHIP_COMPARATOR_BY_ENTRY_YEAR = Comparator.comparing(
+            Tutorship::getStudentCurricularPlan,
+            Comparator.comparing(StudentCurricularPlan::getRegistration, Comparator.comparing(Registration::getStartDate)));
 
     public static Comparator<Tutorship> TUTORSHIP_END_DATE_COMPARATOR = new Comparator<Tutorship>() {
         @Override

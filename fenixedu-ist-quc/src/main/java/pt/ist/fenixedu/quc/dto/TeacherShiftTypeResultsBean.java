@@ -21,9 +21,9 @@ package pt.ist.fenixedu.quc.dto;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Professorship;
@@ -52,7 +52,7 @@ public class TeacherShiftTypeResultsBean implements Serializable {
         for (InquiryBlock inquiryBlock : inquiryTemplate.getInquiryBlocksSet()) {
             getBlockResults().add(new BlockResultsSummaryBean(inquiryBlock, inquiryResults, person, personCategory));
         }
-        Collections.sort(getBlockResults(), new BeanComparator("inquiryBlock.blockOrder"));
+        Collections.sort(getBlockResults(), Comparator.comparing(BlockResultsSummaryBean::getInquiryBlock));
     }
 
     public Professorship getProfessorship() {

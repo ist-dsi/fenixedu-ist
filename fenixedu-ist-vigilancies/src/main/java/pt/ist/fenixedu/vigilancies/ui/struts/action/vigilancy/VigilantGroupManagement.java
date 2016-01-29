@@ -31,7 +31,6 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections.comparators.ComparatorChain;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -121,11 +120,8 @@ public class VigilantGroupManagement extends FenixDispatchAction {
         VigilantGroup group = (VigilantGroup) FenixFramework.getDomainObject(vigilantGroupId);
 
         List<VigilantWrapper> vigilantWrappers = group.getVigilantWrappersThatCanBeConvoked();
-        ComparatorChain chain = new ComparatorChain();
-        chain.addComparator(VigilantWrapper.CATEGORY_COMPARATOR);
-        chain.addComparator(VigilantWrapper.USERNAME_COMPARATOR);
-        chain.addComparator(VigilantWrapper.NAME_COMPARATOR);
-        Collections.sort(vigilantWrappers, chain);
+        Collections.sort(vigilantWrappers, VigilantWrapper.CATEGORY_COMPARATOR.thenComparing(VigilantWrapper.USERNAME_COMPARATOR)
+                .thenComparing(VigilantWrapper.NAME_COMPARATOR));
         request.setAttribute("vigilants", vigilantWrappers);
         request.setAttribute("group", group);
 
@@ -515,11 +511,8 @@ public class VigilantGroupManagement extends FenixDispatchAction {
         VigilantGroup group = (VigilantGroup) FenixFramework.getDomainObject(groupId);
 
         List<VigilantWrapper> vigilantWrappers = new ArrayList<VigilantWrapper>(group.getVigilantWrappersSet());
-        ComparatorChain chain = new ComparatorChain();
-        chain.addComparator(VigilantWrapper.CATEGORY_COMPARATOR);
-        chain.addComparator(VigilantWrapper.USERNAME_COMPARATOR);
-        chain.addComparator(VigilantWrapper.NAME_COMPARATOR);
-        Collections.sort(vigilantWrappers, chain);
+        Collections.sort(vigilantWrappers, VigilantWrapper.CATEGORY_COMPARATOR.thenComparing(VigilantWrapper.USERNAME_COMPARATOR)
+                .thenComparing(VigilantWrapper.NAME_COMPARATOR));
         request.setAttribute("vigilantWrappers", vigilantWrappers);
         request.setAttribute("group", group);
         return mapping.findForward("editVigilantBounds");
@@ -583,11 +576,8 @@ public class VigilantGroupManagement extends FenixDispatchAction {
         VigilantGroup group = (VigilantGroup) FenixFramework.getDomainObject(groupId);
 
         List<VigilantWrapper> vigilantWrappers = group.getVigilantWrappersThatCanBeConvoked();
-        ComparatorChain chain = new ComparatorChain();
-        chain.addComparator(VigilantWrapper.CATEGORY_COMPARATOR);
-        chain.addComparator(VigilantWrapper.USERNAME_COMPARATOR);
-        chain.addComparator(VigilantWrapper.NAME_COMPARATOR);
-        Collections.sort(vigilantWrappers, chain);
+        Collections.sort(vigilantWrappers, VigilantWrapper.CATEGORY_COMPARATOR.thenComparing(VigilantWrapper.USERNAME_COMPARATOR)
+                .thenComparing(VigilantWrapper.NAME_COMPARATOR));
         request.setAttribute("vigilants", vigilantWrappers);
         request.setAttribute("group", group);
         return mapping.findForward("editVigilantStartPoints");

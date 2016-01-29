@@ -21,9 +21,9 @@ package pt.ist.fenixedu.quc.dto;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.fenixedu.academic.domain.Professorship;
 
 public class RegentTeacherResultsResume implements Serializable {
@@ -59,7 +59,8 @@ public class RegentTeacherResultsResume implements Serializable {
     }
 
     public List<TeacherShiftTypeGroupsResumeResult> getOrderedTeacherShiftResumes() {
-        Collections.sort(getTeacherShiftTypeGroupsResumeResults(), new BeanComparator("shiftType"));
+        Collections.sort(getTeacherShiftTypeGroupsResumeResults(),
+                Comparator.comparing(TeacherShiftTypeGroupsResumeResult::getShiftType));
         return getTeacherShiftTypeGroupsResumeResults();
     }
 

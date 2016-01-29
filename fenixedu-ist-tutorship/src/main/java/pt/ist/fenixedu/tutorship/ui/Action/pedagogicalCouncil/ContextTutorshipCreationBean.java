@@ -21,11 +21,11 @@ package pt.ist.fenixedu.tutorship.ui.Action.pedagogicalCouncil;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.collections.comparators.ReverseComparator;
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
@@ -73,7 +73,7 @@ public class ContextTutorshipCreationBean implements Serializable {
                     executionSemesters.add(executionSemester);
                 }
             }
-            Collections.sort(executionSemesters, new ReverseComparator());
+            Collections.sort(executionSemesters, Comparator.reverseOrder());
             return executionSemesters;
         }
 

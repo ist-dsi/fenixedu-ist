@@ -29,7 +29,6 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections.comparators.ReverseComparator;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -562,7 +561,7 @@ public class AcademicAdminOfficeCurriculumValidationDA extends FenixDispatchActi
                 ExecutionSemester.readExecutionPeriodsInTimePeriod(studentCurricularPlan.getStartDate(),
                         getCurrentExecutionSemesterEndDate());
 
-        Collections.sort(executionPeriodsInTimePeriod, new ReverseComparator(ExecutionSemester.COMPARATOR_BY_SEMESTER_AND_YEAR));
+        Collections.sort(executionPeriodsInTimePeriod, ExecutionSemester.COMPARATOR_BY_SEMESTER_AND_YEAR.reversed());
         return executionPeriodsInTimePeriod;
     }
 

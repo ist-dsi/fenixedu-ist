@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,6 @@ import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -212,7 +212,7 @@ public class ViewQucDelegatesStatus extends FenixDispatchAction {
         }
 
         public List<ExecutionCourse> getOrderedCoursesToComment() {
-            Collections.sort(getCoursesToComment(), new BeanComparator("name"));
+            Collections.sort(getCoursesToComment(), Comparator.comparing(ExecutionCourse::getName));
             return getCoursesToComment();
         }
 

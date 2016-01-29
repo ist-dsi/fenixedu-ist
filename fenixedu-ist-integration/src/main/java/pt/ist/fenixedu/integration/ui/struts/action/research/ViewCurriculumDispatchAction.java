@@ -20,6 +20,7 @@ package pt.ist.fenixedu.integration.ui.struts.action.research;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -29,8 +30,6 @@ import java.util.TreeSet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.beanutils.BeanComparator;
-import org.apache.commons.collections.comparators.ReverseComparator;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -104,8 +103,7 @@ public class ViewCurriculumDispatchAction extends FenixAction {
             ExecutionYear finaltExecutionYear, Person person, HttpServletRequest request) {
 
         SortedSet<ExecutionCourse> lectures =
-                new TreeSet<ExecutionCourse>(new ReverseComparator(
-                        ExecutionCourse.EXECUTION_COURSE_COMPARATOR_BY_EXECUTION_PERIOD_AND_NAME));
+                new TreeSet<ExecutionCourse>(ExecutionCourse.EXECUTION_COURSE_COMPARATOR_BY_EXECUTION_PERIOD_AND_NAME.reversed());
         Set<Thesis> orientedThesis = new HashSet<Thesis>();
         Set<PersonFunction> functions = new HashSet<PersonFunction>();
 
@@ -127,7 +125,7 @@ public class ViewCurriculumDispatchAction extends FenixAction {
         }
 
         List<PersonFunction> functionsList = new ArrayList<PersonFunction>(functions);
-        Collections.sort(functionsList, new ReverseComparator(new BeanComparator("beginDateInDateType")));
+        Collections.sort(functionsList, Comparator.comparing(PersonFunction::getBeginDateInDateType).reversed());
         request.setAttribute("functions", functionsList);
 
         request.setAttribute("lectures", lectures);

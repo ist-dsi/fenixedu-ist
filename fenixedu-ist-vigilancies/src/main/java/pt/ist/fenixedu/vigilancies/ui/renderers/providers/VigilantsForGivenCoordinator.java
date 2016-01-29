@@ -20,9 +20,10 @@ package pt.ist.fenixedu.vigilancies.ui.renderers.providers;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
-import org.apache.commons.beanutils.BeanComparator;
+import org.fenixedu.academic.domain.Person;
 
 import pt.ist.fenixWebFramework.rendererExtensions.converters.DomainObjectKeyConverter;
 import pt.ist.fenixWebFramework.renderers.DataProvider;
@@ -42,7 +43,8 @@ public class VigilantsForGivenCoordinator implements DataProvider {
 
         List<VigilantWrapper> vigilantsToReturn = new ArrayList<VigilantWrapper>(coordinator.getVigilantsThatCanManage());
 
-        Collections.sort(vigilantsToReturn, new BeanComparator("person.name"));
+        Collections.sort(vigilantsToReturn,
+                Comparator.comparing(VigilantWrapper::getPerson, Comparator.comparing(Person::getName)));
         return vigilantsToReturn;
     }
 

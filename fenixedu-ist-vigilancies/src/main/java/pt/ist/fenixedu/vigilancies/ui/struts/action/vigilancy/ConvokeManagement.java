@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections.comparators.ReverseComparator;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -461,7 +460,7 @@ public class ConvokeManagement extends FenixDispatchAction {
                     writtenEvaluations.addAll(vigilantGroup.getAllAssociatedWrittenEvaluations());
                 }
             }
-            Collections.sort(writtenEvaluations, new ReverseComparator(WrittenEvaluation.COMPARATOR_BY_BEGIN_DATE));
+            Collections.sort(writtenEvaluations, WrittenEvaluation.COMPARATOR_BY_BEGIN_DATE.reversed());
             request.setAttribute("writtenEvaluations", writtenEvaluations);
         }
     }

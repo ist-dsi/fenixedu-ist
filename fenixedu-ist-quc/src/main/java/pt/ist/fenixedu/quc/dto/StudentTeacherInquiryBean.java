@@ -19,10 +19,10 @@
 package pt.ist.fenixedu.quc.dto;
 
 import java.io.Serializable;
+import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ShiftType;
 
@@ -46,7 +46,7 @@ public class StudentTeacherInquiryBean implements Serializable {
 
     public StudentTeacherInquiryBean(final TeacherDTO teacherDTO, final ExecutionCourse executionCourse,
             final ShiftType shiftType, StudentInquiryTemplate studentTeacherInquiryTemplate) {
-        setTeacherInquiryBlocks(new TreeSet<InquiryBlockDTO>(new BeanComparator("inquiryBlock.blockOrder")));
+        setTeacherInquiryBlocks(new TreeSet<InquiryBlockDTO>(Comparator.comparing(InquiryBlockDTO::getInquiryBlock)));
         for (InquiryBlock inquiryBlock : studentTeacherInquiryTemplate.getInquiryBlocksSet()) {
             getTeacherInquiryBlocks().add(new InquiryBlockDTO(inquiryBlock, null));
         }

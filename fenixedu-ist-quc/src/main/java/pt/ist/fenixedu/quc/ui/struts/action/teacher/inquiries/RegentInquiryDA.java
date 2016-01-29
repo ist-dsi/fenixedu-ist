@@ -24,6 +24,7 @@ package pt.ist.fenixedu.quc.ui.struts.action.teacher.inquiries;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -33,12 +34,12 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionDegree;
+import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.academic.domain.ShiftType;
 import org.fenixedu.academic.predicate.AccessControl;
@@ -101,7 +102,7 @@ public class RegentInquiryDA extends ExecutionCourseBaseAction {
                 coursesResultResume.add(courseResumeResult);
             }
         }
-        Collections.sort(coursesResultResume, new BeanComparator("firstPresentationName"));
+        Collections.sort(coursesResultResume, Comparator.comparing(CurricularCourseResumeResult::getFirstPresentationName));
 
         Map<Professorship, RegentTeacherResultsResume> regentTeachersResumeMap =
                 new HashMap<Professorship, RegentTeacherResultsResume>();
@@ -151,7 +152,10 @@ public class RegentInquiryDA extends ExecutionCourseBaseAction {
 
         request.setAttribute("isComplete", InquiryResponseState.COMPLETE.equals(finalState));
         request.setAttribute("completionState", finalState.getLocalizedName());
-        Collections.sort(regentTeachersResumeList, new BeanComparator("professorship.person.name"));
+        Collections.sort(
+                regentTeachersResumeList,
+                Comparator.comparing(RegentTeacherResultsResume::getProfessorship,
+                        Comparator.comparing(Professorship::getPerson, Comparator.comparing(Person::getName))));
 
         request.setAttribute("professorship", professorship);
         request.setAttribute("executionSemester", executionCourse.getExecutionPeriod());

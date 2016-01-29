@@ -23,11 +23,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.apache.commons.beanutils.BeanComparator;
-import org.apache.commons.collections.comparators.ComparatorChain;
-import org.apache.commons.collections.comparators.ReverseComparator;
 import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 
@@ -72,12 +70,11 @@ public class EmployeesForGivenUnit implements DataProvider {
                 }
             }
         }
-        ComparatorChain chain = new ComparatorChain();
-        chain.addComparator(new CategoryComparator());
-        chain.addComparator(new ReverseComparator(new BeanComparator("person.username")));
-        Collections.sort(employees, chain);
+        Collections
+                .sort(employees,
+                        new CategoryComparator().thenComparing(Employee::getPerson, Comparator.comparing(Person::getUsername))
+                                .reversed());
         return employees;
-
     }
 
     @Override
@@ -85,12 +82,10 @@ public class EmployeesForGivenUnit implements DataProvider {
         return new DomainObjectKeyArrayConverter();
     }
 
-    private class CategoryComparator implements Comparator {
+    private class CategoryComparator implements Comparator<Employee> {
 
         @Override
-        public int compare(Object o1, Object o2) {
-            Employee e1 = (Employee) o1;
-            Employee e2 = (Employee) o2;
+        public int compare(Employee e1, Employee e2) {
 
             Teacher t1 = e1.getPerson().getTeacher();
             Teacher t2 = e2.getPerson().getTeacher();

@@ -21,9 +21,9 @@ package pt.ist.fenixedu.parking.dto;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
@@ -219,13 +219,13 @@ public class ParkingCardSearchBean implements Serializable {
     }
 
     public void orderSearchedParkingParties() {
-        Collections.sort(getSearchedParkingParties(), new BeanComparator("partyClassification"));
-        Collections.sort(getSearchedParkingParties(), new BeanComparator("cardEndDateToCompare"));
+        Collections.sort(getSearchedParkingParties(),
+                Comparator.comparing(ParkingParty::getPartyClassification).thenComparing(ParkingParty::getCardEndDateToCompare));
     }
 
     public void orderSelectedParkingParties() {
-        Collections.sort(getSearchedParkingParties(), new BeanComparator("partyClassification"));
-        Collections.sort(getSearchedParkingParties(), new BeanComparator("cardEndDateToCompare"));
+        Collections.sort(getSelectedParkingParties(),
+                Comparator.comparing(ParkingParty::getPartyClassification).thenComparing(ParkingParty::getCardEndDateToCompare));
     }
 
     public ParkingCardSearchPeriod getParkingCardSearchPeriod() {

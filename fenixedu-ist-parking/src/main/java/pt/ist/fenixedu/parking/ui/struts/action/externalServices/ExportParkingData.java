@@ -18,6 +18,7 @@
  */
 package pt.ist.fenixedu.parking.ui.struts.action.externalServices;
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,7 +26,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -36,8 +36,6 @@ import org.fenixedu.bennu.struts.annotations.Mapping;
 
 import pt.ist.fenixedu.parking.ParkingConfigurationManager;
 import pt.ist.fenixedu.parking.domain.reports.ParkingDataReportFile;
-
-import com.google.common.collect.Ordering;
 
 @Mapping(module = "external", path = "/exportParkingData")
 public class ExportParkingData extends FenixAction {
@@ -65,14 +63,13 @@ public class ExportParkingData extends FenixAction {
     }
 
     private ParkingDataReportFile getLastParkingDataReportJob() {
-        Set<QueueJob> parkingJobs = new HashSet<QueueJob>();
+        Set<ParkingDataReportFile> parkingJobs = new HashSet<ParkingDataReportFile>();
         for (QueueJob queueJob : Bennu.getInstance().getQueueJobSet()) {
             if (queueJob instanceof ParkingDataReportFile && queueJob.getDone()) {
-                parkingJobs.add(queueJob);
+                parkingJobs.add((ParkingDataReportFile) queueJob);
             }
         }
-
-        return parkingJobs.size() > 0 ? (ParkingDataReportFile) Ordering.from(new BeanComparator("requestDate")).max(parkingJobs) : null;
+        return parkingJobs.stream().max(Comparator.comparing(ParkingDataReportFile::getRequestDate)).orElse(null);
     }
 
     private void checkPermissions(String username, String password) throws NotAuthorizedException {

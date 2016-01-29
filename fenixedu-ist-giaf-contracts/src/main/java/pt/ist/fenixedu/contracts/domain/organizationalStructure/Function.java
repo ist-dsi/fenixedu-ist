@@ -18,6 +18,9 @@
  */
 package pt.ist.fenixedu.contracts.domain.organizationalStructure;
 
+import static java.util.Comparator.comparing;
+import static java.util.Comparator.nullsFirst;
+
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -25,10 +28,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.apache.commons.beanutils.BeanComparator;
-import org.apache.commons.collections.comparators.ComparatorChain;
-import org.apache.commons.collections.comparators.NullComparator;
-import org.fenixedu.academic.domain.DomainObjectUtil;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.organizationalStructure.AccountabilityType;
 import org.fenixedu.academic.domain.organizationalStructure.AccountabilityTypeEnum;
@@ -41,21 +40,9 @@ import org.joda.time.YearMonthDay;
 
 public class Function extends Function_Base {
 
-    public static final Comparator<Function> COMPARATOR_BY_ORDER = new Comparator<Function>() {
-        private ComparatorChain chain = null;
-
-        @Override
-        public int compare(Function one, Function other) {
-            if (this.chain == null) {
-                chain = new ComparatorChain();
-                chain.addComparator(new BeanComparator("functionOrder", new NullComparator()));
-                chain.addComparator(new BeanComparator("functionType", new NullComparator()));
-                chain.addComparator(new BeanComparator("name"));
-                chain.addComparator(DomainObjectUtil.COMPARATOR_BY_ID);
-            }
-            return chain.compare(one, other);
-        }
-    };
+    public static final Comparator<Function> COMPARATOR_BY_ORDER = nullsFirst(comparing(Function::getFunctionOrder))
+            .thenComparing(nullsFirst(comparing(Function::getFunctionType))).thenComparing(Function::getName)
+            .thenComparing(Function::getExternalId);
 
     public Function(MultiLanguageString functionName, YearMonthDay beginDate, YearMonthDay endDate, FunctionType type, Unit unit) {
         super();

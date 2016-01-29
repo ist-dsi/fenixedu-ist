@@ -26,9 +26,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.beanutils.BeanComparator;
-import org.apache.commons.collections.comparators.ComparatorChain;
-import org.fenixedu.academic.domain.DomainObjectUtil;
 import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
@@ -45,17 +42,11 @@ import pt.ist.fenixframework.Atomic;
 
 public class PersonFunction extends PersonFunction_Base {
 
-    public final static Comparator<PersonFunction> COMPARATOR_BY_BEGIN_DATE = new ComparatorChain();
+    public final static Comparator<PersonFunction> COMPARATOR_BY_BEGIN_DATE = Comparator.comparing(PersonFunction::getBeginDate)
+            .thenComparing(PersonFunction::getExternalId);
 
-    public final static Comparator<PersonFunction> COMPARATOR_BY_PERSON_NAME = new ComparatorChain();
-
-    static {
-        ((ComparatorChain) COMPARATOR_BY_BEGIN_DATE).addComparator(new BeanComparator("beginDate"));
-        ((ComparatorChain) COMPARATOR_BY_BEGIN_DATE).addComparator(DomainObjectUtil.COMPARATOR_BY_ID);
-
-        ((ComparatorChain) COMPARATOR_BY_PERSON_NAME).addComparator(new BeanComparator("person.name"));
-        ((ComparatorChain) COMPARATOR_BY_PERSON_NAME).addComparator(DomainObjectUtil.COMPARATOR_BY_ID);
-    }
+    public final static Comparator<PersonFunction> COMPARATOR_BY_PERSON_NAME = Comparator.comparing(PersonFunction::getPerson,
+            Comparator.comparing(Person::getName)).thenComparing(PersonFunction::getExternalId);
 
     public PersonFunction(Party parentParty, Party childParty, Function function, YearMonthDay begin, YearMonthDay end,
             Double credits) {

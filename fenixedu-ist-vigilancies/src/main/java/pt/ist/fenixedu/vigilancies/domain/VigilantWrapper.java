@@ -25,9 +25,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.beanutils.BeanComparator;
-import org.apache.commons.collections.comparators.ComparatorChain;
-import org.apache.commons.collections.comparators.ReverseComparator;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Teacher;
@@ -68,7 +65,7 @@ public class VigilantWrapper extends VigilantWrapper_Base {
 
     };
 
-    public static final Comparator<VigilantWrapper> POINTS_COMPARATOR = new BeanComparator("points");
+    public static final Comparator<VigilantWrapper> POINTS_COMPARATOR = Comparator.comparing(VigilantWrapper::getPoints);
 
     public static final Comparator<VigilantWrapper> ESTIMATED_POINTS_COMPARATOR = new Comparator<VigilantWrapper>() {
 
@@ -79,10 +76,11 @@ public class VigilantWrapper extends VigilantWrapper_Base {
 
     };
 
-    public static final Comparator<VigilantWrapper> NAME_COMPARATOR = new BeanComparator("person.name");
+    public static final Comparator<VigilantWrapper> NAME_COMPARATOR = Comparator.comparing(VigilantWrapper::getPerson,
+            Comparator.comparing(Person::getName));
 
-    public static final Comparator<VigilantWrapper> USERNAME_COMPARATOR = new ReverseComparator(new BeanComparator(
-            "person.username"));
+    public static final Comparator<VigilantWrapper> USERNAME_COMPARATOR = Comparator.comparing(VigilantWrapper::getPerson,
+            Comparator.comparing(Person::getUsername)).reversed();
 
     public static final Comparator<VigilantWrapper> CATEGORY_COMPARATOR = new Comparator<VigilantWrapper>() {
 
@@ -108,17 +106,8 @@ public class VigilantWrapper extends VigilantWrapper_Base {
 
     };
 
-    public static final Comparator<VigilantWrapper> SORT_CRITERIA_COMPARATOR = new Comparator<VigilantWrapper>() {
-        @Override
-        public int compare(VigilantWrapper v1, VigilantWrapper v2) {
-            ComparatorChain comparator = new ComparatorChain();
-            comparator.addComparator(ESTIMATED_POINTS_COMPARATOR);
-            comparator.addComparator(CATEGORY_COMPARATOR);
-            comparator.addComparator(USERNAME_COMPARATOR);
-
-            return comparator.compare(v1, v2);
-        }
-    };
+    public static final Comparator<VigilantWrapper> SORT_CRITERIA_COMPARATOR = ESTIMATED_POINTS_COMPARATOR.thenComparing(
+            CATEGORY_COMPARATOR).thenComparing(USERNAME_COMPARATOR);
 
     public double getPoints() {
         double points = this.getStartPoints().doubleValue();
@@ -477,7 +466,8 @@ public class VigilantWrapper extends VigilantWrapper_Base {
 
     /*************** OLD VIGILANT BOUND *******************/
 
-    public static final Comparator<VigilantWrapper> VIGILANT_GROUP_COMPARATOR = new BeanComparator("vigilantGroup.name");
+    public static final Comparator<VigilantWrapper> VIGILANT_GROUP_COMPARATOR = Comparator.comparing(
+            VigilantWrapper::getVigilantGroup, Comparator.comparing(VigilantGroup::getName));
 
     public String getJustificationforNotConvokable() {
         String result = "";

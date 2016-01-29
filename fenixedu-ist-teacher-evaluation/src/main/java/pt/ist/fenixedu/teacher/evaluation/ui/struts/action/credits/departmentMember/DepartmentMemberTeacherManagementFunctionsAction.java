@@ -20,13 +20,12 @@ package pt.ist.fenixedu.teacher.evaluation.ui.struts.action.credits.departmentMe
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.beanutils.BeanComparator;
-import org.apache.commons.collections.comparators.ReverseComparator;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -55,7 +54,7 @@ public class DepartmentMemberTeacherManagementFunctionsAction extends FenixActio
             List<PersonFunction> personFunctions =
                     new ArrayList<PersonFunction>(PersonFunction.getPersonFunctions(userView.getPerson(),
                             AccountabilityTypeEnum.MANAGEMENT_FUNCTION));
-            Collections.sort(personFunctions, new ReverseComparator(new BeanComparator("beginDate")));
+            Collections.sort(personFunctions, Comparator.comparing(PersonFunction::getBeginDate).reversed());
             request.setAttribute("personFunctions", personFunctions);
         }
         return mapping.findForward("showTeacherCreditsManagementFunctions");

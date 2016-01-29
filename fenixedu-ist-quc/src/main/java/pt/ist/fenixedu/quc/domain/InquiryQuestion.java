@@ -22,7 +22,7 @@ import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.bennu.core.domain.Bennu;
 
-public class InquiryQuestion extends InquiryQuestion_Base {
+public class InquiryQuestion extends InquiryQuestion_Base implements Comparable<InquiryQuestion> {
 
     public InquiryQuestion() {
         super();
@@ -96,4 +96,8 @@ public class InquiryQuestion extends InquiryQuestion_Base {
         return getDependentQuestionCondition() != null && getDependentQuestionCondition().getInquiryGroupQuestion() != null;
     }
 
+    @Override
+    public int compareTo(InquiryQuestion o) {
+        return getQuestionOrder().compareTo(o.getQuestionOrder());
+    }
 }

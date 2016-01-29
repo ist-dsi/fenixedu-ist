@@ -18,13 +18,13 @@
  */
 package pt.ist.fenixedu.quc.ui.struts.action.publico;
 
+import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -70,7 +70,7 @@ public class ViewQUCInquiryAnswers extends FenixDispatchAction {
         }
 
         Set<InquiryBlockDTO> coordinatorInquiryBlocks =
-                new TreeSet<InquiryBlockDTO>(new BeanComparator("inquiryBlock.blockOrder"));
+                new TreeSet<InquiryBlockDTO>(Comparator.comparing(InquiryBlockDTO::getInquiryBlock));
         for (InquiryBlock inquiryBlock : coordinatorInquiryTemplate.getInquiryBlocksSet()) {
             coordinatorInquiryBlocks.add(new InquiryBlockDTO(inquiryCoordinatorAnswer, inquiryBlock));
         }
@@ -91,7 +91,8 @@ public class ViewQUCInquiryAnswers extends FenixDispatchAction {
                 RegentInquiryTemplate.getTemplateByExecutionPeriod(professorship.getExecutionCourse().getExecutionPeriod());
         InquiryRegentAnswer inquiryRegentAnswer = professorship.getInquiryRegentAnswer();
 
-        Set<InquiryBlockDTO> regentInquiryBlocks = new TreeSet<InquiryBlockDTO>(new BeanComparator("inquiryBlock.blockOrder"));
+        Set<InquiryBlockDTO> regentInquiryBlocks =
+                new TreeSet<InquiryBlockDTO>(Comparator.comparing(InquiryBlockDTO::getInquiryBlock));
         for (InquiryBlock inquiryBlock : regentInquiryTemplate.getInquiryBlocksSet()) {
             regentInquiryBlocks.add(new InquiryBlockDTO(inquiryRegentAnswer, inquiryBlock));
         }
@@ -113,7 +114,8 @@ public class ViewQUCInquiryAnswers extends FenixDispatchAction {
                 TeacherInquiryTemplate.getTemplateByExecutionPeriod(professorship.getExecutionCourse().getExecutionPeriod());
         InquiryTeacherAnswer inquiryTeacherAnswer = professorship.getInquiryTeacherAnswer();
 
-        Set<InquiryBlockDTO> teacherInquiryBlocks = new TreeSet<InquiryBlockDTO>(new BeanComparator("inquiryBlock.blockOrder"));
+        Set<InquiryBlockDTO> teacherInquiryBlocks =
+                new TreeSet<InquiryBlockDTO>(Comparator.comparing(InquiryBlockDTO::getInquiryBlock));
         for (InquiryBlock inquiryBlock : teacherInquiryTemplate.getInquiryBlocksSet()) {
             teacherInquiryBlocks.add(new InquiryBlockDTO(inquiryTeacherAnswer, inquiryBlock));
         }
@@ -144,7 +146,8 @@ public class ViewQUCInquiryAnswers extends FenixDispatchAction {
             }
         }
 
-        Set<InquiryBlockDTO> delegateInquiryBlocks = new TreeSet<InquiryBlockDTO>(new BeanComparator("inquiryBlock.blockOrder"));
+        Set<InquiryBlockDTO> delegateInquiryBlocks =
+                new TreeSet<InquiryBlockDTO>(Comparator.comparing(InquiryBlockDTO::getInquiryBlock));
         for (InquiryBlock inquiryBlock : delegateInquiryTemplate.getInquiryBlocksSet()) {
             delegateInquiryBlocks.add(new InquiryBlockDTO(inquiryDelegateAnswer, inquiryBlock));
         }

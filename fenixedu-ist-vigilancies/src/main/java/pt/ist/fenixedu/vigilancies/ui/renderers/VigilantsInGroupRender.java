@@ -24,9 +24,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.apache.commons.beanutils.BeanComparator;
-import org.apache.commons.collections.comparators.ComparatorChain;
-import org.apache.commons.collections.comparators.ReverseComparator;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Teacher;
 
@@ -216,13 +213,10 @@ public class VigilantsInGroupRender extends InputRenderer {
 
     }
 
-    private class CategoryComparator implements Comparator {
+    private class CategoryComparator implements Comparator<Person> {
 
         @Override
-        public int compare(Object o1, Object o2) {
-
-            Person p1 = (Person) o1;
-            Person p2 = (Person) o2;
+        public int compare(Person p1, Person p2) {
 
             Employee e1 = p1.getEmployee();
             Employee e2 = p2.getEmployee();
@@ -255,22 +249,16 @@ public class VigilantsInGroupRender extends InputRenderer {
 
             return -c1.compareTo(c2);
         }
-
     }
 
-    private class OrderComparator implements Comparator {
+    private class OrderComparator implements Comparator<MetaObject> {
 
         @Override
-        public int compare(Object o1, Object o2) {
+        public int compare(MetaObject o1, MetaObject o2) {
 
-            Person p1 = (Person) ((MetaObject) o1).getObject();
-            Person p2 = (Person) ((MetaObject) o2).getObject();
-            ComparatorChain chain = new ComparatorChain();
-            chain.addComparator(new CategoryComparator());
-            chain.addComparator(new ReverseComparator(new BeanComparator("username")));
-
-            return chain.compare(p1, p2);
+            Person p1 = (Person) o1.getObject();
+            Person p2 = (Person) o2.getObject();
+            return new CategoryComparator().thenComparing(Comparator.comparing(Person::getUsername).reversed()).compare(p1, p2);
         }
-
     }
 }

@@ -23,12 +23,12 @@ package pt.ist.fenixedu.integration.ui.struts.action.dfa;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -157,7 +157,8 @@ public class SelectDFACandidaciesDispatchAction extends FenixDispatchAction {
             return setError(request, mapping, "no.candidacy.situations.selected", "confirmCandidaciesForSelection", null);
         }
 
-        Collections.sort(substituteCandidacies, new BeanComparator("candidacy.number"));
+        Collections.sort(substituteCandidacies,
+                Comparator.comparing(SelectDFACandidacyBean::getCandidacy, Comparator.comparing(DFACandidacy::getNumber)));
 
         request.setAttribute("admittedCandidacies", admittedCandidacies);
         request.setAttribute("substituteCandidacies", substituteCandidacies);
@@ -199,7 +200,7 @@ public class SelectDFACandidaciesDispatchAction extends FenixDispatchAction {
         List<SelectDFACandidacyBean> notAdmittedCandidacies = retrieveCandidaciesBeans("notAdmittedCandidacies");
 
         if (substituteCandidacies != null) {
-            Collections.sort(substituteCandidacies, new BeanComparator("order"));
+            Collections.sort(substituteCandidacies, Comparator.comparing(SelectDFACandidacyBean::getOrder));
         }
 
         ExecutionDegree executionDegree =

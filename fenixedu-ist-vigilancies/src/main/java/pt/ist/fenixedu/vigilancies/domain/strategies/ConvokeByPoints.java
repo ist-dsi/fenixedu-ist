@@ -25,7 +25,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.collections.comparators.ComparatorChain;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.WrittenEvaluation;
@@ -82,14 +81,8 @@ public class ConvokeByPoints extends Strategy {
             }
         }
 
-        ComparatorChain comparator = new ComparatorChain();
-        comparator.addComparator(VigilantWrapper.ESTIMATED_POINTS_COMPARATOR);
-        // comparator.addComparator(new ConvokeComparator());
-        comparator.addComparator(VigilantWrapper.CATEGORY_COMPARATOR);
-        comparator.addComparator(VigilantWrapper.USERNAME_COMPARATOR);
-
-        Collections.sort(vigilantSugestion, comparator);
-        Collections.sort(teachersSugestion, comparator);
+        Collections.sort(vigilantSugestion, VigilantWrapper.SORT_CRITERIA_COMPARATOR);
+        Collections.sort(teachersSugestion, VigilantWrapper.SORT_CRITERIA_COMPARATOR);
         return new StrategySugestion(teachersSugestion, vigilantSugestion, unavailableVigilants);
     }
 

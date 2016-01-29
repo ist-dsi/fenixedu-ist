@@ -20,9 +20,8 @@ package pt.ist.fenixedu.vigilancies.ui.renderers.providers;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-
-import org.apache.commons.beanutils.BeanComparator;
 
 import pt.ist.fenixWebFramework.rendererExtensions.converters.DomainObjectKeyConverter;
 import pt.ist.fenixWebFramework.renderers.DataProvider;
@@ -38,7 +37,7 @@ public class VigilantGroupsProvider implements DataProvider {
         VigilantBean bean = (VigilantBean) source;
         List<VigilantGroup> groups = new ArrayList(bean.getVigilantGroups());
 
-        Collections.sort(groups, new BeanComparator("name"));
+        Collections.sort(groups, Comparator.comparing(VigilantGroup::getName));
         return groups;
     }
 

@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -29,7 +30,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.Person;
@@ -66,7 +66,7 @@ public class RegentInquiryBean implements Serializable {
     }
 
     private void initRegentInquiry(RegentInquiryTemplate regentInquiryTemplate, Professorship professorship) {
-        setRegentInquiryBlocks(new TreeSet<InquiryBlockDTO>(new BeanComparator("inquiryBlock.blockOrder")));
+        setRegentInquiryBlocks(new TreeSet<InquiryBlockDTO>(Comparator.comparing(InquiryBlockDTO::getInquiryBlock)));
         for (InquiryBlock inquiryBlock : regentInquiryTemplate.getInquiryBlocksSet()) {
             getRegentInquiryBlocks().add(new InquiryBlockDTO(getInquiryRegentAnswer(), inquiryBlock));
         }
@@ -85,7 +85,7 @@ public class RegentInquiryBean implements Serializable {
                 for (InquiryBlock inquiryBlock : courseInquiryTemplate.getInquiryBlocksSet()) {
                     blockResults.add(new BlockResultsSummaryBean(inquiryBlock, results, person, ResultPersonCategory.REGENT));
                 }
-                Collections.sort(blockResults, new BeanComparator("inquiryBlock.blockOrder"));
+                Collections.sort(blockResults, Comparator.comparing(BlockResultsSummaryBean::getInquiryBlock));
                 getCurricularBlockResultsMap().put(executionDegree, blockResults);
             }
         }
@@ -105,8 +105,11 @@ public class RegentInquiryBean implements Serializable {
                                 ResultPersonCategory.REGENT));
                     }
                 }
-                Collections.sort(teachersResults, new BeanComparator("professorship.person.name"));
-                Collections.sort(teachersResults, new BeanComparator("shiftType"));
+                Collections.sort(
+                        teachersResults,
+                        Comparator.comparing(TeacherShiftTypeResultsBean::getProfessorship,
+                                Comparator.comparing(Professorship::getPerson, Comparator.comparing(Person::getName)))
+                                .thenComparing(TeacherShiftTypeResultsBean::getShiftType));
                 getTeachersResultsMap().put(teacherProfessorship, teachersResults);
             }
         }

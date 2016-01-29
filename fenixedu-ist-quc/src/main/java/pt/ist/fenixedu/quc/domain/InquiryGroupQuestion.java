@@ -21,7 +21,7 @@ package pt.ist.fenixedu.quc.domain;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.bennu.core.domain.Bennu;
 
-public class InquiryGroupQuestion extends InquiryGroupQuestion_Base {
+public class InquiryGroupQuestion extends InquiryGroupQuestion_Base implements Comparable<InquiryGroupQuestion> {
 
     public InquiryGroupQuestion() {
         super();
@@ -108,6 +108,11 @@ public class InquiryGroupQuestion extends InquiryGroupQuestion_Base {
         setResultQuestion(null);
         setRootDomainObject(null);
         super.deleteDomainObject();
+    }
+
+    @Override
+    public int compareTo(InquiryGroupQuestion o) {
+        return getGroupOrder().compareTo(o.getGroupOrder());
     }
 
 }

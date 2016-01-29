@@ -22,12 +22,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.Person;
@@ -88,7 +88,7 @@ public class CurricularCourseResumeResult extends BlockResumeResult implements S
 
     @Override
     protected void initResultBlocks() {
-        setResultBlocks(new TreeSet<InquiryResult>(new BeanComparator("inquiryQuestion.questionOrder")));
+        setResultBlocks(new TreeSet<InquiryResult>(Comparator.comparing(InquiryResult::getInquiryQuestion)));
         for (InquiryResult inquiryResult : getExecutionCourse().getInquiryResultsSet()) {
             if ((inquiryResult.getExecutionDegree() == getExecutionDegree() || (inquiryResult.getExecutionDegree() == null && inquiryResult
                     .getProfessorship() == null)) && InquiryConnectionType.GROUP.equals(inquiryResult.getConnectionType())) { //change to COURSE_EVALUATION
@@ -113,8 +113,11 @@ public class CurricularCourseResumeResult extends BlockResumeResult implements S
             }
         }
 
-        Collections.sort(getTeachersResults(), new BeanComparator("professorship.person.name"));
-        Collections.sort(getTeachersResults(), new BeanComparator("shiftType"));
+        Collections.sort(
+                getTeachersResults(),
+                Comparator.comparing(TeacherShiftTypeResultsBean::getProfessorship,
+                        Comparator.comparing(Professorship::getPerson, Comparator.comparing(Person::getName))).thenComparing(
+                        TeacherShiftTypeResultsBean::getShiftType));
     }
 
     private Set<ShiftType> getShiftTypes(Collection<InquiryResult> professorshipResults) {

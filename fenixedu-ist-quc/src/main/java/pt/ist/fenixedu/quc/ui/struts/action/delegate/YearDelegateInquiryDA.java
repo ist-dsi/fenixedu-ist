@@ -23,13 +23,13 @@ package pt.ist.fenixedu.quc.ui.struts.action.delegate;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -110,7 +110,10 @@ public class YearDelegateInquiryDA extends FenixDispatchAction {
             for (ExecutionCourse executionCourse : executionCoursesToInquiries) {
                 coursesResultResume.add(new CurricularCourseResumeResult(executionCourse, executionDegree, yearDelegate));
             }
-            Collections.sort(coursesResultResume, new BeanComparator("executionCourse.name"));
+            Collections.sort(
+                    coursesResultResume,
+                    Comparator.comparing(CurricularCourseResumeResult::getExecutionCourse,
+                            Comparator.comparing(ExecutionCourse::getName)));
             request.setAttribute("executionDegree", executionDegree);
             request.setAttribute("executionPeriod", executionPeriod);
             request.setAttribute("coursesResultResume", coursesResultResume);

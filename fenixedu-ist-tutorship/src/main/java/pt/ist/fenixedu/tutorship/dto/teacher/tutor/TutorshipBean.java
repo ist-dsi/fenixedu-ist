@@ -21,7 +21,6 @@ package pt.ist.fenixedu.tutorship.dto.teacher.tutor;
 import java.io.Serializable;
 import java.util.Comparator;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.fenixedu.academic.domain.student.PersonalIngressionData;
 import org.fenixedu.academic.domain.student.Registration;
 
@@ -29,8 +28,8 @@ import pt.ist.fenixedu.tutorship.domain.Tutorship;
 
 public class TutorshipBean implements Serializable {
 
-    public static final Comparator<TutorshipBean> TUTORSHIP_COMPARATOR_BY_STUDENT_NUMBER = new BeanComparator(
-            "tutorship.studentCurricularPlan.registration.number");
+    public static final Comparator<TutorshipBean> TUTORSHIP_COMPARATOR_BY_STUDENT_NUMBER = Comparator.comparing(
+            TutorshipBean::getTutorship, Tutorship.TUTORSHIP_COMPARATOR_BY_STUDENT_NUMBER);
 
     private Tutorship tutorship;
 

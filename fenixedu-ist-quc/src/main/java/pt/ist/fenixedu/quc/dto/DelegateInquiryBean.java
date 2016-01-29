@@ -22,12 +22,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.Person;
@@ -79,7 +79,7 @@ public class DelegateInquiryBean implements Serializable {
             getCurricularBlockResults().add(
                     new BlockResultsSummaryBean(inquiryBlock, results, person, ResultPersonCategory.DELEGATE));
         }
-        Collections.sort(getCurricularBlockResults(), new BeanComparator("inquiryBlock.blockOrder"));
+        Collections.sort(getCurricularBlockResults(), Comparator.comparing(BlockResultsSummaryBean::getInquiryBlock));
     }
 
     private void initTeachersResults(ExecutionCourse executionCourse, Person person) {
@@ -98,13 +98,16 @@ public class DelegateInquiryBean implements Serializable {
             }
         }
 
-        Collections.sort(getTeachersResults(), new BeanComparator("professorship.person.name"));
-        Collections.sort(getTeachersResults(), new BeanComparator("shiftType"));
+        Collections.sort(
+                getTeachersResults(),
+                Comparator.comparing(TeacherShiftTypeResultsBean::getProfessorship,
+                        Comparator.comparing(Professorship::getPerson, Comparator.comparing(Person::getName))).thenComparing(
+                        TeacherShiftTypeResultsBean::getShiftType));
     }
 
     private void initDelegateInquiry(DelegateInquiryTemplate delegateInquiryTemplate, YearDelegate yearDelegate,
             ExecutionCourse executionCourse, InquiryDelegateAnswer inquiryDelegateAnswer) {
-        setDelegateInquiryBlocks(new TreeSet<InquiryBlockDTO>(new BeanComparator("inquiryBlock.blockOrder")));
+        setDelegateInquiryBlocks(new TreeSet<InquiryBlockDTO>(Comparator.comparing(InquiryBlockDTO::getInquiryBlock)));
         setInquiryDelegateAnswer(inquiryDelegateAnswer);
         for (InquiryBlock inquiryBlock : delegateInquiryTemplate.getInquiryBlocksSet()) {
             getDelegateInquiryBlocks().add(new InquiryBlockDTO(inquiryDelegateAnswer, inquiryBlock));

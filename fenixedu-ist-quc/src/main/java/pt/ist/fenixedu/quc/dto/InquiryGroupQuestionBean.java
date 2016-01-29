@@ -19,11 +19,11 @@
 package pt.ist.fenixedu.quc.dto;
 
 import java.io.Serializable;
+import java.util.Comparator;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.fenixedu.academic.util.MultiLanguageString;
 
 import pt.ist.fenixedu.quc.domain.InquiryAnswer;
@@ -74,7 +74,7 @@ public class InquiryGroupQuestionBean implements Serializable {
 
     private void initGroup(InquiryGroupQuestion groupQuestion) {
         setInquiryGroupQuestion(groupQuestion);
-        setInquiryQuestions(new TreeSet<InquiryQuestionDTO>(new BeanComparator("inquiryQuestion.questionOrder")));
+        setInquiryQuestions(new TreeSet<InquiryQuestionDTO>(Comparator.comparing(InquiryQuestionDTO::getInquiryQuestion)));
         setOrder(groupQuestion.getGroupOrder());
         setJoinUp(false);
     }

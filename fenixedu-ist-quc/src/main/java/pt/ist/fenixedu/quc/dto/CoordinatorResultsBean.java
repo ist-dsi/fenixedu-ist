@@ -20,9 +20,9 @@ package pt.ist.fenixedu.quc.dto;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.Person;
@@ -60,7 +60,7 @@ public class CoordinatorResultsBean extends GlobalCommentsResultsBean {
                 getCurricularBlockResults().add(new BlockResultsSummaryBean(inquiryBlock, results, person, getPersonCategory()));
             }
         }
-        Collections.sort(getCurricularBlockResults(), new BeanComparator("inquiryBlock.blockOrder"));
+        Collections.sort(getCurricularBlockResults(), Comparator.comparing(BlockResultsSummaryBean::getInquiryBlock));
     }
 
     @Override

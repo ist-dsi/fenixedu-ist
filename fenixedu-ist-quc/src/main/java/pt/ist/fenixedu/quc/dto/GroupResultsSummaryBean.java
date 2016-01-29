@@ -21,9 +21,9 @@ package pt.ist.fenixedu.quc.dto;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.fenixedu.academic.domain.Person;
 
 import pt.ist.fenixedu.quc.domain.InquiryGroupQuestion;
@@ -60,7 +60,7 @@ public class GroupResultsSummaryBean implements Serializable {
             getQuestionsResults().add(resultsSummaryBean);
         }
         initGroupResultClassification(inquiryResults);
-        Collections.sort(getQuestionsResults(), new BeanComparator("inquiryQuestion.questionOrder"));
+        Collections.sort(getQuestionsResults(), Comparator.comparing(QuestionResultsSummaryBean::getInquiryQuestion));
     }
 
     private void initGroupResultClassification(List<InquiryResult> inquiryResults) {

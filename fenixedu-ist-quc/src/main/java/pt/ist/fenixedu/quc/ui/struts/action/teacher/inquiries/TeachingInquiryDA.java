@@ -24,6 +24,7 @@ package pt.ist.fenixedu.quc.ui.struts.action.teacher.inquiries;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,7 +32,6 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -102,7 +102,7 @@ public class TeachingInquiryDA extends ExecutionCourseBaseAction {
 
         request.setAttribute("isComplete", InquiryResponseState.COMPLETE.equals(finalState));
         request.setAttribute("completionState", finalState.getLocalizedName());
-        Collections.sort(teacherResults, new BeanComparator("shiftType"));
+        Collections.sort(teacherResults, Comparator.comparing(TeacherShiftTypeGroupsResumeResult::getShiftType));
 
         List<CurricularCourseResumeResult> coursesResultResume = new ArrayList<CurricularCourseResumeResult>();
         for (ExecutionDegree executionDegree : executionCourse.getExecutionDegrees()) {
@@ -113,7 +113,7 @@ public class TeachingInquiryDA extends ExecutionCourseBaseAction {
                 coursesResultResume.add(courseResumeResult);
             }
         }
-        Collections.sort(coursesResultResume, new BeanComparator("firstPresentationName"));
+        Collections.sort(coursesResultResume, Comparator.comparing(CurricularCourseResumeResult::getFirstPresentationName));
 
         request.setAttribute("professorship", professorship);
         request.setAttribute("executionSemester", executionCourse.getExecutionPeriod());

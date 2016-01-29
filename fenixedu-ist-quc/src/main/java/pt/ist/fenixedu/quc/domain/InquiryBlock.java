@@ -21,7 +21,7 @@ package pt.ist.fenixedu.quc.domain;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.bennu.core.domain.Bennu;
 
-public class InquiryBlock extends InquiryBlock_Base {
+public class InquiryBlock extends InquiryBlock_Base implements Comparable<InquiryBlock> {
 
     public InquiryBlock() {
         super();
@@ -54,6 +54,11 @@ public class InquiryBlock extends InquiryBlock_Base {
             removeInquiries(inquiryTemplate);
         }
         super.deleteDomainObject();
+    }
+
+    @Override
+    public int compareTo(InquiryBlock o) {
+        return getBlockOrder().compareTo(o.getBlockOrder());
     }
 
 }

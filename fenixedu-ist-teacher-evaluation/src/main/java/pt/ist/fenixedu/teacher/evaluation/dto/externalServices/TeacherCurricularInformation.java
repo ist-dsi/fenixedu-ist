@@ -31,7 +31,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections.comparators.ReverseComparator;
 import org.fenixedu.academic.domain.CourseLoad;
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.Degree;
@@ -70,28 +69,29 @@ public class TeacherCurricularInformation implements Serializable {
     protected Degree degree;
     protected SortedSet<ExecutionSemester> executionSemesters = new TreeSet<ExecutionSemester>(
             ExecutionSemester.COMPARATOR_BY_SEMESTER_AND_YEAR);
-    protected SortedSet<QualificationBean> qualificationBeans = new TreeSet<QualificationBean>(new ReverseComparator(
-            new Comparator<QualificationBean>() {
-                @Override
-                public int compare(final QualificationBean o1, final QualificationBean o2) {
-                    int compareType = o1.type.compareTo(o2.type);
-                    if (compareType == 0) {
-                        if (o1.year == null && o2.year == null) {
-                            return 0;
-                        } else if (o1.year == null) {
-                            return -1;
-                        } else if (o2.year == null) {
-                            return 1;
-                        }
-                        return o1.year.compareTo(o2.year);
-                    }
-                    if ((o1.getType().equals(QualificationType.AGGREGATION) && o2.getType().isDoctorate())
-                            || (o2.getType().equals(QualificationType.AGGREGATION) && o1.getType().isDoctorate())) {
-                        return -compareType;
-                    }
-                    return compareType;
+    private static final Comparator<QualificationBean> QUALIFICATION_COMPARATOR = new Comparator<QualificationBean>() {
+        @Override
+        public int compare(final QualificationBean o1, final QualificationBean o2) {
+            int compareType = o1.type.compareTo(o2.type);
+            if (compareType == 0) {
+                if (o1.year == null && o2.year == null) {
+                    return 0;
+                } else if (o1.year == null) {
+                    return -1;
+                } else if (o2.year == null) {
+                    return 1;
                 }
-            }));
+                return o1.year.compareTo(o2.year);
+            }
+            if ((o1.getType().equals(QualificationType.AGGREGATION) && o2.getType().isDoctorate())
+                    || (o2.getType().equals(QualificationType.AGGREGATION) && o1.getType().isDoctorate())) {
+                return -compareType;
+            }
+            return compareType;
+        }
+    };
+    protected SortedSet<QualificationBean> qualificationBeans = new TreeSet<QualificationBean>(
+            QUALIFICATION_COMPARATOR.reversed());
 
     protected List<LecturedCurricularUnit> lecturedUCs = new ArrayList<LecturedCurricularUnit>();
     protected List<String> teacherPublications = new ArrayList<String>();

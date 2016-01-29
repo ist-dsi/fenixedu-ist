@@ -21,10 +21,10 @@ package pt.ist.fenixedu.quc.dto;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.beanutils.BeanComparator;
 import org.fenixedu.academic.domain.Person;
 
 import pt.ist.fenixedu.quc.domain.InquiryBlock;
@@ -49,7 +49,7 @@ public class BlockResultsSummaryBean implements Serializable {
                 getGroupsResults().add(new GroupResultsSummaryBean(inquiryGroupQuestion, inquiryResults, person, personCategory));
             }
         }
-        Collections.sort(getGroupsResults(), new BeanComparator("inquiryGroupQuestion.groupOrder"));
+        Collections.sort(getGroupsResults(), Comparator.comparing(GroupResultsSummaryBean::getInquiryGroupQuestion));
         setLeftRightGroups();
     }
 

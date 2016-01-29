@@ -25,8 +25,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.collections.comparators.ComparatorChain;
-
 import pt.ist.fenixWebFramework.renderers.OutputRenderer;
 import pt.ist.fenixWebFramework.renderers.components.HtmlBlockContainer;
 import pt.ist.fenixWebFramework.renderers.components.HtmlComponent;
@@ -329,14 +327,10 @@ public class VigilantTableRender extends OutputRenderer {
 
     @Override
     protected Layout getLayout(Object object, Class type) {
-        ComparatorChain chain = new ComparatorChain();
-        chain.addComparator(VigilantWrapper.CATEGORY_COMPARATOR);
-        chain.addComparator(VigilantWrapper.USERNAME_COMPARATOR);
-
         this.group = (VigilantGroup) object;
         List<VigilantWrapper> vigilants = new ArrayList<VigilantWrapper>(this.group.getVigilantWrappersSet());
 
-        Collections.sort(vigilants, chain);
+        Collections.sort(vigilants, VigilantWrapper.CATEGORY_COMPARATOR.thenComparing(VigilantWrapper.USERNAME_COMPARATOR));
 
         return new VigilantTableRenderLayout(vigilants);
     }

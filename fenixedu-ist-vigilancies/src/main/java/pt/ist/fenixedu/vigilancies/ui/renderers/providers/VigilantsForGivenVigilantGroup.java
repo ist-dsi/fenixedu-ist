@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.collections.comparators.ComparatorChain;
 import org.fenixedu.academic.domain.WrittenEvaluation;
 
 import pt.ist.fenixWebFramework.rendererExtensions.converters.DomainObjectKeyArrayConverter;
@@ -54,10 +53,7 @@ public class VigilantsForGivenVigilantGroup implements DataProvider {
             }
         } else {
             vigilants.addAll(vigilantGroup.getVigilantWrappersSet());
-            ComparatorChain chain = new ComparatorChain();
-            chain.addComparator(VigilantWrapper.CATEGORY_COMPARATOR);
-            chain.addComparator(VigilantWrapper.USERNAME_COMPARATOR);
-            Collections.sort(vigilants, chain);
+            Collections.sort(vigilants, VigilantWrapper.CATEGORY_COMPARATOR.thenComparing(VigilantWrapper.USERNAME_COMPARATOR));
         }
 
         return vigilants;
