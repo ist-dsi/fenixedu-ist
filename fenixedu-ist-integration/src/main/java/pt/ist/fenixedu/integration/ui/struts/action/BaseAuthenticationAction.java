@@ -40,6 +40,7 @@ import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.exceptions.AuthorizationException;
 import org.fenixedu.bennu.core.filters.CasAuthenticationFilter;
 import org.fenixedu.bennu.core.security.Authenticate;
+import org.fenixedu.bennu.struts.annotations.Mapping;
 
 import pt.ist.fenixWebFramework.renderers.components.HtmlLink;
 import pt.ist.fenixWebFramework.servlets.filters.contentRewrite.GenericChecksumRewriter;
@@ -55,7 +56,8 @@ import pt.ist.fenixedu.teacher.evaluation.domain.teacher.ReductionService;
 import pt.ist.fenixedu.teacher.evaluation.domain.teacher.TeacherService;
 import pt.ist.fenixedu.teacher.evaluation.domain.time.calendarStructure.TeacherCreditsFillingCE;
 
-public abstract class BaseAuthenticationAction extends FenixAction {
+@Mapping(path = "/login")
+public class BaseAuthenticationAction extends FenixAction {
 
     @Override
     public final ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,

@@ -44,18 +44,6 @@ public class DelegateApplication {
 
     }
 
-//    @StrutsApplication(bundle = "DelegateResources", path = "communication", titleKey = "label.delegates.comunication",
-//            accessGroup = "role(DELEGATE)", hint = "Delegate")
-//    public static class DelegateMessagingApp {
-//
-//    }
-//
-//    @StrutsApplication(bundle = "DelegateResources", path = "participate", titleKey = "label.participate",
-//            accessGroup = "role(DELEGATE)", hint = "Delegate")
-//    public static class DelegateParticipateApp {
-//
-//    }
-
     @StrutsFunctionality(app = DelegateConsultApp.class, path = "evaluations", titleKey = "link.evaluations",
             accessGroup = "delegate")
     @Mapping(path = "/evaluationsForDelegates", module = "delegate")
