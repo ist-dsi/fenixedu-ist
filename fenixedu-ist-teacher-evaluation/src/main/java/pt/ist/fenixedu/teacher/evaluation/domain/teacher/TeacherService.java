@@ -25,9 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.Professorship;
@@ -80,23 +79,13 @@ public class TeacherService extends TeacherService_Base {
 
     public DegreeTeachingService getDegreeTeachingServiceByShiftAndProfessorship(final Shift shift,
             final Professorship professorship) {
-        return (DegreeTeachingService) CollectionUtils.find(getDegreeTeachingServices(), new Predicate() {
-            @Override
-            public boolean evaluate(Object arg0) {
-                DegreeTeachingService degreeTeachingService = (DegreeTeachingService) arg0;
-                return (degreeTeachingService.getShift() == shift) && (degreeTeachingService.getProfessorship() == professorship);
-            }
-        });
+        return getDegreeTeachingServices().stream().filter(s -> s.getShift() == shift)
+                .filter(s -> s.getProfessorship() == professorship).findAny().orElse(null);
     }
 
     public List<DegreeTeachingService> getDegreeTeachingServiceByProfessorship(final Professorship professorship) {
-        return (List<DegreeTeachingService>) CollectionUtils.select(getDegreeTeachingServices(), new Predicate() {
-            @Override
-            public boolean evaluate(Object arg0) {
-                DegreeTeachingService degreeTeachingService = (DegreeTeachingService) arg0;
-                return degreeTeachingService.getProfessorship() == professorship;
-            }
-        });
+        return getDegreeTeachingServices().stream().filter(s -> s.getProfessorship() == professorship)
+                .collect(Collectors.toList());
     }
 
     public Double getCredits() throws ParseException {
@@ -163,48 +152,28 @@ public class TeacherService extends TeacherService_Base {
     }
 
     public List<DegreeTeachingService> getDegreeTeachingServices() {
-        return (List<DegreeTeachingService>) CollectionUtils.select(getServiceItemsSet(), new Predicate() {
-            @Override
-            public boolean evaluate(Object arg0) {
-                return arg0 instanceof DegreeTeachingService;
-            }
-        });
+        return getServiceItemsSet().stream().filter(s -> s instanceof DegreeTeachingService).map(s -> (DegreeTeachingService) s)
+                .collect(Collectors.toList());
     }
 
     public List<DegreeProjectTutorialService> getDegreeProjectTutorialServices() {
-        return (List<DegreeProjectTutorialService>) CollectionUtils.select(getServiceItemsSet(), new Predicate() {
-            @Override
-            public boolean evaluate(Object arg0) {
-                return arg0 instanceof DegreeProjectTutorialService;
-            }
-        });
+        return getServiceItemsSet().stream().filter(s -> s instanceof DegreeProjectTutorialService)
+                .map(s -> (DegreeProjectTutorialService) s).collect(Collectors.toList());
     }
 
     public List<OtherService> getOtherServices() {
-        return (List<OtherService>) CollectionUtils.select(getServiceItemsSet(), new Predicate() {
-            @Override
-            public boolean evaluate(Object arg0) {
-                return arg0 instanceof OtherService;
-            }
-        });
+        return getServiceItemsSet().stream().filter(s -> s instanceof OtherService).map(s -> (OtherService) s)
+                .collect(Collectors.toList());
     }
 
     public List<InstitutionWorkTime> getInstitutionWorkTimes() {
-        return (List<InstitutionWorkTime>) CollectionUtils.select(getServiceItemsSet(), new Predicate() {
-            @Override
-            public boolean evaluate(Object arg0) {
-                return arg0 instanceof InstitutionWorkTime;
-            }
-        });
+        return getServiceItemsSet().stream().filter(s -> s instanceof InstitutionWorkTime).map(s -> (InstitutionWorkTime) s)
+                .collect(Collectors.toList());
     }
 
     public ReductionService getReductionService() {
-        return (ReductionService) CollectionUtils.find(getServiceItemsSet(), new Predicate() {
-            @Override
-            public boolean evaluate(Object arg0) {
-                return arg0 instanceof ReductionService;
-            }
-        });
+        return getServiceItemsSet().stream().filter(s -> s instanceof ReductionService).map(s -> (ReductionService) s).findAny()
+                .orElse(null);
     }
 
     public List<SupportLesson> getSupportLessons() {
@@ -221,12 +190,8 @@ public class TeacherService extends TeacherService_Base {
     }
 
     public List<TeacherServiceComment> getTeacherServiceComments() {
-        return (List<TeacherServiceComment>) CollectionUtils.select(getServiceItemsSet(), new Predicate() {
-            @Override
-            public boolean evaluate(Object arg0) {
-                return arg0 instanceof TeacherServiceComment;
-            }
-        });
+        return getServiceItemsSet().stream().filter(s -> s instanceof TeacherServiceComment).map(s -> (TeacherServiceComment) s)
+                .collect(Collectors.toList());
     }
 
     private Double round(double n) {

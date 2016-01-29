@@ -23,9 +23,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.Person;
@@ -272,7 +271,7 @@ public class SearchPerson implements Serializable {
         }
     }
 
-    public CollectionPager<Person> run(SearchParameters searchParameters, Predicate predicate) {
+    public CollectionPager<Person> run(SearchParameters searchParameters, SearchPersonPredicate predicate) {
 
         if (searchParameters.emptyParameters()) {
             return new CollectionPager<Person>(new ArrayList<Person>(), 25);
@@ -355,9 +354,8 @@ public class SearchPerson implements Serializable {
             persons = new ArrayList<Person>(0);
         }
 
-        TreeSet<Person> result = new TreeSet<Person>(Person.COMPARATOR_BY_NAME_AND_ID);
-        result.addAll(CollectionUtils.select(persons, predicate));
-        return new CollectionPager<Person>(result, 25);
+        return new CollectionPager<Person>(persons.stream().filter(p -> predicate.evaluate(p))
+                .sorted(Person.COMPARATOR_BY_NAME_AND_ID).collect(Collectors.toList()), 25);
     }
 
     private boolean hasRole(User user, String role) {
@@ -379,7 +377,7 @@ public class SearchPerson implements Serializable {
         }
     }
 
-    public static class SearchPersonPredicate implements Predicate {
+    public static class SearchPersonPredicate {
 
         private final SearchParameters searchParameters;
 
@@ -387,7 +385,6 @@ public class SearchPerson implements Serializable {
             this.searchParameters = searchParameters;
         }
 
-        @Override
         public boolean evaluate(Object arg0) {
             Person person = (Person) arg0;
 
@@ -481,7 +478,7 @@ public class SearchPerson implements Serializable {
     private static final SearchPerson serviceInstance = new SearchPerson();
 
     @Atomic
-    public static CollectionPager<Person> runSearchPerson(SearchParameters searchParameters, Predicate predicate) {
+    public static CollectionPager<Person> runSearchPerson(SearchParameters searchParameters, SearchPersonPredicate predicate) {
         return serviceInstance.run(searchParameters, predicate);
     }
 

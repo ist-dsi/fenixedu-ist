@@ -19,13 +19,11 @@
 package pt.ist.fenixedu.integration.domain.student.importation;
 
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
 import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
@@ -125,37 +123,22 @@ public class ExportExistingStudentsFromImportationProcess extends ExportExisting
     }
 
     public static List<ExportExistingStudentsFromImportationProcess> readDoneJobs(final ExecutionYear executionYear) {
-        List<ExportExistingStudentsFromImportationProcess> jobList =
-                new ArrayList<ExportExistingStudentsFromImportationProcess>();
-
-        CollectionUtils.select(executionYear.getDgesBaseProcessSet(), new Predicate() {
-
-            @Override
-            public boolean evaluate(Object arg0) {
-                return (arg0 instanceof ExportExistingStudentsFromImportationProcess) && ((QueueJob) arg0).getDone();
-            }
-        }, jobList);
-
-        return jobList;
+        return executionYear.getDgesBaseProcessSet().stream()
+                .filter(p -> p instanceof ExportExistingStudentsFromImportationProcess).filter(QueueJob::getDone)
+                .map(p -> (ExportExistingStudentsFromImportationProcess) p).collect(Collectors.toList());
     }
 
     public static List<ExportExistingStudentsFromImportationProcess> readUndoneJobs(final ExecutionYear executionYear) {
-        return new ArrayList(CollectionUtils.subtract(executionYear.getDgesBaseProcessSet(), readDoneJobs(executionYear)));
+        return executionYear.getDgesBaseProcessSet().stream()
+                .filter(p -> p instanceof ExportExistingStudentsFromImportationProcess).filter(j -> !j.getDone())
+                .map(p -> (ExportExistingStudentsFromImportationProcess) p).collect(Collectors.toList());
     }
 
-    public static List<DgesStudentImportationProcess> readPendingJobs(final ExecutionYear executionYear) {
-        List<DgesStudentImportationProcess> jobList = new ArrayList<DgesStudentImportationProcess>();
-
-        CollectionUtils.select(executionYear.getDgesBaseProcessSet(), new Predicate() {
-
-            @Override
-            public boolean evaluate(Object arg0) {
-                return (arg0 instanceof ExportExistingStudentsFromImportationProcess)
-                        && ((QueueJob) arg0).getIsNotDoneAndNotCancelled();
-            }
-        }, jobList);
-
-        return jobList;
+    public static List<ExportExistingStudentsFromImportationProcess> readPendingJobs(final ExecutionYear executionYear) {
+        return executionYear.getDgesBaseProcessSet().stream()
+                .filter(p -> p instanceof ExportExistingStudentsFromImportationProcess)
+                .filter(QueueJob::getIsNotDoneAndNotCancelled).map(p -> (ExportExistingStudentsFromImportationProcess) p)
+                .collect(Collectors.toList());
     }
 
 }

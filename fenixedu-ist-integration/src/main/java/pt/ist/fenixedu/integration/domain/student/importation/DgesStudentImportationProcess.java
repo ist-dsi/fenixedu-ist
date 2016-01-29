@@ -21,12 +21,10 @@ package pt.ist.fenixedu.integration.domain.student.importation;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.EntryPhase;
@@ -427,49 +425,24 @@ public class DgesStudentImportationProcess extends DgesStudentImportationProcess
     }
 
     public static List<DgesStudentImportationProcess> readAllJobs(final ExecutionYear executionYear) {
-        List<DgesStudentImportationProcess> jobList = new ArrayList<DgesStudentImportationProcess>();
-
-        CollectionUtils.select(executionYear.getDgesBaseProcessSet(), new Predicate() {
-
-            @Override
-            public boolean evaluate(Object arg0) {
-                return (arg0 instanceof DgesStudentImportationProcess);
-            }
-        }, jobList);
-
-        return jobList;
+        return executionYear.getDgesBaseProcessSet().stream().filter(p -> p instanceof DgesStudentImportationProcess)
+                .map(p -> (DgesStudentImportationProcess) p).collect(Collectors.toList());
     }
 
     public static List<DgesStudentImportationProcess> readDoneJobs(final ExecutionYear executionYear) {
-        List<DgesStudentImportationProcess> jobList = new ArrayList<DgesStudentImportationProcess>();
-
-        CollectionUtils.select(executionYear.getDgesBaseProcessSet(), new Predicate() {
-
-            @Override
-            public boolean evaluate(Object arg0) {
-                return (arg0 instanceof DgesStudentImportationProcess) && ((QueueJob) arg0).getDone();
-            }
-        }, jobList);
-
-        return jobList;
+        return executionYear.getDgesBaseProcessSet().stream().filter(p -> p instanceof DgesStudentImportationProcess)
+                .filter(QueueJob::getDone).map(p -> (DgesStudentImportationProcess) p).collect(Collectors.toList());
     }
 
     public static List<DgesStudentImportationProcess> readUndoneJobs(final ExecutionYear executionYear) {
-        return new ArrayList(CollectionUtils.subtract(readAllJobs(executionYear), readDoneJobs(executionYear)));
+        return executionYear.getDgesBaseProcessSet().stream().filter(p -> p instanceof DgesStudentImportationProcess)
+                .filter(j -> !j.getDone()).map(p -> (DgesStudentImportationProcess) p).collect(Collectors.toList());
     }
 
     public static List<DgesStudentImportationProcess> readPendingJobs(final ExecutionYear executionYear) {
-        List<DgesStudentImportationProcess> jobList = new ArrayList<DgesStudentImportationProcess>();
-
-        CollectionUtils.select(executionYear.getDgesBaseProcessSet(), new Predicate() {
-
-            @Override
-            public boolean evaluate(Object arg0) {
-                return (arg0 instanceof DgesStudentImportationProcess) && ((QueueJob) arg0).getIsNotDoneAndNotCancelled();
-            }
-        }, jobList);
-
-        return jobList;
+        return executionYear.getDgesBaseProcessSet().stream().filter(p -> p instanceof DgesStudentImportationProcess)
+                .filter(QueueJob::getIsNotDoneAndNotCancelled).map(p -> (DgesStudentImportationProcess) p)
+                .collect(Collectors.toList());
     }
 
     public LabelFormatter getDescriptionForEntryType(final Degree degree, EntryType entryType) {

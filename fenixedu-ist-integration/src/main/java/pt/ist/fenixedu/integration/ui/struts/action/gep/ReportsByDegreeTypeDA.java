@@ -21,11 +21,11 @@ package pt.ist.fenixedu.integration.ui.struts.action.gep;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections.Predicate;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -179,13 +179,10 @@ public class ReportsByDegreeTypeDA extends FenixDispatchAction {
     }
 
     private int getCountReportsForParameters(DegreeType degreeType, ExecutionYear executionYear, Class reportClass) {
-        Predicate predicate = new FindSelectedGepReports(executionYear, degreeType, reportClass);
+        FindSelectedGepReports predicate = new FindSelectedGepReports(executionYear, degreeType, reportClass);
 
-        List<GepReportFile> selectedJobs =
-                (List<GepReportFile>) org.apache.commons.collections.CollectionUtils.select(rootDomainObject.getQueueJobSet(),
-                        predicate);
-
-        return getValidCounterForReports(selectedJobs.size());
+        return getValidCounterForReports((int) rootDomainObject.getQueueJobSet().stream().filter(j -> predicate.evaluate(j))
+                .count());
     }
 
     private int getValidCounterForReports(int totalCounter) {
@@ -838,7 +835,7 @@ public class ReportsByDegreeTypeDA extends FenixDispatchAction {
         }
     }
 
-    public static class FindSelectedGepReports implements Predicate {
+    public static class FindSelectedGepReports {
 
         ExecutionYear executionYear;
 
@@ -854,7 +851,6 @@ public class ReportsByDegreeTypeDA extends FenixDispatchAction {
             this.reportClass = reportClass;
         }
 
-        @Override
         public boolean evaluate(Object object) {
             QueueJob queueJob = (QueueJob) object;
             try {
@@ -884,11 +880,11 @@ public class ReportsByDegreeTypeDA extends FenixDispatchAction {
         Class reportClass = getClassForParameter(type);
         final DegreeType degreeType = getDegreeType(request);
         final ExecutionYear executionYear = getExecutionYear(request);
-        Predicate predicate = new FindSelectedGepReports(executionYear, degreeType, reportClass);
+        FindSelectedGepReports predicate = new FindSelectedGepReports(executionYear, degreeType, reportClass);
 
         List<GepReportFile> selectedJobs =
-                (List<GepReportFile>) org.apache.commons.collections.CollectionUtils.select(rootDomainObject.getQueueJobSet(),
-                        predicate);
+                rootDomainObject.getQueueJobSet().stream().filter(j -> predicate.evaluate(j)).map(r -> (GepReportFile) r)
+                        .collect(Collectors.toList());
         String reportName = "";
         if (selectedJobs.size() > 0) {
             reportName = selectedJobs.iterator().next().getJobName();

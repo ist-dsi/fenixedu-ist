@@ -21,16 +21,14 @@ package pt.ist.fenixedu.integration.domain.student.importation;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.EntryPhase;
 import org.fenixedu.academic.domain.ExecutionDegree;
@@ -146,53 +144,28 @@ public class ExportDegreeCandidaciesByDegreeForPasswordGeneration extends
     }
 
     public static List<ExportDegreeCandidaciesByDegreeForPasswordGeneration> readAllJobs(final ExecutionYear executionYear) {
-        List<ExportDegreeCandidaciesByDegreeForPasswordGeneration> jobList =
-                new ArrayList<ExportDegreeCandidaciesByDegreeForPasswordGeneration>();
-
-        CollectionUtils.select(executionYear.getDgesBaseProcessSet(), new Predicate() {
-
-            @Override
-            public boolean evaluate(Object arg0) {
-                return arg0 instanceof ExportDegreeCandidaciesByDegreeForPasswordGeneration;
-            }
-        }, jobList);
-
-        return jobList;
+        return executionYear.getDgesBaseProcessSet().stream()
+                .filter(p -> p instanceof ExportDegreeCandidaciesByDegreeForPasswordGeneration)
+                .map(p -> (ExportDegreeCandidaciesByDegreeForPasswordGeneration) p).collect(Collectors.toList());
     }
 
     public static List<ExportDegreeCandidaciesByDegreeForPasswordGeneration> readDoneJobs(final ExecutionYear executionYear) {
-        List<ExportDegreeCandidaciesByDegreeForPasswordGeneration> jobList =
-                new ArrayList<ExportDegreeCandidaciesByDegreeForPasswordGeneration>();
-
-        CollectionUtils.select(executionYear.getDgesBaseProcessSet(), new Predicate() {
-
-            @Override
-            public boolean evaluate(Object arg0) {
-                return (arg0 instanceof ExportDegreeCandidaciesByDegreeForPasswordGeneration) && ((QueueJob) arg0).getDone();
-            }
-        }, jobList);
-
-        return jobList;
+        return executionYear.getDgesBaseProcessSet().stream()
+                .filter(p -> p instanceof ExportDegreeCandidaciesByDegreeForPasswordGeneration).filter(QueueJob::getDone)
+                .map(p -> (ExportDegreeCandidaciesByDegreeForPasswordGeneration) p).collect(Collectors.toList());
     }
 
     public static List<ExportDegreeCandidaciesByDegreeForPasswordGeneration> readUndoneJobs(final ExecutionYear executionYear) {
-        return new ArrayList(CollectionUtils.subtract(readAllJobs(executionYear), readDoneJobs(executionYear)));
+        return executionYear.getDgesBaseProcessSet().stream()
+                .filter(p -> p instanceof ExportDegreeCandidaciesByDegreeForPasswordGeneration).filter(j -> !j.getDone())
+                .map(p -> (ExportDegreeCandidaciesByDegreeForPasswordGeneration) p).collect(Collectors.toList());
     }
 
     public static List<ExportDegreeCandidaciesByDegreeForPasswordGeneration> readPendingJobs(final ExecutionYear executionYear) {
-        List<ExportDegreeCandidaciesByDegreeForPasswordGeneration> jobList =
-                new ArrayList<ExportDegreeCandidaciesByDegreeForPasswordGeneration>();
-
-        CollectionUtils.select(executionYear.getDgesBaseProcessSet(), new Predicate() {
-
-            @Override
-            public boolean evaluate(Object arg0) {
-                return (arg0 instanceof ExportDegreeCandidaciesByDegreeForPasswordGeneration)
-                        && ((QueueJob) arg0).getIsNotDoneAndNotCancelled();
-            }
-        }, jobList);
-
-        return jobList;
+        return executionYear.getDgesBaseProcessSet().stream()
+                .filter(p -> p instanceof ExportDegreeCandidaciesByDegreeForPasswordGeneration)
+                .filter(QueueJob::getIsNotDoneAndNotCancelled).map(p -> (ExportDegreeCandidaciesByDegreeForPasswordGeneration) p)
+                .collect(Collectors.toList());
     }
 
 }

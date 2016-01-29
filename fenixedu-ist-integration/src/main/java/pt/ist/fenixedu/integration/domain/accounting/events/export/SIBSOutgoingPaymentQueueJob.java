@@ -20,8 +20,6 @@ package pt.ist.fenixedu.integration.domain.accounting.events.export;
 
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
 import org.fenixedu.academic.domain.QueueJob;
 import org.fenixedu.academic.domain.QueueJobResult;
 import org.fenixedu.bennu.core.domain.Bennu;
@@ -55,16 +53,8 @@ public class SIBSOutgoingPaymentQueueJob extends SIBSOutgoingPaymentQueueJob_Bas
     }
 
     public static SIBSOutgoingPaymentQueueJob getQueueJobNotDoneAndNotCancelled() {
-        List<SIBSOutgoingPaymentQueueJob> jobList = readAllSIBSOutgoingPaymentQueueJobs();
-
-        return (SIBSOutgoingPaymentQueueJob) CollectionUtils.find(jobList, new Predicate() {
-
-            @Override
-            public boolean evaluate(Object arg0) {
-                return ((QueueJob) arg0).getIsNotDoneAndNotCancelled();
-            }
-
-        });
+        return readAllSIBSOutgoingPaymentQueueJobs().stream().filter(QueueJob::getIsNotDoneAndNotCancelled).findFirst()
+                .orElse(null);
     }
 
     public static boolean hasExportationQueueJobToRun() {

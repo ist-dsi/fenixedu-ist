@@ -20,9 +20,8 @@ package pt.ist.fenixedu.tutorship.domain;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
 import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.QueueJobResult;
@@ -44,24 +43,10 @@ public class StudentHighPerformanceQueueJob extends StudentHighPerformanceQueueJ
         final ExecutionSemester semester = (ExecutionSemester) ExecutionSemester.getExecutionInterval(getExecutionInterval());
 
         Collection<Registration> highPerformants =
-                CollectionUtils.select(Bennu.getInstance().getRegistrationsSet(), new Predicate() {
-                    @Override
-                    public boolean evaluate(Object element) {
-                        Registration registration = (Registration) element;
-                        if (registration.hasActiveLastState(semester)) {
-                            Collection<Enrolment> enrols = registration.getEnrolments(semester);
-                            if (!enrols.isEmpty()) {
-                                for (Enrolment enrol : enrols) {
-                                    if (!enrol.isApproved()) {
-                                        return false;
-                                    }
-                                }
-                                return true;
-                            }
-                        }
-                        return false;
-                    }
-                });
+                Bennu.getInstance().getRegistrationsSet().stream().filter(r -> r.hasActiveLastState(semester)).filter(r -> {
+                    Collection<Enrolment> enrols = r.getEnrolments(semester);
+                    return enrols.isEmpty() ? false : enrols.stream().anyMatch(e -> !e.isApproved());
+                }).collect(Collectors.toSet());
 
         SheetData<Registration> data = new SheetData<Registration>(highPerformants) {
             @Override

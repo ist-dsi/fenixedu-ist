@@ -27,9 +27,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.accounting.Event;
@@ -57,6 +56,8 @@ import pt.ist.fenixedu.integration.util.sibs.SibsOutgoingPaymentFile;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
 import pt.ist.fenixframework.FenixFramework;
+
+import com.google.common.collect.Sets;
 
 public class SIBSOutgoingPaymentFile extends SIBSOutgoingPaymentFile_Base {
     private static final Comparator<SIBSOutgoingPaymentFile> SUCCESSFUL_SENT_DATE_TIME_COMPARATOR =
@@ -147,8 +148,7 @@ public class SIBSOutgoingPaymentFile extends SIBSOutgoingPaymentFile_Base {
         PrintedPaymentCodes previousSet = previous == null ? null : previous.getPrintedPaymentCodes();
 
         if (previousSet != null && previousSet.getPaymentCodes() != null) {
-            Collection<String> oldPaymentCodes =
-                    CollectionUtils.subtract(previousSet.getPaymentCodes(), currentSet.getPaymentCodes());
+            Collection<String> oldPaymentCodes = Sets.difference(previousSet.getPaymentCodes(), currentSet.getPaymentCodes());
 
             for (String oldCode : oldPaymentCodes) {
                 sibsOutgoingPaymentFile.addLine(oldCode, new Money("0.01"), new Money("0.01"), new DateTime().minusDays(5)
@@ -232,17 +232,7 @@ public class SIBSOutgoingPaymentFile extends SIBSOutgoingPaymentFile_Base {
     }
 
     public static List<SIBSOutgoingPaymentFile> readSuccessfulSentPaymentFiles() {
-        List<SIBSOutgoingPaymentFile> files = new ArrayList<SIBSOutgoingPaymentFile>();
-
-        CollectionUtils.select(readGeneratedPaymentFiles(), new Predicate() {
-
-            @Override
-            public boolean evaluate(Object arg0) {
-                return ((SIBSOutgoingPaymentFile) arg0).getSuccessfulSentDate() != null;
-            }
-        }, files);
-
-        return files;
+        return readGeneratedPaymentFiles().stream().filter(s -> s.getSuccessfulSentDate() != null).collect(Collectors.toList());
     }
 
     public static SIBSOutgoingPaymentFile readLastSuccessfulSentPaymentFile() {

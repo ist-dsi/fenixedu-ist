@@ -18,19 +18,18 @@
  */
 package pt.ist.fenixedu.quc.domain;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.joda.time.DateTime;
+
+import com.google.common.collect.Sets;
 
 public class RegentInquiryTemplate extends RegentInquiryTemplate_Base {
 
@@ -61,7 +60,7 @@ public class RegentInquiryTemplate extends RegentInquiryTemplate_Base {
 
     public static Collection<ExecutionCourse> getExecutionCoursesWithRegentInquiriesToAnswer(Person person) {
         final Set<ExecutionCourse> result = new HashSet<ExecutionCourse>();
-        final List<ExecutionCourse> allExecutionCourses = new ArrayList<ExecutionCourse>();
+        final Set<ExecutionCourse> allExecutionCourses = new HashSet<ExecutionCourse>();
         final RegentInquiryTemplate currentTemplate = getCurrentTemplate();
         if (currentTemplate != null) {
             for (final Professorship professorship : person.getProfessorships(currentTemplate.getExecutionPeriod())) {
@@ -75,7 +74,7 @@ public class RegentInquiryTemplate extends RegentInquiryTemplate_Base {
                     }
                 }
             }
-            final Collection<ExecutionCourse> disjunctionEC = CollectionUtils.disjunction(result, allExecutionCourses);
+            final Collection<ExecutionCourse> disjunctionEC = Sets.symmetricDifference(result, allExecutionCourses);
             for (final ExecutionCourse executionCourse : disjunctionEC) {
                 if (InquiryResultComment.hasMandatoryCommentsToMakeAsRegentInUC(person, executionCourse)) {
                     result.add(executionCourse);
