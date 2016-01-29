@@ -68,11 +68,6 @@
         </dependency>
         <dependency>
             <groupId>pt.ist</groupId>
-            <artifactId>fenixedu-ist-pre-bolonha</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>pt.ist</groupId>
             <artifactId>fenixedu-ist-quc</artifactId>
             <version>${project.version}</version>
         </dependency>

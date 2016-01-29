@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu IST Pre Bolonha.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.academic.ui.struts.action.administrativeOffice.candidacy;
+package pt.ist.fenixedu.integration.ui.struts.action.dfa;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,9 +28,7 @@ import org.fenixedu.academic.domain.candidacy.Candidacy;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.dto.administrativeOffice.candidacy.CreateDFACandidacyBean;
 import org.fenixedu.academic.predicate.IllegalDataAccessException;
-import org.fenixedu.academic.service.CreateCandidacy;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
-import org.fenixedu.academic.ui.struts.action.masterDegree.administrativeOffice.MasterDegreeOfficeApplication.MasterDegreeDfaApp;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
@@ -38,8 +36,9 @@ import org.fenixedu.bennu.struts.portal.EntryPoint;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
 
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
+import pt.ist.fenixedu.integration.service.services.dfa.CreateCandidacy;
 
-@StrutsFunctionality(app = MasterDegreeDfaApp.class, path = "create-candidacy",
+@StrutsFunctionality(app = DFAApplication.class, path = "create-candidacy",
         titleKey = "link.masterDegree.administrativeOffice.dfaCandidacy.createCandidacy")
 @Mapping(path = "/createDfaCandidacy", module = "masterDegreeAdministrativeOffice",
         input = "/candidacy/chooseDFACandidacyExecutionDegree.jsp")

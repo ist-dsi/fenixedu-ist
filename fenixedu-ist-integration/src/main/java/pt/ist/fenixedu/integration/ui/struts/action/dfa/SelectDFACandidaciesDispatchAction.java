@@ -19,7 +19,7 @@
 /**
  *
  */
-package org.fenixedu.academic.ui.struts.action.administrativeOffice.candidacy;
+package pt.ist.fenixedu.integration.ui.struts.action.dfa;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,10 +38,8 @@ import org.fenixedu.academic.domain.candidacy.CandidacySituationType;
 import org.fenixedu.academic.domain.candidacy.DFACandidacy;
 import org.fenixedu.academic.dto.administrativeOffice.candidacy.DFACandidacyBean;
 import org.fenixedu.academic.dto.administrativeOffice.candidacy.SelectDFACandidacyBean;
-import org.fenixedu.academic.service.services.SelectCandidacies;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
-import org.fenixedu.academic.ui.struts.action.masterDegree.administrativeOffice.MasterDegreeOfficeApplication.MasterDegreeDfaApp;
 import org.fenixedu.bennu.portal.servlet.PortalLayoutInjector;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
@@ -50,13 +48,14 @@ import org.fenixedu.bennu.struts.portal.EntryPoint;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
 
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
+import pt.ist.fenixedu.integration.service.services.dfa.SelectCandidacies;
 
 /**
  * @author - Shezad Anavarali (shezad@ist.utl.pt)
  *
  */
 
-@StrutsFunctionality(app = MasterDegreeDfaApp.class, path = "select-candidacies",
+@StrutsFunctionality(app = DFAApplication.class, path = "select-candidacies",
         titleKey = "link.masterDegree.administrativeOffice.dfaCandidacy.selectCandidacies")
 @Mapping(path = "/selectDFACandidacies", module = "masterDegreeAdministrativeOffice",
         input = "/candidacy/listCandidaciesForSelection.jsp")

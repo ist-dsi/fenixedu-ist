@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu IST Pre Bolonha.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.academic.ui.struts.action.administrativeOffice.candidacy;
+package pt.ist.fenixedu.integration.ui.struts.action.dfa;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,10 +42,8 @@ import org.fenixedu.academic.dto.person.PersonBean;
 import org.fenixedu.academic.service.services.administrativeOffice.candidacy.EditPrecedentDegreeInformation;
 import org.fenixedu.academic.service.services.commons.StateMachineRunner;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
-import org.fenixedu.academic.service.services.masterDegree.administrativeOffice.candidate.RegisterCandidate;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
 import org.fenixedu.academic.ui.struts.action.exceptions.FenixActionException;
-import org.fenixedu.academic.ui.struts.action.masterDegree.administrativeOffice.MasterDegreeOfficeApplication.MasterDegreeDfaApp;
 import org.fenixedu.bennu.portal.servlet.PortalLayoutInjector;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
@@ -54,9 +52,10 @@ import org.fenixedu.bennu.struts.portal.EntryPoint;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
 
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
+import pt.ist.fenixedu.integration.service.services.dfa.RegisterCandidate;
 import pt.ist.fenixframework.FenixFramework;
 
-@StrutsFunctionality(app = MasterDegreeDfaApp.class, path = "view-candidacy",
+@StrutsFunctionality(app = DFAApplication.class, path = "view-candidacy",
         titleKey = "link.masterDegree.administrativeOffice.dfaCandidacy.viewCandidacy")
 @Mapping(path = "/dfaCandidacy", module = "masterDegreeAdministrativeOffice",
         input = "/candidacy/chooseDFACandidacyExecutionDegree.jsp", formBean = "dfaCandidacyForm")

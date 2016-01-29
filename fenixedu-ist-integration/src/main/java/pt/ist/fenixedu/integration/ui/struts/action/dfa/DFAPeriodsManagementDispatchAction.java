@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu IST Pre Bolonha.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.academic.ui.struts.action.administrativeOffice.candidacy;
+package pt.ist.fenixedu.integration.ui.struts.action.dfa;
 
 import java.util.Collections;
 import java.util.List;
@@ -33,7 +33,6 @@ import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
-import org.fenixedu.academic.ui.struts.action.masterDegree.administrativeOffice.MasterDegreeOfficeApplication.MasterDegreeDfaApp;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
@@ -42,7 +41,7 @@ import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
 
 import pt.ist.fenixframework.FenixFramework;
 
-@StrutsFunctionality(app = MasterDegreeDfaApp.class, path = "manage-periods", titleKey = "link.candidacy.dfa.periodsManagement")
+@StrutsFunctionality(app = DFAApplication.class, path = "manage-periods", titleKey = "link.candidacy.dfa.periodsManagement")
 @Mapping(module = "masterDegreeAdministrativeOffice", path = "/dfaPeriodsManagement", formBean = "chooseExecutionYearForm")
 @Forwards({
         @Forward(name = "chooseExecutionYear",
