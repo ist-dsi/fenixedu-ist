@@ -88,9 +88,8 @@ public class CreateInvoiceReceipts extends CustomTask {
             }
         };
         try (final Json2Csv log = new Json2Csv(outputFileName(), "\t")) {
-            final int year = 2015;
             final Stream<AccountingTransactionDetail> stream = Bennu.getInstance().getAccountingTransactionDetailsSet().stream();
-            stream.filter(atd -> atd.getWhenRegistered().getYear() == year).filter(this::needsProcessing)
+            stream.filter(atd -> atd.getWhenRegistered().getYear() >= 2015).filter(this::needsProcessing)
                     .filter(atd -> Utils.validate(consumer, atd)).forEach(d -> process(d, consumer, log, eventsByInvoiceNumber));
 
             taskLog("Competed processing normal invoices.");

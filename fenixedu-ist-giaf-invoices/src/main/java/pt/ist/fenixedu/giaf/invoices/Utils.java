@@ -335,8 +335,8 @@ public class Utils {
         final ExecutionYear debtYear = executionYearOf(event);
         final DebtCycleType cycleType = cycleTypeFor(event, debtYear);
         final String eventDescription = event.getDescription().toString();
-        final String articleCode = isPenalty ? "7242" /* MULTAS */: mapToArticleCode(event, eventDescription);
-        final String rubrica = isPenalty ? "0036" /* MULTAS */: mapToRubrica(event, eventDescription);
+        final String articleCode = isPenalty ? "FEMULTA" /* 7242 --> MULTAS */ : mapToArticleCode(event, eventDescription);
+        final String rubrica = isPenalty ? "0036" /* MULTAS */ : mapToRubrica(event, eventDescription);
         final String costCenter = costCenterFor(event);
         final String clientId = toClientCode(person);
         final String paymentDate = toString(tx.getWhenRegistered().toDate());
@@ -573,8 +573,8 @@ public class Utils {
         final ExecutionYear debtYear = executionYearOf(event);
         final DebtCycleType cycleType = cycleTypeFor(event, debtYear);
         final String eventDescription = event.getDescription().toString();
-        final String articleCode = isPenalty ? "7242" /* MULTAS */: mapToArticleCode(event, eventDescription);
-        final String rubrica = isPenalty ? "0036" /* MULTAS */: mapToRubrica(event, eventDescription);
+        final String articleCode = isPenalty ? "FEMULTA" /* 7242 --> MULTAS */ : mapToArticleCode(event, eventDescription);
+        final String rubrica = isPenalty ? "0036" /* MULTAS */ : mapToRubrica(event, eventDescription);
         final String costCenter = costCenterFor(event);
         final String clientId = toClientCode(person);
 
