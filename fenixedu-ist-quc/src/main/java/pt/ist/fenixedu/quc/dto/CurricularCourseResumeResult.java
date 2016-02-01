@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Function;
 
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionDegree;
@@ -88,7 +89,9 @@ public class CurricularCourseResumeResult extends BlockResumeResult implements S
 
     @Override
     protected void initResultBlocks() {
-        setResultBlocks(new TreeSet<InquiryResult>(Comparator.comparing(InquiryResult::getInquiryQuestion)));
+        Function<InquiryResult, InquiryQuestion> extractor =
+                (Function<InquiryResult, InquiryQuestion> & Serializable) InquiryResult::getInquiryQuestion;
+        setResultBlocks(new TreeSet<InquiryResult>(Comparator.comparing(extractor)));
         for (InquiryResult inquiryResult : getExecutionCourse().getInquiryResultsSet()) {
             if ((inquiryResult.getExecutionDegree() == getExecutionDegree() || (inquiryResult.getExecutionDegree() == null && inquiryResult
                     .getProfessorship() == null)) && InquiryConnectionType.GROUP.equals(inquiryResult.getConnectionType())) { //change to COURSE_EVALUATION

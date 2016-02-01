@@ -21,13 +21,15 @@
  */
 package pt.ist.fenixedu.quc.dto;
 
+import java.util.Comparator;
+
 import org.fenixedu.academic.domain.Person;
 
 /**
  * @author - Shezad Anavarali (shezad@ist.utl.pt)
  * 
  */
-public class AffiliatedTeacherDTO extends TeacherDTO {
+public class AffiliatedTeacherDTO extends TeacherDTO implements Comparable<AffiliatedTeacherDTO> {
 
     private final Person person;
 
@@ -48,5 +50,11 @@ public class AffiliatedTeacherDTO extends TeacherDTO {
     @Override
     public String getPersonID() {
         return person.getExternalId();
+    }
+
+    @Override
+    public int compareTo(AffiliatedTeacherDTO o) {
+        return Comparator.comparing(AffiliatedTeacherDTO::getName).thenComparing(AffiliatedTeacherDTO::getPersonID)
+                .compare(this, o);
     }
 }
