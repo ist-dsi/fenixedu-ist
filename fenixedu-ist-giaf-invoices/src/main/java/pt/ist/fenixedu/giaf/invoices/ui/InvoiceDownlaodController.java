@@ -24,15 +24,22 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.accessControl.AcademicAuthorizationGroup;
+import org.fenixedu.academic.domain.accessControl.academicAdministration.AcademicOperationType;
 import org.fenixedu.academic.domain.accounting.AccountingTransactionDetail;
+import org.fenixedu.academic.domain.accounting.Event;
+import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import pt.ist.fenixedu.giaf.invoices.GiafInvoice;
-
 import com.google.common.io.ByteStreams;
+
+import pt.ist.fenixedu.giaf.invoices.GiafInvoice;
 
 @SpringFunctionality(app = InvoiceController.class, title = "title.giaf.invoice.viewer")
 @RequestMapping("/giaf-invoice-downloader")
@@ -40,18 +47,39 @@ public class InvoiceDownlaodController {
 
     @RequestMapping(value = "/{detail}", method = RequestMethod.GET, produces = "application/pdf")
     public void invoice(@PathVariable AccountingTransactionDetail detail, final HttpServletResponse response) {
-        final String id = detail.getExternalId();
-        final String invoiceNumber = InvoiceController.toInvoiceNumber(id);
-        final File file = GiafInvoice.fileForDocument(id);
-        if (file.exists()) {
-            try (final FileInputStream inputStream = new FileInputStream(file)) {
-                response.setHeader("Content-Disposition", "attachment; filename=" + invoiceNumber + ".pdf");
-                ByteStreams.copy(inputStream, response.getOutputStream());
-                response.flushBuffer();
-            } catch (final IOException e) {
-                throw new Error(e);
+        if (sAllowedToAccess(detail)) {
+            final String id = detail.getExternalId();
+            final String invoiceNumber = InvoiceController.toInvoiceNumber(id);
+            final File file = GiafInvoice.fileForDocument(id);
+            if (file.exists()) {
+                try (final FileInputStream inputStream = new FileInputStream(file)) {
+                    response.setHeader("Content-Disposition", "attachment; filename=" + invoiceNumber + ".pdf");
+                    ByteStreams.copy(inputStream, response.getOutputStream());
+                    response.flushBuffer();
+                } catch (final IOException e) {
+                    throw new Error(e);
+                }
             }
+        } else {
+            response.setStatus(HttpStatus.FORBIDDEN.value());
+            response.getClass();
         }
+    }
+
+    private boolean sAllowedToAccess(final AccountingTransactionDetail detail) {
+        final User user = Authenticate.getUser();
+        return isOwner(detail, user) || isAcademicServiceStaff(user);
+    }
+
+    private boolean isOwner(final AccountingTransactionDetail detail, final User user) {
+        final Event event = detail.getEvent();
+        final Person person = event == null ? null : event.getPerson();
+        return user != null && user == person.getUser();
+    }
+
+    private boolean isAcademicServiceStaff(final User user) {
+        return AcademicAuthorizationGroup.get(AcademicOperationType.MANAGE_STUDENT_PAYMENTS).isMember(user)
+                || AcademicAuthorizationGroup.get(AcademicOperationType.MANAGE_STUDENT_PAYMENTS_ADV).isMember(user);
     }
 
 }
