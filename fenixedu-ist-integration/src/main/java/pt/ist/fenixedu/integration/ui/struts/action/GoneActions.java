@@ -116,4 +116,8 @@ public class GoneActions extends Action {
     @Mapping(path = "/announcementsRSS", module = "external")
     public static class LegacyRSSAction extends GoneActions {
     }
+
+    @Mapping(path = "/loginCAS")
+    public static class OldLoginCASAction extends GoneActions {
+    }
 }
