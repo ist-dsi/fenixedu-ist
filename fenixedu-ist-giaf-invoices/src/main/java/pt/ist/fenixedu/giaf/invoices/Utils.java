@@ -319,7 +319,7 @@ public class Utils {
             e.addProperty("legalArticle", "M99");
             e.addProperty("rubrica", rubrica);
             e.addProperty("observation", "");
-            o.addProperty("reference", debtYear.getName());
+            e.addProperty("reference", debtYear.getName());
             a.add(e);
         }
         o.add("entries", a);
@@ -387,7 +387,7 @@ public class Utils {
             e.addProperty("legalArticle", "M99");
             e.addProperty("rubrica", rubrica);
             e.addProperty("observation", "");
-            o.addProperty("reference", debtYear.getName());
+            e.addProperty("reference", debtYear.getName());
             a.add(e);
         }
         o.add("entries", a);
@@ -556,7 +556,7 @@ public class Utils {
             e.addProperty("legalArticle", "M99");
             e.addProperty("rubrica", invoiceId == null || invoiceId.trim().isEmpty() || rubrica == null ? "" : rubrica);
             e.addProperty("observation", "");
-            o.addProperty("reference", debtYear.getName());
+            e.addProperty("reference", debtYear.getName());
             a.add(e);
         }
         o.add("entries", a);
@@ -629,7 +629,7 @@ public class Utils {
             e.addProperty("legalArticle", "M99");
             e.addProperty("rubrica", invoiceId == null || invoiceId.trim().isEmpty() || rubrica == null ? "" : rubrica);
             e.addProperty("observation", "");
-            o.addProperty("reference", debtYear.getName());
+            e.addProperty("reference", debtYear.getName());
             a.add(e);
         }
         o.add("entries", a);
