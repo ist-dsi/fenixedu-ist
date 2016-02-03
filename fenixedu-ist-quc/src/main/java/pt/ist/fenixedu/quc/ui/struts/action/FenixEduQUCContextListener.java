@@ -24,8 +24,6 @@ import javax.servlet.annotation.WebListener;
 
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.Professorship;
-import org.fenixedu.academic.domain.studentCurriculum.StudentCurricularPlanEnrolment;
-import org.fenixedu.academic.service.filter.enrollment.ClassEnrollmentAuthorizationFilter;
 import org.fenixedu.academic.service.services.manager.MergeExecutionCourses;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
@@ -35,7 +33,6 @@ import pt.ist.fenixedu.quc.domain.InquiryDelegateAnswer;
 import pt.ist.fenixedu.quc.domain.InquiryGlobalComment;
 import pt.ist.fenixedu.quc.domain.InquiryResult;
 import pt.ist.fenixedu.quc.domain.StudentInquiryRegistry;
-import pt.ist.fenixedu.quc.domain.exceptions.FenixEduQucDomainException;
 import pt.ist.fenixframework.FenixFramework;
 
 @WebListener
@@ -44,16 +41,6 @@ public class FenixEduQUCContextListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         MergeExecutionCourses.registerMergeHandler(FenixEduQUCContextListener::copyInquiries);
-        ClassEnrollmentAuthorizationFilter.registerCondition(registration -> {
-            if (StudentInquiryRegistry.hasInquiriesToRespond(registration.getStudent())) {
-                throw FenixEduQucDomainException.inquiriesNotAnswered();
-            }
-        });
-        StudentCurricularPlanEnrolment.registerCondition(scp -> {
-            if (StudentInquiryRegistry.hasInquiriesToRespond(scp.getRegistration().getStudent())) {
-                throw FenixEduQucDomainException.inquiriesNotAnswered();
-            }
-        });
         FenixFramework.getDomainModel()
                 .registerDeletionBlockerListener(
                         Professorship.class,
