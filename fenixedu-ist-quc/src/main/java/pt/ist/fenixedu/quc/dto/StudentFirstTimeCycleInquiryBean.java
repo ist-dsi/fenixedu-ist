@@ -19,7 +19,6 @@
 package pt.ist.fenixedu.quc.dto;
 
 import java.io.Serializable;
-import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -65,7 +64,7 @@ public class StudentFirstTimeCycleInquiryBean implements Serializable {
         setRegistration(registration);
         setPhdProcess(phdProcess);
         setStudentInquiryTemplate(studentInquiryTemplate);
-        setStudentInquiryBlocks(new TreeSet<InquiryBlockDTO>(Comparator.comparing(InquiryBlockDTO::getInquiryBlock)));
+        setStudentInquiryBlocks(new TreeSet<InquiryBlockDTO>());
         for (InquiryBlock inquiryBlock : studentInquiryTemplate.getInquiryBlocksSet()) {
             getStudentInquiryBlocks().add(new InquiryBlockDTO(inquiryBlock));
         }

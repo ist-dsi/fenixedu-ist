@@ -18,6 +18,7 @@
  */
 package pt.ist.fenixedu.quc.ui.struts.action.departmentMember;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Function;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -136,9 +138,10 @@ public abstract class ViewQUCResultsDA extends FenixDispatchAction {
         DepartmentUnit departmentUnit = getDepartmentUnit(request);
         ExecutionSemester executionSemester = getExecutionSemester(request);
 
+        Function<ScientificAreaUnit, String> extractor =
+                (Function<ScientificAreaUnit, String> & Serializable) ScientificAreaUnit::getName;
         Map<ScientificAreaUnit, List<CompetenceCourseResultsResume>> competenceCoursesByScientificArea =
-                new TreeMap<ScientificAreaUnit, List<CompetenceCourseResultsResume>>(
-                        Comparator.comparing(ScientificAreaUnit::getName));
+                new TreeMap<ScientificAreaUnit, List<CompetenceCourseResultsResume>>(Comparator.comparing(extractor));
         for (ScientificAreaUnit scientificAreaUnit : departmentUnit.getScientificAreaUnits()) {
             for (CompetenceCourseGroupUnit competenceCourseGroupUnit : scientificAreaUnit.getCompetenceCourseGroupUnits()) {
                 for (CompetenceCourse competenceCourse : competenceCourseGroupUnit.getCompetenceCourses()) {

@@ -27,7 +27,7 @@ import pt.ist.fenixedu.quc.domain.InquiryTextBoxQuestion;
 import pt.ist.fenixedu.quc.domain.QuestionAnswer;
 import pt.ist.fenixedu.quc.domain.StudentInquiryRegistry;
 
-public class InquiryQuestionDTO implements Serializable {
+public class InquiryQuestionDTO implements Comparable<InquiryQuestionDTO>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -124,5 +124,10 @@ public class InquiryQuestionDTO implements Serializable {
 
     public QuestionAnswer getQuestionAnswer() {
         return questionAnswer;
+    }
+
+    @Override
+    public int compareTo(InquiryQuestionDTO o) {
+        return getInquiryQuestion().compareTo(o.getInquiryQuestion());
     }
 }

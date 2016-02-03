@@ -66,7 +66,7 @@ public class RegentInquiryBean implements Serializable {
     }
 
     private void initRegentInquiry(RegentInquiryTemplate regentInquiryTemplate, Professorship professorship) {
-        setRegentInquiryBlocks(new TreeSet<InquiryBlockDTO>(Comparator.comparing(InquiryBlockDTO::getInquiryBlock)));
+        setRegentInquiryBlocks(new TreeSet<InquiryBlockDTO>());
         for (InquiryBlock inquiryBlock : regentInquiryTemplate.getInquiryBlocksSet()) {
             getRegentInquiryBlocks().add(new InquiryBlockDTO(getInquiryRegentAnswer(), inquiryBlock));
         }

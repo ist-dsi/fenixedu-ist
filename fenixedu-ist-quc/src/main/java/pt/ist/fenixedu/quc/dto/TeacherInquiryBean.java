@@ -63,7 +63,7 @@ public class TeacherInquiryBean implements Serializable {
     }
 
     private void initTeacherInquiry(TeacherInquiryTemplate teacherInquiryTemplate, Professorship professorship) {
-        setTeacherInquiryBlocks(new TreeSet<InquiryBlockDTO>(Comparator.comparing(InquiryBlockDTO::getInquiryBlock)));
+        setTeacherInquiryBlocks(new TreeSet<InquiryBlockDTO>());
         for (InquiryBlock inquiryBlock : teacherInquiryTemplate.getInquiryBlocksSet()) {
             getTeacherInquiryBlocks().add(new InquiryBlockDTO(getInquiryTeacherAnswer(), inquiryBlock));
         }

@@ -107,7 +107,7 @@ public class DelegateInquiryBean implements Serializable {
 
     private void initDelegateInquiry(DelegateInquiryTemplate delegateInquiryTemplate, YearDelegate yearDelegate,
             ExecutionCourse executionCourse, InquiryDelegateAnswer inquiryDelegateAnswer) {
-        setDelegateInquiryBlocks(new TreeSet<InquiryBlockDTO>(Comparator.comparing(InquiryBlockDTO::getInquiryBlock)));
+        setDelegateInquiryBlocks(new TreeSet<InquiryBlockDTO>());
         setInquiryDelegateAnswer(inquiryDelegateAnswer);
         for (InquiryBlock inquiryBlock : delegateInquiryTemplate.getInquiryBlocksSet()) {
             getDelegateInquiryBlocks().add(new InquiryBlockDTO(inquiryDelegateAnswer, inquiryBlock));

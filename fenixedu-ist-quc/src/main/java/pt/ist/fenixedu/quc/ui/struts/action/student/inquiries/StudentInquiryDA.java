@@ -247,8 +247,7 @@ public class StudentInquiryDA extends FenixDispatchAction {
             String inquiryRegistryID = (String) getFromRequest(request, "inquiryRegistryID");
             StudentInquiryRegistry inquiryRegistry = FenixFramework.getDomainObject(inquiryRegistryID);
 
-            Set<InquiryBlockDTO> inquiryBlocks =
-                    new TreeSet<InquiryBlockDTO>(Comparator.comparing(InquiryBlockDTO::getInquiryBlock));
+            Set<InquiryBlockDTO> inquiryBlocks = new TreeSet<InquiryBlockDTO>();
             for (InquiryBlock inquiryBlock : studentInquiryTemplate.getInquiryBlocksSet()) {
                 inquiryBlocks.add(new InquiryBlockDTO(inquiryBlock, inquiryRegistry));
             }

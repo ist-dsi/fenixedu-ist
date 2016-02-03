@@ -19,7 +19,6 @@
 package pt.ist.fenixedu.quc.dto;
 
 import java.io.Serializable;
-import java.util.Comparator;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -35,7 +34,7 @@ import pt.ist.fenixedu.quc.domain.StudentInquiryRegistry;
 
 import com.google.common.base.Strings;
 
-public class InquiryGroupQuestionBean implements Serializable {
+public class InquiryGroupQuestionBean implements Comparable<InquiryGroupQuestionBean>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -74,7 +73,7 @@ public class InquiryGroupQuestionBean implements Serializable {
 
     private void initGroup(InquiryGroupQuestion groupQuestion) {
         setInquiryGroupQuestion(groupQuestion);
-        setInquiryQuestions(new TreeSet<InquiryQuestionDTO>(Comparator.comparing(InquiryQuestionDTO::getInquiryQuestion)));
+        setInquiryQuestions(new TreeSet<InquiryQuestionDTO>());
         setOrder(groupQuestion.getGroupOrder());
         setJoinUp(false);
     }
@@ -241,5 +240,10 @@ public class InquiryGroupQuestionBean implements Serializable {
 
     public String[] getConditionValues() {
         return conditionValues;
+    }
+
+    @Override
+    public int compareTo(InquiryGroupQuestionBean o) {
+        return getInquiryGroupQuestion().compareTo(o.getInquiryGroupQuestion());
     }
 }

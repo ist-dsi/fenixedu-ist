@@ -60,8 +60,7 @@ public class StudentInquiryBean implements Serializable {
     private Set<InquiryBlockDTO> curricularCourseBlocks;
     private StudentInquiryRegistry inquiryRegistry;
     Map<AffiliatedTeacherDTO, List<? extends StudentTeacherInquiryBean>> teachersInquiries =
-            new TreeMap<AffiliatedTeacherDTO, List<? extends StudentTeacherInquiryBean>>(
-                    Comparator.comparing(AffiliatedTeacherDTO::getName));
+            new TreeMap<AffiliatedTeacherDTO, List<? extends StudentTeacherInquiryBean>>();
 
     public StudentInquiryBean(StudentTeacherInquiryTemplate studentTeacherInquiryTemplate, StudentInquiryRegistry inquiryRegistry) {
         setInquiryRegistry(inquiryRegistry);
@@ -159,14 +158,10 @@ public class StudentInquiryBean implements Serializable {
 
     public List<AffiliatedTeacherDTO> getOrderedTeachers() {
         List<AffiliatedTeacherDTO> finalResult = new ArrayList<AffiliatedTeacherDTO>();
-        Set<AffiliatedTeacherDTO> theoricalShiftType =
-                new TreeSet<AffiliatedTeacherDTO>(Comparator.comparing(AffiliatedTeacherDTO::getName));
-        Set<AffiliatedTeacherDTO> praticalShiftType =
-                new TreeSet<AffiliatedTeacherDTO>(Comparator.comparing(AffiliatedTeacherDTO::getName));
-        Set<AffiliatedTeacherDTO> laboratoryShiftType =
-                new TreeSet<AffiliatedTeacherDTO>(Comparator.comparing(AffiliatedTeacherDTO::getName));
-        Set<AffiliatedTeacherDTO> otherShiftTypes =
-                new TreeSet<AffiliatedTeacherDTO>(Comparator.comparing(AffiliatedTeacherDTO::getName));
+        Set<AffiliatedTeacherDTO> theoricalShiftType = new TreeSet<AffiliatedTeacherDTO>();
+        Set<AffiliatedTeacherDTO> praticalShiftType = new TreeSet<AffiliatedTeacherDTO>();
+        Set<AffiliatedTeacherDTO> laboratoryShiftType = new TreeSet<AffiliatedTeacherDTO>();
+        Set<AffiliatedTeacherDTO> otherShiftTypes = new TreeSet<AffiliatedTeacherDTO>();
         for (AffiliatedTeacherDTO teacherDTO : getTeachersInquiries().keySet()) {
             if (containsShiftType(teacherDTO, ShiftType.TEORICA)) {
                 theoricalShiftType.add(teacherDTO);

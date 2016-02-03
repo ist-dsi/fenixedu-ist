@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.function.Function;
 
 import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.academic.domain.ShiftType;
@@ -57,7 +58,9 @@ public class TeacherShiftTypeGroupsResumeResult extends BlockResumeResult implem
 
     @Override
     protected void initResultBlocks() {
-        setResultBlocks(new TreeSet<InquiryResult>(Comparator.comparing(InquiryResult::getInquiryQuestion)));
+        Function<InquiryResult, InquiryQuestion> extractor =
+                (Function<InquiryResult, InquiryQuestion> & Serializable) InquiryResult::getInquiryQuestion;
+        setResultBlocks(new TreeSet<InquiryResult>(Comparator.comparing(extractor)));
         for (InquiryResult inquiryResult : InquiryResult.getInquiryResults(getProfessorship(), getShiftType())) {
             if (InquiryConnectionType.GROUP.equals(inquiryResult.getConnectionType())
                     && !inquiryResult.getInquiryQuestion().getAssociatedBlocksSet().isEmpty()) { //change to TEACHER_SHIFT_EVALUATION
