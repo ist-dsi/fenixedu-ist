@@ -95,11 +95,11 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.YearMonthDay;
 
-import pt.ist.fenixframework.DomainObject;
-
 import com.google.common.base.CharMatcher;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+
+import pt.ist.fenixframework.DomainObject;
 
 public class Utils {
 
@@ -427,7 +427,7 @@ public class Utils {
     }
 
     private static Money amountFor(final Event event, final Exemption e) {
-        final Money amount = event.getOriginalAmountToPay();
+        final Money amount = calculateTotalDebtValue(event);
         if (e instanceof AcademicEventExemption) {
             final AcademicEventExemption o = (AcademicEventExemption) e;
             return o.getValue();
