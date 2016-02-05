@@ -46,6 +46,8 @@ public class SotisPublications {
 
     private static final String RECORD_PATH = "api/sotis-core/record/list";
 
+    private static final String RECORD_URL_PREFIX = BASE_URL + "sotis-ui/?#record/";
+
     public List<String> get(User user) {
         SortedSet<Publication> publications = getPublications(user);
         return publications.stream().map(p -> p.getPublicationString()).collect(Collectors.toList());
@@ -85,6 +87,7 @@ public class SotisPublications {
         private String publicationString;
         private String year;
         private Integer authorsNumber = 0;
+        private String url;
 
         public Publication(JsonObject publication) {
             List<String> parts = new ArrayList<>();
@@ -130,6 +133,12 @@ public class SotisPublications {
             }
             parts.add(Joiner.on(", ").join(otherData));
             publicationString = Joiner.on(". ").join(parts);
+
+            if (publication.has("url")) {
+                url = publication.get("url").getAsString();
+            } else {
+                url = RECORD_URL_PREFIX + publication.get("id").getAsString();
+            }
         }
 
         public boolean isYearBetween(Integer beginYear, Integer endYear) {
@@ -175,6 +184,14 @@ public class SotisPublications {
 
         public void setAuthorsNumber(Integer authorsNumber) {
             this.authorsNumber = authorsNumber;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
         }
 
     }

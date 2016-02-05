@@ -18,6 +18,10 @@
     along with FenixEdu IST Teacher Evaluation.  If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@page import="java.util.Locale"%>
+<%@page import="java.util.ResourceBundle"%>
+<%@page import="java.text.NumberFormat"%>
+<%@page import="org.fenixedu.commons.i18n.I18N"%>
 <%@ page language="java" %>
 
 <%@ taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
@@ -26,6 +30,8 @@
 <%@ taglib uri="http://fenix-ashes.ist.utl.pt/fenix-renderers" prefix="fr" %>
 
 <html:xhtml/>
+
+<% NumberFormat numberFormat = NumberFormat.getInstance(I18N.getLocale()); %>
 
 <em><bean:message bundle="TEACHER_EVALUATION_RESOURCES" key="label.teacher.evaluation.title"/></em>
 
@@ -76,7 +82,7 @@
 				</fr:layout>
 			</fr:view></td><td/> 
 			<td><bean:write name="orientation" property="coorientationNumber"/></td>
-			<td><bean:write name="orientation" property="credits"/></td>
+			<td><logic:present name="orientation" property="credits"><bean:define id="ects" name="orientation" property="credits" type="java.lang.Double"/><%= ects == null ? "" : numberFormat.format(ects) %></logic:present></td>
 			<td><bean:write name="orientation" property="description"/></td>
 		</tr>
 	</logic:iterate>
@@ -98,16 +104,14 @@
 		</tr></thead>
 		<tbody><logic:iterate id="professorship" name="informationBean" property="professorships">
 		<tr>
-			<td><fr:view name="professorship" property="professorship.responsibleFor">
-				<fr:layout>
-					<fr:property name="trueLabel" value="label.teacher.evaluation.professorhip.participationType.teachingAndResponsability" />
-					<fr:property name="falseLabel" value="label.teacher.evaluation.professorhip.participationType.teaching" />
-					<fr:property name="bundle" value="TEACHER_EVALUATION_RESOURCES" />
-				</fr:layout>
-			</fr:view></td>
-			<td><bean:write name="professorship" property="hours"/></td>
+			<td>
+				<bean:define id="professorshipDomainObject" name="professorship" property="professorship" type="org.fenixedu.academic.domain.Professorship"/>
+				<% String profTypeKey = professorshipDomainObject.isResponsibleFor() ? "label.teacher.evaluation.professorhip.participationType.teachingAndResponsability" : "label.teacher.evaluation.professorhip.participationType.teaching"; %>
+				<%= ResourceBundle.getBundle("resources/TeacherEvaluationResources", new Locale("pt", "PT")).getString(profTypeKey) %>
+			</td>
+			<td><bean:define id="hours" name="professorship" property="hours" type="java.math.BigDecimal"/><%= hours == null ? "" : numberFormat.format(hours) %></td>
 			<td><bean:write name="professorship" property="enrolmentsNumber"/></td><td/><td/> 
-			<td><bean:write name="professorship" property="professorshipEvaluationValue"/></td>
+			<td><logic:present name="professorship" property="professorshipEvaluationValue"><bean:define id="qucValue" name="professorship" property="professorshipEvaluationValue" type="java.lang.Double"/><%= qucValue == null ? "" : numberFormat.format(qucValue) %></logic:present></td>
 			<td><bean:write name="professorship" property="description"/></td>
 		</tr>
 	</logic:iterate>
@@ -124,12 +128,18 @@
 			<th><bean:message bundle="TEACHER_EVALUATION_RESOURCES" key="label.teacher.evaluation.publications.author.number"/></th>
 			<th style="width:1px;"/>
 			<th><bean:message bundle="TEACHER_EVALUATION_RESOURCES" key="label.teacher.evaluation.description"/></th>
+			<th/>
+			<th/>
+			<th>URL</th>
 		</tr></thead>
 		<tbody><logic:iterate id="publication" name="informationBean" property="publications">
 		<tr>
 			<td><bean:write name="publication" property="authorsNumber"/></td>
 			<td/>
 			<td><bean:write name="publication" property="publicationString"/></td>
+			<td/>
+			<td/>
+			<td><bean:write name="publication" property="url"/></td>
 		</tr>
 	</logic:iterate>
 	</tbody></table>
@@ -147,12 +157,14 @@
 		<th><bean:message bundle="TEACHER_EVALUATION_RESOURCES" key="label.teacher.evaluation.description"/></th>
 	  </tr>
 	  <% for(com.google.gson.JsonElement projectElement : projects ) { 
-	      com.google.gson.JsonObject project = (com.google.gson.JsonObject) projectElement;%>
+	      com.google.gson.JsonObject project = (com.google.gson.JsonObject) projectElement;
+	      String budget = project.get("budget").getAsString();
+	      %>
 		  <tr>
-			<td><%= project.get("budget").getAsString() %></td>
+			<td><%= "pt".equals(I18N.getLocale().getLanguage()) ? budget.replace('.', ',') : budget %></td>
 			<td/>
 		    <td><%= project.get("institution").getAsString()+" - "+project.get("number").getAsString() +" - " +project.get("name").getAsString() %></td>
-		  </tr>
+		  </tr> 
 	  <% } %>
 	</table>
 <% } %>
@@ -168,7 +180,8 @@
 		</tr></thead>
 		<tbody><logic:iterate id="function" name="informationBean" property="functions">
 		<tr>
-			<td><bean:write name="function" property="credits"/></td><td/>
+			<td><logic:empty name="function" property="credits">&nbsp;</logic:empty><logic:notEmpty name="function" property="credits"><bean:define id="credits" name="function" property="credits" type="java.lang.Double"/><%= numberFormat.format(credits) %></logic:notEmpty></td>
+			<td/>
 			<td><bean:write name="function" property="description"/></td>
 		</tr>
 	</logic:iterate>

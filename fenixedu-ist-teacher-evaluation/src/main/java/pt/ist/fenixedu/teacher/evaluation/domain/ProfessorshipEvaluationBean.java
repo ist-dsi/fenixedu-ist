@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.text.Collator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -29,12 +30,15 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.Professorship;
+import org.fenixedu.academic.domain.Shift;
 import org.fenixedu.academic.domain.ShiftType;
+import org.fenixedu.academic.util.Bundle;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
+
+import com.google.common.base.Joiner;
 
 import pt.ist.fenixedu.teacher.evaluation.domain.teacher.DegreeTeachingService;
 import pt.ist.fenixedu.teacher.evaluation.service.external.ProfessorshipEvaluation;
-
-import com.google.common.base.Joiner;
 
 public class ProfessorshipEvaluationBean implements Serializable, Comparable<ProfessorshipEvaluationBean> {
 
@@ -53,7 +57,7 @@ public class ProfessorshipEvaluationBean implements Serializable, Comparable<Pro
                         BigDecimal.ROUND_HALF_UP);
         enrolmentsNumber = degreeTeachingServices.stream().mapToInt(d -> d.getShift().getStudentsSet().size()).sum();
 
-        shiftTypesPrettyPrint = degreeTeachingServices.iterator().next().getShift().getShiftTypesPrettyPrint();
+        shiftTypesPrettyPrint = getShiftTypesPrettyPrint(degreeTeachingServices.iterator().next().getShift());
         String shiftTypesString =
                 Joiner.on(", ").join(
                         degreeTeachingServices.iterator().next().getShift().getSortedTypes().stream().map(st -> st.getName())
@@ -66,6 +70,20 @@ public class ProfessorshipEvaluationBean implements Serializable, Comparable<Pro
                 Joiner.on(", ").join(getProfessorship().getExecutionCourse().getExecutionPeriod().getQualifiedName(),
                         getProfessorship().getExecutionCourse().getName(),
                         getProfessorship().getExecutionCourse().getDegreePresentationString(), shiftTypesPrettyPrint);
+    }
+
+    public String getShiftTypesPrettyPrint(final Shift shift) {
+        StringBuilder builder = new StringBuilder();
+        int index = 0;
+        SortedSet<ShiftType> sortedTypes = shift.getSortedTypes();
+        for (ShiftType shiftType : sortedTypes) {
+            builder.append(BundleUtil.getString(Bundle.ENUMERATION, new Locale("pt", "PT"), shiftType.getName()));
+            index++;
+            if (index < sortedTypes.size()) {
+                builder.append(", ");
+            }
+        }
+        return builder.toString();
     }
 
     public static Set<ProfessorshipEvaluationBean> getProfessorshipEvaluationBeanSet(Professorship professorship) {
