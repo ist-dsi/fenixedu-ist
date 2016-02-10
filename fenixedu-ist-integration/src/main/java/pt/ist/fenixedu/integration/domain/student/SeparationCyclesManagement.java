@@ -638,7 +638,10 @@ public class SeparationCyclesManagement {
 
         // Second Event
         final Money originalTotalAmount = secondEvent.getGratuityPaymentPlan().calculateOriginalTotalAmount();
-        secondEvent.addDiscount(getPerson(), Money.min(amountLessPenalty, originalTotalAmount));
+        Money min = Money.min(amountLessPenalty, originalTotalAmount);
+        if (min.isPositive()) {
+            secondEvent.addDiscount(getPerson(), min);
+        }
         secondEvent.recalculateState(new DateTime());
     }
 
