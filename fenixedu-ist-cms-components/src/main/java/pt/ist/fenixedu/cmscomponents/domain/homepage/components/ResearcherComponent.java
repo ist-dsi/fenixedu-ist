@@ -18,13 +18,17 @@
  */
 package pt.ist.fenixedu.cmscomponents.domain.homepage.components;
 
+import org.fenixedu.cms.domain.CloneCache;
 import org.fenixedu.cms.domain.Page;
 import org.fenixedu.cms.domain.Site;
+import org.fenixedu.cms.domain.component.Component;
 import org.fenixedu.cms.domain.component.ComponentParameter;
 import org.fenixedu.cms.domain.component.ComponentType;
 import org.fenixedu.cms.domain.component.DynamicComponent;
 import org.fenixedu.cms.rendering.TemplateContext;
 import org.fenixedu.commons.i18n.I18N;
+
+import com.google.gson.JsonObject;
 
 import pt.ist.fenixedu.cmscomponents.FenixEduIstCmsComponentsConfiguration;
 import pt.ist.fenixedu.cmscomponents.domain.homepage.HomepageSite;
@@ -32,10 +36,6 @@ import pt.ist.fenixedu.cmscomponents.domain.homepage.HomepageSite;
 @ComponentType(name = "Researcher Section Data Component",
         description = "Provides homepage owner's researcher section page data.")
 public class ResearcherComponent extends ResearcherComponent_Base {
-
-    public ResearcherComponent(String titleKey, String dataKey) {
-        this(titleKey, "resources.ResearcherResources", dataKey);
-    }
 
     @DynamicComponent
     public ResearcherComponent(@ComponentParameter("Title Key") String titleKey,
@@ -48,7 +48,7 @@ public class ResearcherComponent extends ResearcherComponent_Base {
     @Override
     public void handle(Page page, TemplateContext local, TemplateContext global) {
         global.put("bundle", getTitleBundle());
-        global.put("researcher", ((HomepageSite) page.getSite()).getOwner().getUsername());
+        global.put("researcher", page.getSite().getOwner().getUsername());
         global.put("sotisUrl", FenixEduIstCmsComponentsConfiguration.getConfiguration().sotisURL());
         global.put("language", I18N.getLocale().toLanguageTag());
         global.put("dataKey", getDataKey());
@@ -56,7 +56,19 @@ public class ResearcherComponent extends ResearcherComponent_Base {
     }
 
     public static boolean supportsSite(Site site) {
-        return site instanceof HomepageSite;
+        return site.getHomepageSite()!=null;
+    }
+
+    @Override
+    public Component clone(CloneCache cloneCache) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public JsonObject json() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

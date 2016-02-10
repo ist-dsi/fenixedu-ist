@@ -1,0 +1,88 @@
+{% if site.unit is not null %}
+    <a href="#" data-toggle="modal" data-target="#editLayoutModal"
+       class="btn btn-default" role="button">
+       Layout
+    </a>
+
+    <a class="btn btn-default" href="{{ request.contextPath }}/unit/sites/{{site.slug}}">
+        Banner
+    </a>
+
+    <!-- Modal panel for deleting an banner -->
+    <div class="modal fade" id="editLayoutModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">
+                        Cancel
+                    </span>
+                    </button>
+                    <h4>Layout</h4>
+                </div>
+                <div class="modal-body" id="site-layout">
+                    <center>
+                        <p>Select the site layout</p>
+                        <input type="text" hidden="hidden" name="template" id="selected-layout"/>
+                        <ul class="list-inline">
+                            <li>
+                                <a href="#" layout='unitHomepageWithBannerIntro'>
+                                    <img src="{{request.contextPath}}/static/images/banner_intro.gif" class="img-responsive"
+                                         width="100" height="200" alt="Banner main image"/>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" layout='unitHomepageWithIntroBanner'>
+                                    <img src="{{request.contextPath}}/static/images//intro_banner.gif" class="img-responsive"
+                                         width="100" height="200" alt="Banner main image"/>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" layout='unitHomepageWithIntroFloat'>
+                                    <img src="{{request.contextPath}}/static/images//banner_intro_float.gif"
+                                         class="img-responsive"
+                                         width="100" height="200" alt="Banner main image"/>
+                                </a>
+                            </li>
+                        </ul>
+                    </center>
+                </div>
+                <div class="modal-footer">
+                    <button type="reset" data-dismiss="modal" class="btn btn-default">
+                        Cancel
+                    </button>
+                    <button type="button" data-dismiss="modal" class="btn btn-primary" id="change-layout-btn">
+                        Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="application/javascript">
+        $(function () {
+            $('#site-layout a').each(function () {
+                var el = $(this);
+                el.click(function () {
+                    $('#site-layout a').removeClass('active');
+                    el.addClass('active');
+                })
+            });
+
+            $('#site-layout a[layout="{{site.initialPage.template.type}}]"]').addClass('active');
+
+            $('#editLayoutModal #change-layout-btn').click(function(evt){
+                var selectedEl = $('#site-layout a.active');
+                var selectedLayout = selectedEl.attr('layout');
+                $.post("{{ request.contextPath }}/unit/sites/{{ site.externalId }}/layout", { template: selectedLayout });
+            });
+        });
+    </script>
+
+    <style type="text/css">
+        #site-layout a.active > img {
+            border: #101010 solid medium;
+            padding: 2px;
+        }
+    </style>
+{% endif %}

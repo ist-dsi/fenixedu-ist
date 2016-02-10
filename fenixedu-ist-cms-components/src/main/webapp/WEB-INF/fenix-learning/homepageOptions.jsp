@@ -78,7 +78,7 @@ ${portal.toolkit()}
                     </label>
                     <div class="col-sm-2">
                         <div class="checkbox">
-                            <input name="showUnit" type="checkbox" value="true" ${homepage.showUnit ? "checked='checked'" : ""}>
+                            <input name="showUnit" type="checkbox" value="true" ${homepage.homepageSite.showUnit ? "checked='checked'" : ""}>
                         </div>
                     </div>
                     <div class="col-sm-8">
@@ -96,7 +96,7 @@ ${portal.toolkit()}
                     </label>
                     <div class="col-sm-2">
                         <div class="checkbox">
-                            <input name="showPhoto" type="checkbox" value="true" ${homepage.showPhoto ? "checked='checked'" : ""}>
+                            <input name="showPhoto" type="checkbox" value="true" ${homepage.homepageSite.showPhoto ? "checked='checked'" : ""}>
                         </div>
                     </div>
                     <div class="col-sm-8">
@@ -114,7 +114,7 @@ ${portal.toolkit()}
                     </label>
                     <div class="col-sm-2">
                         <div class="checkbox">
-                            <input name="showCategory" type="checkbox" value="true" ${homepage.showCategory ? "checked='checked'" : ""}>
+                            <input name="showCategory" type="checkbox" value="true" ${homepage.homepageSite.showCategory ? "checked='checked'" : ""}>
                         </div>
                     </div>
                     <div class="col-sm-8">
@@ -131,7 +131,7 @@ ${portal.toolkit()}
                     </label>
                     <div class="col-sm-2">
                         <div class="checkbox">
-                            <input name="showCurrentExecutionCourses" type="checkbox" value="true" ${homepage.showCurrentExecutionCourses ? "checked='checked'" : ""}>
+                            <input name="showCurrentExecutionCourses" type="checkbox" value="true" ${homepage.homepageSite.showCurrentExecutionCourses ? "checked='checked'" : ""}>
                         </div>
                     </div>
                     <div class="col-sm-8">
@@ -148,7 +148,7 @@ ${portal.toolkit()}
                     </label>
                     <div class="col-sm-2">
                         <div class="checkbox">
-                            <input name="showResearchUnitHomepage" type="checkbox" value="true" ${homepage.showResearchUnitHomepage ? "checked='checked'" : ""}>
+                            <input name="showResearchUnitHomepage" type="checkbox" value="true" ${homepage.homepageSite.showResearchUnitHomepage ? "checked='checked'" : ""}>
                         </div>
                     </div>
                     <div class="col-sm-8">
@@ -158,7 +158,7 @@ ${portal.toolkit()}
                                     <spring:message code="label.homepage.research.unit.homepage" />:
                                 </label>
                                 <div class="col-sm-8">
-                                    <input type="url" name="researchUnitHomepage" class="form-control" value="<c:out value='${homepage.researchUnitHomepage}'/>">
+                                    <input type="url" name="researchUnitHomepage" class="form-control" value="<c:out value='${homepage.homepageSite.researchUnitHomepage}'/>">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -166,7 +166,7 @@ ${portal.toolkit()}
                                     <spring:message code="label.homepage.research.unit.name" />:
                                 </label>
                                 <div class="col-sm-8">
-                                    <input type="text" name="researchUnitName" bennu-localized-string class="form-control" value='${homepage.researchUnitName.json()}'>
+                                    <input type="text" name="researchUnitName" bennu-localized-string class="form-control" value='${homepage.homepageSite.researchUnitName.json()}'>
                                 </div>
                             </div>
                         </c:if>
@@ -184,7 +184,7 @@ ${portal.toolkit()}
                     </label>
                     <div class="col-sm-2">
                         <div class="checkbox">
-                            <input name="showActiveStudentCurricularPlans" type="checkbox" value="true" ${homepage.showActiveStudentCurricularPlans ? "checked='checked'" : ""}>
+                            <input name="showActiveStudentCurricularPlans" type="checkbox" value="true" ${homepage.homepageSite.showActiveStudentCurricularPlans ? "checked='checked'" : ""}>
                         </div>
                     </div>
                     <div class="col-sm-8">
@@ -220,7 +220,7 @@ ${portal.toolkit()}
                         </label>
                         <div class="col-sm-2">
                             <div class="checkbox">
-                                <input name="showCurrentAttendingExecutionCourses" type="checkbox" value="true" ${homepage.showCurrentAttendingExecutionCourses ? "checked='checked'" : ""}>
+                                <input name="showCurrentAttendingExecutionCourses" type="checkbox" value="true" ${homepage.homepageSite.showCurrentAttendingExecutionCourses ? "checked='checked'" : ""}>
                             </div>
                         </div>
                         <div class="col-sm-8">
@@ -240,7 +240,7 @@ ${portal.toolkit()}
                         </label>
                         <div class="col-sm-2">
                             <div class="checkbox">
-                                <input name="showAlumniDegrees" type="checkbox" value="true" ${homepage.showAlumniDegrees ? "checked='checked'" : ""}>
+                                <input name="showAlumniDegrees" type="checkbox" value="true" ${homepage.homepageSite.showAlumniDegrees ? "checked='checked'" : ""}>
                             </div>
                         </div>
                         <div class="col-sm-8">

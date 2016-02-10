@@ -84,7 +84,7 @@
                     <td>${i.creationDate.toString('MMM dd, yyyy')}</td>
                     <td>
                         <div class="btn-group">
-                            <c:if test="${i.getClass().name == 'pt.ist.fenixedu.cmscomponents.domain.unit.UnitSite'}">
+                            <c:if test="${i.unit !=null}">
 
                                 <a href="#" data-toggle="modal" data-target="#editLayoutModal-${i.externalId}"
                                    class="btn btn-default" role="button">
@@ -122,7 +122,7 @@
 </c:choose>
 
 <c:forEach var="i" items="${sites}">
-    <c:if test="${i.getClass().name == 'pt.ist.fenixedu.cmscomponents.domain.unit.UnitSite'}">
+    <c:if test="${i.unit !=null}">
         <!-- Modal panel for deleting an banner -->
         <div class="modal fade" id="editLayoutModal-${i.externalId}" tabindex="-1" role="dialog" aria-hidden="true">
             <div class="modal-dialog">

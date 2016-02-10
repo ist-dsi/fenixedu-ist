@@ -24,7 +24,12 @@ import javax.servlet.annotation.WebListener;
 
 import org.fenixedu.academic.domain.Person;
 
+import org.fenixedu.cms.domain.Site;
+import org.fenixedu.cms.routing.CMSRenderer;
+import org.fenixedu.learning.domain.executionCourse.ExecutionCourseRequestHandler;
+import pt.ist.fenixedu.cmscomponents.domain.homepage.HomepageRequestHandler;
 import pt.ist.fenixedu.cmscomponents.domain.homepage.HomepageSite;
+import pt.ist.fenixedu.cmscomponents.domain.unit.UnitRequestHandler;
 import pt.ist.fenixframework.FenixFramework;
 
 /**
@@ -35,12 +40,15 @@ public class FenixISTLearningContextListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         FenixFramework.getDomainModel().registerDeletionListener(Person.class, (person) -> {
-            HomepageSite homepageSite = person.getHomepage();
+            Site homepageSite = person.getHomepage();
             if (homepageSite != null) {
+                homepageSite.getHomepageSite().delete();
                 person.setHomepage(null);
-                homepageSite.delete();
             }
         });
+        CMSRenderer.addHandler(new HomepageRequestHandler());
+        CMSRenderer.addHandler(new UnitRequestHandler());
+
     }
 
     @Override

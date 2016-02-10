@@ -31,7 +31,6 @@ import org.fenixedu.academic.domain.ShiftType;
 import org.fenixedu.cms.domain.Page;
 import org.fenixedu.cms.domain.component.ComponentType;
 import org.fenixedu.cms.rendering.TemplateContext;
-import org.fenixedu.learning.domain.executionCourse.ExecutionCourseSite;
 import org.fenixedu.learning.domain.executionCourse.components.BaseExecutionCourseComponent;
 import org.joda.time.DateTime;
 
@@ -43,7 +42,7 @@ public class ExecutionCourseQUCComponent extends BaseExecutionCourseComponent {
 
     @Override
     public void handle(Page page, TemplateContext componentContext, TemplateContext globalContext) {
-        ExecutionCourse executionCourse = ((ExecutionCourseSite) page.getSite()).getExecutionCourse();
+        ExecutionCourse executionCourse = page.getSite().getExecutionCourse();
 
         ExecutionSemester executionPeriod = executionCourse.getExecutionPeriod();
         ExecutionSemester oldQucExecutionSemester = ExecutionSemester.readBySemesterAndExecutionYear(2, "2009/2010");

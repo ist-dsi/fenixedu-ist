@@ -29,6 +29,7 @@ import java.util.TreeSet;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.TeacherCategory;
+import org.fenixedu.academic.domain.organizationalStructure.DepartmentUnit;
 import org.fenixedu.academic.domain.organizationalStructure.ScientificAreaUnit;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.cms.domain.Page;
@@ -36,7 +37,6 @@ import org.fenixedu.cms.domain.Site;
 import org.fenixedu.cms.domain.component.ComponentType;
 import org.fenixedu.cms.rendering.TemplateContext;
 
-import pt.ist.fenixedu.cmscomponents.domain.unit.UnitSite;
 
 @ComponentType(description = "Shows the teachers of the site's Scientific Area", name = "Scientific Area Teachers")
 public class ScientificAreaTeachers extends UnitSiteComponent {
@@ -60,6 +60,6 @@ public class ScientificAreaTeachers extends UnitSiteComponent {
     }
 
     public static boolean supportsSite(Site site) {
-        return site instanceof UnitSite && ((UnitSite) site).getUnit() instanceof ScientificAreaUnit;
+        return site.getUnit()!=null && site.getUnit() instanceof ScientificAreaUnit;
     }
 }

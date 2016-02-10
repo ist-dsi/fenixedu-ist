@@ -30,6 +30,7 @@ import org.fenixedu.academic.domain.contacts.Phone;
 import org.fenixedu.academic.domain.contacts.WebAddress;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.cms.domain.Site;
 import org.fenixedu.spaces.domain.Space;
 import org.fenixedu.spaces.domain.occupation.SharedOccupation;
 
@@ -67,8 +68,10 @@ public class PersonBean {
         person = p;
     }
 
+    public Site getSite() { return person.getHomepage(); }
+
     public HomepageSite getHomepage() {
-        return person.getHomepage();
+        return person.getHomepage().getHomepageSite();
     }
 
     public Teacher getTeacher() {

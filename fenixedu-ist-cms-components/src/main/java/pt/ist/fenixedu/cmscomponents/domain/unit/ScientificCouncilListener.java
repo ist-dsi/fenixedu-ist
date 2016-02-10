@@ -39,10 +39,9 @@ public class ScientificCouncilListener {
     private static final LocalizedString MENU_TITLE = getLocalizedString("resources.FenixEduLearningResources", "label.menu");
     private static final LocalizedString TITLE_ORGANIZATION = getLocalizedString(BUNDLE, "researchUnit.organization");
 
-    public static UnitSite create(Department department) {
-        final UnitSite newSite = new UnitSite(department.getDepartmentUnit());
-        final Menu menu = new Menu(newSite);
-        menu.setName(MENU_TITLE);
+    public static Site create(Department department) {
+        final Site newSite = new Site( department.getDepartmentUnit().getNameI18n().toLocalizedString(), department.getDepartmentUnit().getNameI18n().toLocalizedString());
+        final Menu menu = new Menu(newSite, MENU_TITLE);
         createDefaultContents(newSite, menu, Authenticate.getUser());
         return newSite;
     }

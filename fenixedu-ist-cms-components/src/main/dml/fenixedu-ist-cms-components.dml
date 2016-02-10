@@ -1,8 +1,6 @@
 package pt.ist.fenixedu.cmscomponents.domain;
 
-class unit.UnitSite extends .org.fenixedu.cms.domain.Site {}
-
-class homepage.HomepageSite extends .org.fenixedu.cms.domain.Site {
+class homepage.HomepageSite  {
     boolean showActiveStudentCurricularPlans;
     boolean showAlumniDegrees;
     boolean showCategory;
@@ -23,22 +21,31 @@ class homepage.components.ResearcherComponent extends .org.fenixedu.cms.domain.c
 
 class accessControl.PersistentManagersOfUnitSiteGroup extends .org.fenixedu.bennu.core.domain.groups.PersistentGroup;
 
-relation HomepageHasOwner {
-    homepage.HomepageSite playsRole homepage {
-        multiplicity 0..1;
+
+relation PersonHasHomepage {
+    .org.fenixedu.cms.domain.Site playsRole homepage {
+        multiplicity 1..1;
     }
     .org.fenixedu.academic.domain.Person playsRole owner {
+        multiplicity 0..1;
+    }
+}
+
+relation HomepageHasInfo {
+    homepage.HomepageSite playsRole homepageSite {
+        multiplicity 0..1;
+    }
+    .org.fenixedu.cms.domain.Site playsRole site {
         multiplicity 1..1;
     }
 }
 
-relation UnitSiteHasUnit {
-    unit.UnitSite playsRole site {
-    	    multiplicity 0..1;
-    }
-    .org.fenixedu.academic.domain.organizationalStructure.Unit playsRole unit {
+relation UnitHasSite {
+    .org.fenixedu.cms.domain.Site playsRole site {
     	    multiplicity 1..1;
     }
+    .org.fenixedu.academic.domain.organizationalStructure.Unit playsRole unit {
+    	    multiplicity 0..1;    }
 }
 
 relation UserBookmarks {

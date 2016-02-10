@@ -38,7 +38,6 @@ import org.fenixedu.cms.domain.component.ComponentType;
 import org.fenixedu.cms.exceptions.ResourceNotFoundException;
 import org.fenixedu.cms.rendering.TemplateContext;
 
-import pt.ist.fenixedu.cmscomponents.domain.unit.UnitSite;
 import pt.ist.fenixframework.FenixFramework;
 
 import com.google.common.base.Strings;
@@ -128,7 +127,7 @@ public class CompetenceCourseComponent extends UnitSiteComponent {
     }
 
     public static boolean supportsSite(Site site) {
-        return site instanceof UnitSite && ((UnitSite) site).getUnit() instanceof DepartmentUnit;
+        return site.getUnit()!=null && site.getUnit() instanceof DepartmentUnit;
     }
 
 }

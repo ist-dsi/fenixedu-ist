@@ -25,43 +25,27 @@ import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.groups.AnyoneGroup;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.groups.LoggedGroup;
-import org.fenixedu.bennu.core.groups.NobodyGroup;
 import org.fenixedu.bennu.core.groups.UserGroup;
+import org.fenixedu.cms.domain.DefaultRoles;
+import org.fenixedu.cms.domain.Role;
+import org.fenixedu.cms.domain.Site;
 import org.fenixedu.commons.i18n.I18N;
 import org.fenixedu.commons.i18n.LocalizedString;
 
-import pt.ist.fenixframework.Atomic;
-
 import com.google.common.collect.ImmutableList;
 
+import pt.ist.fenixframework.Atomic;
+import pt.ist.fenixframework.consistencyPredicates.ConsistencyPredicate;
+
 public class HomepageSite extends HomepageSite_Base {
-    public HomepageSite(Person person) {
-        super();
-        setBennu(Bennu.getInstance());
-        setSlug(person.getUser().getUsername());
-        setCanAdminGroup(NobodyGroup.get());
-        setCanPostGroup(NobodyGroup.get());
-        setOwner(person);
+
+    public HomepageSite(Site site){
+        setSite(site);
     }
 
-    @Override
-    public LocalizedString getName() {
-        return new LocalizedString(I18N.getLocale(), getOwner().getProfile().getDisplayName());
-    }
 
-    @Override
-    public LocalizedString getDescription() {
-        return getName();
-    }
-
-    @Override
-    @Atomic
     public void delete() {
-        setOwner(null);
-        super.delete();
+        deleteDomainObject();
     }
 
-    public List<Group> getContextualPermissionGroups() {
-        return ImmutableList.of(AnyoneGroup.get(), LoggedGroup.get(), UserGroup.of(getOwner().getUser()));
-    }
 }

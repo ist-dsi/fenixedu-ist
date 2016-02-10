@@ -15,7 +15,6 @@ import org.fenixedu.bennu.signals.DomainObjectEvent;
 import org.fenixedu.bennu.signals.Signal;
 import org.fenixedu.cms.domain.Post;
 import org.fenixedu.commons.stream.StreamUtils;
-import org.fenixedu.learning.domain.executionCourse.ExecutionCourseSite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,16 +53,15 @@ public class PushNotificationsInitializer implements ServletContextListener {
     private void sendNotification(DomainObjectEvent<Post> event) {
         Post post = event.getInstance();
 
-        if (post.getSite() instanceof ExecutionCourseSite && post.isVisible()
+        if (post.getSite().getExecutionCourse()!=null && post.isVisible()
                 && post.getCategoriesSet().stream().anyMatch(cat -> "announcement".equalsIgnoreCase(cat.getSlug()))) {
-            ExecutionCourseSite postSite = (ExecutionCourseSite) post.getSite();
 
-            JsonArray usernames = postSite.getExecutionCourse().getAttendsSet().stream()
+            JsonArray usernames = post.getSite().getExecutionCourse().getAttendsSet().stream()
                     .map(a -> a.getRegistration().getPerson().getUser().getUsername()).distinct().map(JsonPrimitive::new)
                     .collect(StreamUtils.toJsonArray());
 
             final String postAuthor = post.getCreatedBy().getUsername();
-            JsonArray teacherUsernames = postSite.getExecutionCourse().getTeacherGroupSet().stream()
+            JsonArray teacherUsernames = post.getSite().getExecutionCourse().getTeacherGroupSet().stream()
                     .flatMap(ptg -> ptg.getMembers().stream()).map(User::getUsername)
                     .filter(u -> !postAuthor.equals(u)).distinct().map(JsonPrimitive::new).collect(StreamUtils.toJsonArray());
 
@@ -79,7 +77,7 @@ public class PushNotificationsInitializer implements ServletContextListener {
             JsonObject returnObj = new JsonObject();
             returnObj.add("usernames", usernames);
             returnObj.add("message", message);
-            returnObj.addProperty("channel", postSite.getExecutionCourse().getSigla());
+            returnObj.addProperty("channel", post.getSite().getExecutionCourse().getSigla());
             try {
                 HTTP_CLIENT.target(pushNotificationServerUrl).path("api/v1/message/").request().header(header, token)
                         .post(Entity.entity(returnObj, "application/json; charset=utf8"));

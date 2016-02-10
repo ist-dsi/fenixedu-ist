@@ -35,14 +35,14 @@ public abstract class HomepageSiteComponent implements CMSComponent {
         return site(page).getOwner();
     }
 
-    protected HomepageSite site(Page page) {
-        if (page.getSite() instanceof HomepageSite) {
-            return (HomepageSite) page.getSite();
+    protected Site site(Page page) {
+        if (page.getSite().getOwner()!=null) {
+            return page.getSite();
         }
         throw new ResourceNotFoundException();
     }
 
     public static boolean supportsSite(Site site) {
-        return site instanceof HomepageSite;
+        return site.getHomepageSite()!=null;
     }
 }

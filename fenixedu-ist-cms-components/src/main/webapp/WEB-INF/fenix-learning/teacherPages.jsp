@@ -52,6 +52,12 @@ window.tooltip = $.fn.tooltip;
     </div>
 </h2>
 <hr />
+    <div class="alert alert-info" role="alert">
+        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+        <a  href="${site.editUrl}"><span class="text-info"><spring:message code="label.check.cms"/></span></a>
+    </div>
+<hr />
+
 <c:if test="${not empty importError}">
     <div class="alert alert-danger" role="alert">
         <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
