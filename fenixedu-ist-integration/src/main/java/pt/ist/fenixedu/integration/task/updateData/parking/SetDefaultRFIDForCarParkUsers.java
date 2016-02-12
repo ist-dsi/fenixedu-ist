@@ -20,7 +20,9 @@ public class SetDefaultRFIDForCarParkUsers extends CronTask {
             final Person person = user.getPerson();
             if (person != null) {
                 final ParkingParty parkingParty = person.getParkingParty();
-                if (parkingParty != null && parkingParty.getCardNumber() == null) {
+                if (parkingParty != null
+                        && (parkingParty.getCardNumber() == null || parkingParty.getCardNumber().longValue() == 0l
+                                || isOutDatedValue(person, parkingParty.getCardNumber()))) {
                     final String rfid = getLastMifareSerialNumber(person);
                     if (rfid != null) {
                         parkingParty.setCardNumber(Long.valueOf(rfid.trim()));
@@ -30,9 +32,17 @@ public class SetDefaultRFIDForCarParkUsers extends CronTask {
         }
     }
 
+    private boolean isOutDatedValue(final Person person, final Long cardNumber) {
+        final Long lastValue = Long.valueOf(getLastMifareSerialNumber(person).trim());
+        final Stream<SantanderCardInformation> infos = person.getSantanderCardsInformationSet().stream();
+        return !cardNumber.equals(lastValue) && infos.map(i -> i.getDchpRegisteLine()).filter(l -> l != null)
+                .map(l -> Long.valueOf(getMifareSerialNumber(l).trim())).anyMatch(l -> l.equals(cardNumber));
+    }
+
     private static String getLastMifareSerialNumber(final Person person) {
         final Stream<SantanderCardInformation> infos = person.getSantanderCardsInformationSet().stream();
-        final String line = infos.map(i -> i.getDchpRegisteLine()).max(SetDefaultRFIDForCarParkUsers::compareDHCPLines).orElse(null);
+        final String line =
+                infos.map(i -> i.getDchpRegisteLine()).max(SetDefaultRFIDForCarParkUsers::compareDHCPLines).orElse(null);
         return line == null ? null : getMifareSerialNumber(line);
     }
 
