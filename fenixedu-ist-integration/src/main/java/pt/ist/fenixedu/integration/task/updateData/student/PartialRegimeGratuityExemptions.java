@@ -62,18 +62,24 @@ public class PartialRegimeGratuityExemptions extends CronTask {
         for (AnnualEvent event : ExecutionYear.readCurrentExecutionYear().getAnnualEventsSet()) {
             if (event instanceof GratuityEventWithPaymentPlan) {
                 GratuityEventWithPaymentPlan gratuityEvent = (GratuityEventWithPaymentPlan) event;
-                if (gratuityEvent.getGratuityPaymentPlan() instanceof FullGratuityPaymentPlanForPartialRegime) {
+                if (gratuityEvent.getGratuityPaymentPlan() instanceof FullGratuityPaymentPlanForPartialRegime
+                        && !gratuityEvent.isCancelled()) {
                     processedStudents++;
                     taskLog("-------- Amount values for %s --------\n", event.getPerson().getUsername());
-                    Money amountToPay = gratuityEvent.getOriginalAmountToPay();
-                    Money newAmountToPay =
-                            calculateAmountToPay(gratuityEvent.getWhenOccured().plusSeconds(1), gratuityEvent,
-                                    gratuityEvent.getGratuityPaymentPlan());
-                    taskLog("Valor antigo: %s - Valor novo: %s\n", amountToPay.getAmountAsString(),
-                            newAmountToPay.getAmountAsString());
-                    //since the exemption is given in % and the system only counts up to 2 decimal cases round up, there maybe values off by 1 cent
-                    if (amountToPay.greaterThan(newAmountToPay.add(new BigDecimal(0.01)))) {
-                        createExemption(gratuityEvent, amountToPay, newAmountToPay);
+                    try {
+                        Money amountToPay = gratuityEvent.getOriginalAmountToPay();
+                        Money newAmountToPay =
+                                calculateAmountToPay(gratuityEvent.getWhenOccured().plusSeconds(1), gratuityEvent,
+                                        gratuityEvent.getGratuityPaymentPlan());
+                        taskLog("Valor antigo: %s - Valor novo: %s\n", amountToPay.getAmountAsString(),
+                                newAmountToPay.getAmountAsString());
+                        //since the exemption is given in % and the system only counts up to 2 decimal cases round up, there maybe values off by 1 cent
+                        if (amountToPay.greaterThan(newAmountToPay.add(new BigDecimal(0.01)))) {
+                            createExemption(gratuityEvent, amountToPay, newAmountToPay);
+                        }
+                    } catch (Exception e) {
+                        taskLog("Exception processing event: %s\n", gratuityEvent.getExternalId());
+                        taskLog("Error: %s\n", e.getMessage());
                     }
                 }
             }
