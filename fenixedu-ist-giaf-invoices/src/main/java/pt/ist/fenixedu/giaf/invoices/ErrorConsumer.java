@@ -18,9 +18,24 @@
  */
 package pt.ist.fenixedu.giaf.invoices;
 
+import org.fenixedu.academic.domain.accounting.AccountingTransactionDetail;
+import org.fenixedu.academic.domain.accounting.Event;
+
 @FunctionalInterface
 public interface ErrorConsumer<T> {
 
     void accept(final T t, final String erro, final String arg);
+
+    public final static ErrorConsumer<Event> VOID_EVENT_CONSUMER = new ErrorConsumer<Event>() {
+        @Override
+        public void accept(Event e, String erro, String arg) {
+        }
+    };
+
+    public final static ErrorConsumer<AccountingTransactionDetail> VOID_CONSUMER = new ErrorConsumer<AccountingTransactionDetail>() {
+        @Override
+        public void accept(AccountingTransactionDetail t, String erro, String arg) {
+        }
+    };
 
 }

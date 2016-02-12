@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.accessControl.AcademicAuthorizationGroup;
 import org.fenixedu.academic.domain.accessControl.academicAdministration.AcademicOperationType;
-import org.fenixedu.academic.domain.accounting.AccountingTransactionDetail;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.security.Authenticate;
@@ -39,21 +38,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.google.common.io.ByteStreams;
 
-import pt.ist.fenixedu.giaf.invoices.GiafInvoice;
+import pt.ist.fenixedu.giaf.invoices.GiafEvent;
 
 @SpringFunctionality(app = InvoiceController.class, title = "title.giaf.invoice.viewer")
 @RequestMapping("/giaf-invoice-downloader")
 public class InvoiceDownlaodController {
 
-    @RequestMapping(value = "/{detail}", method = RequestMethod.GET, produces = "application/pdf")
-    public void invoice(@PathVariable AccountingTransactionDetail detail, final HttpServletResponse response) {
-        if (sAllowedToAccess(detail)) {
-            final String id = detail.getExternalId();
-            final String invoiceNumber = InvoiceController.toInvoiceNumber(id);
-            final File file = GiafInvoice.fileForDocument(id);
-            if (file.exists()) {
+    @RequestMapping(value = "/{event}/{filename}", method = RequestMethod.GET, produces = "application/pdf")
+    public void invoice(@PathVariable Event event, @PathVariable String filename, final HttpServletResponse response) {
+        if (sAllowedToAccess(event)) {
+            final File file =  GiafEvent.receiptFile(event, filename);
+            if (file != null && file.exists()) {
                 try (final FileInputStream inputStream = new FileInputStream(file)) {
-                    response.setHeader("Content-Disposition", "attachment; filename=" + invoiceNumber + ".pdf");
+                    response.setHeader("Content-Disposition", "attachment; filename=" + filename);
                     ByteStreams.copy(inputStream, response.getOutputStream());
                     response.flushBuffer();
                 } catch (final IOException e) {
@@ -66,13 +63,12 @@ public class InvoiceDownlaodController {
         }
     }
 
-    private boolean sAllowedToAccess(final AccountingTransactionDetail detail) {
+    private boolean sAllowedToAccess(final Event event) {
         final User user = Authenticate.getUser();
-        return isOwner(detail, user) || isAcademicServiceStaff(user);
+        return isOwner(event, user) || isAcademicServiceStaff(user);
     }
 
-    private boolean isOwner(final AccountingTransactionDetail detail, final User user) {
-        final Event event = detail.getEvent();
+    private boolean isOwner(final Event event, final User user) {
         final Person person = event == null ? null : event.getPerson();
         return user != null && user == person.getUser();
     }

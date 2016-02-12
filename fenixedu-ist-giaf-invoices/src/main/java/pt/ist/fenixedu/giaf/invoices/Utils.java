@@ -23,12 +23,11 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.Date;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.fenixedu.academic.domain.Country;
@@ -36,72 +35,48 @@ import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
-import org.fenixedu.academic.domain.accounting.AcademicEvent;
 import org.fenixedu.academic.domain.accounting.AccountingTransaction;
 import org.fenixedu.academic.domain.accounting.AccountingTransactionDetail;
-import org.fenixedu.academic.domain.accounting.Discount;
 import org.fenixedu.academic.domain.accounting.Event;
-import org.fenixedu.academic.domain.accounting.Exemption;
-import org.fenixedu.academic.domain.accounting.PaymentMode;
 import org.fenixedu.academic.domain.accounting.PostingRule;
 import org.fenixedu.academic.domain.accounting.accountingTransactions.detail.SibsTransactionDetail;
-import org.fenixedu.academic.domain.accounting.events.AcademicEventExemption;
 import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeAndInsuranceEvent;
-import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeAndInsuranceExemption;
-import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeAndInsurancePenaltyExemption;
-import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeExemption;
 import org.fenixedu.academic.domain.accounting.events.AnnualEvent;
 import org.fenixedu.academic.domain.accounting.events.ImprovementOfApprovedEnrolmentEvent;
-import org.fenixedu.academic.domain.accounting.events.ImprovementOfApprovedEnrolmentPenaltyExemption;
-import org.fenixedu.academic.domain.accounting.events.InsuranceExemption;
-import org.fenixedu.academic.domain.accounting.events.PenaltyExemption;
 import org.fenixedu.academic.domain.accounting.events.candidacy.IndividualCandidacyEvent;
-import org.fenixedu.academic.domain.accounting.events.candidacy.SecondCycleIndividualCandidacyExemption;
 import org.fenixedu.academic.domain.accounting.events.dfa.DFACandidacyEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEvent;
-import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEventWithPaymentPlan;
-import org.fenixedu.academic.domain.accounting.events.gratuity.PercentageGratuityExemption;
-import org.fenixedu.academic.domain.accounting.events.gratuity.ValueGratuityExemption;
-import org.fenixedu.academic.domain.accounting.events.gratuity.exemption.penalty.InstallmentPenaltyExemption;
 import org.fenixedu.academic.domain.accounting.events.insurance.InsuranceEvent;
-import org.fenixedu.academic.domain.administrativeOffice.AdministrativeOffice;
 import org.fenixedu.academic.domain.candidacyProcess.CandidacyProcess;
 import org.fenixedu.academic.domain.candidacyProcess.IndividualCandidacy;
 import org.fenixedu.academic.domain.candidacyProcess.IndividualCandidacyProcess;
 import org.fenixedu.academic.domain.contacts.PartyContact;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
-import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.degreeStructure.CycleType;
 import org.fenixedu.academic.domain.exceptions.DomainException;
-import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.phd.candidacy.PhdProgramCandidacyEvent;
 import org.fenixedu.academic.domain.phd.candidacy.PhdProgramCandidacyProcess;
 import org.fenixedu.academic.domain.phd.debts.PhdEvent;
-import org.fenixedu.academic.domain.phd.debts.PhdEventExemption;
 import org.fenixedu.academic.domain.phd.debts.PhdGratuityEvent;
-import org.fenixedu.academic.domain.phd.debts.PhdGratuityExternalScholarshipExemption;
-import org.fenixedu.academic.domain.phd.debts.PhdGratuityFineExemption;
-import org.fenixedu.academic.domain.phd.debts.PhdRegistrationFeePenaltyExemption;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
-import org.fenixedu.academic.domain.student.registrationStates.RegistrationState;
 import org.fenixedu.academic.util.Money;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.UserProfile;
 import org.fenixedu.commons.StringNormalizer;
 import org.fenixedu.commons.spreadsheet.Spreadsheet;
-import org.fenixedu.spaces.domain.Space;
 import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
-import org.joda.time.YearMonthDay;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.CharMatcher;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import pt.ist.fenixframework.DomainObject;
 
 public class Utils {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
 
     public static boolean validate(final ErrorConsumer<AccountingTransactionDetail> consumer,
             final AccountingTransactionDetail detail) {
@@ -256,149 +231,6 @@ public class Utils {
         return jo;
     }
 
-    public static JsonObject toJson(final Event event, final DateTime threshold) {
-        final Person person = event.getPerson();
-        final ExecutionYear debtYear = executionYearOf(event);
-        final DebtCycleType cycleType = cycleTypeFor(event, debtYear);
-        final String eventDescription = event.getDescription().toString();
-        final String articleCode = mapToArticleCode(event, eventDescription);
-        final String rubrica = mapToRubrica(event, eventDescription);
-        final String costCenter = costCenterFor(event);
-        final String clientId = toClientCode(person);
-
-        final JsonObject o = new JsonObject();
-        o.addProperty("id", idFor(event));
-        o.addProperty("date", toString(new Date()));
-        o.addProperty("type", "F");
-        o.addProperty("series", "13");
-        o.addProperty("group", "212");
-        o.addProperty("clientId", clientId);
-
-        o.addProperty("vatNumber", "");
-        o.addProperty("name", "");
-        o.addProperty("country", "");
-        o.addProperty("postalCode", "");
-        o.addProperty("locality", "");
-        o.addProperty("street", "");
-
-        o.addProperty("doorNumber", 1);
-        o.addProperty("paymentType", "PP");
-        o.addProperty("sellerId", costCenter);
-        o.addProperty("currency", "EUR");
-        o.addProperty("accountingUnit", "10");
-        o.addProperty("reference", debtYear.getName());
-        o.addProperty("observation", cycleType == null ? "Outros" : cycleType.getDescription());
-        o.addProperty("username", "CRISTINAC");
-
-//        o.addProperty("dataVencimento", toString(getDueDate(event)));
-        o.addProperty("dueDate", toString(getDueDate(event)));
-
-        final JsonArray a = new JsonArray();
-        {
-            final JsonObject e = new JsonObject();
-            e.addProperty("line", 1);
-            e.addProperty("type", "2");
-            e.addProperty("article", articleCode);
-            e.addProperty("description", eventDescription);
-            e.addProperty("unitType", "UN");
-            e.addProperty("quantity", BigDecimal.ONE);
-
-            final Money value = calculateTotalDebtValue(event);
-            final Money payedBeforThreshold = calculateAmountPayed(event, threshold);
-            e.addProperty("unitPrice", value.subtract(payedBeforThreshold).getAmount());
-//            e.addProperty("originalValue", value.getAmount());
-//            e.addProperty("discounts", discounts(event).getAmount());
-//            e.addProperty("excemptions", excemptions(event).getAmount());
-//            e.addProperty("payed", calculateAmountPayed(event, new DateTime()).getAmount());
-
-            e.addProperty("vat", BigDecimal.ZERO);
-            e.addProperty("discount", BigDecimal.ZERO);
-            e.addProperty("costCenter", costCenter);
-            e.addProperty("responsible", "9910");
-            e.addProperty("subCenter", "RP" + costCenter);
-            e.addProperty("legalArticle", "M99");
-            e.addProperty("rubrica", rubrica);
-            e.addProperty("observation", "");
-            e.addProperty("reference", debtYear.getName());
-            a.add(e);
-        }
-        o.add("entries", a);
-        return o;
-    }
-
-    public static JsonObject toJsonEventForOverpayment(final AccountingTransaction tx, final Money value, final LocalDate dueDate) {
-        final Event event = tx.getEvent();
-
-        final boolean isPenalty = isPenalty(tx, dueDate);
-
-        final Person person = event.getPerson();
-        final ExecutionYear debtYear = executionYearOf(event);
-        final DebtCycleType cycleType = cycleTypeFor(event, debtYear);
-        final String eventDescription = event.getDescription().toString();
-        final String articleCode = isPenalty ? "FEMULTA" /* 7242 --> MULTAS */ : mapToArticleCode(event, eventDescription);
-        final String rubrica = isPenalty ? "0036" /* MULTAS */ : mapToRubrica(event, eventDescription);
-        final String costCenter = costCenterFor(event);
-        final String clientId = toClientCode(person);
-        final String paymentDate = toString(tx.getWhenRegistered().toDate());
-
-        final JsonObject o = new JsonObject();
-        o.addProperty("id", tx.getExternalId() + "_e" + new LocalDate().toString("yyyyMMdd"));
-        o.addProperty("date", toString(new Date()));
-        o.addProperty("type", "F");
-        o.addProperty("series", "13");
-        o.addProperty("group", "212");
-        o.addProperty("clientId", clientId);
-
-        o.addProperty("vatNumber", "");
-        o.addProperty("name", "");
-        o.addProperty("country", "");
-        o.addProperty("postalCode", "");
-        o.addProperty("locality", "");
-        o.addProperty("street", "");
-
-        o.addProperty("doorNumber", 1);
-        o.addProperty("paymentType", "PP");
-        o.addProperty("sellerId", costCenter);
-        o.addProperty("currency", "EUR");
-        o.addProperty("accountingUnit", "10");
-        o.addProperty("reference", debtYear.getName());
-        o.addProperty("observation", cycleType == null ? "Outros" : cycleType.getDescription());
-        o.addProperty("username", "CRISTINAC");
-
-        o.addProperty("dueDate", paymentDate);
-
-        final JsonArray a = new JsonArray();
-        {
-            final JsonObject e = new JsonObject();
-            e.addProperty("line", 1);
-            e.addProperty("type", "2");
-            e.addProperty("article", articleCode);
-            e.addProperty("description", eventDescription);
-            e.addProperty("unitType", "UN");
-            e.addProperty("quantity", BigDecimal.ONE);
-
-            e.addProperty("unitPrice", value.getAmount());
-
-            e.addProperty("vat", BigDecimal.ZERO);
-            e.addProperty("discount", BigDecimal.ZERO);
-            e.addProperty("costCenter", costCenter);
-            e.addProperty("responsible", "9910");
-            e.addProperty("subCenter", "RP" + costCenter);
-            e.addProperty("legalArticle", "M99");
-            e.addProperty("rubrica", rubrica);
-            e.addProperty("observation", "");
-            e.addProperty("reference", debtYear.getName());
-            a.add(e);
-        }
-        o.add("entries", a);
-        return o;
-    }
-
-    private static boolean isPenalty(final AccountingTransaction tx, final LocalDate dueDate) {
-        final LocalDate txDate = tx.getWhenRegistered().toLocalDate();
-        return txDate.isAfter(dueDate);
-    }
-
     public static Money calculateTotalDebtValue(final Event event) {
         final DateTime when = event.getWhenOccured().plusSeconds(1);
         final PostingRule rule = event.getPostingRule();
@@ -418,66 +250,6 @@ public class Utils {
         }
     }
 
-    private static Money discounts(final Event event) {
-        return event.getDiscountsSet().stream().map(d -> d.getAmount()).reduce(Money.ZERO, Money::add);
-    }
-
-    private static Money excemptions(final Event event) {
-        return event.getExemptionsSet().stream().map(e -> amountFor(event, e)).reduce(Money.ZERO, Money::add);
-    }
-
-    private static Money amountFor(final Event event, final Exemption e) {
-        final Money amount = calculateTotalDebtValue(event);
-        if (e instanceof AcademicEventExemption) {
-            final AcademicEventExemption o = (AcademicEventExemption) e;
-            return o.getValue();
-        } else if (e instanceof AdministrativeOfficeFeeAndInsuranceExemption) {
-            final AdministrativeOfficeFeeAndInsuranceExemption o = (AdministrativeOfficeFeeAndInsuranceExemption) e;
-        } else if (e instanceof AdministrativeOfficeFeeExemption) {
-            final AdministrativeOfficeFeeExemption o = (AdministrativeOfficeFeeExemption) e;
-            final DateTime when = event.getWhenOccured().plusSeconds(1);
-            final PostingRule postingRule = event.getPostingRule();
-            final Money originalAmount = postingRule.calculateTotalAmountToPay(event, when, false);
-            final Money amountToPay = postingRule.calculateTotalAmountToPay(event, when, true);
-            return originalAmount.subtract(amountToPay);
-        } else if (e instanceof InsuranceExemption) {
-            final InsuranceExemption o = (InsuranceExemption) e;
-        } else if (e instanceof SecondCycleIndividualCandidacyExemption) {
-            final SecondCycleIndividualCandidacyExemption o = (SecondCycleIndividualCandidacyExemption) e;
-        } else if (e instanceof PercentageGratuityExemption) {
-            final PercentageGratuityExemption o = (PercentageGratuityExemption) e;
-            return amount.multiply(o.getPercentage());
-        } else if (e instanceof ValueGratuityExemption) {
-            final ValueGratuityExemption o = (ValueGratuityExemption) e;
-            return o.getValue();
-        } else if (e instanceof PhdGratuityExternalScholarshipExemption) {
-            final PhdGratuityExternalScholarshipExemption o = (PhdGratuityExternalScholarshipExemption) e;
-            return o.getValue();
-        } else if (e instanceof PhdGratuityFineExemption) {
-            final PhdGratuityFineExemption o = (PhdGratuityFineExemption) e;
-            return o.getValue();
-        } else if (e instanceof PhdEventExemption) {
-            final PhdEventExemption o = (PhdEventExemption) e;
-            return o.getValue();
-        } else if (e instanceof AdministrativeOfficeFeeAndInsurancePenaltyExemption) {
-            final AdministrativeOfficeFeeAndInsurancePenaltyExemption o = (AdministrativeOfficeFeeAndInsurancePenaltyExemption) e;
-            return Money.ZERO;
-        } else if (e instanceof ImprovementOfApprovedEnrolmentPenaltyExemption) {
-            final ImprovementOfApprovedEnrolmentPenaltyExemption o = (ImprovementOfApprovedEnrolmentPenaltyExemption) e;
-            return Money.ZERO;
-        } else if (e instanceof InstallmentPenaltyExemption) {
-            final InstallmentPenaltyExemption o = (InstallmentPenaltyExemption) e;
-            return Money.ZERO;
-        } else if (e instanceof PhdRegistrationFeePenaltyExemption) {
-            final PhdRegistrationFeePenaltyExemption o = (PhdRegistrationFeePenaltyExemption) e;
-            return Money.ZERO;
-        } else if (e instanceof PenaltyExemption) {
-            final PenaltyExemption o = (PenaltyExemption) e;
-            return Money.ZERO;
-        }
-        return amount;
-    }
-
     final static ErrorConsumer<AccountingTransactionDetail> VOID_CONSUMER = new ErrorConsumer<AccountingTransactionDetail>() {
         @Override
         public void accept(AccountingTransactionDetail t, String erro, String arg) {
@@ -490,266 +262,6 @@ public class Utils {
                 .reduce(Money.ZERO, Money::add);
     }
 
-    public static JsonObject toJson(final AccountingTransactionDetail detail, final boolean accountForValue,
-            final Map<String, EventWrapper> eventsByInvoiceNumber) {
-        final AccountingTransaction transaction = detail.getTransaction();
-        final Event event = transaction.getEvent();
-        final Person person = event.getPerson();
-        final ExecutionYear debtYear = executionYearOf(event);
-        final DebtCycleType cycleType = cycleTypeFor(event, debtYear);
-        final String eventDescription = event.getDescription().toString();
-        final String articleCode = mapToArticleCode(event, eventDescription);
-        final String rubrica = accountForValue ? mapToRubrica(event, eventDescription) : null;
-        final String costCenter = costCenterFor(event);
-        final String clientId = toClientCode(person);
-        final String invoiceId = accountForValue ? invoiceIdFor(detail) : null;
-
-        final JsonObject o = new JsonObject();
-        o.addProperty("id", idFor(detail));
-        o.addProperty("invoiceId", invoiceId == null ? "" : invoiceId);
-        o.addProperty("date", toString(new Date()));
-        o.addProperty("type", "V");
-        o.addProperty("series", "13");
-        o.addProperty("group", "212");
-        o.addProperty("clientId", clientId);
-
-        o.addProperty("vatNumber", "");
-        o.addProperty("name", "");
-        o.addProperty("country", "");
-        o.addProperty("postalCode", "");
-        o.addProperty("locality", "");
-        o.addProperty("street", "");
-
-        o.addProperty("doorNumber", 1);
-        o.addProperty("paymentType", "PP");
-        o.addProperty("sellerId", costCenter);
-        o.addProperty("currency", "EUR");
-        o.addProperty("accountingUnit", "10");
-        o.addProperty("reference", debtYear.getName());
-        o.addProperty("observation", cycleType == null ? "Outros" : cycleType.getDescription());
-        o.addProperty("username", "CRISTINAC");
-
-//        o.addProperty("dataPagamento", toString(transaction.getWhenRegistered().toDate()));
-//        o.addProperty("meioPagamento", toPaymentMethod(transaction.getPaymentMode()));
-//        o.addProperty("numeroDocumento", toPaymentDocumentNumber(detail));
-
-        o.addProperty("paymentDate", toString(transaction.getWhenRegistered().toDate()));
-        o.addProperty("paymentMethod", toPaymentMethod(transaction.getPaymentMode()));
-        o.addProperty("documentNumber", toPaymentDocumentNumber(detail));
-
-        final JsonArray a = new JsonArray();
-        {
-            final JsonObject e = new JsonObject();
-            e.addProperty("line", 1);
-            e.addProperty("type", "2");
-            e.addProperty("article", articleCode);
-            e.addProperty("description", eventDescription);
-            e.addProperty("unitType", "UN");
-            e.addProperty("quantity", BigDecimal.ONE);
-            e.addProperty("unitPrice", getValueForInvoiceAndIncCounter(transaction, event, eventsByInvoiceNumber, invoiceId)
-                    .getAmount());
-            e.addProperty("vat", BigDecimal.ZERO);
-            e.addProperty("discount", BigDecimal.ZERO);
-            e.addProperty("costCenter", costCenter);
-            e.addProperty("responsible", "9910");
-            e.addProperty("subCenter", "RP" + costCenter);
-            e.addProperty("legalArticle", "M99");
-            e.addProperty("rubrica", invoiceId == null || invoiceId.trim().isEmpty() || rubrica == null ? "" : rubrica);
-            e.addProperty("observation", "");
-            e.addProperty("reference", debtYear.getName());
-            a.add(e);
-        }
-        o.add("entries", a);
-        return o;
-    }
-
-    public static JsonObject toJsonOverpayment(final AccountingTransaction tx, final Money value, final LocalDate dueDate,
-            final String invoiceId) {
-        final Event event = tx.getEvent();
-
-        final boolean isPenalty = isPenalty(tx, dueDate);
-
-        final Person person = event.getPerson();
-        final ExecutionYear debtYear = executionYearOf(event);
-        final DebtCycleType cycleType = cycleTypeFor(event, debtYear);
-        final String eventDescription = event.getDescription().toString();
-        final String articleCode = isPenalty ? "FEMULTA" /* 7242 --> MULTAS */ : mapToArticleCode(event, eventDescription);
-        final String rubrica = isPenalty ? "0036" /* MULTAS */ : mapToRubrica(event, eventDescription);
-        final String costCenter = costCenterFor(event);
-        final String clientId = toClientCode(person);
-
-        final JsonObject o = new JsonObject();
-        o.addProperty("id", tx.getExternalId() + "_t" + new LocalDate().toString("yyyyMMdd"));
-        o.addProperty("invoiceId", invoiceId);
-        o.addProperty("date", toString(new Date()));
-        o.addProperty("type", "V");
-        o.addProperty("series", "13");
-        o.addProperty("group", "212");
-        o.addProperty("clientId", clientId);
-
-        o.addProperty("vatNumber", "");
-        o.addProperty("name", "");
-        o.addProperty("country", "");
-        o.addProperty("postalCode", "");
-        o.addProperty("locality", "");
-        o.addProperty("street", "");
-
-        o.addProperty("doorNumber", 1);
-        o.addProperty("paymentType", "PP");
-        o.addProperty("sellerId", costCenter);
-        o.addProperty("currency", "EUR");
-        o.addProperty("accountingUnit", "10");
-        o.addProperty("reference", debtYear.getName());
-        o.addProperty("observation", cycleType == null ? "Outros" : cycleType.getDescription());
-        o.addProperty("username", "CRISTINAC");
-
-//        o.addProperty("dataPagamento", toString(transaction.getWhenRegistered().toDate()));
-//        o.addProperty("meioPagamento", toPaymentMethod(transaction.getPaymentMode()));
-//        o.addProperty("numeroDocumento", toPaymentDocumentNumber(detail));
-
-        o.addProperty("paymentDate", toString(tx.getWhenRegistered().toDate()));
-        o.addProperty("paymentMethod", toPaymentMethod(tx.getPaymentMode()));
-        o.addProperty("documentNumber", toPaymentDocumentNumber(tx.getTransactionDetail()));
-
-        final JsonArray a = new JsonArray();
-        {
-            final JsonObject e = new JsonObject();
-            e.addProperty("line", 1);
-            e.addProperty("type", "2");
-            e.addProperty("article", articleCode);
-            e.addProperty("description", eventDescription);
-            e.addProperty("unitType", "UN");
-            e.addProperty("quantity", BigDecimal.ONE);
-            e.addProperty("unitPrice", value.getAmount());
-            e.addProperty("vat", BigDecimal.ZERO);
-            e.addProperty("discount", BigDecimal.ZERO);
-            e.addProperty("costCenter", costCenter);
-            e.addProperty("responsible", "9910");
-            e.addProperty("subCenter", "RP" + costCenter);
-            e.addProperty("legalArticle", "M99");
-            e.addProperty("rubrica", invoiceId == null || invoiceId.trim().isEmpty() || rubrica == null ? "" : rubrica);
-            e.addProperty("observation", "");
-            e.addProperty("reference", debtYear.getName());
-            a.add(e);
-        }
-        o.add("entries", a);
-        return o;
-    }
-
-    private static Money getValueForInvoiceAndIncCounter(AccountingTransaction transaction, Event event,
-            Map<String, EventWrapper> eventsByInvoiceNumber, String invoiceId) {
-        final Money amount = getValueForInvoice(transaction, event, eventsByInvoiceNumber, invoiceId);
-        if (invoiceId != null && !invoiceId.isEmpty()) {
-            eventsByInvoiceNumber.get(invoiceId).remotePayedValues.add(amount);
-            final Money txAmount = transaction.getAmountWithAdjustment();
-            if (txAmount.greaterThan(amount)) {
-                final Money amountOverpayed = txAmount.subtract(amount);
-                eventsByInvoiceNumber.get(invoiceId).registerOverPayment(transaction, amountOverpayed);
-            }
-        }
-        return amount;
-    }
-
-    private static Money getValueForInvoice(AccountingTransaction transaction, Event event,
-            Map<String, EventWrapper> eventsByInvoiceNumber, String invoiceId) {
-        final Money txAmount = transaction.getAmountWithAdjustment();
-        if (invoiceId != null && !invoiceId.isEmpty()) {
-            final EventWrapper ew = eventsByInvoiceNumber.get(invoiceId);
-            final Money eventAmount = ew.remoteValue;
-            final Money alreadyPayed = ew.calculateRemotePayedValue();
-
-            final Money maxAllowedForNewInvoice = eventAmount.subtract(alreadyPayed);
-            if (txAmount.greaterThan(maxAllowedForNewInvoice)) {
-                return maxAllowedForNewInvoice;
-            }
-        }
-        return txAmount;
-    }
-
-    public static JsonObject toJsonDiscount(final Event event) {
-        final Person person = event.getPerson();
-        final ExecutionYear debtYear = executionYearOf(event);
-        final DebtCycleType cycleType = cycleTypeFor(event, debtYear);
-        final String eventDescription = event.getDescription().toString();
-        final String articleCode = mapToArticleCode(event, eventDescription);
-        final String rubrica = mapToRubrica(event, eventDescription);
-        final String costCenter = costCenterFor(event);
-        final String clientId = toClientCode(person);
-        final String invoiceId = GiafInvoice.documentNumberFor(event);
-
-        final JsonObject o = new JsonObject();
-        o.addProperty("id", idForDiscount(event));
-        o.addProperty("invoiceId", invoiceId);
-        o.addProperty("date", toString(new Date()));
-        o.addProperty("type", "E");
-        o.addProperty("series", "13");
-        o.addProperty("group", "212");
-        o.addProperty("clientId", clientId);
-
-        o.addProperty("vatNumber", "");
-        o.addProperty("name", "");
-        o.addProperty("country", "");
-        o.addProperty("postalCode", "");
-        o.addProperty("locality", "");
-        o.addProperty("street", "");
-
-        o.addProperty("doorNumber", 1);
-        o.addProperty("paymentType", "PP");
-        o.addProperty("sellerId", costCenter);
-        o.addProperty("currency", "EUR");
-        o.addProperty("accountingUnit", "10");
-        o.addProperty("reference", debtYear.getName());
-        o.addProperty("observation", cycleType == null ? "Outros" : cycleType.getDescription());
-        o.addProperty("username", "CRISTINAC");
-
-        final JsonArray a = new JsonArray();
-        {
-            final JsonObject e = new JsonObject();
-            e.addProperty("line", 1);
-            e.addProperty("type", "2");
-            e.addProperty("article", articleCode);
-            e.addProperty("description", eventDescription);
-            e.addProperty("unitType", "UN");
-            e.addProperty("quantity", BigDecimal.ONE);
-            e.addProperty("unitPrice", discountsAndExcemptions(event).getAmount());
-            e.addProperty("vat", BigDecimal.ZERO);
-            e.addProperty("discount", BigDecimal.ZERO);
-            e.addProperty("costCenter", costCenter);
-            e.addProperty("responsible", "9910");
-            e.addProperty("subCenter", "RP" + costCenter);
-            e.addProperty("legalArticle", "M99");
-            e.addProperty("rubrica", rubrica);
-
-            final StringBuilder builder = new StringBuilder();
-            for (final Discount discount : event.getDiscountsSet()) {
-                if (builder.length() > 0) {
-                    builder.append(", ");
-                }
-                builder.append("Desconto");
-            }
-            for (final Exemption exemption : event.getExemptionsSet()) {
-                if (builder.length() > 0) {
-                    builder.append(", ");
-                }
-                builder.append(exemption.getDescription().toString());
-            }
-            e.addProperty("observation", max80(builder.toString()));
-            a.add(e);
-        }
-        o.add("entries", a);
-        return o;
-    }
-
-    private static String max80(final String s) {
-        final int l = s.length();
-        return l > 80 ? s.substring(0, 80) : s;
-    }
-
-    public static Money discountsAndExcemptions(final Event event) {
-        final Money discounts = discounts(event);
-        final Money excemptions = excemptions(event);
-        return discounts.add(excemptions);
-    }
 
     public static byte[] toBytes(final Spreadsheet sheet) {
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -911,79 +423,6 @@ public class Utils {
         throw new Error("not.supported: " + event.getExternalId());
     }
 
-    private static String mapToRubrica(Event event, String eventDescription) {
-        if (event.isGratuity()) {
-            final GratuityEvent gratuityEvent = (GratuityEvent) event;
-            final StudentCurricularPlan scp = gratuityEvent.getStudentCurricularPlan();
-            final Degree degree = scp.getDegree();
-            if (scp.getRegistration().getRegistrationProtocol().isAlien()) {
-                return "0075";// PROPINAS INTERNACIONAL
-            }
-            if (degree.isFirstCycle() && degree.isSecondCycle()) {
-                return "0030";// 724114 PROPINAS MESTRADO INTEGRADO
-            }
-            if (degree.isFirstCycle()) {
-                return "0027";// 724111 PROPINAS 1 CICLO
-            }
-            if (degree.isSecondCycle()) {
-                return "0028";// 724112 PROPINAS 2 CICLO
-            }
-            if (degree.isThirdCycle()) {
-                return "0029";// 724113 PROPINAS 3 CICLO
-            }
-            return "0076";// 724116 PROPINAS - OUTROS
-        }
-        if (event instanceof PhdGratuityEvent) {
-            return "0029";// 724113 PROPINAS 3 CICLO
-        }
-        if (event.isResidenceEvent()) {
-            return null;
-        }
-        if (event.isFctScholarshipPhdGratuityContribuitionEvent()) {
-            return null;
-        }
-        if (event.isAcademicServiceRequestEvent()) {
-            if (eventDescription.indexOf(" Reingresso") >= 0) {
-                return "0035";// 72419 OUTRAS TAXAS
-            }
-            return "0037";// 7246 EMOLUMENTOS
-        }
-        if (event.isDfaRegistrationEvent()) {
-            return "0031";// 72412 TAXAS DE MATRICULA
-        }
-        if (event.isIndividualCandidacyEvent()) {
-            return "0031";// 72412 TAXAS DE MATRICULA
-        }
-        if (event.isEnrolmentOutOfPeriod()) {
-            return "0035";// 72419 OUTRAS TAXAS
-        }
-        if (event instanceof AdministrativeOfficeFeeAndInsuranceEvent) {
-            return "0031";// 72412 TAXAS DE MATRICULA
-        }
-        if (event instanceof InsuranceEvent) {
-            return "0034";// 72415 SEGURO ESCOLAR
-        }
-        if (event.isSpecializationDegreeRegistrationEvent()) {
-            return "0031";// 72412 TAXAS DE MATRICULA
-        }
-        if (event instanceof ImprovementOfApprovedEnrolmentEvent) {
-            return "0033";// 72414 TAXAS DE MELHORIAS DE NOTAS
-        }
-        if (event instanceof DFACandidacyEvent) {
-            return "0031";// 72412 TAXAS DE MATRICULA"
-        }
-        if (event.isPhdEvent()) {
-            if (eventDescription.indexOf("Taxa de Inscri") >= 0) {
-                return "0031";// 72412 TAXAS DE MATRICULA
-            }
-            if (eventDescription.indexOf("Requerimento de provas") >= 0) {
-                return "0032";// 72413 TAXAS  DE EXAMES
-            }
-            return "0031";// 72412 TAXAS DE MATRICULA
-        }
-        throw new Error("not.supported: " + event.getExternalId());
-    }
-
     private static PhysicalAddress toAddress(final Person person) {
         PhysicalAddress address = person.getDefaultPhysicalAddress();
         if (address == null) {
@@ -1052,109 +491,13 @@ public class Utils {
         return digit > 9 ? controleDigit == 0 : digit == controleDigit;
     }
 
-    private static String costCenterFor(final Event event) {
-        if (event instanceof PhdGratuityEvent) {
-            return "8312";
-        }
-        if (event instanceof AcademicEvent) {
-            final AcademicEvent academicEvent = (AcademicEvent) event;
-            final AdministrativeOffice administrativeOffice = academicEvent.getAdministrativeOffice();
-            if (administrativeOffice != null) {
-                final Unit unit = administrativeOffice.getUnit();
-                if (unit != null) {
-                    final Integer costCenter = unit.getCostCenterCode();
-                    if (costCenter != null) {
-                        return costCenter.toString();
-                    }
-                }
-            }
-        }
-        if (event instanceof InsuranceEvent) {
-            final InsuranceEvent insuranceEvent = (InsuranceEvent) event;
-            final ExecutionYear executionYear = insuranceEvent.getExecutionYear();
-            final Person person = event.getPerson();
-            if (!person.getPhdIndividualProgramProcessesSet().isEmpty()) {
-                return "8312";
-            }
-            final Student student = person.getStudent();
-            if (student != null) {
-                for (final Registration registration : student.getRegistrationsSet()) {
-                    for (final RegistrationState registrationState : registration.getRegistrationStates(executionYear)) {
-                        if (registrationState.isActive()) {
-                            final DegreeType degreeType = registration.getDegree().getDegreeType();
-                            if (degreeType.isAdvancedFormationDiploma() || degreeType.isAdvancedSpecializationDiploma()
-                                    || degreeType.isSpecializationCycle() || degreeType.isSpecializationDegree()
-                                    || degreeType.isThirdCycle()) {
-                                return "8312";
-                            }
-                            final Space campus = registration.getCampus(executionYear);
-                            if (campus != null && campus.getName().startsWith("T")) {
-                                return "7640";
-                            }
-                        }
-
-                    }
-                }
-            }
-        }
-        throw new Error("Unknown cost center for event: " + event.getExternalId());
-    }
-
     public static String toClientCode(final Person person) {
         final User user = person.getUser();
         return user == null ? makeUpSomeRandomNumber(person) : user.getUsername();
     }
 
-    private static String toString(final Date d) {
-        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(d);
-    }
-
-    private static String toPaymentMethod(final PaymentMode paymentMode) {
-        switch (paymentMode) {
-        case CASH:
-            return "N";
-        case ATM:
-            return "SIBS";
-        default:
-            throw new Error();
-        }
-    }
-
     public static String toPaymentDocumentNumber(final AccountingTransactionDetail detail) {
         return detail instanceof SibsTransactionDetail ? ((SibsTransactionDetail) detail).getSibsCode() : "";
-    }
-
-    private static Date getDueDate(final Event event) {
-        final DateTime dueDate;
-        if (event instanceof GratuityEventWithPaymentPlan) {
-            final GratuityEventWithPaymentPlan gratuityEventWithPaymentPlan = (GratuityEventWithPaymentPlan) event;
-            dueDate = findLastDueDate(gratuityEventWithPaymentPlan);
-        } else if (event instanceof PhdGratuityEvent) {
-            final PhdGratuityEvent phdGratuityEvent = (PhdGratuityEvent) event;
-            dueDate = phdGratuityEvent.getLimitDateToPay();
-        } else if (event instanceof AdministrativeOfficeFeeAndInsuranceEvent) {
-            final AdministrativeOfficeFeeAndInsuranceEvent insuranceEvent = (AdministrativeOfficeFeeAndInsuranceEvent) event;
-            final YearMonthDay ymd = insuranceEvent.getAdministrativeOfficeFeePaymentLimitDate();
-            dueDate = ymd != null ? ymd.plusDays(1).toDateTimeAtMidnight() : getDueDateByPaymentCodes(event);
-        } else {
-            dueDate = getDueDateByPaymentCodes(event);
-        }
-        return dueDate.toDate();
-    }
-
-    private static DateTime getDueDateByPaymentCodes(final Event event) {
-        final YearMonthDay ymd =
-                event.getPaymentCodesSet().stream().map(pc -> pc.getEndDate()).max((c1, c2) -> c1.compareTo(c2)).orElse(null);
-        return ymd != null ? ymd.plusDays(1).toDateTimeAtMidnight() : event.getWhenOccured();
-    }
-
-    private static DateTime findLastDueDate(final GratuityEventWithPaymentPlan event) {
-        return event.getInstallments().stream().map(i -> i.getEndDate().toDateTimeAtMidnight()).max(new Comparator<DateTime>() {
-            @Override
-            public int compare(DateTime o1, DateTime o2) {
-                return o1.compareTo(o2);
-            }
-        }).orElse(null);
     }
 
     public static String limitFormat(final int maxSize, String in) {
@@ -1202,36 +545,25 @@ public class Utils {
         return "E" + id;
     }
 
-    private static String invoiceIdFor(final AccountingTransactionDetail detail) {
-        final Event event = detail.getEvent();
-        return GiafInvoice.documentNumberFor(event);
-    }
-
-    public static String completeDescriptionFor(final Event event) {
-        final StringBuilder description = new StringBuilder(event.getDescription().toString());
-        if (event instanceof IndividualCandidacyEvent) {
-            final IndividualCandidacyEvent candidacyEvent = (IndividualCandidacyEvent) event;
-            final IndividualCandidacy individualCandidacy = candidacyEvent.getIndividualCandidacy();
-            if (individualCandidacy != null) {
-                final IndividualCandidacyProcess individualCandidacyProcess = individualCandidacy.getCandidacyProcess();
-                if (individualCandidacyProcess != null) {
-                    description.append(" Candidatura");
-                    description.append(individualCandidacyProcess.getProcessCode());
-                    final CandidacyProcess candidacyProcess = individualCandidacyProcess.getCandidacyProcess();
-                    if (candidacyProcess != null) {
-                        description.append(candidacyProcess.getPresentationName());
-                    }
+    public static void writeFileWithoutFailuer(final Path path, final byte[] content, final boolean append) {
+        for (int c = 0;; c++) {
+            try {
+                if (append) {
+                    Files.write(path, content, StandardOpenOption.CREATE, StandardOpenOption.APPEND, StandardOpenOption.WRITE);
+                } else {
+                    Files.write(path, content);
+                }
+                return;
+            } catch (final Throwable e) {
+                if (c > 0 && c % 5 == 0) {
+                    LOGGER.debug("Failed write of invoice file: % - Fail count: %s", path.toString(), c);
+                }
+                try {
+                    Thread.sleep(5000);
+                } catch (final InterruptedException e1) {
                 }
             }
-        } else if (event instanceof PhdProgramCandidacyEvent) {
-            final PhdProgramCandidacyEvent phdProgramCandidacyEvent = (PhdProgramCandidacyEvent) event;
-            final PhdProgramCandidacyProcess candidacyProcess = phdProgramCandidacyEvent.getCandidacyProcess();
-            if (candidacyProcess != null) {
-                description.append(" Candidatura");
-                description.append(candidacyProcess.getProcessNumber());
-            }
         }
-        return description.toString();
     }
 
 }
