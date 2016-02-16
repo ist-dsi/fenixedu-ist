@@ -58,7 +58,8 @@ public class SyncFinancialInfoToGiafTask extends CronTask {
                 }
 
                 if (debtFenix.isPositive()) {
-                    final GiafEventEntry entry = giafEvent.newGiafEventEntry(eventWrapper.event, debtFenix);
+                    final String clientId = Utils.toClientCode(eventWrapper.event.getPerson());
+                    final GiafEventEntry entry = giafEvent.newGiafEventEntry(eventWrapper.event, clientId, debtFenix);
                     final Money exempt = eventWrapper.exempt.add(giafEvent.payed());
                     if (exempt.isPositive()) {
                         giafEvent.exempt(entry, eventWrapper.event, exempt.greaterThan(debtFenix) ? debtFenix : exempt);
