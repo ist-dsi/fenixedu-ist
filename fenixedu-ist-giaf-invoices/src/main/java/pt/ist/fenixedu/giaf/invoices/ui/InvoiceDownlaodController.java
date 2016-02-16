@@ -50,7 +50,7 @@ public class InvoiceDownlaodController {
             final File file =  GiafEvent.receiptFile(event, filename);
             if (file != null && file.exists()) {
                 try (final FileInputStream inputStream = new FileInputStream(file)) {
-                    response.setHeader("Content-Disposition", "attachment; filename=" + filename);
+                    response.setHeader("Content-Disposition", "attachment; filename=" + fullFilename(filename));
                     ByteStreams.copy(inputStream, response.getOutputStream());
                     response.flushBuffer();
                 } catch (final IOException e) {
@@ -61,6 +61,10 @@ public class InvoiceDownlaodController {
             response.setStatus(HttpStatus.FORBIDDEN.value());
             response.getClass();
         }
+    }
+
+    private String fullFilename(final String filename) {
+        return filename.endsWith(".pdf") ? filename : filename + ".pdf";
     }
 
     private boolean sAllowedToAccess(final Event event) {

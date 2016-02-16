@@ -32,7 +32,6 @@
 <table id="invoiceTable" class="table tdmiddle" style="display: none;">
 	<thead>
 		<tr>
-			<th><spring:message code="label.giaf.invoice.payment.document.number" text="Payment Document Number"/></th>
 			<th><spring:message code="label.giaf.invoice.payment.date" text="Payment Date"/></th>
 			<th><spring:message code="label.giaf.invoice.description" text="Description"/></th>
 			<th><spring:message code="label.giaf.invoice.value" text="Value"/></th>
@@ -42,6 +41,31 @@
 	<tbody id="invoiceList">
 	</tbody>
 </table>
+
+<div id="detailsTable" style="display: none;">
+<table class="table tdmiddle">
+	<thead>
+		<tr>
+			<th><spring:message code="label.giaf.operation.date" text="Date"/></th>
+			<th><spring:message code="label.giaf.operation.type" text="Type"/></th>
+			<th><spring:message code="label.giaf.invoice.payment.document.number" text="Payment Document Number"/></th>
+			<th><spring:message code="label.giaf.invoice.value" text="Value"/></th>
+			<th><spring:message code="label.giaf.invoice.payment.date" text="Payment Date"/></th>
+			<th><spring:message code="label.giaf.invoice.document" text="Invoice"/></th>
+			<th><spring:message code="label.giaf.invoice.description" text="Description"/></th>
+		</tr>
+	</thead>
+	<tbody id="detailsList">
+	</tbody>
+</table>
+<a href="#" onclick="document.getElementById('detailsTable').style.display = 'none'; document.getElementById('showDetailsLink').style.display = 'block';">
+	<spring:message code="label.giaf.invoice.view.details.hide" text="Hide Details"/>
+</a>
+</div>
+
+<a id="showDetailsLink" href="#" onclick="document.getElementById('detailsTable').style.display = 'block'; document.getElementById('showDetailsLink').style.display = 'none';">
+	<spring:message code="label.giaf.invoice.view.details" text="View Details"/>
+</a>
 
 <script type="text/javascript">
 	var events = ${events};
@@ -57,7 +81,6 @@
 			if (entry.type == "payment") {
 				var link = contextPath + '/giaf-invoice-downloader/' + entry.eventId + '/' + entry.receiptNumber + '.pdf';
 				row = $('<tr/>').appendTo($('#invoiceList'))
-					.append($('<td/>').text(entry.invoiceNumber ? entry.invoiceNumber : ""))
 					.append($('<td/>').text(entry.paymentDate))
 					.append($('<td/>').text(entry.eventDescription))
 					.append($('<td/>').text(entry.value))
@@ -65,6 +88,16 @@
 					;
 			} else if (entry.type == "fine") {
 			}
+
+			row = $('<tr/>').appendTo($('#detailsList'))
+			.append($('<td/>').text(entry.date))
+			.append($('<td/>').text(entry.type))
+			.append($('<td/>').text(entry.invoiceNumber ? entry.invoiceNumber : ""))
+			.append($('<td/>').text(entry.value))
+			.append($('<td/>').text(entry.paymentDate))
+			.append($('<td/>').text(entry.receiptNumber))
+			.append($('<td/>').text(entry.eventDescription))
+			;
         });
 	});
 </script>

@@ -56,6 +56,15 @@ public class GiafEvent {
 
     private final static String DT_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
+    private final static Comparator<GiafEventEntry> INVOICE_NUMBER_COMPARATOR = new Comparator<GiafEventEntry>() {
+        @Override
+        public int compare(final GiafEventEntry e1, final GiafEventEntry e2) {
+            final String i1 = e1.invoiceNumber;
+            final String i2 = e2.invoiceNumber;
+            return i1 == i2 ? 0 : i1 == null ? -1 : i2 == null ? 1 : i1.compareTo(i2);
+        }
+    };
+
     public class GiafEventEntry {
         public final String invoiceNumber;
         public Money debt;
@@ -140,11 +149,7 @@ public class GiafEvent {
     }
 
     public Money debt() {
-        return addAll((e) -> e.debt);
-    }
-
-    public Money exempt() {
-        return addAll((e) -> e.exempt);
+        return entries.stream().filter(e -> e.fines.isZero()).max(INVOICE_NUMBER_COMPARATOR).map(e -> e.debt).orElse(Money.ZERO);
     }
 
     public Money payed() {

@@ -49,7 +49,7 @@ public class SyncFinancialInfoToGiafTask extends CronTask {
             final Money debtFenix = eventWrapper.debt;
             final Money debtGiaf = giafEvent.debt();
 
-            if (!debtFenix.equals(debtGiaf)) {
+            if (debtFenix.isPositive() && !debtFenix.equals(debtGiaf)) {
                 for (final GiafEventEntry entry : giafEvent.entries) {
                     final Money amountStillInDebt = entry.amountStillInDebt();
                     if (amountStillInDebt.isPositive()) {
