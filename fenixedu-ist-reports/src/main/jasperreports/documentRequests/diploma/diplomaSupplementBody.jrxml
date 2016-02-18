@@ -50,7 +50,7 @@
 					<textFieldExpression class="java.lang.String"><![CDATA[$P{bundle}.getString("diploma.supplement.structure.info")]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="false">
-					<reportElement key="textField-1" x="0" y="104" width="366" height="14"/>
+					<reportElement key="textField-1" x="0" y="104" width="450" height="14"/>
 					<box>
 						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
