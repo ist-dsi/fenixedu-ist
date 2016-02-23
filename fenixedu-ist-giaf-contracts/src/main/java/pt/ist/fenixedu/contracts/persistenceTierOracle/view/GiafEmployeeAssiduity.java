@@ -24,15 +24,16 @@ import java.sql.SQLException;
 
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.core.security.Authenticate;
 import org.joda.time.LocalDate;
-
-import pt.ist.fenixedu.contracts.domain.Employee;
-import pt.ist.fenixedu.contracts.persistenceTierOracle.DbConnector.ResultSetConsumer;
-import pt.ist.fenixedu.contracts.persistenceTierOracle.GiafDbConnector;
 
 import com.google.common.base.Strings;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+
+import pt.ist.fenixedu.contracts.domain.Employee;
+import pt.ist.fenixedu.contracts.persistenceTierOracle.DbConnector.ResultSetConsumer;
+import pt.ist.fenixedu.contracts.persistenceTierOracle.GiafDbConnector;
 
 public class GiafEmployeeAssiduity {
 
@@ -52,6 +53,10 @@ public class GiafEmployeeAssiduity {
     }
 
     public static JsonObject readAssiduityOfEmployee(final User user, final LocalDate date) {
+        return readAssiduityOfEmployee(user, date, Authenticate.getUser());
+    }
+
+    public static JsonObject readAssiduityOfEmployee(final User user, final LocalDate date, final User responsible) {
         final JsonObject result = new JsonObject();
         result.addProperty("username", user.getUsername());
         result.addProperty("name", user.getProfile().getDisplayName());
@@ -78,9 +83,13 @@ public class GiafEmployeeAssiduity {
 
                 + "a.TIPO "
 
-                + "FROM MYGIAF_CASS_PICAGEM a "
+                + "FROM MYGIAF_CASS_PICAGEM a"
 
-                + "WHERE a.ID_EMPREGADO = ? AND (a.DATA = ? OR a.DATA = ?)"
+                + (responsible == user ? " " : ", MYGIAF_V_RESP_SUBORDINADO b ")
+
+                + "WHERE a.ID_EMPREGADO = ? AND (a.DATA = ? OR a.DATA = ?) "
+
+                + (responsible == user ? "" : "AND a.ID_EMPREGADO = b.UTILIZADOR_NUM_EMP AND b.chefe_equipa_id = ? ")
 
                 + "ORDER BY a.id_picagem";
             }
@@ -92,6 +101,9 @@ public class GiafEmployeeAssiduity {
                 statement.setString(1, giafNumber);
                 statement.setString(2, ld.toString("yyyy-MM-dd"));
                 statement.setString(3, ld.minusDays(1).toString("yyyy-MM-dd"));
+                if (responsible != user) {
+                    statement.setString(4, responsible.getUsername().toUpperCase());
+                }
             }
 
             @Override

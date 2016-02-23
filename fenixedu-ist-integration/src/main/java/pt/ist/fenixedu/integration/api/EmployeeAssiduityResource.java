@@ -31,10 +31,10 @@ import org.fenixedu.bennu.oauth.annotation.OAuthEndpoint;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 
+import com.google.gson.JsonObject;
+
 import pt.ist.fenixedu.contracts.persistenceTierOracle.view.GiafAssiduityTeamResponsible;
 import pt.ist.fenixedu.contracts.persistenceTierOracle.view.GiafEmployeeAssiduity;
-
-import com.google.gson.JsonObject;
 
 @Path("/fenix/v1/employeeAssiduity")
 public class EmployeeAssiduityResource {
@@ -45,8 +45,9 @@ public class EmployeeAssiduityResource {
     @Produces(FenixAPIv1.JSON_UTF8)
     @Path("/employee")
     @OAuthEndpoint(ASSIDUITY_SCOPE)
-    public String getEmployeeAssiduityInformation(final @QueryParam("date") String date) {
-        return respond(user -> GiafEmployeeAssiduity.readAssiduityOfEmployee(user, parse(date)));
+    public String getEmployeeAssiduityInformation(final @QueryParam("date") String date, final @QueryParam("username") String username) {
+        final User userToQuery = username == null ? null : User.findByUsername(username);
+        return respond(user -> GiafEmployeeAssiduity.readAssiduityOfEmployee(userToQuery == null ? user : userToQuery, parse(date), user));
     }
 
     @GET
