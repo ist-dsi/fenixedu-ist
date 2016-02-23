@@ -61,6 +61,17 @@
 <a href="#" onclick="document.getElementById('detailsTable').style.display = 'none'; document.getElementById('showDetailsLink').style.display = 'block';">
 	<spring:message code="label.giaf.invoice.view.details.hide" text="Hide Details"/>
 </a>
+
+<% if (request.getParameter("username") != null) { %>
+	<form action="<%= contextPath + "/giaf-invoice-viewer" %>" method="post" style="float: right;">
+		<input type="hidden" name="username" value="<%= request.getParameter("username") %>"/>
+
+		<button value="submit">
+			<spring:message code="label.giaf.invoice.syncEvents" text="Sync Events"/>
+		</button>
+	</form>
+<% } %>
+
 </div>
 
 <a id="showDetailsLink" href="#" onclick="document.getElementById('detailsTable').style.display = 'block'; document.getElementById('showDetailsLink').style.display = 'none';">

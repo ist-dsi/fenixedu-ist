@@ -31,12 +31,14 @@ import org.fenixedu.bennu.spring.portal.SpringApplication;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import pt.ist.fenixedu.giaf.invoices.EventProcessor;
 import pt.ist.fenixedu.giaf.invoices.GiafEvent;
 
 @SpringApplication(group = "logged", path = "giaf-invoice-viewer", title = "title.giaf.invoice.viewer",
@@ -45,7 +47,7 @@ import pt.ist.fenixedu.giaf.invoices.GiafEvent;
 @RequestMapping("/giaf-invoice-viewer")
 public class InvoiceController {
 
-    @RequestMapping
+    @RequestMapping(method = RequestMethod.GET)
     public String home(@RequestParam(required = false) String username, final Model model) {
         final User user = getUser(username);
 
@@ -58,6 +60,19 @@ public class InvoiceController {
         }
 
         return "giaf-invoice-viewer/home";
+    }
+
+    @RequestMapping(method = RequestMethod.POST)
+    public String reprocess(@RequestParam String username, final Model model) {
+        final User currentUser = Authenticate.getUser();
+        if (isAcademicServiceStaff(currentUser)) {
+            final User user = getUser(username);
+            final Person person = user == null ? null : user.getPerson();
+            if (person != null) {
+                person.getEventsSet().forEach(e -> EventProcessor.syncEventWithGiaf(e));
+            }
+        }
+        return home(username, model);
     }
 
     private boolean isAllowedToAccess(final User user) {
