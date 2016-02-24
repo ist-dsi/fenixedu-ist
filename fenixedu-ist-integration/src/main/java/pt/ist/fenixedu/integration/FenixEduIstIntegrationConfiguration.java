@@ -116,6 +116,15 @@ public class FenixEduIstIntegrationConfiguration {
 
         @ConfigurationProperty(key = "externalServices.AEIST.username")
         public String getExternalServicesAEISTUsername();
+
+        @ConfigurationProperty(key = "pushnotifications.server", defaultValue = "http://127.0.0.1:8000/")
+        public String getPushNotificationsServer();
+
+        @ConfigurationProperty(key = "pushnotifications.header", defaultValue = "AccessToken")
+        public String getPushNotificationsHeader();
+
+        @ConfigurationProperty(key = "pushnotifications.token", defaultValue = "someaccesstoken")
+        public String getPushNotificationsToken();
     }
 
     public static ConfigurationProperties getConfiguration() {
