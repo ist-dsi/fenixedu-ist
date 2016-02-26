@@ -19,6 +19,7 @@
 package pt.ist.fenixedu.teacher.evaluation.ui.struts.action.credits;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.ServletOutputStream;
@@ -74,35 +75,34 @@ public class ManageDepartmentCreditsPool extends FenixDispatchAction {
 
     public ActionForward postBackUnitCredits(ActionMapping mapping, ActionForm form, HttpServletRequest request,
             HttpServletResponse response) throws NumberFormatException, FenixServiceException {
-        DepartmentCreditsPoolBean departmentCreditsPoolBean = getRenderedObject("departmentCreditsPoolBean");
-        if (departmentCreditsPoolBean == null) {
-            return prepareManageUnitCredits(mapping, form, request, response);
-        }
-        DepartmentCreditsBean departmentCreditsBean = new DepartmentCreditsBean();
-        departmentCreditsBean.setDepartment(departmentCreditsPoolBean.getDepartment());
-        departmentCreditsBean.setExecutionYear(departmentCreditsPoolBean.getAnnualCreditsState().getExecutionYear());
+        DepartmentCreditsBean departmentCreditsBean = getRenderedObject("departmentCreditsBean1");
         request.setAttribute("departmentCreditsBean", departmentCreditsBean);
-        request.setAttribute("departmentCreditsPoolBean", departmentCreditsPoolBean);
+        request.setAttribute("departmentCreditsPoolBean", getDepartmentCreditsPoolBean(departmentCreditsBean));
+        addActionMessage(request, "error.invalid.form", null);
         return mapping.findForward("manageUnitCredits");
     }
 
+    private DepartmentCreditsPoolBean getDepartmentCreditsPoolBean(DepartmentCreditsBean departmentCreditsBean){
+        List<DepartmentExecutionCourse> departmentExecutionCourses = getRenderedObject("departmentExecutionCourses");
+        List<DepartmentExecutionCourse> departmentSharedExecutionCourses = getRenderedObject("departmentSharedExecutionCourses");
+        DepartmentCreditsPoolBean departmentCreditsPoolBean = new DepartmentCreditsPoolBean(departmentCreditsBean);
+        departmentCreditsPoolBean.setDepartmentExecutionCourses(departmentExecutionCourses);
+        departmentCreditsPoolBean.setDepartmentSharedExecutionCourses(departmentSharedExecutionCourses);
+        return departmentCreditsPoolBean;
+    }
+    
     public ActionForward editUnitCredits(ActionMapping mapping, ActionForm form, HttpServletRequest request,
             HttpServletResponse response) throws NumberFormatException, FenixServiceException {
-        DepartmentCreditsPoolBean departmentCreditsPoolBean = getRenderedObject("departmentCreditsPoolBean");
+        DepartmentCreditsBean departmentCreditsBean = getRenderedObject("departmentCreditsBean1");
+        DepartmentCreditsPoolBean departmentCreditsPoolBean = getDepartmentCreditsPoolBean(departmentCreditsBean);
         RenderUtils.invalidateViewState();
-        if (departmentCreditsPoolBean == null) {
-            return prepareManageUnitCredits(mapping, form, request, response);
-        }
         try {
             departmentCreditsPoolBean.editUnitCredits();
         } catch (DomainException e) {
             addActionMessage(request, e.getMessage(), e.getArgs());
         }
-        DepartmentCreditsBean departmentCreditsBean = new DepartmentCreditsBean();
-        departmentCreditsBean.setDepartment(departmentCreditsPoolBean.getDepartment());
-        departmentCreditsBean.setExecutionYear(departmentCreditsPoolBean.getAnnualCreditsState().getExecutionYear());
         request.setAttribute("departmentCreditsBean", departmentCreditsBean);
-        request.setAttribute("departmentCreditsPoolBean", departmentCreditsPoolBean);
+        request.setAttribute("departmentCreditsPoolBean", new DepartmentCreditsPoolBean(departmentCreditsBean));
         return mapping.findForward("manageUnitCredits");
     }
 
@@ -124,8 +124,8 @@ public class ManageDepartmentCreditsPool extends FenixDispatchAction {
         getExecutionCoursesSheet(departmentCreditsPoolBean.getDepartmentExecutionCourses(), spreadsheet, "Restantes_Disciplinas");
 
         response.setContentType("text/plain");
-        response.setHeader("Content-disposition", "attachment; filename="
-                + departmentCreditsPoolBean.getDepartment().getAcronym() + ".xls");
+        response.setHeader("Content-disposition",
+                "attachment; filename=" + departmentCreditsPoolBean.getDepartment().getAcronym() + ".xls");
         final ServletOutputStream writer = response.getOutputStream();
         spreadsheet.getWorkbook().write(writer);
         writer.flush();
