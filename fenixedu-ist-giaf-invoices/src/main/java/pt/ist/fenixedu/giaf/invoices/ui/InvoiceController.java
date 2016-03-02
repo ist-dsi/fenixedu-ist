@@ -21,6 +21,7 @@ package pt.ist.fenixedu.giaf.invoices.ui;
 import java.util.stream.Collector;
 import java.util.stream.Collector.Characteristics;
 
+import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.accessControl.AcademicAuthorizationGroup;
 import org.fenixedu.academic.domain.accessControl.academicAdministration.AcademicOperationType;
@@ -38,8 +39,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import pt.ist.fenixedu.giaf.invoices.ErrorConsumer;
 import pt.ist.fenixedu.giaf.invoices.EventProcessor;
+import pt.ist.fenixedu.giaf.invoices.EventWrapper;
 import pt.ist.fenixedu.giaf.invoices.GiafEvent;
+import pt.ist.fenixedu.giaf.invoices.Utils;
+import pt.ist.giaf.client.financialDocuments.ClientClient;
 
 @SpringApplication(group = "logged", path = "giaf-invoice-viewer", title = "title.giaf.invoice.viewer",
         hint = "giaf-invoice-viewer")
@@ -53,7 +58,7 @@ public class InvoiceController {
 
         if (isAllowedToAccess(user)) {
             final Person person = user.getPerson();
-            
+
             final JsonArray events = new JsonArray();
             person.getEventsSet().stream().sorted(Event.COMPARATOR_BY_DATE).map(this::toJsonArray).forEach(a -> events.addAll(a));
             model.addAttribute("events", events);
@@ -69,10 +74,23 @@ public class InvoiceController {
             final User user = getUser(username);
             final Person person = user == null ? null : user.getPerson();
             if (person != null) {
-                person.getEventsSet().forEach(e -> EventProcessor.syncEventWithGiaf(e));
+                syncClientInfo(person);
+                person.getEventsSet().stream().filter(this::needsProcessing)
+                        .filter(e -> Utils.validate(ErrorConsumer.VOID_EVENT_CONSUMER, e))
+                        .forEach(e -> EventProcessor.syncEventWithGiaf(e));
             }
         }
         return home(username, model);
+    }
+
+    private void syncClientInfo(final Person person) {
+        final JsonObject json = Utils.toJson(person);
+        ClientClient.createClient(json);
+    }
+
+    private boolean needsProcessing(final Event event) {
+        final ExecutionYear executionYear = Utils.executionYearOf(event);
+        return executionYear.isCurrent() || event.getWhenOccured().isAfter(EventWrapper.THRESHOLD);
     }
 
     private boolean isAllowedToAccess(final User user) {
@@ -96,7 +114,7 @@ public class InvoiceController {
             o.addProperty("eventId", event.getExternalId());
             o.addProperty("eventDescription", event.getDescription().toString());
         }
-        
+
         return result;
     }
 
@@ -104,7 +122,7 @@ public class InvoiceController {
         return Collector.of(JsonArray::new, (array, element) -> array.add(element), (one, other) -> {
             one.addAll(other);
             return one;
-        }, Characteristics.IDENTITY_FINISH);
+        } , Characteristics.IDENTITY_FINISH);
     }
 
 }
