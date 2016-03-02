@@ -18,6 +18,8 @@
  */
 package pt.ist.fenixedu.integration.task.updateData.student;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashMap;
@@ -31,6 +33,7 @@ import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.Installment;
 import org.fenixedu.academic.domain.accounting.PaymentPlan;
+import org.fenixedu.academic.domain.accounting.PostingRule;
 import org.fenixedu.academic.domain.accounting.events.AnnualEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEventWithPaymentPlan;
@@ -67,7 +70,8 @@ public class PartialRegimeGratuityExemptions extends CronTask {
                     processedStudents++;
                     taskLog("-------- Amount values for %s --------\n", event.getPerson().getUsername());
                     try {
-                        Money amountToPay = gratuityEvent.getOriginalAmountToPay();
+                        Money amountToPay =
+                                calculateOriginalDebtAmount(gratuityEvent, gratuityEvent.getWhenOccured().plusSeconds(1), false);
                         Money newAmountToPay =
                                 calculateAmountToPay(gratuityEvent.getWhenOccured().plusSeconds(1), gratuityEvent,
                                         gratuityEvent.getGratuityPaymentPlan());
@@ -86,6 +90,19 @@ public class PartialRegimeGratuityExemptions extends CronTask {
         }
         taskLog("\nStudents processed: %s\n", processedStudents);
         taskLog("Exemptions created: %s\n", exemptionsCreated);
+    }
+
+    private Money calculateOriginalDebtAmount(final Event event, final DateTime when, final boolean applyDiscount) {
+        try {
+            final Method method =
+                    PostingRule.class
+                            .getDeclaredMethod("doCalculationForAmountToPay", Event.class, DateTime.class, boolean.class);
+            method.setAccessible(true);
+            return (Money) method.invoke(event.getPostingRule(), event, when, applyDiscount);
+        } catch (final NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException e) {
+            throw new Error(e);
+        }
     }
 
     // Creates the exemption to adjust the value to pay, if an exemption already exists and was created by this script
