@@ -23,6 +23,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import pt.ist.fenixedu.integration.FenixEduIstIntegrationConfiguration;
+import pt.ist.fenixframework.Atomic;
+import pt.ist.fenixframework.Atomic.TxMode;
 
 @WebListener
 public class PushNotificationsInitializer implements ServletContextListener {
@@ -43,35 +45,40 @@ public class PushNotificationsInitializer implements ServletContextListener {
          * that creates the post, and runs only after the commit is successful.
          */
         Signal.<DomainObjectEvent<Post>> registerWithoutTransaction(Post.SIGNAL_CREATED, (event) -> {
-            Post post = event.getInstance();
-
-            if (post.getSite() instanceof ExecutionCourseSite && post.isVisible()
-                    && post.getCategoriesSet().stream().anyMatch(cat -> "announcement".equalsIgnoreCase(cat.getSlug()))) {
-                ExecutionCourseSite postSite = (ExecutionCourseSite) post.getSite();
-
-                JsonArray usernames = postSite.getExecutionCourse().getAttendsSet().stream()
-                        .map(a -> a.getRegistration().getPerson().getUser().getUsername()).distinct().map(JsonPrimitive::new)
-                        .collect(StreamUtils.toJsonArray());
-
-                JsonObject message = new JsonObject();
-                for (Locale locale : post.getName().getLocales()) {
-                    JsonObject localizedMessage = new JsonObject();
-                    localizedMessage.addProperty("title", post.getName().getContent(locale));
-                    message.add(locale.toLanguageTag(), localizedMessage);
-
-                }
-                JsonObject returnObj = new JsonObject();
-                returnObj.add("usernames", usernames);
-                returnObj.add("message", message);
-                returnObj.addProperty("channel", postSite.getExecutionCourse().getSigla());
-                try {
-                    HTTP_CLIENT.target(pushNotificationServerUrl).path("api/v1/message/").request().header(header, token)
-                            .post(Entity.entity(returnObj, "application/json; charset=utf8"));
-                } catch (Throwable wae) {
-                    logger.warn("error when creating post sending message", wae);
-                }
-            }
+            sendNotification(event);
         });
+    }
+
+    @Atomic(mode = TxMode.READ)
+    private void sendNotification(DomainObjectEvent<Post> event) {
+        Post post = event.getInstance();
+
+        if (post.getSite() instanceof ExecutionCourseSite && post.isVisible()
+                && post.getCategoriesSet().stream().anyMatch(cat -> "announcement".equalsIgnoreCase(cat.getSlug()))) {
+            ExecutionCourseSite postSite = (ExecutionCourseSite) post.getSite();
+
+            JsonArray usernames = postSite.getExecutionCourse().getAttendsSet().stream()
+                    .map(a -> a.getRegistration().getPerson().getUser().getUsername()).distinct().map(JsonPrimitive::new)
+                    .collect(StreamUtils.toJsonArray());
+
+            JsonObject message = new JsonObject();
+            for (Locale locale : post.getName().getLocales()) {
+                JsonObject localizedMessage = new JsonObject();
+                localizedMessage.addProperty("title", post.getName().getContent(locale));
+                message.add(locale.toLanguageTag(), localizedMessage);
+
+            }
+            JsonObject returnObj = new JsonObject();
+            returnObj.add("usernames", usernames);
+            returnObj.add("message", message);
+            returnObj.addProperty("channel", postSite.getExecutionCourse().getSigla());
+            try {
+                HTTP_CLIENT.target(pushNotificationServerUrl).path("api/v1/message/").request().header(header, token)
+                        .post(Entity.entity(returnObj, "application/json; charset=utf8"));
+            } catch (Throwable wae) {
+                logger.warn("error when creating post sending message", wae);
+            }
+        }
     }
 
     @Override
