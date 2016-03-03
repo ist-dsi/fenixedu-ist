@@ -45,7 +45,7 @@ public class StudentHighPerformanceQueueJob extends StudentHighPerformanceQueueJ
         Collection<Registration> highPerformants =
                 Bennu.getInstance().getRegistrationsSet().stream().filter(r -> r.hasActiveLastState(semester)).filter(r -> {
                     Collection<Enrolment> enrols = r.getEnrolments(semester);
-                    return enrols.isEmpty() ? false : enrols.stream().anyMatch(e -> !e.isApproved());
+                    return enrols.isEmpty() ? false : enrols.stream().allMatch(e -> e.isApproved());
                 }).collect(Collectors.toSet());
 
         SheetData<Registration> data = new SheetData<Registration>(highPerformants) {
