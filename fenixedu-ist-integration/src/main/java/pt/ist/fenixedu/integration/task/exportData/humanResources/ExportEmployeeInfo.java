@@ -26,22 +26,21 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.scheduler.CronTask;
 import org.fenixedu.bennu.scheduler.annotation.Task;
-import org.fenixedu.bennu.scheduler.custom.CustomTask;
-
-import pt.ist.fenixedu.contracts.domain.Employee;
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.GiafProfessionalData;
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonContractSituation;
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalData;
-import pt.ist.fenixedu.contracts.domain.research.Researcher;
-import pt.ist.fenixedu.contracts.domain.util.CategoryType;
 
 import com.google.common.base.Strings;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import pt.ist.fenixedu.contracts.domain.Employee;
+import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.GiafProfessionalData;
+import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonContractSituation;
+import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalData;
+import pt.ist.fenixedu.contracts.domain.util.CategoryType;
+
 @Task(englishTitle = "Export working relations to shared json file with other applications.")
-public class ExportEmployeeInfo extends CustomTask {
+public class ExportEmployeeInfo extends CronTask {
 
     @Override
     public void runTask() throws Exception {
@@ -54,11 +53,10 @@ public class ExportEmployeeInfo extends CustomTask {
             final Person person = user.getPerson();
             if (person != null && user.getProfile() != null) {
                 final Employee employee = person.getEmployee();
-                final Researcher researcher = person.getResearcher();
-                if (employee != null && isActiveContractedTeacher(person)) {
+                if (employee != null && getCurrentContractedContractSituation(person, CategoryType.TEACHER) != null) {
                     registerContractSituation(result, user, person, employee, CategoryType.TEACHER);
                 }
-                if (researcher != null && researcher.isActiveContractedResearcher()) {
+                if (employee != null && getCurrentContractedContractSituation(person, CategoryType.RESEARCHER) != null) {
                     registerContractSituation(result, user, person, employee, CategoryType.RESEARCHER);
                 }
                 if (employee != null && employee.isActive()) {
@@ -78,13 +76,9 @@ public class ExportEmployeeInfo extends CustomTask {
         }
     }
 
-    public boolean isActiveContractedTeacher(final Person person) {
-        return getCurrentContractedTeacherContractSituation(person) != null;
-    }
-
-    public PersonContractSituation getCurrentContractedTeacherContractSituation(final Person person) {
+    public PersonContractSituation getCurrentContractedContractSituation(final Person person, final CategoryType categoryType) {
         final PersonProfessionalData data = person.getPersonProfessionalData();
-        return data != null ? data.getCurrentPersonContractSituationByCategoryType(CategoryType.TEACHER) : null;
+        return data != null ? data.getCurrentPersonContractSituationByCategoryType(categoryType) : null;
     }
 
     private void preloadData() throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException,
