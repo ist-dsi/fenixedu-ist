@@ -18,21 +18,29 @@
  */
 package pt.ist.fenixedu.integration.task.exportData;
 
+import pt.ist.fenixedu.contracts.domain.LegacyRoleUtils;
+import pt.ist.fenixframework.Atomic.TxMode;
+
 import java.io.FileOutputStream;
-import java.util.stream.Collector;
-import java.util.stream.Collector.Characteristics;
 
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.UserProfile;
 import org.fenixedu.bennu.scheduler.annotation.Task;
 import org.fenixedu.bennu.scheduler.custom.CustomTask;
+import org.joda.time.LocalDate;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+
+import static org.fenixedu.commons.stream.StreamUtils.toJsonArray;
 
 @Task(englishTitle = "Export user profiles to shared json file with other applications.")
 public class ExportProfiles extends CustomTask {
+
+    @Override
+    public TxMode getTxMode() {
+        return TxMode.READ;
+    }
 
     @Override
     public void runTask() throws Exception {
@@ -53,14 +61,10 @@ public class ExportProfiles extends CustomTask {
         object.addProperty("familyNames", up.getFamilyNames());
         object.addProperty("displayName", up.getDisplayName());
         object.addProperty("email", up.getEmail());
+        LocalDate expiration = up.getUser().getExpiration();
+        object.addProperty("expiration", expiration == null ? null : expiration.toString());
+        object.add("roles", LegacyRoleUtils.mainRoleKeys(up.getUser()).stream().map(JsonPrimitive::new).collect(toJsonArray()));
         return object;
-    }
-
-    public static <T extends JsonElement> Collector<T, JsonArray, JsonArray> toJsonArray() {
-        return Collector.of(JsonArray::new, (array, element) -> array.add(element), (one, other) -> {
-            one.addAll(other);
-            return one;
-        }, Characteristics.IDENTITY_FINISH);
     }
 
 }
