@@ -42,7 +42,7 @@
 	</pageHeader>
 	<columnHeader>
 		<band height="25" splitType="Stretch">
-			<textField>
+			<textField isStretchWithOverflow="true">
 				<reportElement key="staticText-16" x="64" y="1" width="178" height="24"/>
 				<box>
 					<pen lineWidth="0.25" lineStyle="Solid"/>
@@ -56,8 +56,8 @@
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{enrolment}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement key="staticText-17" x="242" y="1" width="77" height="24"/>
+			<textField isStretchWithOverflow="true">
+				<reportElement key="staticText-17" x="242" y="1" width="62" height="24"/>
 				<box>
 					<pen lineWidth="0.25" lineStyle="Solid"/>
 					<topPen lineWidth="0.25" lineStyle="Solid"/>
@@ -70,8 +70,8 @@
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{year}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement key="staticText-26" x="319" y="1" width="76" height="24"/>
+			<textField isStretchWithOverflow="true">
+				<reportElement key="staticText-26" x="304" y="1" width="84" height="24"/>
 				<box>
 					<pen lineWidth="0.25" lineStyle="Solid"/>
 					<topPen lineWidth="0.25" lineStyle="Solid"/>
@@ -84,8 +84,8 @@
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{courseLoad}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement key="staticText-27" x="395" y="1" width="76" height="24"/>
+			<textField isStretchWithOverflow="true">
+				<reportElement key="staticText-27" x="388" y="1" width="84" height="24"/>
 				<box>
 					<pen lineWidth="0.25" lineStyle="Solid"/>
 					<topPen lineWidth="0.25" lineStyle="Solid"/>
@@ -98,8 +98,8 @@
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{autonomousWork}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement key="staticText-28" x="471" y="1" width="63" height="24"/>
+			<textField isStretchWithOverflow="true">
+				<reportElement key="staticText-28" x="472" y="1" width="62" height="24"/>
 				<box>
 					<pen lineWidth="0.25" lineStyle="Solid"/>
 					<topPen lineWidth="0.25" lineStyle="Solid"/>
@@ -130,7 +130,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{curricularCourseName}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
-				<reportElement key="textField-22" style="InvalidCourseLoad" stretchType="RelativeToTallestObject" x="242" y="-1" width="77" height="21"/>
+				<reportElement key="textField-22" style="InvalidCourseLoad" stretchType="RelativeToTallestObject" x="242" y="-1" width="62" height="21"/>
 				<box>
 					<pen lineWidth="0.0"/>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -144,7 +144,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{year}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
-				<reportElement key="textField-30" style="InvalidCourseLoad" stretchType="RelativeToTallestObject" x="319" y="-1" width="76" height="21"/>
+				<reportElement key="textField-30" style="InvalidCourseLoad" stretchType="RelativeToTallestObject" x="304" y="-1" width="84" height="21"/>
 				<box>
 					<pen lineWidth="0.0" lineStyle="Solid"/>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -158,7 +158,7 @@
 				<textFieldExpression class="java.lang.Double"><![CDATA[$F{contactLoad}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
-				<reportElement key="textField-31" style="InvalidCourseLoad" stretchType="RelativeToTallestObject" x="395" y="-1" width="76" height="21"/>
+				<reportElement key="textField-31" style="InvalidCourseLoad" stretchType="RelativeToTallestObject" x="388" y="-1" width="84" height="21"/>
 				<box>
 					<pen lineWidth="0.0" lineStyle="Solid"/>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -172,7 +172,7 @@
 				<textFieldExpression class="java.lang.Double"><![CDATA[$F{autonomousWork}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
-				<reportElement key="textField-32" style="InvalidCourseLoad" stretchType="RelativeToTallestObject" x="471" y="-1" width="63" height="21"/>
+				<reportElement key="textField-32" style="InvalidCourseLoad" stretchType="RelativeToTallestObject" x="472" y="-1" width="62" height="21"/>
 				<box>
 					<pen lineWidth="0.0" lineStyle="Solid"/>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
