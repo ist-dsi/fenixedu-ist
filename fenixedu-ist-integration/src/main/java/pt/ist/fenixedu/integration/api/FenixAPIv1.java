@@ -132,6 +132,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveEmployees;
+import pt.ist.fenixedu.contracts.domain.accessControl.ActiveResearchers;
 import pt.ist.fenixedu.integration.api.beans.FenixCalendar;
 import pt.ist.fenixedu.integration.api.beans.FenixCalendar.FenixCalendarEvent;
 import pt.ist.fenixedu.integration.api.beans.FenixCalendar.FenixClassEvent;
@@ -826,6 +827,7 @@ public class FenixAPIv1 {
      * @summary Information about the institution
      * @return news and events rss
      */
+
     @GET
     @Produces(JSON_UTF8)
     @Path("about")
@@ -1076,6 +1078,46 @@ public class FenixAPIv1 {
             object.addProperty("name", r.getPerson().getUser().getProfile().getDisplayName());
             return object;
         }).collect(StreamUtils.toJsonArray()).toString();
+    }
+
+    @GET
+    @Produces(JSON_UTF8)
+    @Path("users")
+    @OAuthEndpoint(value = PERSONAL_SCOPE, serviceOnly = true)
+    public String getUsers() {
+        Stream<User> users = Bennu.getInstance().getUserSet().stream();
+        return users.filter(u -> !u.isLoginExpired()).filter(u -> u.getProfile() != null)
+                .filter(u -> !Strings.isNullOrEmpty(u.getProfile().getFullName())).map(user -> {
+                    JsonObject object = new JsonObject();
+                    object.addProperty("username", user.getUsername());
+
+                    object.addProperty("name", user.getProfile().getDisplayName());
+                    object.addProperty("givenName", user.getProfile().getGivenNames());
+                    object.addProperty("familyName", user.getProfile().getFamilyNames());
+                    object.addProperty("email", user.getProfile().getEmail());
+
+                    if (user.getProfile().getPreferredLocale() != null)
+                        object.addProperty("locale", user.getProfile().getPreferredLocale().toLanguageTag());
+                    else
+                        object.addProperty("locale", "");
+
+                    return object;
+                }).collect(StreamUtils.toJsonArray()).toString();
+    }
+
+    @GET
+    @Produces(JSON_UTF8)
+    @Path("researchers")
+    @OAuthEndpoint(value = PERSONAL_SCOPE, serviceOnly = true)
+    public String getResearchers() {
+        Stream<User> users = Bennu.getInstance().getUserSet().stream();
+        return users
+                .filter(u -> new ActiveTeachersGroup().isMember(u) || new ActiveResearchers().isMember(u)
+                        || (u.getPerson() != null && u.getPerson().isPhdStudent())).map(user -> {
+                    JsonObject object = new JsonObject();
+                    object.addProperty("username", user.getUsername());
+                    return object;
+                }).collect(StreamUtils.toJsonArray()).toString();
     }
 
     private void addExecutionCourses(final CourseGroup courseGroup, final Collection<ExecutionCourse> executionCourseViews,
