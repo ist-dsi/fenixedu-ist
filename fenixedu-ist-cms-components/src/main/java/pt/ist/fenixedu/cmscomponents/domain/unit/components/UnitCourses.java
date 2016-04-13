@@ -59,9 +59,7 @@ public class UnitCourses extends UnitSiteComponent {
         String courseComponentUrl =
                 DegreeSiteComponent.pageForComponent(page.getSite(), CompetenceCourseComponent.class).map(Page::getAddress)
                         .orElse("#");
-
         ExecutionYear executionYear = executionYear(globalContext.getRequestContext());
-
         if (unit(page) instanceof DepartmentUnit) {
             DepartmentUnit departmentUnit = ofNullable((DepartmentUnit) unit(page)).orElseGet(() -> getPersonDepartmentUnit());
             globalContext.put("scientificAreaUnits", getScientificAreaUnits(departmentUnit, courseComponentUrl, executionYear));
