@@ -116,29 +116,31 @@ public class UnitCourses extends UnitSiteComponent {
     }
 
     public List<ExecutionYear> getValidExecutionYearsForUnit(Unit unit) {
-        List<ScientificAreaUnit> scientificAreaUnits = unit.getSubUnits().stream()
+        HashSet<ExecutionYear> validExecutionYears = new HashSet<>();
+        final List<ExecutionYear> allExecutionYears = getAllExecutionYears();
+        unit.getSubUnits().stream()
                 .filter(Unit::isScientificAreaUnit)
                 .map(ScientificAreaUnit.class::cast)
-                .sorted(ScientificAreaUnit.COMPARATOR_BY_NAME_AND_ID)
-                .collect(toList());
-        HashSet<ExecutionYear> validExecutionYears = new HashSet<>();
-        final List<ExecutionYear> allExecutionYears =
-                ExecutionYear.readExecutionYears(ExecutionYear.readFirstExecutionYear(), ExecutionYear.readLastExecutionYear());
-        for (ExecutionYear executionYear : allExecutionYears) {
-            for (ScientificAreaUnit scientificAreaUnit : scientificAreaUnits) {
-                final List<CompetenceCourseGroupUnit> competenceCourseGroupUnits = scientificAreaUnit.getCompetenceCourseGroupUnits();
-                for (CompetenceCourseGroupUnit competenceCourseGroupUnit : competenceCourseGroupUnits) {
-                    List<CompetenceCourse> competenceCoursesByExecutionYear =
-                            competenceCourseGroupUnit.getCompetenceCoursesByExecutionYear(executionYear);
-                    if (!competenceCoursesByExecutionYear.isEmpty()) {
-                        validExecutionYears.add(executionYear);
-                    }
-                }
-            }
-        }
+                .map(scientificAreaUnit -> scientificAreaUnit.getCompetenceCourseGroupUnits())
+                .forEach(competenceCourseGroupUnits -> {
+                    allExecutionYears.stream()
+                            .forEach(executionYear -> {
+                                competenceCourseGroupUnits.stream()
+                                        .forEach(competenceCourseGroupUnit -> {
+                                            if (!competenceCourseGroupUnit.getCompetenceCoursesByExecutionYear(executionYear).isEmpty()) {
+                                                validExecutionYears.add(executionYear);
+                                            }
+                                        });
+                            });
+                });
+
         return validExecutionYears.stream()
                 .sorted(ExecutionYear.REVERSE_COMPARATOR_BY_YEAR)
                 .collect(toList());
+    }
+
+    private List<ExecutionYear> getAllExecutionYears() {
+        return ExecutionYear.readExecutionYears(ExecutionYear.readFirstExecutionYear(), ExecutionYear.readLastExecutionYear());
     }
 
     private Map<ExecutionYear, String> getExecutionYearsUrls(Page page) {

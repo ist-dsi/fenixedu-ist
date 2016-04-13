@@ -20,7 +20,6 @@
 -->
 {% extends "fenixedu-units-theme/base.html" %}
 
-
 {% block content %}
     <div class="btn-group">
         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
@@ -40,7 +39,7 @@
                     <h3>{{ competenceCourseGroupUnit.name.content }}</h3>
                     <ul class="list-unstyled">
                         {% for competenceCourse in competenceCourseGroupUnit.competenceCourses %}
-                        <li><a href="{{ competenceCourse.url }}">{{ competenceCourse.name.content }} ({{ competenceCourse.acronym }})</a></li>
+                            <li><a href="{{ competenceCourse.url }}">{{ competenceCourse.name.content }} ({{ competenceCourse.acronym }})</a></li>
                         {% endfor %}
                     </ul>
                     <hr/>
