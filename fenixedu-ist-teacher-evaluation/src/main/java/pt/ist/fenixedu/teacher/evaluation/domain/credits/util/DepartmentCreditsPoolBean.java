@@ -20,6 +20,7 @@ package pt.ist.fenixedu.teacher.evaluation.domain.credits.util;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
@@ -170,6 +171,19 @@ public class DepartmentCreditsPoolBean implements Serializable {
         return departmentExecutionCourses;
     }
 
+    public void setDepartmentSharedExecutionCourses(List<DepartmentExecutionCourse> departmentSharedExecutionCourses) {
+        this.departmentSharedExecutionCourses = new TreeSet<DepartmentExecutionCourse>(departmentSharedExecutionCourses);
+    }
+
+    public void setOtherDepartmentSharedExecutionCourses(List<DepartmentExecutionCourse> otherDepartmentSharedExecutionCourses) {
+        this.otherDepartmentSharedExecutionCourses =
+                new TreeSet<DepartmentExecutionCourse>(otherDepartmentSharedExecutionCourses);
+    }
+
+    public void setDepartmentExecutionCourses(List<DepartmentExecutionCourse> departmentExecutionCourses) {
+        this.departmentExecutionCourses = new TreeSet<DepartmentExecutionCourse>(departmentExecutionCourses);
+    }
+
     public BigDecimal getAvailableCredits() {
         return availableCredits;
     }
@@ -264,11 +278,11 @@ public class DepartmentCreditsPoolBean implements Serializable {
             }
             int compareTo = getExecutionCourse().getName().compareTo(o.getExecutionCourse().getName());
             if (compareTo == 0) {
-                compareTo =
-                        getExecutionCourse().getDegreePresentationString().compareTo(
-                                o.getExecutionCourse().getDegreePresentationString());
+                compareTo = getExecutionCourse().getDegreePresentationString()
+                        .compareTo(o.getExecutionCourse().getDegreePresentationString());
             }
-            return compareTo == 0 ? getExecutionCourse().getExternalId().compareTo(o.getExecutionCourse().getExternalId()) : compareTo;
+            return compareTo == 0 ? getExecutionCourse().getExternalId()
+                    .compareTo(o.getExecutionCourse().getExternalId()) : compareTo;
         }
 
     }
@@ -278,25 +292,23 @@ public class DepartmentCreditsPoolBean implements Serializable {
         BigDecimal newAssignedCredits = BigDecimal.ZERO;
         for (DepartmentExecutionCourse departmentExecutionCourse : otherDepartmentSharedExecutionCourses) {
             if (departmentExecutionCourse.getUnitCreditValue() != null) {
-                BigDecimal newExecutionCourseCLE =
-                        departmentExecutionCourse.getDepartmentEffectiveLoad().multiply(
-                                departmentExecutionCourse.getUnitCreditValue());
+                BigDecimal newExecutionCourseCLE = departmentExecutionCourse.getDepartmentEffectiveLoad()
+                        .multiply(departmentExecutionCourse.getUnitCreditValue());
                 newAssignedCredits = newAssignedCredits.add(newExecutionCourseCLE);
             }
         }
 
         for (DepartmentExecutionCourse departmentExecutionCourse : departmentSharedExecutionCourses) {
-            newAssignedCredits =
-                    setExecutionCourseUnitCredit(departmentExecutionCourse, getCanEditSharedUnitCredits(), newAssignedCredits,
-                            true);
+            newAssignedCredits = setExecutionCourseUnitCredit(departmentExecutionCourse, getCanEditSharedUnitCredits(),
+                    newAssignedCredits, true);
         }
         for (DepartmentExecutionCourse departmentExecutionCourse : departmentExecutionCourses) {
             newAssignedCredits =
                     setExecutionCourseUnitCredit(departmentExecutionCourse, getCanEditUnitCredits(), newAssignedCredits, false);
         }
         if (newAssignedCredits.compareTo(getDepartmentCreditsPool().getCreditsPool()) > 0) {
-            throw new DomainException("label.excededDepartmentCreditsPool", getDepartmentCreditsPool().getCreditsPool()
-                    .toString(), newAssignedCredits.toString());
+            throw new DomainException("label.excededDepartmentCreditsPool",
+                    getDepartmentCreditsPool().getCreditsPool().toString(), newAssignedCredits.toString());
         }
         setValues();
     }
@@ -305,22 +317,20 @@ public class DepartmentCreditsPoolBean implements Serializable {
             boolean canEditUnitValue, BigDecimal newAssignedCredits, Boolean shared) {
         if (canEditUnitValue) {
             if (departmentExecutionCourse.getUnitCreditValue() != null) {
-                BigDecimal newExecutionCourseCLE =
-                        departmentExecutionCourse.getDepartmentEffectiveLoad().multiply(
-                                departmentExecutionCourse.getUnitCreditValue());
+                BigDecimal newExecutionCourseCLE = departmentExecutionCourse.getDepartmentEffectiveLoad()
+                        .multiply(departmentExecutionCourse.getUnitCreditValue());
                 newAssignedCredits = newAssignedCredits.add(newExecutionCourseCLE);
                 if ((!Objects.equals(departmentExecutionCourse.executionCourse.getUnitCreditValue(),
                         departmentExecutionCourse.getUnitCreditValue()))
-                        || Objects.equals(departmentExecutionCourse.executionCourse.getUnitCreditValueNotes(),
+                        || !Objects.equals(departmentExecutionCourse.executionCourse.getUnitCreditValueNotes(),
                                 departmentExecutionCourse.getUnitCreditJustification())) {
                     departmentExecutionCourse.executionCourse.setUnitCreditValue(departmentExecutionCourse.getUnitCreditValue(),
                             departmentExecutionCourse.getUnitCreditJustification());
                 }
             }
         } else if (departmentExecutionCourse.executionCourse.getUnitCreditValue() != null) {
-            BigDecimal oldExecutionCourseCLE =
-                    departmentExecutionCourse.getDepartmentEffectiveLoad().multiply(
-                            departmentExecutionCourse.executionCourse.getUnitCreditValue());
+            BigDecimal oldExecutionCourseCLE = departmentExecutionCourse.getDepartmentEffectiveLoad()
+                    .multiply(departmentExecutionCourse.executionCourse.getUnitCreditValue());
             newAssignedCredits = newAssignedCredits.add(oldExecutionCourseCLE);
         }
         return newAssignedCredits;
