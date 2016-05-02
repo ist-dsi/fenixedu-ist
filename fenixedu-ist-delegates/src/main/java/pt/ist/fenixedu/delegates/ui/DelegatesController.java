@@ -46,14 +46,13 @@ public class DelegatesController {
         Student student = Authenticate.getUser().getPerson().getStudent();
         Degree degree = null;
         ExecutionYear executionYear = ExecutionYear.readCurrentExecutionYear();
-        if (student.getLastActiveRegistration() != null) {
-            degree = student.getLastActiveRegistration().getDegree();
-        }
-        if (degree == null && student.getLastRegistration() != null) {
-            degree = student.getLastActiveRegistration().getDegree();
-        }
-        if (degree == null) {
-            // error student has no degree??
+        if (student != null) {
+            if (student.getLastActiveRegistration() != null) {
+                degree = student.getLastActiveRegistration().getDegree();
+            }
+            if (degree == null && student.getLastRegistration() != null) {
+                degree = student.getLastActiveRegistration().getDegree();
+            }
         }
         delegateSearchBean.setDegree(degree);
         delegateSearchBean.setExecutionYear(executionYear);
