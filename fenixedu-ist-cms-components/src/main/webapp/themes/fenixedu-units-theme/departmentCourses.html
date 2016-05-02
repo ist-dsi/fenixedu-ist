@@ -21,6 +21,16 @@
 {% extends "fenixedu-units-theme/base.html" %}
 
 {% block content %}
+    <div class="btn-group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+            {{ executionYear.name }} <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            {% for executionYear in entries(executionYearsUrls) %}
+            <li><a href='{{ executionYear.value }}'>{{ executionYear.key.name }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
     {% for scientificAreaUnit in scientificAreaUnits %}
         {% if scientificAreaUnit.hasCompetenceCourses %}
             <h2><small>{{ scientificAreaUnit.name.content }}</small></h2>
