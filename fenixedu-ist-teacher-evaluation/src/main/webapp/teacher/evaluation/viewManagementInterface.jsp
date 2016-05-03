@@ -209,6 +209,9 @@
 					<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.teacherEvaluationProcess.coevaluators" bundle="TEACHER_EVALUATION_RESOURCES"/>
 				</th>
 				<th>
+					<bean:message key="label.teacher.evaluation.type" bundle="TEACHER_EVALUATION_RESOURCES"/>
+				</th>
+				<th>
 					<bean:message key="label.teacher.evaluation.state" bundle="TEACHER_EVALUATION_RESOURCES"/>
 				</th>
 				<th>
@@ -232,6 +235,13 @@
 					</td>
 					<td>
 						<bean:write name="teacherEvaluationProcess" property="coEvaluatorsAsString"/>
+					</td>
+					<td>
+						<logic:present name="teacherEvaluationProcess" property="type">
+							<fr:view name="teacherEvaluationProcess" property="type">
+								<fr:layout><fr:property name="bundle" value="TEACHER_EVALUATION_RESOURCES"/></fr:layout>
+							</fr:view>
+						</logic:present>
 					</td>
 					<td>
 						<fr:view name="teacherEvaluationProcess" property="state" layout="null-as-label" />
