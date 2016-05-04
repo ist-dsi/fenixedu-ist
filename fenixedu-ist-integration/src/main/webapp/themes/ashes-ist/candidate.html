@@ -1,0 +1,38 @@
+<!--
+    Copyright © 2013 Instituto Superior Técnico
+    This file is part of FenixEdu IST Integration.
+    FenixEdu IST Integration is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    FenixEdu IST Integration is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Lesser General Public License for more details.
+    You should have received a copy of the GNU Lesser General Public License
+    along with FenixEdu IST Integration.  If not, see <http://www.gnu.org/licenses/>.
+-->
+{% extends "ashes-ist/default" %}
+
+{% block footer %}
+<footer class="clearfix" role="contentinfo" >
+		<div class="col-sm-2 text-center">
+			<a class="brand" href="http://fenixedu.org"><img src="{{contextPath}}/themes/ashes/img/logo_fenixedu_footer.svg" alt="Powered by FenixEdu"></a>
+		</div>
+		<p class="col-sm-10">
+			<span>{{config.applicationCopyright.content}}</span>
+			<a href="" onclick="openSupport(); return false;">
+				{{i18n('resources.ApplicationResources', 'support.Contact')}}
+			</a>
+		</p>
+</footer>
+<div class="modal fade" id="supportModal"></div>
+<script>
+openSupport = function() { $('#supportModal').load('{{contextPath}}/themes/ashes-ist/supportModal.jsp'); $('#supportModal').modal('show');
+	window.current$functionality = '{{functionality.externalId}}'; };
+</script>
+<style>
+    .nav-menu li { display: none; }
+    .nav-menu li.active  { display: inline; }
+</style>
+{% endblock %}
