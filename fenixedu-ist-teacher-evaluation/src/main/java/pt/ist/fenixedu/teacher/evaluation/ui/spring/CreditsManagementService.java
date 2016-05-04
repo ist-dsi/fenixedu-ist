@@ -18,11 +18,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.google.common.io.ByteStreams;
 
+import pt.ist.fenixedu.contracts.domain.organizationalStructure.SharedFunction;
 import pt.ist.fenixedu.teacher.evaluation.domain.DepartmentCreditsPool;
 import pt.ist.fenixedu.teacher.evaluation.domain.credits.util.CreditsPoolBean;
 import pt.ist.fenixedu.teacher.evaluation.domain.credits.util.CreditsPoolBean.CreditsPoolByDepartmentBean;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
+import pt.ist.fenixframework.FenixFramework;
 
 @Service
 public class CreditsManagementService {
@@ -100,6 +102,46 @@ public class CreditsManagementService {
 
     private ExecutionSemester getExecutionSemester(String codePart1, String codePart2) {
         return ExecutionSemester.readBySemesterAndExecutionYear(Integer.valueOf(codePart1), codePart2);
+    }
+
+    public Set<String> uploadSharedFunctionsCredits(MultipartFile file) throws Exception {
+        String[] lines = getFileLines(file);
+        return setSharedFunctionsCredits(lines);
+    }
+
+    @Atomic(mode = TxMode.WRITE)
+    public Set<String> setSharedFunctionsCredits(String[] lines) {
+        Set<String> output = new HashSet<String>();
+        for (String line : lines) {
+            String[] values = line.split(WorkbookExportFormat.TSV.getSeparator());
+            if (values.length < 5) {
+                output.add(messageSource.getMessage("error.upload.file.line", new Object[] { line }, I18N.getLocale()));
+                continue;
+            }
+            String sharedFunctionOid = values[3];
+            if (StringUtils.isBlank(sharedFunctionOid)) {
+                output.add(messageSource.getMessage("error.upload.file.line", new Object[] { line }, I18N.getLocale()));
+                continue;
+            }
+
+            SharedFunction sharedFunction =  FenixFramework.getDomainObject(sharedFunctionOid);
+            if (sharedFunction == null) {
+                output.add(messageSource.getMessage("error.upload.file.line", new Object[] { line }, I18N.getLocale()));
+                continue;
+            }
+            BigDecimal credits = null;
+            if (values.length > 5) {
+                String bkString = values[5].trim();
+                try {
+                    credits = new BigDecimal(bkString);
+                } catch (NumberFormatException e) {
+                    output.add(messageSource.getMessage("error.upload.file.line", new Object[] { line }, I18N.getLocale()));
+                    continue;
+                }
+            }
+            sharedFunction.setCredits(credits);
+        }
+        return output;
     }
 
 }
