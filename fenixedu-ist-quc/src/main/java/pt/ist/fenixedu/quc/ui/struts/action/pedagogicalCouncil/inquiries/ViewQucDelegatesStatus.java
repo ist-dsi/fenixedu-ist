@@ -26,6 +26,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -95,7 +96,7 @@ public class ViewQucDelegatesStatus extends FenixDispatchAction {
             Map<Integer, YearDelegate> yearDelegateByYear = new HashMap<Integer, YearDelegate>();
             for (Student student : DelegateUtils
                     .getAllDelegatesByExecutionYearAndFunctionType(degree, executionPeriod.getExecutionYear(), true).stream()
-                    .map(d -> d.getUser().getPerson().getStudent()).collect(Collectors.toList())) {
+                    .map(d -> d.getUser().getPerson().getStudent()).filter(Objects::nonNull).collect(Collectors.toList())) {
                 YearDelegate yearDelegate = getYearDelegate(student, executionPeriod);
                 YearDelegate yearDelegateMap = yearDelegateByYear.get(yearDelegate.getCurricularYear().getYear());
                 if (yearDelegateMap == null) {
