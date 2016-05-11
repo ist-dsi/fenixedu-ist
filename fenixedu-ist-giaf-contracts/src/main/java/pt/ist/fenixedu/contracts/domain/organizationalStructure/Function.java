@@ -40,9 +40,10 @@ import org.joda.time.YearMonthDay;
 
 public class Function extends Function_Base {
 
-    public static final Comparator<Function> COMPARATOR_BY_ORDER = nullsFirst(comparing(Function::getFunctionOrder))
-            .thenComparing(nullsFirst(comparing(Function::getFunctionType))).thenComparing(Function::getName)
-            .thenComparing(Function::getExternalId);
+    public static final Comparator<Function> COMPARATOR_BY_ORDER =
+            comparing(Function::getFunctionOrder, nullsFirst(Comparator.naturalOrder()))
+                    .thenComparing(Function::getFunctionType, nullsFirst(Comparator.naturalOrder()))
+                    .thenComparing(Function::getName).thenComparing(Function::getExternalId);
 
     public Function(MultiLanguageString functionName, YearMonthDay beginDate, YearMonthDay endDate, FunctionType type, Unit unit) {
         super();
