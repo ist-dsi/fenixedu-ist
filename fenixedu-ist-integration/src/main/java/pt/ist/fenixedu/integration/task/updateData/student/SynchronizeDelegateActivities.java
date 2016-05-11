@@ -9,6 +9,7 @@ import org.fenixedu.academic.domain.student.curriculum.ExtraCurricularActivity;
 import org.fenixedu.academic.domain.student.curriculum.ExtraCurricularActivityType;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.scheduler.CronTask;
+import org.fenixedu.bennu.scheduler.annotation.Task;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeFieldType;
 import org.joda.time.Interval;
@@ -20,6 +21,7 @@ import pt.ist.fenixedu.delegates.domain.student.DegreeDelegate;
 import pt.ist.fenixedu.delegates.domain.student.Delegate;
 import pt.ist.fenixedu.delegates.domain.student.YearDelegate;
 
+@Task(englishTitle = "SynchronizeDelegateActivities", readOnly = false)
 public class SynchronizeDelegateActivities extends CronTask {
 
     private static final int MINIMUM_FUNCTION_DAYS = 40;
