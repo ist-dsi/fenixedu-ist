@@ -53,7 +53,7 @@
 				<fr:property name="classes" value="tstyle5 thlight mtop15" />
 				<fr:property name="columnClasses" value=",,tdclear tderror1" />
 			</fr:layout>
-			<fr:destination name="cancel" path="/exportCredits.do?method=exportDepartmentPersonFunctions" />
+			<fr:destination name="cancel" path="/projectTutorialCourses.do?method=exportDepartmentPersonFunctions" />
 		</fr:edit>
 		<html:submit bundle="HTMLALT_RESOURCES" altKey="submit.submit"><bean:message key="label.view" bundle="TEACHER_CREDITS_SHEET_RESOURCES" /></html:submit>
 		<html:cancel><bean:message key="label.export" bundle="APPLICATION_RESOURCES" /></html:cancel>
