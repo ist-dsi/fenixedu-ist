@@ -54,7 +54,6 @@ public class FenixAPIFromExternalServer {
 
     private static final Client HTTP_CLIENT = ClientBuilder.newClient();
 
-    private static JsonObject canteenInfo;
     private static JsonObject shuttleInfo;
     private static JsonObject contactsInfo;
 
@@ -68,22 +67,16 @@ public class FenixAPIFromExternalServer {
 
     private static synchronized void getInformation() {
 
-        String canteenUrl = FenixEduIstIntegrationConfiguration.getConfiguration().getFenixApiCanteenUrl();
         String shuttleUrl = FenixEduIstIntegrationConfiguration.getConfiguration().getFenixApiShuttleUrl();
         String contactsUrl = FenixEduIstIntegrationConfiguration.getConfiguration().getFenixApiContactsUrl();
-        String canteenFile = FenixEduIstIntegrationConfiguration.getConfiguration().getFenixApiCanteenFile();
         String shuttleFile = FenixEduIstIntegrationConfiguration.getConfiguration().getFenixApiShuttleFile();
         String contactsFile = FenixEduIstIntegrationConfiguration.getConfiguration().getFenixApiContactsFile();
 
         if (oldInformation()) {
-            canteenInfo = getInformation(canteenUrl, canteenFile);
             contactsInfo = getInformation(contactsUrl, contactsFile);
             shuttleInfo = getInformation(shuttleUrl, shuttleFile);
             day = new DateTime();
         } else {
-            if (canteenInfo == null) {
-                canteenInfo = getInformation(canteenUrl, canteenFile);
-            }
             if (contactsInfo == null) {
                 contactsInfo = getInformation(contactsUrl, contactsFile);
             }
@@ -107,6 +100,12 @@ public class FenixAPIFromExternalServer {
 
         logger.debug("file or file info for \"{}\" doesn't exist, let's try url : {}", filename, url);
 
+        return updateInformation(url);
+    }
+
+    private static JsonObject updateInformation(String url) {
+
+        JsonObject infoJson;
         try {
             Response response =
                     HTTP_CLIENT.target(url).request(MediaType.APPLICATION_JSON).header("Authorization", getServiceAuth()).get();
@@ -128,8 +127,15 @@ public class FenixAPIFromExternalServer {
     }
 
     public static String getCanteen(String daySearch) {
-        getInformation();
+        String canteenName = FenixEduIstIntegrationConfiguration.getConfiguration().getFenixAPICanteenDefaultName();
+        return getCanteen(daySearch, canteenName);
+    }
 
+    public static String getCanteen(String daySearch, String canteenName) {
+
+        String canteenUrl =
+                FenixEduIstIntegrationConfiguration.getConfiguration().getFenixApiCanteenUrl().concat("?name=" + canteenName);
+        JsonObject canteenInfo = updateInformation(canteenUrl);
         String lang = I18N.getLocale().toLanguageTag();
 
         if (!canteenInfo.has(lang)) {

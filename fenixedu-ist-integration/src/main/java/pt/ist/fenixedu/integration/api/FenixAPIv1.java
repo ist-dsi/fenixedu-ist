@@ -38,13 +38,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -132,6 +126,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveEmployees;
+import pt.ist.fenixedu.integration.FenixEduIstIntegrationConfiguration;
 import pt.ist.fenixedu.integration.api.beans.FenixCalendar;
 import pt.ist.fenixedu.integration.api.beans.FenixCalendar.FenixCalendarEvent;
 import pt.ist.fenixedu.integration.api.beans.FenixCalendar.FenixClassEvent;
@@ -904,12 +899,15 @@ public class FenixAPIv1 {
     @GET
     @Produces(JSON_UTF8)
     @Path("canteen")
-    public String canteen(@QueryParam("day") String day) {
+    public String canteen(@QueryParam("day") String day, @QueryParam("name") String canteenName) {
         validateDay(day);
         if (day == null || Strings.isNullOrEmpty(day.trim())) {
             day = formatDay.print(new DateTime());
         }
-        return FenixAPIFromExternalServer.getCanteen(day);
+        if (canteenName == null || Strings.isNullOrEmpty(canteenName.trim())) {
+            canteenName = FenixEduIstIntegrationConfiguration.getConfiguration().getFenixAPICanteenDefaultName();
+        }
+        return FenixAPIFromExternalServer.getCanteen(day, canteenName);
     }
 
     @GET
