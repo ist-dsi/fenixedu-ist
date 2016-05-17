@@ -54,6 +54,9 @@ import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
 import org.fenixedu.bennu.struts.portal.EntryPoint;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
+import org.fenixedu.commons.spreadsheet.SheetData;
+import org.fenixedu.commons.spreadsheet.SpreadsheetBuilder;
+import org.fenixedu.commons.spreadsheet.WorkbookExportFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -575,6 +578,36 @@ public class TeacherEvaluationDA extends FenixDispatchAction {
         TeacherEvaluationProcess process = getDomainObject(request, "process");
         request.setAttribute("informationBean", new TeacherEvaluationInformationBean(process));
         return mapping.findForward("viewEvalueeInformation");
+    }
+    
+    public ActionForward downloadApprovedEvaluationsFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        final FacultyEvaluationProcess facultyEvaluationProcess = getDomainObject(request, "facultyEvaluationProcessOID");
+
+        SpreadsheetBuilder builder = new SpreadsheetBuilder();
+        String fileName = "avaliação_" + facultyEvaluationProcess.getSuffix();
+        builder.addSheet(fileName,
+                new SheetData<TeacherEvaluationProcess>(facultyEvaluationProcess.getTeacherEvaluationProcessSet()) {
+                    @Override
+                    protected void makeLine(TeacherEvaluationProcess teacherEvaluationProcess) {
+                        addCell("IstId", teacherEvaluationProcess.getEvaluee().getUser().getUsername());
+                        addCell("Nome", teacherEvaluationProcess.getEvaluee().getName());
+                        if (facultyEvaluationProcess.getBeginEvaluationYear() != null
+                                && facultyEvaluationProcess.getEndEvaluationYear() != null) {
+                            for (Integer year =
+                                    facultyEvaluationProcess.getBeginEvaluationYear(); year <= facultyEvaluationProcess
+                                            .getEndEvaluationYear(); year++) {
+                                addCell(year, null);
+                            }
+
+                        };
+                    }
+                });
+        response.setContentType("text/tsv");
+        response.setHeader("Content-Disposition", "filename=" + fileName + ".tsv");
+        builder.build(WorkbookExportFormat.TSV, response.getOutputStream());
+        response.flushBuffer();
+        return null;
     }
 
 }
