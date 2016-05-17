@@ -373,6 +373,12 @@
 	<p class="mbottom1">
 		<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.load.approved.marks.instruction" bundle="TEACHER_EVALUATION_RESOURCES"/>
 	</p>
+	<p>
+		<html:link page="/teacherEvaluation.do?method=downloadApprovedEvaluationsFile" paramId="facultyEvaluationProcessOID" paramName="fileUploadBeanForApprovedMarks" paramProperty="facultyEvaluationProcess.externalId">
+			<bean:message key="label.teacher.evaluation.facultyEvaluationProcess.load.approved.marks.file" bundle="TEACHER_EVALUATION_RESOURCES"/>
+		</html:link>
+	</p>
+	
 	<bean:define id="urlUploadInvalid">/teacherEvaluation.do?method=viewFacultyEvaluationProcess&facultyEvaluationProcessOID=<bean:write name="fileUploadBeanForApprovedMarks" property="facultyEvaluationProcess.externalId"/></bean:define>
 	<fr:edit id="fileUploadBeanForApprovedMarks" name="fileUploadBeanForApprovedMarks" action="/teacherEvaluation.do?method=uploadApprovedEvaluations">
 		<fr:schema bundle="APPLICATION_RESOURCES" type="pt.ist.fenixedu.teacher.evaluation.domain.FileUploadBean">
