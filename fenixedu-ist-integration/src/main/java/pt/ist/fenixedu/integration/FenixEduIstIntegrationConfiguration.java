@@ -65,6 +65,9 @@ public class FenixEduIstIntegrationConfiguration {
         @ConfigurationProperty(key = "fenix.api.canteen.secret", defaultValue = "")
         public String getFenixApiCanteenSecret();
 
+        @ConfigurationProperty(key = "fenix.api.canteen.defaultName", defaultValue = "alameda")
+        public String getFenixAPICanteenDefaultName();
+
         @ConfigurationProperty(key = "externalServices.ISTConnect.password")
         public String getExternalServicesISTConnectPassword();
 
