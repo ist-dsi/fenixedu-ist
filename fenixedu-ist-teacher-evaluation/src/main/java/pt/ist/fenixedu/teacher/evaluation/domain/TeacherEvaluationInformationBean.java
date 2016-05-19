@@ -164,7 +164,8 @@ public class TeacherEvaluationInformationBean implements Serializable {
 
     private ThesisJuryElement getThesisJuryElement(InternalPhdParticipant internalPhdParticipant) {
         for (final ThesisJuryElement element : internalPhdParticipant.getThesisJuryElementsSet()) {
-            if (element.getProcess() != null && element.isFor(internalPhdParticipant.getIndividualProcess().getThesisProcess())) {
+            if (element.isPresident() || (element.getProcess() != null
+                    && element.isFor(internalPhdParticipant.getIndividualProcess().getThesisProcess()))) {
                 return element;
             }
         }
