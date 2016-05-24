@@ -63,7 +63,7 @@
 			<fr:schema bundle="TEACHER_CREDITS_SHEET_RESOURCES" type="pt.ist.fenixedu.teacher.evaluation.domain.credits.util.PersonFunctionBean">
 				<fr:slot name="unit" key="label.departmentOrDegreeOrUnit" layout="autoCompleteWithPostBack">
 					<fr:property name="size" value="80"/>
-					<fr:property name="labelField" value="presentationName"/>
+					<fr:property name="labelField" value="presentationNameWithParents"/>
 					<fr:property name="indicatorShown" value="true"/>
 					<fr:property name="provider" value="pt.ist.fenixedu.teacher.evaluation.ui.renderers.providers.SearchInternalUnits"/>	
 					<fr:property name="args" value="slot=name"/>		
@@ -84,7 +84,7 @@
 		<logic:empty name="personFunctionBean" property="function">
 			<fr:edit id="personFunctionBean2" name="personFunctionBean" action="/managePersonFunctionsShared.do?method=prepareToEditPersonFunctionShared">
 				<fr:schema bundle="TEACHER_CREDITS_SHEET_RESOURCES" type="pt.ist.fenixedu.teacher.evaluation.domain.credits.util.PersonFunctionBean">
-					<fr:slot name="unit.presentationName" key="label.unit" readOnly="true"/>
+					<fr:slot name="unit.presentationNameWithParents" key="label.unit" readOnly="true"/>
 					<fr:slot name="function" key="label.function" layout="menu-select-postback" required="true">
 						<fr:property name="from" value="availableSharedFunctions"/>
 						<fr:property name="destination" value="/managePersonFunctionsShared.do?method=prepareToEditPersonFunctionShared"/>
@@ -101,7 +101,7 @@
 		<logic:notEmpty name="personFunctionBean" property="function">
 			<fr:edit id="personFunctionBean3" name="personFunctionBean" action="/managePersonFunctionsShared.do?method=editPersonFunctionShared">
 				<fr:schema bundle="TEACHER_CREDITS_SHEET_RESOURCES" type="pt.ist.fenixedu.teacher.evaluation.domain.credits.util.PersonFunctionBean">
-					<fr:slot name="unit.presentationName" key="label.unit" readOnly="true"/>
+					<fr:slot name="unit.presentationNameWithParents" key="label.unit" readOnly="true"/>
 					<fr:slot name="function.typeName" key="label.function" readOnly="true"/>
 					<fr:slot name="percentage" key="label.teacher-dfp-student.percentage" required="true"/>
 				</fr:schema>
