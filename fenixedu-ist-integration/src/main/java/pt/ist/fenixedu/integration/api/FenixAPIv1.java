@@ -753,6 +753,12 @@ public class FenixAPIv1 {
         }
 
         for (ExecutionCourse executionCourse : executionCourses) {
+            if (evaluation instanceof Exam) {
+                Exam exam = (Exam) evaluation;
+                if (!exam.isExamsMapPublished()) {
+                    continue;
+                }
+            }
             evaluations.add(getWrittenEvaluationJSON((WrittenEvaluation) evaluation, executionCourse, isEnrolled, student));
         }
         return evaluations;
