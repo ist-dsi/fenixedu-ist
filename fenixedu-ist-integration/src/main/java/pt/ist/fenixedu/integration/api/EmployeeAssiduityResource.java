@@ -24,7 +24,10 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 
+import com.google.common.base.Strings;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.oauth.annotation.OAuthEndpoint;
@@ -40,6 +43,7 @@ import pt.ist.fenixedu.contracts.persistenceTierOracle.view.GiafEmployeeAssiduit
 public class EmployeeAssiduityResource {
 
     public static final String ASSIDUITY_SCOPE = "ASSIDUITY";
+    public static final String dayPattern = "yyyy-MM-dd";
 
     @GET
     @Produces(FenixAPIv1.JSON_UTF8)
@@ -47,7 +51,8 @@ public class EmployeeAssiduityResource {
     @OAuthEndpoint(ASSIDUITY_SCOPE)
     public String getEmployeeAssiduityInformation(final @QueryParam("date") String date, final @QueryParam("username") String username) {
         final User userToQuery = username == null ? null : User.findByUsername(username);
-        return respond(user -> GiafEmployeeAssiduity.readAssiduityOfEmployee(userToQuery == null ? user : userToQuery, parse(date), user));
+        final LocalDate dateToQuery = !Strings.isNullOrEmpty(date) ? parse(date) : new LocalDate();
+        return respond(user -> GiafEmployeeAssiduity.readAssiduityOfEmployee(userToQuery == null ? user : userToQuery, dateToQuery, user));
     }
 
     @GET
@@ -55,7 +60,8 @@ public class EmployeeAssiduityResource {
     @Path("/responsible")
     @OAuthEndpoint(ASSIDUITY_SCOPE)
     public String getAssiduityInformationForEmployees(final @QueryParam("date") String date) {
-        return respond(user -> GiafAssiduityTeamResponsible.readListOfAssiduityEmployees(user, parse(date)));
+        final LocalDate dateToQuery = !Strings.isNullOrEmpty(date) ? parse(date) : new LocalDate();
+        return respond(user -> GiafAssiduityTeamResponsible.readListOfAssiduityEmployees(user, dateToQuery));
     }
 
     private String respond(final Function<User, JsonObject> function) {
@@ -64,7 +70,17 @@ public class EmployeeAssiduityResource {
     }
 
     private LocalDate parse(final String date) {
-        return DateTimeFormat.forPattern("yyyy-MM-dd").parseLocalDate(date);
+        try {
+            return DateTimeFormat.forPattern(dayPattern).parseLocalDate(date);
+        } catch (Exception e) {
+            throw newApplicationError(Response.Status.PRECONDITION_FAILED, "format_error", "day must be " + dayPattern);
+        }
     }
 
+    private WebApplicationException newApplicationError(Response.Status status, String error, String description) {
+        JsonObject errorObject = new JsonObject();
+        errorObject.addProperty("error", error);
+        errorObject.addProperty("description", description);
+        return new WebApplicationException(Response.status(status).entity(errorObject.toString()).build());
+    }
 }
