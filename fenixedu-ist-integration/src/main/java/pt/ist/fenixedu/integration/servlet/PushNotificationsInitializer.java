@@ -9,6 +9,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 
+import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.rest.JsonBodyReaderWriter;
 import org.fenixedu.bennu.signals.DomainObjectEvent;
 import org.fenixedu.bennu.signals.Signal;
@@ -60,6 +61,13 @@ public class PushNotificationsInitializer implements ServletContextListener {
             JsonArray usernames = postSite.getExecutionCourse().getAttendsSet().stream()
                     .map(a -> a.getRegistration().getPerson().getUser().getUsername()).distinct().map(JsonPrimitive::new)
                     .collect(StreamUtils.toJsonArray());
+
+            final String postAuthor = post.getCreatedBy().getUsername();
+            JsonArray teacherUsernames = postSite.getExecutionCourse().getTeacherGroupSet().stream()
+                    .flatMap(ptg -> ptg.getMembers().stream()).map(User::getUsername)
+                    .filter(u -> !postAuthor.equals(u)).distinct().map(JsonPrimitive::new).collect(StreamUtils.toJsonArray());
+
+            usernames.addAll(teacherUsernames);
 
             JsonObject message = new JsonObject();
             for (Locale locale : post.getName().getLocales()) {
