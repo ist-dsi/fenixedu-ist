@@ -29,14 +29,16 @@ public class FenixPayment {
         String amount;
         String type;
         String description;
+        String shortDescription;
         String date;
 
-        public PaymentEvent(String id, String amount, String type, String description, String date) {
+        public PaymentEvent(String id, String amount, String type, String description, String shortDescription, String date) {
             super();
             this.id = id;
             this.amount = amount;
             this.type = type;
             this.description = description;
+            this.shortDescription = shortDescription;
             this.date = date;
         }
 
@@ -70,6 +72,14 @@ public class FenixPayment {
 
         public void setDescription(String description) {
             this.description = description;
+        }
+
+        public String getShortDescription() {
+            return shortDescription;
+        }
+
+        public void setShortDescription(String shortDescription) {
+            this.shortDescription = shortDescription;
         }
 
         public String getDate() {

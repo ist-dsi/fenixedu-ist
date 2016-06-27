@@ -107,11 +107,13 @@ import org.fenixedu.academic.service.factory.RoomSiteComponentBuilder;
 import org.fenixedu.academic.service.services.student.EnrolStudentInWrittenEvaluation;
 import org.fenixedu.academic.service.services.student.UnEnrollStudentInWrittenEvaluation;
 import org.fenixedu.academic.ui.struts.action.ICalendarSyncPoint;
+import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.academic.util.ContentType;
 import org.fenixedu.academic.util.EvaluationType;
 import org.fenixedu.academic.util.MultiLanguageString;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.oauth.annotation.OAuthEndpoint;
 import org.fenixedu.commons.i18n.I18N;
@@ -659,8 +661,9 @@ public class FenixAPIv1 {
             String amount = entry.getOriginalAmount().getAmountAsString();
             String name = entry.getPaymentMode().getName();
             String description = entry.getDescription().toString();
+            String shortDescription = getShortDescriptionForEntry(entry);
             String date = formatDay.print(entry.getWhenRegistered());
-            payed.add(new PaymentEvent(id, amount, name, description, date));
+            payed.add(new PaymentEvent(id, amount, name, description, shortDescription, date));
         }
 
         List<Event> notPayedEvents = calculateNotPayedEvents(person);
@@ -681,6 +684,10 @@ public class FenixAPIv1 {
         }
 
         return new FenixPayment(payed, notPayed);
+    }
+
+    private String getShortDescriptionForEntry(Entry entry) {
+        return BundleUtil.getString(Bundle.ENUMERATION, entry.getEntryType().getName());
     }
 
     /**
