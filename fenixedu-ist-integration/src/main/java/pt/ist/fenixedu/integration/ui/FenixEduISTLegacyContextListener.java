@@ -18,6 +18,8 @@
  */
 package pt.ist.fenixedu.integration.ui;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -25,14 +27,22 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
+import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.degreeStructure.Context;
+import org.fenixedu.academic.domain.enrolment.DegreeModuleToEnrol;
+import org.fenixedu.academic.domain.enrolment.IDegreeModuleToEvaluate;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
+import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.academic.domain.studentCurriculum.CurriculumGroup;
+import org.fenixedu.academic.dto.student.enrollment.bolonha.BolonhaStudentEnrollmentBean;
 import org.fenixedu.academic.thesis.domain.StudentThesisCandidacy;
 import org.fenixedu.academic.thesis.ui.service.ThesisProposalsService;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.signals.DomainObjectEvent;
 import org.fenixedu.bennu.signals.Signal;
@@ -42,6 +52,7 @@ import org.fenixedu.cms.domain.Site;
 import org.fenixedu.learning.domain.executionCourse.ExecutionCourseSite;
 
 import pt.ist.fenixedu.integration.domain.student.AffinityCyclesManagement;
+import pt.ist.fenixedu.integration.domain.student.PreEnrolment;
 import pt.ist.fenixedu.integration.dto.QucProfessorshipEvaluation;
 import pt.ist.fenixedu.teacher.evaluation.domain.ProfessorshipEvaluationBean;
 import pt.ist.fenixframework.FenixFramework;
@@ -116,6 +127,8 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
                     .createCycleOrRepeateSeparate();
         }));
         ProfessorshipEvaluationBean.professorshipEvaluation = new QucProfessorshipEvaluation();
+
+        BolonhaStudentEnrollmentBean.registerStudentEnrolmentHandler(FenixEduISTLegacyContextListener::setPreEnrolledCourses);
     }
 
     private static boolean partOf(Set<ExecutionCourse> degrees, StudentThesisCandidacy studentThesisCandidacy) {
@@ -126,4 +139,31 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
     public void contextDestroyed(ServletContextEvent sce) {
     }
 
+    private static void setPreEnrolledCourses(BolonhaStudentEnrollmentBean bolonhaStudentEnrollmentBean) {
+        Registration registration = bolonhaStudentEnrollmentBean.getRegistration();
+        User user = registration.getPerson().getUser();
+        List<IDegreeModuleToEvaluate> degreeModulesToEnrol = new ArrayList<IDegreeModuleToEvaluate>();
+        if (registration.getEnrolments(bolonhaStudentEnrollmentBean.getExecutionPeriod()).size() == 0) {
+            for (PreEnrolment preEnrolment : user.getPreEnrolmentsSet()) {
+                Optional<Context> courseContext =
+                        preEnrolment
+                                .getCourseGroup()
+                                .getOpenChildContexts(CurricularCourse.class, preEnrolment.getExecutionSemester())
+                                .stream()
+                                .filter(ctx -> ctx.getChildDegreeModule() == preEnrolment.getCurricularCourse()
+                                        && ctx.getCurricularPeriod().getChildOrder() == preEnrolment.getExecutionSemester()
+                                                .getSemester()).findAny();
+
+                CurriculumGroup curriculumGroup =
+                        bolonhaStudentEnrollmentBean.getStudentCurricularPlan().getRoot()
+                                .findCurriculumGroupFor(preEnrolment.getCourseGroup());
+
+                if (courseContext.isPresent()) {
+                    degreeModulesToEnrol.add(new DegreeModuleToEnrol(curriculumGroup, courseContext.get(), preEnrolment
+                            .getExecutionSemester()));
+                }
+            }
+            bolonhaStudentEnrollmentBean.setDegreeModulesToEvaluate(degreeModulesToEnrol);
+        }
+    }
 }

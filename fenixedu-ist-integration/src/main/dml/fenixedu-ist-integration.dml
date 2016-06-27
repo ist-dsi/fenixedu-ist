@@ -84,6 +84,44 @@ class serviceRequests.IstRegistryCodeGenerator extends .org.fenixedu.academic.do
     Integer currentThirdCycle;
 }
 
+class student.PreEnrolment {
+}
+
+relation PreEnrolmentExecutionSemester {
+    .org.fenixedu.academic.domain.ExecutionSemester playsRole executionSemester;
+    student.PreEnrolment playsRole preEnrolments {
+        multiplicity *;
+    }
+}
+
+relation PreEnrolmentDegree {
+    .org.fenixedu.academic.domain.Degree playsRole degree;
+    student.PreEnrolment playsRole preEnrolments {
+        multiplicity *;
+    }
+}
+
+relation PreEnrolmentUser {
+    .org.fenixedu.bennu.core.domain.User playsRole user;
+    student.PreEnrolment playsRole preEnrolments {
+        multiplicity *;
+    }
+}
+
+relation PreEnrolmentCurricularCourse {
+    .org.fenixedu.academic.domain.CurricularCourse playsRole curricularCourse;
+    student.PreEnrolment playsRole preEnrolments {
+        multiplicity *;
+    }
+}
+
+relation PreEnrolmentCourseGroup {
+    .org.fenixedu.academic.domain.degreeStructure.CourseGroup playsRole courseGroup;
+    student.PreEnrolment playsRole preEnrolments {
+        multiplicity *;
+    }
+}
+
 relation BennuHasIstUsernameCounter {
     .org.fenixedu.bennu.core.domain.Bennu playsRole bennu {
         multiplicity 1..1;
