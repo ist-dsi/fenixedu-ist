@@ -57,7 +57,7 @@ public class CoordinatorsAnswersReportFile extends CoordinatorsAnswersReportFile
                     } else {
                         row.setCell("partilhado");
                     }
-                    row.setCell(questionAnswer.getInquiryAnswer().getCode().toString());
+                    row.setCell(questionAnswer.getInquiryQuestion().getCode().toString());
                     row.setCell(questionAnswer.getAnswer() != null ? questionAnswer.getAnswer().replace('\n', ' ')
                             .replace('\r', ' ') : "");
                 }

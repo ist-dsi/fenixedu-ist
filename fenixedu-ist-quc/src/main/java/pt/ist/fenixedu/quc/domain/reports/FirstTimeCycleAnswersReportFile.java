@@ -67,7 +67,7 @@ public class FirstTimeCycleAnswersReportFile extends FirstTimeCycleAnswersReport
                     row.setCell(studentCycleAnswer.getRegistration().getPerson().getUsername());
                     row.setCell(registration.getCycleType(getExecutionYear()) != null ? registration.getCycleType(
                             getExecutionYear()).getDescription() : "");
-                    row.setCell(questionAnswer.getInquiryAnswer().getCode().toString());
+                    row.setCell(questionAnswer.getInquiryQuestion().getCode().toString());
                     row.setCell(questionAnswer.getAnswer());
                 }
             }
