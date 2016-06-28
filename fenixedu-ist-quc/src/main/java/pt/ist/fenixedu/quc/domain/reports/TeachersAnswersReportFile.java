@@ -62,7 +62,7 @@ public class TeachersAnswersReportFile extends TeachersAnswersReportFile_Base {
                             row.setCell(GepReportFile.getExecutionSemesterCode(executionSemester));
                             row.setCell(GepReportFile.getExecutionCourseCode(professorship.getExecutionCourse()));
                             row.setCell(professorship.getPerson().getUsername());
-                            row.setCell(questionAnswer.getInquiryAnswer().getCode().toString());
+                            row.setCell(questionAnswer.getInquiryQuestion().getCode().toString());
                             row.setCell(questionAnswer.getAnswer() != null ? questionAnswer.getAnswer().replace('\n', ' ')
                                     .replace('\r', ' ') : "");
                         }
