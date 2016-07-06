@@ -47,7 +47,7 @@ public class EventWrapper {
 
         // calculate debt
         {
-            final Money value = calculateTotalDebtValue();
+            final Money value = event.isCancelled() ? Money.ZERO : calculateTotalDebtValue();
             final Money diff = value.subtract(payedBeforThreshold);
             debt = diff.isPositive() ? diff : Money.ZERO;
         }
