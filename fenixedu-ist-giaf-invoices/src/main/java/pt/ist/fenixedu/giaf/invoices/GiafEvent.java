@@ -27,6 +27,7 @@ import org.fenixedu.academic.domain.accounting.Exemption;
 import org.fenixedu.academic.domain.accounting.PaymentMode;
 import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeAndInsuranceEvent;
 import org.fenixedu.academic.domain.accounting.events.ImprovementOfApprovedEnrolmentEvent;
+import org.fenixedu.academic.domain.accounting.events.SpecialSeasonEnrolmentEvent;
 import org.fenixedu.academic.domain.accounting.events.dfa.DFACandidacyEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEventWithPaymentPlan;
@@ -411,6 +412,9 @@ public class GiafEvent {
         }
         if (event instanceof DFACandidacyEvent) {
             return "0031";// 72412 TAXAS DE MATRICULA"
+        }
+        if (event instanceof SpecialSeasonEnrolmentEvent) {
+            return "0032";// 72413 TAXAS  DE EXAMES
         }
         if (event.isPhdEvent()) {
             if (eventDescription.indexOf("Taxa de Inscri") >= 0) {
