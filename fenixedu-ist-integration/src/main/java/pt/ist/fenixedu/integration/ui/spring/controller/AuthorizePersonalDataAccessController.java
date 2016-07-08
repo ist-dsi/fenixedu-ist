@@ -18,6 +18,7 @@
  */
 package pt.ist.fenixedu.integration.ui.spring.controller;
 
+import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.spring.portal.SpringApplication;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.springframework.stereotype.Controller;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import pt.ist.fenixedu.integration.domain.BpiCard;
 import pt.ist.fenixedu.integration.domain.cgd.CgdCard;
 
 @SpringApplication(group = "logged", path = "authorize-personal-data-access", title = "authorize.personal.data.access.title")
@@ -41,12 +43,16 @@ public class AuthorizePersonalDataAccessController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public String setCandiadteCGDAccess(@RequestParam(required = false) Boolean allowAccess,
-            @RequestParam(required = false) String qs, Model model) {
-        final boolean authorize = allowAccess != null && allowAccess.booleanValue();
-        final CgdCard card = CgdCard.setGrantAccess(authorize);
+    public String setCandidateBanksAccess(@RequestParam(required = false) boolean allowAccessCgd,
+            @RequestParam(required = false) Boolean allowAccessBpi, @RequestParam(required = false) String qs, Model model) {
+        final CgdCard card = CgdCard.setGrantAccess(allowAccessCgd);
         if (card != null) {
             card.send();
+        }
+
+        if (allowAccessBpi != null) {
+            final boolean authorizeBpi = allowAccessBpi.booleanValue();
+            BpiCard.setGrantAccess(authorizeBpi, Authenticate.getUser());
         }
         return "redirect:" + qs;
     }
