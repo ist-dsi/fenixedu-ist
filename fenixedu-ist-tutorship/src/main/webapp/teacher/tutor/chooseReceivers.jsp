@@ -96,4 +96,15 @@
 	</fr:form>
 </logic:present>
 
-
+<script>
+	$("input[name=selectAll]").click(function (e) {
+		$("#receiversForm input[type=checkbox]").prop("checked", true);
+		$(this).blur();
+		e.preventDefault();
+	});
+	$("input[name=reset]").click(function (e) {
+		$("#receiversForm input[type=checkbox]").prop("checked", false);
+		$(this).blur();
+		e.preventDefault();
+	})
+</script>

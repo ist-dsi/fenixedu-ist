@@ -105,22 +105,12 @@ public class SendEmailToTutoredStudents extends FenixDispatchAction {
         if (RenderUtils.getViewState("receivers") != null) {
             receivers = (StudentsByTutorBean) RenderUtils.getViewState("receivers").getMetaObject().getObject();
 
-            if (request.getParameter("selectAll") != null) {
-                RenderUtils.invalidateViewState();
-                receivers.setStudentsList(Tutorship.getActiveTutorships(teacher));
-                request.setAttribute("receiversBean", receivers);
-            } else if (request.getParameter("reset") != null) {
-                RenderUtils.invalidateViewState();
-                receivers.setStudentsList(new ArrayList<Tutorship>());
+            if (receivers.getStudentsList().isEmpty()) {
+                addActionMessage(request, "error.teacher.tutor.sendMail.chooseReceivers.mustSelectOne");
                 request.setAttribute("receiversBean", receivers);
             } else {
-                if (receivers.getStudentsList().isEmpty()) {
-                    addActionMessage(request, "error.teacher.tutor.sendMail.chooseReceivers.mustSelectOne");
-                    request.setAttribute("receiversBean", receivers);
-                } else {
-                    request.setAttribute("receivers", receivers);
-                    return createMail(mapping, actionForm, request, response);
-                }
+                request.setAttribute("receivers", receivers);
+                return createMail(mapping, actionForm, request, response);
             }
         }
 
