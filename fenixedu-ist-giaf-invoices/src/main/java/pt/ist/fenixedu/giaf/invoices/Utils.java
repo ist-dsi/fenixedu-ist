@@ -43,6 +43,7 @@ import org.fenixedu.academic.domain.accounting.accountingTransactions.detail.Sib
 import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeAndInsuranceEvent;
 import org.fenixedu.academic.domain.accounting.events.AnnualEvent;
 import org.fenixedu.academic.domain.accounting.events.ImprovementOfApprovedEnrolmentEvent;
+import org.fenixedu.academic.domain.accounting.events.SpecialSeasonEnrolmentEvent;
 import org.fenixedu.academic.domain.accounting.events.candidacy.IndividualCandidacyEvent;
 import org.fenixedu.academic.domain.accounting.events.dfa.DFACandidacyEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEvent;
@@ -410,6 +411,9 @@ public class Utils {
         }
         if (event instanceof DFACandidacyEvent) {
             return "FETAXAMAT";// 72412 TAXAS DE MATRICULA"
+        }
+        if (event instanceof SpecialSeasonEnrolmentEvent) {
+            return "FETAXAEX";// 72413 TAXAS  DE EXAMES
         }
         if (event.isPhdEvent()) {
             if (eventDescription.indexOf("Taxa de Inscri") >= 0) {
