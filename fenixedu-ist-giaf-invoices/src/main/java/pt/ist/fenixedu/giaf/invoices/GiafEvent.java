@@ -339,12 +339,7 @@ public class GiafEvent {
             builder.append(exemption.getDescription().toString());
         }
         final String observation = max80(builder.toString());
-        final JsonObject json = toJson(event, clientId, invoiceId, "E", value, observation.isEmpty() ? "Isencao desconto ou estorno" : observation);
-        final int year = Year.now().getValue();
-        if (invoiceId != null && !invoiceId.startsWith(Integer.toString(year))) {
-            json.addProperty("date", invoiceId.substring(0, 4) + "-12-30 23:00:00");
-        }
-        return json;
+        return toJson(event, clientId, invoiceId, "E", value, observation.isEmpty() ? "Isencao desconto ou estorno" : observation);
     }
 
     private String max80(final String s) {
