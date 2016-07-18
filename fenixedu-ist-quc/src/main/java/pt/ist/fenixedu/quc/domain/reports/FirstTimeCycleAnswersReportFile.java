@@ -99,7 +99,7 @@ public class FirstTimeCycleAnswersReportFile extends FirstTimeCycleAnswersReport
                     } else {
                         row.setCell("sem matrícula");
                     }
-                    row.setCell(questionAnswer.getInquiryAnswer().getCode().toString());
+                    row.setCell(questionAnswer.getInquiryQuestion().getCode().toString());
                     row.setCell(questionAnswer.getAnswer());
                 }
             }
