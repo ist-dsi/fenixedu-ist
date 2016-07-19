@@ -229,6 +229,8 @@ public class GiafEvent {
             final String receiptNumber = createInvoice(toJsonPayment(d, clientId, fineEntry.invoiceNumber, fines));
 
             persistLocalChange(clientId, fineEntry.invoiceNumber, "fine", fines, d.getExternalId(), receiptNumber, now, registryDate);
+
+            fineEntry.fines = fineEntry.fines.add(fines);
         }
 
         if (entry != null) {
