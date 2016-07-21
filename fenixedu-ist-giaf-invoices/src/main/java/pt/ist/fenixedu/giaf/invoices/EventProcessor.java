@@ -69,7 +69,7 @@ public class EventProcessor {
                 LOGGER.warn("%s: %s%n", eventWrapper.event.getExternalId(), m);
                 return;
             }
-            LOGGER.error("Unhandled giaf error for event %s : %s%n", eventWrapper.event.getExternalId(), m);
+            LOGGER.error("Unhandled giaf error for event " + eventWrapper.event.getExternalId() + " : " + m);
             e.printStackTrace();
 //        throw e;
         }
