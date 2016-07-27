@@ -27,7 +27,7 @@ public class IstUsernameCounter extends IstUsernameCounter_Base {
     public IstUsernameCounter() {
         super();
         setBennu(Bennu.getInstance());
-        setLastValue(4_00_000);
+        setLastValue(0);
     }
 
     public long getNext() {
