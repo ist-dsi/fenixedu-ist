@@ -48,7 +48,7 @@
 		<p class="text-center">
 			<form method="post">
 				<input type="hidden" name="qs" value='/authorize-personal-data-access'/>					
-				<input type="hidden" name="allowAccess" value='<%= Boolean.toString(!allowCGDAccess) %>'/>
+				<input type="hidden" name="allowAccessCgd" value='<%= Boolean.toString(!allowCGDAccess) %>'/>
 				<button class='<%= "btn btn-lg " + (allowCGDAccess ? "btn-default" : "btn-primary") %>'>
 					<spring:message code='<%= allowCGDAccess ? "label.revoke" : "label.grant" %>' />
 				</button>
