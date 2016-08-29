@@ -38,7 +38,14 @@ import javax.servlet.ServletContext;
 import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -48,6 +55,7 @@ import net.fortuna.ical4j.model.Calendar;
 
 import org.fenixedu.academic.domain.AdHocEvaluation;
 import org.fenixedu.academic.domain.CompetenceCourse;
+import org.fenixedu.academic.domain.Coordinator;
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
@@ -134,6 +142,7 @@ import pt.ist.fenixedu.integration.api.beans.FenixCalendar.FenixCalendarEvent;
 import pt.ist.fenixedu.integration.api.beans.FenixCalendar.FenixClassEvent;
 import pt.ist.fenixedu.integration.api.beans.FenixCalendar.FenixEvaluationEvent;
 import pt.ist.fenixedu.integration.api.beans.FenixCourse;
+import pt.ist.fenixedu.integration.api.beans.FenixCurricularGroup;
 import pt.ist.fenixedu.integration.api.beans.FenixCurriculum;
 import pt.ist.fenixedu.integration.api.beans.FenixPayment;
 import pt.ist.fenixedu.integration.api.beans.FenixPayment.PaymentEvent;
@@ -162,6 +171,7 @@ import pt.ist.fenixedu.integration.api.beans.publico.FenixSchedule;
 import pt.ist.fenixedu.integration.api.beans.publico.FenixSpace;
 import pt.ist.fenixedu.integration.api.infra.FenixAPIFromExternalServer;
 import pt.ist.fenixedu.integration.dto.PersonInformationBean;
+import pt.ist.fenixedu.integration.service.services.externalServices.CreatePreEnrolment;
 import pt.ist.fenixframework.DomainObject;
 import pt.ist.fenixframework.FenixFramework;
 
@@ -176,6 +186,7 @@ import com.google.common.net.HttpHeaders;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
@@ -189,6 +200,7 @@ public class FenixAPIv1 {
     public final static String EVALUATIONS_SCOPE = "EVALUATIONS";
     public final static String CURRICULAR_SCOPE = "CURRICULAR";
     public final static String PAYMENTS_SCOPE = "PAYMENTS";
+    public final static String DEGREE_CURRICULAR_MANAGEMENT = "DEGREE_CURRICULAR_MANAGEMENT";
 
     public final static String JSON_UTF8 = "application/json; charset=utf-8";
 
@@ -1067,6 +1079,174 @@ public class FenixAPIv1 {
             fenixExecutionCourses.add(new FenixExecutionCourse(sigla, credits, name, id, academicTermValue));
         }
         return fenixExecutionCourses;
+    }
+
+    /**
+     * Set the previously chosen courses for students
+     *
+     * @summary Set the previously chosen courses for students
+     * @param id
+     *            degree id
+     * @param academicTerm
+     * 
+     */
+    @POST
+    @Produces(JSON_UTF8)
+    @Path("degrees/{id}/preEnrolmentsCurricularGroups")
+    @OAuthEndpoint(value = DEGREE_CURRICULAR_MANAGEMENT)
+    public Response defaultEnrolments(@PathParam("id") String oid, @QueryParam("academicTerm") String academicTerm,
+            JsonObject preEnrolments) {
+
+        AcademicInterval academicInterval = getAcademicInterval(academicTerm, true);
+        if (academicInterval == null) {
+            throw newApplicationError(Status.BAD_REQUEST, "format_error", "academicTerm parameter must not be null");
+        }
+
+        ExecutionInterval executionInterval = ExecutionInterval.getExecutionInterval(academicInterval);
+        if (!(executionInterval instanceof ExecutionSemester)) {
+            throw newApplicationError(Status.BAD_REQUEST, "format_error", "academicTerm parameter must not be a semester");
+        }
+        ExecutionSemester executionSemester = (ExecutionSemester) executionInterval;
+
+        Degree degree = getDomainObject(oid, Degree.class);
+        final Person coordinator = Authenticate.getUser().getPerson();
+        boolean isCoordinator =
+                degree.getResponsibleCoordinators(executionSemester.getExecutionYear()).stream().map(Coordinator::getPerson)
+                        .anyMatch(p -> p == coordinator);
+        if (!isCoordinator) {
+            throw newApplicationError(Status.BAD_REQUEST, "notAllowed",
+                    "must be a responsible coordinator of the degree in the given semester");
+        }
+
+        JsonObject report = new JsonObject();
+        report.add("errors", new JsonArray());
+
+        JsonArray jArray = preEnrolments.getAsJsonArray("defaultEnrolments");
+        for (JsonElement jsonElement : jArray) {
+            JsonObject jsonObject = jsonElement.getAsJsonObject();
+            String userId = jsonObject.get("student").getAsString();
+            User user = User.findByUsername(userId);
+            if (user == null) {
+                report.get("errors").getAsJsonArray()
+                        .add(new JsonPrimitive("User " + userId + " not found. Pre enrolments for this user were not processed"));
+                break;
+            }
+            for (JsonElement jsonPreEnrol : jsonObject.get("preEnrolments").getAsJsonArray()) {
+                JsonObject jsonEnrolLine = jsonPreEnrol.getAsJsonObject();
+                String curricularCourseId = jsonEnrolLine.get("course").getAsString();
+                String groupId = jsonEnrolLine.get("group").getAsString();
+
+                CurricularCourse curricularCourse = null;
+                try {
+                    curricularCourse = FenixFramework.getDomainObject(curricularCourseId);
+                } catch (Exception e) {
+                    report.get("errors").getAsJsonArray()
+                            .add(new JsonPrimitive("Curricular course " + curricularCourseId + " not found for user " + userId));
+                    break;
+                }
+                CourseGroup courseGroup = null;
+                try {
+                    courseGroup = FenixFramework.getDomainObject(groupId);
+                } catch (Exception e) {
+                    report.get("errors").getAsJsonArray()
+                            .add(new JsonPrimitive("Course group " + groupId + " not found for user " + userId));
+                    break;
+                }
+
+                try {
+                    CreatePreEnrolment.create(executionSemester, degree, user, curricularCourse, courseGroup);
+                } catch (Exception e) {
+                    report.get("errors")
+                            .getAsJsonArray()
+                            .add(new JsonPrimitive("An error occured for user " + userId + " course group " + groupId
+                                    + " and curricular course " + curricularCourseId + " - this pre enrolment was not successful"));
+                }
+            }
+        }
+        return Response.ok(report).build();
+    }
+
+    /**
+     * Courses group structure for degree with id
+     *
+     * @summary Courses group structure for specific degree
+     * @param id
+     *            degree id
+     * @param academicTerm
+     * 
+     */
+    @GET
+    @Produces(JSON_UTF8)
+    @Path("degrees/{id}/curricularGroups")
+    public List<FenixCurricularGroup> curricularGroupsByDegreeId(@PathParam("id") String oid,
+            @QueryParam("academicTerm") String academicTerm) {
+
+        Degree degree = getDomainObject(oid, Degree.class);
+        Set<ExecutionSemester> executionSemesters = getExecutionSemesters(academicTerm);
+        ExecutionYear executionYear = executionSemesters.iterator().next().getExecutionYear();
+
+        Set<FenixCurricularGroup> result = new HashSet<FenixCurricularGroup>();
+        degree.getDegreeCurricularPlansForYear(executionYear).stream().filter(DegreeCurricularPlan::isActive).forEach(dcp -> {
+            result.add(new FenixCurricularGroup(dcp.getRoot(), executionYear));
+            addCurricularGroup(executionYear, result, dcp.getRoot());
+        });
+        return new ArrayList<FenixCurricularGroup>(result);
+    }
+
+    private void addCurricularGroup(ExecutionYear executionYear, Set<FenixCurricularGroup> result, CourseGroup group) {
+        for (DegreeModule degreeModule : group.getChildDegreeModulesValidOn(executionYear)) {
+            if (degreeModule.isCourseGroup()) {
+                result.add(new FenixCurricularGroup((CourseGroup) degreeModule, executionYear));
+                addCurricularGroup(executionYear, result, (CourseGroup) degreeModule);
+            }
+        }
+    }
+
+    /**
+     * Curricular courses for degree with id
+     *
+     * @summary Curricular courses for specific degree
+     * @param id
+     *            degree id
+     * @param academicTerm
+     * 
+     */
+    @GET
+    @Produces(JSON_UTF8)
+    @Path("degrees/{id}/curricularCourses")
+    public String curricularCoursesByDegreeId(@PathParam("id") String oid, @QueryParam("academicTerm") String academicTerm) {
+
+        Degree degree = getDomainObject(oid, Degree.class);
+
+        Set<ExecutionSemester> executionSemesters = getExecutionSemesters(academicTerm);
+        ExecutionYear executionYear = executionSemesters.iterator().next().getExecutionYear();
+
+        final Set<CurricularCourse> curricularCourses = new HashSet<CurricularCourse>();
+
+        degree.getDegreeCurricularPlansForYear(executionYear).stream().filter(DegreeCurricularPlan::isActive)
+                .forEach(plan -> addCurricularCourses(plan.getRoot(), curricularCourses, executionSemesters));
+
+        return curricularCourses.stream().map(cc -> {
+            JsonObject object = new JsonObject();
+            object.addProperty("id", cc.getExternalId());
+            object.addProperty("name", cc.getName());
+            return object;
+        }).collect(StreamUtils.toJsonArray()).toString();
+    }
+
+    private void addCurricularCourses(final CourseGroup courseGroup, final Set<CurricularCourse> curricularCourses,
+            final Set<ExecutionSemester> executionSemesters) {
+        for (ExecutionSemester executionSemester : executionSemesters) {
+            for (DegreeModule degreeModule : courseGroup.getChildDegreeModulesValidOn(executionSemester)) {
+                if (degreeModule.isLeaf()) {
+                    final CurricularCourse curricularCourse = (CurricularCourse) degreeModule;
+                    curricularCourses.add(curricularCourse);
+                } else {
+                    final CourseGroup childCourseGroup = (CourseGroup) degreeModule;
+                    addCurricularCourses(childCourseGroup, curricularCourses, executionSemesters);
+                }
+            }
+        }
     }
 
     @GET
