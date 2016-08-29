@@ -30,8 +30,15 @@ public class ISTUsernameGenerator implements UsernameGenerator {
     }
 
     @Override
-    public String doGenerate(UserProfile parameter) {
-        return "ist" + counter.getNext();
+    public String doGenerate(UserProfile profile) {
+        if (isStudent(profile)) {
+            return "ist1" + profile.getPerson().getStudent().getNumber();
+        } else {
+            return "ist" + counter.getNext();
+        }
     }
 
+    private boolean isStudent(UserProfile profile) {
+        return profile.getPerson().getStudent() != null || !profile.getPerson().getPhdIndividualProgramProcessesSet().isEmpty();
+    }
 }
