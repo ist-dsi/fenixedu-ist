@@ -29,6 +29,11 @@ class BpiCard {
 	boolean allowSendDetails;
 	DateTime whenAllowChanged;
 }
+ 
+class SantanderCard {
+	boolean allowSendDetails;
+	DateTime whenAllowChanged;
+}
 
 class student.importation.DgesBaseProcess extends .org.fenixedu.academic.domain.QueueJobWithFile {
     EntryPhase entryPhase;
@@ -120,6 +125,15 @@ relation CgdCardUser {
 
 relation BpiCardUser {
     BpiCard playsRole bpiCard {
+        multiplicity 0..1;
+    }
+    .org.fenixedu.bennu.core.domain.User playsRole user {
+        multiplicity 1..1;
+    }
+}
+
+relation SantanderCardUser {
+    SantanderCard playsRole santanderCard {
         multiplicity 0..1;
     }
     .org.fenixedu.bennu.core.domain.User playsRole user {

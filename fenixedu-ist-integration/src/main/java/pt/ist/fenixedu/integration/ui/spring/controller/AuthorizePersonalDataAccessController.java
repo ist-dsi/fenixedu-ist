@@ -18,9 +18,12 @@
  */
 package pt.ist.fenixedu.integration.ui.spring.controller;
 
+import org.fenixedu.academic.domain.Person;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.spring.portal.SpringApplication;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
+import org.joda.time.LocalDate;
+import org.joda.time.Years;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import pt.ist.fenixedu.integration.domain.BpiCard;
+import pt.ist.fenixedu.integration.domain.SantanderCard;
 import pt.ist.fenixedu.integration.domain.cgd.CgdCard;
 
 @SpringApplication(group = "logged", path = "authorize-personal-data-access", title = "authorize.personal.data.access.title")
@@ -44,7 +48,8 @@ public class AuthorizePersonalDataAccessController {
 
     @RequestMapping(method = RequestMethod.POST)
     public String setCandidateBanksAccess(@RequestParam(required = false) boolean allowAccessCgd,
-            @RequestParam(required = false) Boolean allowAccessBpi, @RequestParam(required = false) String qs, Model model) {
+            @RequestParam(required = false) Boolean allowAccessBpi, @RequestParam(required = false) Boolean allowAccessSantander,
+            @RequestParam(required = false) String qs, Model model) {
         final CgdCard card = CgdCard.setGrantAccess(allowAccessCgd);
         if (card != null) {
             card.send();
@@ -53,6 +58,11 @@ public class AuthorizePersonalDataAccessController {
         if (allowAccessBpi != null) {
             final boolean authorizeBpi = allowAccessBpi.booleanValue();
             BpiCard.setGrantAccess(authorizeBpi, Authenticate.getUser());
+        }
+
+        if (allowAccessSantander != null) {
+            final boolean authorizeSantander = allowAccessSantander.booleanValue();
+            SantanderCard.setGrantAccess(authorizeSantander, Authenticate.getUser());
         }
         return "redirect:" + qs;
     }
