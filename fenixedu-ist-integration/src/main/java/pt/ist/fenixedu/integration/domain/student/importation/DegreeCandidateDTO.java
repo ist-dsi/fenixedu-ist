@@ -44,7 +44,6 @@ import org.fenixedu.academic.domain.person.IDDocumentType;
 import org.fenixedu.academic.domain.person.MaritalStatus;
 import org.fenixedu.academic.util.PhoneUtil;
 import org.fenixedu.academic.util.StringFormatter;
-import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.UserProfile;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.YearMonthDay;
@@ -391,7 +390,6 @@ public class DegreeCandidateDTO {
     public Person createPerson() {
         HumanName split = HumanName.decompose(StringFormatter.prettyPrint(getName()), false);
         UserProfile profile = new UserProfile(split.getGivenNames(), split.getFamilyNames(), null, null, null);
-        new User(profile);
 
         final Person person = new Person(profile);
 

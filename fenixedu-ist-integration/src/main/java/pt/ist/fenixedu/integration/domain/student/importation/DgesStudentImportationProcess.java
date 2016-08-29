@@ -50,7 +50,6 @@ import org.fenixedu.academic.domain.candidacy.StandByCandidacySituation;
 import org.fenixedu.academic.domain.candidacy.StudentCandidacy;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.organizationalStructure.UnitUtils;
-import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.academic.domain.student.PrecedentDegreeInformation;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.dto.accounting.EntryDTO;
@@ -58,8 +57,6 @@ import org.fenixedu.academic.dto.accounting.EntryWithInstallmentDTO;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.academic.util.LabelFormatter;
 import org.fenixedu.academic.util.Money;
-import org.fenixedu.bennu.core.domain.User;
-import org.fenixedu.bennu.core.domain.UserLoginPeriod;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.DateTime;
 import org.joda.time.YearMonthDay;
@@ -67,7 +64,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import pt.ist.fenixedu.contracts.domain.Employee;
-import pt.ist.fenixedu.contracts.domain.accessControl.ActiveEmployees;
 import pt.ist.fenixedu.tutorship.domain.TutorshipIntention;
 
 public class DgesStudentImportationProcess extends DgesStudentImportationProcess_Base {
@@ -194,17 +190,11 @@ public class DgesStudentImportationProcess extends DgesStudentImportationProcess
                 logger.info("Processed :" + processed);
             }
 
-            int studentNumber = Student.generateStudentNumber();
-
             logCandidate(LOG_WRITER, degreeCandidateDTO);
 
             Person person = null;
             try {
                 person = degreeCandidateDTO.getMatchingPerson();
-                // Person may not yet have a user, so we will create it
-                if (person.getUser() == null) {
-                    person.setUser(new User(person.getProfile()));
-                }
             } catch (DegreeCandidateDTO.NotFoundPersonException e) {
                 person = degreeCandidateDTO.createPerson();
                 logCreatedPerson(LOG_WRITER, person);
@@ -220,22 +210,23 @@ public class DgesStudentImportationProcess extends DgesStudentImportationProcess
                 continue;
             }
 
-            if (person.getTeacher() != null || RoleType.TEACHER.isMember(person.getUser())) {
+            if (person.getTeacher() != null) {
                 logCandidateIsTeacher(LOG_WRITER, degreeCandidateDTO, person);
                 continue;
             }
 
-            if (new ActiveEmployees().isMember(person.getUser()) || person.getEmployee() != null) {
+            if (person.getEmployee() != null) {
                 logCandidateIsEmployee(LOG_WRITER, degreeCandidateDTO, person);
             }
 
-            UserLoginPeriod.createOpenPeriod(person.getUser());
-
+            int studentNumber = Student.generateStudentNumber();
             if (person.getStudent() == null) {
                 // Ensure that the same student number is created
                 new Student(person, studentNumber);
                 logCreatedStudent(LOG_WRITER, person.getStudent());
             }
+
+            person.ensureOpenUserAccount();
 
             voidPreviousCandidacies(person,
                     degreeCandidateDTO.getExecutionDegree(getExecutionYear(), getDgesStudentImportationForCampus()));
