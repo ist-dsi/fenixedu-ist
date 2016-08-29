@@ -194,8 +194,6 @@ public class DgesStudentImportationProcess extends DgesStudentImportationProcess
                 logger.info("Processed :" + processed);
             }
 
-            int studentNumber = Student.generateStudentNumber();
-
             logCandidate(LOG_WRITER, degreeCandidateDTO);
 
             Person person = null;
@@ -233,7 +231,7 @@ public class DgesStudentImportationProcess extends DgesStudentImportationProcess
 
             if (person.getStudent() == null) {
                 // Ensure that the same student number is created
-                new Student(person, studentNumber);
+                new Student(person);
                 logCreatedStudent(LOG_WRITER, person.getStudent());
             }
 

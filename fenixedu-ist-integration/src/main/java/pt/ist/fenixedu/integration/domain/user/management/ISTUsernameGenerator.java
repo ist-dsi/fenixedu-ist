@@ -31,7 +31,7 @@ public class ISTUsernameGenerator implements UsernameGenerator {
 
     @Override
     public String doGenerate(UserProfile parameter) {
-        return "ist" + counter.getNext();
+        return "ist1" + counter.getNext();
     }
 
 }

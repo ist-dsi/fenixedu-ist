@@ -12,6 +12,7 @@ valueType pt.ist.fenixedu.integration.domain.accounting.events.export.PrintedPay
 
 class user.management.IstUsernameCounter {
     long lastValue;
+    long firstStudentNumberMatchingValue;
 }
 
 class cgd.CgdCardCounter {
