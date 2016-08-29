@@ -69,6 +69,7 @@ public class Employee extends Employee_Base {
         setPerson(person);
         setWorkingHours(0);
         setRootDomainObject(Bennu.getInstance());
+        person.ensureOpenUserAccount();
     }
 
     public void delete() {

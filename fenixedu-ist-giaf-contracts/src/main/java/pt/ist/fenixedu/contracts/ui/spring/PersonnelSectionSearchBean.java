@@ -25,7 +25,6 @@ import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.ui.struts.action.accounts.SearchParametersBean;
-import org.fenixedu.bennu.core.domain.User;
 
 import pt.ist.fenixedu.contracts.domain.Employee;
 
@@ -44,19 +43,18 @@ public class PersonnelSectionSearchBean extends SearchParametersBean {
     @Override
     public Collection<Person> search() {
         Collection<Person> search = super.search();
-        Stream<User> stream = search.isEmpty() ? null : search.stream().map(p -> p.getUser());
-        Stream<User> matches = filterEmployeeNumber(stream);
-        return matches == null ? null : matches.map(u -> u.getPerson()).filter(Objects::nonNull).collect(Collectors.toSet());
+        Stream<Person> stream = search.isEmpty() ? null : search.stream();
+        Stream<Person> matches = filterEmployeeNumber(stream);
+        return matches == null ? null : matches.filter(Objects::nonNull).collect(Collectors.toSet());
     }
 
-    private Stream<User> filterEmployeeNumber(Stream<User> matches) {
+    private Stream<Person> filterEmployeeNumber(Stream<Person> matches) {
         if (employeeNumber != null) {
             if (matches == null) {
                 return Stream.of(Employee.readByNumber(employeeNumber)).filter(Objects::nonNull).map(Employee::getPerson)
-                        .map(Person::getUser).filter(Objects::nonNull);
+                        .filter(Objects::nonNull);
             } else {
-                return matches.filter(p -> Stream.of(p.getPerson()).map(Person::getEmployee).filter(Objects::nonNull)
-                        .filter(a -> a.getEmployeeNumber().equals(employeeNumber)).findAny().isPresent());
+                return matches.filter(p -> p.getEmployee() != null && p.getEmployee().getEmployeeNumber().equals(employeeNumber));
             }
         }
         return matches;

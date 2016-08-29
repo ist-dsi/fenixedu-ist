@@ -31,8 +31,6 @@ import org.fenixedu.academic.domain.organizationalStructure.AccountabilityType;
 import org.fenixedu.academic.domain.organizationalStructure.AccountabilityTypeEnum;
 import org.fenixedu.academic.domain.organizationalStructure.Party;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
-import org.fenixedu.academic.domain.person.RoleType;
-import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.UserLoginPeriod;
 import org.joda.time.LocalDate;
 import org.joda.time.YearMonthDay;
@@ -47,17 +45,14 @@ public class Invitation extends Invitation_Base {
 
         setAccountabilityType(accountabilityType);
         setChildParty(person);
-        if (person.getUser() == null) {
-            person.setUser(new User(getInvitedPerson().getProfile()));
-        }
         setParentParty(unit);
         setResponsible(responsible);
-        RoleType.grant(RoleType.PERSON, person.getUser());
         setInvitationInterval(begin, end);
     }
 
     public void setInvitationInterval(YearMonthDay beginDate, YearMonthDay endDate) {
         checkInvitationDatesIntersection(getInvitedPerson(), beginDate, endDate);
+        getInvitedPerson().ensureUserAccount();
         if (getBeginDate() == null) {
             // When editing from the constructor
             new UserLoginPeriod(getInvitedPerson().getUser(), beginDate.toLocalDate(), endDate.toLocalDate());

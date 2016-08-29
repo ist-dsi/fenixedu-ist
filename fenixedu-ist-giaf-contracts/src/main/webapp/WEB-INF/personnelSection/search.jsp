@@ -99,16 +99,23 @@
 			</thead>
 			<tbody>
 				<c:forEach var="person" items="${searchResult}">
-					<c:set var="user" value="${person.user}"/>
+					<c:set var="profile" value="${person.profile}"/>
 					<tr>
-						<td><img src="${user.profile.avatarUrl}" alt="<c:out value='${user.name}'/>" /></td>
-						<td><c:out value="${user.username}"/></td>
+						<td>
+    						<c:if test="${profile.user != null}">
+                                <img src="${profile.avatarUrl}" alt="<c:out value='${profile.fullName}'/>" /></td>
+    						</c:if>
+						</td>
+						<td><c:out value="${person.username}"/></td>
 						<td><c:out value="${person.employee.employeeNumber}"/></td>  
-						<td><c:out value="${user.name}"/></td>
+						<td><c:out value="${profile.fullName}"/></td>
 						<td><c:out value="${person.documentIdNumber}"/></td>
 						<td<c:out value=">${person.emailForSendingEmails}"/></td>
-						<bean:define id="user" name="user" type="org.fenixedu.bennu.core.domain.User"/>
-						<td><%=LegacyRoleUtils.mainRolesStr(user) %></td>
+						<td>
+						  <c:if test="${person.user != null}">
+						      <c:out value="${pt.ist.fenixedu.contracts.domain.LegacyRoleUtils.mainRolesStr(person.user)}" />
+						  </c:if>
+						</td>
 						<c:choose>
 							<c:when test="${person.employee == null}">
 								<td><a href="#" data-toggle="modal" data-target="#create-contract-dialog<c:out value='${person.username}'/>"><span class="glyphicon glyphicon-edit"></span> <spring:message code="label.create.contract"/></a></td>
@@ -124,7 +131,7 @@
 												</h4>
 											</div>
 											<div class="modal-body">
-												<dl class="dl-horizontal"><dt>${fr:message('resources.ApplicationResources', 'label.username')}:</dt><dd><c:out value="${person.user.username}"/>&nbsp;</dd></dl>
+												<dl class="dl-horizontal"><dt>${fr:message('resources.ApplicationResources', 'label.username')}:</dt><dd><c:out value="${person.username}"/>&nbsp;</dd></dl>
 												<dl class="dl-horizontal"><dt>${fr:message('resources.ApplicationResources', 'label.name')}:</dt><dd><c:out value="${person.name}"/>&nbsp;</dd></dl>
 												<dl class="dl-horizontal"><dt>${fr:message('resources.ApplicationResources', 'label.person.email')}</dt><dd><c:out value="${person.emailForSendingEmails}"/>&nbsp;</dd></dl>
 												<dl class="dl-horizontal"><dt>${fr:message('resources.ApplicationResources', 'label.identification')}:</dt><dd><c:out value="${person.documentIdNumber}"/> (<c:out value="${person.idDocumentType.localizedName}"/>)</dd></dl>
