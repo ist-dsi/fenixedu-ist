@@ -37,7 +37,7 @@
             <dependency>
                 <groupId>org.fenixedu</groupId>
                 <artifactId>fenixedu-academic</artifactId>
-                <version>5.2.0</version>
+                <version>5.4.0.RC3</version>
             </dependency>
             <dependency>
                 <groupId>org.fenixedu</groupId>
