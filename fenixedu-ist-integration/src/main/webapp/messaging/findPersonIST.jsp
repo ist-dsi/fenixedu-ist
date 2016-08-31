@@ -276,13 +276,13 @@
 					</fr:view>
 
 					<logic:present name="personalInfo" property="homepage">
-						<logic:equal name="personalInfo" property="homepage.published" value="true">
+						<logic:equal name="personalInfo" property="homepage.site.published" value="true">
 						<tr>
 							<td class="ppleft2"><bean:message key="label.homepage" />
 							</td>
-							<td class="ppright"><html:link href="${personalInfo.homepage.fullUrl}"
+							<td class="ppright"><html:link href="${personalInfo.homepage.site.fullUrl}"
 									target="_blank">
-									${personalInfo.homepage.fullUrl}
+									${personalInfo.homepage.site.fullUrl}
 								</html:link></td>
 						</tr>
 						</logic:equal>
