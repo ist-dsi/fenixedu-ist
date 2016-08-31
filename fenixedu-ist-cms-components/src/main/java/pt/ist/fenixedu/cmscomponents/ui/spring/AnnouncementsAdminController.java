@@ -144,7 +144,8 @@ public class AnnouncementsAdminController extends ExecutionCourseController {
             @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE_TIME) DateTime publicationStarts) throws Exception {
         Site site = executionCourse.getSite();
         atomic(() -> {
-            Post post = Post.create(site, null, Post.sanitize(name), Post.sanitize(body), Post.sanitize(excerpt), announcementsCategory(site), active,
+            Post post = Post.create(site, null, Post.sanitize(name), Post.sanitize(body), excerpt != null ? Post.sanitize
+                    (excerpt) : new LocalizedString(), announcementsCategory(site), active,
                     getUser());
             if (publicationStarts == null) {
                 post.setPublicationBegin(null);
@@ -165,7 +166,8 @@ public class AnnouncementsAdminController extends ExecutionCourseController {
         Post post = executionCourse.getSite().postForSlug(postSlug);
         atomic(() -> {
             post.setName(Post.sanitize(name));
-            post.setBodyAndExcerpt(Post.sanitize(body), Post.sanitize(excerpt));
+            post.setBodyAndExcerpt(body != null ? Post.sanitize(body) : new LocalizedString() , excerpt != null ? Post.sanitize
+                (excerpt) : new LocalizedString());
             post.setActive(active);
             if (publicationStarts == null) {
                 post.setPublicationBegin(null);
