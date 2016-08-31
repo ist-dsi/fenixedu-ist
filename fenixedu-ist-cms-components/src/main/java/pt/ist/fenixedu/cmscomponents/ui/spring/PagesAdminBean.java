@@ -38,6 +38,7 @@ public class PagesAdminBean {
     private MenuItem parent;
     private LocalizedString title;
     private LocalizedString body;
+    private LocalizedString excerpt;
     private final Boolean visible;
 
     public PagesAdminBean(String json) {
@@ -56,6 +57,9 @@ public class PagesAdminBean {
         }
         if (jsonObj.has("body") && jsonObj.get("body") != null && !jsonObj.get("body").isJsonNull()) {
             this.body = LocalizedString.fromJson(jsonObj.get("body"));
+        }
+        if (jsonObj.has("excerpt") && jsonObj.get("excerpt") != null && !jsonObj.get("excerpt").isJsonNull()) {
+            this.excerpt = LocalizedString.fromJson(jsonObj.get("excerpt"));
         }
         if (asString(jsonObj, "canViewGroupIndex").isPresent()) {
             Integer.parseInt(asString(jsonObj, "canViewGroupIndex").get());
@@ -78,6 +82,10 @@ public class PagesAdminBean {
 
     public LocalizedString getBody() {
         return body;
+    }
+
+    public LocalizedString getExcerpt() {
+        return excerpt;
     }
 
     public Group getCanViewGroup() {

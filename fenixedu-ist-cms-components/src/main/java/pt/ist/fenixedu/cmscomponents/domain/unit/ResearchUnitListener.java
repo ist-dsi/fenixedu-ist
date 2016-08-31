@@ -21,6 +21,7 @@ package pt.ist.fenixedu.cmscomponents.domain.unit;
 import static org.fenixedu.bennu.core.i18n.BundleUtil.getLocalizedString;
 import static org.fenixedu.cms.domain.component.Component.forType;
 
+import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
@@ -46,14 +47,12 @@ public class ResearchUnitListener {
     private static final LocalizedString ORGANIZATION_TITLE = BundleUtil.getLocalizedString(BUNDLE, "researchUnit.organization");
     private static final LocalizedString PUBLICATIONS_TITLE = BundleUtil.getLocalizedString(BUNDLE, "department.publications");
 
-    public static UnitSite create(Unit researchUnit) {
-        final UnitSite newSite = new UnitSite(researchUnit);
-        final Menu menu = new Menu(newSite);
-        menu.setName(MENU_TITLE);
+    public static Site create(Department researchUnit) {
+        final Site newSite = new Site( researchUnit.getNameI18n().toLocalizedString(), researchUnit.getNameI18n().toLocalizedString());
+        final Menu menu = new Menu(newSite, MENU_TITLE);
         createDefaultContents(newSite, menu, Authenticate.getUser());
         return newSite;
     }
-
     public static void createDefaultContents(Site site, Menu menu, User user) {
         UnitsListener.createDefaultContents(site, menu, user);
         Page.create(site, menu, null, MEMBERS_TITLE, true, "members", user, forType(UnitComponent.class));

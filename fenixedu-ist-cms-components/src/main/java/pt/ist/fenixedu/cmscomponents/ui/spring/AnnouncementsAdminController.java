@@ -41,6 +41,7 @@ import org.fenixedu.bennu.io.domain.GroupBasedFile;
 import org.fenixedu.bennu.io.servlets.FileDownloadServlet;
 import org.fenixedu.cms.domain.Category;
 import org.fenixedu.cms.domain.Post;
+import org.fenixedu.cms.domain.PostFile;
 import org.fenixedu.cms.domain.Site;
 import org.fenixedu.cms.ui.AdminSites;
 import org.fenixedu.commons.i18n.LocalizedString;
@@ -58,23 +59,23 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.view.JstlView;
 import org.springframework.web.servlet.view.RedirectView;
 
-import pt.ist.fenixframework.Atomic;
-
 import com.google.common.math.IntMath;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import pt.ist.fenixframework.Atomic;
+
 @Controller
 @RequestMapping("/teacher/{executionCourse}/announcements")
 public class AnnouncementsAdminController extends ExecutionCourseController {
-    private static final LocalizedString ANNOUNCEMENT = getLocalizedString("resources.FenixEduLearningResources",
-            "label.announcements");
+    private static final LocalizedString ANNOUNCEMENT =
+            getLocalizedString("resources.FenixEduLearningResources", "label.announcements");
 
     private static final int PER_PAGE = 5;
 
     @RequestMapping(method = RequestMethod.GET)
-    public AnnouncementsAdminView all(Model model, @PathVariable ExecutionCourse executionCourse, @RequestParam(required = false,
-            defaultValue = "1") int page) {
+    public AnnouncementsAdminView all(Model model, @PathVariable ExecutionCourse executionCourse,
+            @RequestParam(required = false, defaultValue = "1") int page) {
         Professorship professorship = executionCourse.getProfessorship(AccessControl.getPerson());
         AccessControl.check(person -> professorship != null && professorship.getPermissions().getAnnouncements());
         List<Post> announcements = getAnnouncements(executionCourse.getSite());
@@ -102,8 +103,9 @@ public class AnnouncementsAdminController extends ExecutionCourseController {
     }
 
     @RequestMapping(value = "{postSlug}/addFile.json", method = RequestMethod.POST, produces = "application/json")
-    public @ResponseBody String addFileJson(Model model, @PathVariable ExecutionCourse executionCourse, @PathVariable(
-            value = "postSlug") String slugPost, @RequestParam("attachment") MultipartFile[] attachments) throws IOException {
+    public @ResponseBody String addFileJson(Model model, @PathVariable ExecutionCourse executionCourse,
+            @PathVariable(value = "postSlug") String slugPost, @RequestParam("attachment") MultipartFile[] attachments)
+                    throws IOException {
         Site s = executionCourse.getSite();
 
         AdminSites.canEdit(s);
@@ -130,22 +132,20 @@ public class AnnouncementsAdminController extends ExecutionCourseController {
 
     @Atomic
     private GroupBasedFile addFile(MultipartFile attachment, Post p) throws IOException {
-        GroupBasedFile f =
-                new GroupBasedFile(attachment.getOriginalFilename(), attachment.getOriginalFilename(), attachment.getBytes(),
-                        AnyoneGroup.get());
-        p.getPostFiles().putFile(f);
+        GroupBasedFile f = new GroupBasedFile(attachment.getOriginalFilename(), attachment.getOriginalFilename(),
+                attachment.getBytes(), AnyoneGroup.get());
+        new PostFile(p, f, true, p.getFilesSet().size());
         return f;
     }
 
     @RequestMapping(value = "create", method = RequestMethod.POST)
     public RedirectView create(@PathVariable ExecutionCourse executionCourse, @RequestParam LocalizedString name,
-            @RequestParam LocalizedString body, @RequestParam(required = false, defaultValue = "false") boolean active,
+            @RequestParam LocalizedString body, @RequestParam(required = false) LocalizedString excerpt, @RequestParam(required = false, defaultValue = "false") boolean active,
             @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE_TIME) DateTime publicationStarts) throws Exception {
         Site site = executionCourse.getSite();
         atomic(() -> {
-            Post post =
-                    Post.create(site, null, Post.sanitize(name), Post.sanitize(body), announcementsCategory(site), active,
-                            getUser());
+            Post post = Post.create(site, null, Post.sanitize(name), Post.sanitize(body), Post.sanitize(excerpt), announcementsCategory(site), active,
+                    getUser());
             if (publicationStarts == null) {
                 post.setPublicationBegin(null);
                 post.setPublicationEnd(null);
@@ -159,13 +159,13 @@ public class AnnouncementsAdminController extends ExecutionCourseController {
 
     @RequestMapping(value = "{postSlug}/edit", method = RequestMethod.POST)
     public RedirectView edit(@PathVariable ExecutionCourse executionCourse, @PathVariable String postSlug,
-            @RequestParam LocalizedString name, @RequestParam LocalizedString body, @RequestParam(required = false,
-                    defaultValue = "false") boolean active,
+            @RequestParam LocalizedString name, @RequestParam LocalizedString body, @RequestParam(required = false) LocalizedString excerpt,
+            @RequestParam(required = false, defaultValue = "false") boolean active,
             @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE_TIME) DateTime publicationStarts) {
         Post post = executionCourse.getSite().postForSlug(postSlug);
         atomic(() -> {
             post.setName(Post.sanitize(name));
-            post.setBody(Post.sanitize(body));
+            post.setBodyAndExcerpt(Post.sanitize(body), Post.sanitize(excerpt));
             post.setActive(active);
             if (publicationStarts == null) {
                 post.setPublicationBegin(null);

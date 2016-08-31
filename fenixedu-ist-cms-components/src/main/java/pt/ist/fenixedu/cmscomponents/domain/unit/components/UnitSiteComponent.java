@@ -24,19 +24,17 @@ import org.fenixedu.cms.domain.Site;
 import org.fenixedu.cms.domain.component.CMSComponent;
 import org.fenixedu.cms.exceptions.ResourceNotFoundException;
 
-import pt.ist.fenixedu.cmscomponents.domain.unit.UnitSite;
-
 public abstract class UnitSiteComponent implements CMSComponent {
 
     protected Unit unit(Page page) {
-        if (page.getSite() instanceof UnitSite) {
-            return ((UnitSite) page.getSite()).getUnit();
+        if (page.getSite()!=null) {
+            return page.getSite().getUnit();
         }
         throw new ResourceNotFoundException();
     }
 
     public static boolean supportsSite(Site site) {
-        return site instanceof UnitSite;
+        return site.getUnit()!=null;
     }
 
 }

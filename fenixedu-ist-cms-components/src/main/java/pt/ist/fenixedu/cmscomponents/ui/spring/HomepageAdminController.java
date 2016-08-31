@@ -31,6 +31,7 @@ import org.fenixedu.academic.domain.contacts.WebAddress;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.bennu.spring.portal.SpringApplication;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
+import org.fenixedu.cms.domain.Site;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
@@ -53,7 +54,7 @@ public class HomepageAdminController {
     @RequestMapping(method = RequestMethod.GET)
     public String options(Model model) {
         Person person = loggedPerson();
-        HomepageSite homepage = person.getHomepage();
+        Site homepage = person.getHomepage();
 
         model.addAttribute("homepage", homepage);
         model.addAttribute("person", person);
@@ -87,18 +88,19 @@ public class HomepageAdminController {
             if (loggedPerson().getHomepage() == null) {
                 HomepageListener.create(loggedPerson());
             } else {
-                HomepageSite homepage = loggedPerson().getHomepage();
+                Site site = loggedPerson().getHomepage();
+                HomepageSite homepage = site.getHomepageSite();
                 homepage.setShowPhoto(showPhoto);
                 homepage.setShowCategory(showCategory);
                 homepage.setShowResearchUnitHomepage(showResearchUnitHomepage);
                 homepage.setShowActiveStudentCurricularPlans(showActiveStudentCurricularPlans);
                 homepage.setResearchUnitHomepage(researchUnitHomepage);
                 homepage.setResearchUnitName(researchUnitName);
-                homepage.setPublished(published);
-                String url = homepage.getFullUrl();
+                homepage.getSite().setPublished(published);
+                String url = homepage.getSite().getFullUrl();
                 if (published) {
                     boolean foundAddress = false;
-                    for (PartyContact contact : homepage.getOwner().getPartyContacts(WebAddress.class)) {
+                    for (PartyContact contact : site.getOwner().getPartyContacts(WebAddress.class)) {
                         WebAddress address = (WebAddress) contact;
                         if (address.getUrl().equals(url)) {
                             address.setDefaultContact(true);
@@ -108,10 +110,10 @@ public class HomepageAdminController {
                         }
                     }
                     if (!foundAddress) {
-                        WebAddress.createWebAddress(homepage.getOwner(), url, PartyContactType.INSTITUTIONAL, true);
+                        WebAddress.createWebAddress(site.getOwner(), url, PartyContactType.INSTITUTIONAL, true);
                     } else {
-                        WebAddress address = homepage.getOwner().getDefaultWebAddress();
-                        if (address != null && address.getUrl().equals(homepage.getFullUrl())) {
+                        WebAddress address = site.getOwner().getDefaultWebAddress();
+                        if (address != null && address.getUrl().equals(homepage.getSite().getFullUrl())) {
                             address.setDefaultContact(false);
                         }
                     }
@@ -127,9 +129,9 @@ public class HomepageAdminController {
 
     @RequestMapping(value = "/activePages", method = RequestMethod.POST)
     public RedirectView editActivePages(HttpServletRequest request) {
-        HomepageSite homepage = loggedPerson().getHomepage();
-        if (homepage != null) {
-            atomic(() -> service.dynamicPages(homepage).forEach(
+        Site site = loggedPerson().getHomepage();
+        if (site != null) {
+            atomic(() -> service.dynamicPages(site).forEach(
                     page -> page.setPublished(request.getParameterMap().keySet().contains(page.getSlug()))));
         }
         return new RedirectView("/personal-homepage", true);

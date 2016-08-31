@@ -31,7 +31,8 @@
                     {{ post.creationDate|formatDate("d MMMM Y, HH:mm") }} - {{post.createdBy.displayName}}
                 </p>
             {% endif %}
-
+            <p>{{post.excerpt.content | raw}}</p>
+            <hr/>
             <p>{{post.body.content | raw}}</p>
 
             {% if post.attachments.size != 0 %}

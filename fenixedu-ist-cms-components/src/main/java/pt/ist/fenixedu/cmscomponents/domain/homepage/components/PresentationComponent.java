@@ -49,7 +49,7 @@ public class PresentationComponent extends HomepageSiteComponent {
 
     @Override
     public void handle(Page page, TemplateContext local, TemplateContext global) {
-        HomepageSite site = site(page);
+        HomepageSite site = site(page).getHomepageSite();
         Person owner = owner(page);
 
         global.put("ownerName", owner.getProfile().getDisplayName());
@@ -131,6 +131,7 @@ public class PresentationComponent extends HomepageSiteComponent {
             }
         }
         return studentCurricularPlans;
+
     }
 
     private List<PartyContact> getSortedFilteredContacts(Collection<? extends PartyContact> unfiltered, PartyContactType... types) {

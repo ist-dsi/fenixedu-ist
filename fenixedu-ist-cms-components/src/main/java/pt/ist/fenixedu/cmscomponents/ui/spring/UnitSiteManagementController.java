@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.fenixedu.bennu.core.domain.Bennu;
@@ -41,7 +40,9 @@ import org.fenixedu.bennu.spring.portal.SpringApplication;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.fenixedu.cms.domain.CMSTemplate;
 import org.fenixedu.cms.domain.Category;
+import org.fenixedu.cms.domain.PermissionEvaluation;
 import org.fenixedu.cms.domain.Post;
+import org.fenixedu.cms.domain.PostFile;
 import org.fenixedu.cms.domain.PostMetadata;
 import org.fenixedu.cms.domain.Site;
 import org.fenixedu.cms.exceptions.CmsDomainException;
@@ -54,13 +55,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.view.RedirectView;
 
-import pt.ist.fenixedu.cmscomponents.domain.unit.UnitSite;
-import pt.ist.fenixframework.Atomic;
-import pt.ist.fenixframework.FenixFramework;
-
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+
+import pt.ist.fenixframework.Atomic;
+import pt.ist.fenixframework.FenixFramework;
 
 /**
  * Created by borgez on 18-03-2015.
@@ -101,9 +101,7 @@ public class UnitSiteManagementController {
     private List<Site> getSites() {
         User user = Authenticate.getUser();
         Set<Site> allSites = Bennu.getInstance().getSitesSet();
-        Predicate<Site> isAdminMember = site -> site.getCanAdminGroup().isMember(user);
-        Predicate<Site> isPostsMember = site -> site.getCanPostGroup().isMember(user);
-        return allSites.stream().filter(isAdminMember.or(isPostsMember)).collect(Collectors.toList());
+        return allSites.stream().filter(site -> PermissionEvaluation.canAccess(user, site)).collect(Collectors.toList());
     }
 
     @RequestMapping(value = "/{unitSiteSlug}")
@@ -194,8 +192,8 @@ public class UnitSiteManagementController {
         if (!FenixFramework.isDomainObjectValid(site)) {
             throw BennuCoreDomainException.resourceNotFound(unitSiteSlug);
         }
-        if (site instanceof UnitSite) {
-            if (!site.getCanAdminGroup().isMember(Authenticate.getUser())) {
+        if (site.getUnit()!=null) {
+            if (!PermissionEvaluation.canAccess(Authenticate.getUser(), site)) {
                 throw CmsDomainException.forbiden();
             }
         }
@@ -255,10 +253,9 @@ public class UnitSiteManagementController {
         private PostMetadata uploadImage(Post post, PostMetadata postMetadata, String name, MultipartFile multipartFile) {
             if (!Strings.isNullOrEmpty(name) && multipartFile != null && !multipartFile.isEmpty()) {
                 try {
-                    GroupBasedFile file =
-                            new GroupBasedFile(multipartFile.getOriginalFilename(), multipartFile.getOriginalFilename(),
-                                    multipartFile.getBytes(), AnyoneGroup.get());
-                    post.getPostFiles().putFile(file);
+                    GroupBasedFile file = new GroupBasedFile(multipartFile.getOriginalFilename(),
+                            multipartFile.getOriginalFilename(), multipartFile.getBytes(), AnyoneGroup.get());
+                    new PostFile(post, file, true, post.getFilesSet().size());
                     postMetadata = postMetadata.with(name, getDownloadUrl(file));
                 } catch (IOException e) {
                     e.printStackTrace();

@@ -38,7 +38,6 @@ import org.fenixedu.cms.rendering.TemplateContext;
 import org.fenixedu.learning.domain.degree.components.DegreeSiteComponent;
 import org.fenixedu.learning.domain.degree.components.ThesisComponent;
 
-import pt.ist.fenixedu.cmscomponents.domain.unit.UnitSite;
 
 @ComponentType(name = "Department Dissertations", description = "Dissertations information for a Department")
 public class DepartmentDissertationsComponent extends UnitSiteComponent {
@@ -60,7 +59,7 @@ public class DepartmentDissertationsComponent extends UnitSiteComponent {
     }
 
     public static boolean supportsSite(Site site) {
-        return site instanceof UnitSite && ((UnitSite) site).getUnit() instanceof DepartmentUnit;
+        return site.getUnit()!=null && site.getUnit() instanceof DepartmentUnit;
     }
 
 }

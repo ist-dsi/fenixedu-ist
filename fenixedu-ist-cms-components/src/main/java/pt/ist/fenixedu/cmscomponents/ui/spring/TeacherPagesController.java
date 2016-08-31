@@ -18,27 +18,14 @@
  */
 package pt.ist.fenixedu.cmscomponents.ui.spring;
 
-import static java.util.function.Predicate.isEqual;
-import static java.util.stream.Collectors.toList;
-import static org.fenixedu.academic.predicate.AccessControl.check;
-import static org.fenixedu.academic.predicate.AccessControl.getPerson;
-import static pt.ist.fenixframework.FenixFramework.atomic;
-
-import java.util.Locale;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.academic.ui.struts.action.teacher.ManageExecutionCourseDA;
 import org.fenixedu.cms.domain.Menu;
 import org.fenixedu.cms.domain.MenuItem;
+import org.fenixedu.cms.domain.Site;
 import org.fenixedu.commons.i18n.LocalizedString;
-import org.fenixedu.learning.domain.executionCourse.ExecutionCourseSite;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -50,8 +37,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.JstlView;
 import org.springframework.web.servlet.view.RedirectView;
-
 import pt.ist.fenixframework.Atomic;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.function.Predicate.isEqual;
+import static java.util.stream.Collectors.toList;
+import static org.fenixedu.academic.predicate.AccessControl.check;
+import static org.fenixedu.academic.predicate.AccessControl.getPerson;
+import static pt.ist.fenixframework.FenixFramework.atomic;
 
 @Controller
 @RequestMapping("/teacher/{executionCourse}/pages")
@@ -78,8 +76,11 @@ public class TeacherPagesController extends ExecutionCourseController {
         return new RedirectView(String.format("/teacher/%s/pages", executionCourse.getExternalId()), true);
     }
 
+
+
+
     @RequestMapping(value = "copyContent", method = RequestMethod.POST)
-    public RedirectView copyContent(@PathVariable ExecutionCourse executionCourse,
+    public RedirectView     copyContent(@PathVariable ExecutionCourse executionCourse,
             @RequestParam ExecutionCourse previousExecutionCourse, RedirectAttributes redirectAttributes) {
         canCopyContent(executionCourse, previousExecutionCourse);
         try {
@@ -94,12 +95,12 @@ public class TeacherPagesController extends ExecutionCourseController {
     }
 
     @Atomic
-    private void copyContent(ExecutionCourseSite from, ExecutionCourseSite to) {
+    private void copyContent(Site from, Site to) {
         Menu newMenu = to.getMenusSet().stream().findAny().get();
         LocalizedString newPageName =
                 new LocalizedString()
                         .with(Locale.getDefault(), from.getExecutionCourse().getExecutionPeriod().getQualifiedName());
-        MenuItem emptyPageParent = service.create(to, null, newPageName, new LocalizedString()).get();
+        MenuItem emptyPageParent = service.create(to, null, newPageName, new LocalizedString(), new LocalizedString()).get();
         emptyPageParent.getPage().setPublished(false);
         emptyPageParent.setTop(newMenu);
         for (Menu oldMenu : from.getMenusSet()) {

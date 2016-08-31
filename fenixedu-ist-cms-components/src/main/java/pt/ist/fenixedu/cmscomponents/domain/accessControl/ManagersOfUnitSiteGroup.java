@@ -18,6 +18,7 @@
  */
 package pt.ist.fenixedu.cmscomponents.domain.accessControl;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.fenixedu.academic.domain.accessControl.FenixGroup;
@@ -25,6 +26,8 @@ import org.fenixedu.bennu.core.annotation.GroupArgument;
 import org.fenixedu.bennu.core.annotation.GroupOperator;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.groups.PersistentGroup;
+import org.fenixedu.cms.domain.DefaultRoles;
+import org.fenixedu.cms.domain.Role;
 import org.fenixedu.cms.domain.Site;
 import org.joda.time.DateTime;
 
@@ -57,27 +60,36 @@ public class ManagersOfUnitSiteGroup extends FenixGroup {
 
     @Override
     public Set<User> getMembers() {
-        return site.getCanAdminGroup().getMembers();
+        return getManagers(DateTime.now());
     }
 
     @Override
     public Set<User> getMembers(DateTime when) {
-        return site.getCanAdminGroup().getMembers(when);
+        return getManagers(when);
     }
 
     @Override
     public boolean isMember(User user) {
-        return site.getCanAdminGroup().isMember(user);
+        return getManagers(DateTime.now()).contains(user);
     }
 
     @Override
     public boolean isMember(User user, DateTime when) {
-        return site.getCanAdminGroup().isMember(user, when);
+        return getManagers(when).contains(user);
     }
 
     @Override
     public PersistentGroup toPersistentGroup() {
         return PersistentManagersOfUnitSiteGroup.getInstance(site);
+    }
+
+    private Set<User> getManagers(DateTime when) {
+        for (Role role : site.getRolesSet()) {
+            if (role.getRoleTemplate().equals(DefaultRoles.getInstance().getAdminRole())) {
+                return role.getGroup().getMembers(when);
+            }
+        }
+        return new HashSet<User>();
     }
 
     @Override

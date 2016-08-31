@@ -33,6 +33,7 @@ import org.fenixedu.cms.domain.Menu;
 import org.fenixedu.cms.domain.Page;
 import org.fenixedu.cms.domain.Site;
 import org.fenixedu.cms.domain.component.Component;
+import org.fenixedu.commons.i18n.I18N;
 import org.fenixedu.commons.i18n.LocalizedString;
 
 import pt.ist.fenixedu.cmscomponents.domain.homepage.components.PresentationComponent;
@@ -59,18 +60,18 @@ public class HomepageListener {
 
     private static final String HOMEPAGE_FOLDER_PATH = "homepage";
 
-    public static HomepageSite create(Person person) {
-        HomepageSite newSite = new HomepageSite(person);
-        Menu menu = new Menu(newSite);
-        menu.setName(MENU_TITLE);
+    public static Site create(Person person) {
+        LocalizedString name = new LocalizedString(I18N.getLocale(), person.getProfile().getDisplayName());
+        Site newsite = new Site(name,name);
+        Menu menu = new Menu(newsite, MENU_TITLE);
 
-        newSite.setTheme(CMSTheme.forType("fenixedu-homepages-theme"));
-        createDefaultContents(newSite, menu, person.getUser());
-        getHomepageFolder().ifPresent(newSite::setFolder);
-        addContact(person, newSite);
-        newSite.setPublished(true);
-        newSite.setShowPhoto(true);
-        return newSite;
+        newsite.setTheme(CMSTheme.forType("fenixedu-homepages-theme"));
+        createDefaultContents(newsite, menu, person.getUser());
+        getHomepageFolder().ifPresent(newsite::setFolder);
+        addContact(person, newsite);
+        newsite.setPublished(true);
+        newsite.getHomepageSite().setShowPhoto(true);
+        return newsite;
     }
 
     public static void createDefaultContents(Site newSite, Menu menu, User user) {
@@ -92,7 +93,7 @@ public class HomepageListener {
         newSite.setInitialPage(initialPage);
     }
 
-    private static void addContact(Person owner, HomepageSite homepageSite) {
+    private static void addContact(Person owner, Site homepageSite) {
         createWebAddress(owner, homepageSite.getFullUrl(), PartyContactType.INSTITUTIONAL, true);
     }
 

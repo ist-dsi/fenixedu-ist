@@ -49,7 +49,6 @@ import org.fenixedu.bennu.signals.Signal;
 import org.fenixedu.cms.domain.CMSFolder;
 import org.fenixedu.cms.domain.Category;
 import org.fenixedu.cms.domain.Site;
-import org.fenixedu.learning.domain.executionCourse.ExecutionCourseSite;
 
 import pt.ist.fenixedu.integration.domain.student.AffinityCyclesManagement;
 import pt.ist.fenixedu.integration.domain.student.PreEnrolment;
@@ -89,7 +88,7 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
         Site.getRelationFolderHasSites().addListener(new RelationAdapter<Site, CMSFolder>() {
             @Override
             public void afterAdd(Site site, CMSFolder folder) {
-                if (site instanceof ExecutionCourseSite && folder != null
+                if (site.getExecutionCourse()!=null && folder != null
                         && !folder.getFunctionality().getPath().equals("disciplinas")) {
                     Bennu.getInstance().getCmsFolderSet().stream()
                             .filter(x -> x.getFunctionality().getPath().equals("disciplinas")).findAny()
