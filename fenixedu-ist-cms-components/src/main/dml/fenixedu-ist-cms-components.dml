@@ -24,7 +24,7 @@ class accessControl.PersistentManagersOfUnitSiteGroup extends .org.fenixedu.benn
 
 relation PersonHasHomepage {
     .org.fenixedu.cms.domain.Site playsRole homepage {
-        multiplicity 1..1;
+        multiplicity 0..1;
     }
     .org.fenixedu.academic.domain.Person playsRole owner {
         multiplicity 0..1;
@@ -42,7 +42,7 @@ relation HomepageHasInfo {
 
 relation UnitHasSite {
     .org.fenixedu.cms.domain.Site playsRole site {
-    	    multiplicity 1..1;
+    	    multiplicity 0..1;
     }
     .org.fenixedu.academic.domain.organizationalStructure.Unit playsRole unit {
     	    multiplicity 0..1;    }
