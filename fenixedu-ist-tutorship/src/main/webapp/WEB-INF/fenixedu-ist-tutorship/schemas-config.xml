@@ -547,7 +547,7 @@
 
 <schema name="student.tutorship.tutorInfo" type="pt.ist.fenixedu.tutorship.domain.Tutorship" bundle="APPLICATION_RESOURCES">
     <slot name="teacher.person" key="label.name" layout="conditional-link">
-        <property name="visibleIf" value="homepage.published"/>
+        <property name="visibleIf" value="homepage.site.published"/>
         <property name="contextRelative" value="true"/>
         <property name="linkFormat" value="/homepage/${username}"/> 
         <property name="subLayout" value="values"/>
