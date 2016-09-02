@@ -42,12 +42,12 @@ $.fn.tooltip = window.tooltip;
     <spring:message code="title.manage.homepage" />
 </h2>
 
-<c:if test="${homepage.site.published}">
+<c:if test="${homepage.published}">
     <ul class="nav nav-pills">
         <li role="presentation"><a href="${pageContext.request.contextPath}/personal-homepage"><spring:message code="label.homepage.options"/></a></li>
         <li role="presentation" class="active"><a href="${pageContext.request.contextPath}/personal-homepage/content"><spring:message code="label.homepage.contents"/></a></li>
         <c:if test="${not empty homepage}">
-            <li><a href="${homepage.site.fullUrl}" target="_blank">Link</a></li>
+            <li><a href="${homepage.fullUrl}" target="_blank">Link</a></li>
         </c:if>
     </ul>
     <%@include file="contents.jsp" %>

@@ -33,12 +33,12 @@ ${portal.toolkit()}
 <h2 class="page-header">
     <spring:message code="title.manage.homepage" />
 </h2>
-<c:if test="${not empty homepage and homepage.site.published}">
+<c:if test="${not empty homepage and homepage.published}">
     <ul class="nav nav-pills">
         <li role="presentation" class="active"><a href="${pageContext.request.contextPath}/personal-homepage"><spring:message code="label.homepage.options"/></a></li>
         <li role="presentation"><a href="${pageContext.request.contextPath}/personal-homepage/content"><spring:message code="label.homepage.contents"/></a></li>
-        <c:if test="${not empty homepage and homepage.site.published}">
-            <li><a href="${homepage.site.fullUrl}" target="_blank">Link</a></li>
+        <c:if test="${not empty homepage and homepage.published}">
+            <li><a href="${homepage.fullUrl}" target="_blank">Link</a></li>
         </c:if>
     </ul>
 </c:if>
@@ -55,13 +55,13 @@ ${portal.toolkit()}
             <div class="col-sm-3">
                 <div class="checkbox">
                     <input name="published" type="checkbox"
-                           value="true" ${not empty homepage and homepage.site.published ? "checked='checked'" : ""}
+                           value="true" ${not empty homepage and homepage.published ? "checked='checked'" : ""}
                            onchange="$('#homepage-publish-form').submit()">
                 </div>
             </div>
         </div>
 
-        <c:if test="${not empty homepage && homepage.site.published}">
+        <c:if test="${not empty homepage && homepage.published}">
             <p>
                 <h3 class="page-header"><spring:message code="label.homepage.components" />
                     <a href="#" data-toggle="modal" data-target="#activePagesModal" class="btn btn-default pull-right" role="button">
@@ -275,7 +275,7 @@ ${portal.toolkit()}
                 </div>
             </c:if>
     </form>
-    <c:if test="${not empty homepage && homepage.site.published}">
+    <c:if test="${not empty homepage && homepage.published}">
         <div class="modal fade" id="activePagesModal" tabindex="-1" role="dialog" aria-hidden="true">
             <form method="post" action="${context}/activePages" class="form-horizontal">
                 <div class="modal-dialog modal-lg">
