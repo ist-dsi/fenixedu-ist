@@ -111,7 +111,9 @@ public class PagesAdminService {
         Menu menu = site.getMenusSet().stream().findFirst().orElse(null);
         Page page = Page.create(site, menu, parent, Post.sanitize(name), true, "view", Authenticate.getUser());
         Category category = site.getOrCreateCategoryForSlug("content", new LocalizedString().with(I18N.getLocale(), "Content"));
-        Post post = Post.create(site, page, Post.sanitize(name), Post.sanitize(body), Post.sanitize(excerpt), category, true, Authenticate.getUser());
+        Post post = Post.create(site, page, Post.sanitize(name), sanitizeOrNew(body), sanitizeOrNew(excerpt),
+            category, true,
+            Authenticate.getUser());
         page.addComponents(new StaticPost(post));
         MenuItem menuItem = page.getMenuItemsSet().stream().findFirst().get();
         if (parent != null) {
@@ -141,7 +143,7 @@ public class PagesAdminService {
 
         if ((post.getBody() == null && body != null || post.getBody() != null && !post.getBody().equals(body))||
                 post.getExcerpt() == null && excerpt!=null || post.getExcerpt() !=null && !post.getExcerpt().equals(excerpt)) {
-            post.setBodyAndExcerpt(body, excerpt);
+            post.setBodyAndExcerpt(sanitizeOrNew(body),sanitizeOrNew(excerpt));
         }
         if (!post.getName().equals(name)) {
             post.setName(name);
@@ -358,7 +360,7 @@ public class PagesAdminService {
     private Post clonePost(Post oldPost, Site newSite) {
         Post newPost = new Post(newSite);
         newPost.setName(oldPost.getName());
-        newPost.setBodyAndExcerpt(oldPost.getBody(), oldPost.getExcerpt());
+        newPost.setBodyAndExcerpt( sanitizeOrNew(oldPost.getBody()),  sanitizeOrNew(oldPost.getExcerpt()));
         newPost.setCreationDate(new DateTime());
         newPost.setCreatedBy(Authenticate.getUser());
         newPost.setActive(oldPost.getActive());
@@ -376,6 +378,10 @@ public class PagesAdminService {
 
         });
         return newPost;
+    }
+
+    private LocalizedString sanitizeOrNew(LocalizedString body) {
+        return body !=null ? Post.sanitize(body) : new LocalizedString();
     }
 
     private Optional<Post> staticPost(Page page) {
