@@ -65,6 +65,9 @@ public class HomepageListener {
         Site newsite = new Site(name,name);
         Menu menu = new Menu(newsite, MENU_TITLE);
 
+        new HomepageSite(newsite);
+        newsite.setOwner(person);
+
         newsite.setTheme(CMSTheme.forType("fenixedu-homepages-theme"));
         createDefaultContents(newsite, menu, person.getUser());
         getHomepageFolder().ifPresent(newsite::setFolder);
