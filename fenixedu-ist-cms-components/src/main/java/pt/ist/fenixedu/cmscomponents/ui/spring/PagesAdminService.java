@@ -323,11 +323,19 @@ public class PagesAdminService {
         attachment.setAccessGroup(permissionGroups(menuItem.getMenu().getSite()).get(groupPosition));
 
         Post post = postForPage(menuItem.getPage());
+
         if (newPosition < 0 || newPosition > post.getFilesSet().size()) {
             newPosition = post.getFilesSet().size();
         }
 
-        new PostFile(post, attachment, true, newPosition);
+        PostFile postFile = attachment.getPostFile();
+        if(postFile!=null) {
+            postFile.setIsEmbedded(true);
+            postFile.setIndex(newPosition);
+            post.fixOrder(post.getFilesSorted());
+        } else {
+            new PostFile(post, attachment, true, newPosition);
+        }
     }
 
     protected void copyStaticPage(MenuItem oldMenuItem, Site newSite, Menu newMenu, MenuItem newParent) {
