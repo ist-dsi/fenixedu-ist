@@ -130,5 +130,6 @@
         <module>fenixedu-ist-teacher-evaluation</module>
         <module>fenixedu-ist-tutorship</module>
         <module>fenixedu-ist-vigilancies</module>
+        <module>fenixedu-ist-registration-process</module>
     </modules>
 </project>
