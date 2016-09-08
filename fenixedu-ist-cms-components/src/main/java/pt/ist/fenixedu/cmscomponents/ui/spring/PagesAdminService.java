@@ -317,6 +317,7 @@ public class PagesAdminService {
     @Atomic(mode = Atomic.TxMode.WRITE)
     public void updateAttachment(MenuItem menuItem, GroupBasedFile attachment, int newPosition, int groupPosition,
             String displayName, boolean visible) {
+        final boolean embedded = !visible;
         if (displayName != null) {
             attachment.setDisplayName(displayName);
         }
@@ -330,11 +331,13 @@ public class PagesAdminService {
 
         PostFile postFile = attachment.getPostFile();
         if(postFile!=null) {
-            postFile.setIsEmbedded(true);
+            postFile.setIsEmbedded(embedded);
+            attachment.setAccessGroup(permissionGroups(menuItem.getMenu().getSite()).get(groupPosition));
             postFile.setIndex(newPosition);
             post.fixOrder(post.getFilesSorted());
         } else {
-            new PostFile(post, attachment, true, newPosition);
+            new PostFile(post, attachment, embedded, newPosition);
+            attachment.setAccessGroup(permissionGroups(menuItem.getMenu().getSite()).get(groupPosition));
         }
     }
 
