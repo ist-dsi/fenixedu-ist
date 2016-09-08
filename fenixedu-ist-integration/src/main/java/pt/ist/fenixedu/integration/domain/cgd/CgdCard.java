@@ -25,6 +25,8 @@ import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.security.Authenticate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
@@ -32,6 +34,8 @@ import pt.ist.fenixframework.FenixFramework;
 import com.qubit.solution.fenixedu.integration.cgd.services.form43.CgdForm43Sender;
 
 public class CgdCard extends CgdCard_Base {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CgdCard.class);
 
     public CgdCard(final CgdCardCounter counter, final User user, final int count) {
         setCgdCardCounter(counter);
@@ -125,7 +129,11 @@ public class CgdCard extends CgdCard_Base {
                 if (student != null) {
                     for (final Registration registration : student.getRegistrationsSet()) {
                         if (registration.isActive()) {
-                            new CgdForm43Sender().sendForm43For(registration);
+                            CgdForm43Sender sender = new CgdForm43Sender();
+                            boolean form = sender.sendForm43For(registration);
+                            boolean attachment = sender.uploadFormAttachment(registration,registration.getRegistrationDeclarationFile().getStream());
+                            LOGGER.info("Sent Form43 ({}) and registration declaration file ({}) for registration {}",
+                                form, attachment, registration.getExternalId() );
                         }
                     }
                 }
