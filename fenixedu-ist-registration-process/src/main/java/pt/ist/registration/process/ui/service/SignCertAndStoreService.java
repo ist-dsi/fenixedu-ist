@@ -116,7 +116,8 @@ public class SignCertAndStoreService {
         String refreshToken = RegistrationProcessConfiguration.getConfiguration().storeAppRefreshToken();
         JsonObject result = ClientFactory.driveCLient(driveUrl, appId, appUser, refreshToken)
                 .uploadWithInfo(uploadDirectoryFor(username).get(), filename, file.getInputStream(), file.getContentType());
-        logger.debug("drive upload result : {}", result.toString());
+        logger.debug("Registration Declaration {} of student {} stored", uniqueIdentifier, username);
+        logger.debug("Registration Declaration {} of student {} is being emailed.", uniqueIdentifier, username);
         sendEmailNotification(email, result.get("downloadFileLink").getAsString());
     }
 
