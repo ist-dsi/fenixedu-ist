@@ -25,13 +25,14 @@
 <%@ taglib uri="http://fenix-ashes.ist.utl.pt/fenix-renderers" prefix="fr"%>
 <%@ taglib uri="http://fenix-ashes.ist.utl.pt/taglib/collection-pager" prefix="cp" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://fenixedu.com/cms/permissions" prefix="permissions" %>
 
 <h2><bean:message key="label.uploadersManagement" bundle="RESEARCHER_RESOURCES"/></h2>
 <bean:define id="actionName" name="functionalityAction"/>
 
 <bean:define id="unitID" name="unit" property="externalId"/>
 
-<c:if test="${unit.site.canAdminGroup.isMember(LOGGED_USER_ATTRIBUTE)}">
+<c:if test="${permissions:canDoThis(unit.site, 'MANAGE_ROLES')}">
 	<fr:edit name="unit" schema="edit-uploaders">
 		<fr:layout>
 			<fr:property name="classes" value="tstyle5 thlight thmiddle"/>
