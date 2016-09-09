@@ -51,6 +51,7 @@ public class CandidacySignalHandler implements Consumer<RegistrationCreatedByCan
         String title = studentNumber + ": Declaração de Matrícula";
         String description = "Declaração de Matrícula do ano letivo " + registration.getStartExecutionYear().getName();
         String externalIdentifier = declarationFile.getUniqueIdentifier();
+        logger.debug("Sending document to be signed with id {}", declarationFile.getUniqueIdentifier());
         signCertAndStoreService.sendDocumentToBeSigned(registration.getExternalId(), queue, title, description, filename,
                 documentWithSignatureField, externalIdentifier);
     }

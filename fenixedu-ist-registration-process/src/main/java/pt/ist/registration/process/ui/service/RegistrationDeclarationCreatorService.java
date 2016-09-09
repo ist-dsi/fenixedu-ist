@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.student.Registration;
 import org.joda.time.DateTime;
@@ -54,13 +55,13 @@ public class RegistrationDeclarationCreatorService {
     public RegistrationDeclarationFile generateAndSaveDocumentsForRegistration(Registration registration)
             throws ProblemsGeneratingDocumentException {
         Person person = registration.getPerson();
-        String executionYear = registration.getStartExecutionYear().getName();
+        String executionYear = ExecutionYear.readCurrentExecutionYear().getName();
         String studentName = person.getName().toUpperCase();
         String documentType = person.getIdDocumentType().getLocalizedName(new Locale("pt"));
         String idNumber = person.getDocumentIdNumber();
         String address = person.getAddress();
         String postalCode = person.getPostalCode();
-        String locality = person.getArea();
+        String curricularYear = Integer.toString(registration.getCurricularYear());
         String gender = person.getGender().toString();
         String course = registration.getDegree().getName();
         String naturality = person.getDistrictOfBirth();
@@ -74,7 +75,7 @@ public class RegistrationDeclarationCreatorService {
         ctx.put("idNumber", idNumber);
         ctx.put("address", address);
         ctx.put("postalCode", postalCode);
-        ctx.put("locality", locality);
+        ctx.put("curricularYear", curricularYear);
         ctx.put("course", course);
 
         try {
@@ -175,8 +176,7 @@ public class RegistrationDeclarationCreatorService {
         body.setAlignment(Element.ALIGN_JUSTIFIED);
         document.add(body);
 
-        Paragraph paragraphDate = new Paragraph("SECRETARIA DOS SERVIÇOS ACADÉMICOS, "
-                + new SimpleDateFormat("d 'de' MMMM 'de' YYYY", new Locale("pt")).format(DateTime.now().toDate()));
+        Paragraph paragraphDate = new Paragraph("Secretaria dos serviços académicos");
         paragraphDate.setSpacingBefore(30);
         document.add(paragraphDate);
     }

@@ -5,6 +5,8 @@ import java.io.IOException;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.bennu.RegistrationProcessConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +24,9 @@ import pt.ist.registration.process.ui.service.SignCertAndStoreService;
 @RestController
 @RequestMapping("/registration-process/registration-declarations")
 public class SignedDeclarationsController {
+    
+    
+    private static final Logger logger = LoggerFactory.getLogger(SignedDeclarationsController.class);
 
     private final SignCertAndStoreService signCertAndStoreService;
 
@@ -36,6 +41,8 @@ public class SignedDeclarationsController {
         String uniqueIdentifier = Jwts.parser().setSigningKey(RegistrationProcessConfiguration.signerJwtSecret())
                 .parseClaimsJws(nounce).getBody().getSubject();
         if (registration.getRegistrationDeclarationFile().getUniqueIdentifier().equals(uniqueIdentifier)) {
+            logger.debug("Registration Declaration {} of student {} was signed.", registration.getRegistrationDeclarationFile().getUniqueIdentifier(), registration.getNumber());
+            logger.debug("Registration Declaration {} of student {} sent to be certified", registration.getRegistrationDeclarationFile().getUniqueIdentifier(),  registration.getNumber());
             signCertAndStoreService.sendDocumentToBeCertified(registration.getExternalId(), getFilename(registration), file,
                     uniqueIdentifier);
             return "ok";
@@ -49,6 +56,8 @@ public class SignedDeclarationsController {
         String uniqueIdentifier = Jwts.parser().setSigningKey(RegistrationProcessConfiguration.certifierJwtSecret())
                 .parseClaimsJws(nounce).getBody().getSubject();
         if (registration.getRegistrationDeclarationFile().getUniqueIdentifier().equals(uniqueIdentifier)) {
+            logger.debug("Registration Declaration {} of student {} was certified.", registration.getRegistrationDeclarationFile().getUniqueIdentifier(), registration.getNumber());
+            logger.debug("Registration Declaration {} of student {} sent out to be stored.", registration.getRegistrationDeclarationFile().getUniqueIdentifier(), registration.getNumber());
             signCertAndStoreService.sendDocumentToBeStored(registration.getPerson().getUsername(),
                     registration.getPerson().getEmailForSendingEmails(), getFilename(registration), file, uniqueIdentifier);
             return "ok";
