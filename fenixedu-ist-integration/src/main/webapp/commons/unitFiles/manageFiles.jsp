@@ -25,6 +25,8 @@
 <%@ taglib uri="http://fenix-ashes.ist.utl.pt/fenix-renderers" prefix="fr"%>
 <%@ taglib uri="http://fenix-ashes.ist.utl.pt/taglib/collection-pager" prefix="cp" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://fenixedu.com/cms/permissions" prefix="permissions" %>
+
 
 <h2><bean:message key="label.manageFiles" bundle="RESEARCHER_RESOURCES"/> <span class="small"><c:out value="${unit.name}"/></span></h2>
 
@@ -42,7 +44,7 @@
 			<html:link page="<%= "/" + actionName + ".do?method=prepareFileUpload&unitId=" + unitID %>"><bean:message key="label.addFile" bundle="RESEARCHER_RESOURCES"/></html:link>
 		</li>
 	</logic:equal>
-	<c:if test="${unit.site.canAdminGroup.isMember(LOGGED_USER_ATTRIBUTE)}">
+	<c:if test="${permissions:canDoThis(unit.site, 'MANAGE_ROLES')}">
 		<li>
 			<html:link page="<%= "/" + actionName + ".do?method=configureGroups&unitId=" + unitID %>"><bean:message key="label.manageAccessGroups" bundle="RESEARCHER_RESOURCES"/></html:link>
 		</li>

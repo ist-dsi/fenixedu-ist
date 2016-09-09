@@ -24,6 +24,7 @@
 <%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 <%@ taglib uri="http://fenix-ashes.ist.utl.pt/fenix-renderers" prefix="fr" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://fenixedu.com/cms/permissions" prefix="permissions" %>
 
 <html:xhtml/>
 
@@ -32,7 +33,7 @@
 
 <h2><bean:message key="label.manageAccessGroups" bundle="RESEARCHER_RESOURCES"/></h2>
 
-<c:if test="${unit.site.canAdminGroup.isMember(LOGGED_USER_ATTRIBUTE)}">
+<c:if test="${permissions:canDoThis(unit.site, 'MANAGE_ROLES')}">
 
 	<p class="mtop2 mbottom05">
 		<strong><bean:message key="label.accessGroup" bundle="RESEARCHER_RESOURCES"/></strong>
