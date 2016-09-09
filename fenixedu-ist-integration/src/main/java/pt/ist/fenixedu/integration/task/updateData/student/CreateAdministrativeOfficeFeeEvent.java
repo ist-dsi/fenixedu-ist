@@ -53,7 +53,7 @@ public class CreateAdministrativeOfficeFeeEvent extends CronTask {
 
             final AccountingEventsManager manager = new AccountingEventsManager();
             final InvocationResult result;
-            if (acceptedDegreeTypesForAdministrativeOfficeFeeAndInsuranceEvent.test(scp.getDegreeType())) {
+            if (!acceptedDegreeTypesForAdministrativeOfficeFeeAndInsuranceEvent.test(scp.getDegreeType())) {
                 return;
             }
             result = manager.createAdministrativeOfficeFeeAndInsuranceEvent(scp, executionYear);
