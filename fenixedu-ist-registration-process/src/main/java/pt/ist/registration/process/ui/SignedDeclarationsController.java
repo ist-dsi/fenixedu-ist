@@ -65,16 +65,8 @@ public class SignedDeclarationsController {
         throw new UnauthorizedException();
     }
 
-    private String getStartYear(Registration registration) {
-        ExecutionYear startExecutionYear = registration.getStartExecutionYear();
-        if (startExecutionYear == null) {
-            startExecutionYear = ExecutionYear.readCurrentExecutionYear();
-        }
-        return startExecutionYear.getQualifiedName().replaceAll("/", "-");
-    }
-
     private String getFilename(Registration registration) {
-        return Joiner.on("_").join("declaracao", registration.getDegree().getSigla(), getStartYear(registration),
+        return Joiner.on("_").join("declaracao", registration.getDegree().getSigla(), ExecutionYear.readCurrentExecutionYear().getQualifiedName().replaceAll("/", "-"),
                 registration.getNumber()) + ".pdf";
     }
 
