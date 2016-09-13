@@ -58,7 +58,7 @@ public class CgdCard extends CgdCard_Base {
     }
 
     static int yearFor(final String cardSerialNumber) {
-        return Integer.parseInt(cardSerialNumber.substring(0, 2));
+        return Integer.parseInt(cardSerialNumber.substring(0, 2))+2000;
     }
 
     static int serialNumberFor(final String memberId) {
