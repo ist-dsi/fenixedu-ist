@@ -394,11 +394,13 @@ public class DegreeCandidateDTO {
         final Person person = new Person(profile);
 
         person.setGender(getGender());
-        person.setIdentification(getDocumentIdNumber(), IDDocumentType.IDENTITY_CARD);
+        final String digit = getDocumentCheckDigit();
+        final IDDocumentType idDocumentType = digit == null || digit.isEmpty() ? IDDocumentType.OTHER : IDDocumentType.IDENTITY_CARD;
+        person.setIdentification(getDocumentIdNumber(), idDocumentType);
 
         person.setMaritalStatus(MaritalStatus.SINGLE);
         person.setDateOfBirthYearMonthDay(getDateOfBirth());
-        person.setIdentificationDocumentSeriesNumber(getDocumentCheckDigit());
+        person.setIdentificationDocumentSeriesNumber(digit);
 
         final PhysicalAddress createPhysicalAddress =
                 PhysicalAddress.createPhysicalAddress(person, new PhysicalAddressData(getAddress(), getAreaCode(),
