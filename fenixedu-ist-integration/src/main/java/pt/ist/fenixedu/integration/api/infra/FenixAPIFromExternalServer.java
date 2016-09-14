@@ -18,9 +18,6 @@
  */
 package pt.ist.fenixedu.integration.api.infra;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -36,15 +33,12 @@ import org.slf4j.LoggerFactory;
 
 import pt.ist.fenixedu.integration.FenixEduIstIntegrationConfiguration;
 
-import com.google.common.base.Strings;
 import com.google.common.io.BaseEncoding;
-import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
@@ -54,56 +48,16 @@ public class FenixAPIFromExternalServer {
 
     private static final Client HTTP_CLIENT = ClientBuilder.newClient();
 
-    private static JsonObject shuttleInfo;
-    private static JsonObject contactsInfo;
+    private static final String shuttleUrl = FenixEduIstIntegrationConfiguration.getConfiguration().getFenixApiShuttleUrl();
+    private static final String contactsUrl = FenixEduIstIntegrationConfiguration.getConfiguration().getFenixApiContactsUrl();
 
     private static JsonObject empty = new JsonObject();
     private static Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    private static DateTime day;
-
     private static final String datePattern = "dd/MM/yyyy";
     private static JsonParser parser = new JsonParser();
 
-    private static synchronized void getInformation() {
-
-        String shuttleUrl = FenixEduIstIntegrationConfiguration.getConfiguration().getFenixApiShuttleUrl();
-        String contactsUrl = FenixEduIstIntegrationConfiguration.getConfiguration().getFenixApiContactsUrl();
-        String shuttleFile = FenixEduIstIntegrationConfiguration.getConfiguration().getFenixApiShuttleFile();
-        String contactsFile = FenixEduIstIntegrationConfiguration.getConfiguration().getFenixApiContactsFile();
-
-        if (oldInformation()) {
-            contactsInfo = getInformation(contactsUrl, contactsFile);
-            shuttleInfo = getInformation(shuttleUrl, shuttleFile);
-            day = new DateTime();
-        } else {
-            if (contactsInfo == null) {
-                contactsInfo = getInformation(contactsUrl, contactsFile);
-            }
-            if (shuttleInfo == null) {
-                shuttleInfo = getInformation(shuttleUrl, shuttleFile);
-            }
-        }
-
-    }
-
-    private static JsonObject getInformation(String url, String filename) {
-
-        logger.debug("get file info for \"{}\"", filename);
-
-        JsonObject infoJson = getFileInfo(filename).getAsJsonObject();
-
-        if (!infoJson.equals(empty)) {
-            logger.debug("file info exists");
-            return infoJson;
-        }
-
-        logger.debug("file or file info for \"{}\" doesn't exist, let's try url : {}", filename, url);
-
-        return updateInformation(url);
-    }
-
-    private static JsonObject updateInformation(String url) {
+    private static JsonObject getInformation(String url) {
 
         JsonObject infoJson;
         try {
@@ -135,7 +89,7 @@ public class FenixAPIFromExternalServer {
 
         String canteenUrl =
                 FenixEduIstIntegrationConfiguration.getConfiguration().getFenixApiCanteenUrl().concat("?name=" + canteenName);
-        JsonObject canteenInfo = updateInformation(canteenUrl);
+        JsonObject canteenInfo = getInformation(canteenUrl);
         String lang = I18N.getLocale().toLanguageTag();
 
         if (!canteenInfo.has(lang)) {
@@ -173,25 +127,17 @@ public class FenixAPIFromExternalServer {
     }
 
     public static String getShuttle() {
-        getInformation();
+        JsonObject shuttleInfo = getInformation(shuttleUrl);
         return gson.toJson(shuttleInfo);
     }
 
     public static String getContacts() {
-        getInformation();
+        JsonObject contactsInfo = getInformation(contactsUrl);
         if (contactsInfo.has(I18N.getLocale().toLanguageTag())) {
             return contactsInfo.get(I18N.getLocale().toLanguageTag()).toString();
         }
 
         return contactsInfo.toString();
-    }
-
-    private static Boolean oldInformation() {
-        if (day == null) {
-            return true;
-        }
-        DateTime now = new DateTime();
-        return now.isAfter(day.plusHours(24));
     }
 
     private static String getServiceAuth() {
@@ -202,20 +148,4 @@ public class FenixAPIFromExternalServer {
         return "Basic " + encoding;
     }
 
-    private static JsonElement getFileInfo(String file) {
-        if (Strings.isNullOrEmpty(file)) {
-            return empty;
-        }
-
-        final InputStream resourceAsStream = FenixAPIFromExternalServer.class.getResourceAsStream(file);
-        if (resourceAsStream == null) {
-            return empty;
-        }
-
-        try {
-            return parser.parse(new String(ByteStreams.toByteArray(resourceAsStream)));
-        } catch (IOException | JsonParseException e) {
-            return empty;
-        }
-    }
 }
