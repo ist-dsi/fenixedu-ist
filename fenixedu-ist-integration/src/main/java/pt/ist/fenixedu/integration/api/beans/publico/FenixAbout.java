@@ -86,8 +86,6 @@ public class FenixAbout {
         }
         currentAcademicTerm = ExecutionSemester.readActualExecutionSemester().getQualifiedName();
         rssPtFeed.add(new FenixRSSFeed("News", FenixEduIstIntegrationConfiguration.getConfiguration().getFenixApiNewsRSSUrlPt()));
-        rssPtFeed.add(new FenixRSSFeed("Events", FenixEduIstIntegrationConfiguration.getConfiguration()
-                .getFenixApiEventsRSSUrlPt()));
 
         languages = FluentIterable.from(CoreConfiguration.supportedLocales()).transform(new Function<Locale, String>() {
 
@@ -123,10 +121,10 @@ public class FenixAbout {
 
         if (Locale.UK.equals(locale)) {
             jArr.addProperty("news", FenixEduIstIntegrationConfiguration.getConfiguration().getFenixApiNewsRSSUrlEn());
-            jArr.addProperty("events", FenixEduIstIntegrationConfiguration.getConfiguration().getFenixApiEventsRSSUrlEn());
+            jArr.addProperty("events", "");
         } else {
             jArr.addProperty("news", FenixEduIstIntegrationConfiguration.getConfiguration().getFenixApiNewsRSSUrlPt());
-            jArr.addProperty("events", FenixEduIstIntegrationConfiguration.getConfiguration().getFenixApiEventsRSSUrlPt());
+            jArr.addProperty("events", "");
         }
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();

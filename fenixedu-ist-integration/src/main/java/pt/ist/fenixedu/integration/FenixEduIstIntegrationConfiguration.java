@@ -26,14 +26,8 @@ public class FenixEduIstIntegrationConfiguration {
     @ConfigurationManager(description = "FenixEdu IST Integration specific properties")
     public interface ConfigurationProperties {
 
-        @ConfigurationProperty(key = "fenix.api.events.rss.url.pt")
-        public String getFenixApiEventsRSSUrlPt();
-
         @ConfigurationProperty(key = "fenix.api.news.rss.url.pt")
         public String getFenixApiNewsRSSUrlPt();
-
-        @ConfigurationProperty(key = "fenix.api.events.rss.url.en")
-        public String getFenixApiEventsRSSUrlEn();
 
         @ConfigurationProperty(key = "fenix.api.news.rss.url.en")
         public String getFenixApiNewsRSSUrlEn();
