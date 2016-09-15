@@ -32,18 +32,6 @@ public class FenixEduIstIntegrationConfiguration {
         @ConfigurationProperty(key = "fenix.api.news.rss.url.en")
         public String getFenixApiNewsRSSUrlEn();
 
-        @ConfigurationProperty(key = "fenix.api.canteen.file",
-                description = "if is not defined it will fallback to the same property url", defaultValue = "")
-        public String getFenixApiCanteenFile();
-
-        @ConfigurationProperty(key = "fenix.api.shuttle.file",
-                description = "if is not defined it will fallback to the same property url", defaultValue = "")
-        public String getFenixApiShuttleFile();
-
-        @ConfigurationProperty(key = "fenix.api.contacts.file",
-                description = "if is not defined it will fallback to the same property url", defaultValue = "")
-        public String getFenixApiContactsFile();
-
         @ConfigurationProperty(key = "fenix.api.canteen.url", defaultValue = "")
         public String getFenixApiCanteenUrl();
 
