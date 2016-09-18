@@ -71,7 +71,7 @@ public class FenixAbout {
     String institutionName = null;
     String institutionUrl = null;
 
-    List<FenixRSSFeed> rssPtFeed = new ArrayList<>();
+    List<FenixRSSFeed> rssFeeds = new ArrayList<>();
 
     String currentAcademicTerm;
     Set<String> languages;
@@ -85,7 +85,7 @@ public class FenixAbout {
             institutionUrl = unit.getDefaultWebAddressUrl();
         }
         currentAcademicTerm = ExecutionSemester.readActualExecutionSemester().getQualifiedName();
-        rssPtFeed.add(new FenixRSSFeed("News", FenixEduIstIntegrationConfiguration.getConfiguration().getFenixApiNewsRSSUrlPt()));
+        rssFeeds.add(new FenixRSSFeed("News", getNewsRSSUrl()));
 
         languages = FluentIterable.from(CoreConfiguration.supportedLocales()).transform(new Function<Locale, String>() {
 
@@ -111,7 +111,17 @@ public class FenixAbout {
     }
 
     public List<FenixRSSFeed> getRssFeeds() {
-        return rssPtFeed;
+        return rssFeeds;
+    }
+
+    private String getNewsRSSUrl() {
+        Locale locale = I18N.getLocale();
+
+        if (Locale.UK.equals(locale)) {
+            return FenixEduIstIntegrationConfiguration.getConfiguration().getFenixApiNewsRSSUrlEn();
+        } else {
+            return FenixEduIstIntegrationConfiguration.getConfiguration().getFenixApiNewsRSSUrlPt();
+        }
     }
 
     @JsonRawValue
@@ -119,13 +129,8 @@ public class FenixAbout {
         Locale locale = I18N.getLocale();
         final JsonObject jArr = new JsonObject();
 
-        if (Locale.UK.equals(locale)) {
-            jArr.addProperty("news", FenixEduIstIntegrationConfiguration.getConfiguration().getFenixApiNewsRSSUrlEn());
-            jArr.addProperty("events", "");
-        } else {
-            jArr.addProperty("news", FenixEduIstIntegrationConfiguration.getConfiguration().getFenixApiNewsRSSUrlPt());
-            jArr.addProperty("events", "");
-        }
+        jArr.addProperty("news", getNewsRSSUrl());
+        jArr.addProperty("events", "");
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         JsonElement je = new JsonParser().parse(jArr.toString());
