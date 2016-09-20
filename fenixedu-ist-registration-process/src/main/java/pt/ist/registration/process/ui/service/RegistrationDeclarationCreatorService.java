@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -12,7 +11,7 @@ import java.util.Map;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.student.Registration;
-import org.joda.time.DateTime;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.springframework.stereotype.Service;
 
 import com.itextpdf.text.Document;
@@ -63,7 +62,7 @@ public class RegistrationDeclarationCreatorService {
         String postalCode = person.getPostalCode();
         String curricularYear = Integer.toString(registration.getCurricularYear());
         String gender = person.getGender().toString();
-        String course = registration.getDegree().getName();
+        String degree = getDegreeDescription(registration);
         String naturality = person.getDistrictOfBirth();
 
         Map<String, Object> ctx = new HashMap<>();
@@ -76,7 +75,7 @@ public class RegistrationDeclarationCreatorService {
         ctx.put("address", address);
         ctx.put("postalCode", postalCode);
         ctx.put("curricularYear", curricularYear);
-        ctx.put("course", course);
+        ctx.put("degree", degree);
 
         try {
             byte[] document = generateDocument(ctx, registration);
@@ -90,6 +89,16 @@ public class RegistrationDeclarationCreatorService {
             throw new ProblemsGeneratingDocumentException(e);
         }
 
+    }
+
+    private String getDegreeDescription(Registration registration) {
+        String degreeName = registration.getDegree().getFilteredName(ExecutionYear.readCurrentExecutionYear());
+        if (registration.getDegree().isEmpty()) {
+            return degreeName;
+        }
+        String degreeTypeName = registration.getDegreeType().getName().getContent().replaceAll("Bolonha", ""); //dirty hack until degree type has display form ?
+        return BundleUtil.getString("resources.RegistrationProcessResources", "registration.document.degree.full.name",
+                degreeTypeName, degreeName);
     }
 
     private byte[] generateDocument(Map<String, Object> ctx, Registration registration)
