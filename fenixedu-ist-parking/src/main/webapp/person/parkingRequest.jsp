@@ -48,7 +48,7 @@
 		<logic:notEqual name="parkingParty"	property="hasAllNecessaryPersonalInfo" value="false">
 			<p>
 				<bean:message key="label.read.parkingRegulation" bundle="PARKING_RESOURCES" />: 
-				<a href="<%= org.fenixedu.academic.domain.Installation.getInstance().getInstituitionURL() %>files/viver-IST/gestao-estacionamento/reg_estac.pdf" target="_blank">
+				<a href="<%= org.fenixedu.academic.domain.Installation.getInstance().getInstituitionURL() %>files/2016/05/regulamento-estacionamento.pdf" target="_blank">
 					<bean:message key="label.parkingRegulation" arg0="<%=org.fenixedu.academic.domain.organizationalStructure.Unit.getInstitutionAcronym()%>" bundle="PARKING_RESOURCES" />
 					<bean:message key="label.parkingRegulation.pdf" bundle="PARKING_RESOURCES" />
 				</a>
@@ -90,7 +90,7 @@
 	<logic:notEmpty name="parkingParty" property="parkingRequestsSet">
 		<p>
 			<bean:message key="label.read.parkingRegulation" bundle="PARKING_RESOURCES" />: 
-			<a href="<%= org.fenixedu.academic.domain.Installation.getInstance().getInstituitionURL() %>files/viver-IST/gestao-estacionamento/reg_estac.pdf" target="_blank">
+			<a href="<%= org.fenixedu.academic.domain.Installation.getInstance().getInstituitionURL() %>files/2016/05/regulamento-estacionamento.pdf" target="_blank">
 				<bean:message key="label.parkingRegulation" arg0="<%=org.fenixedu.academic.domain.organizationalStructure.Unit.getInstitutionAcronym()%>" bundle="PARKING_RESOURCES" />
 				<bean:message key="label.parkingRegulation.pdf" bundle="PARKING_RESOURCES" />
 			</a>
