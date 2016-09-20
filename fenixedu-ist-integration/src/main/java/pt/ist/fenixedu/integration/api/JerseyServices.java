@@ -386,7 +386,7 @@ public class JerseyServices {
             }
         }
         for (ConclusionProcess conclusionProcess : Bennu.getInstance().getConclusionProcessesSet()) {
-            if (conclusionProcess.getConclusionDate() != null
+            if (conclusionProcess.getLastVersion() != null && conclusionProcess.getConclusionDate() != null
                     && !conclusionProcess.getConclusionDate().plusYears(1).isBefore(today)) {
                 registrations.add(conclusionProcess.getRegistration());
             }
