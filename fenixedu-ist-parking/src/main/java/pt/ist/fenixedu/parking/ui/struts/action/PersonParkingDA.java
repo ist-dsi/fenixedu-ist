@@ -447,16 +447,6 @@ public class PersonParkingDA extends FenixDispatchAction {
         }
         if (!isOwner(parkingForm, "ownVehicle1")) {
             parkingForm.set("ownVehicle1", false);
-            if (hasNotDeliveryValue(parkingForm, "Id1")) {
-                actionMessages.add("firstCarOwnerIdDeliveryMessage", new ActionMessage("error.requiredDocumentDelivery"));
-                result = false;
-            } else if ((isStudent || isElectronicDelivery(parkingForm, "Id1"))
-                    && (parkingRequestFactory.getFirstCarOwnerIdFileName() == null || parkingRequestFactory
-                            .getFirstCarOwnerIdFileName().length() == 0)) {
-                actionMessages.add("firstCarOwnerIdMessage", new ActionMessage("error.requiredStudentField"));
-                parkingForm.set("Id1", ParkingDocumentState.ELECTRONIC_DELIVERY.name());
-                result = false;
-            }
             if (hasNotDeliveryValue(parkingForm, "declaration1")) {
                 actionMessages.add("firstDeclarationAuthorizationDeliveryMessage", new ActionMessage(
                         "error.requiredDocumentDelivery"));
@@ -465,7 +455,6 @@ public class PersonParkingDA extends FenixDispatchAction {
                     && (parkingRequestFactory.getFirstDeclarationAuthorizationFileName() == null || parkingRequestFactory
                             .getFirstDeclarationAuthorizationFileName().length() == 0)) {
                 actionMessages.add("firstDeclarationAuthorizationMessage", new ActionMessage("error.requiredStudentField"));
-                parkingForm.set("declaration1", ParkingDocumentState.ELECTRONIC_DELIVERY.name());
                 result = false;
             }
         }
@@ -505,17 +494,6 @@ public class PersonParkingDA extends FenixDispatchAction {
                 }
                 if (!isOwner(parkingForm, "ownVehicle2")) {
                     parkingForm.set("ownVehicle2", false);
-                    if (hasNotDeliveryValue(parkingForm, "Id2")) {
-                        actionMessages
-                                .add("secondCarOwnerIdDeliveryMessage", new ActionMessage("error.requiredDocumentDelivery"));
-                        result = false;
-                    } else if ((isStudent || isElectronicDelivery(parkingForm, "Id2"))
-                            && (parkingRequestFactory.getSecondCarOwnerIdFileName() == null || parkingRequestFactory
-                                    .getSecondCarOwnerIdFileName().length() == 0)) {
-                        actionMessages.add("secondCarOwnerIdMessage", new ActionMessage("error.requiredStudentField"));
-                        parkingForm.set("Id2", ParkingDocumentState.ELECTRONIC_DELIVERY.name());
-                        result = false;
-                    }
                     if (hasNotDeliveryValue(parkingForm, "declaration2")) {
                         actionMessages.add("secondDeclarationAuthorizationDeliveryMessage", new ActionMessage(
                                 "error.requiredDocumentDelivery"));

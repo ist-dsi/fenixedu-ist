@@ -39,11 +39,6 @@ function hideStudentRadioButtons(){
 	document.getElementById('registry1Radio').style.display='none';		
 	document.getElementById('registry1Student').style.display='block';
 
-	document.getElementsByName('Id1')[2].checked=true;
-	document.getElementById('Id1Div').style.display='block';
-	document.getElementById('Id1Radio').style.display='none';	
-	document.getElementById('Id1Student').style.display='block';	
-
 	document.getElementsByName('declaration1')[1].checked=true;
 	document.getElementById('declaration1Div').style.display='block';
 	document.getElementById('declaration1Radio').style.display='none';
@@ -54,11 +49,6 @@ function hideStudentRadioButtons(){
 	document.getElementById('registry2Radio').style.display='none';		
 	document.getElementById('registry2Student').style.display='block';		
 
-	document.getElementsByName('Id2')[2].checked=true;
-	document.getElementById('Id2Div').style.display='block';
-	document.getElementById('Id2Radio').style.display='none';
-	document.getElementById('Id2Student').style.display='block';		
-	
 	document.getElementsByName('declaration2')[1].checked=true;
 	document.getElementById('declaration2Div').style.display='block';
 	document.getElementById('declaration2Radio').style.display='none';
@@ -85,11 +75,6 @@ function hideInputBoxes(){
 		document.getElementById('registry1File').style.display='none';		
 		document.getElementById('registry1DivTop').style.display='block';
 	}
-	if(document.getElementsByName('Id1')[2].checked==false){
-		document.getElementById('Id1Div').style.display='none';
-		document.getElementById('Id1File').style.display='none';		
-		document.getElementById('Id1DivTop').style.display='block';
-	}
 	if(document.getElementsByName('declaration1')[1].checked==false){	
 		document.getElementById('declaration1Div').style.display='none';
 		document.getElementById('declaration1File').style.display='none';		
@@ -99,11 +84,6 @@ function hideInputBoxes(){
 		document.getElementById('registry2Div').style.display='none';
 		document.getElementById('registry2File').style.display='none';		
 		document.getElementById('registry2DivTop').style.display='block';
-	}
-	if(document.getElementsByName('Id2')[2].checked==false){
-		document.getElementById('Id2Div').style.display='none';
-		document.getElementById('Id2File').style.display='none';		
-		document.getElementById('Id2DivTop').style.display='block';
 	}
 	if(document.getElementsByName('declaration2')[1].checked==false){
 		document.getElementById('declaration2Div').style.display='none';
@@ -133,7 +113,6 @@ function changeElementsDisplay(elementId, elementId2,elementDisplay, topDisplay)
 	<ul>
 		<li><bean:message key="label.driverLicense" bundle="PARKING_RESOURCES"/></li>		
 		<li><bean:message key="title.registo" bundle="PARKING_RESOURCES"/> <span class="greytxt1">(<bean:message key="title.forEachVehicle" bundle="PARKING_RESOURCES"/>)</span></li>
-		<li><bean:message key="title.ownerId" bundle="PARKING_RESOURCES"/> <span class="greytxt1">(<bean:message key="title.forEachVehicleNotOwned" bundle="PARKING_RESOURCES"/>)</span></li>
 		<bean:define id="url" type="java.lang.String">
 			<html:link page="/personParking.do?method=downloadAuthorizationDocument">
 				<bean:message key="title.anexIV.label" bundle="PARKING_RESOURCES" />
@@ -143,11 +122,6 @@ function changeElementsDisplay(elementId, elementId2,elementDisplay, topDisplay)
 		<p class="mtop025"><em><bean:message key="message.forMoreThan2Cars" bundle="PARKING_RESOURCES"/></em></p>
 	</ul>		
 
-	<p class="mvert025"><bean:message key="title.documentDelivery" bundle="PARKING_RESOURCES"/>:</p>
-	<ul>
-		<li><bean:message key="title.documentDeliveryOnline" arg0="<%=org.fenixedu.academic.domain.organizationalStructure.Unit.getInstitutionAcronym()%>" bundle="PARKING_RESOURCES"/></li>
-		<li><bean:message key="title.documentDeliveryPaper" bundle="PARKING_RESOURCES"/></li>
-	</ul>
 	<p class="mvert025"><bean:message key="message.toSubmitDocuments" bundle="PARKING_RESOURCES"/></p>
 	<ul>
 		<li><bean:message key="message.maxFileSize" bundle="PARKING_RESOURCES"/></li>
@@ -168,9 +142,6 @@ function changeElementsDisplay(elementId, elementId2,elementDisplay, topDisplay)
 	</bean:define>
 	<bean:define id="propertyRegisterLabel">
 		<bean:message  key="title.registo" bundle="PARKING_RESOURCES"/>
-	</bean:define>
-	<bean:define id="ownerId">
-		<bean:message  key="title.ownerId" bundle="PARKING_RESOURCES"/>
 	</bean:define>
 	<bean:define id="authorizationDeclaration">
 		<bean:message  key="label.firstDeclarationAuthorization" bundle="PARKING_RESOURCES"/>
@@ -418,84 +389,6 @@ function changeElementsDisplay(elementId, elementId2,elementDisplay, topDisplay)
 
 	<div class="separator1"></div>
 
-		<div id="Id1Radio">
-			<table class="tstyle8 thright thlight mtop025 mbottom0">
-				<tr>
-					<th class="width150px"><div id="Id1DivTop" style="display:none"><bean:message key="label.firstCarOwnerId" bundle="PARKING_RESOURCES"/>:</div></th>
-					<td>
-						<p>
-						<html:radio bundle="PARKING_RESOURCES" altKey="radio.Id1" name="personParkingForm" property="Id1" value="ALREADY_DELIVERED_HARD_COPY" onclick="changeElementsDisplay('Id1Div','Id1File', 'none', 'block')">
-							<bean:message key="label.deliveredDocument" bundle="PARKING_RESOURCES" arg0="<%=ownerId%>"/>
-						</html:radio>
-						</p>
-						<p>
-						<html:radio bundle="PARKING_RESOURCES" altKey="radio.Id1" name="personParkingForm" property="Id1" value="WILL_DELIVER_HARD_COPY" onclick="changeElementsDisplay('Id1Div','Id1File', 'none', 'block')">
-							<bean:message key="label.willdeliverDocument" bundle="PARKING_RESOURCES" arg0="<%=ownerId%>"/>
-						</html:radio>
-						</p>
-						<p>				
-						<html:radio bundle="PARKING_RESOURCES" altKey="radio.Id1" name="personParkingForm" property="Id1" value="ELECTRONIC_DELIVERY" onclick="changeElementsDisplay('Id1Div','Id1File', 'block', 'none')">
-							<bean:message key="label.deliverOnlineDocument" bundle="PARKING_RESOURCES" arg0="<%=ownerId%>"/>
-						</html:radio>
-						</p>
-						<div id="Id1File">
-						<logic:notEmpty name="<%= factoryName %>" property="firstCarOwnerIdFileName">
-							<p>
-							<span class="mtop05">
-								<bean:message key="label.currentFile" bundle="PARKING_RESOURCES" arg0="<%=ownerId%>"/>
-								<bean:write name="<%= factoryName %>" property="firstCarOwnerIdFileName"/>
-							</span>
-							</p>
-						</logic:notEmpty>
-						</div>
-					</td>	
-				</tr>
-			</table>
-		</div>
-
-		<div id="Id1Student" style="display:none">
-			<logic:notEmpty name="<%= factoryName %>" property="firstCarOwnerIdFileName">
-				<table class="tstyle8 thright thlight mbottom0 mtop0 tstylepark">
-					<tr>
-						<th class="width150px"/>
-						<td>						
-							<span class="mtop025">
-								<bean:message key="label.currentFile" bundle="PARKING_RESOURCES" arg0="<%=ownerId%>"/>
-								<strong><bean:write name="<%= factoryName %>" property="firstCarOwnerIdFileName"/></strong>
-							</span>											
-						</td>
-					</tr>
-				</table>
-			</logic:notEmpty>
-		</div>
-
-		<div id="Id1Div">
-			<fr:edit id="Id1FR" name="<%= factoryName %>" schema="<%= action+".parkingRequestFactory.firstCarId.notOwnCar"%>"
-				type="<%= type %>">
-				<fr:layout name="tabular">
-					<fr:property name="classes" value="tstyle8 thright thlight mtop0 mbottom0"/>
-					<fr:property name="columnClasses" value="width150px,,noborder"/>
-				</fr:layout>					
-			</fr:edit>
-			<p>
-				<span class="error0 mtop025">
-					<html:messages id="message" property="firstCarOwnerIdMessage" message="true" bundle="PARKING_RESOURCES">
-						<bean:write name="message"/>
-					</html:messages>
-				</span>
-			</p>
-		</div>
-
-		<p>
-			<span class="error0 mtop0">
-				<html:messages id="message" property="firstCarOwnerIdDeliveryMessage" message="true" bundle="PARKING_RESOURCES">
-					<bean:write name="message"/>
-				</html:messages>
-			</span>	
-		</p>
-
-	<div class="separator1"></div>
-
 		<div id="declaration1Radio">
 			<table class="tstyle8 thright thlight mtop0 mbottom0">
 			<tr>
@@ -703,84 +596,6 @@ function changeElementsDisplay(elementId, elementId2,elementDisplay, topDisplay)
 
 	<div id="ownCar2">
 
-	<div class="separator1"></div>
-
-		<div id="Id2Radio">
-			<table class="tstyle8 thright thlight mtop025 mbottom0">
-			<tr>
-				<th class="width150px"><div id="Id2DivTop" style="display:none"><bean:message key="label.secondCarOwnerId" bundle="PARKING_RESOURCES"/>:</div></th>
-				<td>
-					<p>
-					<html:radio bundle="PARKING_RESOURCES" altKey="radio.Id2" name="personParkingForm" property="Id2" value="ALREADY_DELIVERED_HARD_COPY" onclick="changeElementsDisplay('Id2Div','Id2File', 'none', 'block')">
-						<bean:message key="label.deliveredDocument" bundle="PARKING_RESOURCES" arg0="<%=ownerId%>"/>
-					</html:radio>
-					</p>
-					<p>
-					<html:radio bundle="PARKING_RESOURCES" altKey="radio.Id2" name="personParkingForm" property="Id2" value="WILL_DELIVER_HARD_COPY" onclick="changeElementsDisplay('Id2Div','Id2File', 'none', 'block')">
-						<bean:message key="label.willdeliverDocument" bundle="PARKING_RESOURCES" arg0="<%=ownerId%>"/>
-					</html:radio>
-					</p>
-					<p>						
-					<html:radio bundle="PARKING_RESOURCES" altKey="radio.Id2" name="personParkingForm" property="Id2" value="ELECTRONIC_DELIVERY" onclick="changeElementsDisplay('Id2Div','Id2File', 'block', 'none')">
-						<bean:message key="label.deliverOnlineDocument" bundle="PARKING_RESOURCES" arg0="<%=ownerId%>"/>
-					</html:radio>
-					</p>
-					<div id="Id2File">
-					<logic:notEmpty name="<%= factoryName %>" property="secondCarOwnerIdFileName">
-						<p>
-						<span class="mtop05">				
-							<bean:message key="label.currentFile" bundle="PARKING_RESOURCES" arg0="<%=ownerId%>"/>
-							<strong><bean:write name="<%= factoryName %>" property="secondCarOwnerIdFileName"/></strong>
-						</span>
-						</p>
-					</logic:notEmpty>				
-					</div>
-				</td>	
-			</tr>
-			</table>
-		</div>
-
-		<div id="Id2Student" style="display:none">
-			<logic:notEmpty name="<%= factoryName %>" property="secondCarOwnerIdFileName">
-				<table class="tstyle8 thright thlight mbottom0 mtop0 tstylepark">
-					<tr>
-						<th class="width150px"/>
-						<td>						
-							<span class="mtop025">
-								<bean:message key="label.currentFile" bundle="PARKING_RESOURCES" arg0="<%=ownerId%>"/>
-								<strong><bean:write name="<%= factoryName %>" property="secondCarOwnerIdFileName"/></strong>
-							</span>											
-						</td>
-					</tr>
-				</table>
-			</logic:notEmpty>
-		</div>
-
-		<div id="Id2Div">
-			<fr:edit id="Id2FR" name="<%= factoryName %>" schema="<%= action+".parkingRequestFactory.secondCarId.notOwnCar"%>"
-				type="<%= type %>">
-				<fr:layout name="tabular">
-					<fr:property name="classes" value="tstyle8 thright thlight mtop0 mbottom0"/>
-					<fr:property name="columnClasses" value="width150px,,noborder"/>
-				</fr:layout>					
-			</fr:edit>
-			<p>
-				<span class="error0 mtop025">
-					<html:messages id="message" property="secondCarOwnerIdMessage" message="true" bundle="PARKING_RESOURCES">
-						<bean:write name="message"/>
-					</html:messages>
-				</span>
-			</p>
-		</div>
-
-		<p>
-			<span class="error0 mtop0">
-				<html:messages id="message" property="secondCarOwnerIdDeliveryMessage" message="true" bundle="PARKING_RESOURCES">
-					<bean:write name="message"/>
-				</html:messages>
-			</span>
-		</p>
-
 	<div class="separator1"></div>	
 
 		<div id="declaration2Radio">
@@ -925,8 +740,6 @@ function changeElementsDisplay(elementId, elementId2,elementDisplay, topDisplay)
 		hideInputBoxes();
 	</script>
 
-	<logic:present name="student">
 		<script type="text/javascript">
 			hideStudentRadioButtons();
 		</script>
-	</logic:present>
