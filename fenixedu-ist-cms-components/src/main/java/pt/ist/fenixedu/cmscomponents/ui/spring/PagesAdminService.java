@@ -39,13 +39,7 @@ import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.io.domain.GroupBasedFile;
 import org.fenixedu.bennu.io.servlets.FileDownloadServlet;
-import org.fenixedu.cms.domain.Category;
-import org.fenixedu.cms.domain.Menu;
-import org.fenixedu.cms.domain.MenuItem;
-import org.fenixedu.cms.domain.Page;
-import org.fenixedu.cms.domain.Post;
-import org.fenixedu.cms.domain.PostFile;
-import org.fenixedu.cms.domain.Site;
+import org.fenixedu.cms.domain.*;
 import org.fenixedu.cms.domain.component.StaticPost;
 import org.fenixedu.commons.i18n.I18N;
 import org.fenixedu.commons.i18n.LocalizedString;
@@ -58,7 +52,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-
+import org.fenixedu.cms.domain.PermissionEvaluation;
+import org.fenixedu.cms.domain.PermissionsArray.Permission;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
 
@@ -108,7 +103,9 @@ public class PagesAdminService {
 
     @Atomic(mode = Atomic.TxMode.WRITE)
     protected Optional<MenuItem> create(Site site, MenuItem parent, LocalizedString name, LocalizedString body, LocalizedString excerpt) {
-        Menu menu = site.getMenusSet().stream().findFirst().orElse(null);
+        Menu menu = site.getMenusSet().stream()
+                .filter(m -> PermissionEvaluation.canDoThis(site, Permission.EDIT_PRIVILEGED_MENU) || !m.getPrivileged())
+                .findFirst().orElse(null);
         Page page = Page.create(site, menu, parent, Post.sanitize(name), true, "view", Authenticate.getUser());
         Category category = site.getOrCreateCategoryForSlug("content", new LocalizedString().with(I18N.getLocale(), "Content"));
         Post post = Post.create(site, page, Post.sanitize(name), sanitizeOrNew(body), sanitizeOrNew(excerpt),
