@@ -98,6 +98,9 @@ public class AnnouncementsAdminController extends ExecutionCourseController {
     @RequestMapping(value = "{postSlug}/delete", method = RequestMethod.POST)
     public RedirectView delete(@PathVariable ExecutionCourse executionCourse, @PathVariable String postSlug) {
         Post post = executionCourse.getSite().postForSlug(postSlug);
+        if(post == null){
+            return new RedirectView("404");
+        }
         atomic(() -> post.delete());
         return viewAll(executionCourse);
     }
@@ -164,6 +167,9 @@ public class AnnouncementsAdminController extends ExecutionCourseController {
             @RequestParam(required = false, defaultValue = "false") boolean active,
             @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE_TIME) DateTime publicationStarts) {
         Post post = executionCourse.getSite().postForSlug(postSlug);
+        if(post == null){
+            return new RedirectView("404");
+        }
         atomic(() -> {
             post.setName(Post.sanitize(name));
             post.setBodyAndExcerpt(body != null ? Post.sanitize(body) : new LocalizedString() , excerpt != null ? Post.sanitize
