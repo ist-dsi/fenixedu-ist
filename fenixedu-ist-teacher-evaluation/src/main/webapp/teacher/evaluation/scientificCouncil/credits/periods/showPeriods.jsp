@@ -141,22 +141,31 @@
 			</fr:edit>
 			<h4 class="mtop15 mbottom05">Outras datas</h4>
 			<fr:edit name="teacherCreditsBean" id="annualCreditsState" >
-			<fr:schema bundle="TEACHER_CREDITS_SHEET_RESOURCES" type="pt.ist.fenixedu.teacher.evaluation.domain.credits.AnnualCreditsState">
-				<fr:slot name="annualCreditsState.orientationsCalculationDate" layout="null-as-label" readOnly="true" key="label.orientationsCalculationDate"/>
-				<fr:slot name="finalCalculationDate" layout="null-as-label" readOnly="<%= Boolean.valueOf(closed.toString())%>" validator="pt.ist.fenixWebFramework.rendererExtensions.validators.LocalDateValidator"/>
-				<fr:slot name="closeCreditsDate" layout="null-as-label" readOnly="<%= Boolean.valueOf(closed.toString())%>" validator="pt.ist.fenixWebFramework.rendererExtensions.validators.LocalDateValidator"/>
-				<logic:present role="role(MANAGER)">
-					<fr:slot name="annualCreditsState.isFinalCreditsCalculated" layout="null-as-label" readOnly="true"/>
-					<fr:slot name="annualCreditsState.isCreditsClosed" layout="null-as-label" readOnly="true"/>
-				</logic:present>
-			</fr:schema>
-			<fr:layout name="tabular">
-				<fr:property name="classes" value="tstyle2 thleft thlight mtop05"/>
-			</fr:layout>
-		</fr:edit>
-			<logic:equal name="closed" value="false">
-				<html:submit bundle="HTMLALT_RESOURCES" altKey="submit.submit" styleClass="inputbutton"><bean:message key="link.change" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/></html:submit>
-			</logic:equal>
+				<fr:schema bundle="TEACHER_CREDITS_SHEET_RESOURCES" type="pt.ist.fenixedu.teacher.evaluation.domain.credits.AnnualCreditsState">
+					<fr:slot name="annualCreditsState.orientationsCalculationDate" layout="null-as-label" readOnly="true" key="label.orientationsCalculationDate"/>
+					<fr:slot name="finalCalculationDate" layout="null-as-label" readOnly="<%= Boolean.valueOf(closed.toString())%>" validator="pt.ist.fenixWebFramework.rendererExtensions.validators.LocalDateValidator"/>
+					<fr:slot name="closeCreditsDate" layout="null-as-label" readOnly="<%= Boolean.valueOf(closed.toString())%>" validator="pt.ist.fenixWebFramework.rendererExtensions.validators.LocalDateValidator"/>
+					<logic:present role="role(MANAGER)">
+						<fr:slot name="annualCreditsState.isFinalCreditsCalculated" layout="null-as-label" readOnly="true"/>
+						<fr:slot name="annualCreditsState.isCreditsClosed" layout="null-as-label" readOnly="true"/>
+					</logic:present>
+				</fr:schema>
+				<fr:layout name="tabular">
+					<fr:property name="classes" value="tstyle2 thleft thlight mtop05"/>
+				</fr:layout>
+			</fr:edit>
+			
+		<logic:equal name="closed" value="false">
+			<html:submit bundle="HTMLALT_RESOURCES" altKey="submit.submit" styleClass="inputbutton">
+			<bean:message key="link.change" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/>
+			</html:submit>
+		</logic:equal>
+		<logic:equal name="teacherCreditsBean" property="canOpenCredits" value="true">
+			<bean:define id="confirmationMessage"><bean:message key="message.confirmation.openAnnualTeachingCredits"  bundle="TEACHER_CREDITS_SHEET_RESOURCES"/></bean:define>
+			<html:submit bundle="HTMLALT_RESOURCES" altKey="submit.submit" styleClass="inputbutton" onclick="<%="return confirm('"+confirmationMessage+"')" %>">
+			<bean:message key="link.open" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/>
+			</html:submit>
+		</logic:equal>
 		</fr:form>
 	</logic:notEmpty>
 </logic:present>
