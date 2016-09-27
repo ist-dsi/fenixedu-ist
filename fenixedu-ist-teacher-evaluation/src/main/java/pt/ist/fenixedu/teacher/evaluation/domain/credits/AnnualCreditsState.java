@@ -18,9 +18,11 @@
  */
 package pt.ist.fenixedu.teacher.evaluation.domain.credits;
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Teacher;
@@ -128,6 +130,11 @@ public class AnnualCreditsState extends AnnualCreditsState_Base {
         TeacherCreditsFillingForTeacherCE teacherCreditsFillingForTeacher =
                 TeacherCreditsFillingForTeacherCE.getTeacherCreditsFillingForTeacher(executionSemester.getAcademicInterval());
         return teacherCreditsFillingForTeacher != null && teacherCreditsFillingForTeacher.containsNow();
+    }
+
+    public static AnnualCreditsState getLastClosedAnnualCreditsState() {
+        return Bennu.getInstance().getAnnualCreditsStatesSet().stream().filter(acs -> acs.getIsCreditsClosed())
+                .sorted(Comparator.comparing(AnnualCreditsState::getExecutionYear).reversed()).findFirst().orElse(null);
     }
 
 }

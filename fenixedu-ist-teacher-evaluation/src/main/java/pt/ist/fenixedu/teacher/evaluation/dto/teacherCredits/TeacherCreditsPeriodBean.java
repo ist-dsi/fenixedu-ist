@@ -21,6 +21,7 @@ package pt.ist.fenixedu.teacher.evaluation.dto.teacherCredits;
 import java.io.Serializable;
 
 import org.fenixedu.academic.domain.ExecutionSemester;
+import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
@@ -109,9 +110,8 @@ public class TeacherCreditsPeriodBean implements Serializable {
 
         ExecutionSemester executionSemester = getExecutionPeriod();
 
-        TeacherCreditsFillingForDepartmentAdmOfficeCE departmentAdmOffice =
-                TeacherCreditsFillingForDepartmentAdmOfficeCE.getTeacherCreditsFillingForDepartmentAdmOffice(executionSemester
-                        .getAcademicInterval());
+        TeacherCreditsFillingForDepartmentAdmOfficeCE departmentAdmOffice = TeacherCreditsFillingForDepartmentAdmOfficeCE
+                .getTeacherCreditsFillingForDepartmentAdmOffice(executionSemester.getAcademicInterval());
         setBeginForDepartmentAdmOffice(departmentAdmOffice != null ? departmentAdmOffice.getBegin() : null);
         setEndForDepartmentAdmOffice(departmentAdmOffice != null ? departmentAdmOffice.getEnd() : null);
 
@@ -241,11 +241,21 @@ public class TeacherCreditsPeriodBean implements Serializable {
 
     @Atomic
     public void editIntervals() {
-        annualCreditsState.setSharedUnitCreditsInterval(getSharedUnitCreditsInterval());
-        annualCreditsState.setUnitCreditsInterval(getUnitCreditsInterval());
-        annualCreditsState.setReductionServiceApproval(getReductionServiceApprovalInterval());
-        annualCreditsState.setCloseCreditsDate(getCloseCreditsDate());
-        annualCreditsState.setFinalCalculationDate(getFinalCalculationDate());
-        setAnnualCreditsState();
+        if (getAnnualCreditsState().getIsCreditsClosed()) {
+            annualCreditsState.setCloseCreditsDate(null);
+            annualCreditsState.setIsCreditsClosed(false);
+        } else {
+            annualCreditsState.setSharedUnitCreditsInterval(getSharedUnitCreditsInterval());
+            annualCreditsState.setUnitCreditsInterval(getUnitCreditsInterval());
+            annualCreditsState.setReductionServiceApproval(getReductionServiceApprovalInterval());
+            annualCreditsState.setCloseCreditsDate(getCloseCreditsDate());
+            annualCreditsState.setFinalCalculationDate(getFinalCalculationDate());
+            setAnnualCreditsState();
+        }
+    }
+
+    public boolean getCanOpenCredits() {
+        return getAnnualCreditsState().getIsCreditsClosed()
+                && getAnnualCreditsState().equals(AnnualCreditsState.getLastClosedAnnualCreditsState());
     }
 }
