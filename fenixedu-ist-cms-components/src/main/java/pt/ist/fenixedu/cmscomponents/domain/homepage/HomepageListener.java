@@ -23,15 +23,14 @@ import static org.fenixedu.bennu.core.i18n.BundleUtil.getLocalizedString;
 
 import java.util.Optional;
 
+import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.accessControl.TeacherGroup;
 import org.fenixedu.academic.domain.contacts.PartyContactType;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
-import org.fenixedu.cms.domain.CMSFolder;
-import org.fenixedu.cms.domain.CMSTheme;
-import org.fenixedu.cms.domain.Menu;
-import org.fenixedu.cms.domain.Page;
-import org.fenixedu.cms.domain.Site;
+import org.fenixedu.bennu.core.groups.NobodyGroup;
+import org.fenixedu.cms.domain.*;
 import org.fenixedu.cms.domain.component.Component;
 import org.fenixedu.commons.i18n.I18N;
 import org.fenixedu.commons.i18n.LocalizedString;
@@ -72,6 +71,7 @@ public class HomepageListener {
         createDefaultContents(newsite, menu, person.getUser());
         getHomepageFolder().ifPresent(newsite::setFolder);
         addContact(person, newsite);
+        createSiteRoles(newsite,person.getUser());
         newsite.setPublished(true);
         newsite.getHomepageSite().setShowPhoto(true);
         return newsite;
@@ -94,6 +94,14 @@ public class HomepageListener {
         Page.create(newSite, menu, null, PUBLICATIONS_TITLE, false, "researcherSection", user, publicationsComponent);
 
         newSite.setInitialPage(initialPage);
+    }
+
+    private static void createSiteRoles(Site newSite,User user) {
+        new Role(DefaultRoles.getInstance().getAdminRole(), newSite);
+        new Role(DefaultRoles.getInstance().getAuthorRole(), newSite);
+        new Role(DefaultRoles.getInstance().getContributorRole(), newSite);
+        Role editor = new Role(DefaultRoles.getInstance().getEditorRole(), newSite);
+        editor.setGroup(editor.getGroup().toGroup().grant(user).toPersistentGroup());
     }
 
     private static void addContact(Person owner, Site homepageSite) {
