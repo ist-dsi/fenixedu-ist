@@ -210,12 +210,14 @@ public class UpdateTeacherAuthorizations extends CronTask {
                                 employeeContract.getEndDate() == null ? new DateTime(Long.MAX_VALUE) : employeeContract
                                         .getEndDate().toLocalDate().toDateTimeAtStartOfDay().plusMillis(1));
                 Interval overlap = semesterInterval.overlap(contractInterval);
-                int days = overlap.toPeriod(PeriodType.days()).getDays() + 1;
-                if (days > minimumDaysForActivity) {
-                    return employeeDepartmentUnit;
-                }
-                if (firstDepartmentUnit == null) {
-                    firstDepartmentUnit = employeeDepartmentUnit;
+                if (overlap != null) {
+                    int days = overlap.toPeriod(PeriodType.days()).getDays() + 1;
+                    if (days > minimumDaysForActivity) {
+                        return employeeDepartmentUnit;
+                    }
+                    if (firstDepartmentUnit == null) {
+                        firstDepartmentUnit = employeeDepartmentUnit;
+                    }
                 }
             }
         }
