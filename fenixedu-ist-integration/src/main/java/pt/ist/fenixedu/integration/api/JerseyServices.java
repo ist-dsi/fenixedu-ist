@@ -327,8 +327,16 @@ public class JerseyServices {
         Set<Registration> registrations = new HashSet<Registration>();
         for (Registration registration : student.getRegistrationsSet()) {
             if (registration.isBolonha() && !registration.getDegreeType().isEmpty()) {
-                if (registration.isActive() || registration.isConcluded()) {
+                if (registration.isActive()) {
                     registrations.add(registration);
+                } else {
+                    ProgramConclusion.conclusionsFor(registration).forEach(programConclusion -> {
+                        RegistrationConclusionBean registrationConclusionBean =
+                                new RegistrationConclusionBean(registration, programConclusion);
+                        if (registrationConclusionBean.isConcluded() && registrationConclusionBean.getConclusionDate() != null) {
+                            registrations.add(registration);
+                        }
+                    });
                 }
             }
         }
