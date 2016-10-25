@@ -370,12 +370,14 @@ public class FenixAPIv1 {
     public void fillEnrolments(final Person person, List<FenixEnrolment> enrolments, ExecutionSemester executionSemester) {
         final Student foundStudent = person.getStudent();
 
-        for (Registration registration : foundStudent.getAllRegistrations()) {
-            for (Enrolment enrolment : registration.getEnrolments(executionSemester)) {
-                final ExecutionCourse executionCourse = enrolment.getExecutionCourseFor(executionSemester);
-                String grade = enrolment.getGrade().getValue();
-                double ects = enrolment.getEctsCredits();
-                enrolments.add(new FenixEnrolment(executionCourse, grade, ects));
+        if(foundStudent != null) {
+            for (Registration registration : foundStudent.getAllRegistrations()) {
+                for (Enrolment enrolment : registration.getEnrolments(executionSemester)) {
+                    final ExecutionCourse executionCourse = enrolment.getExecutionCourseFor(executionSemester);
+                    String grade = enrolment.getGrade().getValue();
+                    double ects = enrolment.getEctsCredits();
+                    enrolments.add(new FenixEnrolment(executionCourse, grade, ects));
+                }
             }
         }
     }
