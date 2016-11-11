@@ -330,6 +330,7 @@ public class PagesAdminService {
         if(postFile!=null) {
             postFile.setIsEmbedded(embedded);
             attachment.setAccessGroup(permissionGroups(menuItem.getMenu().getSite()).get(groupPosition));
+            post.getFilesSorted().get(newPosition).setIndex(postFile.getIndex());
             postFile.setIndex(newPosition);
             post.fixOrder(post.getFilesSorted());
         } else {
