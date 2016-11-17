@@ -26,8 +26,6 @@
 <%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean"%>
 <%@ taglib uri="http://fenix-ashes.ist.utl.pt/fenix-renderers" prefix="fr" %>
 
-<logic:present role="role(SCIENTIFIC_COUNCIL)">
-
 <h3><bean:message key="label.teacherCreditsSheet.otherTypeCreditLines" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/></h3>
 <jsp:include page="../teacherCreditsStyles.jsp"/>
 <logic:present name="otherService">
@@ -60,21 +58,19 @@
 <fr:hasMessages><p><span class="error0"><fr:messages><fr:message/></fr:messages></span></p></fr:hasMessages>
 
 
-	<logic:present name="otherService">
-		<fr:edit id="otherService" name="otherService" action="<%="/credits.do?method=viewAnnualTeachingCredits&executionYearOid="+executionYearOid+"&teacherOid="+teacherOid %>" schema="manage.otherService">
-			<fr:layout>
-				<fr:property name="classes" value="tstyle2 thlight thleft mtop05 mbottom05"/>
-			</fr:layout>
-		</fr:edit>
-	</logic:present>
-	<logic:notPresent name="otherService">
-		<fr:create action="<%="/credits.do?method=viewAnnualTeachingCredits&executionYearOid="+executionYearOid+"&teacherOid="+teacherOid %>" type="pt.ist.fenixedu.teacher.evaluation.domain.teacher.OtherService"
-		schema="manage.otherService">
-		<fr:hidden slot="teacherService" name="teacherService"/>
+<logic:present name="otherService">
+	<fr:edit id="otherService" name="otherService" action="<%="/credits.do?method=viewAnnualTeachingCredits&executionYearOid="+executionYearOid+"&teacherOid="+teacherOid %>" schema="manage.otherService">
 		<fr:layout>
 			<fr:property name="classes" value="tstyle2 thlight thleft mtop05 mbottom05"/>
 		</fr:layout>
-	</fr:create>
-	</logic:notPresent>	
-
+	</fr:edit>
 </logic:present>
+<logic:notPresent name="otherService">
+	<fr:create action="<%="/credits.do?method=viewAnnualTeachingCredits&executionYearOid="+executionYearOid+"&teacherOid="+teacherOid %>" type="pt.ist.fenixedu.teacher.evaluation.domain.teacher.OtherService"
+	schema="manage.otherService">
+	<fr:hidden slot="teacherService" name="teacherService"/>
+	<fr:layout>
+		<fr:property name="classes" value="tstyle2 thlight thleft mtop05 mbottom05"/>
+	</fr:layout>
+</fr:create>
+</logic:notPresent>
