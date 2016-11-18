@@ -20,11 +20,15 @@ package pt.ist.fenixedu.integration.api.beans.publico;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.fenixedu.academic.domain.Attends;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExportGrouping;
 import org.fenixedu.academic.domain.Grouping;
+import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.StudentGroup;
 import org.fenixedu.academic.util.EnrolmentGroupPolicyType;
 import org.joda.time.DateTime;
 
@@ -75,6 +79,71 @@ public class FenixCourseGroup {
 
     }
 
+    public static class StudentGroupMembers {
+        int groupNumber;
+        String shift;
+        List<StudentGroupMember> members;
+
+        public static class StudentGroupMember {
+            String name;
+            String username;
+
+            public StudentGroupMember(Person person) {
+                this.name = person.getName();
+                this.username = person.getUsername();
+            }
+
+            public String getName() {
+                return name;
+            }
+
+            public void setName(String name) {
+                this.name = name;
+            }
+
+            public String getUsername() {
+                return username;
+            }
+
+            public void setUsername(String username) {
+                this.username = username;
+            }
+        }
+
+        public StudentGroupMembers(StudentGroup studentGroup) {
+            this.groupNumber = studentGroup.getGroupNumber();
+            this.shift = studentGroup.getShift().getPresentationName();
+            this.members = studentGroup.getAttendsSet().stream()
+                    .map(a -> a.getRegistration().getPerson())
+                    .map(StudentGroupMember::new)
+                    .collect(Collectors.toList());
+        }
+
+        public int getGroupNumber() {
+            return groupNumber;
+        }
+
+        public void setGroupNumber(int groupNumber) {
+            this.groupNumber = groupNumber;
+        }
+
+        public String getShift() {
+            return shift;
+        }
+
+        public void setShift(String shift) {
+            this.shift = shift;
+        }
+
+        public List<StudentGroupMember> getMembers() {
+            return members;
+        }
+
+        public void setMembers(List<StudentGroupMember> members) {
+            this.members = members;
+        }
+    }
+
     String name;
     String description;
     FenixInterval enrolmentPeriod;
@@ -83,6 +152,7 @@ public class FenixCourseGroup {
     Integer maximumCapacity;
     Integer idealCapacity;
     List<GroupedCourse> associatedCourses = new ArrayList<>();
+    List<StudentGroupMembers> associatedGroups = new ArrayList<>();
 
     public FenixCourseGroup(final Grouping grouping) {
         this.name = grouping.getName();
@@ -103,6 +173,8 @@ public class FenixCourseGroup {
             final ExecutionCourse executionCourse = exportGrouping.getExecutionCourse();
             associatedCourses.add(new GroupedCourse(executionCourse));
         }
+
+        this.associatedGroups = grouping.getStudentGroupsSet().stream().map(StudentGroupMembers::new).collect(Collectors.toList());
     }
 
     public String getName() {
@@ -167,6 +239,14 @@ public class FenixCourseGroup {
 
     public void setAssociatedCourses(List<GroupedCourse> associatedCourses) {
         this.associatedCourses = associatedCourses;
+    }
+
+    public List<StudentGroupMembers> getAssociatedGroups() {
+        return associatedGroups;
+    }
+
+    public void setAssociatedGroups(List<StudentGroupMembers> groups) {
+        this.associatedGroups = groups;
     }
 
 }
