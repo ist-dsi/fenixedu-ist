@@ -33,7 +33,11 @@ public class SetDefaultRFIDForCarParkUsers extends CronTask {
     }
 
     private boolean isOutDatedValue(final Person person, final Long cardNumber) {
-        final Long lastValue = Long.valueOf(getLastMifareSerialNumber(person).trim());
+        final String rfid = getLastMifareSerialNumber(person);
+        if (rfid ==  null) {
+            return false;
+        }
+        final Long lastValue = Long.valueOf(rfid.trim());
         final Stream<SantanderCardInformation> infos = person.getSantanderCardsInformationSet().stream();
         return !cardNumber.equals(lastValue) && infos.map(i -> i.getDchpRegisteLine()).filter(l -> l != null)
                 .map(l -> Long.valueOf(getMifareSerialNumber(l).trim())).anyMatch(l -> l.equals(cardNumber));
