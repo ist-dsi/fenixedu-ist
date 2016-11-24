@@ -18,11 +18,7 @@
  */
 package pt.ist.fenixedu.contracts.service.manager;
 
-import static org.fenixedu.academic.predicate.AccessControl.check;
-
 import org.fenixedu.academic.domain.organizationalStructure.Party;
-import org.fenixedu.academic.predicate.RolePredicates;
-
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.Invitation;
 import pt.ist.fenixframework.Atomic;
 
@@ -30,7 +26,6 @@ public class EditInvitationResponsible {
 
     @Atomic
     public static void run(Invitation invitation, Party responsible) {
-        check(RolePredicates.MANAGER_OR_OPERATOR_PREDICATE);
         if (invitation != null && responsible != null) {
             invitation.setResponsible(responsible);
         }

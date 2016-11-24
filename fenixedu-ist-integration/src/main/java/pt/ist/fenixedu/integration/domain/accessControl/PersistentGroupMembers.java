@@ -18,18 +18,13 @@
  */
 package pt.ist.fenixedu.integration.domain.accessControl;
 
-import static org.fenixedu.academic.predicate.AccessControl.check;
-
 import java.util.Collection;
 
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
-import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.academic.domain.util.email.UnitBasedSender;
-import org.fenixedu.academic.predicate.AccessControl;
-import org.fenixedu.academic.predicate.AccessControlPredicate;
 import org.fenixedu.bennu.core.domain.Bennu;
 
 import pt.ist.fenixedu.integration.domain.UnitFile;
@@ -40,7 +35,6 @@ import com.google.common.base.Strings;
 public class PersistentGroupMembers extends PersistentGroupMembers_Base {
 
     public PersistentGroupMembers(String name, PersistentGroupMembersType type) {
-//        check(this, PersistentGroupMembersPredicates.checkPermissionsToManagePersistentGroups);
         super();
         setRootDomainObject(Bennu.getInstance());
         setName(name);
@@ -49,7 +43,6 @@ public class PersistentGroupMembers extends PersistentGroupMembers_Base {
     }
 
     public void edit(String name, PersistentGroupMembersType type) {
-        check(this, checkPermissionsToManagePersistentGroups);
         setName(name);
         setType(type);
         checkIfPersistenGroupAlreadyExists(name, type);
@@ -62,7 +55,6 @@ public class PersistentGroupMembers extends PersistentGroupMembers_Base {
     }
 
     public void delete() {
-        check(this, checkPermissionsToManagePersistentGroups);
         if (getMembersLinkGroup() != null) {
             throw new DomainException("error.persistentGroupMembers.cannotDeletePersistentGroupMembersUsedInAccessControl");
         }
@@ -79,7 +71,6 @@ public class PersistentGroupMembers extends PersistentGroupMembers_Base {
     }
 
     public void setNewPersonToMembersList(Person person) {
-        check(this, checkPermissionsToManagePersistentGroups);
         if (person == null) {
             throw new DomainException("error.PersistentGroupMembers.empty.person");
         }
@@ -88,7 +79,6 @@ public class PersistentGroupMembers extends PersistentGroupMembers_Base {
 
     @Override
     public void removePersons(Person person) {
-        check(this, checkPermissionsToManagePersistentGroups);
         super.removePersons(person);
     }
 
@@ -148,9 +138,4 @@ public class PersistentGroupMembers extends PersistentGroupMembers_Base {
     private boolean hasRecipientWithToName(UnitBasedSender sender, final String toName) {
         return sender.getRecipientsSet().stream().filter(r -> r.getToName().equals(toName)).findAny().isPresent();
     }
-
-    private static final AccessControlPredicate<PersistentGroupMembers> checkPermissionsToManagePersistentGroups = members -> {
-        Person person = AccessControl.getPerson();
-        return RoleType.MANAGER.isMember(person.getUser()) || RoleType.RESEARCHER.isMember(person.getUser());
-    };
 }

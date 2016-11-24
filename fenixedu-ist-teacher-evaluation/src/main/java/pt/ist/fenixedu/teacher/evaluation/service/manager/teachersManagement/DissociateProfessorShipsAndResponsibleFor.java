@@ -18,8 +18,6 @@
  */
 package pt.ist.fenixedu.teacher.evaluation.service.manager.teachersManagement;
 
-import static org.fenixedu.academic.predicate.AccessControl.check;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -31,7 +29,6 @@ import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.academic.domain.ShiftProfessorship;
 import org.fenixedu.academic.domain.Summary;
 import org.fenixedu.academic.dto.InfoProfessorship;
-import org.fenixedu.academic.predicate.RolePredicates;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 import org.fenixedu.academic.service.services.exceptions.NonExistingServiceException;
 
@@ -44,8 +41,6 @@ public class DissociateProfessorShipsAndResponsibleFor {
     @Atomic
     public static Map run(String personNumber, List<String> professorships, List<String> responsibleFors)
             throws FenixServiceException {
-        check(RolePredicates.MANAGER_OR_OPERATOR_PREDICATE);
-
         if (personNumber == null) {
             throw new FenixServiceException("nullPersonNumber");
         }

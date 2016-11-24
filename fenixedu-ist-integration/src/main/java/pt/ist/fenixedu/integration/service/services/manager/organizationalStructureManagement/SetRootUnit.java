@@ -18,10 +18,7 @@
  */
 package pt.ist.fenixedu.integration.service.services.manager.organizationalStructureManagement;
 
-import static org.fenixedu.academic.predicate.AccessControl.check;
-
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
-import org.fenixedu.academic.predicate.RolePredicates;
 import org.fenixedu.bennu.core.domain.Bennu;
 
 import pt.ist.fenixframework.Atomic;
@@ -30,8 +27,6 @@ public class SetRootUnit {
 
     @Atomic
     public static void run(final Unit unit, final Boolean institutionUnit) {
-        check(RolePredicates.MANAGER_PREDICATE);
-
         if (unit.isPlanetUnit()) {
             Bennu.getInstance().setEarthUnit(unit);
 

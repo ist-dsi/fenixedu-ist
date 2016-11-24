@@ -22,10 +22,7 @@
  */
 package pt.ist.fenixedu.integration.service.services.manager.organizationalStructureManagement;
 
-import static org.fenixedu.academic.predicate.AccessControl.check;
-
 import org.fenixedu.academic.domain.organizationalStructure.Accountability;
-import org.fenixedu.academic.predicate.RolePredicates;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 
 import pt.ist.fenixframework.Atomic;
@@ -35,7 +32,6 @@ public class DisassociateParentUnit {
 
     @Atomic
     public static void run(String accountabilityID) throws FenixServiceException {
-        check(RolePredicates.MANAGER_PREDICATE);
         Accountability accountability = FenixFramework.getDomainObject(accountabilityID);
         if (accountability == null) {
             throw new FenixServiceException("error.inexistent.accountability");

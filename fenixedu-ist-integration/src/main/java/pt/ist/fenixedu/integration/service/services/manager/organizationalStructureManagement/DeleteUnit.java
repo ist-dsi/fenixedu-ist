@@ -22,10 +22,7 @@
  */
 package pt.ist.fenixedu.integration.service.services.manager.organizationalStructureManagement;
 
-import static org.fenixedu.academic.predicate.AccessControl.check;
-
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
-import org.fenixedu.academic.predicate.RolePredicates;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 
 import pt.ist.fenixframework.Atomic;
@@ -35,7 +32,6 @@ public class DeleteUnit {
 
     @Atomic
     public static void run(String unitID) throws FenixServiceException {
-        check(RolePredicates.MANAGER_PREDICATE);
         Unit unit = (Unit) FenixFramework.getDomainObject(unitID);
         if (unit == null) {
             throw new FenixServiceException("error.noUnit");

@@ -18,11 +18,7 @@
  */
 package pt.ist.fenixedu.contracts.service.manager;
 
-import static org.fenixedu.academic.predicate.AccessControl.check;
-
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.predicate.RolePredicates;
-
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.Invitation;
 import pt.ist.fenixedu.contracts.dto.InvitedPersonBean;
 import pt.ist.fenixframework.Atomic;
@@ -31,7 +27,6 @@ public class CreateNewInvitedPerson {
 
     @Atomic
     public static Invitation run(InvitedPersonBean bean) {
-        check(RolePredicates.MANAGER_OR_OPERATOR_PREDICATE);
         Person person = new Person(bean);
         Invitation invitation = new Invitation(person, bean.getUnit(), bean.getResponsible(), bean.getBegin(), bean.getEnd());
         return invitation;
