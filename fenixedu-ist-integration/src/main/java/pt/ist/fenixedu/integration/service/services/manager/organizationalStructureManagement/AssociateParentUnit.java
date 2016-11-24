@@ -18,11 +18,8 @@
  */
 package pt.ist.fenixedu.integration.service.services.manager.organizationalStructureManagement;
 
-import static org.fenixedu.academic.predicate.AccessControl.check;
-
 import org.fenixedu.academic.domain.organizationalStructure.AccountabilityType;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
-import org.fenixedu.academic.predicate.RolePredicates;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 
 import pt.ist.fenixframework.Atomic;
@@ -33,8 +30,6 @@ public class AssociateParentUnit {
     @Atomic
     public static void run(String unitID, String parentUnitID, AccountabilityType accountabilityType)
             throws FenixServiceException {
-        check(RolePredicates.MANAGER_PREDICATE);
-
         Unit parentUnit = getParentUnit(parentUnitID);
         Unit unit = (Unit) FenixFramework.getDomainObject(unitID);
 

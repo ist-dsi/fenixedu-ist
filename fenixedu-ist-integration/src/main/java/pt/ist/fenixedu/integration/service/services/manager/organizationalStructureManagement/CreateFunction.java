@@ -18,11 +18,8 @@
  */
 package pt.ist.fenixedu.integration.service.services.manager.organizationalStructureManagement;
 
-import static org.fenixedu.academic.predicate.AccessControl.check;
-
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
-import org.fenixedu.academic.predicate.RolePredicates;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 import org.fenixedu.academic.util.MultiLanguageString;
 import org.joda.time.YearMonthDay;
@@ -37,8 +34,6 @@ public class CreateFunction {
     @Atomic
     public static void run(MultiLanguageString functionName, YearMonthDay begin, YearMonthDay end, FunctionType type,
             String unitID) throws FenixServiceException, DomainException {
-        check(RolePredicates.MANAGER_PREDICATE);
-
         Unit unit = (Unit) FenixFramework.getDomainObject(unitID);
         if (unit == null) {
             throw new FenixServiceException("error.function.no.unit");

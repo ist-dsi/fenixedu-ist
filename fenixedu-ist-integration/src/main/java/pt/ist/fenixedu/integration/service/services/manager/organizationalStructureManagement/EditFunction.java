@@ -18,10 +18,7 @@
  */
 package pt.ist.fenixedu.integration.service.services.manager.organizationalStructureManagement;
 
-import static org.fenixedu.academic.predicate.AccessControl.check;
-
 import org.fenixedu.academic.domain.exceptions.DomainException;
-import org.fenixedu.academic.predicate.RolePredicates;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 import org.fenixedu.academic.util.MultiLanguageString;
 import org.joda.time.YearMonthDay;
@@ -36,8 +33,6 @@ public class EditFunction {
     @Atomic
     public static void run(String functionID, MultiLanguageString functionName, YearMonthDay begin, YearMonthDay end,
             FunctionType type) throws FenixServiceException, DomainException {
-        check(RolePredicates.MANAGER_PREDICATE);
-
         Function function = (Function) FenixFramework.getDomainObject(functionID);
         if (function == null) {
             throw new FenixServiceException("error.noFunction");

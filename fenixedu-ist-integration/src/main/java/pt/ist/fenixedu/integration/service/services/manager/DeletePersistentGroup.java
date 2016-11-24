@@ -18,10 +18,6 @@
  */
 package pt.ist.fenixedu.integration.service.services.manager;
 
-import static org.fenixedu.academic.predicate.AccessControl.check;
-
-import org.fenixedu.academic.predicate.RolePredicates;
-
 import pt.ist.fenixedu.integration.domain.accessControl.PersistentGroupMembers;
 import pt.ist.fenixframework.Atomic;
 
@@ -29,7 +25,6 @@ public class DeletePersistentGroup {
 
     @Atomic
     public static void run(PersistentGroupMembers groupMembers) {
-        check(RolePredicates.MANAGER_PREDICATE);
         if (groupMembers != null) {
             groupMembers.delete();
         }

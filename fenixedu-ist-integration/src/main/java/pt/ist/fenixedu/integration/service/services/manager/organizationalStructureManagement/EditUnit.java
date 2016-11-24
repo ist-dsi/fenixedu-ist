@@ -18,15 +18,12 @@
  */
 package pt.ist.fenixedu.integration.service.services.manager.organizationalStructureManagement;
 
-import static org.fenixedu.academic.predicate.AccessControl.check;
-
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.administrativeOffice.AdministrativeOffice;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.organizationalStructure.UnitClassification;
-import org.fenixedu.academic.predicate.RolePredicates;
 import org.fenixedu.academic.service.ServiceMonitoring;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 import org.fenixedu.academic.util.MultiLanguageString;
@@ -43,8 +40,6 @@ public class EditUnit {
             String acronym, YearMonthDay begin, YearMonthDay end, String departmentID, String degreeID,
             String administrativeOfficeID, String webAddress, UnitClassification classification,
             Boolean canBeResponsibleOfSpaces, String campusID) throws FenixServiceException, DomainException {
-        check(RolePredicates.MANAGER_PREDICATE);
-
         ServiceMonitoring.logService(EditUnit.class, unitID, unitName, unitNameCard, unitCostCenter, acronym, begin, end,
                 departmentID, degreeID, administrativeOfficeID, webAddress, classification, canBeResponsibleOfSpaces, campusID);
 
