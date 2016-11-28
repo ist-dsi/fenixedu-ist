@@ -135,13 +135,10 @@ public class ViewDepartmentTeacherServiceDA extends FenixDispatchAction {
                         Double shiftHours = executionCourse.getAllShiftUnitHours(shiftType).doubleValue();
                         totalHours += shiftHours;
                         spreadsheet.addCell(shiftHours);
-
-//                        Integer numberOfShifts = executionCourse.getNumberOfShifts(shiftType);
-//                        spreadsheet.addCell(numberOfShifts == 0 ? 0 : (double) totalStudentsNumber / numberOfShifts);
-
                     }
 
-                    Duration totalShiftsDuration = executionCourse.getTotalShiftsDuration();
+                    Duration totalShiftsDuration = new Duration(new Double(executionCourse.getAssociatedShifts().stream()
+                            .mapToDouble(s -> s.getCourseLoadWeeklyAverage().doubleValue()).sum() * 3600000).longValue());
                     spreadsheet.addCell(periodFormatter.print(totalShiftsDuration.toPeriod()));
                     int colNum = spreadsheet.getNextWritableCell();
                     spreadsheet.addCell("");
