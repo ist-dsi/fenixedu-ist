@@ -374,7 +374,7 @@ public class TeacherEvaluationDA extends FenixDispatchAction {
             final Teacher teacher = person.getTeacher();
             if (teacher != null) {
                 final Department department = teacher.getDepartment();
-                if (DepartmentPresidentStrategy.getCurrentDepartmentPresident(department) == person) {
+                if (DepartmentPresidentStrategy.isPersonCurrentDepartmentPresident(person, department)) {
                     for (final TeacherEvaluationProcess teacherEvaluation : facultyEvaluationProcess
                             .getTeacherEvaluationProcessSet()) {
                         if (teacherEvaluation.getEvaluee().getTeacher().getDepartment() == department) {
