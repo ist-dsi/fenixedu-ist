@@ -18,8 +18,6 @@
  */
 package pt.ist.fenixedu.giaf.invoices;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
@@ -48,15 +46,10 @@ import org.fenixedu.academic.domain.accounting.events.candidacy.IndividualCandid
 import org.fenixedu.academic.domain.accounting.events.dfa.DFACandidacyEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEvent;
 import org.fenixedu.academic.domain.accounting.events.insurance.InsuranceEvent;
-import org.fenixedu.academic.domain.candidacyProcess.CandidacyProcess;
-import org.fenixedu.academic.domain.candidacyProcess.IndividualCandidacy;
-import org.fenixedu.academic.domain.candidacyProcess.IndividualCandidacyProcess;
 import org.fenixedu.academic.domain.contacts.PartyContact;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
 import org.fenixedu.academic.domain.degreeStructure.CycleType;
 import org.fenixedu.academic.domain.exceptions.DomainException;
-import org.fenixedu.academic.domain.phd.candidacy.PhdProgramCandidacyEvent;
-import org.fenixedu.academic.domain.phd.candidacy.PhdProgramCandidacyProcess;
 import org.fenixedu.academic.domain.phd.debts.PhdEvent;
 import org.fenixedu.academic.domain.phd.debts.PhdGratuityEvent;
 import org.fenixedu.academic.domain.student.Registration;
@@ -65,7 +58,6 @@ import org.fenixedu.academic.util.Money;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.UserProfile;
 import org.fenixedu.commons.StringNormalizer;
-import org.fenixedu.commons.spreadsheet.Spreadsheet;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,23 +65,21 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.CharMatcher;
 import com.google.gson.JsonObject;
 
-import pt.ist.fenixframework.DomainObject;
-
 public class Utils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
 
-    public static boolean validate(final ErrorConsumer<AccountingTransactionDetail> consumer,
+    public static boolean validate(final ErrorLogConsumer consumer,
             final AccountingTransactionDetail detail) {
         final AccountingTransaction transaction = detail.getTransaction();
         final Event event = transaction.getEvent();
-        if (!validateEvent(consumer, detail, event)) {
+        if (!validate(consumer, event)) {
             return false;
         }
         try {
             transaction.getAmountWithAdjustment().getAmount();
         } catch (final DomainException ex) {
-            consumer.accept(detail, "Unable to Determine Amount", ex.getMessage());
+            logError(consumer, "Unable to Determine Amount", event, null, "", null, null, null, null, event);
             return false;
         }
 
@@ -105,7 +95,7 @@ public class Utils {
                 return false;
             } else {
                 if (transaction.getAdjustmentTransactionsSet().isEmpty()) {
-                    consumer.accept(detail, "Zero Value For Transaction", detail.getExternalId());
+                    logError(consumer, "Zero Value For Transaction", event, null, "", null, null, null, null, event);
                     return false;
                 } else {
                     // consumer.accept(detail, "Ignore Adjustment Transaction", detail.getExternalId());
@@ -116,126 +106,182 @@ public class Utils {
         return true;
     }
 
-    public static boolean validate(final ErrorConsumer<Event> consumer, final Event event) {
-        return validateEvent(consumer, event, event);
-    }
-
-    private static <T> boolean validateEvent(final ErrorConsumer<T> consumer, final T t, final Event event) {
+    public static boolean validate(final ErrorLogConsumer consumer, final Event event) {
         final String eventDescription;
         try {
             eventDescription = event.getDescription().toString();
         } catch (final NullPointerException ex) {
-            consumer.accept(t, "No Description Available", ex.getMessage());
+            logError(consumer, "No Description Available", event, null, "", null, null, null, null, event);
             return false;
         }
         try {
             event.getOriginalAmountToPay();
         } catch (final DomainException ex) {
-            consumer.accept(t, "Unable to Determine Amount", ex.getMessage());
+            logError(consumer, "Unable to Determine Amount", event, null, "", null, null, null, null, event);
             return false;
         } catch (final NullPointerException ex) {
-            consumer.accept(t, "Unable to Determine Amount", ex.getMessage());
-            return false;
-        }
-        final String articleCode = Utils.mapToArticleCode(event, eventDescription);
-        if (articleCode == null) {
-            if (eventDescription.indexOf("Pagamento da resid") != 0) {
-                consumer.accept(t, "No Article Code", eventDescription);
-            }
+            logError(consumer, "Unable to Determine Amount", event, null, "", null, null, null, null, event);
             return false;
         }
 
-        final Person person = event.getPerson();
-        final Country country = person.getCountry();
         if (event.getParty().isPerson()) {
-            if (country == null) {
-                consumer.accept(t, "No Country", person.getUsername());
+            final Person person = event.getPerson();
+            final Country country = person.getCountry();
+
+            final String articleCode = Utils.mapToArticleCode(event, eventDescription);
+            if (articleCode == null) {
+                if (eventDescription.indexOf("Pagamento da resid") != 0) {
+                    logError(consumer, "No Article Code", event, null, "", null, null, null, null, event);
+                }
                 return false;
             }
-            final PhysicalAddress address = Utils.toAddress(person);
+
+            if (country == null) {
+                logError(consumer, "No Country", event, person.getUsername(), "", country, person, null, null, event);
+                return false;
+            }
+            final PhysicalAddress address = toAddress(person);
             if (address == null) {
-                consumer.accept(t, "No Address", person.getUsername());
+                logError(consumer, "No Address", event, person.getUsername(), "", country, person, address, null, event);
                 return false;
             }
             final Country countryOfAddress = address.getCountryOfResidence();
             if (countryOfAddress == null) {
-                consumer.accept(t, "No Valid Country for Address", person.getUsername());
+                logError(consumer, "No Valid Country for Address", event, person.getUsername(), "", country, person, address, countryOfAddress, event);
                 return false;
             } else if ("PT".equals(countryOfAddress.getCode()) /* || "PT".equals(country.getCode()) */) {
-                if (!Utils.isValidPostCode(Utils.hackAreaCodePT(address.getAreaCode(), countryOfAddress))) {
-                    consumer.accept(t, "No Valid Post Code For Address For", person.getUsername());
+                if (!isValidPostCode(hackAreaCodePT(address.getAreaCode(), countryOfAddress))) {
+                    logError(consumer, "No Valid Post Code For Address For", event, person.getUsername(), "", country, person, address, countryOfAddress, event);
                     return false;
                 }
             }
 
-            final String vat = Utils.toVatNumber(person);
+            final String vat = ClientMap.uVATNumberFor(person);
             if (vat == null) {
-                consumer.accept(t, "No VAT Number", person.getUsername());
+                logError(consumer, "No VAT Number", event, person.getUsername(), vat, country, person, address, countryOfAddress, event);
                 return false;
             }
             if ("PT".equals(country.getCode())) {
-                if (!Utils.isVatValidForPT(vat)) {
-                    consumer.accept(t, "No a Valid PT VAT Number", vat);
+                if (!ClientMap.isVatValidForPT(vat.substring(2))) {
+                    logError(consumer, "Not a Valid PT VAT Number", event, person.getUsername(), vat, country, person, address, countryOfAddress, event);
                     return false;
                 }
             }
         } else {
-            consumer.accept(t, "Not a person", event.getParty().toString());
+            //consumer.accept(t, "Not a person", event.getParty().toString());
             return false;
         }
 
-        final BigDecimal amount = calculateTotalDebtValue(event).getAmount();
+        final BigDecimal amount = Utils.calculateTotalDebtValue(event).getAmount();
         //final BigDecimal amount = event.getOriginalAmountToPay().getAmount();
         if (amount.signum() <= 0) {
             if (event.isCancelled()) {
                 // consumer.accept(detail, "Canceled Transaction", detail.getExternalId());
                 return false;
             } else {
-                consumer.accept(t, "Zero Value For Transaction", event.getExternalId());
+                //consumer.accept(t, "Zero Value For Transaction", event.getExternalId());
                 return false;
             }
         }
         return true;
     }
 
-    public static JsonObject toJson(final Person person) {
-        final String clientCode = toClientCode(person);
+    public static PhysicalAddress toAddress(final Person person) {
+        PhysicalAddress address = person.getDefaultPhysicalAddress();
+        if (address == null) {
+            for (final PartyContact contact : person.getPartyContactsSet()) {
+                if (contact instanceof PhysicalAddress) {
+                    address = (PhysicalAddress) contact;
+                    break;
+                }
+            }
+        }
+        return address;
+    }
 
-        final String vat = toVatNumber(person);
-        final String vatCountry = countryForVat(vat, person);
+    public static String hackAreaCode(final String areaCode, final Country countryOfResidence, final Person person) {
+        return countryOfResidence != null && !"PT".equals(countryOfResidence.getCode()) ? "0" : hackAreaCodePT(areaCode,
+                countryOfResidence);
+    }
 
-        final PhysicalAddress address = toAddress(person);
-        final String street = limitFormat(60, address.getAddress()).replace('\t', ' ');
-        final String locality = limitFormat(35, address.getAreaOfAreaCode());
-        final String postCode = hackAreaCode(address.getAreaCode(), address.getCountryOfResidence(), person);
-        final String country = address.getCountryOfResidence().getCode();
-        final String name = limitFormat(50, getDisplayName(person));
+    private static String hackAreaCodePT(final String areaCode, final Country countryOfResidence) {
+        if (countryOfResidence != null && "PT".equals(countryOfResidence.getCode())) {
+            if (areaCode == null || areaCode.isEmpty()) {
+                return "0000-000";
+            }
+            if (areaCode.length() == 4) {
+                return areaCode + "-001";
+            }
+        }
+        return areaCode;
+    }
 
-        final JsonObject jo = new JsonObject();
-        jo.addProperty("id", clientCode);
-        jo.addProperty("name", limitFormat(60, name));
-        jo.addProperty("type", "S");
-        jo.addProperty("countryOfVatNumber", vatCountry);
-        jo.addProperty("vatNumber", vat);
-        jo.addProperty("address", street);
-        jo.addProperty("locality", locality);
-        jo.addProperty("postCode", postCode);
-        jo.addProperty("countryOfAddress", country);
-        jo.addProperty("phone", "");
-        jo.addProperty("fax", "");
-        jo.addProperty("email", "");
-        jo.addProperty("ban", "");
-        jo.addProperty("iban", "");
-        jo.addProperty("swift", "");
-        jo.addProperty("paymentMethod", "CH");
+    private static void logError(final ErrorLogConsumer consumer, final String error, final Event event, final String user, final String vat, final Country country,
+            final Person person, final PhysicalAddress address, final Country countryOfAddress, final Event e) {
 
-        return jo;
+        if (consumer == null) {
+            return;
+        }
+
+        BigDecimal amount;
+        DebtCycleType cycleType;
+        
+        try {
+            amount = Utils.calculateTotalDebtValue(e).getAmount();
+            cycleType = cycleType(e);
+        } catch (Throwable t) {
+            amount = null;
+            cycleType = null;
+        }
+
+        consumer.accept(
+                event.getExternalId(),
+                user,
+                person == null ? "" : person.getName(),
+                amount == null ? "" : amount.toPlainString(),
+                cycleType == null ? "" : cycleType.getDescription(),
+                error,
+                vat,
+                "",
+                country == null ? "" : country.getCode(),
+                vat,
+                address == null ? "" : address.getAddress(),
+                "",
+                address == null ? "" : address.getPostalCode(),
+                countryOfAddress == null ? "" : countryOfAddress.getCode(),
+                "");
+    }
+
+    public static DebtCycleType cycleType(final Event e) {
+        final ExecutionYear debtYear = Utils.executionYearOf(e);
+        final DebtCycleType type = Utils.cycleTypeFor(e, debtYear);
+        if (type != null) {
+            return type;
+        }
+        final DebtCycleType cycleType = Utils.cycleTypeFor(e, ExecutionYear.readCurrentExecutionYear());
+        return cycleType == null ? Utils.cycleTypeFor(e, ExecutionYear.readCurrentExecutionYear().getPreviousExecutionYear()) : cycleType;
+    }
+
+    public static String getDisplayName(final Person person) {
+        final User user = person.getUser();
+        final UserProfile profile = user == null ? null : user.getProfile();
+        final String displayName = profile == null ? null : profile.getDisplayName();
+        return displayName == null ? person.getName() : displayName;
     }
 
     public static Money calculateTotalDebtValue(final Event event) {
         final DateTime when = event.getWhenOccured().plusSeconds(1);
         final PostingRule rule = event.getPostingRule();
         return call(rule, event, when, false);
+    }
+
+    private static boolean isValidPostCode(final String postalCode) {
+        if (postalCode != null) {
+            final String v = postalCode.trim();
+            return v.length() == 8 && v.charAt(4) == '-' && CharMatcher.DIGIT.matchesAllOf(v.substring(0, 4))
+                    && CharMatcher.DIGIT.matchesAllOf(v.substring(5));
+        }
+        return false;
     }
 
     private static Money call(final PostingRule rule, final Event event, final DateTime when, final boolean applyDiscount) {
@@ -248,37 +294,6 @@ public class Utils {
         } catch (final NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
                 | InvocationTargetException e) {
             throw new Error(e);
-        }
-    }
-
-    final static ErrorConsumer<AccountingTransactionDetail> VOID_CONSUMER = new ErrorConsumer<AccountingTransactionDetail>() {
-        @Override
-        public void accept(AccountingTransactionDetail t, String erro, String arg) {
-        }
-    };
-
-    public static Money calculateAmountPayed(final Event event, final DateTime threshold) {
-        return event.getAccountingTransactionsSet().stream().filter(t -> t.getWhenRegistered().isBefore(threshold))
-                .filter(t -> validate(VOID_CONSUMER, t.getTransactionDetail())).map(t -> t.getAmountWithAdjustment())
-                .reduce(Money.ZERO, Money::add);
-    }
-
-
-    public static byte[] toBytes(final Spreadsheet sheet) {
-        final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        try {
-            sheet.exportToXLSSheet(bos);
-        } catch (final IOException e) {
-            throw new Error(e);
-        }
-        return bos.toByteArray();
-    }
-
-    public static String valueOf(final AccountingTransactionDetail detail) {
-        try {
-            return detail.getTransaction().getAmountWithAdjustment().getAmount().toString();
-        } catch (final DomainException ex) {
-            return "?";
         }
     }
 
@@ -427,79 +442,6 @@ public class Utils {
         throw new Error("not.supported: " + event.getExternalId());
     }
 
-    private static PhysicalAddress toAddress(final Person person) {
-        PhysicalAddress address = person.getDefaultPhysicalAddress();
-        if (address == null) {
-            for (final PartyContact contact : person.getPartyContactsSet()) {
-                if (contact instanceof PhysicalAddress) {
-                    address = (PhysicalAddress) contact;
-                    break;
-                }
-            }
-        }
-        return address;
-    }
-
-    private static boolean isValidPostCode(final String postalCode) {
-        if (postalCode != null) {
-            final String v = postalCode.trim();
-            return v.length() == 8 && v.charAt(4) == '-' && CharMatcher.DIGIT.matchesAllOf(v.substring(0, 4))
-                    && CharMatcher.DIGIT.matchesAllOf(v.substring(5));
-        }
-        return false;
-    }
-
-    private static String toVatNumber(final Person person) {
-        final Country country = person.getCountry();
-        final String ssn = person.getSocialSecurityNumber();
-        final String vat = toVatNumber(ssn);
-        if (vat != null && isVatValidForPT(vat)) {
-            return vat;
-        }
-        if (country != null && "PT".equals(country.getCode())) {
-            return null;
-        }
-        final User user = person.getUser();
-        return user == null ? makeUpSomeRandomNumber(person) : user.getUsername();
-    }
-
-    private static String makeUpSomeRandomNumber(final Person person) {
-        final String id = person.getExternalId();
-        return "FE" + id.substring(id.length() - 10, id.length());
-    }
-
-    private static String toVatNumber(final String ssn) {
-        return ssn == null ? null : ssn.startsWith("PT") ? ssn.substring(2) : ssn;
-    }
-
-    private static boolean isVatValidForPT(final String vat) {
-        if (vat.length() != 9) {
-            return false;
-        }
-        for (int i = 0; i < 9; i++) {
-            if (!Character.isDigit(vat.charAt(i))) {
-                return false;
-            }
-        }
-        if (Integer.parseInt(vat) <= 0) {
-            return false;
-        }
-        int sum = 0;
-        for (int i = 0; i < 8; i++) {
-            final int c = Character.getNumericValue(vat.charAt(i));
-            sum += c * (9 - i);
-        }
-        final int controleDigit = Character.getNumericValue(vat.charAt(8));
-        final int remainder = sum % 11;
-        int digit = 11 - remainder;
-        return digit > 9 ? controleDigit == 0 : digit == controleDigit;
-    }
-
-    public static String toClientCode(final Person person) {
-        final User user = person.getUser();
-        return user == null ? makeUpSomeRandomNumber(person) : user.getUsername();
-    }
-
     public static String toPaymentDocumentNumber(final AccountingTransactionDetail detail) {
         return detail instanceof SibsTransactionDetail ? ((SibsTransactionDetail) detail).getSibsCode() : "";
     }
@@ -510,43 +452,6 @@ public class Utils {
         }
         final String out = StringNormalizer.normalizeAndRemoveAccents(in).toUpperCase();
         return out.length() > maxSize ? out.substring(0, maxSize) : out;
-    }
-
-    public static String countryForVat(final String vat, Person person) {
-        return isVatValidForPT(vat) ? "PT" : person.getCountry().getCode();
-    }
-
-    private static String hackAreaCode(final String areaCode, final Country countryOfResidence, final Person person) {
-        return countryOfResidence != null && !"PT".equals(countryOfResidence.getCode()) ? "0" : hackAreaCodePT(areaCode,
-                countryOfResidence);
-    }
-
-    private static String hackAreaCodePT(final String areaCode, final Country countryOfResidence) {
-        if (countryOfResidence != null && "PT".equals(countryOfResidence.getCode())) {
-            if (areaCode == null || areaCode.isEmpty()) {
-                return "0000-000";
-            }
-            if (areaCode.length() == 4) {
-                return areaCode + "-001";
-            }
-        }
-        return areaCode;
-    }
-
-    private static String getDisplayName(final Person person) {
-        final User user = person.getUser();
-        final UserProfile profile = user == null ? null : user.getProfile();
-        final String displayName = profile == null ? null : profile.getDisplayName();
-        return displayName == null ? person.getName() : displayName;
-    }
-
-    public static String idFor(final DomainObject object) {
-        return object.getExternalId();
-    }
-
-    public static String idForDiscount(final Event event) {
-        final String id = idFor(event);
-        return "E" + id;
     }
 
     public static void writeFileWithoutFailuer(final Path path, final byte[] content, final boolean append) {

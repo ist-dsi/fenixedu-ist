@@ -39,12 +39,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import pt.ist.fenixedu.giaf.invoices.ErrorConsumer;
+import pt.ist.fenixedu.giaf.invoices.ClientMap;
+import pt.ist.fenixedu.giaf.invoices.ErrorLogConsumer;
+import pt.ist.fenixedu.giaf.invoices.EventLogger;
 import pt.ist.fenixedu.giaf.invoices.EventProcessor;
 import pt.ist.fenixedu.giaf.invoices.EventWrapper;
 import pt.ist.fenixedu.giaf.invoices.GiafEvent;
 import pt.ist.fenixedu.giaf.invoices.Utils;
-import pt.ist.giaf.client.financialDocuments.ClientClient;
 
 @SpringApplication(group = "logged", path = "giaf-invoice-viewer", title = "title.giaf.invoice.viewer",
         hint = "giaf-invoice-viewer")
@@ -71,21 +72,36 @@ public class InvoiceController {
     public String reprocess(@RequestParam String username, final Model model) {
         final User currentUser = Authenticate.getUser();
         if (isAcademicServiceStaff(currentUser)) {
+
+            final StringBuilder errors = new StringBuilder();
+            final ErrorLogConsumer errorLogConsumer = new ErrorLogConsumer() {
+                @Override
+                public void accept(final String oid, final String user, final String name, final String amount, final String cycleType, final String error, final String args,
+                        final String type, final String countryOfVatNumber, final String vatNumber, final String address, final String locality,
+                        final String postCode, final String countryOfAddress, final String paymentMethod) {
+                    errors.append(oid + " " + error + " : " + args + "\n");
+                }
+            };
+            final EventLogger elogger = (msg, args) -> {};
+
             final User user = getUser(username);
             final Person person = user == null ? null : user.getPerson();
             if (person != null) {
-                syncClientInfo(person);
+                final ClientMap clientMap = new ClientMap();
+                ClientMap.createOrUpdateClientInfo(clientMap, errorLogConsumer, person);
+                EventWrapper.eventsToProcess(errorLogConsumer, person.getEventsSet().stream(),
+                        person.getEventsSet().stream()
+                            .flatMap(e -> e.getAdjustedTransactions().stream())
+                            .map(tx -> tx.getTransactionDetail()));
                 person.getEventsSet().stream().filter(this::needsProcessing)
-                        .filter(e -> Utils.validate(ErrorConsumer.VOID_EVENT_CONSUMER, e))
-                        .forEach(e -> EventProcessor.syncEventWithGiaf(e));
+                        .filter(e -> Utils.validate(errorLogConsumer, e))
+                        .forEach(e -> EventProcessor.syncEventWithGiaf(clientMap, errorLogConsumer, elogger, e));
+            }
+            if (errors.length() > 0) {
+                model.addAttribute("errors", errors.toString());
             }
         }
         return home(username, model);
-    }
-
-    private void syncClientInfo(final Person person) {
-        final JsonObject json = Utils.toJson(person);
-        ClientClient.createClient(json);
     }
 
     private boolean needsProcessing(final Event event) {

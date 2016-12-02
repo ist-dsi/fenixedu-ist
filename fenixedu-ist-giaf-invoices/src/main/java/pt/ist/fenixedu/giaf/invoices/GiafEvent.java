@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
-import java.time.Year;
 import java.util.Base64;
 import java.util.Comparator;
 import java.util.Date;
@@ -57,7 +57,7 @@ public class GiafEvent {
 
     private final static String DT_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-    private final static Comparator<GiafEventEntry> INVOICE_NUMBER_COMPARATOR = new Comparator<GiafEventEntry>() {
+    private final Comparator<GiafEventEntry> INVOICE_NUMBER_COMPARATOR = new Comparator<GiafEventEntry>() {
         @Override
         public int compare(final GiafEventEntry e1, final GiafEventEntry e2) {
             final String i1 = e1.invoiceNumber;
@@ -202,8 +202,9 @@ public class GiafEvent {
         return entry;
     }
 
-    public void pay(final AccountingTransactionDetail d) {
-        final GiafEventEntry entry = openEntry();
+    public void pay(final ClientMap clientMap, final AccountingTransactionDetail d) {
+        final Person person = d.getEvent().getPerson();
+        final GiafEventEntry entry = updatedVatEntry(clientMap, person, d.getEvent(), openEntry());
         final Money txAmount = d.getTransaction().getAmountWithAdjustment();
         final Money amountStillInDebt = entry == null ? Money.ZERO : entry.amountStillInDebt();
 
@@ -214,28 +215,119 @@ public class GiafEvent {
         final String registryDate = d.getWhenRegistered().toString(DT_FORMAT);
 
         if (payed.isPositive()) {
-            final String receiptNumber = createInvoice(toJsonPayment(d, entry.clientId, entry.invoiceNumber, payed));
+            final String receiptNumber = createInvoice(toJsonPayment(d, entry.clientId, entry.invoiceNumber, payed, true));
 
             persistLocalChange(entry.clientId, entry.invoiceNumber, "payment", payed, d.getExternalId(), receiptNumber, now, registryDate);
 
             entry.payed = entry.payed.add(payed);
+            entry.receiptIds.add(d.getExternalId());
         }
 
         if (fines.isPositive()) {
-            final String clientId = entry == null ? Utils.toClientCode(d.getEvent().getPerson()) : entry.clientId;
+            final String clientId = clientMap.getClientId(person);
 
             final GiafEventEntry fineEntry = newGiafEventEntry(d.getEvent(), clientId, fines);
 
-            final String receiptNumber = createInvoice(toJsonPayment(d, clientId, fineEntry.invoiceNumber, fines));
+            final String receiptNumber = createInvoice(toJsonPayment(d, clientId, fineEntry.invoiceNumber, fines, true));
 
             persistLocalChange(clientId, fineEntry.invoiceNumber, "fine", fines, d.getExternalId(), receiptNumber, now, registryDate);
 
             fineEntry.fines = fineEntry.fines.add(fines);
+            fineEntry.receiptIds.add(d.getExternalId());
+        }
+    }
+
+    private GiafEventEntry updatedVatEntry(final ClientMap clientMap, final Person person, final Event event, final GiafEventEntry openEntry) {
+        if (openEntry == null) {
+            return null;
+        }
+        final String clientId = clientMap.getClientId(person);
+        if (clientId.equals(openEntry.clientId)) {
+            return openEntry;
         }
 
-        if (entry != null) {
-            entry.receiptIds.add(d.getExternalId());
+        final Money amountToExempt = openEntry.exempt.add(openEntry.fines).add(openEntry.payed);
+
+        final Money amountStillInDebt = openEntry.amountStillInDebt();
+        if (amountStillInDebt.isPositive()) {
+            exempt(openEntry, event, amountStillInDebt);
         }
+
+        final GiafEventEntry newEntry = newGiafEventEntry(event, clientId, openEntry.debt);
+
+        if (amountToExempt.isPositive()) {
+            exempt(newEntry, event, amountToExempt);
+        }
+
+        return newEntry;
+    }
+
+    public void payWithoutDebtRegistration(final ClientMap clientMap, final AccountingTransactionDetail d) {
+        final String clientId = clientMap.getClientId(d.getEvent().getPerson());
+        final Money txAmount = d.getTransaction().getAmountWithAdjustment();
+        final String receiptNumber = createInvoice(toJsonPayment(d, clientId, null, txAmount, false));
+        final String now = new DateTime().toString(DT_FORMAT);
+        final String registryDate = d.getWhenRegistered().toString(DT_FORMAT);
+        persistLocalChange(clientId, "", "payment", txAmount, d.getExternalId(), receiptNumber, now, registryDate);
+        logPastPayments(d, clientId, txAmount, receiptNumber, now, registryDate);
+    }
+
+    private void logPastPayments(final AccountingTransactionDetail d, final String clientId, final Money txAmount, final String receiptNumber,
+            final String now, final String registryDate) {
+        final Event event = d.getEvent();
+        final ExecutionYear debtYear = Utils.executionYearOf(event);
+
+        final StringBuilder builder = new StringBuilder();
+        builder.append(event.getExternalId());
+        builder.append("\t");
+        builder.append(d.getExternalId());
+        builder.append("\t");
+        builder.append(clientId == null ? " " : clientId);
+        builder.append("\t");
+        builder.append(txAmount.toPlainString());
+        builder.append("\t");
+        builder.append(receiptNumber);
+        builder.append("\t");
+        builder.append(now);
+        builder.append("\t");
+        builder.append(registryDate);
+        builder.append("\t");
+        builder.append(debtYear.getName());
+        builder.append("\n");
+        appendPastLog(builder.toString());
+    }
+
+    private void appendPastLog(final String line) {
+        final File file = new File("/afs/ist.utl.pt/ciist/fenix/fenix015/ist/giaf_past_event_log.csv");
+        if (!file.exists()) {
+            final StringBuilder builder = new StringBuilder();
+            builder.append("Event");
+            builder.append("\t");
+            builder.append("Transaction");
+            builder.append("\t");
+            builder.append("ClientId");
+            builder.append("\t");
+            builder.append("TX Amount");
+            builder.append("\t");
+            builder.append("Receipt Number");
+            builder.append("\t");
+            builder.append("Sent To Accounting");
+            builder.append("\t");
+            builder.append("Registry Date");
+            builder.append("\t");
+            builder.append("Debt Year");
+            builder.append("\n");
+            append(file, builder.toString());
+        }
+        append(file, line);
+    }
+
+    private void append(final File file, final String line) {
+        try {
+            Files.write(file.toPath(), line.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND, StandardOpenOption.WRITE);
+        } catch (final IOException e) {
+            throw new Error(e);
+        }        
     }
 
     public void exempt(final GiafEventEntry entry, final Event event, final Money exempt) {
@@ -252,12 +344,12 @@ public class GiafEvent {
         return entries.stream().filter(e -> e.amountStillInDebt().isPositive()).findAny().orElse(null);
     }
 
-    public JsonObject toJson(final Event event, final String clientId, final String invoiceId, final String type, final Money value, final String observation) {
+    public JsonObject toJson(final Event event, final String clientId, final String invoiceId, final String type, final Money value, 
+            final String observation, final boolean accountForValue) {
         final ExecutionYear debtYear = Utils.executionYearOf(event);
         final DebtCycleType cycleType = Utils.cycleTypeFor(event, debtYear);
         final String eventDescription = event.getDescription().toString();
         final String articleCode = Utils.mapToArticleCode(event, eventDescription);
-        final String rubrica = mapToRubrica(event, eventDescription);
         final String costCenter = costCenterFor(event);
 
         final JsonObject o = new JsonObject();
@@ -303,7 +395,10 @@ public class GiafEvent {
             e.addProperty("responsible", "9910");
             e.addProperty("subCenter", "RP" + costCenter);
             e.addProperty("legalArticle", "M99");
-            e.addProperty("rubrica", rubrica);
+            if (accountForValue) {
+                final String rubrica = mapToRubrica(event, eventDescription);
+                e.addProperty("rubrica", rubrica);
+            }
             e.addProperty("observation", observation);
             e.addProperty("reference", debtYear.getName());
             a.add(e);
@@ -313,16 +408,17 @@ public class GiafEvent {
     }
 
     public JsonObject toJsonDebt(final Event event, final String clientId, final Money value) {
-        final JsonObject o = toJson(event, clientId, null, "F", value, "");
+        final JsonObject o = toJson(event, clientId, null, "F", value, "", true);
         o.addProperty("dueDate", toString(getDueDate(event)));
         return o;
     }
 
-    public JsonObject toJsonPayment(final AccountingTransactionDetail detail, final String clientId, final String invoiceId, final Money value) {
+    public JsonObject toJsonPayment(final AccountingTransactionDetail detail, final String clientId, final String invoiceId, 
+            final Money value, final boolean accountForValue) {
         final AccountingTransaction transaction = detail.getTransaction();
         final Event event = transaction.getEvent();
 
-        final JsonObject o = toJson(event, clientId, invoiceId, "V", value, "");
+        final JsonObject o = toJson(event, clientId, invoiceId, "V", value, "", accountForValue);
         o.addProperty("paymentDate", toString(transaction.getWhenRegistered().toDate()));
         o.addProperty("paymentMethod", toPaymentMethod(transaction.getPaymentMode()));
         o.addProperty("documentNumber", Utils.toPaymentDocumentNumber(detail));
@@ -341,7 +437,7 @@ public class GiafEvent {
             builder.append(exemption.getDescription().toString());
         }
         final String observation = max80(builder.toString());
-        return toJson(event, clientId, invoiceId, "E", value, observation.isEmpty() ? "Isencao desconto ou estorno" : observation);
+        return toJson(event, clientId, invoiceId, "E", value, observation.isEmpty() ? "Isencao desconto ou estorno" : observation, true);
     }
 
     private String max80(final String s) {
@@ -465,7 +561,18 @@ public class GiafEvent {
                                 return "7640";
                             }
                         }
-
+                    }
+                }
+                for (final Registration registration : student.getRegistrationsSet()) {
+                    final DegreeType degreeType = registration.getDegree().getDegreeType();
+                    if (degreeType.isAdvancedFormationDiploma() || degreeType.isAdvancedSpecializationDiploma()
+                            || degreeType.isSpecializationCycle() || degreeType.isSpecializationDegree()
+                            || degreeType.isThirdCycle()) {
+                        return "8312";
+                    }
+                    final Space campus = registration.getCampus(executionYear);
+                    if (campus != null && campus.getName().startsWith("T")) {
+                        return "7640";
                     }
                 }
             }
