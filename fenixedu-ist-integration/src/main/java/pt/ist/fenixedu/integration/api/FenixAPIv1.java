@@ -54,6 +54,7 @@ import javax.ws.rs.core.StreamingOutput;
 import net.fortuna.ical4j.model.Calendar;
 
 import org.fenixedu.academic.domain.AdHocEvaluation;
+import org.fenixedu.academic.domain.Attends;
 import org.fenixedu.academic.domain.CompetenceCourse;
 import org.fenixedu.academic.domain.Coordinator;
 import org.fenixedu.academic.domain.CurricularCourse;
@@ -112,6 +113,8 @@ import org.fenixedu.academic.dto.InfoSiteRoomTimeTable;
 import org.fenixedu.academic.dto.InfoWrittenEvaluation;
 import org.fenixedu.academic.dto.InfoWrittenTest;
 import org.fenixedu.academic.service.factory.RoomSiteComponentBuilder;
+import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
+import org.fenixedu.academic.service.services.exceptions.InvalidArgumentsServiceException;
 import org.fenixedu.academic.service.services.student.EnrolStudentInWrittenEvaluation;
 import org.fenixedu.academic.service.services.student.UnEnrollStudentInWrittenEvaluation;
 import org.fenixedu.academic.ui.struts.action.ICalendarSyncPoint;
@@ -805,8 +808,8 @@ public class FenixAPIv1 {
             @QueryParam("enrol") String enrol, @Context HttpServletResponse response, @Context HttpServletRequest request,
             @Context ServletContext context) {
         validateEnrol(enrol);
+        WrittenEvaluation eval = getDomainObject(oid, WrittenEvaluation.class);
         try {
-            WrittenEvaluation eval = getDomainObject(oid, WrittenEvaluation.class);
             if (enrol != null && !Strings.isNullOrEmpty(enrol.trim())) {
                 if (enrol.equalsIgnoreCase(ENROL)) {
                     EnrolStudentInWrittenEvaluation.runEnrolStudentInWrittenEvaluation(getPerson().getUsername(),
@@ -818,7 +821,24 @@ public class FenixAPIv1 {
             }
             return evaluations(response, request, context);
 
-        } catch (Exception e) {
+        } catch (InvalidArgumentsServiceException e) {
+            if (e.getMessage() == null) {
+                final Set<ExecutionCourse> associatedExecutionCoursesSet = eval.getAssociatedExecutionCoursesSet();
+                for (final Registration registration : getPerson().getStudent().getRegistrationsSet()) {
+                    for (final Attends attends : registration.getAssociatedAttendsSet()) {
+                        final ExecutionCourse executionCourse = attends.getExecutionCourse();
+                        if (associatedExecutionCoursesSet.contains(executionCourse)) {
+                            throw newApplicationError(Status.PRECONDITION_FAILED, "invalid_registration",
+                                    "student registration is " + registration.getActiveStateType().name());
+                        }
+                    }
+                }
+                throw newApplicationError(Status.PRECONDITION_FAILED, "student_not_registered",
+                        "the student does not have a registration in a degree associated with this evaluation");
+
+            }
+            throw newApplicationError(Status.PRECONDITION_FAILED, e.getMessage(), e.getMessage());
+        } catch (FenixServiceException e) {
             throw newApplicationError(Status.PRECONDITION_FAILED, e.getMessage(), e.getMessage());
         }
     }
