@@ -21,6 +21,7 @@ package pt.ist.fenixedu.contracts.domain.accessControl;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.Person;
@@ -32,7 +33,6 @@ import org.fenixedu.bennu.core.annotation.GroupOperator;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.joda.time.DateTime;
-import org.joda.time.YearMonthDay;
 
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.Function;
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.FunctionType;
@@ -45,18 +45,16 @@ public class DepartmentPresidentStrategy extends FenixGroupStrategy {
 
     @Override
     public Set<User> getMembers() {
-        return Bennu.getInstance().getDepartmentsSet().stream().map(d -> getCurrentDepartmentPresident(d))
+        return Bennu.getInstance().getDepartmentsSet().stream().flatMap(d -> getCurrentDepartmentPresidents(d))
                 .filter(Objects::nonNull).map(p -> p.getUser()).collect(Collectors.toSet());
     }
 
     @Override
     public boolean isMember(User user) {
-        return user != null
-                && user.getPerson() != null
-                && user.getPerson().getEmployee() != null
+        return user != null && user.getPerson() != null && user.getPerson().getEmployee() != null
                 && user.getPerson().getEmployee().getCurrentDepartmentWorkingPlace() != null
-                && user.getPerson().equals(
-                        getCurrentDepartmentPresident(user.getPerson().getEmployee().getCurrentDepartmentWorkingPlace()));
+                && isPersonCurrentDepartmentPresident(user.getPerson(),
+                        user.getPerson().getEmployee().getCurrentDepartmentWorkingPlace());
     }
 
     @Override
@@ -69,10 +67,10 @@ public class DepartmentPresidentStrategy extends FenixGroupStrategy {
         return isMember(user);
     }
 
+    @Deprecated
     public static Person getCurrentDepartmentPresident(Department department) {
-        final YearMonthDay today = new YearMonthDay();
         for (final Accountability accountability : department.getDepartmentUnit().getChildsSet()) {
-            if (accountability instanceof PersonFunction && accountability.isActive(today)) {
+            if (accountability instanceof PersonFunction && accountability.isActive()) {
                 final PersonFunction personFunction = (PersonFunction) accountability;
                 final Function function = personFunction.getFunction();
                 if (function != null && function.getFunctionType() == FunctionType.PRESIDENT) {
@@ -86,8 +84,20 @@ public class DepartmentPresidentStrategy extends FenixGroupStrategy {
         return null;
     }
 
+    private static Stream<Person> getCurrentDepartmentPresidents(Department department) {
+        return department.getDepartmentUnit().getChildsSet().stream()
+                .filter(a -> a instanceof PersonFunction && a.isActive() && ((PersonFunction) a).getFunction() != null
+                        && ((PersonFunction) a).getFunction().getFunctionType() == FunctionType.PRESIDENT
+                        && a.getChildParty() != null && a.getChildParty().isPerson())
+                .map(a -> (Person) a.getChildParty());
+    }
+
+    public static boolean isPersonCurrentDepartmentPresident(Person person, Department department) {
+        return getCurrentDepartmentPresidents(department).anyMatch(p -> p.equals(person));
+    }
+
     public static boolean isCurrentUserCurrentDepartmentPresident(Department department) {
         final Person person = AccessControl.getPerson();
-        return person == null ? false : person.equals(getCurrentDepartmentPresident(department));
+        return person == null ? false : isPersonCurrentDepartmentPresident(person, department);
     }
 }
