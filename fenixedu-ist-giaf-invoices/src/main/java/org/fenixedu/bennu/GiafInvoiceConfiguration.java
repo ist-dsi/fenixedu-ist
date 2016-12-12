@@ -33,6 +33,10 @@ public class GiafInvoiceConfiguration {
                 description = "File store used to store files regarding invoices and reciepts from GIAF.")
         public String giafInvoiceDir();
 
+        @ConfigurationProperty(key = "pt.indra.mygiaf.client.map", defaultValue = "/dev/null",
+                description = "Filename to the client list from GIAF and corresponding VAT numbers.")
+        public String clientMapFilename();
+
     }
 
     public static ConfigurationProperties getConfiguration() {

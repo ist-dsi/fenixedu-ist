@@ -4,11 +4,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
+import org.fenixedu.bennu.GiafInvoiceConfiguration;
 import org.fenixedu.bennu.core.domain.User;
 
 import com.google.gson.JsonElement;
@@ -16,19 +18,19 @@ import com.google.gson.JsonObject;
 
 import pt.ist.giaf.client.financialDocuments.ClientClient;
 
-public class ClientMap extends TreeMap<String, String> {
+public class ClientMap {
 
-    private static final String MAP_FILENAME = "/afs/ist.utl.pt/ciist/fenix/fenix015/ist/giafVATNumberToClientIdMap.csv";
+	private final SortedMap<String, String> map = new TreeMap<>();
 
     public ClientMap() {
         try {
-            for (final String line : Files.readAllLines(new File(MAP_FILENAME).toPath())) {
+            for (final String line : Files.readAllLines(new File(GiafInvoiceConfiguration.getConfiguration().clientMapFilename()).toPath())) {
                 final String[] parts = line.split("\t");
 
                 final String uVATNumber = parts[0];
                 final String clientId = parts[1];
 
-                put(uVATNumber, clientId);
+                map.put(uVATNumber, clientId);
             }
         } catch (final IOException e) {
             throw new Error(e);
@@ -36,9 +38,9 @@ public class ClientMap extends TreeMap<String, String> {
     }
 
     public void register(final String uVATNumber, final String clientId) {
-        put(uVATNumber, clientId);
+        map.put(uVATNumber, clientId);
 
-        try (final FileOutputStream stream = new FileOutputStream(MAP_FILENAME, true)) {
+        try (final FileOutputStream stream = new FileOutputStream(GiafInvoiceConfiguration.getConfiguration().clientMapFilename(), true)) {
             stream.write(uVATNumber.getBytes());
             stream.write("\t".getBytes());
             stream.write(clientId.getBytes());
@@ -50,7 +52,7 @@ public class ClientMap extends TreeMap<String, String> {
 
     public String getClientId(final Person p) {
         final String uVATNumber = uVATNumberFor(p);
-        return uVATNumber == null ? null : get(uVATNumber);
+        return uVATNumber == null ? null : map.get(uVATNumber);
     }
 
     public boolean containsClient(final Person p) {
