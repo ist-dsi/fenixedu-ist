@@ -1,9 +1,9 @@
 package pt.ist.fenixedu.giaf.invoices;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.time.Year;
 import java.util.stream.Stream;
 
+import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.accounting.AccountingTransactionDetail;
 import org.fenixedu.academic.domain.accounting.CreditNoteEntry;
 import org.fenixedu.academic.domain.accounting.Entry;
@@ -30,7 +30,31 @@ import org.joda.time.DateTime;
 
 public class EventWrapper {
 
-    public static final DateTime THRESHOLD = new DateTime(2015, 12, 1, 0, 0, 0, 0);
+    public final static DateTime THRESHOLD = new DateTime(2015, 12, 1, 0, 0, 0, 0);
+
+    public static Stream<Event> eventsToProcess(final ErrorLogConsumer consumer,
+            final Stream<Event> eventStream, final Stream<AccountingTransactionDetail> txStream) {
+        final Stream<Event> currentEvents = eventStream
+                .filter(EventWrapper::needsProcessing)
+                .filter(e -> Utils.validate(consumer, e))
+                ;
+
+        final int currentYear = Year.now().getValue();
+        final Stream<Event> pastEvents = txStream
+            .filter(d -> d.getWhenRegistered().getYear() == currentYear)
+            .map(d -> d.getEvent())
+            .filter(e -> !needsProcessing(e))
+            .filter(e -> Utils.validate(consumer, e))
+            ;
+
+        return Stream.concat(currentEvents, pastEvents).distinct();        
+    }
+
+    public static boolean needsProcessing(final Event event) {
+        final ExecutionYear executionYear = Utils.executionYearOf(event);
+        final int year = executionYear.getBeginLocalDate().getYear();
+        return year >= THRESHOLD.getYear() || event.getWhenOccured().isAfter(THRESHOLD);
+    }
 
     public final Event event;
     public final Money debt;
@@ -47,7 +71,7 @@ public class EventWrapper {
 
         // calculate debt
         {
-            final Money value = event.isCancelled() ? Money.ZERO : calculateTotalDebtValue();
+            final Money value = event.isCancelled() ? Money.ZERO : Utils.calculateTotalDebtValue(event);
             final Money diff = value.subtract(payedBeforThreshold);
             debt = diff.isPositive() ? diff : Money.ZERO;
         }
@@ -73,29 +97,10 @@ public class EventWrapper {
         return debt.subtract(exempt).subtract(payed);
     }
 
-    private Money calculateTotalDebtValue() {
-        final DateTime when = event.getWhenOccured().plusSeconds(1);
-        final PostingRule rule = event.getPostingRule();
-        return call(rule, when, false);
-    }
-
-    private Money call(final PostingRule rule, final DateTime when, final boolean applyDiscount) {
-        try {
-            final Method method =
-                    PostingRule.class
-                            .getDeclaredMethod("doCalculationForAmountToPay", Event.class, DateTime.class, boolean.class);
-            method.setAccessible(true);
-            return (Money) method.invoke(rule, event, when, applyDiscount);
-        } catch (final NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
-                | InvocationTargetException e) {
-            throw new Error(e);
-        }
-    }
-
     private Money calculateAmountPayed(final DateTime threshold) {
         return event.getAccountingTransactionsSet().stream()
                 .filter(t -> threshold == null || t.getWhenRegistered().isBefore(threshold))
-                .filter(t -> Utils.validate(ErrorConsumer.VOID_CONSUMER, t.getTransactionDetail()))
+                .filter(t -> Utils.validate(null, t.getTransactionDetail()))
                 .map(t -> t.getAmountWithAdjustment())
                 .reduce(Money.ZERO, Money::add);
     }
@@ -109,7 +114,7 @@ public class EventWrapper {
     }
 
     private Money amountFor(final Exemption e) {
-        final Money amount = calculateTotalDebtValue();
+        final Money amount = Utils.calculateTotalDebtValue(event);
         if (e instanceof AcademicEventExemption) {
             final AcademicEventExemption o = (AcademicEventExemption) e;
             return o.getValue();
@@ -166,7 +171,7 @@ public class EventWrapper {
                 //.filter(d -> d.getWhenRegistered().getYear() >= START_YEAR_TO_CONSIDER_TRANSACTIONS)
                 .filter(d -> d.getWhenRegistered().isAfter(THRESHOLD))
                 .filter(d -> !isCreditNote(d))
-                .filter(d -> Utils.validate(ErrorConsumer.VOID_CONSUMER, d));
+                .filter(d -> Utils.validate(null, d));
     }
 
     private boolean isCreditNote(AccountingTransactionDetail detail) {

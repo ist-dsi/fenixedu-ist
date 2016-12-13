@@ -78,6 +78,10 @@
 	<spring:message code="label.giaf.invoice.view.details" text="View Details"/>
 </a>
 
+<% final String errors = (String) request.getAttribute("errors");
+   if (errors != null) {
+%><div style="color: red;"><pre><%= errors %></pre></div>
+<% }%>
 <script type="text/javascript">
 	var events = ${events};
 	var contextPath = '<%= contextPath %>';
