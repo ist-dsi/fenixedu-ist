@@ -52,6 +52,17 @@
 	<fr:destination name="semesterPostBack" path="/viewTutors.do?method=listTutors"/>
 </fr:edit>
 
+<logic:notEmpty name="tutorsBean" property="tutors">
+	<bean:define id="query" value=""/>	
+	<logic:notEmpty name="tutorsBean" property="executionDegree">
+		<bean:define id="executionDegreeId" name="tutorsBean" property="executionDegree.externalId"/>
+		<bean:define id="query" value="<%="&executionDegree="+ executionDegreeId%>"/>
+	</logic:notEmpty>	
+	<html:img border="0" src="<%= request.getContextPath() + "/images/excel.gif"%>" altKey="excel" bundle="IMAGE_RESOURCES" />
+	<html:link page="<%= "/viewTutors.do?method=exportToExcel" + query.toString()%>">
+		<bean:message key="link.exportToExcel" bundle="APPLICATION_RESOURCES"/>
+	</html:link>
+</logic:notEmpty>
 
 <logic:notEmpty name="tutorsBean" property="tutors">		
 	<fr:view name="tutorsBean" property="tutors">
