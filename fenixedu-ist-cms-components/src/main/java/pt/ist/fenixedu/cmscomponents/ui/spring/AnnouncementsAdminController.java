@@ -21,6 +21,7 @@ package pt.ist.fenixedu.cmscomponents.ui.spring;
 import static java.lang.String.format;
 import static org.fenixedu.bennu.core.i18n.BundleUtil.getLocalizedString;
 import static org.fenixedu.bennu.core.security.Authenticate.getUser;
+import static org.fenixedu.cms.domain.PermissionEvaluation.ensureCanDoThis;
 import static org.fenixedu.cms.domain.Post.CREATION_DATE_COMPARATOR;
 import static pt.ist.fenixframework.FenixFramework.atomic;
 
@@ -37,12 +38,11 @@ import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.academic.ui.struts.action.teacher.ManageExecutionCourseDA;
 import org.fenixedu.bennu.core.groups.AnyoneGroup;
+import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.io.domain.GroupBasedFile;
 import org.fenixedu.bennu.io.servlets.FileDownloadServlet;
-import org.fenixedu.cms.domain.Category;
-import org.fenixedu.cms.domain.Post;
-import org.fenixedu.cms.domain.PostFile;
-import org.fenixedu.cms.domain.Site;
+import org.fenixedu.cms.domain.*;
+import org.fenixedu.cms.ui.AdminPosts;
 import org.fenixedu.cms.ui.AdminSites;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.joda.time.DateTime;
@@ -98,6 +98,9 @@ public class AnnouncementsAdminController extends ExecutionCourseController {
     @RequestMapping(value = "{postSlug}/delete", method = RequestMethod.POST)
     public RedirectView delete(@PathVariable ExecutionCourse executionCourse, @PathVariable String postSlug) {
         Post post = executionCourse.getSite().postForSlug(postSlug);
+        Professorship professorship = executionCourse.getProfessorship(AccessControl.getPerson());
+        AccessControl.check(person -> professorship != null && professorship.getPermissions().getAnnouncements());
+        
         if(post == null){
             return new RedirectView("404");
         }
@@ -110,10 +113,10 @@ public class AnnouncementsAdminController extends ExecutionCourseController {
             @PathVariable(value = "postSlug") String slugPost, @RequestParam("attachment") MultipartFile[] attachments)
                     throws IOException {
         Site s = executionCourse.getSite();
-
-        AdminSites.canEdit(s);
-
         Post p = s.postForSlug(slugPost);
+        
+        Professorship professorship = executionCourse.getProfessorship(AccessControl.getPerson());
+        AccessControl.check(person -> professorship != null && professorship.getPermissions().getAnnouncements());
         JsonArray array = new JsonArray();
 
         Arrays.asList(attachments).stream().map((attachment) -> {
@@ -146,6 +149,10 @@ public class AnnouncementsAdminController extends ExecutionCourseController {
             @RequestParam LocalizedString body, @RequestParam(required = false) LocalizedString excerpt, @RequestParam(required = false, defaultValue = "false") boolean active,
             @RequestParam(required = false) @DateTimeFormat(iso = ISO.DATE_TIME) DateTime publicationStarts) throws Exception {
         Site site = executionCourse.getSite();
+    
+        Professorship professorship = executionCourse.getProfessorship(AccessControl.getPerson());
+        AccessControl.check(person -> professorship != null && professorship.getPermissions().getAnnouncements());
+        
         atomic(() -> {
             Post post = Post.create(site, null, Post.sanitize(name), Post.sanitize(body), excerpt != null ? Post.sanitize
                     (excerpt) : new LocalizedString(), announcementsCategory(site), active,
@@ -170,6 +177,10 @@ public class AnnouncementsAdminController extends ExecutionCourseController {
         if(post == null){
             return new RedirectView("404");
         }
+    
+        Professorship professorship = executionCourse.getProfessorship(AccessControl.getPerson());
+        AccessControl.check(person -> professorship != null && professorship.getPermissions().getAnnouncements());
+        
         atomic(() -> {
             post.setName(Post.sanitize(name));
             post.setBodyAndExcerpt(body != null ? Post.sanitize(body) : new LocalizedString() , excerpt != null ? Post.sanitize
@@ -223,4 +234,5 @@ public class AnnouncementsAdminController extends ExecutionCourseController {
         }
 
     }
+    
 }
