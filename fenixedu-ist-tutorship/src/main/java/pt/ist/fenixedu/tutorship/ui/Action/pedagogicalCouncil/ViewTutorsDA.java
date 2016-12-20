@@ -18,12 +18,14 @@
  */
 package pt.ist.fenixedu.tutorship.ui.Action.pedagogicalCouncil;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -41,11 +43,14 @@ import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
 import org.fenixedu.bennu.struts.portal.EntryPoint;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
+import org.fenixedu.commons.StringNormalizer;
+import org.fenixedu.commons.spreadsheet.StyledExcelSpreadsheet;
 
 import pt.ist.fenixWebFramework.rendererExtensions.converters.DomainObjectKeyConverter;
 import pt.ist.fenixWebFramework.renderers.DataProvider;
 import pt.ist.fenixWebFramework.renderers.components.converters.Converter;
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
+import pt.ist.fenixedu.tutorship.domain.Tutorship;
 import pt.ist.fenixedu.tutorship.domain.TutorshipIntention;
 import pt.ist.fenixedu.tutorship.ui.TutorshipApplications.TutorshipApp;
 import pt.ist.fenixframework.FenixFramework;
@@ -66,6 +71,54 @@ public class ViewTutorsDA extends FenixDispatchAction {
         request.setAttribute("tutorsBean", bean);
         RenderUtils.invalidateViewState();
         return mapping.findForward("viewTutors");
+    }
+
+    public ActionForward exportToExcel(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
+            HttpServletResponse response) throws IOException {
+        
+        ExecutionDegree executionDegree = getDomainObject(request, "executionDegree");
+        ViewTutorsBean bean = new ViewTutorsBean();
+        bean.setExecutionDegree(executionDegree);
+        List<TutorshipIntention> tutorsList = bean.getTutors();
+
+        StyledExcelSpreadsheet spreadsheet = new StyledExcelSpreadsheet("Tutores-Tutorandos", 15);
+        spreadsheet.newHeaderRow();
+        spreadsheet.addHeader("Tutor-Username");
+        spreadsheet.addHeader("Tutor-Nome", 12500);
+        spreadsheet.addHeader("Tutorando-Nº");
+        spreadsheet.addHeader("Tutorando-Nome", 12500);
+        spreadsheet.addHeader("Tutorando-Telemóvel", 7000);
+        spreadsheet.addHeader("Tutorando-Email");
+
+        for (TutorshipIntention tutorshipIntention : tutorsList) {
+            if (tutorshipIntention.getTutorships().size() > 0) {
+                for (Tutorship tutorship : tutorshipIntention.getTutorships()) {
+                    spreadsheet.newRow();
+                    spreadsheet.addCell(tutorshipIntention.getTeacher().getPerson().getUsername());
+                    spreadsheet.addCell(tutorshipIntention.getTeacher().getPerson().getName());
+                    spreadsheet.addCell(tutorship.getStudent().getNumber());
+                    spreadsheet.addCell(tutorship.getStudent().getName());
+                    spreadsheet.addCell(tutorship.getStudent().getPerson().getDefaultMobilePhoneNumber());
+                    spreadsheet.addCell(tutorship.getStudent().getPerson().getDefaultEmailAddressValue());
+                }
+            }
+            else {
+                spreadsheet.newRow();
+                spreadsheet.addCell(tutorshipIntention.getTeacher().getPerson().getUsername());
+                spreadsheet.addCell(tutorshipIntention.getTeacher().getPerson().getName());
+            }
+        }
+
+        response.setContentType("application/vnd.ms-excel");
+        response.setHeader("Content-Disposition", "attachment; filename="
+                + StringNormalizer.slugify(executionDegree.getExecutionYear().getQualifiedName() + " "
+                        + executionDegree.getPresentationName())
+                + "\".xls");
+        final ServletOutputStream writer = response.getOutputStream();
+        spreadsheet.getWorkbook().write(writer);
+        writer.flush();
+        response.flushBuffer();
+        return null;
     }
 
     public ActionForward viewStudentsOfTutorship(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
