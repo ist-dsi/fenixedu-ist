@@ -34,7 +34,6 @@ import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.academic.domain.util.email.Sender;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
 import org.fenixedu.academic.ui.struts.action.messaging.EmailsDA;
-import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
@@ -66,7 +65,7 @@ public class SendEmailToTutoredStudents extends FenixDispatchAction {
         if (receivers != null) {
             for (TutorshipBean tutorshipBean : receivers.getStudentsList()) {
                 Person person = tutorshipBean.getTutorship().getStudent().getPerson();
-                recipients.add(Recipient.newInstance(person.getName(), UserGroup.of(person.getUser())));
+                recipients.add(Recipient.newInstance(person.getName(), person.getUser().groupOf()));
             }
         }
 

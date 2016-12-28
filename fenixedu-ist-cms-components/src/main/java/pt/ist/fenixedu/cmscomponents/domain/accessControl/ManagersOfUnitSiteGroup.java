@@ -18,14 +18,14 @@
  */
 package pt.ist.fenixedu.cmscomponents.domain.accessControl;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.accessControl.FenixGroup;
 import org.fenixedu.bennu.core.annotation.GroupArgument;
 import org.fenixedu.bennu.core.annotation.GroupOperator;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.groups.PersistentGroup;
+import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.cms.domain.DefaultRoles;
 import org.fenixedu.cms.domain.Role;
 import org.fenixedu.cms.domain.Site;
@@ -59,23 +59,23 @@ public class ManagersOfUnitSiteGroup extends FenixGroup {
     }
 
     @Override
-    public Set<User> getMembers() {
-        return getManagers(DateTime.now());
+    public Stream<User> getMembers() {
+        return getManagers().getMembers();
     }
 
     @Override
-    public Set<User> getMembers(DateTime when) {
-        return getManagers(when);
+    public Stream<User> getMembers(DateTime when) {
+        return getManagers().getMembers(when);
     }
 
     @Override
     public boolean isMember(User user) {
-        return getManagers(DateTime.now()).contains(user);
+        return getManagers().isMember(user);
     }
 
     @Override
     public boolean isMember(User user, DateTime when) {
-        return getManagers(when).contains(user);
+        return getManagers().isMember(user, when);
     }
 
     @Override
@@ -83,13 +83,13 @@ public class ManagersOfUnitSiteGroup extends FenixGroup {
         return PersistentManagersOfUnitSiteGroup.getInstance(site);
     }
 
-    private Set<User> getManagers(DateTime when) {
+    private Group getManagers() {
         for (Role role : site.getRolesSet()) {
             if (role.getRoleTemplate().equals(DefaultRoles.getInstance().getAdminRole())) {
-                return role.getGroup().getMembers(when);
+                return role.getGroup().toGroup();
             }
         }
-        return new HashSet<User>();
+        return Group.nobody();
     }
 
     @Override

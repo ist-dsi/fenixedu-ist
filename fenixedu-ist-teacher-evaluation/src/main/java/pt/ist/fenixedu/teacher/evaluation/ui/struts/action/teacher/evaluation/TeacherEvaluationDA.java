@@ -47,7 +47,7 @@ import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
 import org.fenixedu.academic.ui.struts.action.teacher.TeacherApplication.TeacherTeachingApp;
-import org.fenixedu.bennu.core.groups.DynamicGroup;
+import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
@@ -116,9 +116,8 @@ public class TeacherEvaluationDA extends FenixDispatchAction {
             HttpServletResponse response) throws Exception {
         TeacherEvaluationTypeSelection selection = getRenderedObject("process-selection");
         selection.createEvaluation();
-        if ((AccessControl.getPerson().isTeacherEvaluationCoordinatorCouncilMember() || DynamicGroup.get("managers").isMember(
-                Authenticate.getUser()))
-                && selection.getProcess().getEvaluee() != AccessControl.getPerson()) {
+        if ((AccessControl.getPerson().isTeacherEvaluationCoordinatorCouncilMember() || Group.managers()
+                .isMember(Authenticate.getUser())) && selection.getProcess().getEvaluee() != AccessControl.getPerson()) {
             request.setAttribute("process", selection.getProcess());
             return mapping.findForward("viewEvaluationByCCAD");
         } else {
@@ -163,9 +162,8 @@ public class TeacherEvaluationDA extends FenixDispatchAction {
             HttpServletResponse response) throws Exception {
         TeacherEvaluationProcess process = getDomainObject(request, "process");
         process.getCurrentTeacherEvaluation().lickAutoEvaluationStamp();
-        if ((AccessControl.getPerson().isTeacherEvaluationCoordinatorCouncilMember() || DynamicGroup.get("managers").isMember(
-                Authenticate.getUser()))
-                && process.getEvaluee() != AccessControl.getPerson()) {
+        if ((AccessControl.getPerson().isTeacherEvaluationCoordinatorCouncilMember() || Group.managers()
+                .isMember(Authenticate.getUser())) && process.getEvaluee() != AccessControl.getPerson()) {
             request.setAttribute("process", process);
             return mapping.findForward("viewEvaluationByCCAD");
         } else {
@@ -177,9 +175,8 @@ public class TeacherEvaluationDA extends FenixDispatchAction {
             HttpServletResponse response) throws Exception {
         TeacherEvaluationProcess process = getDomainObject(request, "process");
         process.getCurrentTeacherEvaluation().lickEvaluationStamp();
-        if ((AccessControl.getPerson().isTeacherEvaluationCoordinatorCouncilMember() || DynamicGroup.get("managers").isMember(
-                Authenticate.getUser()))
-                && process.getEvaluee() != AccessControl.getPerson()) {
+        if ((AccessControl.getPerson().isTeacherEvaluationCoordinatorCouncilMember() || Group.managers()
+                .isMember(Authenticate.getUser())) && process.getEvaluee() != AccessControl.getPerson()) {
             request.setAttribute("process", process);
             return mapping.findForward("viewEvaluationByCCAD");
         } else {
@@ -303,7 +300,7 @@ public class TeacherEvaluationDA extends FenixDispatchAction {
             request.setAttribute("evalueeOID", fileUploadBean.getTeacherEvaluationProcess().getEvaluee().getExternalId());
             return viewEvaluation(mapping, form, request, response);
         } else {
-            if ((AccessControl.getPerson().isTeacherEvaluationCoordinatorCouncilMember() || DynamicGroup.get("managers")
+            if ((AccessControl.getPerson().isTeacherEvaluationCoordinatorCouncilMember() || Group.managers()
                     .isMember(Authenticate.getUser()))
                     && fileUploadBean.getTeacherEvaluationProcess().getEvaluee() != AccessControl.getPerson()) {
                 request.setAttribute("process", fileUploadBean.getTeacherEvaluationProcess());
@@ -364,7 +361,7 @@ public class TeacherEvaluationDA extends FenixDispatchAction {
         int evaluatedCount = 0;
         int approvedEvaluatedCount = 0;
         final Person person = AccessControl.getPerson();
-        if (DynamicGroup.get("managers").isMember(person.getUser()) || person.isTeacherEvaluationCoordinatorCouncilMember()) {
+        if (Group.managers().isMember(person.getUser()) || person.isTeacherEvaluationCoordinatorCouncilMember()) {
             teacherEvaluationProcesses = facultyEvaluationProcess.getSortedTeacherEvaluationProcess();
             autoEvaluatedCount = facultyEvaluationProcess.getAutoEvaluatedCount();
             evaluatedCount = facultyEvaluationProcess.getEvaluatedCount();

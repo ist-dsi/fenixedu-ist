@@ -19,15 +19,10 @@
 package pt.ist.fenixedu.integration.ui.struts.action.research.researchUnit;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.bennu.core.groups.Group;
-import org.fenixedu.bennu.core.groups.NobodyGroup;
-import org.fenixedu.bennu.core.groups.UnionGroup;
 
 import pt.ist.fenixedu.integration.domain.UnitFile;
 import pt.ist.fenixedu.integration.domain.UnitFileTag;
@@ -46,7 +41,7 @@ public class UnitFileBean implements Serializable {
 
     protected UnitFileBean() {
         this.file = null;
-        group = NobodyGroup.get();
+        group = Group.nobody();
     }
 
     public UnitFileBean(UnitFile file) {
@@ -93,16 +88,16 @@ public class UnitFileBean implements Serializable {
         return group;
     }
 
-    public List<Group> getGroups() {
-        if (group instanceof UnionGroup) {
-            return new ArrayList<>(((UnionGroup) group).getChildren());
-        }
-        return Collections.singletonList(group);
-    }
-
-    public void setGroups(List<Group> groups) {
-        group = UnionGroup.of(groups.stream());
-    }
+//    public List<Group> getGroups() {
+//        if (group instanceof UnionGroup) {
+//            return new ArrayList<>(((UnionGroup) group).getChildren());
+//        }
+//        return Collections.singletonList(group);
+//    }
+//
+//    public void setGroups(List<Group> groups) {
+//        group = UnionGroup.of(groups.stream());
+//    }
 
     public Unit getUnit() {
         return getFile().getUnit();

@@ -38,10 +38,9 @@ import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.ui.struts.action.base.FenixAction;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.exceptions.AuthorizationException;
-import org.fenixedu.bennu.core.filters.CasAuthenticationFilter;
 import org.fenixedu.bennu.core.security.Authenticate;
-import org.fenixedu.bennu.struts.annotations.Mapping;
 
+import org.fenixedu.bennu.struts.annotations.Mapping;
 import pt.ist.fenixWebFramework.renderers.components.HtmlLink;
 import pt.ist.fenixWebFramework.servlets.filters.contentRewrite.GenericChecksumRewriter;
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveEmployees;
@@ -64,7 +63,7 @@ public class BaseAuthenticationAction extends FenixAction {
             HttpServletResponse response) throws Exception {
         try {
 
-            if (!Authenticate.isLogged() && request.getAttribute(CasAuthenticationFilter.AUTHENTICATION_EXCEPTION_KEY) == null) {
+            if (!Authenticate.isLogged() && !"true".equals(request.getParameter("login_failed"))) {
                 response.sendRedirect(request.getContextPath() + "/login?callback=" + request.getRequestURL().toString());
                 return null;
             }
@@ -72,7 +71,7 @@ public class BaseAuthenticationAction extends FenixAction {
             final User userView = Authenticate.getUser();
 
             if (userView == null || userView.isLoginExpired()) {
-                return getAuthenticationFailedForward(mapping, request, "errors.noAuthorization", "errors.noAuthorization");
+                return getAuthenticationFailedForward(request, response);
             }
 
             final HttpSession httpSession = request.getSession(false);
@@ -105,7 +104,7 @@ public class BaseAuthenticationAction extends FenixAction {
                 return handleSessionCreationAndGetForward(mapping, request, userView, httpSession);
             }
         } catch (AuthorizationException e) {
-            return getAuthenticationFailedForward(mapping, request, "invalidAuthentication", "errors.invalidAuthentication");
+            return getAuthenticationFailedForward(request, response);
         }
     }
 
@@ -267,9 +266,8 @@ public class BaseAuthenticationAction extends FenixAction {
         return false;
     }
 
-    protected ActionForward getAuthenticationFailedForward(final ActionMapping mapping, final HttpServletRequest request,
-            final String actionKey, final String messageKey) {
-        Authenticate.logout(request.getSession());
+    protected ActionForward getAuthenticationFailedForward(final HttpServletRequest request, final HttpServletResponse response) {
+        Authenticate.logout(request, response);
         return new ActionForward("/authenticationFailed.jsp");
     }
 

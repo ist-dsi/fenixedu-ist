@@ -29,8 +29,6 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.groups.PersistentGroup;
 import org.fenixedu.bennu.core.groups.Group;
-import org.fenixedu.bennu.core.groups.UnionGroup;
-import org.fenixedu.bennu.core.groups.UserGroup;
 
 import pt.ist.fenixframework.Atomic;
 
@@ -47,14 +45,13 @@ public class TeacherEvaluationFile extends TeacherEvaluationFile_Base {
         final Set<Group> groups = new HashSet<>();
 
         final TeacherEvaluationProcess process = teacherEvaluation.getTeacherEvaluationProcess();
-        groups.add(UserGroup.of(process.getEvaluator().getUser()));
-        groups.add(UserGroup.of(process.getEvaluee().getUser()));
-        PersistentGroup group = Bennu.getInstance().getTeacherEvaluationCoordinatorCouncil();
-        if (group != null) {
-            groups.add(group.toGroup());
+        Group group = process.getEvaluator().getUser().groupOf().grant(process.getEvaluee().getUser());
+        PersistentGroup g = Bennu.getInstance().getTeacherEvaluationCoordinatorCouncil();
+        if (g != null) {
+            group = group.or(g.toGroup());
         }
 
-        init(filename, filename, content, UnionGroup.of(groups));
+        init(filename, filename, content, group);
     }
 
     private String getExtension(String filename) {

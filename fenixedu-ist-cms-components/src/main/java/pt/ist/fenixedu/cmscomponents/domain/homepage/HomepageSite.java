@@ -18,24 +18,7 @@
  */
 package pt.ist.fenixedu.cmscomponents.domain.homepage;
 
-import java.util.List;
-
-import org.fenixedu.academic.domain.Person;
-import org.fenixedu.bennu.core.domain.Bennu;
-import org.fenixedu.bennu.core.groups.AnyoneGroup;
-import org.fenixedu.bennu.core.groups.Group;
-import org.fenixedu.bennu.core.groups.LoggedGroup;
-import org.fenixedu.bennu.core.groups.UserGroup;
-import org.fenixedu.cms.domain.DefaultRoles;
-import org.fenixedu.cms.domain.Role;
 import org.fenixedu.cms.domain.Site;
-import org.fenixedu.commons.i18n.I18N;
-import org.fenixedu.commons.i18n.LocalizedString;
-
-import com.google.common.collect.ImmutableList;
-
-import pt.ist.fenixframework.Atomic;
-import pt.ist.fenixframework.consistencyPredicates.ConsistencyPredicate;
 
 public class HomepageSite extends HomepageSite_Base {
 
@@ -43,9 +26,7 @@ public class HomepageSite extends HomepageSite_Base {
         setSite(site);
     }
 
-
     public void delete() {
         deleteDomainObject();
     }
-
 }

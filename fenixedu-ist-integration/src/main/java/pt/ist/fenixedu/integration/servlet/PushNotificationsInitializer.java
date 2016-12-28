@@ -10,9 +10,10 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 
 import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.core.domain.groups.PersistentGroup;
 import org.fenixedu.bennu.core.rest.JsonBodyReaderWriter;
-import org.fenixedu.bennu.signals.DomainObjectEvent;
-import org.fenixedu.bennu.signals.Signal;
+import org.fenixedu.bennu.core.signals.DomainObjectEvent;
+import org.fenixedu.bennu.core.signals.Signal;
 import org.fenixedu.cms.domain.Post;
 import org.fenixedu.commons.stream.StreamUtils;
 import org.slf4j.Logger;
@@ -62,7 +63,7 @@ public class PushNotificationsInitializer implements ServletContextListener {
 
             final String postAuthor = post.getCreatedBy().getUsername();
             JsonArray teacherUsernames = post.getSite().getExecutionCourse().getTeacherGroupSet().stream()
-                    .flatMap(ptg -> ptg.getMembers().stream()).map(User::getUsername)
+                    .flatMap(PersistentGroup::getMembers).map(User::getUsername)
                     .filter(u -> !postAuthor.equals(u)).distinct().map(JsonPrimitive::new).collect(StreamUtils.toJsonArray());
 
             usernames.addAll(teacherUsernames);

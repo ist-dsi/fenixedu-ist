@@ -19,8 +19,6 @@
 package pt.ist.fenixedu.contracts.domain.accessControl;
 
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.Department;
@@ -44,9 +42,9 @@ public class DepartmentPresidentStrategy extends FenixGroupStrategy {
     private static final long serialVersionUID = -3153992434314606564L;
 
     @Override
-    public Set<User> getMembers() {
+    public Stream<User> getMembers() {
         return Bennu.getInstance().getDepartmentsSet().stream().flatMap(d -> getCurrentDepartmentPresidents(d))
-                .filter(Objects::nonNull).map(p -> p.getUser()).collect(Collectors.toSet());
+                .filter(Objects::nonNull).map(p -> p.getUser());
     }
 
     @Override
@@ -58,7 +56,7 @@ public class DepartmentPresidentStrategy extends FenixGroupStrategy {
     }
 
     @Override
-    public Set<User> getMembers(DateTime when) {
+    public Stream<User> getMembers(DateTime when) {
         return getMembers();
     }
 

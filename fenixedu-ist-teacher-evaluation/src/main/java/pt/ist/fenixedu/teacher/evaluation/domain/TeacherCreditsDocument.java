@@ -18,7 +18,7 @@
  */
 package pt.ist.fenixedu.teacher.evaluation.domain;
 
-import org.fenixedu.bennu.io.servlets.FileDownloadServlet;
+import org.fenixedu.bennu.io.servlet.FileDownloadServlet;
 
 public class TeacherCreditsDocument extends TeacherCreditsDocument_Base {
     // Delete jsp usages and delete this method

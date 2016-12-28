@@ -18,8 +18,6 @@
  */
 package pt.ist.fenixedu.teacher.evaluation.task;
 
-import java.io.PrintWriter;
-
 import org.fenixedu.academic.domain.QueueJob;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.scheduler.CronTask;
@@ -36,19 +34,18 @@ public class RunCreditsQueueJobs extends CronTask {
     @Override
     public void runTask() throws Exception {
         LocalDate today = new LocalDate();
-        PrintWriter logWriter = getTaskLogWriter();
         for (AnnualCreditsState annualCreditsState : Bennu.getInstance().getAnnualCreditsStatesSet()) {
             if (!annualCreditsState.getIsFinalCreditsCalculated() && annualCreditsState.getFinalCalculationDate() != null
                     && !today.isBefore(annualCreditsState.getFinalCalculationDate())
                     && !alreadyLaunched(CalculateCreditsQueueJob.class.getName())) {
                 new CalculateCreditsQueueJob(annualCreditsState.getExecutionYear());
-                logWriter.println("Lauched CalculateCreditsQueueJob");
+                taskLog("Lauched CalculateCreditsQueueJob");
             }
             if (!annualCreditsState.getIsCreditsClosed() && annualCreditsState.getCloseCreditsDate() != null
                     && !today.isBefore(annualCreditsState.getCloseCreditsDate())
                     && !alreadyLaunched(CloseCreditsQueueJob.class.getName())) {
                 new CloseCreditsQueueJob(annualCreditsState.getExecutionYear());
-                logWriter.println("Lauched CloseCreditsQueueJob");
+                taskLog("Lauched CloseCreditsQueueJob");
             }
         }
     }

@@ -21,8 +21,6 @@ package pt.ist.fenixedu.delegates.domain.util.email;
 import org.fenixedu.academic.domain.util.email.CurrentUserReplyTo;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.groups.Group;
-import org.fenixedu.bennu.core.groups.NobodyGroup;
-import org.fenixedu.bennu.core.groups.UserGroup;
 
 import pt.ist.fenixedu.delegates.domain.student.Delegate;
 
@@ -35,7 +33,7 @@ public class DelegateSender extends DelegateSender_Base {
     public DelegateSender(Delegate delegate) {
         setFromName(delegate.getUser().getPerson().getName() + " (" + delegate.getTitle() + ")");
         setFromAddress(getNoreplyMail());
-        setMembers(UserGroup.of(delegate.getUser()));
+        setMembers(delegate.getUser().groupOf());
         setRootDomainObject(Bennu.getInstance());
         addReplyTos(new CurrentUserReplyTo());
     }
@@ -45,7 +43,7 @@ public class DelegateSender extends DelegateSender_Base {
         if (getDelegateSet().iterator().next().isActive()) {
             return super.getMembers();
         }
-        return NobodyGroup.get();
+        return Group.nobody();
     }
 
 }

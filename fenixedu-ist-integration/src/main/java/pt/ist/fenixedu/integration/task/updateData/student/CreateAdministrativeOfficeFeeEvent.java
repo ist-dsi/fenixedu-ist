@@ -18,6 +18,8 @@
  */
 package pt.ist.fenixedu.integration.task.updateData.student;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.function.Predicate;
 
 import org.fenixedu.academic.domain.ExecutionYear;
@@ -63,7 +65,9 @@ public class CreateAdministrativeOfficeFeeEvent extends CronTask {
             }
         } catch (Exception e) {
             taskLog("Exception on student curricular plan with oid : %s\n", scp.getExternalId());
-            e.printStackTrace(getTaskLogWriter());
+            StringWriter writer = new StringWriter();
+            e.printStackTrace(new PrintWriter(writer));
+            taskLog(writer.toString());
         }
     }
 
@@ -78,7 +82,9 @@ public class CreateAdministrativeOfficeFeeEvent extends CronTask {
             }
         } catch (Exception e) {
             taskLog("Exception on person with oid : %s\n", person.getExternalId());
-            e.printStackTrace(getTaskLogWriter());
+            StringWriter writer = new StringWriter();
+            e.printStackTrace(new PrintWriter(writer));
+            taskLog(writer.toString());
         }
     }
 

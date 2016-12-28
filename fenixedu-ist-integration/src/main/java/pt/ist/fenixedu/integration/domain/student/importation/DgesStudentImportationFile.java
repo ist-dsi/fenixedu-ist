@@ -21,7 +21,7 @@ package pt.ist.fenixedu.integration.domain.student.importation;
 import org.fenixedu.academic.domain.EntryPhase;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.exceptions.DomainException;
-import org.fenixedu.academic.domain.person.RoleType;
+import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.spaces.domain.Space;
 
 import pt.ist.fenixframework.Atomic;
@@ -33,7 +33,7 @@ public class DgesStudentImportationFile extends DgesStudentImportationFile_Base 
 
     protected DgesStudentImportationFile(byte[] contents, String filename) {
         this();
-        init(filename, filename, contents, RoleType.MANAGER.actualGroup());
+        init(filename, filename, contents, Group.managers());
     }
 
     @Atomic

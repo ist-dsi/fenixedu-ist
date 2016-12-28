@@ -23,7 +23,6 @@
 <%@page import="pt.ist.fenixedu.teacher.evaluation.domain.teacher.TeacherService"%>
 <%@page import="org.fenixedu.academic.domain.Professorship"%>
 <%@page import="pt.ist.fenixedu.teacher.evaluation.domain.teacher.DegreeTeachingService"%>
-<%@page import="org.fenixedu.bennu.core.groups.Group"%>
 <%@page import="pt.ist.fenixedu.teacher.evaluation.domain.CreditsManagerGroup"%>
 <%@page import="org.fenixedu.bennu.core.domain.User"%>
 <%@page import="org.fenixedu.bennu.core.security.Authenticate"%>
@@ -91,7 +90,7 @@ $(document).ready(function() {
 User user = Authenticate.getUser();
 if(RoleType.SCIENTIFIC_COUNCIL.actualGroup().isMember(user)){
     request.setAttribute("roleType", "SCIENTIFIC_COUNCIL");
-}else  if (Group.parse("creditsManager").isMember(Authenticate.getUser())) {
+}else  if (new CreditsManagerGroup().isMember(Authenticate.getUser())) {
     request.setAttribute("roleType", "DEPARTMENT_ADMINISTRATIVE_OFFICE");
 }else{
     request.setAttribute("roleType", "");

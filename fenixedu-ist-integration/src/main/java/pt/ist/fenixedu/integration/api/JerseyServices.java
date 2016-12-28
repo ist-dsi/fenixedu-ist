@@ -68,8 +68,8 @@ import org.fenixedu.academic.util.MultiLanguageString;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.UserProfile;
-import org.fenixedu.bennu.core.groups.DynamicGroup;
-import org.fenixedu.bennu.io.servlets.FileDownloadServlet;
+import org.fenixedu.bennu.core.groups.Group;
+import org.fenixedu.bennu.io.servlet.FileDownloadServlet;
 import org.fenixedu.commons.stream.StreamUtils;
 import org.joda.time.LocalDate;
 import org.joda.time.YearMonthDay;
@@ -613,7 +613,7 @@ public class JerseyServices {
     public static Response addDeveloperRole(@PathParam("istid") String istid) {
         User user = User.findByUsername(istid);
         if (user != null && user.getPerson() != null) {
-            if (!DynamicGroup.get("developers").isMember(user)) {
+            if (!Group.dynamic("developers").isMember(user)) {
                 addDeveloper(user);
             }
         }
@@ -622,7 +622,7 @@ public class JerseyServices {
 
     @Atomic(mode = TxMode.WRITE)
     public static void addDeveloper(User user) {
-        DynamicGroup.get("developers").mutator().grant(user);
+        Group.dynamic("developers").mutator().grant(user);
     }
 
     @GET

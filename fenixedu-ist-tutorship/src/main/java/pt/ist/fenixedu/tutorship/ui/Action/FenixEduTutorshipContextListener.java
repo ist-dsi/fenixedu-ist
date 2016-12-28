@@ -31,7 +31,7 @@ import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.candidacy.StudentCandidacy;
 import org.fenixedu.academic.domain.candidacy.workflow.RegistrationOperation.RegistrationCreatedByCandidacy;
 import org.fenixedu.academic.domain.student.Registration;
-import org.fenixedu.bennu.signals.Signal;
+import org.fenixedu.bennu.core.signals.Signal;
 import org.joda.time.LocalDate;
 
 import pt.ist.fenixedu.tutorship.domain.Tutorship;

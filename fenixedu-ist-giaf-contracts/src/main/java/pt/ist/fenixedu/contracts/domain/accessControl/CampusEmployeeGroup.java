@@ -18,8 +18,7 @@
  */
 package pt.ist.fenixedu.contracts.domain.accessControl;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.accessControl.FenixGroup;
@@ -63,19 +62,14 @@ public class CampusEmployeeGroup extends FenixGroup {
     }
 
     @Override
-    public Set<User> getMembers() {
+    public Stream<User> getMembers() {
         return getMembers(new DateTime());
     }
 
     @Override
-    public Set<User> getMembers(DateTime when) {
-        Set<User> users = new HashSet<>();
-        for (final User user : Employee.EMPLOYEE_GROUP.getMembers()) {
-            if (user.getPerson() != null && isMember(user.getPerson(), campus, when)) {
-                users.add(user);
-            }
-        }
-        return users;
+    public Stream<User> getMembers(DateTime when) {
+        return Employee.EMPLOYEE_GROUP.getMembers().filter(
+                user -> user.getPerson() != null && isMember(user.getPerson(), campus, when));
     }
 
     @Override

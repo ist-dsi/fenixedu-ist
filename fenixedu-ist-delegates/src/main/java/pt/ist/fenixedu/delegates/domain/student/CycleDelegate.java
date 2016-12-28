@@ -32,7 +32,6 @@ import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.degreeStructure.CycleType;
 import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.bennu.core.domain.User;
-import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 
 import pt.ist.fenixedu.delegates.domain.accessControl.DelegateGroup;
@@ -95,7 +94,7 @@ public class CycleDelegate extends CycleDelegate_Base {
     @Override
     public void setSender(DelegateSender sender) {
         super.setSender(sender);
-        getSender().setMembers(UserGroup.of(getUser()));
+        getSender().setMembers(getUser().groupOf());
         setupRecipients();
     }
 

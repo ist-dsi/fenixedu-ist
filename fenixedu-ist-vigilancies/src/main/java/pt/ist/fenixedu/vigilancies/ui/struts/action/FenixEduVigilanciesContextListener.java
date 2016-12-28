@@ -38,9 +38,8 @@ import org.fenixedu.academic.service.services.manager.MergeExecutionCourses;
 import org.fenixedu.academic.service.services.resourceAllocationManager.exams.EditWrittenEvaluation.EditWrittenEvaluationEvent;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.domain.Bennu;
-import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
-import org.fenixedu.bennu.signals.Signal;
+import org.fenixedu.bennu.core.signals.Signal;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixedu.vigilancies.domain.Vigilancy;
@@ -99,7 +98,7 @@ public class FenixEduVigilanciesContextListener implements ServletContextListene
                 }
                 Sender sender = Bennu.getInstance().getSystemSender();
                 new Message(sender, new ConcreteReplyTo(group.getContactEmail()).asCollection(), new Recipient(
-                        UserGroup.of(Person.convertToUsers(tos))).asCollection(), subject, body, "");
+                        Person.convertToUserGroup(tos)).asCollection(), subject, body, "");
 
             }
         }
@@ -136,7 +135,7 @@ public class FenixEduVigilanciesContextListener implements ServletContextListene
                 }
                 Sender sender = Bennu.getInstance().getSystemSender();
                 new Message(sender, new ConcreteReplyTo(group.getContactEmail()).asCollection(), new Recipient(
-                        UserGroup.of(Person.convertToUsers(tos))).asCollection(), subject, body, "");
+                        Person.convertToUserGroup(tos)).asCollection(), subject, body, "");
             }
         }
     }

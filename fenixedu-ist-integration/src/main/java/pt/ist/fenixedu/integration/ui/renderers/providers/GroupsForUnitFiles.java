@@ -45,7 +45,7 @@ public class GroupsForUnitFiles implements DataProvider {
         for (final PersistentGroupMembers persistentMembers : unit.getPersistentGroupsSet()) {
             groups.add(MembersLinkGroup.get(persistentMembers));
         }
-        groups.addAll(((UnitFileBean) source).getGroups());
+//        groups.addAll(((UnitFileBean) source).getGroups());
         return groups;
     }
 }

@@ -29,16 +29,16 @@
 <%@page import="org.fenixedu.academic.domain.EvaluationConfiguration"%>
 <%@page import="org.fenixedu.commons.i18n.I18N"%>
 <%@page import="org.fenixedu.bennu.core.domain.UserProfile"%>
-<%@page import="org.fenixedu.bennu.core.groups.DynamicGroup"%>
 <%@page import="org.fenixedu.bennu.core.security.Authenticate"%>
 <%@page import="org.fenixedu.academic.ui.renderers.student.curriculum.StudentCurricularPlanRenderer"%>
+<%@ page import="org.fenixedu.bennu.core.groups.Group" %>
 <html:xhtml/>
 
 <!-- showStudentCurriculum.jsp -->
 
 <h2><bean:message key="message.student.curriculum" bundle="APPLICATION_RESOURCES" /></h2>
 
-<bean:define id="isPedagogicalCouncilMember" value="<%= ((java.lang.Boolean) DynamicGroup.get("pedagogicalCouncil").isMember(Authenticate.getUser())).toString() %>" />
+<bean:define id="isPedagogicalCouncilMember" value="<%= ((java.lang.Boolean) Group.dynamic("pedagogicalCouncil").isMember(Authenticate.getUser())).toString() %>" />
 <logic:equal name="isPedagogicalCouncilMember" value="true">
 	<fr:form action="/studentTutorshipCurriculum.do?method=showStudentCurriculum">
 		<fr:edit id="filterForm" name="tutorateBean" schema="tutorship.student.number">

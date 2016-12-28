@@ -1,5 +1,6 @@
 package pt.ist.registration.process.ui.service;
 
+import com.mitchellbosecke.pebble.loader.StringLoader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -104,7 +105,7 @@ public class RegistrationDeclarationCreatorService {
     private byte[] generateDocument(Map<String, Object> ctx, Registration registration)
             throws PebbleException, DocumentException, IOException {
 
-        PebbleEngine engine = new PebbleEngine();
+        PebbleEngine engine = new PebbleEngine.Builder().loader(new StringLoader()).build();
 
         Document document = new Document(PageSize.A4, 50, 50, 50, 50);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();

@@ -34,12 +34,12 @@ import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.organizationalStructure.AccountabilityTypeEnum;
 import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.bennu.core.domain.User;
-import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.joda.time.Interval;
 
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.PersonFunction;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonContractSituation;
+import pt.ist.fenixedu.teacher.evaluation.domain.CreditsManagerGroup;
 import pt.ist.fenixedu.teacher.evaluation.domain.teacher.InstitutionWorkTime;
 import pt.ist.fenixedu.teacher.evaluation.domain.teacher.OtherService;
 import pt.ist.fenixedu.teacher.evaluation.domain.teacher.ReductionService;
@@ -70,7 +70,7 @@ public class AnnualTeachingCreditsByPeriodBean implements Serializable {
             boolean canLockAndEditTeacherCredits = inValidCreditsPeriod && !isLocked;
             setCanLockTeacherCredits(canLockAndEditTeacherCredits);
             setCanEditTeacherCredits(canLockAndEditTeacherCredits);
-        } else if (Group.parse("creditsManager").isMember(user) || RoleType.SCIENTIFIC_COUNCIL.isMember(user)) {
+        } else if (new CreditsManagerGroup().isMember(user) || RoleType.SCIENTIFIC_COUNCIL.isMember(user)) {
             boolean inValidTeacherCreditsPeriod = TeacherCreditsFillingCE.isInValidTeacherCreditsPeriod(executionPeriod);
             setCanUnlockTeacherCredits(inValidCreditsPeriod && inValidTeacherCreditsPeriod && isLocked);
             setCanEditTeacherCredits(RoleType.SCIENTIFIC_COUNCIL.isMember(user)

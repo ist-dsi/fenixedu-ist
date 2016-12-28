@@ -18,8 +18,6 @@
  */
 package pt.ist.fenixedu.delegates.domain.accessControl;
 
-import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.Degree;
@@ -114,14 +112,13 @@ public class DelegateGroup extends CustomGroup {
     }
 
     @Override
-    public Set<User> getMembers() {
+    public Stream<User> getMembers() {
         return getMembers(new DateTime());
     }
 
     @Override
-    public Set<User> getMembers(DateTime when) {
-        return filterMatches(Bennu.getInstance().getDelegatesSet().stream(), when).map(d -> d.getUser()).collect(
-                Collectors.toSet());
+    public Stream<User> getMembers(DateTime when) {
+        return filterMatches(Bennu.getInstance().getDelegatesSet().stream(), when).map(d -> d.getUser());
     }
 
     @Override

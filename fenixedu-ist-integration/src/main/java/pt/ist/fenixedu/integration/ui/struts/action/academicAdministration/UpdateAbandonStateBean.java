@@ -41,7 +41,6 @@ import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.academic.domain.util.email.SystemSender;
 import org.fenixedu.academic.util.predicates.AndPredicate;
 import org.fenixedu.bennu.core.domain.Bennu;
-import org.fenixedu.bennu.core.groups.UserGroup;
 import org.joda.time.YearMonthDay;
 
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
@@ -194,7 +193,7 @@ public class UpdateAbandonStateBean implements Serializable {
 
         SystemSender systemSender = Bennu.getInstance().getSystemSender();
         List<Recipient> recipientList = new ArrayList<Recipient>();
-        recipientList.add(new Recipient(UserGroup.of(person.getUser())));
+        recipientList.add(new Recipient(person.getUser().groupOf()));
 
         String body = buildMessage(registration);
         String subject =

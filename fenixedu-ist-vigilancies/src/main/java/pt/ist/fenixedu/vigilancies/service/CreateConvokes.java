@@ -29,7 +29,6 @@ import org.fenixedu.academic.domain.util.email.ConcreteReplyTo;
 import org.fenixedu.academic.domain.util.email.Message;
 import org.fenixedu.academic.domain.util.email.PersonSender;
 import org.fenixedu.academic.domain.util.email.Recipient;
-import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
 
@@ -75,8 +74,8 @@ public class CreateConvokes {
                                     beginDateString });
 
             new Message(PersonSender.newInstance(person), new ConcreteReplyTo(replyTo).asCollection(), new Recipient(
-                    UserGroup.of(Person.convertToUsers(recievers))).asCollection(), Collections.EMPTY_LIST,
-                    Collections.EMPTY_LIST, subject, emailMessage, bccs);
+                    Person.convertToUserGroup(recievers)).asCollection(), Collections.EMPTY_LIST, Collections.EMPTY_LIST,
+                    subject, emailMessage, bccs);
         }
     }
 }

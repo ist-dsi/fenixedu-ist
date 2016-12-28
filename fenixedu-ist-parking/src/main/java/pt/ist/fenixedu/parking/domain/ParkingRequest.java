@@ -32,9 +32,7 @@ import org.fenixedu.academic.domain.contacts.Phone;
 import org.fenixedu.academic.domain.organizationalStructure.Party;
 import org.fenixedu.academic.service.services.commons.FactoryExecutor;
 import org.fenixedu.bennu.core.domain.Bennu;
-import org.fenixedu.bennu.core.groups.DynamicGroup;
 import org.fenixedu.bennu.core.groups.Group;
-import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.commons.i18n.I18N;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -492,8 +490,8 @@ public class ParkingRequest extends ParkingRequest_Base {
         }
 
         private Group getGroup(Party party) {
-            final Group personGroup = UserGroup.of(((Person) party).getUser());
-            final Group roleGroup = DynamicGroup.get("parkingManager");
+            final Group personGroup = ((Person) party).getUser().groupOf();
+            final Group roleGroup = Group.dynamic("parkingManager");
             return personGroup.or(roleGroup);
         }
 

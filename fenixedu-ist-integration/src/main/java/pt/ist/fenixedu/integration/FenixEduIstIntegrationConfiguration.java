@@ -110,6 +110,10 @@ public class FenixEduIstIntegrationConfiguration {
 
         @ConfigurationProperty(key = "pushnotifications.token", defaultValue = "someaccesstoken")
         public String getPushNotificationsToken();
+
+        @ConfigurationProperty(key = "ist.cas.enabled", defaultValue = "false")
+        public boolean istCasEnable();
+
     }
 
     public static ConfigurationProperties getConfiguration() {
