@@ -43,13 +43,16 @@
 
     <dependencies>
         <dependency>
-        <groupId>org.fenixedu</groupId>
-        <artifactId>bennu-modular-rendering</artifactId>
-        <version>1.0.0</version>
+            <groupId>org.fenixedu</groupId>
+            <artifactId>fenixedu-academic</artifactId>
         </dependency>
         <dependency>
             <groupId>org.fenixedu</groupId>
-            <artifactId>fenixedu-academic</artifactId>
+            <artifactId>fenixedu-cms</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.fenixedu</groupId>
+            <artifactId>fenixedu-learning</artifactId>
         </dependency>
         <dependency>
             <groupId>pt.ist</groupId>
@@ -67,14 +70,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.fenixedu</groupId>
-            <artifactId>bennu-scheduler</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>ojdbc14</artifactId>
-        </dependency>
-        <dependency>
             <groupId>pt.ist</groupId>
             <artifactId>fenixedu-id-cards</artifactId>
         </dependency>
@@ -90,16 +85,48 @@
         </dependency>
         <dependency>
             <groupId>org.fenixedu</groupId>
-            <artifactId>fenixedu-learning</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.fenixedu</groupId>
             <artifactId>fenixedu-academic-thesis</artifactId>
         </dependency>
         <dependency>
             <groupId>pt.ist</groupId>
             <artifactId>fenixedu-ist-parking</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.fenixedu</groupId>
+            <artifactId>bennu-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.fenixedu</groupId>
+            <artifactId>bennu-io</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.fenixedu</groupId>
+            <artifactId>bennu-spring</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.fenixedu</groupId>
+            <artifactId>fenixedu-commons</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.fenixedu</groupId>
+            <artifactId>bennu-modular-rendering</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
         </dependency>
     </dependencies>
 

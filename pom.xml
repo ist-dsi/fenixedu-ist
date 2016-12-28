@@ -17,6 +17,38 @@
     <name>FenixEdu IST Contribution Modules</name>
     <inceptionYear>2013</inceptionYear>
 
+    <properties>
+        <version.org.fenixedu.academic>5.4.0.RC3</version.org.fenixedu.academic>
+        <version.org.fenixedu.fenixedu-cms>2.0.0</version.org.fenixedu.fenixedu-cms>
+        <version.org.fenixedu.fenixedu-learning>2.0.0</version.org.fenixedu.fenixedu-learning>
+        <version.org.fenixedu.fenixedu-academic-thesis>3.3.2</version.org.fenixedu.fenixedu-academic-thesis>
+        <version.org.fenixedu.fenixedu-spaces>1.6.1</version.org.fenixedu.fenixedu-spaces>
+        <version.pt.ist.fenixedu-id-cards>2.1.0</version.pt.ist.fenixedu-id-cards>
+        <version.pt.ist.fenixedu-ulisboa-cgdIntegration>1.2.0.IST</version.pt.ist.fenixedu-ulisboa-cgdIntegration>
+        <version.org.fenixedu.bennu>3.4.0</version.org.fenixedu.bennu>
+        <version.org.fenixedu.bennu-spring>1.1.0</version.org.fenixedu.bennu-spring>
+        <version.org.fenixedu.bennu-oauth>1.0.3</version.org.fenixedu.bennu-oauth>
+        <version.org.fenixedu.bennu-renderers>5.0.0</version.org.fenixedu.bennu-renderers>
+        <version.org.fenixedu.fenixedu-commons>1.1.1</version.org.fenixedu.fenixedu-commons>
+        <version.org.fenixedu.bennu-modular-rendering>1.0.0</version.org.fenixedu.bennu-modular-rendering>
+        <version.org.fenixedu.bennu-social>1.0.0</version.org.fenixedu.bennu-social>
+        <version.com.google.guava.guava>17.0</version.com.google.guava.guava>
+        <version.joda.time.joda.time>2.3</version.joda.time.joda.time>
+        <version.com.google.code.gson.gson>2.2.4</version.com.google.code.gson.gson>
+        <version.javax.ws.rs.javax.ws.rs.api>2.0</version.javax.ws.rs.javax.ws.rs.api>
+        <version.com.sun.mail.javax.mail>1.5.1</version.com.sun.mail.javax.mail>
+        <version.javax.faces.jsf-api>1.1_01</version.javax.faces.jsf-api>
+        <version.com.lowagie.itext>2.1.0</version.com.lowagie.itext>
+        <version.org.glassfish.jersey>2.9</version.org.glassfish.jersey>
+        <version.com.mitchellbosecke.pebble>1.0.0</version.com.mitchellbosecke.pebble>
+        <version.pt.ist.drive-sdk>1.3.0</version.pt.ist.drive-sdk>
+    </properties>
+
+    <issueManagement>
+        <system>JIRA</system>
+        <url>https://jira.fenixedu.org/browse/FIST</url>
+    </issueManagement>
+
     <licenses>
         <license>
             <name>GNU Lesser General Public License v3.0</name>
@@ -37,53 +69,153 @@
             <dependency>
                 <groupId>org.fenixedu</groupId>
                 <artifactId>fenixedu-academic</artifactId>
-                <version>5.4.0.RC3</version>
+                <version>${version.org.fenixedu.academic}</version>
             </dependency>
             <dependency>
                 <groupId>org.fenixedu</groupId>
-                <artifactId>bennu-scheduler</artifactId>
-                <version>3.4.1</version>
-            </dependency>
-            <dependency>
-                <groupId>com.oracle</groupId>
-                <artifactId>ojdbc14</artifactId>
-                <version>9.0.2.0.0</version>
-            </dependency>
-            <dependency>
-                <groupId>pt.ist</groupId>
-                <artifactId>fenixedu-id-cards</artifactId>
-                <version>2.1.0</version>
+                <artifactId>fenixedu-cms</artifactId>
+                <version>${version.org.fenixedu.fenixedu-cms}</version>
             </dependency>
             <dependency>
                 <groupId>org.fenixedu</groupId>
                 <artifactId>fenixedu-learning</artifactId>
-                <version>2.0.0</version>
+                <version>${version.org.fenixedu.fenixedu-learning}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.fenixedu</groupId>
+                <artifactId>fenixedu-spaces</artifactId>
+                <version>${version.org.fenixedu.fenixedu-spaces}</version>
             </dependency>
             <dependency>
                 <groupId>org.fenixedu</groupId>
                 <artifactId>fenixedu-academic-thesis</artifactId>
-                <version>3.3.2</version>
+                <version>${version.org.fenixedu.fenixedu-academic-thesis}</version>
             </dependency>
             <dependency>
-                <groupId>com.healthmarketscience.jackcess</groupId>
-                <artifactId>jackcess</artifactId>
-                <version>1.2.8</version>
+                <groupId>pt.ist</groupId>
+                <artifactId>fenixedu-id-cards</artifactId>
+                <version>${version.pt.ist.fenixedu-id-cards}</version>
             </dependency>
             <dependency>
-                <groupId>net.sf.jasperreports</groupId>
-                <artifactId>jasperreports</artifactId>
-                <version>3.6.0</version>
+                <groupId>pt.ist</groupId>
+                <artifactId>fenixedu-ulisboa-cgdIntegration</artifactId>
+                <version>${version.pt.ist.fenixedu-ulisboa-cgdIntegration}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.fenixedu</groupId>
+                <artifactId>bennu-core</artifactId>
+                <version>${version.org.fenixedu.bennu}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.fenixedu</groupId>
+                <artifactId>bennu-scheduler</artifactId>
+                <version>${version.org.fenixedu.bennu}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.fenixedu</groupId>
+                <artifactId>bennu-portal</artifactId>
+                <version>${version.org.fenixedu.bennu}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.fenixedu</groupId>
+                <artifactId>bennu-io</artifactId>
+                <version>${version.org.fenixedu.bennu}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.fenixedu</groupId>
+                <artifactId>bennu-spring</artifactId>
+                <version>${version.org.fenixedu.bennu-spring}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.fenixedu</groupId>
+                <artifactId>bennu-cas-client</artifactId>
+                <version>${version.org.fenixedu.bennu}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.fenixedu</groupId>
+                <artifactId>bennu-oauth</artifactId>
+                <version>${version.org.fenixedu.bennu-oauth}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.fenixedu</groupId>
+                <artifactId>bennu-renderers</artifactId>
+                <version>${version.org.fenixedu.bennu-renderers}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.fenixedu</groupId>
+                <artifactId>bennu-struts</artifactId>
+                <version>${version.org.fenixedu.bennu-renderers}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.fenixedu</groupId>
+                <artifactId>fenixedu-commons</artifactId>
+                <version>${version.org.fenixedu.fenixedu-commons}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.fenixedu</groupId>
+                <artifactId>bennu-modular-rendering</artifactId>
+                <version>${version.org.fenixedu.bennu-modular-rendering}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.fenixedu</groupId>
+                <artifactId>bennu-social</artifactId>
+                <version>${version.org.fenixedu.bennu-social}</version>
                 <exclusions>
                     <exclusion>
-                        <artifactId>jdtcore</artifactId>
-                        <groupId>eclipse</groupId>
+                        <groupId>com.google.guava</groupId>
+                        <artifactId>guava-jdk5</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${version.com.google.guava.guava}</version>
+            </dependency>
+            <dependency>
+                <groupId>joda-time</groupId>
+                <artifactId>joda-time</artifactId>
+                <version>${version.joda.time.joda.time}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>${version.com.google.code.gson.gson}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.ws.rs</groupId>
+                <artifactId>javax.ws.rs-api</artifactId>
+                <version>${version.javax.ws.rs.javax.ws.rs.api}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.mail</groupId>
+                <artifactId>javax.mail</artifactId>
+                <version>${version.com.sun.mail.javax.mail}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.faces</groupId>
+                <artifactId>jsf-api</artifactId>
+                <version>${version.javax.faces.jsf-api}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.lowagie</groupId>
                 <artifactId>itext</artifactId>
-                <version>2.1.0</version>
+                <version>${version.com.lowagie.itext}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.media</groupId>
+                <artifactId>jersey-media-multipart</artifactId>
+                <version>${version.org.glassfish.jersey}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.mitchellbosecke</groupId>
+                <artifactId>pebble</artifactId>
+                <version>${version.com.mitchellbosecke.pebble}</version>
+            </dependency>
+            <dependency>
+                <groupId>pt.ist</groupId>
+                <artifactId>drive-sdk</artifactId>
+                <version>${version.pt.ist.drive-sdk}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

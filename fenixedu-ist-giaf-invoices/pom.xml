@@ -11,6 +11,10 @@
 
     <name>FenixEdu IST GIAF Invoices</name>
 
+    <properties>
+        <version.pt.ist.giaf-client-financial-documents>1.2.0</version.pt.ist.giaf-client-financial-documents>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.fenixedu</groupId>
@@ -19,7 +23,39 @@
         <dependency>
             <groupId>pt.ist</groupId>
             <artifactId>giaf-client-financial-documents</artifactId>
-            <version>1.2.0</version>
+            <version>${version.pt.ist.giaf-client-financial-documents}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.fenixedu</groupId>
+            <artifactId>bennu-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.fenixedu</groupId>
+            <artifactId>bennu-scheduler</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.fenixedu</groupId>
+            <artifactId>bennu-spring</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.fenixedu</groupId>
+            <artifactId>fenixedu-commons</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
         </dependency>
     </dependencies>
 

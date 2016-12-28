@@ -13,6 +13,8 @@
 
     <properties>
         <jasper.threads>3</jasper.threads>
+
+        <version.net.sf.jasperreports.jasperreports>3.6.0</version.net.sf.jasperreports.jasperreports>
     </properties>
 
     <build>
@@ -33,7 +35,7 @@
                     <dependency>
                         <groupId>net.sf.jasperreports</groupId>
                         <artifactId>jasperreports</artifactId>
-                        <version>3.6.0</version>
+                        <version>${version.net.sf.jasperreports.jasperreports}</version>
                     </dependency>
                     <dependency>
                         <groupId>log4j</groupId>
@@ -61,12 +63,19 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>net.sf.jasperreports</groupId>
-            <artifactId>jasperreports</artifactId>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.lowagie</groupId>
-            <artifactId>itext</artifactId>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports</artifactId>
+            <version>${version.net.sf.jasperreports.jasperreports}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>jdtcore</artifactId>
+                    <groupId>eclipse</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
@@ -76,5 +85,4 @@
             <url>https://repo.fenixedu.org/fenixedu-maven-repository</url>
         </repository>
     </repositories>
-
 </project>

@@ -11,6 +11,10 @@
 
     <name>FenixEdu IST Parking</name>
 
+    <properties>
+        <version.com.healthmarketscience.jackcess.jackcess>1.2.8</version.com.healthmarketscience.jackcess.jackcess>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.fenixedu</groupId>
@@ -26,8 +30,41 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.fenixedu</groupId>
+            <artifactId>bennu-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.fenixedu</groupId>
+            <artifactId>bennu-scheduler</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.fenixedu</groupId>
+            <artifactId>bennu-renderers</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.fenixedu</groupId>
+            <artifactId>bennu-struts</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.fenixedu</groupId>
+            <artifactId>fenixedu-commons</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.healthmarketscience.jackcess</groupId>
             <artifactId>jackcess</artifactId>
+            <version>${version.com.healthmarketscience.jackcess.jackcess}</version>
         </dependency>
     </dependencies>
 

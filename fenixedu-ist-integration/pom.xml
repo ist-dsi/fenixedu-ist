@@ -11,6 +11,14 @@
 
     <name>FenixEdu IST Integration</name>
 
+    <properties>
+        <version.com.fasterxml.jackson.jaxrs.jackson-jaxrs-json-provider>2.2.3</version.com.fasterxml.jackson.jaxrs.jackson-jaxrs-json-provider>
+        <version.com.fasterxml.jackson.core.jackson-databind>2.2.3</version.com.fasterxml.jackson.core.jackson-databind>
+        <version.com.fasterxml.jackson.core.jackson-annotations>2.2.3</version.com.fasterxml.jackson.core.jackson-annotations>
+        <version.com.googlecode.json-simple.json-simple>1.1</version.com.googlecode.json-simple.json-simple>
+        <version.org.mnode.ical4j.ical4j>1.0.5.2</version.org.mnode.ical4j.ical4j>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.fenixedu</groupId>
@@ -18,11 +26,7 @@
         </dependency>
         <dependency>
             <groupId>org.fenixedu</groupId>
-            <artifactId>bennu-scheduler</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>ojdbc14</artifactId>
+            <artifactId>fenixedu-spaces</artifactId>
         </dependency>
         <dependency>
             <groupId>pt.ist</groupId>
@@ -35,7 +39,6 @@
         <dependency>
             <groupId>org.fenixedu</groupId>
             <artifactId>fenixedu-cms</artifactId>
-            <version>2.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.fenixedu</groupId>
@@ -102,19 +105,93 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.fasterxml.jackson.jaxrs</groupId>
-            <artifactId>jackson-jaxrs-json-provider</artifactId>
-            <version>2.2.3</version>
+            <groupId>pt.ist</groupId>
+            <artifactId>fenixedu-ulisboa-cgdIntegration</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.fenixedu</groupId>
+            <artifactId>bennu-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.fenixedu</groupId>
+            <artifactId>bennu-scheduler</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.fenixedu</groupId>
+            <artifactId>bennu-portal</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.fenixedu</groupId>
+            <artifactId>bennu-io</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.fenixedu</groupId>
+            <artifactId>bennu-spring</artifactId>
         </dependency>
         <dependency>
             <groupId>org.fenixedu</groupId>
             <artifactId>bennu-oauth</artifactId>
-            <version>1.0.3</version>
         </dependency>
         <dependency>
-          <groupId>pt.ist</groupId>
-          <artifactId>fenixedu-ulisboa-cgdIntegration</artifactId>
-          <version>1.2.0.IST</version>
+            <groupId>org.fenixedu</groupId>
+            <artifactId>bennu-renderers</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.fenixedu</groupId>
+            <artifactId>bennu-struts</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.fenixedu</groupId>
+            <artifactId>fenixedu-commons</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.faces</groupId>
+            <artifactId>jsf-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>${version.com.googlecode.json-simple.json-simple}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.jaxrs</groupId>
+            <artifactId>jackson-jaxrs-json-provider</artifactId>
+            <version>${version.com.fasterxml.jackson.jaxrs.jackson-jaxrs-json-provider}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${version.com.fasterxml.jackson.core.jackson-annotations}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${version.com.fasterxml.jackson.core.jackson-databind}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mnode.ical4j</groupId>
+            <artifactId>ical4j</artifactId>
+            <version>${version.org.mnode.ical4j.ical4j}</version>
         </dependency>
     </dependencies>
 
