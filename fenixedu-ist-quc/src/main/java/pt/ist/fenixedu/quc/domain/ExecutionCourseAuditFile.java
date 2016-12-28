@@ -20,7 +20,6 @@ package pt.ist.fenixedu.quc.domain;
 
 import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.bennu.core.groups.Group;
-import org.fenixedu.bennu.core.groups.UserGroup;
 
 public class ExecutionCourseAuditFile extends ExecutionCourseAuditFile_Base {
 
@@ -31,8 +30,8 @@ public class ExecutionCourseAuditFile extends ExecutionCourseAuditFile_Base {
     }
 
     private Group getPermissionGroup() {
-        Group teacherGroup = UserGroup.of(getExecutionCourseAudit().getTeacherAuditor().getPerson().getUser());
-        Group studentGroup = UserGroup.of(getExecutionCourseAudit().getStudentAuditor().getPerson().getUser());
+        Group teacherGroup = getExecutionCourseAudit().getTeacherAuditor().getPerson().getUser().groupOf();
+        Group studentGroup = getExecutionCourseAudit().getStudentAuditor().getPerson().getUser().groupOf();
         Group pedagogicalCouncil = RoleType.PEDAGOGICAL_COUNCIL.actualGroup();
         return teacherGroup.or(studentGroup).or(pedagogicalCouncil);
     }

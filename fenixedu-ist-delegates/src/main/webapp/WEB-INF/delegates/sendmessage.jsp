@@ -28,6 +28,7 @@
 <h1> Selecionar Disciplinas<small></small></h1>
 <spring:url var="formActionUrl" value="${action}"/>
 <form class="form-horizontal" role="form">
+  ${csrf.field()}
   <div class="form-group">
     <label for="inputEmail3" class="col-sm-1 control-label">Remetente</label>
     <div class="col-sm-11">
@@ -70,9 +71,7 @@
 
 
 <form:form modelAttribute="students" role="form" method="post" action="${formActionUrl}" enctype="multipart/form-data" class="form-horizontal">
-
-
-
+${csrf.field()}
 <button type="submit" class="btn btn-default">
 	<spring:message code="label.submit" />
 </button>

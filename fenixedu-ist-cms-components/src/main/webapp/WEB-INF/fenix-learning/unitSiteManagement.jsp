@@ -293,6 +293,7 @@ ${portal.toolkit()}
 <!-- Modal panel for deleting an banner -->
 <div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-hidden="true">
     <form id="deleteForm" method="post" action="#">
+        ${csrf.field()}
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">

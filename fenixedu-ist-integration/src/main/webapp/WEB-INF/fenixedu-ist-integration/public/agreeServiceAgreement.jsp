@@ -54,6 +54,7 @@
 
 <div style="width: 80%; margin: 1em 1em 0 0; padding: 0 1em 1em 1em; text-align: left;">
 	<form action="${acceptServiceAgreementUrl}" method="post">
+		${csrf.field()}
 		<p>
 			<input type="checkbox" name="agreedServiceAgreement"/>
 			${i18n.message("oauthapps.text.manage.applications.agree.terms")}

@@ -18,15 +18,11 @@
  */
 package pt.ist.fenixedu.teacher.evaluation.domain.credits;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.bennu.core.groups.Group;
-import org.fenixedu.bennu.core.groups.UnionGroup;
-import org.fenixedu.bennu.core.groups.UserGroup;
+import pt.ist.fenixedu.teacher.evaluation.domain.CreditsManagerGroup;
 
 public class AnnualTeachingCreditsDocument extends AnnualTeachingCreditsDocument_Base {
 
@@ -35,20 +31,19 @@ public class AnnualTeachingCreditsDocument extends AnnualTeachingCreditsDocument
         super();
         String filename = getFilename(annualTeachingCredits);
 
-        final Set<Group> groups = new HashSet<>();
+        Group group = RoleType.SCIENTIFIC_COUNCIL.actualGroup();
         final Teacher teacher = annualTeachingCredits.getTeacher();
         if (teacher != null) {
             final Person person = teacher.getPerson();
             if (person != null) {
-                groups.add(UserGroup.of(person.getUser()));
+                group = group.grant(person.getUser());
             }
         }
-        groups.add(RoleType.SCIENTIFIC_COUNCIL.actualGroup());
         if (!hasConfidencialInformation) {
-            groups.add(Group.parse("creditsManager"));
+            group = group.or(new CreditsManagerGroup());
         }
 
-        init(filename, filename, content, UnionGroup.of(groups));
+        init(filename, filename, content, group);
         setAnnualTeachingCredits(annualTeachingCredits);
         setHasConfidencialInformation(hasConfidencialInformation);
     }

@@ -44,6 +44,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.google.common.base.MoreObjects;
 import org.fenixedu.academic.FenixEduAcademicConfiguration;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.predicate.AccessControl;
@@ -60,7 +61,6 @@ import org.slf4j.LoggerFactory;
 import pt.ist.fenixedu.contracts.domain.LegacyRoleUtils;
 import pt.ist.fenixframework.FenixFramework;
 
-import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
 
@@ -191,7 +191,7 @@ public class SupportFormResource extends BennuRestResource {
     private void sendEmail(String from, String subject, String body, SupportBean bean) {
         Properties props = new Properties();
         props.put("mail.smtp.host",
-                Objects.firstNonNull(FenixEduAcademicConfiguration.getConfiguration().getMailSmtpHost(), "localhost"));
+                MoreObjects.firstNonNull(FenixEduAcademicConfiguration.getConfiguration().getMailSmtpHost(), "localhost"));
         Session session = Session.getDefaultInstance(props, null);
         MimeMessage message = new MimeMessage(session);
         try {

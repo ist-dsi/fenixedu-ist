@@ -18,6 +18,8 @@
  */
 package pt.ist.fenixedu.integration.task.updateData.student;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Locale;
 import java.util.function.Predicate;
 
@@ -76,7 +78,9 @@ public class CreateGratuityEvents extends CronTask {
             }
         } catch (Exception e) {
             taskLog("Exception on student curricular plan with oid : %s\n", studentCurricularPlan.getExternalId());
-            e.printStackTrace(getTaskLogWriter());
+            StringWriter writer = new StringWriter();
+            e.printStackTrace(new PrintWriter(writer));
+            taskLog(writer.toString());
         }
     }
 

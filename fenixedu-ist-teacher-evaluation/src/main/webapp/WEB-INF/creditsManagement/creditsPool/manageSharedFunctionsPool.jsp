@@ -13,7 +13,8 @@
 
 <spring:url var="viewUrl" value="/sharedFunctionsPool"></spring:url>
 <form:form role="form" modelAttribute="departmentCreditsBean" method="GET" class="form-horizontal" action="${viewUrl}">
-        <div class="form-group">
+    ${csrf.field()}
+    <div class="form-group">
                 <label for="executionYear" class="col-sm-2 control-label">${fr:message('resources.ApplicationResources', 'label.executionYear')}:</label>
                 <div class="col-sm-10">
                         <form:select path="executionYear" id="executionYear" class="form-control col-sm-11" required="required">

@@ -18,6 +18,7 @@
  */
 package pt.ist.fenixedu.integration.task.exportData;
 
+import java.util.Optional;
 import pt.ist.fenixedu.contracts.domain.LegacyRoleUtils;
 import pt.ist.fenixframework.Atomic.TxMode;
 
@@ -64,9 +65,8 @@ public class ExportProfiles extends CustomTask {
         object.addProperty("familyNames", up.getFamilyNames());
         object.addProperty("displayName", up.getDisplayName());
         object.addProperty("email", up.getEmail());
-        object.add("userAliases", aliasesFor(up));
-        LocalDate expiration = up.getUser().getExpiration();
-        object.addProperty("expiration", expiration == null ? null : expiration.toString());
+        Optional<LocalDate> expiration = up.getUser().getExpiration();
+        object.addProperty("expiration", expiration.map(Object::toString).orElse(null));
         object.add("roles", LegacyRoleUtils.mainRoleKeys(up.getUser()).stream().map(JsonPrimitive::new).collect(toJsonArray()));
         return object;
     }

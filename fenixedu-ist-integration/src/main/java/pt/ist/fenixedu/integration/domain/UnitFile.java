@@ -27,7 +27,7 @@ import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.bennu.core.groups.Group;
-import org.fenixedu.bennu.io.servlets.FileDownloadServlet;
+import org.fenixedu.bennu.io.servlet.FileDownloadServlet;
 
 import pt.ist.fenixedu.integration.domain.accessControl.MembersLinkGroup;
 import pt.ist.fenixframework.dml.runtime.RelationAdapter;

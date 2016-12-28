@@ -35,6 +35,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
+import com.google.common.base.MoreObjects;
 import org.fenixedu.academic.FenixEduAcademicConfiguration;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.io.domain.FileStorage;
@@ -46,7 +47,6 @@ import org.fenixedu.bennu.scheduler.annotation.Task;
 
 import pt.ist.fenixedu.integration.FenixEduIstIntegrationConfiguration;
 
-import com.google.common.base.Objects;
 import com.google.common.io.ByteStreams;
 
 @Task(englishTitle = "Checks the AFS store's quota", readOnly = true)
@@ -91,7 +91,7 @@ public class CheckStoreQuota extends CronTask {
     private void sendEmail(String subject, String body, String to) throws Exception {
         Properties props = new Properties();
         props.put("mail.smtp.host",
-                Objects.firstNonNull(FenixEduAcademicConfiguration.getConfiguration().getMailSmtpHost(), "localhost"));
+                MoreObjects.firstNonNull(FenixEduAcademicConfiguration.getConfiguration().getMailSmtpHost(), "localhost"));
         Session session = Session.getDefaultInstance(props, null);
         MimeMessage message = new MimeMessage(session);
         message.setFrom(new InternetAddress(Bennu.getInstance().getSystemSender().getFromAddress()));

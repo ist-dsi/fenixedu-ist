@@ -30,6 +30,7 @@ import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
 
+import pt.ist.fenixedu.teacher.evaluation.domain.CreditsManagerGroup;
 import pt.ist.fenixedu.teacher.evaluation.domain.credits.CreditsPersonFunctionsSharedQueueJob;
 
 public abstract class TeacherCreditsFillingCE extends TeacherCreditsFillingCE_Base {
@@ -156,7 +157,7 @@ public abstract class TeacherCreditsFillingCE extends TeacherCreditsFillingCE_Ba
     }
 
     public static TeacherCreditsFillingCE getValidCreditsPeriod(ExecutionSemester executionSemester, User user) {
-        if (org.fenixedu.bennu.core.groups.Group.parse("creditsManager").isMember(user)) {
+        if (new CreditsManagerGroup().isMember(user)) {
             return TeacherCreditsFillingForDepartmentAdmOfficeCE.getTeacherCreditsFillingForDepartmentAdmOffice(executionSemester
                     .getAcademicInterval());
         }

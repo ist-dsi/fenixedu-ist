@@ -20,7 +20,7 @@ package pt.ist.fenixedu.cmscomponents.ui.spring;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static org.fenixedu.bennu.io.servlets.FileDownloadServlet.getDownloadUrl;
+import static org.fenixedu.bennu.io.servlet.FileDownloadServlet.getDownloadUrl;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -32,8 +32,7 @@ import java.util.stream.Collectors;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.exceptions.BennuCoreDomainException;
-import org.fenixedu.bennu.core.groups.AnyoneGroup;
-import org.fenixedu.bennu.core.groups.DynamicGroup;
+import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.io.domain.GroupBasedFile;
 import org.fenixedu.bennu.spring.portal.SpringApplication;
@@ -84,7 +83,7 @@ public class UnitSiteManagementController {
         model.addAttribute("numberOfPages", pages.size());
         model.addAttribute("currentPage", currentPage);
         model.addAttribute("sites", pages.isEmpty() ? Collections.emptyList() : pages.get(currentPage));
-        model.addAttribute("isManager", DynamicGroup.get("managers").isMember(Authenticate.getUser()));
+        model.addAttribute("isManager", Group.managers().isMember(Authenticate.getUser()));
         return "fenix-learning/istSites";
     }
 
@@ -169,7 +168,7 @@ public class UnitSiteManagementController {
     public RedirectView setAsDefault(@RequestParam String slug) {
         Site s = Site.fromSlug(slug);
 
-        if (!DynamicGroup.get("managers").isMember(Authenticate.getUser())) {
+        if (!Group.managers().isMember(Authenticate.getUser())) {
             throw CmsDomainException.forbiden();
         }
 
@@ -254,7 +253,7 @@ public class UnitSiteManagementController {
             if (!Strings.isNullOrEmpty(name) && multipartFile != null && !multipartFile.isEmpty()) {
                 try {
                     GroupBasedFile file = new GroupBasedFile(multipartFile.getOriginalFilename(),
-                            multipartFile.getOriginalFilename(), multipartFile.getBytes(), AnyoneGroup.get());
+                            multipartFile.getOriginalFilename(), multipartFile.getBytes(), Group.anyone());
                     new PostFile(post, file, true, post.getFilesSet().size());
                     postMetadata = postMetadata.with(name, getDownloadUrl(file));
                 } catch (IOException e) {

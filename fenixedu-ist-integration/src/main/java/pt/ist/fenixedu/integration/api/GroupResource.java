@@ -27,7 +27,7 @@ public class GroupResource {
             Group group = Group.parse(groupExpression);
             JsonObject result = new JsonObject();
             result.addProperty("groupExpression", groupExpression);
-            result.add("members", group.getMembers().stream().map(User::getUsername).map(JsonPrimitive::new)
+            result.add("members", group.getMembers().map(User::getUsername).map(JsonPrimitive::new)
                     .collect(StreamUtils.toJsonArray()));
             return result;
         } catch (BennuCoreDomainException e) {

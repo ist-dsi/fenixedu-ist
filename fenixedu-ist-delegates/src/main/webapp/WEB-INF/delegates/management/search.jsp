@@ -50,6 +50,7 @@
 <spring:url var="assignPositionUrl" value="${assign}"/>
 <b><spring:message code="label.delegates.select.degree"/></b><p>
 <form:form modelAttribute="searchBean" role="form" method="post" action="${formActionUrl}" enctype="multipart/form-data" class="form-horizontal">
+	${csrf.field()}
 	<div class="form-group">
 		<label for="degreeType" class="col-md-1 control-label"><spring:message code="label.delegates.select.degree.type"/></label>
 		<div class="col-md-11">

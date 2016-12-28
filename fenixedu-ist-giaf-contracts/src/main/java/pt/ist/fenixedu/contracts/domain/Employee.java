@@ -371,12 +371,10 @@ public class Employee extends Employee_Base {
 
     public static Collection<Person> getPossibleGroupMembers(Unit unit) {
         if (unit instanceof ScientificCouncilUnit) {
-            return RoleType.SCIENTIFIC_COUNCIL.actualGroup().getMembers().stream().map(u -> u.getPerson())
-                    .collect(Collectors.toSet());
+            return RoleType.SCIENTIFIC_COUNCIL.actualGroup().getMembers().map(u -> u.getPerson()).collect(Collectors.toSet());
         }
         if (unit instanceof PedagogicalCouncilUnit) {
-            return RoleType.PEDAGOGICAL_COUNCIL.actualGroup().getMembers().stream().map(u -> u.getPerson())
-                    .collect(Collectors.toSet());
+            return RoleType.PEDAGOGICAL_COUNCIL.actualGroup().getMembers().map(u -> u.getPerson()).collect(Collectors.toSet());
         }
         return getAllCurrentActiveWorkingEmployees(unit).stream().map(e -> e.getPerson()).collect(Collectors.toSet());
     }

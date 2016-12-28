@@ -6,6 +6,7 @@
 
 <spring:url var="viewUrl" value="/creditsPool"></spring:url>
 <form:form role="form" modelAttribute="creditsPoolBean" method="GET" class="form-horizontal" action="${viewUrl}">
+	${csrf.field()}
 	<div class="form-group">
 		<label for="executionYear" class="col-sm-2 control-label">${fr:message('resources.ApplicationResources', 'label.executionYear')}:</label>
 		<div class="col-sm-10">
@@ -25,6 +26,7 @@
 
 <spring:url var="editUrl" value="/creditsPool/editCreditsPool"></spring:url>
 <form:form role="form" modelAttribute="creditsPoolBean" method="POST" class="form-horizontal" action="${editUrl}">
+	${csrf.field()}
 	<c:set var="canEditCreditsPool" value="${creditsPoolBean.getCanEditCreditsPool()}"/>
 	<h3>${fr:message('resources.TeacherCreditsSheetResources', 'label.departmentCreditsPool')} <c:out value="${creditsPoolBean.executionYear.year}"/></h3>
 	<input type="hidden" name="executionYear" value="<c:out value='${creditsPoolBean.executionYear.externalId}'/>"/>

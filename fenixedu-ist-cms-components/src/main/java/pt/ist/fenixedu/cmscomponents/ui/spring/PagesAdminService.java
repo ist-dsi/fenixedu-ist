@@ -32,13 +32,10 @@ import org.fenixedu.academic.domain.accessControl.StudentGroup;
 import org.fenixedu.academic.domain.accessControl.StudentSharingDegreeOfCompetenceOfExecutionCourseGroup;
 import org.fenixedu.academic.domain.accessControl.StudentSharingDegreeOfExecutionCourseGroup;
 import org.fenixedu.academic.domain.accessControl.TeacherGroup;
-import org.fenixedu.bennu.core.groups.AnyoneGroup;
 import org.fenixedu.bennu.core.groups.Group;
-import org.fenixedu.bennu.core.groups.LoggedGroup;
-import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.io.domain.GroupBasedFile;
-import org.fenixedu.bennu.io.servlets.FileDownloadServlet;
+import org.fenixedu.bennu.io.servlet.FileDownloadServlet;
 import org.fenixedu.cms.domain.*;
 import org.fenixedu.cms.domain.component.StaticPost;
 import org.fenixedu.commons.i18n.I18N;
@@ -76,8 +73,8 @@ public class PagesAdminService {
     static List<Group> permissionGroups(Site site) {
         if (site.getExecutionCourse()!=null) {
             return ImmutableList.of(
-                    AnyoneGroup.get(),
-                    LoggedGroup.get(),
+                    Group.anyone(),
+                    Group.logged(),
                     TeacherGroup.get(site.getExecutionCourse()),
                     TeacherGroup.get(site.getExecutionCourse()).or(StudentGroup.get(site.getExecutionCourse())),
                     StudentSharingDegreeOfExecutionCourseGroup.get(site.getExecutionCourse()),
@@ -86,11 +83,11 @@ public class PagesAdminService {
         }
         if (site.getHomepageSite()!=null) {
             return ImmutableList.of(
-                    AnyoneGroup.get(),
-                    LoggedGroup.get(),
-                    UserGroup.of(site.getOwner().getUser()));
+                    Group.anyone(),
+                    Group.logged(),
+                    site.getOwner().getUser().groupOf());
         }
-        return ImmutableList.of(AnyoneGroup.get(), LoggedGroup.get());
+        return ImmutableList.of(Group.anyone(), Group.logged());
     }
 
     @Atomic(mode = Atomic.TxMode.WRITE)
@@ -181,7 +178,7 @@ public class PagesAdminService {
     protected PostFile addAttachment(String name, MultipartFile attachment, MenuItem menuItem) throws IOException {
         Post post = postForPage(menuItem.getPage());
         GroupBasedFile file =
-                new GroupBasedFile(name, attachment.getOriginalFilename(), attachment.getBytes(), AnyoneGroup.get());
+                new GroupBasedFile(name, attachment.getOriginalFilename(), attachment.getBytes(), Group.anyone());
         return new PostFile(post, file, false, post.getFilesSet().size());
     }
 
@@ -299,7 +296,7 @@ public class PagesAdminService {
     @Atomic
     protected GroupBasedFile addPostFile(MultipartFile attachment, MenuItem menuItem) throws IOException {
         GroupBasedFile f = new GroupBasedFile(attachment.getOriginalFilename(), attachment.getOriginalFilename(),
-                attachment.getBytes(), AnyoneGroup.get());
+                attachment.getBytes(), Group.anyone());
         Post post = postForPage(menuItem.getPage());
         new PostFile(post, f, true, post.getFilesSet().size());
         return f;
@@ -382,7 +379,7 @@ public class PagesAdminService {
         oldPost.getFilesSorted().forEach(postFile -> {
             GroupBasedFile file = postFile.getFiles();
             GroupBasedFile attachmentCopy =
-                    new GroupBasedFile(file.getDisplayName(), file.getFilename(), file.getContent(), AnyoneGroup.get());
+                    new GroupBasedFile(file.getDisplayName(), file.getFilename(), file.getContent(), Group.anyone());
             new PostFile(newPost, attachmentCopy, postFile.getIsEmbedded(), newPost.getFilesSet().size());
 
         });

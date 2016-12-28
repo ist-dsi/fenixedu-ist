@@ -199,6 +199,7 @@
 
 <div class="modal fade" id="defaultSite" tabindex="-1" role="dialog" aria-hidden="true">
     <form action="${unitSitesContext}/default" class="form-horizontal" method="post">
+        ${csrf.field()}
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">

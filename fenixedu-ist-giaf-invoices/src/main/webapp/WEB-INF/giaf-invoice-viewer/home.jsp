@@ -64,6 +64,7 @@
 
 <% if (request.getParameter("username") != null) { %>
 	<form action="<%= contextPath + "/giaf-invoice-viewer" %>" method="post" style="float: right;">
+		${csrf.field()}
 		<input type="hidden" name="username" value="<%= request.getParameter("username") %>"/>
 
 		<button value="submit">

@@ -18,8 +18,7 @@
  */
 package pt.ist.fenixedu.vigilancies.domain.accessControl;
 
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.bennu.core.annotation.GroupOperator;
@@ -40,14 +39,14 @@ public class ExamCoordinatorGroup extends GroupStrategy {
     }
 
     @Override
-    public Set<User> getMembers() {
+    public Stream<User> getMembers() {
         return Bennu.getInstance().getExamCoordinatorsSet().stream()
                 .filter(coordinator -> coordinator.getExecutionYear().equals(ExecutionYear.readCurrentExecutionYear()))
-                .map(coordinator -> coordinator.getPerson().getUser()).collect(Collectors.toSet());
+                .map(coordinator -> coordinator.getPerson().getUser());
     }
 
     @Override
-    public Set<User> getMembers(DateTime when) {
+    public Stream<User> getMembers(DateTime when) {
         return getMembers();
     }
 

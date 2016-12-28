@@ -20,6 +20,7 @@ package pt.ist.fenixedu.cmscomponents.ui.spring;
 
 import java.util.Optional;
 
+import com.google.common.base.MoreObjects;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.cms.domain.MenuItem;
 import org.fenixedu.commons.i18n.LocalizedString;
@@ -116,7 +117,7 @@ public class PagesAdminBean {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(this).add("menuItem", menuItem).add("parent", parent).add("title", title).add("body", body)
+        return MoreObjects.toStringHelper(this).add("menuItem", menuItem).add("parent", parent).add("title", title).add("body", body)
                 .toString();
     }
 

@@ -18,10 +18,8 @@
  */
 package pt.ist.fenixedu.teacher.evaluation.domain;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.stream.Stream;
 
-import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.bennu.core.annotation.GroupOperator;
 import org.fenixedu.bennu.core.domain.Bennu;
@@ -39,18 +37,13 @@ public class CreditsManagerGroup extends GroupStrategy {
     }
 
     @Override
-    public Set<User> getMembers() {
-        Set<User> members = new HashSet<User>();
-        for (Department department : Bennu.getInstance().getDepartmentsSet()) {
-            for (Person person : department.getAssociatedPersonsSet()) {
-                members.add(person.getUser());
-            }
-        }
-        return members;
+    public Stream<User> getMembers() {
+        return Bennu.getInstance().getDepartmentsSet().stream().flatMap(dep -> dep.getAssociatedPersonsSet().stream())
+                .map(Person::getUser);
     }
 
     @Override
-    public Set<User> getMembers(DateTime when) {
+    public Stream<User> getMembers(DateTime when) {
         return getMembers();
     }
 

@@ -18,8 +18,7 @@
  */
 package pt.ist.fenixedu.contracts.domain.accessControl;
 
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.annotation.GroupOperator;
@@ -42,13 +41,13 @@ public class ActiveResearchers extends GroupStrategy {
     }
 
     @Override
-    public Set<User> getMembers() {
+    public Stream<User> getMembers() {
         return Bennu.getInstance().getEmployeesSet().stream().filter(ActiveResearchers::isResearcher)
-                .map(employee -> employee.getPerson().getUser()).collect(Collectors.toSet());
+                .map(employee -> employee.getPerson().getUser());
     }
 
     @Override
-    public Set<User> getMembers(DateTime when) {
+    public Stream<User> getMembers(DateTime when) {
         return getMembers();
     }
 

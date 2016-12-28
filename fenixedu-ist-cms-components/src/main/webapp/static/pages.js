@@ -149,8 +149,11 @@ teacherApp.controller('PagesCtrl', ['$scope', '$http', '$upload', function ($sco
             });
     }
 
-    $http.get($scope.context + "/data").success(function (data) {
+    $http.get($scope.context + "/data").then(function (response) {
+        var data = response.data;
         $scope.loaded = true;
+        $scope.error = false;
+
         $("#tree").fancytree({ source: [], extensions: ["dnd"],
             dnd: {
                 preventVoidMoves: true, // Prevent dropping nodes 'before self', etc.
@@ -216,6 +219,9 @@ teacherApp.controller('PagesCtrl', ['$scope', '$http', '$upload', function ($sco
             tree.activateKey(window.location.hash.split('#')[1]);
             $('#pageFilesLink').tab('show');
         }
+    }, function(response){
+        $scope.loaded = true;
+        $scope.error = response.status;
     });
 
     $scope.updateFile = function(file, newPosition) {

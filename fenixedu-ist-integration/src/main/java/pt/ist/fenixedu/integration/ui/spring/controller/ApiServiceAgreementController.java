@@ -24,7 +24,7 @@ import java.io.InputStream;
 import javax.servlet.http.HttpServletRequest;
 
 import org.fenixedu.bennu.core.domain.User;
-import org.fenixedu.bennu.core.groups.DynamicGroup;
+import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.portal.servlet.PortalLayoutInjector;
 import org.fenixedu.bennu.spring.I18NBean;
@@ -69,7 +69,7 @@ public class ApiServiceAgreementController {
 
     @Atomic
     private void addDeveloperRole(User user) {
-        DynamicGroup.get("developers").mutator().grant(user);
+        Group.dynamic("developers").mutator().grant(user);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "show")

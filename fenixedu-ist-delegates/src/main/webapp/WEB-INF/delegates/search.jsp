@@ -48,6 +48,7 @@
 <spring:url var="formActionUrl" value="${action}"/>
 
 <form:form modelAttribute="searchBean" role="form" method="post" action="${formActionUrl}" enctype="multipart/form-data" class="form-horizontal">
+	${csrf.field()}
 	<div class="form-group">
 		<label for="executionYear" class="col-md-1 control-label"><spring:message code="label.delegates.select.execution.year"/></label>
 		<div class="col-md-11">

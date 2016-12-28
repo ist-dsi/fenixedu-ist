@@ -48,6 +48,7 @@ ${portal.toolkit()}
 
 <div class="homepage-options">
     <form role="form" method="post" action="${context}/options" class="form-horizontal" id="homepage-publish-form">
+        ${csrf.field()}
         <div class="form-group">
             <label class="col-sm-3 control-label">
                 <spring:message code="label.homepage.activated" />

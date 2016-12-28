@@ -8,7 +8,7 @@ import org.fenixedu.bennu.rendering.annotations.BennuIntersections;
  */
 @BennuIntersections({
     @BennuIntersection(location = "site.manage", position = "extra.properties",
-        file= "/templates/fenix-learning/editSiteLayout.html")
+        file= "templates/fenix-learning/editSiteLayout.html")
 })
 public class SiteLayoutIntersection {
 }

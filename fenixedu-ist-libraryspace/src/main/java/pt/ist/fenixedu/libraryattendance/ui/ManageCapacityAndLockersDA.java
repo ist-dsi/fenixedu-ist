@@ -20,6 +20,7 @@ package pt.ist.fenixedu.libraryattendance.ui;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -81,9 +82,12 @@ public class ManageCapacityAndLockersDA extends FenixDispatchAction {
         if (!library.isActive()) {
             throw new UnsupportedOperationException("Library not active");
         }
-        setCapacity(library, libraryInformation.getCapacity());
-        setLockers(library, libraryInformation.getLockers(), new DateTime());
-
+        try {
+            setCapacity(library, libraryInformation.getCapacity());
+            setLockers(library, libraryInformation.getLockers(), new DateTime());
+        } catch (IOException ioecexception){
+            throw new UnsupportedOperationException("IO related error with library");
+        }
         libraryInformation.setCapacity(library.getAllocatableCapacity());
         libraryInformation.setLockers(library.getChildren().size());
 
@@ -99,13 +103,13 @@ public class ManageCapacityAndLockersDA extends FenixDispatchAction {
         return mapping.findForward("libraryUpdateCapacityAndLockers");
     }
 
-    private void setCapacity(Space library, int capacity) {
+    private void setCapacity(Space library, int capacity) throws IOException {
         InformationBean bean = library.bean();
         bean.setAllocatableCapacity(capacity);
         library.bean(bean);
     }
 
-    private void setLockers(Space library, int lockers, DateTime today) {
+    private void setLockers(Space library, int lockers, DateTime today) throws IOException {
         int highestLocker = 0;
         for (Space relSpace : library.getChildren()) {
             Space space = relSpace;

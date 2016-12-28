@@ -37,6 +37,7 @@
 </div>
 
 <form:form role="form" modelAttribute="search" method="GET" class="form-horizontal">
+	${csrf.field()}
 	<div class="form-group">
 		<label for="username" class="col-sm-2 control-label">${fr:message('resources.ApplicationResources', 'label.username')}:</label>
 		<div class="col-sm-10">
@@ -146,6 +147,7 @@
 											</div>
 											<div class="modal-footer">
 												 <form:form role="form" method="GET" action="${createUrl}/${person.externalId}" modelAttribute="search">
+													 ${csrf.field()}
 													 <input type="hidden" name="username" value="<c:out value='${search.username}'/>"/>
 													 <input type="hidden" name="name" value="<c:out value='${search.name}'/>"/>
 													 <input type="hidden" name="documentIdNumber" value="<c:out value='${search.documentIdNumber}'/>"/>

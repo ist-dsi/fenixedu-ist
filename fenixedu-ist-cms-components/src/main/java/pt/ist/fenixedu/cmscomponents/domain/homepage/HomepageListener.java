@@ -29,7 +29,6 @@ import org.fenixedu.academic.domain.accessControl.TeacherGroup;
 import org.fenixedu.academic.domain.contacts.PartyContactType;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
-import org.fenixedu.bennu.core.groups.NobodyGroup;
 import org.fenixedu.cms.domain.*;
 import org.fenixedu.cms.domain.component.Component;
 import org.fenixedu.commons.i18n.I18N;

@@ -8,7 +8,6 @@ import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.groups.DynamicGroup;
 import org.fenixedu.bennu.core.groups.Group;
-import org.fenixedu.bennu.core.groups.UserGroup;
 import org.fenixedu.bennu.scheduler.CronTask;
 import org.fenixedu.bennu.scheduler.annotation.Task;
 import org.joda.time.LocalDate;
@@ -33,7 +32,7 @@ public class UpdateRetiredTeachersGroup extends CronTask {
                 .map(giafData -> giafData.getPersonProfessionalData().getPerson().getUser()).filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
-        Group actualRetiredTeachersGroup = UserGroup.of(retiredTeachersUsers);
+        Group actualRetiredTeachersGroup = Group.users(retiredTeachersUsers.stream());
         DynamicGroup.get("retiredTeachers").mutator().changeGroup(actualRetiredTeachersGroup);
 
     }

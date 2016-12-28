@@ -24,6 +24,7 @@
 <h1><spring:message code="channels.title"/></h1>
 
 <form class="form-horizontal" method="POST">
+	${csrf.field()}
 	<div class="form-group">
 		<label class="control-label col-sm-2"><spring:message code="channels.label.execution.year"/></label>
 		<div class="col-sm-10">

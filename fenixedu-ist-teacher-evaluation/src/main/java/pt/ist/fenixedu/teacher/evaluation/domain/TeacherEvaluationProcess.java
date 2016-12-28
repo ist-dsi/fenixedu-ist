@@ -28,7 +28,7 @@ import java.util.TreeSet;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.bennu.core.domain.Bennu;
-import org.fenixedu.bennu.core.groups.DynamicGroup;
+import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.security.Authenticate;
 
@@ -131,7 +131,7 @@ public class TeacherEvaluationProcess extends TeacherEvaluationProcess_Base {
 
     public boolean isPossibleToInsertApprovedMark() {
         return (isEvaluationLocked() || getFacultyEvaluationProcess().getEvaluationInterval().getEnd().isBeforeNow())
-                && (AccessControl.getPerson().isTeacherEvaluationCoordinatorCouncilMember() || DynamicGroup.get("managers")
+                && (AccessControl.getPerson().isTeacherEvaluationCoordinatorCouncilMember() || Group.managers()
                         .isMember(Authenticate.getUser()));
     }
 

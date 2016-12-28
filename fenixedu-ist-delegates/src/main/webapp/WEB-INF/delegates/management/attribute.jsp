@@ -34,6 +34,7 @@ ${portal.toolkit()}
 <b><spring:message code="label.select.student.for.position"/> <c:out value="${delegatePositionBean.delegateTitle}"/></b><p>
 <div>
 <form:form modelAttribute="delegatePositionBean" role="form" method="post" action="${formActionUrl}" enctype="multipart/form-data">
+	${csrf.field()}
 	<form:input type="hidden" class="form-control" id="cycleTypeInput" path="cycleType" value="${delegatePositionBean.cycleType}"/>
 	<c:if test="${not empty delegatePositionBean.delegate}">
 	<form:input type="hidden" class="form-control" id="delegateInput" path="delegate" value="${delegatePositionBean.delegate.externalId}"/>

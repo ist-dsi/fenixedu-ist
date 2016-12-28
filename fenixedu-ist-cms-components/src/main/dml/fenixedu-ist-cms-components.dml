@@ -19,8 +19,6 @@ class homepage.components.ResearcherComponent extends .org.fenixedu.cms.domain.c
 	String dataKey;
 }
 
-class accessControl.PersistentManagersOfUnitSiteGroup extends .org.fenixedu.bennu.core.domain.groups.PersistentGroup;
-
 
 relation PersonHasHomepage {
     .org.fenixedu.cms.domain.Site playsRole homepage {
@@ -54,14 +52,5 @@ relation UserBookmarks {
     }
     .org.fenixedu.cms.domain.Category playsRole bookmarks {
         multiplicity *;
-    }
-}
-
-relation PersistentManagersOfUnitSiteGroupUnitSite {
-    public accessControl.PersistentManagersOfUnitSiteGroup playsRole managersOfUnitSiteGroup {
-        multiplicity 0..1;
-    }
-    public .org.fenixedu.cms.domain.Site playsRole unitSite {
-        multiplicity 1..1;
     }
 }

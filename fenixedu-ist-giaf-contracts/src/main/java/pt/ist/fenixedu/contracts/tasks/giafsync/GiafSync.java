@@ -19,6 +19,7 @@
 package pt.ist.fenixedu.contracts.tasks.giafsync;
 
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 
 import org.fenixedu.bennu.scheduler.CronTask;
@@ -61,7 +62,8 @@ public class GiafSync extends CronTask {
         GiafMetadata metadata = new GiafMetadata();
         updateMetadata(metadata);
 
-        PrintWriter logWriter = getTaskLogWriter();
+        StringWriter writer = new StringWriter();
+        PrintWriter logWriter = new PrintWriter(writer);
         new ImportPersonProfessionalData().process(metadata, logWriter, logger);
         new ImportPersonContractSituationsFromGiaf().process(metadata, logWriter, logger);
         new ImportPersonProfessionalCategoriesFromGiaf().process(metadata, logWriter, logger);
@@ -74,15 +76,18 @@ public class GiafSync extends CronTask {
         new ImportPersonGrantOwnerEquivalentFromGiaf().process(metadata, logWriter, logger);
         new ImportPersonAbsencesFromGiaf().process(metadata, logWriter, logger);
         new ImportEmployeeUnitsFromGiaf().process(metadata, logWriter, logger);
+        taskLog(writer.toString());
     }
 
     @Atomic(mode = TxMode.WRITE)
     private void updateMetadata(GiafMetadata metadata) throws Exception {
-        PrintWriter logWriter = getTaskLogWriter();
+        StringWriter writer = new StringWriter();
+        PrintWriter logWriter = new PrintWriter(writer);
         new ImportTypesFromGiaf().processChanges(metadata, logWriter, logger);
         new ImportContractSituationsFromGiaf().processChanges(metadata, logWriter, logger);
         new ImportProfessionalCategoryFromGiaf().processChanges(metadata, logWriter, logger);
         new ImportProfessionalRegimesFromGiaf().processChanges(metadata, logWriter, logger);
         new ImportProfessionalRelationsFromGiaf().processChanges(metadata, logWriter, logger);
+        taskLog(writer.toString());
     }
 }

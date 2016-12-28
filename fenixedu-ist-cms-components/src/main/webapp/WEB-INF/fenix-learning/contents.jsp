@@ -19,11 +19,15 @@
 
 --%>
 <div ng-app="pagesApp">
-    <div ng-controller="PagesCtrl">
+    <div ngCloak ng-controller="PagesCtrl">
 
-        <div class="alert alert-danger" ng-if="error"><strong></strong><spring:message code="label.error"/>: </strong><spring:message code="label.error.tryAgain"/></div>
+        <div class="alert alert-danger" ng-if="error" ng-switch on="error"><strong>
+            <spring:message code="label.error"/>: </strong>
+            <span ng-switch="401"><spring:message code="error.not.authorized"/></span>
+            <span ng-switch-default<spring:message code="label.error.tryAgain"/></span>
+        </div>
 
-        <div class="row" style="min-height:400px" ng-show="loaded">
+        <div class="row" style="min-height:400px" ng-show="loaded && !error">
 
             <div class="col-md-3">
                 <div id="tree"  style="border: dotted 2px #eee;"></div>

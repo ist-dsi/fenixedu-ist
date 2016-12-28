@@ -4,9 +4,8 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
-import org.fenixedu.bennu.signals.HandlerRegistration;
-import org.fenixedu.bennu.signals.Signal;
-
+import org.fenixedu.bennu.core.signals.HandlerRegistration;
+import org.fenixedu.bennu.core.signals.Signal;
 import pt.ist.registration.process.handler.CandidacySignalHandler;
 import pt.ist.registration.process.ui.service.RegistrationDeclarationCreatorService;
 import pt.ist.registration.process.ui.service.SignCertAndStoreService;

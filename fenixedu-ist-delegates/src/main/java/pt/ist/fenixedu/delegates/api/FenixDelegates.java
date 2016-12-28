@@ -38,7 +38,7 @@ import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.degreeStructure.CycleType;
 import org.fenixedu.bennu.core.domain.User;
-import org.fenixedu.bennu.core.groups.DynamicGroup;
+import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.oauth.annotation.OAuthEndpoint;
 import org.joda.time.DateTime;
@@ -137,7 +137,7 @@ public class FenixDelegates {
     @Path("degrees/{degreeSigla}/delegates")
     @OAuthEndpoint(DELEGATE_MANAGEMENT_SCOPE)
     public FenixDelegate assign(@PathParam("degreeSigla") String degreeSigla, FenixDelegate bean) {
-        if (!DynamicGroup.get("pedagogicalCouncil").isMember(Authenticate.getUser())) {
+        if (!Group.dynamic("pedagogicalCouncil").isMember(Authenticate.getUser())) {
             throw newApplicationError(Status.UNAUTHORIZED, "unauthorized", "User is not authorized to access this resource");
         }
         Degree degree = Degree.readBySigla(degreeSigla);

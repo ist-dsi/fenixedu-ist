@@ -47,6 +47,7 @@ import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.academic.util.Money;
 import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.bennu.core.groups.Group;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.YearMonthDay;
@@ -94,7 +95,7 @@ public class SIBSOutgoingPaymentFile extends SIBSOutgoingPaymentFile_Base {
             StringBuilder errorsBuilder = new StringBuilder();
             byte[] paymentFileContents = createPaymentFile(lastSuccessfulSentDateTime, errorsBuilder).getBytes("ASCII");
             setErrors(errorsBuilder.toString());
-            init(outgoingFilename(), outgoingFilename(), paymentFileContents, RoleType.MANAGER.actualGroup());
+            init(outgoingFilename(), outgoingFilename(), paymentFileContents, Group.managers());
         } catch (UnsupportedEncodingException e) {
             throw new DomainException(e.getMessage(), e);
         }

@@ -206,13 +206,19 @@
     function goByeBye() {
         document.getElementById ( "banksBody" ).style.display = "none";
         document.getElementById ( "byeByeBody" ).style.visibility = "visible";
-        replaceTargetWith( 'visibleTitle', '<span id="visibleTitle">Processo Concluído</span>' );
+        replaceTargetWith( 'visibleTitle', '<span id="visibleTitle">Processo Concluï¿½do</span>' );
     }
 
     function postYes(allowAccessCgd, allowAccessBpi, allowAccessSantander) {
         var form = document.createElement("form");
         form.setAttribute("method", "post");
         form.setAttribute("action", '<%= contextPath %>' + '/authorize-personal-data-access' );
+
+        var csrfHiddenField = document.createElement("input");
+        csrfHiddenField.setAttribute("type", "hidden");
+        csrfHiddenField.setAttribute("name", "${csrf.parameterName}");
+        csrfHiddenField.setAttribute("value", "${csrf.token}");
+        form.appendChild(csrfHiddenField);
 
         var hiddenField = document.createElement("input");
         hiddenField.setAttribute("type", "hidden");
@@ -248,5 +254,5 @@
         document.getElementById ( "banksBody" ).style.display = "none";
     }
 
-    replaceTargetWith( 'visibleTitle', '<span id="visibleTitle">Cedência de Dados / Cartões</span>' );
+    replaceTargetWith( 'visibleTitle', '<span id="visibleTitle">Cedï¿½ncia de Dados / Cartï¿½es</span>' );
 </script>

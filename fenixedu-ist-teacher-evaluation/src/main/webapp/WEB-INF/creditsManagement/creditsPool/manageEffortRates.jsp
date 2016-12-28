@@ -12,6 +12,7 @@
 
 <spring:url var="editUrl" value="/effortRates"></spring:url>
 <form:form role="form" modelAttribute="departmentCreditsBean" method="GET" class="form-horizontal" action="${editUrl}">
+	${csrf.field()}
 	<div class="form-group">
 		<label for="executionYear" class="col-sm-2 control-label">${fr:message('resources.ApplicationResources', 'label.executionYear')}:</label>
 		<div class="col-sm-10">
@@ -46,7 +47,9 @@
 								<h4><spring:message code="label.upload"/></h4>
 				            </div>
 				             <form method="POST" class="form-horizontal" enctype="multipart/form-data" action="${uploadUrl}">
-				            <div class="modal-body">
+									 ${csrf.field()}
+
+								 <div class="modal-body">
 				                <p><spring:message code="label.upload"/></p>
 								<input type="hidden" name="executionYear" value="<c:out value='${departmentCreditsBean.executionYear.externalId}'/>"/>
 								<div class="form-group">

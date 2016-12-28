@@ -22,7 +22,6 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 import org.fenixedu.bennu.core.groups.Group;
-import org.fenixedu.bennu.core.groups.UserGroup;
 
 import pt.ist.fenixedu.integration.domain.UnitFile;
 import pt.ist.fenixframework.Atomic;
@@ -33,7 +32,7 @@ public class CreateUnitFile {
     public static void run(byte[] content, String originalFilename, String displayName, String description, String tags,
             Group permittedGroup, Unit unit, Person person) throws FenixServiceException {
         new UnitFile(unit, person, description, tags, originalFilename, displayName, content,
-                !isPublic(permittedGroup) ? permittedGroup.or(UserGroup.of(person.getUser())) : permittedGroup);
+                !isPublic(permittedGroup) ? permittedGroup.or(person.getUser().groupOf()) : permittedGroup);
     }
 
     private static boolean isPublic(Group permittedGroup) {

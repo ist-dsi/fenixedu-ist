@@ -34,7 +34,6 @@ import org.fenixedu.academic.domain.accessControl.ActiveStudentsGroup;
 import org.fenixedu.academic.domain.accessControl.AllAlumniGroup;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
-import org.fenixedu.bennu.core.domain.UserLoginPeriod;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
@@ -192,7 +191,7 @@ class ImportPersonContractSituationsFromGiaf extends ImportProcessor {
                     modifications.add(new Modification() {
                         @Override
                         public void execute() {
-                            UserLoginPeriod.createOpenPeriod(user);
+                            user.openLoginPeriod();
                         }
                     });
                 } else {
@@ -201,7 +200,7 @@ class ImportPersonContractSituationsFromGiaf extends ImportProcessor {
                         modifications.add(new Modification() {
                             @Override
                             public void execute() {
-                                UserLoginPeriod.closeOpenPeriod(user);
+                                user.closeLoginPeriod();
                             }
                         });
                     }

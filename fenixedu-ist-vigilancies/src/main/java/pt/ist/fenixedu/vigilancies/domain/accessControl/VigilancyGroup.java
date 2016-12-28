@@ -20,6 +20,8 @@ package pt.ist.fenixedu.vigilancies.domain.accessControl;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.accessControl.FenixGroup;
@@ -58,16 +60,11 @@ public class VigilancyGroup extends FenixGroup {
 
     @Override
     public String getPresentationName() {
-        return Joiner.on('\n').join(FluentIterable.from(getMembers()).transform(new Function<User, String>() {
-            @Override
-            public String apply(User user) {
-                return user.getName();
-            }
-        }));
+        return getMembers().map(User::getName).collect(Collectors.joining("\n"));
     }
 
     @Override
-    public Set<User> getMembers() {
+    public Stream<User> getMembers() {
         Set<User> users = new HashSet<>();
         for (Person person : vigilancy.getTeachers()) {
             User user = person.getUser();
@@ -79,17 +76,17 @@ public class VigilancyGroup extends FenixGroup {
         if (user != null) {
             users.add(user);
         }
-        return users;
+        return users.stream();
     }
 
     @Override
-    public Set<User> getMembers(DateTime when) {
+    public Stream<User> getMembers(DateTime when) {
         return getMembers();
     }
 
     @Override
     public boolean isMember(User user) {
-        return user != null && getMembers().contains(user);
+        return user != null && getMembers().anyMatch(u -> u == user);
     }
 
     @Override

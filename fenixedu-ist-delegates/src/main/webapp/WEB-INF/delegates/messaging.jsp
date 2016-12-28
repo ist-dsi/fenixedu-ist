@@ -30,6 +30,7 @@
 <form:form modelAttribute="students" role="form" method="post"
 	action="${formActionReload}" enctype="multipart/form-data"
 	class="form-horizontal">
+	${csrf.field()}
 	<div class="row">
 		<div class="col-sm-2"><spring:message code="delegates.messaging.send.email.as"/>:</div>
 		<div class="col-sm-5">
@@ -43,6 +44,7 @@
 <form:form modelAttribute="students" role="form" method="post"
 	action="${formActionUrl}" enctype="multipart/form-data"
 	class="form-horizontal">
+	${csrf.field()}
 	<p>
 		<form:input type="hidden"
 			value="${students.selectedPosition.externalId}"

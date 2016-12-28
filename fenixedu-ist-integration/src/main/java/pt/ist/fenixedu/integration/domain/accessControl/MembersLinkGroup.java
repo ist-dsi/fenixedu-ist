@@ -18,8 +18,7 @@
  */
 package pt.ist.fenixedu.integration.domain.accessControl;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.accessControl.FenixGroup;
@@ -57,18 +56,12 @@ public class MembersLinkGroup extends FenixGroup {
     }
 
     @Override
-    public Set<User> getMembers() {
-        Set<User> users = new HashSet<>();
-        for (Person person : persistentGroupMembers.getPersonsSet()) {
-            if (person.getUser() != null) {
-                users.add(person.getUser());
-            }
-        }
-        return users;
+    public Stream<User> getMembers() {
+        return persistentGroupMembers.getPersonsSet().stream().map(Person::getUser).filter(u -> u != null);
     }
 
     @Override
-    public Set<User> getMembers(DateTime when) {
+    public Stream<User> getMembers(DateTime when) {
         return getMembers();
     }
 
