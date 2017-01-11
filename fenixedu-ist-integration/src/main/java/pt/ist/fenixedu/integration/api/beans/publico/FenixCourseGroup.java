@@ -112,7 +112,7 @@ public class FenixCourseGroup {
 
         public StudentGroupMembers(StudentGroup studentGroup) {
             this.groupNumber = studentGroup.getGroupNumber();
-            this.shift = studentGroup.getShift().getPresentationName();
+            this.shift = studentGroup.getShift() != null ? studentGroup.getShift().getPresentationName() : null;
             this.members = studentGroup.getAttendsSet().stream()
                     .map(a -> a.getRegistration().getPerson())
                     .map(StudentGroupMember::new)
