@@ -32,12 +32,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import javax.servlet.ServletContext;
 import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -70,12 +73,16 @@ import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Grouping;
+import org.fenixedu.academic.domain.Lesson;
+import org.fenixedu.academic.domain.LessonInstance;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Photograph;
 import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.academic.domain.Project;
 import org.fenixedu.academic.domain.Shift;
+import org.fenixedu.academic.domain.ShiftType;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
+import org.fenixedu.academic.domain.Summary;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.WrittenEvaluation;
 import org.fenixedu.academic.domain.WrittenEvaluationEnrolment;
@@ -112,15 +119,19 @@ import org.fenixedu.academic.dto.InfoShowOccupation;
 import org.fenixedu.academic.dto.InfoSiteRoomTimeTable;
 import org.fenixedu.academic.dto.InfoWrittenEvaluation;
 import org.fenixedu.academic.dto.InfoWrittenTest;
+import org.fenixedu.academic.dto.SummariesManagementBean;
 import org.fenixedu.academic.service.factory.RoomSiteComponentBuilder;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 import org.fenixedu.academic.service.services.exceptions.InvalidArgumentsServiceException;
 import org.fenixedu.academic.service.services.student.EnrolStudentInWrittenEvaluation;
 import org.fenixedu.academic.service.services.student.UnEnrollStudentInWrittenEvaluation;
+import org.fenixedu.academic.service.services.teacher.CreateSummary;
+import org.fenixedu.academic.service.services.teacher.DeleteSummary;
 import org.fenixedu.academic.ui.struts.action.ICalendarSyncPoint;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.academic.util.ContentType;
 import org.fenixedu.academic.util.EvaluationType;
+import org.fenixedu.academic.util.HourMinuteSecond;
 import org.fenixedu.academic.util.MultiLanguageString;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
@@ -128,11 +139,16 @@ import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.oauth.annotation.OAuthEndpoint;
 import org.fenixedu.commons.i18n.I18N;
+import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.commons.stream.StreamUtils;
 import org.fenixedu.spaces.domain.BlueprintFile;
 import org.fenixedu.spaces.domain.Space;
 import org.fenixedu.spaces.services.SpaceBlueprintsDWGProcessor;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeFieldType;
+import org.joda.time.Partial;
+import org.joda.time.TimeOfDay;
+import org.joda.time.YearMonthDay;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
@@ -192,6 +208,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+
+import static org.fenixedu.academic.dto.SummariesManagementBean.SummaryType.NORMAL_SUMMARY;
 
 @Path("/fenix/v1")
 public class FenixAPIv1 {
@@ -1425,6 +1443,257 @@ public class FenixAPIv1 {
 
         return groupings;
 
+    }
+
+    /**
+     * Returns summaries for course by id
+     *
+     * @summary Course summaries by id
+     * @param oid
+     *            course id
+     * @return
+     */
+    @GET
+    @Produces(JSON_UTF8)
+    @Path("courses/{id}/summaries")
+    @OAuthEndpoint(PERSONAL_SCOPE)
+    public List<FenixLessonSummary> summariesCoursesByOid(@PathParam("id") String oid) {
+        final ExecutionCourse executionCourse = getDomainObject(oid, ExecutionCourse.class);
+        List<FenixLessonSummary> summaries = new ArrayList<>();
+
+        for (Shift shift : executionCourse.getAssociatedShifts()) {
+            for (Lesson lesson : shift.getAssociatedLessonsSet()) {
+                lesson.getAllLessonDates().stream().sorted().map(ld -> {
+                    LessonInstance lessonInstance = lesson.getLessonInstanceFor(ld);
+                    HourMinuteSecond time = lesson.getBeginHourMinuteSecond();
+                    TimeOfDay lessonTime = new TimeOfDay(time.getHour(), time.getMinuteOfHour(), time.getSecondOfMinute());
+                    return new FenixLessonSummary(shift, ld.toDateTime(lessonTime), lesson.getSala(), lessonInstance);
+                }).forEach(summaries::add);
+            }
+        }
+
+        return summaries;
+    }
+
+    /**
+     * Adds a summary for a lesson in a course by id
+     *
+     * @summary Add summary to lesson in course
+     * @param oid
+     *            course id
+     * @param summaryInfo
+     *            JSON object containing the summary info:
+     *              {
+     *                  "shift": "shift_id",
+     *                  "date": "yyyy-MM-dd HH:mm:ss",
+     *                  "room": "room_id",
+     *                  "taught": true/false,
+     *                  "attendance": 0,
+     *                  "title": {
+     *                      "pt-PT": "pt title",
+     *                      "en-GB": "en title"
+     *                  },
+     *                  "content": {
+     *                      "pt-PT": "pt content",
+     *                      "en-GB": "en content"
+     *                  }
+     *              }
+     * @return
+     */
+    @POST
+    @Produces(JSON_UTF8)
+    @Path("courses/{id}/summaries")
+    @OAuthEndpoint(PERSONAL_SCOPE)
+    public FenixLessonSummary createSummaryCourseByOid(@PathParam("id") String oid, JsonObject summaryInfo) {
+        return addOrUpdateSummary(oid, summaryInfo, (bean) -> {
+            try {
+                CreateSummary.runCreateSummary(bean);
+            } catch (Exception e) {
+                throw newApplicationError(Status.PRECONDITION_FAILED, "validation error", e.getMessage());
+            }
+        });
+    }
+
+    /**
+     * Edits a summary for a lesson in a course by id
+     *
+     * @summary Edit summary of lesson in course
+     * @param oid
+     *            course id
+     * @param summaryInfo
+     *            JSON object containing the summary info:
+     *              {
+     *                  "shift": "shift_id",
+     *                  "date": "yyyy-MM-dd HH:mm:ss",
+     *                  "room": "room_id",
+     *                  "taught": true/false,
+     *                  "attendance": 0,
+     *                  "title": {
+     *                      "pt-PT": "pt title",
+     *                      "en-GB": "en title"
+     *                  },
+     *                  "content": {
+     *                      "pt-PT": "pt content",
+     *                      "en-GB": "en content"
+     *                  }
+     *              }
+     * @return
+     */
+    @PUT
+    @Produces(JSON_UTF8)
+    @Path("courses/{id}/summaries")
+    @OAuthEndpoint(PERSONAL_SCOPE)
+    public FenixLessonSummary updateSummaryCourseByOid(@PathParam("id") String oid, JsonObject summaryInfo) {
+        return addOrUpdateSummary(oid, summaryInfo, (bean) -> {
+            try {
+                CreateSummary.runEditSummary(bean);
+            } catch (Exception e) {
+                throw newApplicationError(Status.PRECONDITION_FAILED, "validation error", e.getMessage());
+            }
+        });
+    }
+
+    private FenixLessonSummary addOrUpdateSummary(String courseOid, JsonObject summaryInfo, Consumer<SummariesManagementBean> service)  {
+        final String room, shiftId, date;
+        final Boolean taught;
+        final int attendance;
+        final JsonObject title, content;
+
+        try {
+            room = summaryInfo.get("room").getAsString();
+            shiftId = summaryInfo.get("shift").getAsString();
+            date = summaryInfo.get("date").getAsString();
+        } catch (Exception ignored) {
+            throw newApplicationError(Status.PRECONDITION_FAILED, "invalid parameters", "missing keys 'room', 'shift' or 'date'");
+        }
+
+        try {
+            taught = summaryInfo.get("taught").getAsBoolean();
+            attendance = summaryInfo.get("attendance").getAsInt();
+        } catch (Exception ignored) {
+            throw newApplicationError(Status.PRECONDITION_FAILED, "invalid parameters", "missing keys 'taught' or 'attendance'");
+        }
+
+        try {
+            title = summaryInfo.getAsJsonObject("title");
+            content = summaryInfo.getAsJsonObject("content");
+        } catch (Exception ignored) {
+            throw newApplicationError(Status.PRECONDITION_FAILED, "invalid parameters", "missing keys 'title' or 'content'");
+        }
+
+
+        final ExecutionCourse executionCourse = getDomainObject(courseOid, ExecutionCourse.class);
+        final Space space = getDomainObject(room, Space.class);
+        final Shift shift = getDomainObject(shiftId, Shift.class);
+
+        if (!executionCourse.getAssociatedShifts().contains(shift)) {
+            throw newApplicationError(Status.PRECONDITION_FAILED, "invalid parameters", "invalid shift for this execution course");
+        }
+
+        SummariesManagementBean bean =
+                fillSummaryManagementBean(executionCourse, shift, space, date, title, content, taught, attendance);
+        service.accept(bean);
+
+        Lesson lesson = bean.getLesson();
+        DateTime lessonDateTime = DateTimeFormat.forPattern(dayHourSecondPattern).parseDateTime(date);
+        LessonInstance lessonInstance = lesson.getLessonInstanceFor(lessonDateTime.toYearMonthDay());
+        return new FenixLessonSummary(shift, lessonDateTime, space, lessonInstance);
+    }
+
+    private SummariesManagementBean fillSummaryManagementBean(ExecutionCourse executionCourse, Shift shift, Space space,
+            String date, JsonObject title, JsonObject content, Boolean taught, int attendance) {
+
+        MultiLanguageString titleMLS, contentMLS;
+        try {
+            titleMLS = MultiLanguageString.fromLocalizedString(LocalizedString.fromJson(title));
+            contentMLS = MultiLanguageString.fromLocalizedString(LocalizedString.fromJson(content));
+        } catch (Exception e) {
+            throw newApplicationError(Status.PRECONDITION_FAILED, "invalid parameters", "'title' or 'content' is not a valid multi-language string");
+        }
+
+        DateTime lessonDateTime = DateTimeFormat.forPattern(dayHourSecondPattern).parseDateTime(date);
+        YearMonthDay lessonDate = lessonDateTime.toYearMonthDay();
+        Partial lessonTime = new Partial()
+                .with(DateTimeFieldType.hourOfDay(), lessonDateTime.getHourOfDay())
+                .with(DateTimeFieldType.minuteOfHour(), lessonDateTime.getMinuteOfHour())
+                .with(DateTimeFieldType.secondOfDay(), lessonDateTime.getSecondOfMinute());
+
+
+        Optional<Lesson> lesson = shift.getAssociatedLessonsSet().stream()
+                .filter(l -> l.getAllLessonDates().stream().anyMatch(lessonDate::equals))
+                .filter(l -> l.getSala().equals(space))
+                .findFirst();
+
+        if (!lesson.isPresent()) {
+            throw newApplicationError(Status.PRECONDITION_FAILED, "invalid parameters", "invalid lesson date or room");
+        }
+
+        Person person = getPerson();
+        Professorship professorship = executionCourse.getProfessorship(person);
+        String teacherName = person.getName();
+        LessonInstance lessonInstance = lesson.get().getLessonInstanceFor(lessonDate);
+        Summary summary = lessonInstance != null ? lessonInstance.getSummary() : null;
+        ShiftType shiftType = shift.getSortedTypes().first();
+
+        return new SummariesManagementBean(titleMLS, contentMLS, attendance, NORMAL_SUMMARY, professorship,
+                teacherName, null, shift, lesson.get(), lessonDate, space, lessonTime, summary, professorship, shiftType, taught);
+    }
+
+    /**
+     * Deletes a summary in a lesson of a course by id
+     *
+     * @summary Delete summary of lesson in course
+     * @param oid
+     *            course id
+     * @param summaryInfo
+     *            JSON object containing the summary info:
+     *              {
+     *                  "shift": "shift_id",
+     *                  "date": "yyyy-MM-dd HH:mm:ss",
+     *                  "room": "room_id",
+     *              }
+     * @return
+     */
+    @DELETE
+    @Produces(JSON_UTF8)
+    @Path("courses/{id}/summaries")
+    @OAuthEndpoint(PERSONAL_SCOPE)
+    public Response deleteSummaryCourseByOid(@PathParam("id") String oid, JsonObject summaryInfo) {
+        final String shiftId, date, room;
+        try {
+            shiftId = summaryInfo.get("shift").getAsString();
+            date = summaryInfo.get("date").getAsString();
+            room = summaryInfo.get("room").getAsString();
+        } catch (Exception e) {
+            throw newApplicationError(Status.PRECONDITION_FAILED, "invalid parameters", "missing keys 'shift', 'date' or 'room'");
+        }
+
+        final ExecutionCourse executionCourse = getDomainObject(oid, ExecutionCourse.class);
+        final Space space = getDomainObject(room, Space.class);
+        final Shift shift = getDomainObject(shiftId, Shift.class);
+
+        DateTime lessonDateTime = DateTimeFormat.forPattern(dayHourSecondPattern).parseDateTime(date);
+        YearMonthDay lessonDate = lessonDateTime.toYearMonthDay();
+
+        Optional<LessonInstance> lessonInstance = shift.getAssociatedLessonsSet().stream()
+                                                       .map(l -> l.getLessonInstanceFor(lessonDate))
+                                                       .filter(l -> l != null && l.getRoom().equals(space))
+                                                       .findFirst();
+        if (!lessonInstance.isPresent()) {
+            throw newApplicationError(Status.PRECONDITION_FAILED, "invalid parameters", "invalid lesson date or room");
+        }
+
+        final Person person = getPerson();
+        Summary summary = lessonInstance.get().getSummary();
+        Professorship professorship = executionCourse.getProfessorship(person);
+
+        try {
+            DeleteSummary.runDeleteSummary(executionCourse, summary, professorship);
+        } catch (Exception e) {
+            throw newApplicationError(Status.PRECONDITION_FAILED, "validation error", e.getMessage());
+        }
+
+        return Response.noContent().build();
     }
 
     /**
