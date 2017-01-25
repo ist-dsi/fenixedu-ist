@@ -41,6 +41,14 @@
 	{% endfor %}
 {% endmacro %}
 
+{% block title %}
+    <title>{{page.name.content}} · {{ ownerName }}</title>
+{% endblock title %}
+
+{% block titleLinkName %}
+    {{ ownerName }}
+{% endblock titleLinkName %}
+
 {% block content %}
 		{% if ownerAvatarUrl is not empty %}
 				<div style="float:right;position:relative; top: -95px;">
