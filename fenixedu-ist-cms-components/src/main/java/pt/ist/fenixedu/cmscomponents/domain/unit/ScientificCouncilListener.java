@@ -40,7 +40,8 @@ public class ScientificCouncilListener {
     private static final LocalizedString TITLE_ORGANIZATION = getLocalizedString(BUNDLE, "researchUnit.organization");
 
     public static Site create(Department department) {
-        final Site newSite = new Site( department.getDepartmentUnit().getNameI18n().toLocalizedString(), department.getDepartmentUnit().getNameI18n().toLocalizedString());
+        final Site newSite = UnitSiteBuilder.getInstance().create(department);
+        
         final Menu menu = new Menu(newSite, MENU_TITLE);
         createDefaultContents(newSite, menu, Authenticate.getUser());
         return newSite;

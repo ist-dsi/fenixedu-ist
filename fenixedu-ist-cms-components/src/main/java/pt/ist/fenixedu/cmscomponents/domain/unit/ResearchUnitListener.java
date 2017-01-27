@@ -48,7 +48,7 @@ public class ResearchUnitListener {
     private static final LocalizedString PUBLICATIONS_TITLE = BundleUtil.getLocalizedString(BUNDLE, "department.publications");
 
     public static Site create(Department researchUnit) {
-        final Site newSite = new Site( researchUnit.getNameI18n().toLocalizedString(), researchUnit.getNameI18n().toLocalizedString());
+        final Site newSite = UnitSiteBuilder.getInstance().create(researchUnit);
         final Menu menu = new Menu(newSite, MENU_TITLE);
         createDefaultContents(newSite, menu, Authenticate.getUser());
         return newSite;

@@ -50,7 +50,7 @@ public class ScientificAreaListener {
     private static final LocalizedString TITLE_COURES = getLocalizedString(BUNDLE, "department.courses");
 
     public static Site create(Unit scientificArea) {
-        final Site newSite = new Site(scientificArea.getNameI18n().toLocalizedString(),scientificArea.getNameI18n().toLocalizedString());
+        final Site newSite = UnitSiteBuilder.getInstance().create(scientificArea);
         final Menu menu = new Menu(newSite, MENU_TITLE);
         createDefaultContents(newSite, menu, Authenticate.getUser());
         return newSite;

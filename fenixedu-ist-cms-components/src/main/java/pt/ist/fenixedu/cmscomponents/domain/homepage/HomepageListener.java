@@ -18,24 +18,19 @@
  */
 package pt.ist.fenixedu.cmscomponents.domain.homepage;
 
-import static org.fenixedu.academic.domain.contacts.WebAddress.createWebAddress;
-import static org.fenixedu.bennu.core.i18n.BundleUtil.getLocalizedString;
-
-import java.util.Optional;
-
-import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.accessControl.TeacherGroup;
 import org.fenixedu.academic.domain.contacts.PartyContactType;
-import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
-import org.fenixedu.cms.domain.*;
+import org.fenixedu.cms.domain.Menu;
+import org.fenixedu.cms.domain.Page;
+import org.fenixedu.cms.domain.Site;
 import org.fenixedu.cms.domain.component.Component;
-import org.fenixedu.commons.i18n.I18N;
 import org.fenixedu.commons.i18n.LocalizedString;
-
 import pt.ist.fenixedu.cmscomponents.domain.homepage.components.PresentationComponent;
 import pt.ist.fenixedu.cmscomponents.domain.homepage.components.ResearcherComponent;
+
+import static org.fenixedu.academic.domain.contacts.WebAddress.createWebAddress;
+import static org.fenixedu.bennu.core.i18n.BundleUtil.getLocalizedString;
 
 /**
  * Created by borgez on 24-11-2014.
@@ -49,31 +44,24 @@ public class HomepageListener {
     private static final String PRIZES_KEY = "homepage.researcher.prizes";
 
     private static final LocalizedString PRESENTATION_TITLE = getLocalizedString(BUNDLE, "homepage.presentation.title");
-    private static final LocalizedString MENU_TITLE = getLocalizedString("resources.FenixEduLearningResources", "label.menu");
     private static final LocalizedString INTERESTS_TITLE = getLocalizedString(BUNDLE, INTERESTS_KEY);
     private static final LocalizedString PATENTS_TITLE = getLocalizedString(BUNDLE, PATENTS_KEY);
     private static final LocalizedString PUBLICATIONS_TITLE = getLocalizedString(BUNDLE, PUBLICATIONS_KEY);
     private static final LocalizedString ACTIVITIES_TITLE = getLocalizedString(BUNDLE, ACTIVITIES_KEY);
     private static final LocalizedString PRIZES_TITLE = getLocalizedString(BUNDLE, PRIZES_KEY);
-
-    private static final String HOMEPAGE_FOLDER_PATH = "homepage";
-
+    
+    private static final LocalizedString MENU_TITLE = getLocalizedString("resources.FenixEduLearningResources", "label.menu");
+    
     public static Site create(Person person) {
-        LocalizedString name = new LocalizedString(I18N.getLocale(), person.getProfile().getDisplayName());
-        Site newsite = new Site(name,name);
-        Menu menu = new Menu(newsite, MENU_TITLE);
-
-        new HomepageSite(newsite);
-        newsite.setOwner(person);
-
-        newsite.setTheme(CMSTheme.forType("fenixedu-homepages-theme"));
-        createDefaultContents(newsite, menu, person.getUser());
-        getHomepageFolder().ifPresent(newsite::setFolder);
-        addContact(person, newsite);
-        createSiteRoles(newsite,person.getUser());
-        newsite.setPublished(true);
-        newsite.getHomepageSite().setShowPhoto(true);
-        return newsite;
+        Site newSite = HomepageSiteBuilder.getInstance().create(person);
+    
+        Menu menu = new Menu(newSite, MENU_TITLE);
+    
+        createDefaultContents(newSite, menu, person.getUser());
+        addContact(person, newSite);
+        newSite.getHomepageSite().setShowPhoto(true);
+        return newSite;
+        
     }
 
     public static void createDefaultContents(Site newSite, Menu menu, User user) {
@@ -94,21 +82,9 @@ public class HomepageListener {
 
         newSite.setInitialPage(initialPage);
     }
-
-    private static void createSiteRoles(Site newSite,User user) {
-        new Role(DefaultRoles.getInstance().getAdminRole(), newSite);
-        new Role(DefaultRoles.getInstance().getAuthorRole(), newSite);
-        new Role(DefaultRoles.getInstance().getContributorRole(), newSite);
-        Role editor = new Role(DefaultRoles.getInstance().getEditorRole(), newSite);
-        editor.setGroup(editor.getGroup().toGroup().grant(user).toPersistentGroup());
-    }
-
+    
     private static void addContact(Person owner, Site homepageSite) {
         createWebAddress(owner, homepageSite.getFullUrl(), PartyContactType.INSTITUTIONAL, true);
     }
 
-    private static Optional<CMSFolder> getHomepageFolder() {
-        return Bennu.getInstance().getCmsFolderSet().stream()
-                .filter(folder -> HOMEPAGE_FOLDER_PATH.equals(folder.getFunctionality().getPath())).findFirst();
-    }
 }

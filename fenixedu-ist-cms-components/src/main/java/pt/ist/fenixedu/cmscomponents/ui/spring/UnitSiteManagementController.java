@@ -21,6 +21,8 @@ package pt.ist.fenixedu.cmscomponents.ui.spring;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.fenixedu.bennu.io.servlet.FileDownloadServlet.getDownloadUrl;
+import static org.fenixedu.cms.domain.PermissionEvaluation.canAccess;
+import static org.fenixedu.cms.domain.PermissionEvaluation.ensureCanAccess;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -29,6 +31,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.flickr4java.flickr.auth.Auth;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.exceptions.BennuCoreDomainException;
@@ -37,13 +40,7 @@ import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.io.domain.GroupBasedFile;
 import org.fenixedu.bennu.spring.portal.SpringApplication;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
-import org.fenixedu.cms.domain.CMSTemplate;
-import org.fenixedu.cms.domain.Category;
-import org.fenixedu.cms.domain.PermissionEvaluation;
-import org.fenixedu.cms.domain.Post;
-import org.fenixedu.cms.domain.PostFile;
-import org.fenixedu.cms.domain.PostMetadata;
-import org.fenixedu.cms.domain.Site;
+import org.fenixedu.cms.domain.*;
 import org.fenixedu.cms.exceptions.CmsDomainException;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.springframework.ui.Model;
@@ -100,7 +97,7 @@ public class UnitSiteManagementController {
     private List<Site> getSites() {
         User user = Authenticate.getUser();
         Set<Site> allSites = Bennu.getInstance().getSitesSet();
-        return allSites.stream().filter(site -> PermissionEvaluation.canAccess(user, site)).collect(Collectors.toList());
+        return allSites.stream().filter(site -> canAccess(user, site)).collect(Collectors.toList());
     }
 
     @RequestMapping(value = "/{unitSiteSlug}")
@@ -167,11 +164,7 @@ public class UnitSiteManagementController {
     @RequestMapping(value = "default", method = RequestMethod.POST)
     public RedirectView setAsDefault(@RequestParam String slug) {
         Site s = Site.fromSlug(slug);
-
-        if (!Group.managers().isMember(Authenticate.getUser())) {
-            throw CmsDomainException.forbiden();
-        }
-
+        CmsSettings.getInstance().ensureCanManageSettings();
         makeDefaultSite(s);
 
         return new RedirectView("/unit/sites", true);
@@ -192,7 +185,7 @@ public class UnitSiteManagementController {
             throw BennuCoreDomainException.resourceNotFound(unitSiteSlug);
         }
         if (site.getUnit()!=null) {
-            if (!PermissionEvaluation.canAccess(Authenticate.getUser(), site)) {
+            if (!canAccess(Authenticate.getUser(), site)) {
                 throw CmsDomainException.forbiden();
             }
         }

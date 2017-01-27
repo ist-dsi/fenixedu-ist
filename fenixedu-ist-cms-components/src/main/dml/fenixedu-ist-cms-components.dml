@@ -13,12 +13,18 @@ class homepage.HomepageSite  {
     LocalizedString researchUnitName;
 }
 
+class homepage.HomepageSiteBuilder extends .org.fenixedu.cms.domain.SystemSiteBuilder {
+}
+
 class homepage.components.ResearcherComponent extends .org.fenixedu.cms.domain.component.Component  {
 	String titleKey;
 	String titleBundle;
 	String dataKey;
 }
 
+
+class unit.UnitSiteBuilder extends .org.fenixedu.cms.domain.SystemSiteBuilder {
+}
 
 relation PersonHasHomepage {
     .org.fenixedu.cms.domain.Site playsRole homepage {
