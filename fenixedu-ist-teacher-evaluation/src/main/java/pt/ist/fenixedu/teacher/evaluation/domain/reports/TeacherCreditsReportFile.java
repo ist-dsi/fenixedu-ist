@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
@@ -98,6 +99,8 @@ public class TeacherCreditsReportFile extends TeacherCreditsReportFile_Base {
         spreadsheet.setHeader("CLA");
         spreadsheet.setHeader("SNE - Descrição");
         spreadsheet.setHeader("O - Descrição");
+        spreadsheet.setHeader("Nacionalidade");
+        spreadsheet.setHeader("Género");
 
         Collection<Teacher> teachers = Bennu.getInstance().getTeachersSet();
         for (ExecutionSemester executionSemester : executionYear.getExecutionPeriodsSet()) {
@@ -181,9 +184,20 @@ public class TeacherCreditsReportFile extends TeacherCreditsReportFile_Base {
                     }
                     row.setCell(getServiceExemptionDescription(executionSemester, teacher)); //SNE Desc
                     row.setCell(teacherService == null ? EMPTY_CELL : getOthersDesciption(teacherService));//O (desc)
+                    row.setCell(getNationality(teacher)); //Nacionalidade
+                    row.setCell(
+                            teacher.getPerson().getGender() != null ? teacher.getPerson().getGender().getLocalizedName() : null);//Genero
                 }
             }
         }
+    }
+
+    private String getNationality(Teacher teacher) {
+        Country country = teacher.getPerson().getCountry();
+        if (country == null || country.getCountryNationality() == null) {
+            return null;
+        }
+        return country.getCountryNationality().toString();
     }
 
     private ProfessionalRegime getProfessionalRegime(PersonContractSituation teacherContractSituation, Interval interval) {
