@@ -46,8 +46,8 @@
 	<fr:schema bundle="TEACHER_CREDITS_SHEET_RESOURCES" type="pt.ist.fenixedu.teacher.evaluation.dto.DepartmentCreditsAuthorizationBean" >
 		<fr:slot name="department" key="label.department" layout="menu-select-postback" validator="pt.ist.fenixWebFramework.renderers.validators.RequiredValidator">
 	        <fr:property name="from" value="availableDepartments"/>
-			<fr:property name="format" value="\${name}"/>
-	        <fr:property name="sortBy" value="name" />
+			<fr:property name="format" value="\${name.content}"/>
+	        <fr:property name="sortBy" value="name.content" />
 	        <fr:property name="destination" value="postback" />
    		</fr:slot>
    		<fr:slot name="person" layout="autoComplete" key="label.user" required="true">

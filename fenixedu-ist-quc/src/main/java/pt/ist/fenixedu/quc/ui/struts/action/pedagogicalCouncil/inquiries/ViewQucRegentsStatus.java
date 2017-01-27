@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -140,7 +141,8 @@ public class ViewQucRegentsStatus extends FenixDispatchAction {
 
         for (RegentBean regentBean : regentsList) {
             Row row = spreadsheet.addRow();
-            row.setCell(regentBean.getDepartment() != null ? regentBean.getDepartment().getName() : "-");
+            row.setCell(regentBean.getDepartment() != null ? regentBean.getDepartment().getName().getContent(
+                    Locale.forLanguageTag("pt")) : "-");
             row.setCell(regentBean.getRegent().getName());
             row.setCell(regentBean.getRegent().getUsername());
             row.setCell(regentBean.getRegent().getDefaultMobilePhoneNumber());

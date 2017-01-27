@@ -44,7 +44,8 @@
 		<fr:slot name="teacherEvaluationProcess.facultyEvaluationProcess.title" key="label.teacher.evaluation.evaluation" layout="null-as-label" />
 		<fr:slot name="teacherEvaluationProcess.evaluee.presentationName" key="label.teacher.evaluation.evaluee" layout="null-as-label" />
 		<fr:slot name="teacherAuthorization.teacherCategory.name" key="label.category" layout="null-as-label" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/>
-		<fr:slot name="teacherAuthorization.department.name" key="label.department" layout="null-as-label" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/>
+		<fr:slot name="teacherAuthorization.department.name.content" key="label.department" layout="null-as-label"
+                 bundle="TEACHER_CREDITS_SHEET_RESOURCES"/>
 		<fr:slot name="teacherEvaluationProcess.facultyEvaluationProcess" key="label.teacher.evaluation.facultyEvaluationProcess.evaluationInterval">
 			<fr:property name="format" value="\${teacherEvaluationProcess.facultyEvaluationProcess.beginEvaluationYear} - \${teacherEvaluationProcess.facultyEvaluationProcess.endEvaluationYear}"/>
 			<fr:property name="useParent" value="true" />

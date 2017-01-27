@@ -22,7 +22,6 @@ import static org.fenixedu.bennu.core.i18n.BundleUtil.getLocalizedString;
 import static org.fenixedu.cms.domain.component.Component.forType;
 
 import org.fenixedu.academic.domain.Department;
-import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.security.Authenticate;
@@ -48,7 +47,7 @@ public class ResearchUnitListener {
     private static final LocalizedString PUBLICATIONS_TITLE = BundleUtil.getLocalizedString(BUNDLE, "department.publications");
 
     public static Site create(Department researchUnit) {
-        final Site newSite = new Site( researchUnit.getNameI18n().toLocalizedString(), researchUnit.getNameI18n().toLocalizedString());
+        final Site newSite = new Site( researchUnit.getName(), researchUnit.getName());
         final Menu menu = new Menu(newSite, MENU_TITLE);
         createDefaultContents(newSite, menu, Authenticate.getUser());
         return newSite;

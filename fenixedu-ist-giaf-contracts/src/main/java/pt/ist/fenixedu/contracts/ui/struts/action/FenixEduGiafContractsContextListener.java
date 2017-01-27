@@ -81,7 +81,7 @@ public class FenixEduGiafContractsContextListener implements ServletContextListe
                     } else {
                         participation.setCategory(teacher.getLastCategory().getName().getContent());
                     }
-                    participation.setAffiliation(teacher.getDepartment().getRealName());
+                    participation.setAffiliation(teacher.getDepartment().getFullName().getContent());
                 } else {
                     Employee employee = person.getEmployee();
                     if (employee != null) {

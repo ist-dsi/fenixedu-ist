@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -140,7 +141,7 @@ public class ViewQucTeacherStatus extends FenixDispatchAction {
 
         for (TeacherBean teacherBean : teachersList) {
             Row row = spreadsheet.addRow();
-            row.setCell(teacherBean.getDepartment() != null ? teacherBean.getDepartment().getName() : "-");
+            row.setCell(teacherBean.getDepartment() != null ? teacherBean.getDepartment().getName().getContent(Locale.forLanguageTag("pt")) : "-");
             row.setCell(teacherBean.getTeacher().getName());
             row.setCell(teacherBean.getTeacher().getUsername());
             row.setCell(teacherBean.getTeacher().getDefaultMobilePhoneNumber());

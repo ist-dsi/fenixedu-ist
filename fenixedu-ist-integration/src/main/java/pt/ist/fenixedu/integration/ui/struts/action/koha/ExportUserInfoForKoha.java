@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -137,7 +138,7 @@ public class ExportUserInfoForKoha extends ExternalInterfaceDispatchAction {
 
         for (final Department department : rootDomainObject.getDepartmentsSet()) {
             final Row row = spreadsheet.addRow();
-            row.setCell(department.getExternalId()).setCell(department.getName());
+            row.setCell(department.getExternalId()).setCell(department.getName().getContent(Locale.forLanguageTag("pt")));
         }
 
         return sendXls(response, spreadsheet);

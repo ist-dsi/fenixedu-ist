@@ -218,7 +218,7 @@
         <property name="subLayout" value="values" />
         <property name="subSchema" value="coordinator.chooseTutor.person.email" />
     </slot>
-    <slot name="teacher.department.name" key="label.department" />
+    <slot name="teacher.department.name.content" key="label.department" />
     <slot name="teacher.category.name" key="label.teacherCategory"/>
     <slot name="teacher.numberOfPastTutorships" key="label.coordinator.tutor.tutorshipInfo.pastTutoredStudents"/>
     <slot name="teacher.numberOfActiveTutorships" key="label.coordinator.tutor.tutorshipInfo.currentTutoredStudents"/>
@@ -232,7 +232,7 @@
         <property name="useParent" value="true"/>
         <property name="linkFormat" value="/tutorManagement.do?method=viewTutorshipHistory&amp;forwardTo=prepareChooseTutorHistory&amp;teacherId=${teacher.teacherId}&amp;executionDegreeId=${executionDegreeID}&amp;degreeCurricularPlanID=${degreeCurricularPlanID}"/>
     </slot>
-    <slot name="teacher.department.name" key="label.department" />
+    <slot name="teacher.department.name.content" key="label.department" />
     <slot name="teacher.category.name" key="label.teacherCategory"/>
     <slot name="teacher.numberOfPastTutorships" key="label.coordinator.tutor.tutorshipInfo.pastTutoredStudents.br"/>
     <slot name="teacher.numberOfActiveTutorships" key="label.coordinator.tutor.tutorshipInfo.allTutoredStudents.br"/>   
@@ -265,8 +265,8 @@
         <property name="key" value="true" />
         <property name="defaultText" value="label.dropDown.all" />
         <property name="bundle" value="PEDAGOGICAL_COUNCIL" />
-        <property name="format" value="${nameI18n}" />
-        <property name="sortBy" value="name" />
+        <property name="format" value="${fullName.content}" />
+        <property name="sortBy" value="fullName.content" />
         <property name="destination" value="departmentPostBack" />
     </slot>
     <slot name="teacher" layout="menu-select-postback" key="label.teacher"
@@ -558,7 +558,7 @@
     <slot name="teacher.teacherId" key="label.teacherId"/>
     <slot name="teacher.person.personWorkPhone.number" key="label.person.workPhone.short"/>
     <slot name="teacher.category.name" key="label.teacher.category"/>
-    <slot name="teacher.department.name" key="label.teacher.department"/>
+    <slot name="teacher.department.name.content" key="label.teacher.department"/>
     <slot name="teacher.person.email" key="label.email" layout="link">
         <property name="useParent" value="true"/>
         <property name="linkFormat" value="mailto:${teacher.person.email}"/>
@@ -575,7 +575,7 @@
 <schema name="teacher.tutor.name" bundle="APPLICATION_RESOURCES" type="org.fenixedu.academic.domain.organizationalStructure.Party">  
     <slot name="name" key="label.tutor" />
     <slot name="username" key="label.teacherId"/>
-    <slot name="teacher.department.realName" key="label.department" />
+    <slot name="teacher.department.fullName.content" key="label.department" />
 </schema>
 
 <schema name="teacher.tutor.performanceGrid.filters" bundle="APPLICATION_RESOURCES" type="pt.ist.fenixedu.tutorship.dto.teacher.tutor.StudentsPerformanceInfoBean" >

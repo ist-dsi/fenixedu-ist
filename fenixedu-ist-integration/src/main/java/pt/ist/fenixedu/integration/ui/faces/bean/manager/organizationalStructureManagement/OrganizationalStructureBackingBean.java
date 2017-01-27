@@ -422,8 +422,8 @@ public class OrganizationalStructureBackingBean extends FenixBackingBean {
 
         for (Department department : allDepartments) {
             selectItem = new SelectItem();
-            selectItem.setLabel(department.getRealName());
-            selectItem.setValue(department.getExternalId().toString());
+            selectItem.setLabel(department.getFullName().getContent());
+            selectItem.setValue(department.getExternalId());
             list.add(selectItem);
         }
 

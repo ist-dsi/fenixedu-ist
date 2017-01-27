@@ -58,8 +58,8 @@ Definir Período de Preenchimento das Fichas
                         <fr:property name="key" value="true" />
                         <fr:property name="defaultText" value="label.dropDown.all" />
                         <fr:property name="bundle" value="PEDAGOGICAL_COUNCIL" />
-                        <fr:property name="format" value="${nameI18n}" />
-                        <fr:property name="sortBy" value="name" />
+                        <fr:property name="format" value="${fullName.content}" />
+                        <fr:property name="sortBy" value="fullName" />
                         <fr:property name="destination" value="postback" />
                     </fr:slot>
                     <fr:slot name="teacher" layout="menu-select-postback" key="label.teacher"

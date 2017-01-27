@@ -139,7 +139,7 @@ public class TeacherCurricularInformation implements Serializable {
                                 new Interval(executionSemesters.first().getBeginDateYearMonthDay().toDateTimeAtMidnight(),
                                         executionSemesters.last().getEndDateYearMonthDay().plusDays(1).toDateTimeAtMidnight()))
                         .map(a -> a.getDepartment()).orElse(null);
-        return lastDepartment == null ? null : lastDepartment.getName();
+        return lastDepartment == null ? null : lastDepartment.getName().getContent();
     }
 
     public String getProfessionalCategoryName() {

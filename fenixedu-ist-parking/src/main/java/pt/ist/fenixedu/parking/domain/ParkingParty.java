@@ -285,7 +285,8 @@ public class ParkingParty extends ParkingParty_Base {
             Teacher teacher = person.getTeacher();
             if (teacher != null) {
                 ExecutionSemester currentExecutionSemester = ExecutionSemester.readActualExecutionSemester();
-                String currentWorkingDepartmentName = teacher.getDepartment() != null ? teacher.getDepartment().getName() : null;
+                String currentWorkingDepartmentName = teacher.getDepartment() != null ? teacher.getDepartment().getName().getContent() :
+                        null;
                 PersonContractSituation currentOrLastTeacherContractSituation =
                         PersonContractSituation.getCurrentOrLastTeacherContractSituation(teacher);
                 if (currentOrLastTeacherContractSituation != null) {

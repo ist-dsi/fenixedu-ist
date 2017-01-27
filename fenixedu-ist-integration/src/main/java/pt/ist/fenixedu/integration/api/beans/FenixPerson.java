@@ -109,7 +109,7 @@ public class FenixPerson {
         private FenixDepartment department;
 
         public TeacherFenixRole(Department department) {
-            setDepartment(new FenixDepartment(department.getName(), department.getAcronym()));
+            setDepartment(new FenixDepartment(department.getName().getContent(), department.getAcronym()));
         }
 
         public FenixDepartment getDepartment() {

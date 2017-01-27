@@ -182,7 +182,7 @@ public class PersonInformationDTO {
         }
 
         if (person.getTeacher() != null && person.getTeacher().getDepartment() != null) {
-            this.teacherDepartment = person.getTeacher().getDepartment().getRealName();
+            this.teacherDepartment = person.getTeacher().getDepartment().getFullName().getContent();
         }
 
         if (person.getEmployee() != null) {

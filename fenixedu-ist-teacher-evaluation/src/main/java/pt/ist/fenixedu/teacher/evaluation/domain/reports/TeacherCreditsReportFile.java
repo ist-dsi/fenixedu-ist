@@ -132,9 +132,9 @@ public class TeacherCreditsReportFile extends TeacherCreditsReportFile_Base {
                     row.setCell(regime == null ? null : regime.getName().getContent());
                     row.setCell(category == null ? null : category.isTeacherProfessorCategory() ? "S" : "N");
                     Department lastDepartment = teacher.getLastDepartment(executionSemester.getAcademicInterval());
-                    row.setCell(lastDepartment == null ? null : lastDepartment.getName());
+                    row.setCell(lastDepartment == null ? null : lastDepartment.getName().getContent());
                     Department creditsDepartment = teacher.getDepartment(executionSemester.getAcademicInterval()).orElse(null);
-                    row.setCell(creditsDepartment == null ? null : creditsDepartment.getName());
+                    row.setCell(creditsDepartment == null ? null : creditsDepartment.getName().getContent());
 
                     TeacherService teacherService = TeacherService.getTeacherServiceByExecutionPeriod(teacher, executionSemester);
                     row.setCell(teacherService == null ? 0 : teacherService.getTeachingDegreeHours());// CLE

@@ -67,7 +67,7 @@
             </fr:schema>
             <fr:layout name="tabular-editable">
                 <fr:property name="classes" value="tstyle1" />
-                <fr:property name="sortBy" value="department.name=asc,teacher.person.name=asc"></fr:property>
+                <fr:property name="sortBy" value="department.name.content=asc,teacher.person.name=asc"></fr:property>
             </fr:layout>
         </fr:edit>
         <html:submit>

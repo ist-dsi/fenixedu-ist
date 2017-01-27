@@ -631,8 +631,8 @@ extends="presentSimpleConvokesWithoutLink">
 
 <schema name="addExternalCourse-withoutjs" type="pt.ist.fenixedu.vigilancies.ui.struts.action.vigilancy.VigilancyCourseGroupBean" bundle="VIGILANCY_RESOURCES">
         <slot name="selectedDepartment" key="label.vigilancy.department" layout="menu-select">
-            <property name="format" value="${realName}"/>
-            <property name="sortBy" value="realName"/>
+            <property name="format" value="${fullName.content}"/>
+            <property name="sortBy" value="fullName.content"/>
             <property name="providerClass" value="org.fenixedu.academic.ui.renderers.providers.choiceType.replacement.single.DepartmentProvider"/>
         </slot>
         <slot name="externalCourse" key="label.vigilancy.name" layout="menu-select">

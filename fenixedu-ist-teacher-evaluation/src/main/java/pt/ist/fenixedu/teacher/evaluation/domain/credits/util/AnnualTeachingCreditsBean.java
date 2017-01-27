@@ -173,7 +173,7 @@ public class AnnualTeachingCreditsBean implements Serializable {
 
     public String getDepartmentName() {
         Department department = teacher.getLastDepartment(executionYear.getAcademicInterval());
-        return department == null ? null : department.getName();
+        return department == null ? null : department.getName().getContent();
     }
 
     public List<ThesisEvaluationParticipant> getMasterDegreeThesis() {

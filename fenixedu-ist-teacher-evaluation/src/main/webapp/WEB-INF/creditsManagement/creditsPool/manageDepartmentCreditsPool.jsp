@@ -38,7 +38,7 @@
 				<c:forEach var="pool" items="${creditsPoolBean.creditsPoolByDepartments}" varStatus="status">
 					<input type="hidden" name="creditsPoolByDepartments[${status.index}].department" value="<c:out value='${pool.department.externalId}'/>"/>
 					<tr>
-						<td><c:out value="${pool.department.name}"/></td>
+						<td><c:out value="${pool.department.name.content}"/></td>
 						<c:choose>
 							<c:when test="${canEditCreditsPool}">
 							    <td><form:input path="creditsPoolByDepartments[${status.index}].originalCreditsPool" class="form-control" value="${pool.originalCreditsPool}" type="number" step="any" min="0"/></td>
