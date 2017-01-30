@@ -56,6 +56,19 @@
 			</fr:layout>
 		</fr:edit>
 	</fr:form>
+	
+	
+	<logic:equal name="teacherCreditsBean" property="canCreateTeacherAuthorizations" value="true">
+			<fr:form id="teacherCreditsBeanForm" action="/defineCreditsPeriods.do?method=createTeacherAuthorizations">
+				<fr:edit name="teacherCreditsBean" visible="false"/>
+				<bean:define id="confirmationMessage"><bean:message key="message.confirmation.createTeacherAuthorizations"  bundle="TEACHER_CREDITS_SHEET_RESOURCES"/></bean:define>
+				<html:submit bundle="HTMLALT_RESOURCES" altKey="submit.submit" styleClass="inputbutton" onclick="<%="return confirm('"+confirmationMessage+"')" %>">
+					<bean:message key="link.teacherAuthorizations.create"  bundle="TEACHER_CREDITS_SHEET_RESOURCES"/>
+				</html:submit>
+			</fr:form>
+	</logic:equal>
+	
+	
 	<h3 class="mtop15 mbottom05"><bean:message key="label.teacher"/></h3>
 	<fr:view name="teacherCreditsBean" layout="tabular">
 		<fr:schema type="pt.ist.fenixedu.teacher.evaluation.dto.teacherCredits.TeacherCreditsPeriodBean" bundle="TEACHER_CREDITS_SHEET_RESOURCES">
