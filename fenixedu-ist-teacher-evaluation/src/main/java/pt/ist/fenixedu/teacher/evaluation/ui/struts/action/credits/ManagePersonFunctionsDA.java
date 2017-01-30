@@ -38,6 +38,7 @@ import org.fenixedu.bennu.struts.portal.EntryPoint;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
 
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.PersonFunction;
+import pt.ist.fenixedu.teacher.evaluation.domain.credits.AnnualCreditsState;
 import pt.ist.fenixedu.teacher.evaluation.domain.credits.util.DepartmentCreditsBean;
 import pt.ist.fenixedu.teacher.evaluation.domain.credits.util.PersonFunctionBean;
 import pt.ist.fenixedu.teacher.evaluation.ui.struts.action.DepartmentCreditsManagerApp;
@@ -64,7 +65,10 @@ public class ManagePersonFunctionsDA extends FenixDispatchAction {
             departmentCreditsBean = new DepartmentCreditsBean();
         }
         request.setAttribute("departmentCreditsBean", departmentCreditsBean);
-        request.setAttribute("canViewCredits", String.valueOf(RoleType.SCIENTIFIC_COUNCIL.isMember(Authenticate.getUser())));
+        request.setAttribute("canViewCredits",
+                String.valueOf(
+                        AnnualCreditsState.getAnnualCreditsState(departmentCreditsBean.getExecutionSemester().getExecutionYear())
+                                .getIsFinalCreditsCalculated() || RoleType.SCIENTIFIC_COUNCIL.isMember(Authenticate.getUser())));
         return mapping.findForward("showDepartmentPersonFunctions");
     }
 
