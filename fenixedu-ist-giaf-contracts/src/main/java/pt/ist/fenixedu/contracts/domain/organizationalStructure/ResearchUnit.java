@@ -263,7 +263,9 @@ public class ResearchUnit extends ResearchUnit_Base {
             employees.add(contract.getEmployee());
         }
         for (Unit subUnit : getSubUnits()) {
-            employees.addAll(((ResearchUnit) subUnit).getAllWorkingEmployees());
+            if (subUnit instanceof ResearchUnit) {
+                employees.addAll(((ResearchUnit) subUnit).getAllWorkingEmployees());
+            }
         }
         return new ArrayList<Employee>(employees);
     }
