@@ -33,10 +33,12 @@ import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
+import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
@@ -46,6 +48,7 @@ import org.fenixedu.commons.spreadsheet.StyledExcelSpreadsheet;
 
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.PersonFunction;
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.PersonFunctionShared;
+import pt.ist.fenixedu.teacher.evaluation.domain.credits.AnnualCreditsState;
 import pt.ist.fenixedu.teacher.evaluation.domain.credits.util.DepartmentCreditsBean;
 import pt.ist.fenixedu.teacher.evaluation.ui.struts.action.DepartmentCreditsManagerApp;
 import pt.ist.fenixframework.FenixFramework;
@@ -130,6 +133,10 @@ public class ProjectTutorialExecutionCoursesDA extends FenixDispatchAction {
         }
         StyledExcelSpreadsheet spreadsheet = new StyledExcelSpreadsheet();
 
+        boolean canViewCredits = 
+                AnnualCreditsState.getAnnualCreditsState(departmentCreditsBean.getExecutionSemester().getExecutionYear())
+                        .getIsFinalCreditsCalculated() || RoleType.SCIENTIFIC_COUNCIL.isMember(Authenticate.getUser());
+        
         for (Department department : departments) {
             String sheetName = "Cargos_" + department.getAcronym();
             spreadsheet.getSheet(sheetName);
@@ -155,9 +162,11 @@ public class ProjectTutorialExecutionCoursesDA extends FenixDispatchAction {
                     spreadsheet.addCell(personFunction.getPerson().getName());
                     spreadsheet.addCell(personFunction.getFunction().getName());
                     spreadsheet.addCell(personFunction.getFunction().getUnit().getPresentationName());
-                    spreadsheet.addCell(personFunction instanceof PersonFunctionShared ? ((PersonFunctionShared) personFunction)
-                            .getPercentage() : "-");
-                    spreadsheet.addCell(personFunction.getCredits());
+                    if(canViewCredits) {
+                        spreadsheet.addCell(personFunction instanceof PersonFunctionShared ? ((PersonFunctionShared) personFunction)
+                                .getPercentage() : "-");
+                        spreadsheet.addCell(personFunction.getCredits());
+                    }
                 }
             }
         }
