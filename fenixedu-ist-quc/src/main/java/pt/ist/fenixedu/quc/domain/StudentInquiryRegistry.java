@@ -26,8 +26,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
@@ -146,12 +148,14 @@ public class StudentInquiryRegistry extends StudentInquiryRegistry_Base {
     }
 
     public ExecutionDegree getExecutionDegree() {
-        final Optional<StudentCurricularPlan> studentCurricularPlan =
-                getFirstStudentCurricularPlan(getRegistration(), getExecutionPeriod().getExecutionYear());
-        if (studentCurricularPlan.isPresent()) {
-            final DegreeCurricularPlan degreeCurricularPlan = studentCurricularPlan.get().getDegreeCurricularPlan();
-            return degreeCurricularPlan.getExecutionDegreeByAcademicInterval(getExecutionPeriod().getAcademicInterval());
+        Optional<ExecutionDegree> executionDegree = getActiveStudentCurricularPlans().map(scp -> scp
+                .getDegreeCurricularPlan().getExecutionDegreeByAcademicInterval(getExecutionPeriod()
+                        .getAcademicInterval())).filter(Objects::nonNull).findFirst();
+
+        if (executionDegree.isPresent()) {
+            return executionDegree.get();
         }
+
         DegreeCurricularPlan lastDegreeCurricularPlan = getRegistration().getLastDegreeCurricularPlan();
         if (lastDegreeCurricularPlan != null) {
             return lastDegreeCurricularPlan.getExecutionDegreeByAcademicInterval(getExecutionPeriod().getAcademicInterval());
@@ -159,9 +163,11 @@ public class StudentInquiryRegistry extends StudentInquiryRegistry_Base {
         return null;
     }
 
-    private Optional<StudentCurricularPlan> getFirstStudentCurricularPlan(Registration registration, ExecutionYear executionYear) {
-        return registration.getStudentCurricularPlansSet().stream().filter(scp -> scp.isActive(executionYear))
-                .sorted(StudentCurricularPlan.STUDENT_CURRICULAR_PLAN_COMPARATOR_BY_START_DATE).findFirst();
+    private Stream<StudentCurricularPlan> getActiveStudentCurricularPlans() {
+        return getRegistration().getStudentCurricularPlansSet().stream().filter(scp -> scp
+                .isActive
+                        (getExecutionPeriod().getExecutionYear()))
+                .sorted(StudentCurricularPlan.STUDENT_CURRICULAR_PLAN_COMPARATOR_BY_START_DATE);
     }
 
     public static boolean checkTotalPercentageDistribution(List<CurricularCourseInquiriesRegistryDTO> courses) {
