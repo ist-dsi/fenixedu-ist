@@ -130,4 +130,17 @@ public class ManageCreditsPeriods extends FenixDispatchAction {
         request.setAttribute("teacherCreditsBean", bean);
         return mapping.findForward("show-credits-periods");
     }
+    
+    public ActionForward createTeacherAuthorizations(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        TeacherCreditsPeriodBean bean = getRenderedObject();
+        try {
+            bean.startTeacherAuthorizations();
+        } catch (Exception e) {
+            addActionMessage(request, e.getMessage());
+        }
+        RenderUtils.invalidateViewState();
+        request.setAttribute("teacherCreditsBean", bean);
+        return mapping.findForward("show-credits-periods");
+    }
 }

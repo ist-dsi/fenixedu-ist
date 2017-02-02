@@ -21,12 +21,12 @@ package pt.ist.fenixedu.teacher.evaluation.dto.teacherCredits;
 import java.io.Serializable;
 
 import org.fenixedu.academic.domain.ExecutionSemester;
-import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 
+import pt.ist.fenixedu.contracts.service.UpdateTeacherAuthorizationsForSemester;
 import pt.ist.fenixedu.teacher.evaluation.domain.credits.AnnualCreditsState;
 import pt.ist.fenixedu.teacher.evaluation.domain.time.calendarStructure.TeacherCreditsFillingForDepartmentAdmOfficeCE;
 import pt.ist.fenixedu.teacher.evaluation.domain.time.calendarStructure.TeacherCreditsFillingForTeacherCE;
@@ -258,4 +258,17 @@ public class TeacherCreditsPeriodBean implements Serializable {
         return getAnnualCreditsState().getIsCreditsClosed()
                 && getAnnualCreditsState().equals(AnnualCreditsState.getLastClosedAnnualCreditsState());
     }
+
+    @Atomic
+    public void startTeacherAuthorizations() {
+        if (getCanCreateTeacherAuthorizations()) {
+            new UpdateTeacherAuthorizationsForSemester().updateTeacherAuthorization(getExecutionPeriod());
+        }
+    }
+
+    public boolean getCanCreateTeacherAuthorizations() {
+        return (!getExecutionPeriod().getTeacherAuthorizationStream().findAny().isPresent())
+                && getExecutionPeriod().getPreviousExecutionPeriod().getTeacherAuthorizationStream().findAny().isPresent();
+    }
+
 }
