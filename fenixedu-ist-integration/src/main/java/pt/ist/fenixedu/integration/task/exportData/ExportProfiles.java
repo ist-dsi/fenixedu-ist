@@ -23,12 +23,15 @@ import pt.ist.fenixframework.Atomic.TxMode;
 
 import java.io.FileOutputStream;
 
+import org.fenixedu.academic.domain.Person;
 import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.UserProfile;
 import org.fenixedu.bennu.scheduler.annotation.Task;
 import org.fenixedu.bennu.scheduler.custom.CustomTask;
 import org.joda.time.LocalDate;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
@@ -61,10 +64,27 @@ public class ExportProfiles extends CustomTask {
         object.addProperty("familyNames", up.getFamilyNames());
         object.addProperty("displayName", up.getDisplayName());
         object.addProperty("email", up.getEmail());
+        object.add("userAliases", aliasesFor(up));
         LocalDate expiration = up.getUser().getExpiration();
         object.addProperty("expiration", expiration == null ? null : expiration.toString());
         object.add("roles", LegacyRoleUtils.mainRoleKeys(up.getUser()).stream().map(JsonPrimitive::new).collect(toJsonArray()));
         return object;
+    }
+
+    private JsonArray aliasesFor(final UserProfile up) {
+    	final User user = up.getUser();
+    	final Person person = user.getPerson();
+    	final JsonArray result = new JsonArray();
+    	result.add(new JsonPrimitive(user.getUsername()));
+    	if (person != null) {
+    		if (person.getEmployee() != null) {
+    			result.add(new JsonPrimitive(person.getEmployee().getEmployeeNumber()));
+    		}
+    		if (person.getStudent() != null) {
+    			result.add(new JsonPrimitive(person.getStudent().getNumber()));
+    		}
+    	}
+    	return result;
     }
 
 }
