@@ -53,7 +53,6 @@ import pt.ist.fenixedu.quc.domain.reports.WorkloadSummaryBoardReportFile;
 import pt.ist.fenixedu.teacher.evaluation.domain.reports.EffectiveTeachingLoadReportFile;
 import pt.ist.fenixedu.teacher.evaluation.domain.reports.TeacherCreditsReportFile;
 import pt.ist.fenixedu.teacher.evaluation.domain.reports.TeachersByShiftReportFile;
-import pt.ist.fenixedu.teacher.evaluation.domain.reports.TeachersListFromGiafReportFile;
 import pt.ist.fenixedu.teacher.evaluation.domain.reports.TimetablesReportFile;
 import pt.ist.fenixedu.tutorship.domain.reports.TutorshipProgramReportFile;
 import pt.ist.fenixframework.Atomic;
@@ -104,16 +103,6 @@ public class ReportFileFactory {
         dissertationsWithExternalAffiliationsReportFile.setDegreeType(degreeType);
         dissertationsWithExternalAffiliationsReportFile.setExecutionYear(executionYear);
         return dissertationsWithExternalAffiliationsReportFile;
-    }
-
-    @Atomic
-    public static GepReportFile createTeachersListFromGiafReportFile(String type, DegreeType degreeType,
-            ExecutionYear executionYear) {
-        final TeachersListFromGiafReportFile teachersListFromGiafReportFile = new TeachersListFromGiafReportFile();
-        teachersListFromGiafReportFile.setType(type);
-        teachersListFromGiafReportFile.setDegreeType(degreeType);
-        teachersListFromGiafReportFile.setExecutionYear(executionYear);
-        return teachersListFromGiafReportFile;
     }
 
     @Atomic

@@ -251,19 +251,19 @@
 			           <bean:message key="label.report.course.load.and.responsibles" bundle="GEP_RESOURCES"/>
 			       </td>
 			       <td>
-			           <bean:define id="urlCourseLoadAndResponsiblesCsv" type="java.lang.String"><bean:write name="urlCourseLoadAndResponsibles" filter="false"/>&amp;format=csv&amp;type=18</bean:define>
+			           <bean:define id="urlCourseLoadAndResponsiblesCsv" type="java.lang.String"><bean:write name="urlCourseLoadAndResponsibles" filter="false"/>&amp;format=csv&amp;type=17</bean:define>
 			           <html:link page="<%= urlCourseLoadAndResponsiblesCsv %>">
 			               <bean:message key="label.request.csv" bundle="GEP_RESOURCES" />
 			           </html:link>
 			           |
-			           <bean:define id="urlCourseLoadAndResponsiblesXls" type="java.lang.String"><bean:write name="urlCourseLoadAndResponsibles" filter="false"/>&amp;format=xls&amp;type=18</bean:define>
+			           <bean:define id="urlCourseLoadAndResponsiblesXls" type="java.lang.String"><bean:write name="urlCourseLoadAndResponsibles" filter="false"/>&amp;format=xls&amp;type=17</bean:define>
 			           <html:link page="<%= urlCourseLoadAndResponsiblesXls %>">
 			               <bean:message key="label.request.xls" bundle="GEP_RESOURCES" />
 			           </html:link>
 			       </td>
 			       <td>
-			           <html:link page="<%= viewReports + "&type=18" %>">
-			               <bean:message key="label.view.requests.done" bundle="GEP_RESOURCES" /> (<bean:write name="numberOfReportsType18"/>)
+			           <html:link page="<%= viewReports + "&type=17" %>">
+			               <bean:message key="label.view.requests.done" bundle="GEP_RESOURCES" /> (<bean:write name="numberOfReportsType17"/>)
 			           </html:link>
 			       </td>
 			    </tr>
@@ -380,19 +380,19 @@
 						<bean:message key="label.report.teachers.and.lessons" bundle="GEP_RESOURCES"/>
 					</td>
 					<td>
-						<bean:define id="urlTimetablesCsv" type="java.lang.String"><bean:write name="urlTimetables" filter="false"/>&amp;format=csv&amp;type=19</bean:define>
+						<bean:define id="urlTimetablesCsv" type="java.lang.String"><bean:write name="urlTimetables" filter="false"/>&amp;format=csv&amp;type=18</bean:define>
 						<html:link page="<%= urlTimetablesCsv %>">
 							<bean:message key="label.request.csv" bundle="GEP_RESOURCES" />
 						</html:link>
 						|
-						<bean:define id="urlTimetablesXls" type="java.lang.String"><bean:write name="urlTimetables" filter="false"/>&amp;format=xls&amp;type=19</bean:define>
+						<bean:define id="urlTimetablesXls" type="java.lang.String"><bean:write name="urlTimetables" filter="false"/>&amp;format=xls&amp;type=18</bean:define>
 						<html:link page="<%= urlTimetablesXls %>">
 							<bean:message key="label.request.xls" bundle="GEP_RESOURCES" />
 						</html:link>
 					</td>
 					<td>
-						<html:link page="<%= viewReports + "&type=19" %>">
-							<bean:message key="label.view.requests.done" bundle="GEP_RESOURCES" /> (<bean:write name="numberOfReportsType19"/>)
+						<html:link page="<%= viewReports + "&type=18" %>">
+							<bean:message key="label.view.requests.done" bundle="GEP_RESOURCES" /> (<bean:write name="numberOfReportsType18"/>)
 						</html:link>
 					</td>
 				</tr>
@@ -474,19 +474,19 @@
                             <bean:message key="label.report.raides.specialization" bundle="GEP_RESOURCES"/>
                         </td>
                         <td>
-                            <bean:define id="urlRaidesSpecializationCsv" type="java.lang.String"><bean:write name="urlRaidesSpecialization" filter="false"/>&amp;format=csv&amp;type=20</bean:define>
+                            <bean:define id="urlRaidesSpecializationCsv" type="java.lang.String"><bean:write name="urlRaidesSpecialization" filter="false"/>&amp;format=csv&amp;type=19</bean:define>
                             <html:link page="<%= urlRaidesSpecializationCsv %>">
                                 <bean:message key="label.request.csv" bundle="GEP_RESOURCES" />
                             </html:link>
                             |
-                            <bean:define id="urlRaidesSpecializationXls" type="java.lang.String"><bean:write name="urlRaidesSpecialization" filter="false"/>&amp;format=xls&amp;type=20</bean:define>
+                            <bean:define id="urlRaidesSpecializationXls" type="java.lang.String"><bean:write name="urlRaidesSpecialization" filter="false"/>&amp;format=xls&amp;type=19</bean:define>
                             <html:link page="<%= urlRaidesSpecializationXls %>">
                                 <bean:message key="label.request.xls" bundle="GEP_RESOURCES" />
                             </html:link>
                         </td>
                         <td>
-                            <html:link page="<%= viewReports + "&type=20" %>">
-                                <bean:message key="label.view.requests.done" bundle="GEP_RESOURCES" /> (<bean:write name="numberOfReportsType20"/>)
+                            <html:link page="<%= viewReports + "&type=19" %>">
+                                <bean:message key="label.view.requests.done" bundle="GEP_RESOURCES" /> (<bean:write name="numberOfReportsType19"/>)
                             </html:link>
                         </td>
                     </tr>
@@ -505,7 +505,6 @@
 <bean:define id="urlDissertations" type="java.lang.String">/reportsByDegreeType.do?method=downloadDissertationsWithExternalAffiliations&amp;<bean:write name="args" filter="false"/></bean:define>
 <bean:define id="urlDissertationsProposals" type="java.lang.String">/reportsByDegreeType.do?method=downloadDissertationsProposals&amp;<bean:write name="args" filter="false"/></bean:define>
 <bean:define id="urlTeachersFromAplica" type="java.lang.String">/reportsByDegreeType.do?method=downloadTeachersListFromAplica&amp;<bean:write name="args" filter="false"/></bean:define>
-<bean:define id="urlTeachersFromGiaf" type="java.lang.String">/reportsByDegreeType.do?method=downloadTeachersListFromGiaf&amp;<bean:write name="args" filter="false"/></bean:define>
 <bean:define id="urlTeacherCreditsReportFile" type="java.lang.String">/reportsByDegreeType.do?method=downloadTeacherCreditsReportFile&amp;<bean:write name="args" filter="false"/></bean:define>
 <bean:define id="urlEffectiveTeachingLoadReportFile" type="java.lang.String">/reportsByDegreeType.do?method=downloadEffectiveTeachingLoadReportFile&amp;<bean:write name="args" filter="false"/>
 </bean:define>
@@ -529,19 +528,19 @@
 				<bean:message key="label.report.summaries" bundle="GEP_RESOURCES"/>
 			</td>
 			<td>
-				<bean:define id="urlSummariesCsv" type="java.lang.String"><bean:write name="urlSummaries" filter="false"/>&amp;format=csv&amp;type=21</bean:define>
+				<bean:define id="urlSummariesCsv" type="java.lang.String"><bean:write name="urlSummaries" filter="false"/>&amp;format=csv&amp;type=20</bean:define>
 				<html:link page="<%= urlSummariesCsv %>">
 					<bean:message key="label.request.csv" bundle="GEP_RESOURCES" />
 				</html:link>
 				|
-				<bean:define id="urlSummariesXls" type="java.lang.String"><bean:write name="urlSummaries" filter="false"/>&amp;format=xls&amp;type=21</bean:define>
+				<bean:define id="urlSummariesXls" type="java.lang.String"><bean:write name="urlSummaries" filter="false"/>&amp;format=xls&amp;type=20</bean:define>
 				<html:link page="<%= urlSummariesXls %>">
 					<bean:message key="label.request.xls" bundle="GEP_RESOURCES" />
 				</html:link>
 			</td>
 			<td>
-				<html:link page="<%= viewReports + "&type=21" %>">
-					<bean:message key="label.view.requests.done" bundle="GEP_RESOURCES" /> (<bean:write name="numberOfReportsType21"/>)
+				<html:link page="<%= viewReports + "&type=20" %>">
+					<bean:message key="label.view.requests.done" bundle="GEP_RESOURCES" /> (<bean:write name="numberOfReportsType20"/>)
 				</html:link>
 			</td>
 		</tr>
@@ -550,19 +549,19 @@
 				<bean:message key="label.report.writtenEvaluations" bundle="GEP_RESOURCES"/>
 			</td>
 			<td>
-				<bean:define id="urlWrittenEvaluationsCsv" type="java.lang.String"><bean:write name="urlWrittenEvaluations" filter="false"/>&amp;format=csv&amp;type=22</bean:define>
+				<bean:define id="urlWrittenEvaluationsCsv" type="java.lang.String"><bean:write name="urlWrittenEvaluations" filter="false"/>&amp;format=csv&amp;type=21</bean:define>
 				<html:link page="<%= urlWrittenEvaluationsCsv %>">
 					<bean:message key="label.request.csv" bundle="GEP_RESOURCES" />
 				</html:link>
 				|
-				<bean:define id="urlWrittenEvaluationsXls" type="java.lang.String"><bean:write name="urlWrittenEvaluations" filter="false"/>&amp;format=xls&amp;type=22</bean:define>
+				<bean:define id="urlWrittenEvaluationsXls" type="java.lang.String"><bean:write name="urlWrittenEvaluations" filter="false"/>&amp;format=xls&amp;type=21</bean:define>
 				<html:link page="<%= urlWrittenEvaluationsXls %>">
 					<bean:message key="label.request.xls" bundle="GEP_RESOURCES" />
 				</html:link>
 			</td>
 			<td>
-				<html:link page="<%= viewReports + "&type=22" %>">
-					<bean:message key="label.view.requests.done" bundle="GEP_RESOURCES" /> (<bean:write name="numberOfReportsType22"/>)
+				<html:link page="<%= viewReports + "&type=21" %>">
+					<bean:message key="label.view.requests.done" bundle="GEP_RESOURCES" /> (<bean:write name="numberOfReportsType21"/>)
 				</html:link>
 			</td>
 		</tr>
@@ -632,36 +631,36 @@
 	</tr--%>
 	<tr>
 		<td style="width: 350px;">
-			<bean:message key="label.report.teachersList.from.giaf" arg0="<%=org.fenixedu.academic.domain.organizationalStructure.Unit.getInstitutionAcronym()%>" bundle="GEP_RESOURCES"/>
+			<bean:message key="label.report.teacherCredits" arg0="<%=org.fenixedu.academic.domain.organizationalStructure.Unit.getInstitutionAcronym()%>" bundle="GEP_RESOURCES"/>
 		</td>
 		<td>
-			<bean:define id="urlTeachersCsv" type="java.lang.String"><bean:write name="urlTeachersFromGiaf" filter="false"/>&amp;format=csv&amp;type=17</bean:define>
+			<bean:define id="urlTeachersCsv" type="java.lang.String"><bean:write name="urlTeacherCreditsReportFile" filter="false"/>&amp;format=csv&amp;type=22</bean:define>
 			<html:link page="<%= urlTeachersCsv %>">
 				<bean:message key="label.request.csv" bundle="GEP_RESOURCES" />
 			</html:link>
 			|
-			<bean:define id="urlTeachersXls" type="java.lang.String"><bean:write name="urlTeachersFromGiaf" filter="false"/>&amp;format=xls&amp;type=17</bean:define>
+			<bean:define id="urlTeachersXls" type="java.lang.String"><bean:write name="urlTeacherCreditsReportFile" filter="false"/>&amp;format=xls&amp;type=22</bean:define>
 			<html:link page="<%= urlTeachersXls %>">
 				<bean:message key="label.request.xls" bundle="GEP_RESOURCES" />
 			</html:link>
 		</td>
 		<td>
-			<html:link page="<%= viewReports + "&type=17" %>">
-				<bean:message key="label.view.requests.done" bundle="GEP_RESOURCES" /> (<bean:write name="numberOfReportsType17"/>)
+			<html:link page="<%= viewReports + "&type=22" %>">
+				<bean:message key="label.view.requests.done" bundle="GEP_RESOURCES" /> (<bean:write name="numberOfReportsType22"/>)
 			</html:link>
 		</td>
 	</tr>
 	<tr>
 		<td style="width: 350px;">
-			<bean:message key="label.report.teacherCredits" arg0="<%=org.fenixedu.academic.domain.organizationalStructure.Unit.getInstitutionAcronym()%>" bundle="GEP_RESOURCES"/>
+			<bean:message key="label.report.effectiveTeachingLoad" bundle="GEP_RESOURCES"/>
 		</td>
 		<td>
-			<bean:define id="urlTeachersCsv" type="java.lang.String"><bean:write name="urlTeacherCreditsReportFile" filter="false"/>&amp;format=csv&amp;type=23</bean:define>
+			<bean:define id="urlTeachersCsv" type="java.lang.String"><bean:write name="urlEffectiveTeachingLoadReportFile" filter="false"/>&amp;format=csv&amp;type=23</bean:define>
 			<html:link page="<%= urlTeachersCsv %>">
 				<bean:message key="label.request.csv" bundle="GEP_RESOURCES" />
 			</html:link>
 			|
-			<bean:define id="urlTeachersXls" type="java.lang.String"><bean:write name="urlTeacherCreditsReportFile" filter="false"/>&amp;format=xls&amp;type=23</bean:define>
+			<bean:define id="urlTeachersXls" type="java.lang.String"><bean:write name="urlEffectiveTeachingLoadReportFile" filter="false"/>&amp;format=xls&amp;type=23</bean:define>
 			<html:link page="<%= urlTeachersXls %>">
 				<bean:message key="label.request.xls" bundle="GEP_RESOURCES" />
 			</html:link>
@@ -673,38 +672,38 @@
 		</td>
 	</tr>
 	<tr>
-		<td style="width: 350px;">
-			<bean:message key="label.report.effectiveTeachingLoad" bundle="GEP_RESOURCES"/>
-		</td>
-		<td>
-			<bean:define id="urlTeachersCsv" type="java.lang.String"><bean:write name="urlEffectiveTeachingLoadReportFile" filter="false"/>&amp;format=csv&amp;type=24</bean:define>
-			<html:link page="<%= urlTeachersCsv %>">
-				<bean:message key="label.request.csv" bundle="GEP_RESOURCES" />
-			</html:link>
-			|
-			<bean:define id="urlTeachersXls" type="java.lang.String"><bean:write name="urlEffectiveTeachingLoadReportFile" filter="false"/>&amp;format=xls&amp;type=24</bean:define>
-			<html:link page="<%= urlTeachersXls %>">
-				<bean:message key="label.request.xls" bundle="GEP_RESOURCES" />
-			</html:link>
-		</td>
-		<td>
-			<html:link page="<%= viewReports + "&type=24" %>">
-				<bean:message key="label.view.requests.done" bundle="GEP_RESOURCES" /> (<bean:write name="numberOfReportsType24"/>)
-			</html:link>
-		</td>
-	</tr>
-	<tr>
         <td>
         	${fr:message('resources.FenixEduQucResources', 'label.report.available.quc')}                        
         </td>
         <td>
-            <bean:define id="urlAvailableForInquiryCsv" type="java.lang.String"><bean:write name="urlAvailableCoursesForInquiry" filter="false"/>&amp;format=csv&amp;type=25</bean:define>
+            <bean:define id="urlAvailableForInquiryCsv" type="java.lang.String"><bean:write name="urlAvailableCoursesForInquiry" filter="false"/>&amp;format=csv&amp;type=24</bean:define>
             <html:link page="<%= urlAvailableForInquiryCsv %>">
                 <bean:message key="label.request.csv" bundle="GEP_RESOURCES" />
             </html:link>
             |
-            <bean:define id="urlAvailableForInquiryXls" type="java.lang.String"><bean:write name="urlAvailableCoursesForInquiry" filter="false"/>&amp;format=xls&amp;type=25</bean:define>
+            <bean:define id="urlAvailableForInquiryXls" type="java.lang.String"><bean:write name="urlAvailableCoursesForInquiry" filter="false"/>&amp;format=xls&amp;type=24</bean:define>
             <html:link page="<%= urlAvailableForInquiryXls %>">
+                <bean:message key="label.request.xls" bundle="GEP_RESOURCES" />
+            </html:link>
+        </td>
+        <td>
+            <html:link page="<%= viewReports + "&type=24" %>">
+                <bean:message key="label.view.requests.done" bundle="GEP_RESOURCES" /> (<bean:write name="numberOfReportsType24"/>)
+            </html:link>
+        </td>
+    </tr>
+    <tr>
+        <td>
+        	${fr:message('resources.FenixEduQucResources', 'label.report.workload.summary')}                        
+        </td>
+        <td>
+            <bean:define id="urlInquiryWorkloadSummaryBoardCsv" type="java.lang.String"><bean:write name="urlInquiryWorkloadSummaryBoard" filter="false"/>&amp;format=csv&amp;type=25</bean:define>
+            <html:link page="<%= urlInquiryWorkloadSummaryBoardCsv %>">
+                <bean:message key="label.request.csv" bundle="GEP_RESOURCES" />
+            </html:link>
+            |
+            <bean:define id="urlInquiryWorkloadSummaryBoardXls" type="java.lang.String"><bean:write name="urlInquiryWorkloadSummaryBoard" filter="false"/>&amp;format=xls&amp;type=25</bean:define>
+            <html:link page="<%= urlInquiryWorkloadSummaryBoardXls %>">
                 <bean:message key="label.request.xls" bundle="GEP_RESOURCES" />
             </html:link>
         </td>
@@ -716,16 +715,16 @@
     </tr>
     <tr>
         <td>
-        	${fr:message('resources.FenixEduQucResources', 'label.report.workload.summary')}                        
+        	${fr:message('resources.FenixEduQucResources', 'label.report.initial.answers')}                        
         </td>
         <td>
-            <bean:define id="urlInquiryWorkloadSummaryBoardCsv" type="java.lang.String"><bean:write name="urlInquiryWorkloadSummaryBoard" filter="false"/>&amp;format=csv&amp;type=26</bean:define>
-            <html:link page="<%= urlInquiryWorkloadSummaryBoardCsv %>">
+            <bean:define id="urlInquiryInitialAnswersReportFileCsv" type="java.lang.String"><bean:write name="urlInquiryInitialAnswersReportFile" filter="false"/>&amp;format=csv&amp;type=26</bean:define>
+            <html:link page="<%= urlInquiryInitialAnswersReportFileCsv %>">
                 <bean:message key="label.request.csv" bundle="GEP_RESOURCES" />
             </html:link>
             |
-            <bean:define id="urlInquiryWorkloadSummaryBoardXls" type="java.lang.String"><bean:write name="urlInquiryWorkloadSummaryBoard" filter="false"/>&amp;format=xls&amp;type=26</bean:define>
-            <html:link page="<%= urlInquiryWorkloadSummaryBoardXls %>">
+            <bean:define id="urlInquiryInitialAnswersReportFileXls" type="java.lang.String"><bean:write name="urlInquiryInitialAnswersReportFile" filter="false"/>&amp;format=xls&amp;type=26</bean:define>
+            <html:link page="<%= urlInquiryInitialAnswersReportFileXls %>">
                 <bean:message key="label.request.xls" bundle="GEP_RESOURCES" />
             </html:link>
         </td>
@@ -737,43 +736,22 @@
     </tr>
     <tr>
         <td>
-        	${fr:message('resources.FenixEduQucResources', 'label.report.initial.answers')}                        
+        	${fr:message('resources.FenixEduQucResources', 'label.report.inquiry.answers')}                        
         </td>
         <td>
-            <bean:define id="urlInquiryInitialAnswersReportFileCsv" type="java.lang.String"><bean:write name="urlInquiryInitialAnswersReportFile" filter="false"/>&amp;format=csv&amp;type=27</bean:define>
-            <html:link page="<%= urlInquiryInitialAnswersReportFileCsv %>">
+            <bean:define id="urlInquiryCoursesAnswersReportFileCsv" type="java.lang.String"><bean:write name="urlInquiryCoursesAnswersReportFile" filter="false"/>&amp;format=csv&amp;type=27</bean:define>
+            <html:link page="<%= urlInquiryCoursesAnswersReportFileCsv %>">
                 <bean:message key="label.request.csv" bundle="GEP_RESOURCES" />
             </html:link>
             |
-            <bean:define id="urlInquiryInitialAnswersReportFileXls" type="java.lang.String"><bean:write name="urlInquiryInitialAnswersReportFile" filter="false"/>&amp;format=xls&amp;type=27</bean:define>
-            <html:link page="<%= urlInquiryInitialAnswersReportFileXls %>">
+            <bean:define id="urlInquiryCoursesAnswersReportFileXls" type="java.lang.String"><bean:write name="urlInquiryCoursesAnswersReportFile" filter="false"/>&amp;format=xls&amp;type=27</bean:define>
+            <html:link page="<%= urlInquiryCoursesAnswersReportFileXls %>">
                 <bean:message key="label.request.xls" bundle="GEP_RESOURCES" />
             </html:link>
         </td>
         <td>
             <html:link page="<%= viewReports + "&type=27" %>">
                 <bean:message key="label.view.requests.done" bundle="GEP_RESOURCES" /> (<bean:write name="numberOfReportsType27"/>)
-            </html:link>
-        </td>
-    </tr>
-    <tr>
-        <td>
-        	${fr:message('resources.FenixEduQucResources', 'label.report.inquiry.answers')}                        
-        </td>
-        <td>
-            <bean:define id="urlInquiryCoursesAnswersReportFileCsv" type="java.lang.String"><bean:write name="urlInquiryCoursesAnswersReportFile" filter="false"/>&amp;format=csv&amp;type=28</bean:define>
-            <html:link page="<%= urlInquiryCoursesAnswersReportFileCsv %>">
-                <bean:message key="label.request.csv" bundle="GEP_RESOURCES" />
-            </html:link>
-            |
-            <bean:define id="urlInquiryCoursesAnswersReportFileXls" type="java.lang.String"><bean:write name="urlInquiryCoursesAnswersReportFile" filter="false"/>&amp;format=xls&amp;type=28</bean:define>
-            <html:link page="<%= urlInquiryCoursesAnswersReportFileXls %>">
-                <bean:message key="label.request.xls" bundle="GEP_RESOURCES" />
-            </html:link>
-        </td>
-        <td>
-            <html:link page="<%= viewReports + "&type=28" %>">
-                <bean:message key="label.view.requests.done" bundle="GEP_RESOURCES" /> (<bean:write name="numberOfReportsType28"/>)
             </html:link>
         </td>
     </tr>
@@ -790,13 +768,34 @@
         	${fr:message('resources.FenixEduQucResources', 'label.report.quc.answers.delegates')}                        
         </td>
         <td>
-            <bean:define id="urlDelegatesAnswersReportFileCsv" type="java.lang.String"><bean:write name="urlDelegatesAnswersReportFile" filter="false"/>&amp;format=csv&amp;type=30</bean:define>
+            <bean:define id="urlDelegatesAnswersReportFileCsv" type="java.lang.String"><bean:write name="urlDelegatesAnswersReportFile" filter="false"/>&amp;format=csv&amp;type=29</bean:define>
             <html:link page="<%= urlDelegatesAnswersReportFileCsv %>">
                 <bean:message key="label.request.csv" bundle="GEP_RESOURCES" />
             </html:link>
             |
-            <bean:define id="urlDelegatesAnswersReportFileXls" type="java.lang.String"><bean:write name="urlDelegatesAnswersReportFile" filter="false"/>&amp;format=xls&amp;type=30</bean:define>
+            <bean:define id="urlDelegatesAnswersReportFileXls" type="java.lang.String"><bean:write name="urlDelegatesAnswersReportFile" filter="false"/>&amp;format=xls&amp;type=29</bean:define>
             <html:link page="<%= urlDelegatesAnswersReportFileXls %>">
+                <bean:message key="label.request.xls" bundle="GEP_RESOURCES" />
+            </html:link>
+        </td>
+        <td>
+            <html:link page="<%= viewReports + "&type=29" %>">
+                <bean:message key="label.view.requests.done" bundle="GEP_RESOURCES" /> (<bean:write name="numberOfReportsType29"/>)
+            </html:link>
+        </td>
+    </tr> 
+    <tr>
+        <td>
+        	${fr:message('resources.FenixEduQucResources', 'label.report.quc.answers.teachers')}                        
+        </td>
+        <td>
+            <bean:define id="urlTeachersAnswersReportFileCsv" type="java.lang.String"><bean:write name="urlTeachersAnswersReportFile" filter="false"/>&amp;format=csv&amp;type=30</bean:define>
+            <html:link page="<%= urlTeachersAnswersReportFileCsv %>">
+                <bean:message key="label.request.csv" bundle="GEP_RESOURCES" />
+            </html:link>
+            |
+            <bean:define id="urlTeachersAnswersReportFileXls" type="java.lang.String"><bean:write name="urlTeachersAnswersReportFile" filter="false"/>&amp;format=xls&amp;type=30</bean:define>
+            <html:link page="<%= urlTeachersAnswersReportFileXls %>">
                 <bean:message key="label.request.xls" bundle="GEP_RESOURCES" />
             </html:link>
         </td>
@@ -808,16 +807,16 @@
     </tr> 
     <tr>
         <td>
-        	${fr:message('resources.FenixEduQucResources', 'label.report.quc.answers.teachers')}                        
+        	${fr:message('resources.FenixEduQucResources', 'label.report.quc.answers.regents')}                        
         </td>
         <td>
-            <bean:define id="urlTeachersAnswersReportFileCsv" type="java.lang.String"><bean:write name="urlTeachersAnswersReportFile" filter="false"/>&amp;format=csv&amp;type=31</bean:define>
-            <html:link page="<%= urlTeachersAnswersReportFileCsv %>">
+            <bean:define id="urlRegentsAnswersReportFileCsv" type="java.lang.String"><bean:write name="urlRegentsAnswersReportFile" filter="false"/>&amp;format=csv&amp;type=31</bean:define>
+            <html:link page="<%= urlRegentsAnswersReportFileCsv %>">
                 <bean:message key="label.request.csv" bundle="GEP_RESOURCES" />
             </html:link>
             |
-            <bean:define id="urlTeachersAnswersReportFileXls" type="java.lang.String"><bean:write name="urlTeachersAnswersReportFile" filter="false"/>&amp;format=xls&amp;type=31</bean:define>
-            <html:link page="<%= urlTeachersAnswersReportFileXls %>">
+            <bean:define id="urlRegentsAnswersReportFileXls" type="java.lang.String"><bean:write name="urlRegentsAnswersReportFile" filter="false"/>&amp;format=xls&amp;type=31</bean:define>
+            <html:link page="<%= urlRegentsAnswersReportFileXls %>">
                 <bean:message key="label.request.xls" bundle="GEP_RESOURCES" />
             </html:link>
         </td>
@@ -829,16 +828,16 @@
     </tr> 
     <tr>
         <td>
-        	${fr:message('resources.FenixEduQucResources', 'label.report.quc.answers.regents')}                        
+        	${fr:message('resources.FenixEduQucResources', 'label.report.quc.answers.coordinator')}                        
         </td>
         <td>
-            <bean:define id="urlRegentsAnswersReportFileCsv" type="java.lang.String"><bean:write name="urlRegentsAnswersReportFile" filter="false"/>&amp;format=csv&amp;type=32</bean:define>
-            <html:link page="<%= urlRegentsAnswersReportFileCsv %>">
+            <bean:define id="urlCoordinatorsAnswersReportFileCsv" type="java.lang.String"><bean:write name="urlCoordinatorsAnswersReportFile" filter="false"/>&amp;format=csv&amp;type=32</bean:define>
+            <html:link page="<%= urlCoordinatorsAnswersReportFileCsv %>">
                 <bean:message key="label.request.csv" bundle="GEP_RESOURCES" />
             </html:link>
             |
-            <bean:define id="urlRegentsAnswersReportFileXls" type="java.lang.String"><bean:write name="urlRegentsAnswersReportFile" filter="false"/>&amp;format=xls&amp;type=32</bean:define>
-            <html:link page="<%= urlRegentsAnswersReportFileXls %>">
+            <bean:define id="urlCoordinatorsAnswersReportFileXls" type="java.lang.String"><bean:write name="urlCoordinatorsAnswersReportFile" filter="false"/>&amp;format=xls&amp;type=32</bean:define>
+            <html:link page="<%= urlCoordinatorsAnswersReportFileXls %>">
                 <bean:message key="label.request.xls" bundle="GEP_RESOURCES" />
             </html:link>
         </td>
@@ -850,43 +849,22 @@
     </tr> 
     <tr>
         <td>
-        	${fr:message('resources.FenixEduQucResources', 'label.report.quc.answers.coordinator')}                        
+        	${fr:message('resources.FenixEduQucResources', 'label.report.quc.answers.firstTimeCycle')}                        
         </td>
         <td>
-            <bean:define id="urlCoordinatorsAnswersReportFileCsv" type="java.lang.String"><bean:write name="urlCoordinatorsAnswersReportFile" filter="false"/>&amp;format=csv&amp;type=33</bean:define>
-            <html:link page="<%= urlCoordinatorsAnswersReportFileCsv %>">
+            <bean:define id="urlFirstTimeCycleAnswersReportFileCsv" type="java.lang.String"><bean:write name="urlFirstTimeCycleAnswersReportFile" filter="false"/>&amp;format=csv&amp;type=33</bean:define>
+            <html:link page="<%= urlFirstTimeCycleAnswersReportFileCsv %>">
                 <bean:message key="label.request.csv" bundle="GEP_RESOURCES" />
             </html:link>
             |
-            <bean:define id="urlCoordinatorsAnswersReportFileXls" type="java.lang.String"><bean:write name="urlCoordinatorsAnswersReportFile" filter="false"/>&amp;format=xls&amp;type=33</bean:define>
-            <html:link page="<%= urlCoordinatorsAnswersReportFileXls %>">
+            <bean:define id="urlFirstTimeCycleAnswersReportFileXls" type="java.lang.String"><bean:write name="urlFirstTimeCycleAnswersReportFile" filter="false"/>&amp;format=xls&amp;type=33</bean:define>
+            <html:link page="<%= urlFirstTimeCycleAnswersReportFileXls %>">
                 <bean:message key="label.request.xls" bundle="GEP_RESOURCES" />
             </html:link>
         </td>
         <td>
             <html:link page="<%= viewReports + "&type=33" %>">
                 <bean:message key="label.view.requests.done" bundle="GEP_RESOURCES" /> (<bean:write name="numberOfReportsType33"/>)
-            </html:link>
-        </td>
-    </tr> 
-    <tr>
-        <td>
-        	${fr:message('resources.FenixEduQucResources', 'label.report.quc.answers.firstTimeCycle')}                        
-        </td>
-        <td>
-            <bean:define id="urlFirstTimeCycleAnswersReportFileCsv" type="java.lang.String"><bean:write name="urlFirstTimeCycleAnswersReportFile" filter="false"/>&amp;format=csv&amp;type=34</bean:define>
-            <html:link page="<%= urlFirstTimeCycleAnswersReportFileCsv %>">
-                <bean:message key="label.request.csv" bundle="GEP_RESOURCES" />
-            </html:link>
-            |
-            <bean:define id="urlFirstTimeCycleAnswersReportFileXls" type="java.lang.String"><bean:write name="urlFirstTimeCycleAnswersReportFile" filter="false"/>&amp;format=xls&amp;type=34</bean:define>
-            <html:link page="<%= urlFirstTimeCycleAnswersReportFileXls %>">
-                <bean:message key="label.request.xls" bundle="GEP_RESOURCES" />
-            </html:link>
-        </td>
-        <td>
-            <html:link page="<%= viewReports + "&type=34" %>">
-                <bean:message key="label.view.requests.done" bundle="GEP_RESOURCES" /> (<bean:write name="numberOfReportsType34"/>)
             </html:link>
         </td>
     </tr> 
@@ -899,19 +877,19 @@
         	${fr:message('resources.FenixEduQucResources', 'label.report.quc.questions')}                        
         </td>
         <td>
-            <bean:define id="urlQUCQuestionsReportFileCsv" type="java.lang.String"><bean:write name="urlQUCQuestionsReportFile" filter="false"/>&amp;format=csv&amp;type=29</bean:define>
+            <bean:define id="urlQUCQuestionsReportFileCsv" type="java.lang.String"><bean:write name="urlQUCQuestionsReportFile" filter="false"/>&amp;format=csv&amp;type=28</bean:define>
             <html:link page="<%= urlQUCQuestionsReportFileCsv %>">
                 <bean:message key="label.request.csv" bundle="GEP_RESOURCES" />
             </html:link>
             |
-            <bean:define id="urlQUCQuestionsReportFileXls" type="java.lang.String"><bean:write name="urlQUCQuestionsReportFile" filter="false"/>&amp;format=xls&amp;type=29</bean:define>
+            <bean:define id="urlQUCQuestionsReportFileXls" type="java.lang.String"><bean:write name="urlQUCQuestionsReportFile" filter="false"/>&amp;format=xls&amp;type=28</bean:define>
             <html:link page="<%= urlQUCQuestionsReportFileXls %>">
                 <bean:message key="label.request.xls" bundle="GEP_RESOURCES" />
             </html:link>
         </td>
         <td>
-            <html:link page="<%= viewReports + "&type=29" %>">
-                <bean:message key="label.view.requests.done" bundle="GEP_RESOURCES" /> (<bean:write name="numberOfReportsType29"/>)
+            <html:link page="<%= viewReports + "&type=28" %>">
+                <bean:message key="label.view.requests.done" bundle="GEP_RESOURCES" /> (<bean:write name="numberOfReportsType28"/>)
             </html:link>
         </td>
     </tr>    

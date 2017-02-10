@@ -61,6 +61,8 @@ import org.fenixedu.bennu.struts.annotations.Mapping;
 import org.fenixedu.bennu.struts.portal.EntryPoint;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
 
+import com.google.common.base.Strings;
+
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
 import pt.ist.fenixedu.integration.domain.ReportFileFactory;
 import pt.ist.fenixedu.quc.domain.reports.AvailableCoursesForQUCReportFile;
@@ -76,12 +78,9 @@ import pt.ist.fenixedu.quc.domain.reports.WorkloadSummaryBoardReportFile;
 import pt.ist.fenixedu.teacher.evaluation.domain.reports.EffectiveTeachingLoadReportFile;
 import pt.ist.fenixedu.teacher.evaluation.domain.reports.TeacherCreditsReportFile;
 import pt.ist.fenixedu.teacher.evaluation.domain.reports.TeachersByShiftReportFile;
-import pt.ist.fenixedu.teacher.evaluation.domain.reports.TeachersListFromGiafReportFile;
 import pt.ist.fenixedu.teacher.evaluation.domain.reports.TimetablesReportFile;
 import pt.ist.fenixedu.tutorship.domain.reports.TutorshipProgramReportFile;
 import pt.ist.fenixframework.FenixFramework;
-
-import com.google.common.base.Strings;
 
 @StrutsFunctionality(app = GepPortalApp.class, path = "reports", titleKey = "link.reports")
 @Mapping(module = "gep", path = "/reportsByDegreeType")
@@ -381,21 +380,6 @@ public class ReportsByDegreeTypeDA extends FenixDispatchAction {
         final String format = getFormat(request);
 
         prepareNewJobResponse(request, ReportFileFactory.createFlunkedReportFile(format, degreeType, executionYear));
-
-        return selectDegreeType(mapping, actionForm, request, response);
-    }
-
-    @SuppressWarnings("unused")
-    public ActionForward downloadTeachersListFromGiaf(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
-            HttpServletResponse response) throws IOException {
-        if (isRepeatedJob(AccessControl.getPerson(), request, getClassForParameter(request.getParameter("type")))) {
-            return selectDegreeType(mapping, actionForm, request, response);
-        }
-        final DegreeType degreeType = getDegreeType(request);
-        final ExecutionYear executionYear = getExecutionYear(request);
-        final String format = getFormat(request);
-
-        prepareNewJobResponse(request, ReportFileFactory.createTeachersListFromGiafReportFile(format, degreeType, executionYear));
 
         return selectDegreeType(mapping, actionForm, request, response);
     }
@@ -795,40 +779,38 @@ public class ReportsByDegreeTypeDA extends FenixDispatchAction {
         case 16:
             return TutorshipProgramReportFile.class;
         case 17:
-            return TeachersListFromGiafReportFile.class;
-        case 18:
             return CourseLoadAndResponsiblesReportFile.class;
-        case 19:
+        case 18:
             return TimetablesReportFile.class;
-        case 20:
+        case 19:
             return RaidesSpecializationReportFile.class;
-        case 21:
+        case 20:
             return SummaryOccupancyReportFile.class;
-        case 22:
+        case 21:
             return WrittenEvaluationReportFile.class;
-        case 23:
+        case 22:
             return TeacherCreditsReportFile.class;
-        case 24:
+        case 23:
             return EffectiveTeachingLoadReportFile.class;
-        case 25:
+        case 24:
             return AvailableCoursesForQUCReportFile.class;
-        case 26:
+        case 25:
             return WorkloadSummaryBoardReportFile.class;
-        case 27:
+        case 26:
             return InitialAnswersReportFile.class;
-        case 28:
+        case 27:
             return CoursesAnswersReportFile.class;
-        case 29:
+        case 28:
             return QUCQuestionsReportFile.class;
-        case 30:
+        case 29:
             return DelegatesAnswersReportFile.class;
-        case 31:
+        case 30:
             return TeachersAnswersReportFile.class;
-        case 32:
+        case 31:
             return RegentsAnswersReportFile.class;
-        case 33:
+        case 32:
             return CoordinatorsAnswersReportFile.class;
-        case 34:
+        case 33:
             return FirstTimeCycleAnswersReportFile.class;
         default:
             return null;
