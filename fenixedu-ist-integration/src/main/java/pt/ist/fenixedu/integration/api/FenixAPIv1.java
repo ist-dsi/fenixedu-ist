@@ -34,6 +34,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.servlet.ServletContext;
@@ -356,13 +357,15 @@ public class FenixAPIv1 {
 
         List<FenixEnrolment> enrolments = new ArrayList<FenixEnrolment>();
         List<FenixCourse> teachingCourses = new ArrayList<FenixCourse>();
+        List<FenixCourse> attendingCourses = new ArrayList<>();
 
         for (ExecutionSemester executionSemester : semesters) {
             fillEnrolments(person, enrolments, executionSemester);
             fillTeachingCourses(person, teachingCourses, executionSemester);
+            fillAttendingCourses(person, attendingCourses, executionSemester);
         }
 
-        return new FenixPersonCourses(enrolments, teachingCourses);
+        return new FenixPersonCourses(enrolments, teachingCourses, attendingCourses);
     }
 
     public Set<ExecutionSemester> getExecutionSemesters(String academicTerm) {
@@ -400,6 +403,17 @@ public class FenixAPIv1 {
                     enrolments.add(new FenixEnrolment(executionCourse, grade, ects));
                 }
             }
+        }
+    }
+
+    public void fillAttendingCourses(final Person person, List<FenixCourse> attendingCourses, ExecutionSemester executionSemester) {
+        final Student foundStudent = person.getStudent();
+
+        if(foundStudent != null) {
+            foundStudent.getRegistrationsSet().stream()
+                    .flatMap(r -> r.getAttendingExecutionCoursesFor(executionSemester).stream())
+                    .map(FenixCourse::new)
+                    .forEach(attendingCourses::add);
         }
     }
 

@@ -54,15 +54,17 @@ public class FenixPersonCourses {
 
     private List<FenixEnrolment> enrolments;
     private List<FenixCourse> teaching;
+    private List<FenixCourse> attending;
 
     public FenixPersonCourses() {
 
     }
 
-    public FenixPersonCourses(List<FenixEnrolment> enrolments, List<FenixCourse> teaching) {
+    public FenixPersonCourses(List<FenixEnrolment> enrolments, List<FenixCourse> teaching, List<FenixCourse> attending) {
         super();
         this.enrolments = enrolments;
         this.teaching = teaching;
+        this.attending = attending;
     }
 
     public List<FenixEnrolment> getEnrolments() {
@@ -81,4 +83,11 @@ public class FenixPersonCourses {
         this.teaching = teaching;
     }
 
+    public List<FenixCourse> getAttending() {
+        return attending;
+    }
+
+    public void setAttending(List<FenixCourse> attending) {
+        this.attending = attending;
+    }
 }
