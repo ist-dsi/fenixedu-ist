@@ -61,7 +61,7 @@ public class TeacherSearchForSummariesManagement extends Action {
         }
         Teacher teacher = person.getTeacher();
         String employeeDepartment = AccessControl.getPerson().getEmployee().getCurrentDepartmentWorkingPlace().getCode();
-        if (teacher == null || !employeeDepartment.equals(teacher.getDepartment().getName())) {
+        if (teacher == null || !employeeDepartment.equals(teacher.getDepartment().getCode())) {
             return null;
         } else {
             return teacher;
