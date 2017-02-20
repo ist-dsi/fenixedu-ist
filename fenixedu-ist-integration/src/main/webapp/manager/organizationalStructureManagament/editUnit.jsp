@@ -55,7 +55,7 @@
 		<div class="form-group">
 			<label class="col-sm-3 control-label">${bundle['message.name.en']}</label>
 			<h:panelGroup styleClass="col-sm-6">
-				<h:inputText alt="#{htmlAltBundle['inputText.unitName']}" id="nameEn" required="false" size="60" value="#{organizationalStructureBackingBean.unitName}" styleClass="form-control" />
+				<h:inputText alt="#{htmlAltBundle['inputText.unitName']}" id="nameEn" required="false" size="60" value="#{organizationalStructureBackingBean.unitNameEn}" styleClass="form-control" />
 			</h:panelGroup>
 			<span class="col-sm-3">
 				<h:message for="nameEn" styleClass="error"/>
