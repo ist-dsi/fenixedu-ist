@@ -21,8 +21,8 @@
  */
 package pt.ist.fenixedu.quc.ui.struts.action.gep.inquiries;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,21 +30,17 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.fenixedu.academic.domain.exceptions.DomainException;
+import org.fenixedu.academic.domain.QueueJob;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
 import org.fenixedu.bennu.struts.portal.EntryPoint;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
-import pt.ist.fenixedu.quc.domain.InquiryResult;
+import pt.ist.fenixedu.quc.domain.ResultsImportationProcess;
 import pt.ist.fenixedu.quc.dto.ResultsFileBean;
-
-import com.google.common.io.CharStreams;
 
 /**
  * @author - Ricardo Rodrigues (ricardo.rodrigues@ist.utl.pt)
@@ -55,12 +51,20 @@ import com.google.common.io.CharStreams;
 @Forwards(@Forward(name = "prepareUploadPage", path = "/gep/inquiries/uploadInquiriesResults.jsp"))
 public class UploadInquiriesResultsDA extends FenixDispatchAction {
 
-    private static final Logger logger = LoggerFactory.getLogger(UploadInquiriesResultsDA.class);
+    private final int MAX_QUEUE_JOB_LIST_SIZE = 5;
 
     @EntryPoint
     public ActionForward prepare(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
             HttpServletResponse response) {
+        List<ResultsImportationProcess> lastQueueJobs =
+                rootDomainObject.getQueueJobSet().stream().filter(q -> q instanceof ResultsImportationProcess)
+                        .map(q -> (ResultsImportationProcess) q).sorted((q1, q2) -> q2.getResultsImportationFile()
+                                .getCreationDate().compareTo(q1.getResultsImportationFile().getCreationDate()))
+                        .limit(5)
+                        .collect(Collectors.toList());
+        QueueJob.getLastJobsForClassOrSubClass(ResultsImportationProcess.class, MAX_QUEUE_JOB_LIST_SIZE);
         request.setAttribute("uploadFileBean", new ResultsFileBean());
+        request.setAttribute("queueJobList", lastQueueJobs);
         return mapping.findForward("prepareUploadPage");
     }
 
@@ -69,24 +73,8 @@ public class UploadInquiriesResultsDA extends FenixDispatchAction {
         ResultsFileBean resultsBean = getRenderedObject("uploadFileBean");
         RenderUtils.invalidateViewState("uploadFileBean");
 
-        try {
-            final String stringResults = readFile(resultsBean);
-            if (resultsBean.getNewResults()) {
-                InquiryResult.importResults(stringResults, resultsBean.getResultsDate());
-            } else {
-                InquiryResult.updateRows(stringResults, resultsBean.getResultsDate());
-            }
-            request.setAttribute("success", "true");
-        } catch (IOException e) {
-            addErrorMessage(request, e.getMessage(), e.getMessage());
-        } catch (DomainException e) {
-            logger.error(e.getMessage(), e);
-            addErrorMessage(request, e.getKey(), e.getKey(), e.getArgs());
-        }
+        resultsBean.createImportationProcess();
+        request.setAttribute("success", "true");
         return prepare(mapping, actionForm, request, response);
-    }
-
-    private String readFile(ResultsFileBean resultsBean) throws IOException {
-        return CharStreams.toString(new InputStreamReader(resultsBean.getInputStream()));
     }
 }

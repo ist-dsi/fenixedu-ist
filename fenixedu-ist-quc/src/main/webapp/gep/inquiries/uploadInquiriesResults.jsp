@@ -23,16 +23,43 @@
 <%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean"%>
 <%@ taglib uri="http://struts.apache.org/tags-logic" prefix="logic"%>
 <%@ taglib uri="http://fenix-ashes.ist.utl.pt/fenix-renderers" prefix="fr"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 
 <span class="error"><html:errors bundle="INQUIRIES_RESOURCES" /></span>
 <html:messages id="message" message="true" bundle="INQUIRIES_RESOURCES">
     <p><span class="error"><bean:write name="message" /></span></p>
 </html:messages>
 <logic:present name="success">
-	<p><span class="success0"><bean:message key="message.inquiry.upload.sucess" bundle="INQUIRIES_RESOURCES"/></span></p>
+	<p><span class="success0">${fr:message('resources.FenixEduQucResources', 'message.results.importation.file.upload.success')}</span></p>
 </logic:present>
 
 <h2><bean:message key="title.inquiries.uploadResults" bundle="INQUIRIES_RESOURCES"/></h2>
+
+
+<p><bean:message key="label.gep.latest.requests.done" bundle="GEP_RESOURCES"/></p>
+<table class="table table-striped table-bordered table-condensed">
+	<tr>
+		<th>${fr:message('resources.FenixEduQucResources', 'label.results.importation.requestDate')}</th>
+		<th><bean:message key="label.inquiries.result.date" bundle="INQUIRIES_RESOURCES"/></th>
+		<th><bean:message key="label.inquiry.importResults.newResults" bundle="INQUIRIES_RESOURCES"/></th>
+		<th>${fr:message('resources.FenixEduQucResources', 'label.results.importation.processedFile')}</th>
+	</tr>	
+	<c:forEach var="queueJob" items="${queueJobList}">
+	<tr>
+		<td><c:out value="${queueJob.resultsImportationFile.creationDate.toString('dd-MM-yyyy HH:mm:ss')}"/></td>
+		<td><c:out value="${queueJob.resultsDate.toString('dd-MM-yyyy HH:mm:ss')}"/></td>
+		<td>
+			<c:if test="${queueJob.newResults}"><bean:message key="label.yes" bundle="GEP_RESOURCES"/></c:if>
+			<c:if test="${!queueJob.newResults}"><bean:message key="label.no" bundle="GEP_RESOURCES"/></c:if>
+		</td>
+		<td>
+			<c:if test="${queueJob.done}"><bean:message key="label.yes" bundle="GEP_RESOURCES"/></c:if>
+			<c:if test="${!queueJob.done}"><bean:message key="label.no" bundle="GEP_RESOURCES"/></c:if>
+		</td>
+	</tr>
+	</c:forEach>	
+</table>
 
 <fr:edit id="uploadFileBean" name="uploadFileBean" action="/uploadInquiriesResults.do?method=submitResultsFile" >
 	<fr:schema type="pt.ist.fenixedu.quc.dto.ResultsFileBean" bundle="INQUIRIES_RESOURCES">
@@ -52,5 +79,3 @@
 	</fr:layout>
 	<fr:destination name="cancel" path="/uploadInquiriesResults.do?method=prepare"/>
 </fr:edit>
-
-<br/>

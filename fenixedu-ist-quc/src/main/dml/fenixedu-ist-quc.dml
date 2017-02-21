@@ -253,6 +253,19 @@ class reports.CoordinatorsAnswersReportFile extends .org.fenixedu.academic.domai
 class reports.FirstTimeCycleAnswersReportFile extends .org.fenixedu.academic.domain.reports.GepReportFile {
 }
 
+class ResultsImportationProcess extends .org.fenixedu.academic.domain.QueueJob {
+	DateTime resultsDate;
+	Boolean newResults;
+}
+
+class ResultsImportationFile extends .org.fenixedu.bennu.io.domain.GenericFile {
+}
+
+relation ResultsImportationProcessResultsImportationFile {
+    ResultsImportationProcess playsRole resultsImportationProcess;
+    ResultsImportationFile playsRole resultsImportationFile;
+}
+
 relation InquiriesRootLink {
     InquiriesRoot playsRole inquiriesRoot {
         multiplicity 0..1;
