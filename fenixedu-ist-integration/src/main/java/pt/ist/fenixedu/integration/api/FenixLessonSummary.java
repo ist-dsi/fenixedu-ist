@@ -15,6 +15,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.*;
 public class FenixLessonSummary {
     private String shift;
     private String shiftName;
+    private String shiftType;
     private String lessonDate;
     private FenixSpace room;
     private FenixSummary summary;
@@ -22,6 +23,7 @@ public class FenixLessonSummary {
     public FenixLessonSummary(Shift shift, DateTime lessonDate, Space space, LessonInstance lessonInstance) {
         this.shift = shift.getExternalId();
         this.shiftName = shift.getPresentationName();
+        this.shiftType = !shift.getSortedTypes().isEmpty() ? shift.getSortedTypes().first().getFullNameTipoAula() : null;
         this.lessonDate = lessonDate.toString("yyyy-MM-dd HH:mm:ss");
         this.room = space != null ? new FenixSpace.Room(space) : null;
         if(lessonInstance != null && lessonInstance.getSummary() != null) {
@@ -43,6 +45,14 @@ public class FenixLessonSummary {
 
     public void setShiftName(String shiftName) {
         this.shiftName = shiftName;
+    }
+
+    public String getShiftType() {
+        return shiftType;
+    }
+
+    public void setShiftType(String shiftType) {
+        this.shiftType = shiftType;
     }
 
     public String getLessonDate() {
