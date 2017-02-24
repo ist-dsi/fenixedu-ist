@@ -18,6 +18,8 @@
  */
 package pt.ist.fenixedu.integration.api;
 
+import static org.fenixedu.academic.dto.SummariesManagementBean.SummaryType.NORMAL_SUMMARY;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -32,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -54,8 +55,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
-
-import net.fortuna.ical4j.model.Calendar;
 
 import org.fenixedu.academic.domain.AdHocEvaluation;
 import org.fenixedu.academic.domain.Attends;
@@ -155,6 +154,22 @@ import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.CaseFormat;
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Ordering;
+import com.google.common.io.ByteStreams;
+import com.google.common.net.HttpHeaders;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+
+import net.fortuna.ical4j.model.Calendar;
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveEmployees;
 import pt.ist.fenixedu.integration.FenixEduIstIntegrationConfiguration;
 import pt.ist.fenixedu.integration.api.beans.FenixCalendar;
@@ -194,23 +209,6 @@ import pt.ist.fenixedu.integration.dto.PersonInformationBean;
 import pt.ist.fenixedu.integration.service.services.externalServices.CreatePreEnrolment;
 import pt.ist.fenixframework.DomainObject;
 import pt.ist.fenixframework.FenixFramework;
-
-import com.google.common.base.CaseFormat;
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.Ordering;
-import com.google.common.io.ByteStreams;
-import com.google.common.net.HttpHeaders;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-
-import static org.fenixedu.academic.dto.SummariesManagementBean.SummaryType.NORMAL_SUMMARY;
 
 @Path("/fenix/v1")
 public class FenixAPIv1 {
@@ -1159,7 +1157,7 @@ public class FenixAPIv1 {
 
         ExecutionInterval executionInterval = ExecutionInterval.getExecutionInterval(academicInterval);
         if (!(executionInterval instanceof ExecutionSemester)) {
-            throw newApplicationError(Status.BAD_REQUEST, "format_error", "academicTerm parameter must not be a semester");
+            throw newApplicationError(Status.BAD_REQUEST, "format_error", "academicTerm parameter must be a semester");
         }
         ExecutionSemester executionSemester = (ExecutionSemester) executionInterval;
 
@@ -1214,7 +1212,8 @@ public class FenixAPIv1 {
                     report.get("errors")
                             .getAsJsonArray()
                             .add(new JsonPrimitive("An error occured for user " + userId + " course group " + groupId
-                                    + " and curricular course " + curricularCourseId + " - this pre enrolment was not successful"));
+                                    + " and curricular course " + curricularCourseId
+                                    + " - this pre enrolment was not successful - Exception: " + e.getMessage()));
                 }
             }
         }
