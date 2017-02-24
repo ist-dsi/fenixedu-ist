@@ -30,12 +30,14 @@ import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.administrativeOffice.AdministrativeOfficeType;
+import org.fenixedu.academic.domain.degreeStructure.CycleType;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.registrationStates.RegistrationState;
 import org.fenixedu.academic.domain.student.registrationStates.RegistrationStateType;
 import org.fenixedu.academic.domain.studentCurriculum.CurriculumLine;
 import org.fenixedu.academic.domain.studentCurriculum.CurriculumModule;
 import org.fenixedu.academic.domain.studentCurriculum.CurriculumModule.CurriculumModulePredicateByType;
+import org.fenixedu.academic.domain.studentCurriculum.CycleCurriculumGroup;
 import org.fenixedu.academic.domain.util.email.Message;
 import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.academic.domain.util.email.SystemSender;
@@ -123,7 +125,10 @@ public class UpdateAbandonStateBean implements Serializable {
 
                 state.setRemarks(RenderUtils.getFormatedResourceString(RESOURCE_BUNDLE,
                         "message.academicAdministration.abandonState.observations"));
-                sendEmail(registration);
+                CycleCurriculumGroup cycle = registration.getLastStudentCurricularPlan().getCycle(CycleType.SECOND_CYCLE);
+                if (!(registration.getDegreeType().isIntegratedMasterDegree() && cycle != null && cycle.isConcluded())) {
+                    sendEmail(registration);
+                }
                 getLog().append(registration.getStudent().getNumber()).append("\t")
                         .append(registration.getLastDegreeCurricularPlan().getName()).append("\n");
                 return true;
