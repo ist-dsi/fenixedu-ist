@@ -41,4 +41,16 @@ public class FenixEduQucDomainException extends DomainException {
     public static FenixEduQucDomainException questionAnwserDuplicateCreation() {
         return new FenixEduQucDomainException("error.inquiry.questionAnswer.duplicateCreation");
     }
+
+    public static FenixEduQucDomainException importationResultFileEmpty() {
+        return new FenixEduQucDomainException("error.results.importation.file.cannot.be.null");
+    }
+
+    public static FenixEduQucDomainException importationResultDateEmpty() {
+        return new FenixEduQucDomainException("error.results.importation.resultDate.cannot.be.null");
+    }
+
+    public static FenixEduQucDomainException importationResultFileError(Exception e) {
+        return new FenixEduQucDomainException("error.results.importation.file.reading", e.getMessage());
+    }
 }

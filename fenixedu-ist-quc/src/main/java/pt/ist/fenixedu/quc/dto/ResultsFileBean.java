@@ -18,17 +18,25 @@
  */
 package pt.ist.fenixedu.quc.dto;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 
 import org.joda.time.DateTime;
+
+import com.google.common.io.ByteStreams;
+
+import pt.ist.fenixedu.quc.domain.ResultsImportationFile;
+import pt.ist.fenixedu.quc.domain.ResultsImportationProcess;
+import pt.ist.fenixedu.quc.domain.exceptions.FenixEduQucDomainException;
+import pt.ist.fenixframework.Atomic;
 
 public class ResultsFileBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private transient InputStream inputStream;
     private DateTime resultsDate;
-    private Boolean newResults;
+    private boolean newResults;
 
     public void setInputStream(InputStream inputStream) {
         this.inputStream = inputStream;
@@ -46,11 +54,22 @@ public class ResultsFileBean implements Serializable {
         return resultsDate;
     }
 
-    public void setNewResults(Boolean newResults) {
+    public void setNewResults(boolean newResults) {
         this.newResults = newResults;
     }
 
-    public Boolean getNewResults() {
+    public boolean getNewResults() {
         return newResults;
+    }
+
+    @Atomic
+    public void createImportationProcess() {
+        try {
+            ResultsImportationFile resultsImportationFile =
+                    new ResultsImportationFile("filename", ByteStreams.toByteArray(getInputStream()));
+            new ResultsImportationProcess(getResultsDate(), resultsImportationFile, getNewResults());
+        } catch (IOException e) {
+            throw FenixEduQucDomainException.importationResultFileError(e);
+        }
     }
 }
