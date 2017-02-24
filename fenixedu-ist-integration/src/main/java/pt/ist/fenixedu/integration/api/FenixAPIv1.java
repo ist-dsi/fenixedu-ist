@@ -609,18 +609,16 @@ public class FenixAPIv1 {
         final List<FenixCurriculum> curriculums = new ArrayList<FenixCurriculum>();
 
         for (Registration registration : registrationsList) {
-            StudentCurricularPlan studentCurricularPlan = registration.getLastStudentCurricularPlan();
+            String start = registration.getFirstStudentCurricularPlan().getStartDateYearMonthDay().toString(formatDay);
 
-            String start = studentCurricularPlan.getStartDateYearMonthDay().toString(formatDay);
+            StudentCurricularPlan lastCurricularPlan = registration.getLastStudentCurricularPlan();
 
             String end = null;
-            if (studentCurricularPlan.getEndDate() != null) {
-                end = studentCurricularPlan.getEndDate().toString(formatDay);
+            if (lastCurricularPlan .getEndDate() != null) {
+                end = lastCurricularPlan.getEndDate().toString(formatDay);
             }
 
-            Stream<CurriculumGroup> curriculumGroups = getAllGroupsForConclusion(studentCurricularPlan);
-
-            ICurriculum icurriculum = studentCurricularPlan.getCurriculum(new DateTime(), null);
+            ICurriculum icurriculum = lastCurricularPlan.getCurriculum(new DateTime(), null);
 
             final Integer curricularYear = icurriculum.getCurricularYear();
             BigDecimal credits = icurriculum.getSumEctsCredits();
@@ -628,44 +626,47 @@ public class FenixAPIv1 {
 
             Integer calculatedAverage = icurriculum.getFinalGrade().getIntegerValue();
 
-            boolean isFinished = studentCurricularPlan.isConcluded();
-
+            boolean isFinished = lastCurricularPlan.isConcluded();
             final List<FenixCurriculum.ApprovedCourse> courseInfos = new ArrayList<>();
 
-            curriculumGroups.forEach(curriculumGroup -> {
-                for (ICurriculumEntry iCurriculumEntry : curriculumGroup.getCurriculum().getCurriculumEntries()) {
+            for (StudentCurricularPlan studentCurricularPlan : registration.getStudentCurricularPlansSet()) {
+                Stream<CurriculumGroup> curriculumGroups = getAllGroupsForConclusion(studentCurricularPlan);
 
-                    String entryGradeValue = iCurriculumEntry.getGradeValue();
-                    BigDecimal entryEcts = iCurriculumEntry.getEctsCreditsForCurriculum();
+                curriculumGroups.forEach(curriculumGroup -> {
+                    for (ICurriculumEntry iCurriculumEntry : curriculumGroup.getCurriculum().getCurriculumEntries()) {
 
-                    FenixCourse course = null;
-                    if (iCurriculumEntry instanceof Enrolment) {
-                        Enrolment enrolment = (Enrolment) iCurriculumEntry;
-                        ExecutionCourse executionCourse = enrolment.getExecutionCourseFor(enrolment.getExecutionPeriod());
-                        if (executionCourse != null) {
-                            course = new FenixCourse(executionCourse);
-                        } else {
-                            CurricularCourse curricularCourse = enrolment.getCurricularCourse();
+                        String entryGradeValue = iCurriculumEntry.getGradeValue();
+                        BigDecimal entryEcts = iCurriculumEntry.getEctsCreditsForCurriculum();
+
+                        FenixCourse course = null;
+                        if (iCurriculumEntry instanceof Enrolment) {
+                            Enrolment enrolment = (Enrolment) iCurriculumEntry;
+                            ExecutionCourse executionCourse = enrolment.getExecutionCourseFor(enrolment.getExecutionPeriod());
+                            if (executionCourse != null) {
+                                course = new FenixCourse(executionCourse);
+                            } else {
+                                CurricularCourse curricularCourse = enrolment.getCurricularCourse();
+                                String entryName = mls(iCurriculumEntry.getPresentationName());
+                                course = new FenixCourse(curricularCourse.getExternalId(), curricularCourse.getAcronym(), entryName);
+                            }
+
+                        } else if (iCurriculumEntry instanceof Dismissal) {
+                            Dismissal dismissal = (Dismissal) iCurriculumEntry;
+                            CurricularCourse curricularCourse = dismissal.getCurricularCourse();
                             String entryName = mls(iCurriculumEntry.getPresentationName());
                             course = new FenixCourse(curricularCourse.getExternalId(), curricularCourse.getAcronym(), entryName);
+                        } else {
+                            continue;
                         }
 
-                    } else if (iCurriculumEntry instanceof Dismissal) {
-                        Dismissal dismissal = (Dismissal) iCurriculumEntry;
-                        CurricularCourse curricularCourse = dismissal.getCurricularCourse();
-                        String entryName = mls(iCurriculumEntry.getPresentationName());
-                        course = new FenixCourse(curricularCourse.getExternalId(), curricularCourse.getAcronym(), entryName);
-                    } else {
-                        continue;
+                        courseInfos.add(new FenixCurriculum.ApprovedCourse(course, entryGradeValue, entryEcts));
+
                     }
+                });
+            }
 
-                    courseInfos.add(new FenixCurriculum.ApprovedCourse(course, entryGradeValue, entryEcts));
-
-                }
-            });
-            curriculums.add(new FenixCurriculum(new FenixDegree(studentCurricularPlan.getDegree()), start, end, credits, average,
+            curriculums.add(new FenixCurriculum(new FenixDegree(lastCurricularPlan.getDegree()), start, end, credits, average,
                     calculatedAverage, isFinished, curricularYear, courseInfos));
-
         }
         return curriculums;
     }
