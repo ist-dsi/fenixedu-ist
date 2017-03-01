@@ -944,3 +944,32 @@
 		</td>
 	</tr>
 </table>
+
+<bean:define id="urlMeritReportFile" type="java.lang.String">/reportsByDegreeType.do?method=downloadMeritReportFile&amp;<bean:write name="args" filter="false"/></bean:define>
+<logic:present name="reportBean" property="executionYear">
+<logic:present name="reportBean" property="degreeType">
+<table class="tstyle1 thleft thlight mtop05">
+	<tr>
+		<td style="width: 350px;">
+			${fr:message('resources.FenixeduIstIntegrationResources', 'label.student.merit.reports')} 
+		</td>
+		<td>
+			<bean:define id="urlMeritReportFileCsv" type="java.lang.String"><bean:write name="urlMeritReportFile" filter="false"/>&amp;format=csv&amp;type=35</bean:define>
+			<html:link page="<%= urlMeritReportFileCsv %>">
+				<bean:message key="label.request.csv" bundle="GEP_RESOURCES" />
+			</html:link>
+			|
+			<bean:define id="urlMeritReportFileXls" type="java.lang.String"><bean:write name="urlMeritReportFile" filter="false"/>&amp;format=xls&amp;type=35</bean:define>
+			<html:link page="<%= urlMeritReportFileXls %>">
+				<bean:message key="label.request.xls" bundle="GEP_RESOURCES" />
+			</html:link>
+		</td>
+		<td>
+			<html:link page="<%= viewReports + "&type=35" %>">
+				<bean:message key="label.view.requests.done" bundle="GEP_RESOURCES" /> (<bean:write name="numberOfReportsType35"/>)
+			</html:link>
+		</td>
+	</tr>
+</table>
+</logic:present>
+</logic:present>

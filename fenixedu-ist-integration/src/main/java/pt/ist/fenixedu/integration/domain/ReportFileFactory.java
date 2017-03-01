@@ -40,6 +40,7 @@ import org.fenixedu.academic.domain.reports.StatusAndApprovalReportFile;
 import org.fenixedu.academic.domain.reports.SummaryOccupancyReportFile;
 import org.fenixedu.academic.domain.reports.WrittenEvaluationReportFile;
 
+import pt.ist.fenixedu.integration.domain.reports.StudentMeritReportFile;
 import pt.ist.fenixedu.quc.domain.reports.AvailableCoursesForQUCReportFile;
 import pt.ist.fenixedu.quc.domain.reports.CoordinatorsAnswersReportFile;
 import pt.ist.fenixedu.quc.domain.reports.CoursesAnswersReportFile;
@@ -374,5 +375,14 @@ public class ReportFileFactory {
         firstTimeCycleAnswersReportFile.setDegreeType(degreeType);
         firstTimeCycleAnswersReportFile.setExecutionYear(executionYear);
         return firstTimeCycleAnswersReportFile;
+    }
+
+    @Atomic
+    public static GepReportFile createMeritReportFile(String type, DegreeType degreeType, ExecutionYear executionYear) {
+        final StudentMeritReportFile studentMeritReportFile = new StudentMeritReportFile();
+        studentMeritReportFile.setType(type);
+        studentMeritReportFile.setDegreeType(degreeType);
+        studentMeritReportFile.setExecutionYear(executionYear);
+        return studentMeritReportFile;
     }
 }
