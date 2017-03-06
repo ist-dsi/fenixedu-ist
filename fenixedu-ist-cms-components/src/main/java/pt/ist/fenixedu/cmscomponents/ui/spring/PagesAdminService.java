@@ -49,7 +49,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import org.fenixedu.cms.domain.PermissionEvaluation;
 import org.fenixedu.cms.domain.PermissionsArray.Permission;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
@@ -379,7 +378,9 @@ public class PagesAdminService {
         oldPost.getFilesSorted().forEach(postFile -> {
             GroupBasedFile file = postFile.getFiles();
             GroupBasedFile attachmentCopy =
-                    new GroupBasedFile(file.getDisplayName(), file.getFilename(), file.getContent(), Group.anyone());
+                    new GroupBasedFile(file.getDisplayName(), file.getFilename(), file.getContent(),
+                            Optional.ofNullable(newSite.getDefaultRoleTemplateRole())
+                                    .map(r->r.getGroup()).orElseGet(()->Group.users(Authenticate.getUser())));
             new PostFile(newPost, attachmentCopy, postFile.getIsEmbedded(), newPost.getFilesSet().size());
 
         });
