@@ -222,6 +222,7 @@ teacherApp.controller('PagesCtrl', ['$scope', '$http', '$upload', function ($sco
     }, function(response){
         $scope.loaded = true;
         $scope.error = response.status;
+        $scope.errorMsg = response.data;
     });
 
     $scope.updateFile = function(file, newPosition) {

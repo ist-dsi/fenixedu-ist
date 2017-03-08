@@ -24,7 +24,8 @@
         <div class="alert alert-danger" ng-if="error" ng-switch on="error"><strong>
             <spring:message code="label.error"/>: </strong>
             <span ng-switch="401"><spring:message code="error.not.authorized"/></span>
-            <span ng-switch-default<spring:message code="label.error.tryAgain"/></span>
+            <span ng-switch-default><spring:message code="label.error.tryAgain"/></span>
+            <span ng-if="errorMsg">{{errorMsg}}</span>
         </div>
 
         <div class="row" style="min-height:400px" ng-show="loaded && !error">

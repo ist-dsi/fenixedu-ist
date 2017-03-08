@@ -32,6 +32,7 @@ import org.fenixedu.academic.domain.accessControl.StudentGroup;
 import org.fenixedu.academic.domain.accessControl.StudentSharingDegreeOfCompetenceOfExecutionCourseGroup;
 import org.fenixedu.academic.domain.accessControl.StudentSharingDegreeOfExecutionCourseGroup;
 import org.fenixedu.academic.domain.accessControl.TeacherGroup;
+import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.io.domain.GroupBasedFile;
@@ -188,8 +189,9 @@ public class PagesAdminService {
 
     protected JsonObject serialize(Site site) {
         JsonObject data = new JsonObject();
-        if (!site.getMenusSet().isEmpty()) {
-            Menu menu = site.getMenusSet().stream().filter(m -> !m.getPrivileged()).findFirst().get();
+        Optional<Menu> menuOpt = site.getMenusSet().stream().filter(m -> !m.getPrivileged()).findFirst();
+        if (menuOpt.isPresent()) {
+            Menu menu = menuOpt.get();
             JsonObject root = new JsonObject();
             root.add("title", site.getName().json());
             root.add("root", new JsonPrimitive(true));
@@ -208,6 +210,8 @@ public class PagesAdminService {
             root.add("children", child);
             data.add("root", root);
             data.add("groups", groupsJson);
+        } else {
+            throw new DomainException("Missing menu");
         }
         return data;
     }
