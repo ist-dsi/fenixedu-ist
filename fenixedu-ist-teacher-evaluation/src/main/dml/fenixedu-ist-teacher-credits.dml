@@ -160,8 +160,6 @@ class reports.EffectiveTeachingLoadReportFile extends .org.fenixedu.academic.dom
 
 class reports.TeachersByShiftReportFile extends .org.fenixedu.academic.domain.reports.GepReportFile {}
 
-class reports.TeachersListFromGiafReportFile extends .org.fenixedu.academic.domain.reports.GepReportFile {}
-
 class reports.TimetablesReportFile extends .org.fenixedu.academic.domain.reports.GepReportFile {}
 
 
