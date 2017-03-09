@@ -37,14 +37,14 @@ public class GroupCheck extends ExternalInterfaceDispatchAction {
     /**
      * Checks if the user belongs to the group specified in query.
      * 
-     * The response has the following format: <RESPONSE_CODE>\n<BOOLEAN_VALUE>
+     * The response has the following format: &lt;RESPONSE_CODE&gt;\n&lt;BOOLEAN_VALUE&gt;
      * 
      * 
      * 
-     * <RESPONSE_CODE> = NON_EXISTING_GROUP | SUCESS | NOT_AUTHORIZED |
+     * &lt;RESPONSE_CODE&gt; = NON_EXISTING_GROUP | SUCESS | NOT_AUTHORIZED |
      * UNEXPECTED_ERROR
      * 
-     * <BOOLEAN_VALUE> = true || false
+     * &lt;BOOLEAN_VALUE&gt; = true || false
      * 
      * 
      * 

@@ -142,8 +142,11 @@ public class DegreeCandidateDTO {
      * Morada2(8)	Codpos(9)	Codpos3(10)	CodLocal(11)	Telefone(12)	Sexo(13)	DataNasc(dd-MMM-yy)(14)	
      * Conting(15)	PrefCol (op ingresso)(16)	EtapCol(17)	Media12(18)	NotaCand(19)	cod_escola_sec(20)	
      * escola_sec(21)	tipo_estab_sec(22)	curso_secundario(23)
-     * 
-     * </pre>
+     *</pre>
+     *
+     * @param dataLine
+     * @return
+     *
      */
 
     public boolean fillWithFileLineData(String dataLine) {

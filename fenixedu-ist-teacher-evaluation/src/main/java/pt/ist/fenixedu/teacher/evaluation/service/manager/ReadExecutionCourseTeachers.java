@@ -44,7 +44,7 @@ public class ReadExecutionCourseTeachers {
     /**
      * Executes the service. Returns the current collection of infoTeachers.
      * 
-     * @throws ExcepcaoPersistencia
+     * @throws FenixServiceException
      */
 
     protected List<InfoTeacher> run(String executionCourseId) throws FenixServiceException {

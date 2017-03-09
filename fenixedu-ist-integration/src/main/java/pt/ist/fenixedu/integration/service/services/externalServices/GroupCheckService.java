@@ -79,28 +79,31 @@ public class GroupCheckService {
      * Checks if the user belongs to the group specified in query
      * 
      * Generic query format:
-     * user=ISTnnnn;role=ROLE;type=TYPE;unit=IST.<TheUnit>{
-     * .<SubUnit>}[;year=<TheYear>][;semester=<TheSemester>]
+     * user=ISTnnnn;role=ROLE;type=TYPE;unit=IST.&lt;TheUnit&gt;{
+     * .&lt;SubUnit&gt;}[;year=&lt;TheYear&gt;][;semester=&lt;TheSemester&gt;]
      * 
      * Available queries:
-     * user=ISTnnnn;role=ROLE;type=DEPARTMENT;unit=IST.<DepartmentAcronym
-     * >[;year=<TheYear>]
-     * user=ISTnnnn;role=ROLE;type=DEGREE;unit=IST.<DegreeAcronym> (Uses the
+     * user=ISTnnnn;role=ROLE;type=DEPARTMENT;unit=IST.&lt;DepartmentAcronym
+     * &gt;[;year=&lt;TheYear&gt;]
+     * user=ISTnnnn;role=ROLE;type=DEGREE;unit=IST.&lt;DegreeAcronym&gt; (Uses the
      * active degree curricular plans)
      * user=ISTnnnn;role=ROLE;type=CURRICULAR_COURSE
-     * ;unit=IST.<DegreeAcronym>.<CurricularCourseAcronym
-     * >[;year=<TheYear>;semester=<TheSemester>]
+     * ;unit=IST.&lt;DegreeAcronym&gt;.&lt;CurricularCourseAcronym
+     * &gt;[;year=&lt;TheYear&gt;;semester=&lt;TheSemester&gt;]
      * user=ISTnnnn;role=ROLE;type=EXECUTION_COURSE
-     * ;unit=IST.<DegreeAcronym>.<CurricularCourseAcronym
-     * >[;year=<TheYear>;semester=<TheSemester>]
+     * ;unit=IST.&lt;DegreeAcronym&gt;.&lt;CurricularCourseAcronym
+     * &gt;[;year=&lt;TheYear&gt;;semester=&lt;TheSemester&gt;]
      * 
      * Queries that will be available in future:
      * user=ISTnnnn;role=ROLE;type=SCIENTIFIC_AREA
-     * ;unit=IST.<TheUnit>{.<SubUnit>}[;year=<TheYear>][;semester=<TheSemester>]
+     * ;unit=IST.&lt;TheUnit&gt;{.&lt;SubUnit&gt;}[;year=&lt;TheYear&gt;][;semester=&lt;TheSemester&gt;]
      * user
-     * =ISTnnnn;role=ROLE;type=SECTION;unit=IST.<TheUnit>{.<SubUnit>}[;year=<
-     * TheYear>][;semester=<TheSemester>]
-     * 
+     * =ISTnnnn;role=ROLE;type=SECTION;unit=IST.&lt;TheUnit&gt;{.&lt;SubUnit&gt;}[;year=&lt;
+     * TheYear&gt;][;semester=&lt;TheSemester&gt;]
+     *
+     * @param query
+     * @return
+     * @throws FenixServiceException
      */
     @Atomic
     public static Boolean run(String query) throws FenixServiceException {

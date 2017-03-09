@@ -256,7 +256,7 @@ public abstract class Vigilancy extends Vigilancy_Base {
     }
 
     /**
-     * A vigilancy initialy starts as active and {@value AttendingStatus#NOT_ATTENDED}. However when a vigilant is
+     * A vigilancy initialy starts as active and {@link AttendingStatus} NOT_ATTENDED. However when a vigilant is
      * diconvoked the status becomes undefined.
      * 
      * @return <code>true</code> if the status is undefined and should not be

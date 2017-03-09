@@ -186,7 +186,6 @@ public class StudentsByEntryYearBean implements Serializable {
      * 
      * 
      * @param personsExternalIds
-     * @param executionSemester
      * @param executionDegree
      * @return list of persons with no registration in execution course
      */

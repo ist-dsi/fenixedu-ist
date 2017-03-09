@@ -153,7 +153,7 @@ public class LdapSyncServices extends BennuRestResource {
      * 
      * <p>
      * Request example :
-     * <p>
+     * </p>
      * 
      * <pre>
      * curl -X POST -H '__username__: user' -H '__password__: pass' --data "email=user1@fenixedu.org" /api/fenix-ist/ldapSync/setEmail/user1
@@ -161,7 +161,7 @@ public class LdapSyncServices extends BennuRestResource {
      * 
      * @param username the username to set the email to
      * @param email the new email value
-     * @return {@link Status.OK} if successful, {@link Status.NOT_FOUND} otherwise
+     * @return {@link Status} OK if successful, NOT_FOUND otherwise
      */
     @POST
     @Path("/setEmail/{username}")

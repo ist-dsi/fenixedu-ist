@@ -310,7 +310,7 @@ public class PersonFunction extends PersonFunction_Base {
     }
 
     /**
-     * The main difference between this method and {@link #getActivePersonFunctions()} is that person functions with a virtual
+     * The main difference between this method and {@link #getActivePersonFunctions(Person)} is that person functions with a virtual
      * function are also included. This method also collects person functions from the given unit and all subunits.
      * 
      * @see Function#isVirtual()

@@ -197,7 +197,7 @@ public class ContextTutorshipCreationBean implements Serializable {
      * courses in a given Year and Semester
      * 
      * @param degree
-     * @param curricularYear
+     * @param execYear
      * @param executionSemester
      * @return
      */

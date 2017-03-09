@@ -281,9 +281,9 @@ public class FenixAPIv1 {
     /**
      * It will return name, istid, campus, email, photo and contacts
      *
-     * @summary Personal Information
+
      * @return only public contacts and photo are available
-     * @servicetag PERSONAL_SCOPE
+
      */
     @GET
     @Produces(JSON_UTF8)
@@ -335,13 +335,10 @@ public class FenixAPIv1 {
     /**
      * Person courses (enrolled if student and teaching if teacher)
      *
-     * @summary Person courses
-     * @param sem
-     *            selected semester ("1" | "2")
-     * @param year
-     *            selected year ("yyyy/yyyy")
+
+     * @param academicTerm
      * @return enrolled courses and teaching courses
-     * @servicetag CURRICULAR_SCOPE
+
      */
     @OAuthEndpoint(CURRICULAR_SCOPE)
     @GET
@@ -507,12 +504,12 @@ public class FenixAPIv1 {
      * calendar of all written evaluations (tests and exams). Available for
      * students and teachers.
      *
-     * @summary Evaluations calendar
+
      * @param format
      *            ("calendar" or "json")
      * @return If format is "calendar", returns iCal format. If not returns the
      *         following json.
-     * @servicetag SCHEDULE_SCOPE
+
      */
     @OAuthEndpoint(SCHEDULE_SCOPE)
     @GET
@@ -560,12 +557,12 @@ public class FenixAPIv1 {
     /**
      * calendar of all lessons of students and teachers
      *
-     * @summary Classes calendar
+
      * @param format
      *            ("calendar" or "json")
      * @return If format is "calendar", returns iCal format. If not returns the
      *         following json.
-     * @servicetag SCHEDULE_SCOPE
+
      */
     @OAuthEndpoint(SCHEDULE_SCOPE)
     @GET
@@ -585,8 +582,7 @@ public class FenixAPIv1 {
     /**
      * Complete curriculum (for students)
      *
-     * @summary Curriculum
-     * @servicetag CURRICULAR_SCOPE
+     * @return
      */
     @OAuthEndpoint(CURRICULAR_SCOPE)
     @GET
@@ -690,9 +686,7 @@ public class FenixAPIv1 {
     /**
      * Information about gratuity payments (payed and not payed)
      *
-     * @summary Gratuity payments
      * @return
-     * @servicetag PAYMENTS_SCOPE
      */
     @OAuthEndpoint(PAYMENTS_SCOPE)
     @GET
@@ -741,9 +735,9 @@ public class FenixAPIv1 {
     /**
      * Written evaluations for students
      *
-     * @summary Evaluations
+
      * @return enrolled and not enrolled student's evaluations
-     * @servicetag EVALUATIONS_SCOPE
+
      */
     @OAuthEndpoint(EVALUATIONS_SCOPE)
     @GET
@@ -823,13 +817,13 @@ public class FenixAPIv1 {
      * Enrols in evaluation represented by oid if enrol is "yes". unenrols
      * evaluation if enrol is "no".
      *
-     * @summary evaluation enrollment
+
      * @param oid
      *            evaluations id
      * @param enrol
      *            ( "yes" or "no")
      * @return all evaluations
-     * @servicetag EVALUATIONS_SCOPE
+
      */
     @OAuthEndpoint(EVALUATIONS_SCOPE)
     @PUT
@@ -896,7 +890,7 @@ public class FenixAPIv1 {
     /**
      * generic information about the institution
      *
-     * @summary Information about the institution
+
      * @return news and events rss
      */
     @GET
@@ -909,7 +903,7 @@ public class FenixAPIv1 {
     /**
      * Academic Terms
      *
-     * @summary Lists all academic terms
+
      * @return all the academic terms available to be used in other endpoints as academicTerm query parameter.
      */
     @GET
@@ -954,7 +948,7 @@ public class FenixAPIv1 {
     /**
      * All information about degrees available
      *
-     * @summary All degrees
+
      * @param academicTerm
      * @see academicTerms
      *
@@ -1073,10 +1067,10 @@ public class FenixAPIv1 {
      *
      * Retrieves information about degree with id
      *
-     * @summary Degree information
+
      * @param oid
      *            degree id
-     * @param year
+     * @param academicTerm
      *            ("yyyy/yyyy")
      */
     @GET
@@ -1100,10 +1094,10 @@ public class FenixAPIv1 {
     /**
      * Courses for degree with id
      *
-     * @summary Courses for specific degree
+
      * @param oid
      *            degree id
-     * @param year
+     * @param academicTerm
      *            ("yyyy/yyyy")
      */
     @GET
@@ -1137,10 +1131,10 @@ public class FenixAPIv1 {
     /**
      * Set the previously chosen courses for students
      *
-     * @summary Set the previously chosen courses for students
-     * @param id
-     *            degree id
+
+     * @param oid degree id
      * @param academicTerm
+     * @param preEnrolments
      * 
      */
     @POST
@@ -1223,8 +1217,8 @@ public class FenixAPIv1 {
     /**
      * Courses group structure for degree with id
      *
-     * @summary Courses group structure for specific degree
-     * @param id
+
+     * @param oid
      *            degree id
      * @param academicTerm
      * 
@@ -1259,8 +1253,8 @@ public class FenixAPIv1 {
     /**
      * Curricular courses for degree with id
      *
-     * @summary Curricular courses for specific degree
-     * @param id
+
+     * @param oid
      *            degree id
      * @param academicTerm
      * 
@@ -1357,7 +1351,7 @@ public class FenixAPIv1 {
     /**
      * Detailed information about course
      *
-     * @summary Course information by id
+
      * @param oid
      *            course id
      * @return
@@ -1438,7 +1432,7 @@ public class FenixAPIv1 {
     /**
      * Retrieve groups for course given by oid
      *
-     * @summary Course groups by course oid
+
      * @param oid
      *            course id
      */
@@ -1462,7 +1456,7 @@ public class FenixAPIv1 {
     /**
      * Returns summaries for course by id
      *
-     * @summary Course summaries by id
+
      * @param oid
      *            course id
      * @return
@@ -1492,7 +1486,7 @@ public class FenixAPIv1 {
     /**
      * Adds a summary for a lesson in a course by id
      *
-     * @summary Add summary to lesson in course
+
      * @param oid
      *            course id
      * @param summaryInfo
@@ -1531,7 +1525,7 @@ public class FenixAPIv1 {
     /**
      * Edits a summary for a lesson in a course by id
      *
-     * @summary Edit summary of lesson in course
+
      * @param oid
      *            course id
      * @param summaryInfo
@@ -1656,7 +1650,7 @@ public class FenixAPIv1 {
     /**
      * Deletes a summary in a lesson of a course by id
      *
-     * @summary Delete summary of lesson in course
+
      * @param oid
      *            course id
      * @param summaryInfo
@@ -1713,7 +1707,7 @@ public class FenixAPIv1 {
     /**
      * All students for course by id
      *
-     * @summary Course students
+
      * @param oid
      *            course id
      * @return
@@ -1731,7 +1725,7 @@ public class FenixAPIv1 {
      * Returns evaluations for course by id (Test, Exams, Project, AdHoc,
      * OnlineTest)
      *
-     * @summary Course evaluations
+
      * @param oid
      * @return
      */
@@ -1844,7 +1838,7 @@ public class FenixAPIv1 {
     /**
      * All lessons and lesson period of course by id
      *
-     * @summary Lesson schedule of course by id
+
      * @param oid
      * @return
      */
@@ -1859,7 +1853,7 @@ public class FenixAPIv1 {
     /**
      * Campus spaces
      *
-     * @summary All campus
+
      * @return
      */
     @GET
@@ -1899,7 +1893,7 @@ public class FenixAPIv1 {
      * Returns the blueprint of this space
      *
      * @param oid
-     * @param day
+     * @param format
      *            ("dd/mm/yyyy")
      * @return
      */
@@ -2120,7 +2114,7 @@ public class FenixAPIv1 {
     /**
      * information about the domain model implemented by this application
      *
-     * @summary Representation of the Domain Model
+
      * @return domain model
      */
     @GET
