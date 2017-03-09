@@ -35,6 +35,8 @@ class SantanderCard {
 	DateTime whenAllowChanged;
 }
 
+class reports.StudentMeritReportFile extends .org.fenixedu.academic.domain.reports.GepReportFile {}
+
 class student.importation.DgesBaseProcess extends .org.fenixedu.academic.domain.QueueJobWithFile {
     EntryPhase entryPhase;
 }

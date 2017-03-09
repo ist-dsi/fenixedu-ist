@@ -65,6 +65,7 @@ import com.google.common.base.Strings;
 
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
 import pt.ist.fenixedu.integration.domain.ReportFileFactory;
+import pt.ist.fenixedu.integration.domain.reports.StudentMeritReportFile;
 import pt.ist.fenixedu.quc.domain.reports.AvailableCoursesForQUCReportFile;
 import pt.ist.fenixedu.quc.domain.reports.CoordinatorsAnswersReportFile;
 import pt.ist.fenixedu.quc.domain.reports.CoursesAnswersReportFile;
@@ -259,6 +260,21 @@ public class ReportsByDegreeTypeDA extends FenixDispatchAction {
 
     private String getFormat(final HttpServletRequest httpServletRequest) {
         return httpServletRequest.getParameter("format");
+    }
+
+    @SuppressWarnings("unused")
+    public ActionForward downloadMeritReportFile(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
+            HttpServletResponse response) throws IOException {
+        if (isRepeatedJob(AccessControl.getPerson(), request, getClassForParameter(request.getParameter("type")))) {
+            return selectDegreeType(mapping, actionForm, request, response);
+        }
+        final DegreeType degreeType = getDegreeType(request);
+        final ExecutionYear executionYear = getExecutionYear(request);
+        final String format = getFormat(request);
+
+        prepareNewJobResponse(request, ReportFileFactory.createMeritReportFile(format, degreeType, executionYear));
+
+        return selectDegreeType(mapping, actionForm, request, response);
     }
 
     @SuppressWarnings("unused")
@@ -812,6 +828,8 @@ public class ReportsByDegreeTypeDA extends FenixDispatchAction {
             return CoordinatorsAnswersReportFile.class;
         case 33:
             return FirstTimeCycleAnswersReportFile.class;
+        case 35:
+            return StudentMeritReportFile.class;
         default:
             return null;
         }
