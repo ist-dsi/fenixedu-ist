@@ -31,7 +31,7 @@
 				<staticText>
 					<reportElement key="staticText-4" x="357" y="58" width="162" height="40"/>
 					<textElement textAlignment="Justified"/>
-					<text><![CDATA[Coordenadora do Núcleo de Pós-Graduação e Formação Contínua]]></text>
+					<text><![CDATA[Responsável pela Área de Pós-Graduação]]></text>
 				</staticText>
 				<textField isBlankWhenNull="false">
 					<reportElement key="textField-4" x="51" y="21" width="153" height="24"/>
