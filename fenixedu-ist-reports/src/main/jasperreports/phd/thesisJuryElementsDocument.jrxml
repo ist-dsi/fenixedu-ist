@@ -77,7 +77,7 @@
 			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
 				<reportElement key="textField-6" x="120" y="64" width="443" height="14"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA["(Coordenadora do " + $P{administrativeOfficeName} + ")"]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA["(Responsável pela " + $P{administrativeOfficeName} + ")"]]></textFieldExpression>
 			</textField>
 		</band>
 	</summary>

@@ -32,7 +32,7 @@
 					</textElement>
 					<textFieldExpression class="java.lang.String"><![CDATA["Best Regards, " +
 "\n" + $P{administrativeOfficeCoordinator} +
-"\n(Post-Graduation Unit Coordinator)"]]></textFieldExpression>
+"\n(Post-Graduation Unit Responsible)"]]></textFieldExpression>
 				</textField>
 				<line>
 					<reportElement key="line-1" x="44" y="53" width="354" height="1"/>
