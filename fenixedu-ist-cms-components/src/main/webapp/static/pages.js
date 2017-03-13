@@ -236,13 +236,13 @@ teacherApp.controller('PagesCtrl', ['$scope', '$http', '$upload', function ($sco
 
     function emptyLocalizedString() {
         var mlsBody = {};
-        mlsBody[BennuPortal.locale.tag] = '';
+        mlsBody[Bennu.locale.tag] = '';
         return mlsBody;
     }
 
     function initialTitle() {
         var mlsBody = {};
-        mlsBody[BennuPortal.locale.tag] = 'New Entry';
+        mlsBody[Bennu.locale.tag] = 'New Entry';
         return mlsBody;
     }
 

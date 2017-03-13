@@ -25,6 +25,7 @@ import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.dto.GenericPair;
 import org.fenixedu.academic.service.services.administrativeOffice.enrolment.MultiSemesterEnrolmentReporter;
+import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.rest.BennuRestResource;
 import org.fenixedu.bennu.oauth.annotation.OAuthEndpoint;
 import org.joda.time.DateTime;
@@ -44,7 +45,7 @@ public class EnrolmentStatisticsResource extends BennuRestResource {
     @Path("/by-degree")
     @OAuthEndpoint("_internal")
     public String statisticsByDegree() {
-        accessControl("#managers");
+        accessControl(Group.managers());
 
         final Map<StudentCurricularPlan, Set<Enrolment>> studentsEnrolments = new HashMap<>();
         final Map<DegreeCurricularPlan, GenericPair<AtomicInteger, AtomicInteger>> degreesMap =
@@ -104,7 +105,7 @@ public class EnrolmentStatisticsResource extends BennuRestResource {
     @OAuthEndpoint("_internal")
     public String statisticsOverTime(@DefaultValue("1") @QueryParam("hoursToReport") int hoursToReport,
             @DefaultValue("10") @QueryParam("yearsToReport") int yearsToReport) {
-        accessControl("#managers");
+        accessControl(Group.managers());
         ExecutionSemester semester = ExecutionSemester.readActualExecutionSemester();
         final MultiSemesterEnrolmentReporter reporter = new MultiSemesterEnrolmentReporter(hoursToReport, semester.getSemester());
 

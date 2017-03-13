@@ -77,6 +77,7 @@ window.tooltip = $.fn.tooltip;
                 <h4><spring:message code="label.settings"/></h4>
             </div>
             <form role="form" method="post" action="${teacherContext}/options" class="form-horizontal" id="homepage-publish-form">
+                ${csrf.field()}
                 <div class="modal-body">
                     <div class="form-group">
                         <label class="control-label col-sm-2">
@@ -112,6 +113,7 @@ window.tooltip = $.fn.tooltip;
                 <h4><spring:message code="label.import.previousSite"/></h4>
             </div>
             <form role="form" method="post" action="${teacherContext}/copyContent" class="form-horizontal" id="homepage-publish-form">
+                ${csrf.field()}
                 <div class="modal-body">
                     <div class="form-group">
                         <select class="form-control" name="previousExecutionCourse">

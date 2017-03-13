@@ -279,6 +279,7 @@ ${portal.toolkit()}
     <c:if test="${not empty homepage && homepage.published}">
         <div class="modal fade" id="activePagesModal" tabindex="-1" role="dialog" aria-hidden="true">
             <form method="post" action="${context}/activePages" class="form-horizontal">
+                ${csrf.field()}
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">

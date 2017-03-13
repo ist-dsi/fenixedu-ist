@@ -71,7 +71,7 @@
             <!-- Modal panel for editing an announcement -->
             <div class="modal fade" id="editModal${announcement.externalId}" tabindex="-1" role="dialog" aria-hidden="true">
                 <form method="post" action="${context}/${announcement.slug}/edit">
-                    ${csrf.field()}
+                    ${csrfField}
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
 
@@ -165,7 +165,7 @@
 <!-- Modal panel for creating an announcement -->
 <div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-hidden="true">
     <form method="post" action="${context}/create">
-        ${csrf.field()}
+        ${csrfField}
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -231,7 +231,7 @@
 <!-- Modal panel for deleting an announcement -->
 <div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-hidden="true">
     <form id="deleteForm" method="post" action="#">
-        ${csrf.field()}
+        ${csrfField}
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
