@@ -64,6 +64,7 @@ ${portal.toolkit()}
                 <div class="modal-dialog modal-lg">
                     <form method="post" class="form-horizontal" action="${context}/${banner.post.slug}/update"
                           enctype="multipart/form-data">
+                        ${csrf.field()}
                         <div class="modal-content">
                             <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal">
@@ -202,6 +203,7 @@ ${portal.toolkit()}
                     <h4><spring:message code="action.create"/></h4>
                 </div>
                 <form method="post" class="form-horizontal" action="${context}/create" enctype="multipart/form-data">
+                    ${csrf.field()}
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="name" class="control-label col-sm-3"><spring:message code="label.name"/></label>
