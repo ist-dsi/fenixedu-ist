@@ -26,6 +26,13 @@
 <c:set var="teacherContext" scope="request" value="${pageContext.request.contextPath}/teacher/${executionCourse.externalId}/pages"/>
 
 ${portal.angularToolkit()}
+<script>
+    angular.module("bennuToolkit").config(['$httpProvider',function($httpProvider) {
+        $httpProvider.defaults.headers.common = $httpProvider.defaults.headers.common || {};
+        $httpProvider.defaults.headers.common['${csrf.headerName}'] = '${csrf.token}';
+    }]);
+</script>
+
 <link href="${pageContext.request.contextPath}/static/lib/fancytree/skin-lion/ui.fancytree.css" rel="stylesheet" type="text/css">
 <script>
 window.tooltip = $.fn.tooltip;
