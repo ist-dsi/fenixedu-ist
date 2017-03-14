@@ -60,7 +60,7 @@
                             <br/>
                             <fieldset class="form-horizontal" ng-show="selected.loaded">
                                 <label for="title"><spring:message code="label.title"/></label>
-                                <input type="text" id="title" name="title" ng-localized-string="selected.title" required class="form-control" placeholder="<spring:message code="label.title"/>"/>
+                                <input type="text" id="title" name="title" bennu-localized-string="selected.title" required class="form-control" placeholder="<spring:message code="label.title"/>"/>
 
                                 <label for="body"><spring:message code="label.content"/></label>
 
@@ -78,7 +78,7 @@
                                     </ul>
                                 </div>
 
-                                <textarea bennu-localized-string ng-html-editor="selected.body" ng-on-image-added="onImageAdded"
+                                <textarea bennu-localized-html-editor="selected.body" on-image-added="onImageAdded"
                                           id="body" toolbar="size,style,colors,lists,align,links,table,image,undo,fullscreen,source" class="form-control"></textarea>
 
                                 <div>
