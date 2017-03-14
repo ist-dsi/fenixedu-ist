@@ -78,7 +78,7 @@
                                     </ul>
                                 </div>
 
-                                <textarea bennu-localized-html-editor="selected.body" ng-on-image-added="onImageAdded"
+                                <textarea bennu-localized-html-editor="selected.body" on-image-added="onImageAdded"
                                           id="body" toolbar="size,style,colors,lists,align,links,table,image,undo,fullscreen,source" class="form-control"></textarea>
 
                                 <div>
