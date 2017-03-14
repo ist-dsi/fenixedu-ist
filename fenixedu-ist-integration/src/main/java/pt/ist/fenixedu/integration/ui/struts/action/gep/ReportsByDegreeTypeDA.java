@@ -828,7 +828,7 @@ public class ReportsByDegreeTypeDA extends FenixDispatchAction {
             return CoordinatorsAnswersReportFile.class;
         case 33:
             return FirstTimeCycleAnswersReportFile.class;
-        case 35:
+        case 34:
             return StudentMeritReportFile.class;
         default:
             return null;
