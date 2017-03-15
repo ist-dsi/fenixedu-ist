@@ -51,6 +51,7 @@
                                                         <h4><spring:message code="label.upload"/></h4>
                                     </div>
                                      <form method="POST" class="form-horizontal" enctype="multipart/form-data" action="${uploadUrl}">
+                                         ${csrf.field()}
                                     <div class="modal-body">
                                         <p><spring:message code="label.upload"/></p>
                                                         <input type="hidden" name="executionYear" value="<c:out value='${departmentCreditsBean.executionYear.externalId}'/>"/>
