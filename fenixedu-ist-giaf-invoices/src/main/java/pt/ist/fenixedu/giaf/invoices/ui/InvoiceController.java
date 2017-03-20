@@ -93,7 +93,7 @@ public class InvoiceController {
                         person.getEventsSet().stream()
                             .flatMap(e -> e.getAdjustedTransactions().stream())
                             .map(tx -> tx.getTransactionDetail()));
-                person.getEventsSet().stream().filter(this::needsProcessing)
+                person.getEventsSet().stream().filter(EventWrapper::needsProcessing)
                         .filter(e -> Utils.validate(errorLogConsumer, e))
                         .forEach(e -> EventProcessor.syncEventWithGiaf(clientMap, errorLogConsumer, elogger, e));
             }
@@ -102,11 +102,6 @@ public class InvoiceController {
             }
         }
         return home(username, model);
-    }
-
-    private boolean needsProcessing(final Event event) {
-        final ExecutionYear executionYear = Utils.executionYearOf(event);
-        return executionYear.isCurrent() || event.getWhenOccured().isAfter(EventWrapper.THRESHOLD);
     }
 
     private boolean isAllowedToAccess(final User user) {

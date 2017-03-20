@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
@@ -20,7 +21,7 @@ import pt.ist.giaf.client.financialDocuments.ClientClient;
 
 public class ClientMap {
 
-	private final SortedMap<String, String> map = new TreeMap<>();
+    private final SortedMap<String, String> map = new TreeMap<>();
 
     public ClientMap() {
         try {
@@ -38,6 +39,9 @@ public class ClientMap {
     }
 
     public void register(final String uVATNumber, final String clientId) {
+        if ("PT999999990".equals(uVATNumber)) {
+            return ;
+        }
         map.put(uVATNumber, clientId);
 
         try (final FileOutputStream stream = new FileOutputStream(GiafInvoiceConfiguration.getConfiguration().clientMapFilename(), true)) {
@@ -52,7 +56,7 @@ public class ClientMap {
 
     public String getClientId(final Person p) {
         final String uVATNumber = uVATNumberFor(p);
-        return uVATNumber == null ? null : map.get(uVATNumber);
+        return uVATNumber == null ? null : "PT999999990".equals(uVATNumber) ? "999996097" : map.get(uVATNumber);
     }
 
     public boolean containsClient(final Person p) {
@@ -67,13 +71,16 @@ public class ClientMap {
             return "PT" + vat;
         }
         if (country == null || "PT".equals(country.getCode())) {
-            return null;
+            return "PT999999990";
         }
         if (vat != null) {
-            return country.getCode() + vat;
+            return trimVatTo12Digits(country.getCode() + vat);
         }
-        final User user = person.getUser();
-        return user == null ? country.getCode() + makeUpSomeRandomNumber(person) : null;
+        return trimVatTo12Digits(country.getCode() + makeUpSomeRandomNumber(person));
+    }
+
+    private static String trimVatTo12Digits(final String uVat) {
+        return uVat.substring(0, 2) + StringUtils.right(uVat, Math.min(uVat.length() - 2, 10));
     }
 
     private static String toVatNumber(final String ssn) {
@@ -108,7 +115,7 @@ public class ClientMap {
         return "FE" + id.substring(id.length() - 10, id.length());
     }
 
-    private static JsonObject toJson(final Person person) {
+    public static JsonObject toJson(final Person person) {
         final String uVATNumber = ClientMap.uVATNumberFor(person);
         final String clientCode = uVATNumber;
 
@@ -155,7 +162,7 @@ public class ClientMap {
         }
     }
 
-    private static boolean createClient(final ErrorLogConsumer errorLogConsumer, final JsonObject j) {
+    public static boolean createClient(final ErrorLogConsumer errorLogConsumer, final JsonObject j) {
         try {
             final JsonObject result = ClientClient.createClient(j);
             final JsonElement je = result.get("errorMessage");

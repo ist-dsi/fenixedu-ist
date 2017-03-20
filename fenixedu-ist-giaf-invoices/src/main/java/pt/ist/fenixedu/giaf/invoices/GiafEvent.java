@@ -522,8 +522,13 @@ public class GiafEvent {
     }
 
     private String costCenterFor(final Event event) {
+        final String newCode = newCostCenterFor(event);
+        return "8321".equals(newCode) ? "8312" : newCode;
+    }
+
+    private String newCostCenterFor(final Event event) {
         if (event instanceof PhdGratuityEvent) {
-            return "8312";
+            return "8321";
         }
         if (event instanceof AcademicEvent) {
             final AcademicEvent academicEvent = (AcademicEvent) event;
@@ -543,7 +548,7 @@ public class GiafEvent {
             final ExecutionYear executionYear = insuranceEvent.getExecutionYear();
             final Person person = event.getPerson();
             if (!person.getPhdIndividualProgramProcessesSet().isEmpty()) {
-                return "8312";
+                return "8321";
             }
             final Student student = person.getStudent();
             if (student != null) {
@@ -554,7 +559,7 @@ public class GiafEvent {
                             if (degreeType.isAdvancedFormationDiploma() || degreeType.isAdvancedSpecializationDiploma()
                                     || degreeType.isSpecializationCycle() || degreeType.isSpecializationDegree()
                                     || degreeType.isThirdCycle()) {
-                                return "8312";
+                                return "8321";
                             }
                             final Space campus = registration.getCampus(executionYear);
                             if (campus != null && campus.getName().startsWith("T")) {
@@ -568,7 +573,7 @@ public class GiafEvent {
                     if (degreeType.isAdvancedFormationDiploma() || degreeType.isAdvancedSpecializationDiploma()
                             || degreeType.isSpecializationCycle() || degreeType.isSpecializationDegree()
                             || degreeType.isThirdCycle()) {
-                        return "8312";
+                        return "8321";
                     }
                     final Space campus = registration.getCampus(executionYear);
                     if (campus != null && campus.getName().startsWith("T")) {
@@ -675,7 +680,7 @@ public class GiafEvent {
 
     private static File dirFor(final Event event) {
         final String id = event.getExternalId();
-        final String dirPath = GiafInvoiceConfiguration.getConfiguration().giafInvoiceDir() + splitPath(id) + File.separator + id;
+        final String dirPath = GiafInvoiceConfiguration.getConfiguration().giafInvoiceDir() + Utils.splitPath(id) + File.separator + id;
         final File dir = new File(dirPath);
         if (!dir.exists()) {
             dir.mkdirs();
@@ -691,16 +696,6 @@ public class GiafEvent {
 
     private static String complete(final String filename) {
         return filename.endsWith(".pdf") ? filename : filename + ".pdf";
-    }
-
-    private static String splitPath(final String id) {
-        final StringBuilder b = new StringBuilder();
-        for (int i = 0; i < id.length() - 1; i++, i++) {
-            b.append(id.charAt(i));
-            b.append(id.charAt(i + 1));
-            b.append(File.separatorChar);
-        }
-        return b.toString();
     }
 
 }
