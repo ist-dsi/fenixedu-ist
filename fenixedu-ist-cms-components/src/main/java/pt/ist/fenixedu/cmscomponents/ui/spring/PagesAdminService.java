@@ -205,7 +205,9 @@ public class PagesAdminService {
             }
 
             JsonArray child = new JsonArray();
-            menu.getToplevelItemsSorted().filter(isStaticPage).map(item -> serialize(item, false))
+            
+            // getSite()!=null to check for archived pages, replace with proper API when ready
+            menu.getToplevelItemsSorted().filter(isStaticPage).filter(item->item.getPage().getSite()!=null).map(item -> serialize(item, false))
                     .forEach(json -> child.add(json));
             root.add("children", child);
             data.add("root", root);
@@ -225,7 +227,7 @@ public class PagesAdminService {
         }
         root.add("key", new JsonPrimitive(item.getExternalId()));
         String pageAddress = Optional.ofNullable(item.getUrl()).orElse(item.getPage().getAddress());
-        root.add("pageAddress", new JsonPrimitive(pageAddress));
+        root.add("pageAddress", pageAddress == null ? null : new JsonPrimitive(pageAddress));
         root.add("position", new JsonPrimitive(item.getPosition()));
         root.add("isFolder", new JsonPrimitive(Optional.ofNullable(item.getFolder()).orElse(false)));
         root.addProperty("visible", item.getPage().isPublished());
