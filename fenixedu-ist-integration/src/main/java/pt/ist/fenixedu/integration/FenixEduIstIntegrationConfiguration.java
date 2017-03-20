@@ -113,7 +113,9 @@ public class FenixEduIstIntegrationConfiguration {
 
         @ConfigurationProperty(key = "ist.cas.enabled", defaultValue = "false")
         public boolean istCasEnable();
-
+    
+        @ConfigurationProperty(key = "scheduler.watchdog.file", defaultValue = "/tmp/fenix-scheduler-watchdog")
+        public String getSchedulerWatchdogFilePath();
     }
 
     public static ConfigurationProperties getConfiguration() {
