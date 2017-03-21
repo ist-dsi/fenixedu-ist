@@ -98,14 +98,6 @@
         </dependency>
         <dependency>
             <groupId>org.fenixedu</groupId>
-            <artifactId>bennu-scheduler</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.fenixedu</groupId>
-            <artifactId>bennu-io</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.fenixedu</groupId>
             <artifactId>bennu-renderers</artifactId>
         </dependency>
         <dependency>
