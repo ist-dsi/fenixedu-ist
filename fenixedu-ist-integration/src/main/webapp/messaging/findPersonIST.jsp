@@ -178,12 +178,13 @@
 				<tr class="highlight">
 					<td class="ppleft" valign="top"><bean:message
 							key="label.person.workPhone.short" /></td>
-					<td class="ppright" valign="top" style="width: 18em;"><fr:view
+					<td class="ppright" valign="top" style="width: 25em;"><fr:view
 							name="personalInfo" property="phones">
 							<fr:layout name="contact-list">
 								<fr:property name="classes" value="nobullet list6" />
 							</fr:layout>
-						</fr:view> <fr:view name="personalInfo" property="mobilePhones">
+						</fr:view> 
+						<fr:view name="personalInfo" property="mobilePhones">
 							<fr:layout name="contact-list">
 								<fr:property name="classes" value="nobullet list6" />
 							</fr:layout>
