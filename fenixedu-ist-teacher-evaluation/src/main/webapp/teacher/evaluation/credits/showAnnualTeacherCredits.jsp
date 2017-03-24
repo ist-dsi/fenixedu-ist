@@ -645,7 +645,7 @@ if(RoleType.SCIENTIFIC_COUNCIL.actualGroup().isMember(user)){
 				<fr:schema bundle="TEACHER_CREDITS_SHEET_RESOURCES" type="pt.ist.fenixedu.teacher.evaluation.domain.teacher.TeacherServiceComment">
 					<fr:slot name="content" key="label.comment"/>
 					<fr:slot name="createdBy" key="label.user">
-						<fr:property name="format" value="${name} (${username})"/>
+						<fr:property name="format" value="${profile.displayName} (${username})"/>
 					</fr:slot>
 					<fr:slot name="creationDate" key="label.date"/>
 					<fr:slot name="lastModifiedDate" key="label.lastModifiedDate"/>

@@ -60,7 +60,7 @@ public class VigilancyGroup extends FenixGroup {
 
     @Override
     public String getPresentationName() {
-        return getMembers().map(User::getName).collect(Collectors.joining("\n"));
+        return getMembers().map(u -> u.getProfile().getDisplayName()).collect(Collectors.joining("\n"));
     }
 
     @Override
