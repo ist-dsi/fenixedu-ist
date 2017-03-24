@@ -18,6 +18,7 @@
  */
 package pt.ist.fenixedu.giaf.invoices;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
@@ -55,6 +56,7 @@ import org.fenixedu.academic.domain.phd.debts.PhdGratuityEvent;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.util.Money;
+import org.fenixedu.bennu.GiafInvoiceConfiguration;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.UserProfile;
 import org.fenixedu.commons.StringNormalizer;
@@ -114,13 +116,18 @@ public class Utils {
             logError(consumer, "No Description Available", event, null, "", null, null, null, null, event);
             return false;
         }
+        final Money originalAmountToPay;
         try {
-            event.getOriginalAmountToPay();
+            originalAmountToPay = event.getOriginalAmountToPay();
         } catch (final DomainException ex) {
-            logError(consumer, "Unable to Determine Amount", event, null, "", null, null, null, null, event);
+            if (hasAnyGiafEntry(event)) {
+                logError(consumer, "Unable to Determine Amount", event, null, "", null, null, null, null, event);
+            }
             return false;
         } catch (final NullPointerException ex) {
-            logError(consumer, "Unable to Determine Amount", event, null, "", null, null, null, null, event);
+            if (hasAnyGiafEntry(event)) {
+                logError(consumer, "Unable to Determine Amount", event, null, "", null, null, null, null, event);
+            }
             return false;
         }
 
@@ -167,6 +174,10 @@ public class Utils {
                     return false;
                 }
             }
+            if ("PT999999990".equals(vat) && originalAmountToPay.greaterThan(new Money(100))) {
+                logError(consumer, "No VAT Number", event, person.getUsername(), vat, country, person, address, countryOfAddress, event);            
+                return false;
+            }
         } else {
             //consumer.accept(t, "Not a person", event.getParty().toString());
             return false;
@@ -184,6 +195,29 @@ public class Utils {
             }
         }
         return true;
+    }
+
+    private static boolean hasAnyGiafEntry(final Event event) {
+        final String id = event.getExternalId();
+        final String dirPath = GiafInvoiceConfiguration.getConfiguration().giafInvoiceDir() + splitPath(id) + File.separator + id;
+        final File dir = new File(dirPath);
+        if (dir.exists()) {
+            final File file = new File(dir, event.getExternalId() + ".json");
+            if (file.exists()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static String splitPath(final String id) {
+        final StringBuilder b = new StringBuilder();
+        for (int i = 0; i < id.length() - 1; i++, i++) {
+            b.append(id.charAt(i));
+            b.append(id.charAt(i + 1));
+            b.append(File.separatorChar);
+        }
+        return b.toString();
     }
 
     public static PhysicalAddress toAddress(final Person person) {

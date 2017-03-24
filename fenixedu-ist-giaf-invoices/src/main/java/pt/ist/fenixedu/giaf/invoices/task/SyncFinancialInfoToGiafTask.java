@@ -93,9 +93,31 @@ public class SyncFinancialInfoToGiafTask extends CronTask {
             .filter(p -> p != null && p.isPerson())
             .map(p -> (Person) p)
             .distinct()
-            .forEach(p -> ClientMap.createOrUpdateClientInfo(clientMap, errorLogConsumer, p));
-        touch("Updated client information.");
+            .filter(p -> clientMap.containsClient(p))
+            .filter(p -> !"PT999999990".equals(ClientMap.uVATNumberFor(p)))
+            .map(p -> ClientMap.toJson(p))
+            .forEach(j -> ClientMap.createClient(errorLogConsumer, j));
+        touch("Updated existing client information.");
 
+        long[] count = new long[] { 0l };
+        unfilteredEventStream(errorLogConsumer)
+            .map(e -> e.getParty())
+            .filter(p -> p != null && p.isPerson())
+            .map(p -> (Person) p)
+            .distinct()
+            .filter(p -> !clientMap.containsClient(p))
+            .filter(p -> !"PT999999990".equals(ClientMap.uVATNumberFor(p)))
+            .map(p -> ClientMap.toJson(p))
+            .forEach(j -> {
+                taskLog("Registering new client %s %s %s %s%n", j.get("id").getAsString(), j.get("countryOfVatNumber").getAsString(), j.get("vatNumber").getAsString(), j.get("name").getAsString());
+                if (ClientMap.createClient(errorLogConsumer, j)) {
+                    final String clientCode = j.get("id").getAsString();
+                    clientMap.register(clientCode, clientCode);
+                }
+            });
+        touch("Created " + count[0] + " new clients.");
+
+        
         touch("Processing events...");
         unfilteredEventStream(errorLogConsumer).forEach(e -> EventProcessor.syncEventWithGiaf(clientMap, errorLogConsumer, elogger, e));
         touch("Completed processing events.");

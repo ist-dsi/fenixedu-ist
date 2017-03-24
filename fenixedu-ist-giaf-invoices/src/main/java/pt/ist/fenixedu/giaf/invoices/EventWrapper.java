@@ -62,11 +62,11 @@ public class EventWrapper {
     public final Money payed;
     public final Money fines;
 
-    public EventWrapper(final Event event) {
+    public EventWrapper(final Event event, final pt.ist.fenixedu.giaf.invoices.ErrorLogConsumer errorLogConsumer) {
         this.event = event;
 
-        final Money payedTotal = calculateAmountPayed(null);
-        final Money payedBeforThreshold = calculateAmountPayed(THRESHOLD);
+        final Money payedTotal = calculateAmountPayed(null, errorLogConsumer);
+        final Money payedBeforThreshold = calculateAmountPayed(THRESHOLD, errorLogConsumer);
         final Money payedAfterThreshhold = payedTotal.subtract(payedBeforThreshold);
 
         // calculate debt
@@ -97,10 +97,10 @@ public class EventWrapper {
         return debt.subtract(exempt).subtract(payed);
     }
 
-    private Money calculateAmountPayed(final DateTime threshold) {
+    private Money calculateAmountPayed(final DateTime threshold, final pt.ist.fenixedu.giaf.invoices.ErrorLogConsumer errorLogConsumer) {
         return event.getAccountingTransactionsSet().stream()
                 .filter(t -> threshold == null || t.getWhenRegistered().isBefore(threshold))
-                .filter(t -> Utils.validate(null, t.getTransactionDetail()))
+                .filter(t -> Utils.validate(errorLogConsumer, t.getTransactionDetail()))
                 .map(t -> t.getAmountWithAdjustment())
                 .reduce(Money.ZERO, Money::add);
     }

@@ -1,7 +1,6 @@
 package pt.ist.fenixedu.giaf.invoices;
 
 import java.math.BigDecimal;
-
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.util.Money;
 
@@ -10,7 +9,7 @@ import pt.ist.fenixedu.giaf.invoices.GiafEvent.GiafEventEntry;
 public class EventProcessor {
 
     public static void syncEventWithGiaf(final ClientMap clientMap, final ErrorLogConsumer consumer, final EventLogger elogger, final Event event) {
-        final EventWrapper wrapper = new EventWrapper(event);
+        final EventWrapper wrapper = new EventWrapper(event, consumer);
         process(clientMap, consumer, elogger, wrapper);
     }
 
