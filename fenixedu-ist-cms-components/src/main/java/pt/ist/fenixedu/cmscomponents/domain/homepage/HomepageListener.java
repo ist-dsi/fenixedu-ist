@@ -21,10 +21,13 @@ package pt.ist.fenixedu.cmscomponents.domain.homepage;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.contacts.PartyContactType;
 import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.core.domain.UserProfile;
 import org.fenixedu.cms.domain.Menu;
 import org.fenixedu.cms.domain.Page;
 import org.fenixedu.cms.domain.Site;
+import org.fenixedu.cms.domain.SlugUtils;
 import org.fenixedu.cms.domain.component.Component;
+import org.fenixedu.commons.i18n.I18N;
 import org.fenixedu.commons.i18n.LocalizedString;
 import pt.ist.fenixedu.cmscomponents.domain.homepage.components.PresentationComponent;
 import pt.ist.fenixedu.cmscomponents.domain.homepage.components.ResearcherComponent;
@@ -86,5 +89,9 @@ public class HomepageListener {
     private static void addContact(Person owner, Site homepageSite) {
         createWebAddress(owner, homepageSite.getFullUrl(), PartyContactType.INSTITUTIONAL, true);
     }
-
+    
+    public static void updateName(UserProfile profile) {
+        Site site = profile.getPerson().getHomepage();
+        site.setName( new LocalizedString(I18N.getLocale(), profile.getDisplayName()));
+    }
 }

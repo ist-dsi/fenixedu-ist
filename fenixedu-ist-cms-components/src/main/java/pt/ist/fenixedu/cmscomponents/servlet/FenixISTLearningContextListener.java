@@ -25,9 +25,12 @@ import javax.servlet.annotation.WebListener;
 import org.fenixedu.academic.domain.Person;
 
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
+import org.fenixedu.bennu.core.domain.UserProfile;
+import org.fenixedu.bennu.core.signals.Signal;
 import org.fenixedu.cms.domain.Site;
 import org.fenixedu.cms.routing.CMSRenderer;
 import org.fenixedu.learning.domain.executionCourse.ExecutionCourseRequestHandler;
+import pt.ist.fenixedu.cmscomponents.domain.homepage.HomepageListener;
 import pt.ist.fenixedu.cmscomponents.domain.homepage.HomepageRequestHandler;
 import pt.ist.fenixedu.cmscomponents.domain.homepage.HomepageSite;
 import pt.ist.fenixedu.cmscomponents.domain.unit.UnitRequestHandler;
@@ -58,7 +61,7 @@ public class FenixISTLearningContextListener implements ServletContextListener {
 
         CMSRenderer.addHandler(new HomepageRequestHandler());
         CMSRenderer.addHandler(new UnitRequestHandler());
-
+        Signal.register(UserProfile.USER_NAME_CHANGED, HomepageListener::updateName);
     }
 
     @Override
