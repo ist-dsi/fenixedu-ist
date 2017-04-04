@@ -34,6 +34,8 @@ public class HomepageSiteBuilder extends HomepageSiteBuilder_Base {
                 new LocalizedString(I18N.getLocale(), person.getProfile().getDisplayName()),
                 new LocalizedString(I18N.getLocale(), person.getProfile().getDisplayName()));
         
+        site.setSlug(person.getUsername());
+        
         new HomepageSite(site);
         site.setOwner(person);
         
