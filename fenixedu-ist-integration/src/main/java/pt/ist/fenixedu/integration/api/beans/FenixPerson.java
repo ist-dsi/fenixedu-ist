@@ -221,24 +221,31 @@ public class FenixPerson {
     String birthday;
     String username;
     String email;
+    String displayName;
+    String institutionalEmail;
 
     List<String> personalEmails;
     List<String> workEmails;
     List<String> webAddresses;
     List<String> workWebAddresses;
 
-    public FenixPerson(String campus, Set<FenixRole> roles, FenixPhoto photo, String name, String gender, String birthday,
-            String username, String email, List<String> personalEmails, List<String> workEmails, List<String> webAddresses,
+    public FenixPerson(String campus, Set<FenixRole> roles, FenixPhoto photo, String name, String displayName, String gender,
+            String birthday,
+            String username, String email, String institutionalEmail, List<String> personalEmails, List<String> workEmails,
+            List<String>
+            webAddresses,
             List<String> workWebAddresses) {
         super();
         this.campus = campus;
         this.roles = roles;
         this.photo = photo;
         this.name = name;
+        this.displayName = displayName;
         this.gender = gender;
         this.birthday = birthday;
         this.username = username;
         this.email = email;
+        this.institutionalEmail = institutionalEmail;
         this.personalEmails = personalEmails;
         this.workEmails = workEmails;
         this.webAddresses = webAddresses;
@@ -339,5 +346,21 @@ public class FenixPerson {
 
     public void setWorkWebAddresses(List<String> workWebAddresses) {
         this.workWebAddresses = workWebAddresses;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String getInstitutionalEmail() {
+        return institutionalEmail;
+    }
+
+    public void setInstitutionalEmail(String institutionalEmail) {
+        this.institutionalEmail = institutionalEmail;
     }
 }

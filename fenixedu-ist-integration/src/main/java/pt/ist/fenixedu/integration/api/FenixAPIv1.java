@@ -317,18 +317,23 @@ public class FenixAPIv1 {
         }
 
         final String name = pib.getName();
+        final String displayName = person.getDisplayName();
         final String gender = person.getGender().name();
         final String birthday = person.getDateOfBirthYearMonthDay().toString(formatDay);
         final String username = person.getUsername();
         final String campus = pib.getCampus();
         final String email = pib.getEmail();
+        final String institutionalEmail = person.getInstitutionalEmailAddress() == null ? null : person
+                .getInstitutionalEmailAddress().getValue();
         final List<String> personalEmails = pib.getPersonalEmails();
         final List<String> workEmails = pib.getWorkEmails();
         List<String> personalWebAdresses = pib.getPersonalWebAdresses();
         List<String> workWebAdresses = pib.getWorkWebAdresses();
         final FenixPhoto photo = getPhoto(person);
 
-        return new FenixPerson(campus, roles, photo, name, gender, birthday, username, email, personalEmails, workEmails,
+        return new FenixPerson(campus, roles, photo, name, displayName, gender, birthday, username, email, institutionalEmail, 
+                personalEmails,
+                workEmails,
                 personalWebAdresses, workWebAdresses);
     }
 
