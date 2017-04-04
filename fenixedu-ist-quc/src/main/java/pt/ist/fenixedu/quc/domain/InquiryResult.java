@@ -38,10 +38,10 @@ import org.fenixedu.academic.domain.reports.GepReportFile;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.joda.time.DateTime;
 
+import com.google.common.base.Strings;
+
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
-
-import com.google.common.base.Strings;
 
 public class InquiryResult extends InquiryResult_Base {
 
@@ -412,6 +412,11 @@ public class InquiryResult extends InquiryResult_Base {
             //meter aqui algumas validações
             //se vier com valor + classificação dá erro
 
+            String executionDegreeCode = row[0];
+            ExecutionDegree executionDegree =
+                    !Strings.isNullOrEmpty(executionDegreeCode) ? InquiryResult.getExecutionDegree(executionDegreeCode) : null;
+            setExecutionDegree(executionDegree);
+
             String resultTypeString = row[1];
             if (!Strings.isNullOrEmpty(resultTypeString)) {
                 InquiryResultType inquiryResultType = InquiryResultType.valueOf(resultTypeString);
@@ -531,6 +536,10 @@ public class InquiryResult extends InquiryResult_Base {
 
         public ExecutionDegree getExecutionDegree() {
             return executionDegree;
+        }
+
+        public void setExecutionDegree(ExecutionDegree executionDegree) {
+            this.executionDegree = executionDegree;
         }
 
         public ExecutionCourse getExecutionCourse() {
