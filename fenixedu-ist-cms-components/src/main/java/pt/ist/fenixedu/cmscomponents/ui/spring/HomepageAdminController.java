@@ -97,6 +97,11 @@ public class HomepageAdminController {
                 homepage.setResearchUnitHomepage(researchUnitHomepage);
                 homepage.setResearchUnitName(researchUnitName);
                 homepage.getSite().setPublished(published);
+                homepage.setShowUnit(showUnit);
+                homepage.setShowCurrentExecutionCourses(showCurrentExecutionCourses);
+                homepage.setShowCurrentAttendingExecutionCourses(showCurrentAttendingExecutionCourses);
+                homepage.setShowAlumniDegrees(showAlumniDegrees);
+    
                 String url = homepage.getSite().getFullUrl();
                 if (published) {
                     boolean foundAddress = false;
@@ -111,17 +116,14 @@ public class HomepageAdminController {
                     }
                     if (!foundAddress) {
                         WebAddress.createWebAddress(site.getOwner(), url, PartyContactType.INSTITUTIONAL, true);
-                    } else {
-                        WebAddress address = site.getOwner().getDefaultWebAddress();
-                        if (address != null && address.getUrl().equals(homepage.getSite().getFullUrl())) {
-                            address.setDefaultContact(false);
-                        }
                     }
-                    homepage.setShowUnit(showUnit);
-                    homepage.setShowCurrentExecutionCourses(showCurrentExecutionCourses);
-                    homepage.setShowCurrentAttendingExecutionCourses(showCurrentAttendingExecutionCourses);
-                    homepage.setShowAlumniDegrees(showAlumniDegrees);
+                } else {
+                    WebAddress address = site.getOwner().getDefaultWebAddress();
+                    if (address != null && address.getUrl().equals(url)) {
+                        address.setDefaultContact(false);
+                    }
                 }
+
             }
         });
         return new RedirectView("/personal-homepage", true);
