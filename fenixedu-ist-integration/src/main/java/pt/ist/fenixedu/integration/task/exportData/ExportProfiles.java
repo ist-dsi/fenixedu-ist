@@ -28,6 +28,7 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.UserProfile;
+import org.fenixedu.bennu.scheduler.CronTask;
 import org.fenixedu.bennu.scheduler.annotation.Task;
 import org.fenixedu.bennu.scheduler.custom.CustomTask;
 import org.joda.time.LocalDate;
@@ -39,7 +40,7 @@ import com.google.gson.JsonPrimitive;
 import static org.fenixedu.commons.stream.StreamUtils.toJsonArray;
 
 @Task(englishTitle = "Export user profiles to shared json file with other applications.")
-public class ExportProfiles extends CustomTask {
+public class ExportProfiles extends CronTask {
 
     @Override
     public TxMode getTxMode() {

@@ -45,6 +45,7 @@ import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.util.email.Sender;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.scheduler.CronTask;
 import org.fenixedu.bennu.scheduler.annotation.Task;
 import org.fenixedu.bennu.scheduler.custom.CustomTask;
 import org.fenixedu.commons.StringNormalizer;
@@ -55,7 +56,7 @@ import pt.ist.fenixedu.parking.domain.ParkingGroup;
 import pt.ist.fenixedu.parking.domain.ParkingParty;
 
 @Task(englishTitle = "Send car park users to remote car park")
-public class ExportCarParkUsers extends CustomTask {
+public class ExportCarParkUsers extends CronTask {
 
     private static final String EMAIL_ADDRESSES_TO_SEND_DATA =
             "arcodocego@empark.pt, mamede@empark.pt, aneves@empark.es, alameda@empark.pt";
