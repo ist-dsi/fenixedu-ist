@@ -19,9 +19,11 @@
 package pt.ist.fenixedu.integration.ui;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -30,11 +32,15 @@ import javax.servlet.annotation.WebListener;
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.ExecutionCourse;
+import org.fenixedu.academic.domain.OccupationPeriod;
+import org.fenixedu.academic.domain.OccupationPeriodType;
 import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.Summary;
 import org.fenixedu.academic.domain.accounting.VatNumberResolver;
 import org.fenixedu.academic.domain.degreeStructure.Context;
 import org.fenixedu.academic.domain.enrolment.DegreeModuleToEnrol;
 import org.fenixedu.academic.domain.enrolment.IDegreeModuleToEvaluate;
+import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.studentCurriculum.CurriculumGroup;
@@ -127,6 +133,19 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
             new AffinityCyclesManagement(enrolment.getRegistration().getLastStudentCurricularPlan())
                     .createCycleOrRepeateSeparate();
         }));
+
+        Consumer<DomainObjectEvent<Summary>> handler = (DomainObjectEvent<Summary> event) -> {
+            Optional<Calendar> gradeSubmissionEndDate = event.getInstance().getExecutionCourse().getExecutionDegrees().stream()
+                    .flatMap(ed -> ed.getPeriods(OccupationPeriodType.GRADE_SUBMISSION)).map(OccupationPeriod::getEndDate)
+                    .max(Calendar::compareTo);
+
+            if (gradeSubmissionEndDate.map(v -> v.before(Calendar.getInstance())).orElse(false)) {
+                throw new DomainException("error.summary.current.date.after.end.period");
+            }
+        };
+        Signal.register(Summary.CREATE_SIGNAL, handler);
+        Signal.register(Summary.EDIT_SIGNAL, handler);
+
         ProfessorshipEvaluationBean.professorshipEvaluation = new QucProfessorshipEvaluation();
 
         BolonhaStudentEnrollmentBean.registerStudentEnrolmentHandler(FenixEduISTLegacyContextListener::setPreEnrolledCourses);
