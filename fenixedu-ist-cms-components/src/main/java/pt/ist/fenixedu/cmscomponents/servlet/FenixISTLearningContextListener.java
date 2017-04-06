@@ -31,9 +31,12 @@ import org.fenixedu.cms.domain.Site;
 import org.fenixedu.cms.routing.CMSRenderer;
 import org.fenixedu.learning.domain.executionCourse.ExecutionCourseRequestHandler;
 import pt.ist.fenixedu.cmscomponents.domain.homepage.HomepageListener;
+import pt.ist.fenixedu.cmscomponents.domain.executionCourse.ExecutionCourseQUCComponent;
+import pt.ist.fenixedu.cmscomponents.domain.executionCourse.ExecutionCourseQUCListener;
 import pt.ist.fenixedu.cmscomponents.domain.homepage.HomepageRequestHandler;
 import pt.ist.fenixedu.cmscomponents.domain.homepage.HomepageSite;
 import pt.ist.fenixedu.cmscomponents.domain.unit.UnitRequestHandler;
+import pt.ist.fenixedu.quc.domain.ResultsImportationProcess;
 import pt.ist.fenixframework.FenixFramework;
 
 /**
@@ -61,7 +64,10 @@ public class FenixISTLearningContextListener implements ServletContextListener {
 
         CMSRenderer.addHandler(new HomepageRequestHandler());
         CMSRenderer.addHandler(new UnitRequestHandler());
+        
         Signal.register(UserProfile.USER_NAME_CHANGED, HomepageListener::updateName);
+    
+        Signal.register(ResultsImportationProcess.QUC_RESULTS_IMPORTED, (event) -> ExecutionCourseQUCListener.createQUCComponent());
     }
 
     @Override
