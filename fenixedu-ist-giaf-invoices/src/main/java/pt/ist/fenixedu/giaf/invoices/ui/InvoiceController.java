@@ -21,7 +21,6 @@ package pt.ist.fenixedu.giaf.invoices.ui;
 import java.util.stream.Collector;
 import java.util.stream.Collector.Characteristics;
 
-import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.accessControl.AcademicAuthorizationGroup;
 import org.fenixedu.academic.domain.accessControl.academicAdministration.AcademicOperationType;
@@ -78,7 +77,8 @@ public class InvoiceController {
                 @Override
                 public void accept(final String oid, final String user, final String name, final String amount, final String cycleType, final String error, final String args,
                         final String type, final String countryOfVatNumber, final String vatNumber, final String address, final String locality,
-                        final String postCode, final String countryOfAddress, final String paymentMethod) {
+                        final String postCode, final String countryOfAddress, final String paymentMethod,
+                        final String documentNumber, final String action) {
                     errors.append(oid + " " + error + " : " + args + "\n");
                 }
             };
@@ -104,17 +104,17 @@ public class InvoiceController {
         return home(username, model);
     }
 
-    private boolean isAllowedToAccess(final User user) {
+    static boolean isAllowedToAccess(final User user) {
         final User currentUser = Authenticate.getUser();
-        return currentUser == user || isAcademicServiceStaff(currentUser);
+        return currentUser != null && (currentUser == user || isAcademicServiceStaff(currentUser));
     }
 
-    private boolean isAcademicServiceStaff(final User user) {
+    static boolean isAcademicServiceStaff(final User user) {
         return AcademicAuthorizationGroup.get(AcademicOperationType.MANAGE_STUDENT_PAYMENTS).isMember(user)
                 || AcademicAuthorizationGroup.get(AcademicOperationType.MANAGE_STUDENT_PAYMENTS_ADV).isMember(user);
     }
 
-    private User getUser(final String username) {
+    static User getUser(final String username) {
         return username == null || username.isEmpty() ? Authenticate.getUser() : User.findByUsername(username);
     }
 

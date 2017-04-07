@@ -588,7 +588,7 @@ public class SeparationCyclesManagement {
 
         if (!oldStudentCurricularPlan.hasGratuityEvent(getExecutionYear(), GratuityEventWithPaymentPlan.class)
                 || oldStudentCurricularPlan.getGratuityEvent(getExecutionYear(), GratuityEventWithPaymentPlan.class)
-                        .isCancelled()) {
+                        .get().isCancelled()) {
             return;
         }
 
@@ -598,9 +598,9 @@ public class SeparationCyclesManagement {
         }
 
         final GratuityEvent firstEvent =
-                oldStudentCurricularPlan.getGratuityEvent(getExecutionYear(), GratuityEventWithPaymentPlan.class);
+                oldStudentCurricularPlan.getGratuityEvent(getExecutionYear(), GratuityEventWithPaymentPlan.class).get();
         final GratuityEvent secondEvent =
-                newStudentCurricularPlan.getGratuityEvent(getExecutionYear(), GratuityEventWithPaymentPlan.class);
+                newStudentCurricularPlan.getGratuityEvent(getExecutionYear(), GratuityEventWithPaymentPlan.class).get();
 
         if (!firstEvent.isGratuityEventWithPaymentPlan() || !secondEvent.isGratuityEventWithPaymentPlan()) {
             throw new DomainException("error.SeparationCyclesManagement.unexpected.event.types");

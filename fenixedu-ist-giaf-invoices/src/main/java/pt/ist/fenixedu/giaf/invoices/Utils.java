@@ -36,7 +36,6 @@ import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.accounting.AccountingTransaction;
 import org.fenixedu.academic.domain.accounting.AccountingTransactionDetail;
 import org.fenixedu.academic.domain.accounting.Event;
-import org.fenixedu.academic.domain.accounting.PostingRule;
 import org.fenixedu.academic.domain.accounting.accountingTransactions.detail.SibsTransactionDetail;
 import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeAndInsuranceEvent;
 import org.fenixedu.academic.domain.accounting.events.AnnualEvent;
@@ -48,7 +47,6 @@ import org.fenixedu.academic.domain.accounting.events.dfa.DFACandidacyEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEventWithPaymentPlan;
 import org.fenixedu.academic.domain.accounting.events.insurance.InsuranceEvent;
-import org.fenixedu.academic.domain.contacts.PartyContact;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
 import org.fenixedu.academic.domain.degreeStructure.CycleType;
 import org.fenixedu.academic.domain.exceptions.DomainException;
@@ -57,7 +55,6 @@ import org.fenixedu.academic.domain.phd.debts.PhdGratuityEvent;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.util.Money;
-import org.fenixedu.bennu.GiafInvoiceConfiguration;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.UserProfile;
 import org.fenixedu.commons.StringNormalizer;
@@ -110,6 +107,9 @@ public class Utils {
     }
 
     public static boolean validate(final ErrorLogConsumer consumer, final Event event) {
+        if (event.isCancelled()) {
+            return false;
+        }
         final String eventDescription;
         try {
             eventDescription = event.getDescription().toString();
@@ -121,14 +121,10 @@ public class Utils {
         try {
             originalAmountToPay = event.getOriginalAmountToPay();
         } catch (final DomainException ex) {
-            if (hasAnyGiafEntry(event)) {
-                logError(consumer, "Unable to Determine Amount", event, null, "", null, null, null, null, event);
-            }
+            logError(consumer, "Unable to Determine Amount: " + ex.getMessage(), event, null, "", null, null, null, null, event);
             return false;
         } catch (final NullPointerException ex) {
-            if (hasAnyGiafEntry(event)) {
-                logError(consumer, "Unable to Determine Amount", event, null, "", null, null, null, null, event);
-            }
+            logError(consumer, "Unable to Determine Amount: " + ex.getMessage(), event, null, "", null, null, null, null, event);
             return false;
         }
 
@@ -148,7 +144,7 @@ public class Utils {
                 logError(consumer, "No Country", event, person.getUsername(), "", country, person, null, null, event);
                 return false;
             }
-            final PhysicalAddress address = toAddress(person);
+            final PhysicalAddress address = toAddress(person, country.getCode());
             if (address == null) {
                 logError(consumer, "No Address", event, person.getUsername(), "", country, person, address, null, event);
                 return false;
@@ -184,7 +180,7 @@ public class Utils {
             return false;
         }
 
-        final BigDecimal amount = Utils.calculateTotalDebtValue(event).getAmount();
+        final BigDecimal amount = originalAmountToPay.getAmount();
         //final BigDecimal amount = event.getOriginalAmountToPay().getAmount();
         if (amount.signum() <= 0) {
             if (event.isCancelled()) {
@@ -198,19 +194,6 @@ public class Utils {
         return true;
     }
 
-    private static boolean hasAnyGiafEntry(final Event event) {
-        final String id = event.getExternalId();
-        final String dirPath = GiafInvoiceConfiguration.getConfiguration().giafInvoiceDir() + splitPath(id) + File.separator + id;
-        final File dir = new File(dirPath);
-        if (dir.exists()) {
-            final File file = new File(dir, event.getExternalId() + ".json");
-            if (file.exists()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public static String splitPath(final String id) {
         final StringBuilder b = new StringBuilder();
         for (int i = 0; i < id.length() - 1; i++, i++) {
@@ -221,17 +204,18 @@ public class Utils {
         return b.toString();
     }
 
-    public static PhysicalAddress toAddress(final Person person) {
-        PhysicalAddress address = person.getDefaultPhysicalAddress();
-        if (address == null) {
-            for (final PartyContact contact : person.getPartyContactsSet()) {
-                if (contact instanceof PhysicalAddress) {
-                    address = (PhysicalAddress) contact;
-                    break;
-                }
-            }
-        }
-        return address;
+    public static PhysicalAddress toAddress(final Person person, final String countryCode) {
+        return person.getPartyContactsSet().stream()
+            .filter(pc -> pc instanceof PhysicalAddress)
+            .map(pc -> (PhysicalAddress) pc)
+            .filter(a -> a.getCountryOfResidence() != null && countryCode.equals(a.getCountryOfResidence().getCode()))
+            .filter(a -> a.isActiveAndValid())
+            .sorted((a1, a2) -> {
+                boolean d1 = a1.getDefaultContact();
+                boolean d2 = a2.getDefaultContact();
+                return d1 && !d2 ? 1 : d2 && !d1 ? -1 : a1.getExternalId().compareTo(a2.getExternalId());
+            })
+            .findFirst().orElse(null);
     }
 
     public static String hackAreaCode(final String areaCode, final Country countryOfResidence, final Person person) {
@@ -262,7 +246,7 @@ public class Utils {
         DebtCycleType cycleType;
         
         try {
-            amount = Utils.calculateTotalDebtValue(e).getAmount();
+            amount = e.getOriginalAmountToPay().getAmount();
             cycleType = cycleType(e);
         } catch (Throwable t) {
             amount = null;
@@ -284,6 +268,8 @@ public class Utils {
                 "",
                 address == null ? "" : address.getPostalCode(),
                 countryOfAddress == null ? "" : countryOfAddress.getCode(),
+                "",
+                "",
                 "");
     }
 
@@ -304,12 +290,6 @@ public class Utils {
         return displayName == null ? person.getName() : displayName;
     }
 
-    public static Money calculateTotalDebtValue(final Event event) {
-        final DateTime when = event.getWhenOccured().plusSeconds(1);
-        final PostingRule rule = event.getPostingRule();
-        return call(rule, event, when, false);
-    }
-
     private static boolean isValidPostCode(final String postalCode) {
         if (postalCode != null) {
             final String v = postalCode.trim();
@@ -319,13 +299,15 @@ public class Utils {
         return false;
     }
 
-    private static Money call(final PostingRule rule, final Event event, final DateTime when, final boolean applyDiscount) {
-        return rule.doCalculationForAmountToPayWithoutExemptions(event, when, applyDiscount);
-    }
-
     public static ExecutionYear executionYearOf(final Event event) {
         return event instanceof AnnualEvent ? ((AnnualEvent) event).getExecutionYear() : ExecutionYear.readByDateTime(event
                 .getWhenOccured());
+    }
+
+    public static String getDegreeAcronym(final Event event) {
+        return event instanceof GratuityEvent ? ((GratuityEvent) event).getDegree()
+                .getSigla() : event instanceof PhdGratuityEvent ? ((PhdGratuityEvent) event).getPhdIndividualProgramProcess()
+                        .getPhdProgram().getAcronym() : "";
     }
 
     private static DebtCycleType getCycleType(Collection<CycleType> cycleTypes) {
@@ -393,7 +375,7 @@ public class Utils {
     }
 
     public static String mapToArticleCode(final Event event, final String eventDescription) {
-        if (event.isGratuity()) {
+        if (event.isGratuity() && !(event instanceof PhdGratuityEvent)) {
             final GratuityEvent gratuityEvent = (GratuityEvent) event;
             final StudentCurricularPlan scp = gratuityEvent.getStudentCurricularPlan();
             final Degree degree = scp.getDegree();
@@ -476,7 +458,7 @@ public class Utils {
         if (in == null) {
             return "";
         }
-        final String out = StringNormalizer.normalizeAndRemoveAccents(in).toUpperCase();
+        final String out = StringNormalizer.normalizePreservingCapitalizedLetters(in);
         return out.length() > maxSize ? out.substring(0, maxSize) : out;
     }
 
@@ -491,11 +473,12 @@ public class Utils {
                 return;
             } catch (final Throwable e) {
                 if (c > 0 && c % 5 == 0) {
-                    LOGGER.debug("Failed write of invoice file: % - Fail count: %s", path.toString(), c);
+                    LOGGER.debug("Failed write of file: % - Fail count: %s", path.toString(), c);
                 }
                 try {
                     Thread.sleep(5000);
                 } catch (final InterruptedException e1) {
+                    e1.printStackTrace();
                 }
             }
         }

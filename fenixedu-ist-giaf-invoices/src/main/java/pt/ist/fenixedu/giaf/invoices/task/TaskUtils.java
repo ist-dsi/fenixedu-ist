@@ -16,6 +16,7 @@ import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.Transport;
+import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
@@ -34,6 +35,18 @@ public class TaskUtils {
 
     static void sendReport(final String filename, final byte[] byteArray, final String subject, final String body)
             throws MessagingException {
+        send(filename, byteArray, subject, body, EMAIL_ADDRESSES_TO_SEND_DATA_FILENAME, EMAIL_ADDRESSES_BCC_SEND_DATA_FILENAME);
+    }
+
+    static void sendSapReport(final String filename, final byte[] byteArray, final String subject, final String body)
+            throws AddressException, MessagingException {
+//        send(filename, byteArray, subject, body, GiafInvoiceConfiguration.getConfiguration().clientSapLogErrorsMails(),
+//                GiafInvoiceConfiguration.getConfiguration().clientSapLogErrorsMailsBcc());
+    }
+
+    private static void send(final String filename, final byte[] byteArray, final String subject, final String body,
+            String emailAddressesFilePath, String emailAddressesBccFilePath)
+            throws MessagingException {
         final Properties properties = new Properties();
         properties.put("mail.smtp.host", FenixEduAcademicConfiguration.getConfiguration().getMailSmtpHost());
         properties.put("mail.smtp.name", FenixEduAcademicConfiguration.getConfiguration().getMailSmtpName());
@@ -45,8 +58,8 @@ public class TaskUtils {
 
         final Message message = new MimeMessage(session);
         message.setFrom(new InternetAddress(sender.getAddress()));
-        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(fileContent(EMAIL_ADDRESSES_TO_SEND_DATA_FILENAME)));
-        message.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(fileContent(EMAIL_ADDRESSES_BCC_SEND_DATA_FILENAME)));
+        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(fileContent(emailAddressesFilePath)));
+        message.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(fileContent(emailAddressesBccFilePath)));
         message.setSubject(subject);
         message.setText(body);
 

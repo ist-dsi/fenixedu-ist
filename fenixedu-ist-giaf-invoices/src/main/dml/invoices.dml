@@ -1,0 +1,71 @@
+package pt.ist.fenixedu.domain;
+
+enum pt.ist.fenixedu.domain.SapRequestType	as SapRequestType;
+
+class SapRoot {
+	Long sapDocumentNumber;
+}
+
+class SapRequest {
+	String documentNumber;
+	String sapDocumentNumber;
+	String clientId;
+	String creditId;
+	Money value;
+	SapRequestType requestType;
+	DateTime whenSent;
+	DateTime whenCreated;
+	Money advancement;
+	boolean sent;
+	boolean integrated;
+	String integrationMessage;
+	String request;
+}
+
+class SapDocumentFile extends .org.fenixedu.bennu.io.domain.GenericFile {
+}
+
+relation SapRequestSapRequestAnnulled {
+	SapRequest playsRole originalRequest {
+	    multiplicity 0..1;
+    }
+    SapRequest playsRole anulledRequest {
+	    multiplicity 0..1;
+    }
+}
+      
+relation SapRequestEvent {
+	SapRequest playsRole sapRequest {
+	    multiplicity *;
+    }
+    .org.fenixedu.academic.domain.accounting.Event playsRole event {
+    	multiplicity 1..1;
+    }
+}
+       
+relation SapRequestPayment {
+	SapRequest playsRole sapRequest {
+	    multiplicity *;
+    }
+    .org.fenixedu.academic.domain.accounting.AccountingTransaction playsRole payment {
+    	multiplicity 0..1;
+    }   
+}       
+        
+relation SapRequestSapDocumentFile {
+	SapRequest playsRole sapRequest {
+	    multiplicity 1..1;
+    }
+    SapDocumentFile playsRole sapDocumentFile {
+    	multiplicity 0..1;
+    }	
+}
+
+relation SapRootBennu {
+    SapRoot playsRole sapRoot {
+        multiplicity 0..1;
+    }
+    .org.fenixedu.bennu.core.domain.Bennu playsRole bennu {
+        multiplicity 1..1;
+    }
+}

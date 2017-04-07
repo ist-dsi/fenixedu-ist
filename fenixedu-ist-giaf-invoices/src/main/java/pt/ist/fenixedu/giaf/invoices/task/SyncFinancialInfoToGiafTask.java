@@ -52,7 +52,8 @@ public class SyncFinancialInfoToGiafTask extends CronTask {
             @Override
             public void accept(final String oid, final String user, final String name, final String amount, final String cycleType, final String error, final String args,
                     final String type, final String countryOfVatNumber, final String vatNumber, final String address, final String locality,
-                    final String postCode, final String countryOfAddress, final String paymentMethod) {
+                    final String postCode, final String countryOfAddress, final String paymentMethod,
+                    final String documentNumber, final String action) {
                 if (!oids.contains(oid)) {
                     oids.add(oid);
 
@@ -72,6 +73,8 @@ public class SyncFinancialInfoToGiafTask extends CronTask {
                     row.setCell("postCode", postCode);
                     row.setCell("countryOfAddress", countryOfAddress);
                     row.setCell("paymentMethod", paymentMethod);
+                    row.setCell("documentNumber", documentNumber);
+                    row.setCell("action", action);
                     
                     taskLog("Logging error for %s: %s : %s%n", oid, error, args);
                 }

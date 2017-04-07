@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:n1="urn:sap-com:document:sap:rfc:functions" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="urn:sap-com:document:sap:soap:functions:mc-style" xmlns:wsoap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:sap-com:document:sap:soap:functions:mc-style">
+   <wsdl:documentation>
+      <sidl:sidl xmlns:sidl="http://www.sap.com/2007/03/sidl" />
+   </wsdl:documentation>
+   <wsdl:types>
+      <xsd:schema attributeFormDefault="qualified" targetNamespace="urn:sap-com:document:sap:rfc:functions">
+         <xsd:simpleType name="char1">
+            <xsd:restriction base="xsd:string">
+               <xsd:maxLength value="1" />
+            </xsd:restriction>
+         </xsd:simpleType>
+         <xsd:simpleType name="char3">
+            <xsd:restriction base="xsd:string">
+               <xsd:maxLength value="3" />
+            </xsd:restriction>
+         </xsd:simpleType>
+         <xsd:simpleType name="char30">
+            <xsd:restriction base="xsd:string">
+               <xsd:maxLength value="30" />
+            </xsd:restriction>
+         </xsd:simpleType>
+         <xsd:simpleType name="char60">
+            <xsd:restriction base="xsd:string">
+               <xsd:maxLength value="60" />
+            </xsd:restriction>
+         </xsd:simpleType>
+         <xsd:simpleType name="date10">
+            <xsd:restriction base="xsd:string">
+               <xsd:maxLength value="10" />
+               <xsd:pattern value="\d\d\d\d-\d\d-\d\d" />
+            </xsd:restriction>
+         </xsd:simpleType>
+         <xsd:simpleType name="numeric4">
+            <xsd:restriction base="xsd:string">
+               <xsd:maxLength value="4" />
+               <xsd:pattern value="\d*" />
+            </xsd:restriction>
+         </xsd:simpleType>
+         <xsd:simpleType name="string">
+            <xsd:restriction base="xsd:string" />
+         </xsd:simpleType>
+      </xsd:schema>
+      <xsd:schema xmlns:n0="urn:sap-com:document:sap:rfc:functions" attributeFormDefault="qualified" targetNamespace="urn:sap-com:document:sap:soap:functions:mc-style">
+         <xsd:import namespace="urn:sap-com:document:sap:rfc:functions" />
+         <xsd:complexType name="ZulwsfaturacaoClientesIn">
+            <xsd:sequence>
+               <xsd:element name="Data" type="xsd:base64Binary" />
+               <xsd:element name="FinantialInstitution" type="n0:string" />
+            </xsd:sequence>
+         </xsd:complexType>
+         <xsd:complexType name="ZulwsfaturacaoClientesOut">
+            <xsd:sequence>
+               <xsd:element name="DocumentStatus" type="tns:ZulfwsdocumentStatusWsTab1" />
+               <xsd:element name="Customers" type="tns:ZulfwscustomersReturn1" />
+               <xsd:element name="RequestId" type="n0:string" />
+            </xsd:sequence>
+         </xsd:complexType>
+         <xsd:complexType name="ZulwsdocumentStatusWs1">
+            <xsd:sequence>
+               <xsd:element name="CertifiedDocumentUrl" type="n0:string" />
+               <xsd:element name="DocumentNumber" type="n0:string" />
+               <xsd:element name="ErrorDescription" type="n0:string" />
+               <xsd:element name="IntegrationStatus" type="n0:string" />
+               <xsd:element name="SapDocumentNumber" type="n0:string" />
+            </xsd:sequence>
+         </xsd:complexType>
+         <xsd:complexType name="ZulfwscustomersReturn1S">
+            <xsd:sequence>
+               <xsd:element name="CustomerId" type="n0:string" />
+               <xsd:element name="CustomerIdSap" type="n0:string" />
+               <xsd:element name="IntegrationStatus" type="n0:string" />
+               <xsd:element name="ReturnMsg" type="n0:string" />
+            </xsd:sequence>
+         </xsd:complexType>
+         <xsd:complexType name="ZulwsDocumentosInput">
+            <xsd:sequence>
+               <xsd:element name="TaxRegistrationNumber" type="n0:string" />
+               <xsd:element name="IdProcesso" type="n0:char3" />
+               <xsd:element name="FinantialDocumentNumber" type="n0:char60" />
+            </xsd:sequence>
+         </xsd:complexType>
+         <xsd:complexType name="ZulwsDocumentosOutput">
+            <xsd:sequence>
+               <xsd:element name="Status" type="n0:char1" />
+               <xsd:element name="ErrorDescription" type="n0:string" />
+               <xsd:element name="Binary" type="xsd:base64Binary" />
+            </xsd:sequence>
+         </xsd:complexType>
+         <xsd:complexType name="ZulwsReembolsosInput">
+            <xsd:sequence>
+               <xsd:element name="TaxRegistrationNumber" type="n0:string" />
+               <xsd:element name="IdProcesso" type="n0:char3" />
+               <xsd:element name="FinantialDocumentNumber" type="n0:char60" />
+            </xsd:sequence>
+         </xsd:complexType>
+         <xsd:complexType name="ZulwsReembolsosOutput">
+            <xsd:sequence>
+               <xsd:element name="ExerciseYear" type="n0:numeric4" />
+               <xsd:element name="ReimbursementStatusCode" type="n0:char30" />
+               <xsd:element name="ReimbursementStatusDate" type="n0:date10" />
+            </xsd:sequence>
+         </xsd:complexType>
+         <xsd:complexType name="ZulfwsdocumentStatusWsTab1">
+            <xsd:sequence>
+               <xsd:element name="item" type="tns:ZulwsdocumentStatusWs1" minOccurs="0" maxOccurs="unbounded" />
+            </xsd:sequence>
+         </xsd:complexType>
+         <xsd:complexType name="ZulfwscustomersReturn1">
+            <xsd:sequence>
+               <xsd:element name="item" type="tns:ZulfwscustomersReturn1S" minOccurs="0" maxOccurs="unbounded" />
+            </xsd:sequence>
+         </xsd:complexType>
+         <xsd:element name="ZulfmwsFaturacaoClientes">
+            <xsd:complexType>
+               <xsd:sequence>
+                  <xsd:element name="Input" type="tns:ZulwsfaturacaoClientesIn" />
+               </xsd:sequence>
+            </xsd:complexType>
+         </xsd:element>
+         <xsd:element name="ZulfmwsFaturacaoClientesResponse">
+            <xsd:complexType>
+               <xsd:sequence>
+                  <xsd:element name="Output" type="tns:ZulwsfaturacaoClientesOut" />
+               </xsd:sequence>
+            </xsd:complexType>
+         </xsd:element>
+         <xsd:element name="ZulwsDocumentos">
+            <xsd:complexType>
+               <xsd:sequence>
+                  <xsd:element name="Input" type="tns:ZulwsDocumentosInput" />
+               </xsd:sequence>
+            </xsd:complexType>
+         </xsd:element>
+         <xsd:element name="ZulwsDocumentosResponse">
+            <xsd:complexType>
+               <xsd:sequence>
+                  <xsd:element name="Output" type="tns:ZulwsDocumentosOutput" />
+               </xsd:sequence>
+            </xsd:complexType>
+         </xsd:element>
+         <xsd:element name="ZulwsReembolsos">
+            <xsd:complexType>
+               <xsd:sequence>
+                  <xsd:element name="Input" type="tns:ZulwsReembolsosInput" />
+               </xsd:sequence>
+            </xsd:complexType>
+         </xsd:element>
+         <xsd:element name="ZulwsReembolsosResponse">
+            <xsd:complexType>
+               <xsd:sequence>
+                  <xsd:element name="Output" type="tns:ZulwsReembolsosOutput" />
+               </xsd:sequence>
+            </xsd:complexType>
+         </xsd:element>
+      </xsd:schema>
+   </wsdl:types>
+   <wsdl:message name="ZulfmwsFaturacaoClientes">
+      <wsdl:part name="parameters" element="tns:ZulfmwsFaturacaoClientes" />
+   </wsdl:message>
+   <wsdl:message name="ZulfmwsFaturacaoClientesResponse">
+      <wsdl:part name="parameter" element="tns:ZulfmwsFaturacaoClientesResponse" />
+   </wsdl:message>
+   <wsdl:message name="ZulwsDocumentos">
+      <wsdl:part name="parameters" element="tns:ZulwsDocumentos" />
+   </wsdl:message>
+   <wsdl:message name="ZulwsDocumentosResponse">
+      <wsdl:part name="parameter" element="tns:ZulwsDocumentosResponse" />
+   </wsdl:message>
+   <wsdl:message name="ZulwsReembolsos">
+      <wsdl:part name="parameters" element="tns:ZulwsReembolsos" />
+   </wsdl:message>
+   <wsdl:message name="ZulwsReembolsosResponse">
+      <wsdl:part name="parameter" element="tns:ZulwsReembolsosResponse" />
+   </wsdl:message>
+   <wsdl:portType name="ZULWS_FATURACAOCLIENTES_BLK">
+      <wsdl:documentation>
+         <sapdoc:sapdoc xmlns:sapdoc="urn:sap:esi:documentation">
+            <sapdoc:docitem docURL="http://ul-sap-qua.ulisboa.pt:8000/sap/bc/esdt/docu/sd_text?sap-client=010&amp;sd_name=ZULWS_FATURACAOCLIENTES_BLK" />
+         </sapdoc:sapdoc>
+      </wsdl:documentation>
+      <wsdl:operation name="ZulfmwsFaturacaoClientes">
+         <wsdl:input message="tns:ZulfmwsFaturacaoClientes" />
+         <wsdl:output message="tns:ZulfmwsFaturacaoClientesResponse" />
+      </wsdl:operation>
+      <wsdl:operation name="ZulwsDocumentos">
+         <wsdl:input message="tns:ZulwsDocumentos" />
+         <wsdl:output message="tns:ZulwsDocumentosResponse" />
+      </wsdl:operation>
+      <wsdl:operation name="ZulwsReembolsos">
+         <wsdl:input message="tns:ZulwsReembolsos" />
+         <wsdl:output message="tns:ZulwsReembolsosResponse" />
+      </wsdl:operation>
+   </wsdl:portType>
+   <wsdl:binding name="ZULWS_FATURACAOCLIENTES_BLK" type="tns:ZULWS_FATURACAOCLIENTES_BLK">
+      <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+      <wsdl:operation name="ZulfmwsFaturacaoClientes">
+         <soap:operation soapAction="urn:sap-com:document:sap:soap:functions:mc-style:ZULWS_FATURACAOCLIENTES_BLK:ZulfmwsFaturacaoClientesRequest" style="document" />
+         <wsdl:input>
+            <soap:body use="literal" />
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal" />
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="ZulwsDocumentos">
+         <soap:operation soapAction="urn:sap-com:document:sap:soap:functions:mc-style:ZULWS_FATURACAOCLIENTES_BLK:ZulwsDocumentosRequest" style="document" />
+         <wsdl:input>
+            <soap:body use="literal" />
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal" />
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="ZulwsReembolsos">
+         <soap:operation soapAction="urn:sap-com:document:sap:soap:functions:mc-style:ZULWS_FATURACAOCLIENTES_BLK:ZulwsReembolsosRequest" style="document" />
+         <wsdl:input>
+            <soap:body use="literal" />
+         </wsdl:input>
+         <wsdl:output>
+            <soap:body use="literal" />
+         </wsdl:output>
+      </wsdl:operation>
+   </wsdl:binding>
+   <wsdl:binding name="ZULWS_FATURACAOCLIENTES_BLK_soap12" type="tns:ZULWS_FATURACAOCLIENTES_BLK">
+      <wsoap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+      <wsdl:operation name="ZulfmwsFaturacaoClientes">
+         <wsoap12:operation soapAction="urn:sap-com:document:sap:soap:functions:mc-style:ZULWS_FATURACAOCLIENTES_BLK:ZulfmwsFaturacaoClientesRequest" style="document" />
+         <wsdl:input>
+            <wsoap12:body use="literal" />
+         </wsdl:input>
+         <wsdl:output>
+            <wsoap12:body use="literal" />
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="ZulwsDocumentos">
+         <wsoap12:operation soapAction="urn:sap-com:document:sap:soap:functions:mc-style:ZULWS_FATURACAOCLIENTES_BLK:ZulwsDocumentosRequest" style="document" />
+         <wsdl:input>
+            <wsoap12:body use="literal" />
+         </wsdl:input>
+         <wsdl:output>
+            <wsoap12:body use="literal" />
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="ZulwsReembolsos">
+         <wsoap12:operation soapAction="urn:sap-com:document:sap:soap:functions:mc-style:ZULWS_FATURACAOCLIENTES_BLK:ZulwsReembolsosRequest" style="document" />
+         <wsdl:input>
+            <wsoap12:body use="literal" />
+         </wsdl:input>
+         <wsdl:output>
+            <wsoap12:body use="literal" />
+         </wsdl:output>
+      </wsdl:operation>
+   </wsdl:binding>
+   <wsdl:service name="ZULWS_FATURACAOCLIENTES_BLK">
+      <wsdl:port name="ZULWS_FATURACAOCLIENTES_BLK" binding="tns:ZULWS_FATURACAOCLIENTES_BLK">
+         <soap:address location="https://ul-sap-qua.ulisboa.pt:8443/sap/bc/srt/rfc/sap/zulws_faturacaoclientes_blk/010/zulws_faturacaoclientes_blk/zulws_faturacaoclientes_blk" />
+      </wsdl:port>
+      <wsdl:port name="ZULWS_FATURACAOCLIENTES_BLK_soap12" binding="tns:ZULWS_FATURACAOCLIENTES_BLK_soap12">
+         <wsoap12:address location="https://ul-sap-qua.ulisboa.pt:8443/sap/bc/srt/rfc/sap/zulws_faturacaoclientes_blk/010/zulws_faturacaoclientes_blk/zulws_faturacaoclientes_blk" />
+      </wsdl:port>
+   </wsdl:service>
+</wsdl:definitions>

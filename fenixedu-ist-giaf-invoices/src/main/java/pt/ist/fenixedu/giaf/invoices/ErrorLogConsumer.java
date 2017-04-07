@@ -17,6 +17,8 @@ public interface ErrorLogConsumer {
             final String locality,
             final String postCode,
             final String countryOfAddress,
-            final String paymentMethod);
+            final String paymentMethod,
+            final String documentNumber,
+            final String actionType);
 
 }
