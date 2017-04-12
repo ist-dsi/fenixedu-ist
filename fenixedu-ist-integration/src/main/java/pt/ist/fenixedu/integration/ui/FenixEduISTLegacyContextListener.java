@@ -31,6 +31,7 @@ import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.accounting.VatNumberResolver;
 import org.fenixedu.academic.domain.degreeStructure.Context;
 import org.fenixedu.academic.domain.enrolment.DegreeModuleToEnrol;
 import org.fenixedu.academic.domain.enrolment.IDegreeModuleToEvaluate;
@@ -50,14 +51,15 @@ import org.fenixedu.cms.domain.CMSFolder;
 import org.fenixedu.cms.domain.Category;
 import org.fenixedu.cms.domain.Site;
 
+import com.google.common.collect.Sets;
+
+import pt.ist.fenixedu.giaf.invoices.ClientMap;
 import pt.ist.fenixedu.integration.domain.student.AffinityCyclesManagement;
 import pt.ist.fenixedu.integration.domain.student.PreEnrolment;
 import pt.ist.fenixedu.integration.dto.QucProfessorshipEvaluation;
 import pt.ist.fenixedu.teacher.evaluation.domain.ProfessorshipEvaluationBean;
 import pt.ist.fenixframework.FenixFramework;
 import pt.ist.fenixframework.dml.runtime.RelationAdapter;
-
-import com.google.common.collect.Sets;
 
 @WebListener
 public class FenixEduISTLegacyContextListener implements ServletContextListener {
@@ -128,6 +130,15 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
         ProfessorshipEvaluationBean.professorshipEvaluation = new QucProfessorshipEvaluation();
 
         BolonhaStudentEnrollmentBean.registerStudentEnrolmentHandler(FenixEduISTLegacyContextListener::setPreEnrolledCourses);
+
+        VatNumberResolver.RESOLVER = new VatNumberResolver() {
+
+        	@Override
+        	public String uVATNumberFor(final Person person) {
+        		return ClientMap.uVATNumberFor(person);
+			}
+
+        };
     }
 
     private static boolean partOf(Set<ExecutionCourse> degrees, StudentThesisCandidacy studentThesisCandidacy) {
