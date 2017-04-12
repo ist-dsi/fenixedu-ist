@@ -66,6 +66,7 @@ public class ExportProfiles extends CronTask {
         object.addProperty("familyNames", up.getFamilyNames());
         object.addProperty("displayName", up.getDisplayName());
         object.addProperty("email", up.getEmail());
+        object.add("userAliases", aliasesFor(up));
         Optional<LocalDate> expiration = up.getUser().getExpiration();
         object.addProperty("expiration", expiration.map(Object::toString).orElse(null));
         object.add("roles", LegacyRoleUtils.mainRoleKeys(up.getUser()).stream().map(JsonPrimitive::new).collect(toJsonArray()));
