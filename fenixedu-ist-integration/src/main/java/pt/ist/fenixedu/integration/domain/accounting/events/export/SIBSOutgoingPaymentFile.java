@@ -31,6 +31,8 @@ import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.accessControl.AcademicAuthorizationGroup;
+import org.fenixedu.academic.domain.accessControl.academicAdministration.AcademicOperationType;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.PaymentCode;
 import org.fenixedu.academic.domain.accounting.ResidenceEvent;
@@ -44,7 +46,6 @@ import org.fenixedu.academic.domain.accounting.paymentCodes.IndividualCandidacyP
 import org.fenixedu.academic.domain.accounting.paymentCodes.rectorate.RectoratePaymentCode;
 import org.fenixedu.academic.domain.candidacy.StudentCandidacy;
 import org.fenixedu.academic.domain.exceptions.DomainException;
-import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.academic.util.Money;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.groups.Group;
@@ -52,13 +53,13 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.YearMonthDay;
 
+import com.google.common.collect.Sets;
+
 import pt.ist.fenixedu.integration.domain.student.importation.DgesStudentImportationProcess;
 import pt.ist.fenixedu.integration.util.sibs.SibsOutgoingPaymentFile;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
 import pt.ist.fenixframework.FenixFramework;
-
-import com.google.common.collect.Sets;
 
 public class SIBSOutgoingPaymentFile extends SIBSOutgoingPaymentFile_Base {
     private static final Comparator<SIBSOutgoingPaymentFile> SUCCESSFUL_SENT_DATE_TIME_COMPARATOR =
@@ -95,7 +96,7 @@ public class SIBSOutgoingPaymentFile extends SIBSOutgoingPaymentFile_Base {
             StringBuilder errorsBuilder = new StringBuilder();
             byte[] paymentFileContents = createPaymentFile(lastSuccessfulSentDateTime, errorsBuilder).getBytes("ASCII");
             setErrors(errorsBuilder.toString());
-            init(outgoingFilename(), outgoingFilename(), paymentFileContents, Group.managers());
+            init(outgoingFilename(), outgoingFilename(), paymentFileContents, Group.managers().or(AcademicAuthorizationGroup.get(AcademicOperationType.CREATE_SIBS_PAYMENTS_REPORT)));
         } catch (UnsupportedEncodingException e) {
             throw new DomainException(e.getMessage(), e);
         }
