@@ -26,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -46,6 +47,7 @@ import org.fenixedu.academic.domain.accounting.events.SpecialSeasonEnrolmentEven
 import org.fenixedu.academic.domain.accounting.events.candidacy.IndividualCandidacyEvent;
 import org.fenixedu.academic.domain.accounting.events.dfa.DFACandidacyEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEvent;
+import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEventWithPaymentPlan;
 import org.fenixedu.academic.domain.accounting.events.insurance.InsuranceEvent;
 import org.fenixedu.academic.domain.contacts.PartyContact;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
@@ -61,11 +63,11 @@ import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.UserProfile;
 import org.fenixedu.commons.StringNormalizer;
 import org.joda.time.DateTime;
+import org.joda.time.YearMonthDay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.CharMatcher;
-import com.google.gson.JsonObject;
 
 public class Utils {
 
@@ -507,6 +509,33 @@ public class Utils {
                 }
             }
         }
+    }
+
+    public static Date getDueDate(final Event event) {
+        final DateTime dueDate;
+        if (event instanceof GratuityEventWithPaymentPlan) {
+            final GratuityEventWithPaymentPlan gratuityEventWithPaymentPlan = (GratuityEventWithPaymentPlan) event;
+            dueDate = findLastDueDate(gratuityEventWithPaymentPlan);
+        } else if (event instanceof PhdGratuityEvent) {
+            final PhdGratuityEvent phdGratuityEvent = (PhdGratuityEvent) event;
+            dueDate = phdGratuityEvent.getLimitDateToPay();
+        } else if (event instanceof AdministrativeOfficeFeeAndInsuranceEvent) {
+            final AdministrativeOfficeFeeAndInsuranceEvent insuranceEvent = (AdministrativeOfficeFeeAndInsuranceEvent) event;
+            final YearMonthDay ymd = insuranceEvent.getAdministrativeOfficeFeePaymentLimitDate();
+            dueDate = ymd != null ? ymd.plusDays(1).toDateTimeAtMidnight() : getDueDateByPaymentCodes(event);
+        } else {
+            dueDate = getDueDateByPaymentCodes(event);
+        }
+        return dueDate.toDate();
+    }
+
+    private static DateTime getDueDateByPaymentCodes(final Event event) {
+        final YearMonthDay ymd = event.getPaymentCodesSet().stream().map(pc -> pc.getEndDate()).max(YearMonthDay::compareTo).orElse(null);
+        return ymd != null ? ymd.plusDays(1).toDateTimeAtMidnight() : event.getWhenOccured();
+    }
+
+    private static DateTime findLastDueDate(final GratuityEventWithPaymentPlan event) {
+        return event.getInstallments().stream().map(i -> i.getEndDate().toDateTimeAtMidnight()).max(DateTime::compareTo).orElse(null);
     }
 
 }
