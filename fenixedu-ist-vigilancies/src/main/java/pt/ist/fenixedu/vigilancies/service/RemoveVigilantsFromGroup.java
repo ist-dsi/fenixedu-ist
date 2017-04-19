@@ -31,7 +31,6 @@ import pt.ist.fenixframework.Atomic;
 
 public class RemoveVigilantsFromGroup {
 
-    @Atomic
     public static List<VigilantWrapper> run(Map<VigilantGroup, List<VigilantWrapper>> vigilantsToRemove) {
 
         List<VigilantWrapper> unableToRemove = new ArrayList<VigilantWrapper>();
@@ -43,12 +42,17 @@ public class RemoveVigilantsFromGroup {
 
             for (VigilantWrapper vigilantWrapper : vigilantWrappers) {
                 try {
-                    vigilantWrapper.delete();
+                    runAtomic(vigilantWrapper);
                 } catch (DomainException e) {
                     unableToRemove.add(vigilantWrapper);
                 }
             }
         }
         return unableToRemove;
+    }
+
+    @Atomic
+    private static void runAtomic(VigilantWrapper vigilantWrapper) {
+        vigilantWrapper.delete();
     }
 }
