@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.bennu.RegistrationProcessConfiguration;
+import org.fenixedu.bennu.core.security.SkipCSRF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,7 @@ public class SignedDeclarationsController {
         this.signCertAndStoreService = signCertAndStoreService;
     }
 
+    @SkipCSRF
     @RequestMapping(method = RequestMethod.POST, value = "sign/{registration}")
     public String signCallback(@PathVariable Registration registration, @RequestParam MultipartFile file,
             @RequestParam String nounce) throws IOException {
@@ -50,6 +52,7 @@ public class SignedDeclarationsController {
         throw new UnauthorizedException();
     }
 
+    @SkipCSRF
     @RequestMapping(method = RequestMethod.POST, value = "cert/{registration}")
     public String certifierCallback(@PathVariable Registration registration, @RequestParam MultipartFile file,
             @RequestParam String nounce) throws IOException {
