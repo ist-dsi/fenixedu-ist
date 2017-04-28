@@ -409,7 +409,7 @@ public class GiafEvent {
 
     public JsonObject toJsonDebt(final Event event, final String clientId, final Money value) {
         final JsonObject o = toJson(event, clientId, null, "F", value, "", true);
-        o.addProperty("dueDate", toString(getDueDate(event)));
+        o.addProperty("dueDate", toString(Utils.getDueDate(event)));
         return o;
     }
 
@@ -587,39 +587,6 @@ public class GiafEvent {
 
     private String toString(final Date d) {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(d);
-    }
-
-    private Date getDueDate(final Event event) {
-        final DateTime dueDate;
-        if (event instanceof GratuityEventWithPaymentPlan) {
-            final GratuityEventWithPaymentPlan gratuityEventWithPaymentPlan = (GratuityEventWithPaymentPlan) event;
-            dueDate = findLastDueDate(gratuityEventWithPaymentPlan);
-        } else if (event instanceof PhdGratuityEvent) {
-            final PhdGratuityEvent phdGratuityEvent = (PhdGratuityEvent) event;
-            dueDate = phdGratuityEvent.getLimitDateToPay();
-        } else if (event instanceof AdministrativeOfficeFeeAndInsuranceEvent) {
-            final AdministrativeOfficeFeeAndInsuranceEvent insuranceEvent = (AdministrativeOfficeFeeAndInsuranceEvent) event;
-            final YearMonthDay ymd = insuranceEvent.getAdministrativeOfficeFeePaymentLimitDate();
-            dueDate = ymd != null ? ymd.plusDays(1).toDateTimeAtMidnight() : getDueDateByPaymentCodes(event);
-        } else {
-            dueDate = getDueDateByPaymentCodes(event);
-        }
-        return dueDate.toDate();
-    }
-
-    private DateTime getDueDateByPaymentCodes(final Event event) {
-        final YearMonthDay ymd =
-                event.getPaymentCodesSet().stream().map(pc -> pc.getEndDate()).max((c1, c2) -> c1.compareTo(c2)).orElse(null);
-        return ymd != null ? ymd.plusDays(1).toDateTimeAtMidnight() : event.getWhenOccured();
-    }
-
-    private DateTime findLastDueDate(final GratuityEventWithPaymentPlan event) {
-        return event.getInstallments().stream().map(i -> i.getEndDate().toDateTimeAtMidnight()).max(new Comparator<DateTime>() {
-            @Override
-            public int compare(DateTime o1, DateTime o2) {
-                return o1.compareTo(o2);
-            }
-        }).orElse(null);
     }
 
     private String toPaymentMethod(final PaymentMode paymentMode) {
