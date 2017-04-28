@@ -66,21 +66,24 @@ public class CreateGratuityEvents extends CronTask {
         generateGratuityEvent(studentCurricularPlan, executionYear);
     }
 
-    @Atomic(mode = TxMode.WRITE)
     private void generateGratuityEvent(StudentCurricularPlan studentCurricularPlan, ExecutionYear executionYear) {
         try {
-            final AccountingEventsManager manager = new AccountingEventsManager();
-
-            final InvocationResult result = manager.createGratuityEvent(studentCurricularPlan, executionYear);
-
-            if (result.isSuccess()) {
-                GratuityEvent_TOTAL_CREATED++;
-            }
+            generateGratuityEventAtomic(executionYear, studentCurricularPlan);
         } catch (Exception e) {
             taskLog("Exception on student curricular plan with oid : %s\n", studentCurricularPlan.getExternalId());
             StringWriter writer = new StringWriter();
             e.printStackTrace(new PrintWriter(writer));
             taskLog(writer.toString());
+        }
+
+    }
+
+    @Atomic(mode = TxMode.WRITE)
+    private void generateGratuityEventAtomic(ExecutionYear executionYear, StudentCurricularPlan studentCurricularPlan) {
+        final AccountingEventsManager manager = new AccountingEventsManager();
+        final InvocationResult result = manager.createGratuityEvent(studentCurricularPlan, executionYear);
+        if (result.isSuccess()) {
+            GratuityEvent_TOTAL_CREATED++;
         }
     }
 

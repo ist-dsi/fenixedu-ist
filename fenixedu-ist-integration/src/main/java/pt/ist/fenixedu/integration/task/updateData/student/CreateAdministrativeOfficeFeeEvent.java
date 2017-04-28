@@ -49,42 +49,49 @@ public class CreateAdministrativeOfficeFeeEvent extends CronTask {
             DegreeType::isIntegratedMasterDegree, DegreeType::isEmpty, DegreeType::isAdvancedFormationDiploma,
             DegreeType::isSpecializationDegree);
 
-    @Atomic(mode = TxMode.WRITE)
     private void createAdministrativeOfficeFeeEvent(StudentCurricularPlan scp, ExecutionYear executionYear) {
         try {
-
-            final AccountingEventsManager manager = new AccountingEventsManager();
-            final InvocationResult result;
-            if (!acceptedDegreeTypesForAdministrativeOfficeFeeAndInsuranceEvent.test(scp.getDegreeType())) {
-                return;
-            }
-            result = manager.createAdministrativeOfficeFeeAndInsuranceEvent(scp, executionYear);
-
-            if (result.isSuccess()) {
-                AdministrativeOfficeFee_TOTAL_CREATED++;
-            }
+            createAdministrativeOfficeFeeEventAtomic(executionYear, scp);
         } catch (Exception e) {
             taskLog("Exception on student curricular plan with oid : %s\n", scp.getExternalId());
             StringWriter writer = new StringWriter();
             e.printStackTrace(new PrintWriter(writer));
             taskLog(writer.toString());
         }
+
     }
 
     @Atomic(mode = TxMode.WRITE)
+    private void createAdministrativeOfficeFeeEventAtomic(ExecutionYear executionYear, StudentCurricularPlan scp) {
+        final AccountingEventsManager manager = new AccountingEventsManager();
+        final InvocationResult result;
+        if (!acceptedDegreeTypesForAdministrativeOfficeFeeAndInsuranceEvent.test(scp.getDegreeType())) {
+            return;
+        }
+        result = manager.createAdministrativeOfficeFeeAndInsuranceEvent(scp, executionYear);
+        if (result.isSuccess()) {
+            AdministrativeOfficeFee_TOTAL_CREATED++;
+        }
+    }
+
     private void createInsuranceEvent(Person person, ExecutionYear executionYear) {
         try {
-            final AccountingEventsManager manager = new AccountingEventsManager();
-            final InvocationResult result = manager.createInsuranceEvent(person, executionYear);
-
-            if (result.isSuccess()) {
-                InsuranceEvent_TOTAL_CREATED++;
-            }
+            createInsuranceEventAtomic(executionYear, person);
         } catch (Exception e) {
             taskLog("Exception on person with oid : %s\n", person.getExternalId());
             StringWriter writer = new StringWriter();
             e.printStackTrace(new PrintWriter(writer));
             taskLog(writer.toString());
+        }
+
+    }
+
+    @Atomic(mode = TxMode.WRITE)
+    private void createInsuranceEventAtomic(ExecutionYear executionYear, Person person) {
+        final AccountingEventsManager manager = new AccountingEventsManager();
+        final InvocationResult result = manager.createInsuranceEvent(person, executionYear);
+        if (result.isSuccess()) {
+            InsuranceEvent_TOTAL_CREATED++;
         }
     }
 
@@ -107,7 +114,6 @@ public class CreateAdministrativeOfficeFeeEvent extends CronTask {
                 }
             }
         }
-
         taskLog("Created %s AdministrativeOfficeFee events\n", AdministrativeOfficeFee_TOTAL_CREATED);
         taskLog("Created %s InsuranceEvent events\n", InsuranceEvent_TOTAL_CREATED);
     }
