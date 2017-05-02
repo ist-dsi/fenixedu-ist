@@ -41,10 +41,11 @@ import org.fenixedu.idcards.domain.SantanderCardInformation;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.YearMonthDay;
 
+import com.google.common.io.BaseEncoding;
+
 import pt.ist.fenixedu.contracts.domain.LegacyRoleUtils;
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.Invitation;
-
-import com.google.common.io.BaseEncoding;
+import pt.ist.fenixedu.integration.util.contacts.ISTPhoneNumberHandler;
 
 /**
  * @author - Shezad Anavarali (shezad@ist.utl.pt)
@@ -242,10 +243,24 @@ public class PersonInformationDTO {
             List<String> workContacts) {
         for (final PartyContact partyContact : contacts) {
             if (partyContact.getType() == PartyContactType.PERSONAL) {
-                personalContacts.add(partyContact.getPresentationValue());
+                addContact(personalContacts, partyContact);
             } else if (partyContact.getType() == PartyContactType.WORK) {
-                workContacts.add(partyContact.getPresentationValue());
+                addContact(workContacts, partyContact);
             }
+        }
+    }
+
+    private void addContact(final List<String> list, final PartyContact partyContact) {
+        if (partyContact instanceof Phone) {
+            final Phone phone = (Phone) partyContact;
+            final String number = phone.getNumber();
+            list.add(number);
+            final String extension = ISTPhoneNumberHandler.getExternalNumberForExtension(number);
+            if (extension != null) {
+                list.add(extension);
+            }
+        } else {
+            list.add(partyContact.getPresentationValue());
         }
     }
 
