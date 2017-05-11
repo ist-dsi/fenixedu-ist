@@ -134,136 +134,129 @@ public class ViewInquiriesResultsForCoordinatorDA extends ViewInquiriesResultsDA
                 new HashMap<Integer, List<CurricularCourseResumeResult>>();
         boolean coursesToAudit = false;
         boolean responsibleCoordinator = false;
-        if (!resultPageDTO.getDegreeCurricularPlan().getDegreeType().isThirdCycle()) {
 
-            CoordinatorInquiryTemplate coordinatorInquiryTemplate =
-                    CoordinatorInquiryTemplate.getTemplateByExecutionPeriod(executionSemester);
+        CoordinatorInquiryTemplate coordinatorInquiryTemplate =
+                CoordinatorInquiryTemplate.getTemplateByExecutionPeriod(executionSemester);
 
-            if (coordinatorInquiryTemplate == null) {
-                request.setAttribute("coursesResultResumeMap", coursesResultResumeMap);
-                return super.prepare(actionMapping, actionForm, request, response);
+        if (coordinatorInquiryTemplate == null) {
+            request.setAttribute("coursesResultResumeMap", coursesResultResumeMap);
+            return super.prepare(actionMapping, actionForm, request, response);
+        }
+
+        ExecutionDegree executionDegree = resultPageDTO.getDegreeCurricularPlan()
+                .getExecutionDegreeByAcademicInterval(executionSemester.getAcademicInterval());
+
+        if (executionDegree == null) {
+            return super.prepare(actionMapping, actionForm, request, response);
+        }
+
+        Coordinator coordinator = executionDegree.getCoordinatorByTeacher(AccessControl.getPerson());
+        ExecutionSemester currentExecutionSemester = ExecutionSemester.readActualExecutionSemester();
+        Coordinator currentCoordinator = null;
+        ExecutionDegree currentExecutionDegree = resultPageDTO.getDegreeCurricularPlan()
+                .getExecutionDegreeByAcademicInterval(currentExecutionSemester.getAcademicInterval());
+        if (currentExecutionSemester.getExecutionYear() != executionSemester.getExecutionYear()
+                && currentExecutionSemester.isAfter(executionSemester)) {
+            // check if the degree has been opened this semester
+            if (currentExecutionDegree != null) {
+                currentCoordinator = currentExecutionDegree.getCoordinatorByTeacher(AccessControl.getPerson());
+            }
             }
 
-            ExecutionDegree executionDegree =
-                    resultPageDTO.getDegreeCurricularPlan().getExecutionDegreeByAcademicInterval(
-                            executionSemester.getAcademicInterval());
+        // check if the chosen executionSemester has the same executionYear
+        // of the next executionSemester of the chosen one
+        ExecutionYear executionYear = executionSemester.getExecutionYear();
+        ExecutionYear nextExecutionYear = executionSemester.getNextExecutionPeriod().getExecutionYear();
+        boolean sameExecutionYear = executionYear == nextExecutionYear;
 
-            if (executionDegree == null) {
-                return super.prepare(actionMapping, actionForm, request, response);
-            }
-
-            Coordinator coordinator = executionDegree.getCoordinatorByTeacher(AccessControl.getPerson());
-            ExecutionSemester currentExecutionSemester = ExecutionSemester.readActualExecutionSemester();
-            Coordinator currentCoordinator = null;
-            ExecutionDegree currentExecutionDegree =
-                    resultPageDTO.getDegreeCurricularPlan().getExecutionDegreeByAcademicInterval(
-                            currentExecutionSemester.getAcademicInterval());
-            if (currentExecutionSemester.getExecutionYear() != executionSemester.getExecutionYear()
-                    && currentExecutionSemester.isAfter(executionSemester)) {
-                // check if the degree has been opened this semester
-                if (currentExecutionDegree != null) {
-                    currentCoordinator = currentExecutionDegree.getCoordinatorByTeacher(AccessControl.getPerson());
-                }
-            }
-
-            // check if the chosen executionSemester has the same executionYear
-            // of the next executionSemester of the chosen one
-            ExecutionYear executionYear = executionSemester.getExecutionYear();
-            ExecutionYear nextExecutionYear = executionSemester.getNextExecutionPeriod().getExecutionYear();
-            boolean sameExecutionYear = executionYear == nextExecutionYear;
-
-            Coordinator coordinatorAfter = null; // it can see the results in
-            // the previous semesters of
-            // its coordination
-            if (coordinator == null && currentCoordinator == null) {
-                if (!sameExecutionYear) {
-                    ExecutionSemester executionSemesterIter = executionSemester.getNextExecutionPeriod();
-                    while (executionSemesterIter.isBefore(currentExecutionSemester)) {
-                        ExecutionDegree nextExecutionDegree =
-                                resultPageDTO.getDegreeCurricularPlan().getExecutionDegreeByAcademicInterval(
-                                        executionSemesterIter.getAcademicInterval());
-                        coordinatorAfter = nextExecutionDegree.getCoordinatorByTeacher(AccessControl.getPerson());
-                        if (coordinatorAfter != null) {
-                            break;
-                        }
-                        executionSemesterIter = executionSemesterIter.getNextExecutionPeriod();
+        Coordinator coordinatorAfter = null; // it can see the results in
+        // the previous semesters of
+        // its coordination
+        if (coordinator == null && currentCoordinator == null) {
+            if (!sameExecutionYear) {
+                ExecutionSemester executionSemesterIter = executionSemester.getNextExecutionPeriod();
+                while (executionSemesterIter.isBefore(currentExecutionSemester)) {
+                    ExecutionDegree nextExecutionDegree = resultPageDTO.getDegreeCurricularPlan()
+                            .getExecutionDegreeByAcademicInterval(executionSemesterIter.getAcademicInterval());
+                    coordinatorAfter = nextExecutionDegree.getCoordinatorByTeacher(AccessControl.getPerson());
+                    if (coordinatorAfter != null) {
+                        break;
+                    }
+                    executionSemesterIter = executionSemesterIter.getNextExecutionPeriod();
                     }
                 }
             }
 
-            if (coordinator == null && coordinatorAfter == null && currentCoordinator == null) {
-                request.setAttribute("notCoordinator", "true");
-                request.setAttribute("executionDegree", executionDegree);
-                request.setAttribute("executionPeriods", getExecutionSemesters(request, actionForm));
-                return actionMapping.findForward("curricularUnitSelection");
-            }
-
-            Coordinator finalCoordinatorToUse = null;
-            if (sameExecutionYear) {
-                responsibleCoordinator = coordinator != null ? coordinator.isResponsible() : false;
-            } else {
-                responsibleCoordinator =
-                        currentCoordinator != null ? currentCoordinator.isResponsible() : currentExecutionDegree == null
-                                && coordinator != null ? coordinator.isResponsible() : false;
-            }
-            if (coordinator != null) {
-                finalCoordinatorToUse = coordinator;
-            } else {
-                finalCoordinatorToUse = currentCoordinator != null ? currentCoordinator : coordinatorAfter;
-            }
-            // responsibleCoordinator = coordinator.isResponsible();
-
-            InquiryCoordinatorAnswer inquiryCoordinatorAnswer = null;
-            if (coordinatorInquiryTemplate.getShared()) {
-                inquiryCoordinatorAnswer =
-                        InquiryCoordinatorAnswer.getInquiryCoordinationAnswers(executionDegree, executionSemester);
-            } else {
-                // TODO since in the 1rst semester more than one could fill in
-                // the inquiry, it should show multiples links for each one, it
-                // is only showing one link
-                if (coordinator != null) {
-                    inquiryCoordinatorAnswer =
-                            InquiryCoordinatorAnswer.getInquiryCoordinatorAnswer(coordinator, executionSemester);
-                }
-            }
-            if (inquiryCoordinatorAnswer == null
-                    || inquiryCoordinatorAnswer.hasRequiredQuestionsToAnswer(coordinatorInquiryTemplate)) {
-                request.setAttribute("completionState", InquiryResponseState.INCOMPLETE.getLocalizedName());
-            } else {
-                request.setAttribute("completionState", InquiryResponseState.COMPLETE.getLocalizedName());
-            }
-
+        if (coordinator == null && coordinatorAfter == null && currentCoordinator == null) {
+            request.setAttribute("notCoordinator", "true");
             request.setAttribute("executionDegree", executionDegree);
-            request.setAttribute("degreeAcronym", executionDegree.getDegree().getSigla());
-            request.setAttribute("coordinator", finalCoordinatorToUse);
-            request.setAttribute("readMode", !coordinatorInquiryTemplate.isOpen());
+            request.setAttribute("executionPeriods", getExecutionSemesters(request, actionForm));
+            return actionMapping.findForward("curricularUnitSelection");
+        }
 
-            Set<ExecutionCourse> dcpExecutionCourses =
-                    resultPageDTO.getDegreeCurricularPlan().getExecutionCoursesByExecutionPeriod(executionSemester);
-            for (ExecutionCourse executionCourse : dcpExecutionCourses) {
-                CurricularCourseResumeResult courseResumeResult =
-                        new CurricularCourseResumeResult(executionCourse, executionDegree, "label.inquiry.curricularUnit",
-                                executionCourse.getName(), AccessControl.getPerson(), ResultPersonCategory.DEGREE_COORDINATOR,
-                                false, true, false, false, responsibleCoordinator);
-                if (courseResumeResult.getResultBlocks().size() > 1) {
+        Coordinator finalCoordinatorToUse = null;
+        if (sameExecutionYear) {
+            responsibleCoordinator = coordinator != null ? coordinator.isResponsible() : false;
+        } else {
+            responsibleCoordinator =
+                    currentCoordinator != null ? currentCoordinator.isResponsible() : currentExecutionDegree == null
+                            && coordinator != null ? coordinator.isResponsible() : false;
+        }
+        if (coordinator != null) {
+            finalCoordinatorToUse = coordinator;
+        } else {
+            finalCoordinatorToUse = currentCoordinator != null ? currentCoordinator : coordinatorAfter;
+        }
+        // responsibleCoordinator = coordinator.isResponsible();
 
-                    if (ResultClassification.getForAudit(executionCourse, executionDegree) != null) {
-                        coursesToAudit = true;
+        InquiryCoordinatorAnswer inquiryCoordinatorAnswer = null;
+        if (coordinatorInquiryTemplate.getShared()) {
+                inquiryCoordinatorAnswer =
+                    InquiryCoordinatorAnswer.getInquiryCoordinationAnswers(executionDegree, executionSemester);
+        } else {
+            // TODO since in the 1rst semester more than one could fill in
+            // the inquiry, it should show multiples links for each one, it
+            // is only showing one link
+            if (coordinator != null) {
+                inquiryCoordinatorAnswer = InquiryCoordinatorAnswer.getInquiryCoordinatorAnswer(coordinator, executionSemester);
+            }
+        }
+        if (inquiryCoordinatorAnswer == null
+                || inquiryCoordinatorAnswer.hasRequiredQuestionsToAnswer(coordinatorInquiryTemplate)) {
+            request.setAttribute("completionState", InquiryResponseState.INCOMPLETE.getLocalizedName());
+        } else {
+            request.setAttribute("completionState", InquiryResponseState.COMPLETE.getLocalizedName());
+            }
+
+        request.setAttribute("executionDegree", executionDegree);
+        request.setAttribute("degreeAcronym", executionDegree.getDegree().getSigla());
+        request.setAttribute("coordinator", finalCoordinatorToUse);
+        request.setAttribute("readMode", !coordinatorInquiryTemplate.isOpen());
+
+        Set<ExecutionCourse> dcpExecutionCourses =
+                resultPageDTO.getDegreeCurricularPlan().getExecutionCoursesByExecutionPeriod(executionSemester);
+        for (ExecutionCourse executionCourse : dcpExecutionCourses) {
+            CurricularCourseResumeResult courseResumeResult = new CurricularCourseResumeResult(executionCourse, executionDegree,
+                    "label.inquiry.curricularUnit", executionCourse.getName(), AccessControl.getPerson(),
+                    ResultPersonCategory.DEGREE_COORDINATOR, false, true, false, false, responsibleCoordinator);
+            if (courseResumeResult.getResultBlocks().size() > 1) {
+
+                if (ResultClassification.getForAudit(executionCourse, executionDegree) != null) {
+                    coursesToAudit = true;
+                }
+                CurricularCourse curricularCourse =
+                        executionCourse.getCurricularCourseFor(resultPageDTO.getDegreeCurricularPlan());
+
+                for (Context context : curricularCourse.getParentContextsByExecutionSemester(executionSemester)) {
+                    Integer curricurlarYear = context.getCurricularYear();
+                    List<CurricularCourseResumeResult> coursesResultResume = coursesResultResumeMap.get(curricurlarYear);
+                    if (coursesResultResume == null) {
+                        coursesResultResume = new ArrayList<CurricularCourseResumeResult>();
+                        coursesResultResumeMap.put(curricurlarYear, coursesResultResume);
                     }
-                    CurricularCourse curricularCourse =
-                            executionCourse.getCurricularCourseFor(resultPageDTO.getDegreeCurricularPlan());
-
-                    for (Context context : curricularCourse.getParentContextsByExecutionSemester(executionSemester)) {
-                        Integer curricurlarYear = context.getCurricularYear();
-                        List<CurricularCourseResumeResult> coursesResultResume = coursesResultResumeMap.get(curricurlarYear);
-                        if (coursesResultResume == null) {
-                            coursesResultResume = new ArrayList<CurricularCourseResumeResult>();
-                            coursesResultResumeMap.put(curricurlarYear, coursesResultResume);
-                        }
-                        coursesResultResume.add(courseResumeResult);
+                    coursesResultResume.add(courseResumeResult);
                     }
                 }
-            }
         }
 
         for (Integer curricularYear : coursesResultResumeMap.keySet()) {
