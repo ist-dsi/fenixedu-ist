@@ -30,7 +30,6 @@ import org.fenixedu.academic.domain.accounting.events.ImprovementOfApprovedEnrol
 import org.fenixedu.academic.domain.accounting.events.SpecialSeasonEnrolmentEvent;
 import org.fenixedu.academic.domain.accounting.events.dfa.DFACandidacyEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEvent;
-import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEventWithPaymentPlan;
 import org.fenixedu.academic.domain.accounting.events.insurance.InsuranceEvent;
 import org.fenixedu.academic.domain.administrativeOffice.AdministrativeOffice;
 import org.fenixedu.academic.domain.degree.DegreeType;
@@ -43,7 +42,6 @@ import org.fenixedu.academic.util.Money;
 import org.fenixedu.bennu.GiafInvoiceConfiguration;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.DateTime;
-import org.joda.time.YearMonthDay;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -164,8 +162,9 @@ public class GiafEvent {
         return addAll((e) -> e.fines);
     }
 
-    public boolean hasPayment(final AccountingTransactionDetail d) {
-        return entries.stream().flatMap(e -> e.receiptIds.stream()).anyMatch(s -> s.equals(d.getExternalId()));
+    public boolean hasPayment(final AccountingTransactionDetail d, final Money totalPayed) {
+        final Money payedInGiaf = entries.stream().map(e -> e.payed.add(e.fines)).reduce(Money.ZERO, Money::add);
+        return payedInGiaf.greaterOrEqualThan(totalPayed);
     }
 
     private void persistLocalChange(final String clientId, final String invoiceNumber, final String type, final Money value,
@@ -202,14 +201,20 @@ public class GiafEvent {
         return entry;
     }
 
-    public void pay(final ClientMap clientMap, final AccountingTransactionDetail d) {
+    public void pay(final ClientMap clientMap, final AccountingTransactionDetail d, final Money totalPayed) {
         final Person person = d.getEvent().getPerson();
         final GiafEventEntry entry = updatedVatEntry(clientMap, person, d.getEvent(), openEntry());
+
+        final Money totalRegistered = payed().add(fines());
+
+        final Money totalMissing = totalPayed.subtract(totalRegistered);
         final Money txAmount = d.getTransaction().getAmountWithAdjustment();
+        final Money amountToRegister = txAmount.greaterOrEqualThan(totalMissing) ? totalMissing : txAmount;
+
         final Money amountStillInDebt = entry == null ? Money.ZERO : entry.amountStillInDebt();
 
-        final Money payed = txAmount.greaterThan(amountStillInDebt) ? amountStillInDebt : txAmount;
-        final Money fines = txAmount.subtract(payed);
+        final Money payed = amountToRegister.greaterThan(amountStillInDebt) ? amountStillInDebt : amountToRegister;
+        final Money fines = amountToRegister.subtract(amountStillInDebt);
 
         final String now = new DateTime().toString(DT_FORMAT);
         final String registryDate = d.getWhenRegistered().toString(DT_FORMAT);

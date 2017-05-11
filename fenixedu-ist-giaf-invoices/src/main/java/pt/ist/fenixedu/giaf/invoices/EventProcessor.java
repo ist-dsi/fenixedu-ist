@@ -56,12 +56,14 @@ public class EventProcessor {
                     }
                 }
 
-                eventWrapper.payments().filter(d -> !giafEvent.hasPayment(d))
+                final Money totalPayed = eventWrapper.payed.add(eventWrapper.fines);
+                eventWrapper.payments().filter(d -> !giafEvent.hasPayment(d, totalPayed))
                     .peek(d -> elogger.log("Processing payment %s : %s%n", eventWrapper.event.getExternalId(), d.getExternalId()))
-                    .forEach(d -> giafEvent.pay(clientMap, d));
+                    .forEach(d -> giafEvent.pay(clientMap, d, totalPayed));
             }
 
-            eventWrapper.payments().filter(d -> !giafEvent.hasPayment(d))
+            final Money totalPayed = eventWrapper.payed.add(eventWrapper.fines);
+            eventWrapper.payments().filter(d -> !giafEvent.hasPayment(d, totalPayed))
                 .peek(d -> elogger.log("Processing past payment %s : %s%n", eventWrapper.event.getExternalId(), d.getExternalId()))
                 .forEach(d -> giafEvent.payWithoutDebtRegistration(clientMap, d));        
         } catch (final Error e) {
