@@ -29,19 +29,22 @@ import pt.ist.fenixframework.Atomic;
 
 public class AddExecutionCourseToGroup {
 
-    @Atomic
     public static List<ExecutionCourse> run(VigilantGroup group, List<ExecutionCourse> executionCourses) {
 
         List<ExecutionCourse> executionCoursesUnableToAdd = new ArrayList<ExecutionCourse>();
         for (ExecutionCourse course : executionCourses) {
             try {
-                group.addExecutionCourses(course);
-
+                runAtomic(group, course);
             } catch (DomainException e) {
                 executionCoursesUnableToAdd.add(course);
             }
         }
         return executionCoursesUnableToAdd;
+    }
+
+    @Atomic
+    private static void runAtomic(VigilantGroup group, ExecutionCourse course) {
+        group.addExecutionCourses(course);
     }
 
 }

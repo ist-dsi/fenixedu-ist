@@ -28,7 +28,8 @@ public class FenixEduIstCmsComponentsConfiguration {
         @ConfigurationProperty(key = "sotisURL", defaultValue = "https://sotis.tecnico.ulisboa.pt")
         public String sotisURL();
     }
-
+ 
+    
     public static ConfigurationProperties getConfiguration() {
         return ConfigurationInvocationHandler.getConfiguration(ConfigurationProperties.class);
     }

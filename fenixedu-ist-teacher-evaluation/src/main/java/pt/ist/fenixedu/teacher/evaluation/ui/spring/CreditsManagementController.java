@@ -34,7 +34,7 @@ public class CreditsManagementController {
         model.addAttribute("creditsPoolBean", creditsPoolBean);
         model.addAttribute("executionYears", Bennu.getInstance().getExecutionYearsSet().stream().distinct()
                 .sorted(ExecutionYear.REVERSE_COMPARATOR_BY_YEAR).limit(4).collect(Collectors.toList()));
-        return "/creditsManagement/creditsPool/ ";
+        return "/creditsManagement/creditsPool/manageDepartmentCreditsPool";
     }
 
     @RequestMapping(method = POST, value = "editCreditsPool")
