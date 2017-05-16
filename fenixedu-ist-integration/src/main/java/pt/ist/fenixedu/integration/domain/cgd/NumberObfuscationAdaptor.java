@@ -43,6 +43,9 @@ public class NumberObfuscationAdaptor implements IMemberIDAdapter {
 
     @Override
     public boolean isAllowedAccessToMember(final Person person) {
+        if (person == null) {
+            return false;
+        }
         final User user = person.getUser();
         if (user != null) {
             final int year = Year.now().getValue();
