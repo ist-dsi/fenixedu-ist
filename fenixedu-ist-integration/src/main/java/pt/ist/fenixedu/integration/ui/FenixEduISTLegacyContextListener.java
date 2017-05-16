@@ -44,6 +44,7 @@ import org.fenixedu.academic.domain.OccupationPeriod;
 import org.fenixedu.academic.domain.OccupationPeriodType;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Summary;
+import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.VatNumberResolver;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
 import org.fenixedu.academic.domain.degreeStructure.Context;
