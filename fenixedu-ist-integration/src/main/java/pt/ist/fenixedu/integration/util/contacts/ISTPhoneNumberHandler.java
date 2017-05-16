@@ -25,7 +25,7 @@ public class ISTPhoneNumberHandler extends AcademicPhoneNumberHandler implements
         return getExternalNumberForExtension(numberText) != null;
     }
 
-    private static String getExternalNumberForExtension(String numberText) {
+    public static String getExternalNumberForExtension(String numberText) {
         int extension;
         try {
             extension = Integer.parseInt(numberText);
