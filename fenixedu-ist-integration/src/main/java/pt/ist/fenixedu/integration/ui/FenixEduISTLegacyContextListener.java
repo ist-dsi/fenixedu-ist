@@ -149,11 +149,14 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
         }));
 
         Consumer<DomainObjectEvent<Summary>> handler = (DomainObjectEvent<Summary> event) -> {
-            Optional<Calendar> gradeSubmissionEndDate = event.getInstance().getExecutionCourse().getExecutionDegrees().stream()
-                    .flatMap(ed -> ed.getPeriods(OccupationPeriodType.GRADE_SUBMISSION)).map(OccupationPeriod::getEndDate)
+            ExecutionCourse executionCourse = event.getInstance().getExecutionCourse();
+            Optional<Calendar> gradeSubmissionEndDate = executionCourse.getExecutionDegrees().stream()
+                    .flatMap(ed -> ed.getPeriods(OccupationPeriodType.GRADE_SUBMISSION, executionCourse.getExecutionPeriod().getSemester())).map(OccupationPeriod::getEndDate)
                     .max(Calendar::compareTo);
 
-            if (gradeSubmissionEndDate.map(v -> v.before(Calendar.getInstance())).orElse(false)) {
+            if(!gradeSubmissionEndDate.isPresent()) {
+                throw new DomainException("error.summary.grade.submission.period.not.defined");
+            }else if (gradeSubmissionEndDate.map(v -> v.before(Calendar.getInstance())).orElse(false)) {
                 throw new DomainException("error.summary.current.date.after.end.period");
             }
         };
