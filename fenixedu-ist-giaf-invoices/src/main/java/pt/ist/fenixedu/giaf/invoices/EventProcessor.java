@@ -1,6 +1,7 @@
 package pt.ist.fenixedu.giaf.invoices;
 
 import java.math.BigDecimal;
+
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.util.Money;
 
@@ -57,13 +58,12 @@ public class EventProcessor {
                 }
 
                 final Money totalPayed = eventWrapper.payed.add(eventWrapper.fines);
-                eventWrapper.payments().filter(d -> !giafEvent.hasPayment(d, totalPayed))
+                eventWrapper.payments().filter(d -> !giafEvent.hasPayment(d))
                     .peek(d -> elogger.log("Processing payment %s : %s%n", eventWrapper.event.getExternalId(), d.getExternalId()))
                     .forEach(d -> giafEvent.pay(clientMap, d, totalPayed));
             }
 
-            final Money totalPayed = eventWrapper.payed.add(eventWrapper.fines);
-            eventWrapper.payments().filter(d -> !giafEvent.hasPayment(d, totalPayed))
+            eventWrapper.payments().filter(d -> !giafEvent.hasPayment(d))
                 .peek(d -> elogger.log("Processing past payment %s : %s%n", eventWrapper.event.getExternalId(), d.getExternalId()))
                 .forEach(d -> giafEvent.payWithoutDebtRegistration(clientMap, d));        
         } catch (final Error e) {
