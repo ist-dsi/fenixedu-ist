@@ -71,7 +71,8 @@ public class ClientMap {
             return "PT" + vat;
         }
         if (country == null || "PT".equals(country.getCode())) {
-            return "PT999999990";
+            //return "PT999999990";
+            return null;
         }
         if (vat != null) {
             return trimVatTo12Digits(country.getCode() + vat);
