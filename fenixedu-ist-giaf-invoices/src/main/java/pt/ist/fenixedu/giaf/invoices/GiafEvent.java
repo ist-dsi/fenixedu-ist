@@ -9,7 +9,9 @@ import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -87,6 +89,7 @@ public class GiafEvent {
     private final File file;
     private final JsonArray array;
     public final Set<GiafEventEntry> entries = new HashSet<>();
+    private final Map<String, Money> registeredValueForAccountingTransaction = new HashMap<>();
 
     public GiafEvent(final Event event) {
         file = giafEventFile(event);
@@ -116,13 +119,31 @@ public class GiafEvent {
 
                 final String receiptId = o.get("receiptId").getAsString();
                 entry.receiptIds.add(receiptId);
+
+                registerAccountingTransactionValue(receiptId, value);
             } else if (type.equals("fine")) {
                 entry.fines = entry.fines.add(value);
 
                 final String receiptId = o.get("receiptId").getAsString();
-                entry.receiptIds.add(receiptId);                    
+                entry.receiptIds.add(receiptId);
+
+                registerAccountingTransactionValue(receiptId, value);
             }
         }
+    }
+
+    private Money amountAlreadyRegisteredForTx(final String txId) {
+        final Money value = registeredValueForAccountingTransaction.get(txId);
+        return value == null ? Money.ZERO : value;
+    }
+
+    private Money amountAlreadyRegisteredForTx(AccountingTransactionDetail d) {
+        return amountAlreadyRegisteredForTx(d.getExternalId());
+    }
+
+    private void registerAccountingTransactionValue(final String receiptId, final Money value) {
+        final Money newValue = amountAlreadyRegisteredForTx(receiptId).add(value);
+        registeredValueForAccountingTransaction.put(receiptId, newValue);
     }
 
     public static JsonArray readEventFile(final Event event) {
@@ -162,8 +183,9 @@ public class GiafEvent {
         return addAll((e) -> e.fines);
     }
 
-    public boolean hasPayment(final AccountingTransactionDetail d, final Money totalPayed) {
-        final Money payedInGiaf = entries.stream().map(e -> e.payed.add(e.fines)).reduce(Money.ZERO, Money::add);
+    public boolean hasPayment(final AccountingTransactionDetail d) {
+        final Money totalPayed = d.getTransaction().getAmountWithAdjustment();
+        final Money payedInGiaf = amountAlreadyRegisteredForTx(d);
         return payedInGiaf.greaterOrEqualThan(totalPayed);
     }
 
@@ -206,10 +228,11 @@ public class GiafEvent {
         final GiafEventEntry entry = updatedVatEntry(clientMap, person, d.getEvent(), openEntry());
 
         final Money totalRegistered = payed().add(fines());
-
         final Money totalMissing = totalPayed.subtract(totalRegistered);
         final Money txAmount = d.getTransaction().getAmountWithAdjustment();
-        final Money amountToRegister = txAmount.greaterOrEqualThan(totalMissing) ? totalMissing : txAmount;
+        final Money amountAlreadyRegisteredForTx = amountAlreadyRegisteredForTx(d);
+        final Money missingTxAmount = txAmount.subtract(amountAlreadyRegisteredForTx);
+        final Money amountToRegister = missingTxAmount.greaterOrEqualThan(totalMissing) ? totalMissing : missingTxAmount;
 
         final Money amountStillInDebt = entry == null ? Money.ZERO : entry.amountStillInDebt();
 
@@ -226,6 +249,8 @@ public class GiafEvent {
 
             entry.payed = entry.payed.add(payed);
             entry.receiptIds.add(d.getExternalId());
+
+            registerAccountingTransactionValue(d.getExternalId(), payed);
         }
 
         if (fines.isPositive()) {
@@ -239,6 +264,8 @@ public class GiafEvent {
 
             fineEntry.fines = fineEntry.fines.add(fines);
             fineEntry.receiptIds.add(d.getExternalId());
+
+            registerAccountingTransactionValue(d.getExternalId(), fines);
         }
     }
 
