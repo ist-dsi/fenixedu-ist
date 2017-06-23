@@ -28,6 +28,8 @@
                 {% for degree in getValue(degreesByType, type) %}
                     {% if degree.siteUrl is not empty %}
                         <li><h5><a href="{{ degree.siteUrl }}">{{ degree.nameI18N }}</a></h5></li>
+                    {% elseif degree.site is not empty %}
+                        <li><h5><a href="{{ degree.site.fullUrl }}">{{ degree.nameI18N }}</a></h5></li>
                     {% else %}
                         <li><h5>{{ degree.nameI18N }}</h5></li>
                     {% endif %}
