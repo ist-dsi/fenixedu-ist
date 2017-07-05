@@ -70,7 +70,7 @@ import org.fenixedu.cms.domain.CMSFolder;
 import org.fenixedu.cms.domain.Category;
 import org.fenixedu.cms.domain.Site;
 
-import com.google.api.client.util.Strings;
+import com.google.common.base.Strings;
 import com.google.common.base.CharMatcher;
 import com.google.common.collect.Sets;
 
