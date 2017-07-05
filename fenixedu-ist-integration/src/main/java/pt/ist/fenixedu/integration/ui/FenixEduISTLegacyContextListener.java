@@ -30,6 +30,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.servlet.ServletContextEvent;
@@ -69,6 +70,7 @@ import org.fenixedu.cms.domain.CMSFolder;
 import org.fenixedu.cms.domain.Category;
 import org.fenixedu.cms.domain.Site;
 
+import com.google.api.client.util.Strings;
 import com.google.common.base.CharMatcher;
 import com.google.common.collect.Sets;
 
@@ -83,6 +85,7 @@ import pt.ist.fenixframework.dml.runtime.RelationAdapter;
 
 @WebListener
 public class FenixEduISTLegacyContextListener implements ServletContextListener {
+
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         FenixFramework.getDomainModel().registerDeletionBlockerListener(Person.class, (person, blockers) -> {
@@ -214,8 +217,11 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
                 }
 
                 final Stream<Event> events = person.getEventsSet().stream();
-                if (events.anyMatch(e -> isOverDue(e))) {
-                    warnings.add(BundleUtil.getString("resources.FenixeduIstIntegrationResources", "label.event.overdue"));
+                final String overDueEvents = events.filter(FenixEduISTLegacyContextListener::isOverDue)
+                        .map(e -> e.getDescription().toString())
+                        .collect(Collectors.joining(","));
+                if (!Strings.isNullOrEmpty(overDueEvents)) {
+                    warnings.add(BundleUtil.getString("resources.FenixeduIstIntegrationResources", "label.event.overdue", overDueEvents));
                 }
 
                 return warnings;
