@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -37,6 +38,7 @@ import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.PaymentCode;
 import org.fenixedu.academic.domain.accounting.ResidenceEvent;
 import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeAndInsuranceEvent;
+import org.fenixedu.academic.domain.accounting.events.SpecialSeasonEnrolmentEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.DfaGratuityEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEventWithPaymentPlan;
 import org.fenixedu.academic.domain.accounting.events.gratuity.StandaloneEnrolmentGratuityEvent;
@@ -46,6 +48,7 @@ import org.fenixedu.academic.domain.accounting.paymentCodes.IndividualCandidacyP
 import org.fenixedu.academic.domain.accounting.paymentCodes.rectorate.RectoratePaymentCode;
 import org.fenixedu.academic.domain.candidacy.StudentCandidacy;
 import org.fenixedu.academic.domain.exceptions.DomainException;
+import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.util.Money;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.groups.Group;
@@ -138,6 +141,14 @@ public class SIBSOutgoingPaymentFile extends SIBSOutgoingPaymentFile_Base {
             appendToErrors(errorsBuilder, "", e);
         }
 
+        try {
+            final SpecialSeasonEnrolmentEventStuff stuff = new SpecialSeasonEnrolmentEventStuff(sibsOutgoingPaymentFile, errorsBuilder);
+            stuff.start();
+            stuff.join();
+        } catch (Throwable e) {
+            appendToErrors(errorsBuilder, "", e);
+        }
+
         this.setPrintedPaymentCodes(sibsOutgoingPaymentFile.getAssociatedPaymentCodes());
         invalidateOldPaymentCodes(sibsOutgoingPaymentFile, errorsBuilder);
 
@@ -201,6 +212,28 @@ public class SIBSOutgoingPaymentFile extends SIBSOutgoingPaymentFile_Base {
             }
         }
 
+    }
+
+    protected void exportSpecialSeasonEnrolmentCodes(SibsOutgoingPaymentFile sibsFile, StringBuilder errorsBuilder) {
+        final LocalDate now = new LocalDate();
+
+        Bennu.getInstance().getStudentsSet().stream()
+
+        .map(Student::getPerson)
+
+        .filter(Objects::nonNull)
+
+        .flatMap(p -> p.getEventsSet().stream())
+
+        .filter(e -> e instanceof SpecialSeasonEnrolmentEvent)
+
+        .filter(Event::isOpen)
+
+        .flatMap(e -> e.getAllPaymentCodes().stream())
+
+        .filter(pc -> pc.getEndDate().isAfter(now))
+
+        .forEach(pc -> addPaymentCode(sibsFile, pc, errorsBuilder));
     }
 
     protected void addPaymentCode(final SibsOutgoingPaymentFile file, final PaymentCode paymentCode, StringBuilder errorsBuilder) {
@@ -347,6 +380,28 @@ public class SIBSOutgoingPaymentFile extends SIBSOutgoingPaymentFile_Base {
 
         private void txDo() {
             exportRectoratePaymentCodes(sibsOutgoingPaymentFile, errorsBuilder);
+        }
+
+    }
+
+    private class SpecialSeasonEnrolmentEventStuff extends Thread {
+
+        final SibsOutgoingPaymentFile sibsOutgoingPaymentFile;
+        final StringBuilder errorsBuilder;
+
+        public SpecialSeasonEnrolmentEventStuff(final SibsOutgoingPaymentFile sibsOutgoingPaymentFile, final StringBuilder errorsBuilder) {
+            this.sibsOutgoingPaymentFile = sibsOutgoingPaymentFile;
+            this.errorsBuilder = errorsBuilder;
+        }
+
+        @Override
+        @Atomic(mode = TxMode.READ)
+        public void run() {
+            txDo();
+        }
+
+        private void txDo() {
+            exportSpecialSeasonEnrolmentCodes(sibsOutgoingPaymentFile, errorsBuilder);
         }
 
     }
