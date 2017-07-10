@@ -64,6 +64,7 @@ import org.joda.time.DateTime;
 import org.joda.time.YearMonthDay;
 
 import pt.ist.fenixedu.contracts.domain.Employee;
+import pt.ist.fenixedu.contracts.domain.accessControl.ActiveGrantOwner;
 import pt.ist.fenixedu.contracts.domain.util.CategoryType;
 import pt.ist.fenixedu.integration.FenixEduIstIntegrationConfiguration;
 import pt.ist.fenixedu.integration.ui.struts.action.externalServices.ExternalInterfaceDispatchAction;
@@ -168,10 +169,16 @@ public class ExportUserInfoForKoha extends ExternalInterfaceDispatchAction {
         final Spreadsheet spreadsheet = new Spreadsheet("OfficialsNotTeachers");
         spreadsheet.setHeader("IST-ID").setHeader("nome").setHeader("email").setHeader("telefone").setHeader("cgdCode");
 
-        Bennu.getInstance().getEmployeesSet().stream().filter(Employee::isActive).map(employee -> employee.getPerson())
-                .forEach(p -> addEmployeeInformationOfficialsNotTeachers(spreadsheet, p));
+        Bennu.getInstance().getEmployeesSet().stream()
+            .filter(this::isEmployeeOrGrantOwner)
+            .map(employee -> employee.getPerson())
+            .forEach(p -> addEmployeeInformationOfficialsNotTeachers(spreadsheet, p));
 
         return sendXls(response, spreadsheet);
+    }
+
+    private boolean isEmployeeOrGrantOwner(final Employee employee) {
+        return employee.isActive() || ActiveGrantOwner.isGrantOwner(employee);
     }
 
     private void addEmployeeInformation(final Spreadsheet spreadsheet, final Person person) {

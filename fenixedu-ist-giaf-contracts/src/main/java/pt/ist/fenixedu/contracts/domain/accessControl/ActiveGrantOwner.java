@@ -62,7 +62,7 @@ public class ActiveGrantOwner extends GroupStrategy {
         return isMember(user);
     }
 
-    protected static boolean isGrantOwner(Employee employee) {
+    public static boolean isGrantOwner(Employee employee) {
         return (employee.getPerson().getPersonProfessionalData() != null ? employee.getPerson().getPersonProfessionalData()
                 .getCurrentPersonContractSituationByCategoryType(CategoryType.GRANT_OWNER) : null) != null;
     }
