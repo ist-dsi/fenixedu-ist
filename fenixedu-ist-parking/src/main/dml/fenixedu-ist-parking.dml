@@ -24,7 +24,7 @@ enum pt.ist.fenixedu.parking.domain.ParkingRequestType                          
 
     class ParkingGroup  {
         String groupName;
-        MultiLanguageString groupDescription;
+        LocalizedString groupDescription;
     }
 
     class ParkingParty  {

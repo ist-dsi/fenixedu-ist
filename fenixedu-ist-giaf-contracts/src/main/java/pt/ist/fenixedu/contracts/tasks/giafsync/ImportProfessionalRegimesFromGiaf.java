@@ -24,7 +24,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Objects;
 
-import org.fenixedu.academic.util.MultiLanguageString;
+import org.fenixedu.commons.i18n.LocalizedString;
 import org.slf4j.Logger;
 
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalRegime;
@@ -69,7 +69,7 @@ class ImportProfessionalRegimesFromGiaf implements MetadataProcessor {
             }
 
             ProfessionalRegime professionalRegime = metadata.regime(giafId);
-            MultiLanguageString name = new MultiLanguageString(MultiLanguageString.pt, regimeName);
+            LocalizedString name = new LocalizedString(org.fenixedu.academic.util.LocaleUtils.PT, regimeName);
             if (professionalRegime != null) {
                 if (!isEqual(professionalRegime, name, weighting, fullTimeEquivalent, categoryType)) {
                     professionalRegime.edit(name, weighting, fullTimeEquivalent, categoryType);
@@ -86,7 +86,7 @@ class ImportProfessionalRegimesFromGiaf implements MetadataProcessor {
         log.printf("Regimes: %d updated, %d new\n", updatedRegimes, newRegimes);
     }
 
-    private boolean isEqual(ProfessionalRegime professionalRegime, MultiLanguageString name, Integer weighting,
+    private boolean isEqual(ProfessionalRegime professionalRegime, LocalizedString name, Integer weighting,
             BigDecimal fullTimeEquivalent, CategoryType categoryType) {
         return professionalRegime.getName().getContent().equalsIgnoreCase(name.getContent())
                 && Objects.equals(professionalRegime.getFullTimeEquivalent(), fullTimeEquivalent)

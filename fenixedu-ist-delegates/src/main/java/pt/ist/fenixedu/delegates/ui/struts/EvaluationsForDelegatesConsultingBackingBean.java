@@ -46,7 +46,6 @@ import org.fenixedu.academic.domain.WrittenEvaluation;
 import org.fenixedu.academic.ui.faces.bean.base.FenixBackingBean;
 import org.fenixedu.academic.ui.faces.components.util.CalendarLink;
 import org.fenixedu.academic.util.Bundle;
-import org.fenixedu.academic.util.MultiLanguageString;
 import org.fenixedu.academic.util.PeriodState;
 import org.fenixedu.commons.i18n.I18N;
 
@@ -195,7 +194,7 @@ public class EvaluationsForDelegatesConsultingBackingBean extends FenixBackingBe
     public String getDegreeName() {
         final Locale locale = FacesContext.getCurrentInstance().getViewRoot().getLocale();
         return locale.getLanguage().equals(Locale.ENGLISH.getLanguage()) ? getDegree().getNameFor(getExecutionYear()).getContent(
-                MultiLanguageString.en) : getDegree().getNameFor(getExecutionYear()).getContent(MultiLanguageString.pt);
+                org.fenixedu.academic.util.LocaleUtils.EN) : getDegree().getNameFor(getExecutionYear()).getContent(org.fenixedu.academic.util.LocaleUtils.PT);
     }
 
     public List<SelectItem> getDegreeCurricularPlanSelectItems() {

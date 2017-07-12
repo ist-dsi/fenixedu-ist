@@ -5,7 +5,7 @@ enum pt.ist.fenixedu.contracts.domain.organizationalStructure.FunctionType      
 
 class personnelSection.contracts.ContractSituation  {
     String giafId (REQUIRED);
-    MultiLanguageString name (REQUIRED);
+    LocalizedString name (REQUIRED);
     Boolean endSituation (REQUIRED);
     Boolean serviceExemption (REQUIRED);
     Boolean inExercise (REQUIRED);
@@ -16,7 +16,7 @@ class personnelSection.contracts.ContractSituation  {
 
 class personnelSection.contracts.ProfessionalContractType  {
     String giafId;
-    MultiLanguageString name;
+    LocalizedString name;
 }
 
 class personnelSection.contracts.PersonProfessionalData  {
@@ -65,7 +65,7 @@ class personnelSection.contracts.PersonContractSituation  {
 
 class personnelSection.contracts.ProfessionalCategory {
     String giafId;
-    MultiLanguageString name;
+    LocalizedString name;
     CategoryType categoryType;
     Integer weight;
     String identificationCardLabel;
@@ -87,7 +87,7 @@ class personnelSection.contracts.PersonProfessionalCategory  {
 
 class personnelSection.contracts.ProfessionalRegime  {
     String giafId;
-    MultiLanguageString name;
+    LocalizedString name;
     Integer weighting;
     BigDecimal fullTimeEquivalent;
     CategoryType categoryType;
@@ -105,7 +105,7 @@ class personnelSection.contracts.PersonProfessionalRegime  {
 
 class personnelSection.contracts.ProfessionalRelation  {
     String giafId;
-    MultiLanguageString name;
+    LocalizedString name;
     Boolean fullTimeEquivalent;
 }
 
@@ -122,7 +122,7 @@ class personnelSection.contracts.PersonProfessionalRelation  {
 
 class personnelSection.contracts.FunctionsAccumulation  {
     String giafId;
-    MultiLanguageString name;
+    LocalizedString name;
 }
 
 class personnelSection.contracts.PersonFunctionsAccumulation  {
@@ -166,7 +166,7 @@ class personnelSection.contracts.PersonAbsence extends personnelSection.contract
 
 class personnelSection.contracts.GrantOwnerEquivalent  {
     String giafId;
-    MultiLanguageString name;
+    LocalizedString name;
     Boolean hasMandatoryCredits (REQUIRED);
     Boolean giveCredits (REQUIRED);
     Boolean isSabaticalOrEquivalent (REQUIRED);
@@ -174,7 +174,7 @@ class personnelSection.contracts.GrantOwnerEquivalent  {
 
 class personnelSection.contracts.ServiceExemption  {
     String giafId;
-    MultiLanguageString name;
+    LocalizedString name;
     Boolean hasMandatoryCredits (REQUIRED);
     Boolean giveCredits (REQUIRED);
     Boolean isSabaticalOrEquivalent (REQUIRED);
@@ -182,7 +182,7 @@ class personnelSection.contracts.ServiceExemption  {
 
 class personnelSection.contracts.Absence  {
     String giafId;
-    MultiLanguageString name;
+    LocalizedString name;
     Boolean importAbsence (REQUIRED);
     Boolean hasMandatoryCredits (REQUIRED);
     Boolean giveCredits (REQUIRED);

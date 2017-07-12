@@ -82,7 +82,7 @@ public class UnitCourses extends UnitSiteComponent {
         List<Map> competenceCoursesWraps =
                 scientificAreaUnit.getCompetenceCourseGroupUnits().stream()
                         .map(competenceCourseGroupUnit -> wrap(competenceCourseGroupUnit, courseComponentUrl, executionYear)).collect(toList());
-        return ImmutableMap.of("name", scientificAreaUnit.getNameI18n().toLocalizedString(), "competenceCourseGroupUnits",
+        return ImmutableMap.of("name", scientificAreaUnit.getNameI18n(), "competenceCourseGroupUnits",
                 competenceCoursesWraps, "hasCompetenceCourses",
                 competenceCoursesWraps.stream().anyMatch(wrap -> (boolean) wrap.get("hasCompetenceCourses")));
     }
@@ -90,7 +90,7 @@ public class UnitCourses extends UnitSiteComponent {
     public Map wrap(CompetenceCourseGroupUnit competenceCourseGroupUnit, String courseComponentUrl, ExecutionYear executionYear) {
         List<CompetenceCourse> competenceCourses =
                 competenceCourseGroupUnit.getCompetenceCoursesByExecutionYear(executionYear);
-        return ImmutableMap.of("name", competenceCourseGroupUnit.getNameI18n().toLocalizedString(), "competenceCourses",
+        return ImmutableMap.of("name", competenceCourseGroupUnit.getNameI18n(), "competenceCourses",
                 approvedCompetenceCourses(competenceCourses).map(competenceCourse -> wrap(competenceCourse, courseComponentUrl))
                         .collect(toList()), "hasCompetenceCourses", approvedCompetenceCourses(competenceCourses).count() > 0);
     }
@@ -100,7 +100,7 @@ public class UnitCourses extends UnitSiteComponent {
     }
 
     public Map wrap(CompetenceCourse competenceCourse, String courseComponentUrl) {
-        return ImmutableMap.of("name", competenceCourse.getNameI18N().toLocalizedString(), "acronym",
+        return ImmutableMap.of("name", competenceCourse.getNameI18N(), "acronym",
                 competenceCourse.getAcronym(), "url", format("%s/%s", courseComponentUrl, competenceCourse.getExternalId()),
                 "approved", competenceCourse.isApproved());
     }

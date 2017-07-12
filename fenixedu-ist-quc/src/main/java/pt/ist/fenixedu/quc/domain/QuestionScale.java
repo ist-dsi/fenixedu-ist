@@ -23,20 +23,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.fenixedu.academic.domain.exceptions.DomainException;
-import org.fenixedu.academic.util.MultiLanguageString;
+import org.fenixedu.academic.util.LocaleUtils;
+import org.fenixedu.commons.i18n.LocalizedString;
 
 import com.google.common.base.CharMatcher;
 
 public class QuestionScale implements Serializable {
 
-    private MultiLanguageString[] scale;
+    private LocalizedString[] scale;
     private String[] scaleValues;
     private final static String SCALE_KEY = "qs$";
     private final static String SCALE_VALUE_SEPARATOR = "_#_";
 
     private static final long serialVersionUID = 1L;
 
-    public QuestionScale(MultiLanguageString[] scale, String[] values) {
+    public QuestionScale(LocalizedString[] scale, String[] values) {
         if (scale.length != values.length) {
             throw new DomainException("error.questionChoice.scaleDontMatchValues");
         }
@@ -51,7 +52,7 @@ public class QuestionScale implements Serializable {
     public String exportAsString() {
         final StringBuilder result = new StringBuilder();
         for (int iter = 0; iter < getScale().length; iter++) {
-            final String scaleItem = getScale()[iter].exportAsString();
+            final String scaleItem = getScale()[iter].json().toString();
             final String scaleValue = getScaleValues()[iter];
             result.append(SCALE_KEY);
             result.append(scaleItem.length() + scaleValue.length() + SCALE_VALUE_SEPARATOR.length());
@@ -68,7 +69,7 @@ public class QuestionScale implements Serializable {
             return null;
         }
 
-        List<MultiLanguageString> scalePortions = new ArrayList<MultiLanguageString>();
+        List<LocalizedString> scalePortions = new ArrayList<LocalizedString>();
         List<String> valuePortions = new ArrayList<String>();
         for (int iter = 0; iter < string.length();) {
             int length = 0;
@@ -81,12 +82,12 @@ public class QuestionScale implements Serializable {
                 String value = scalePortion.substring(0, index);
                 String scale = scalePortion.substring(index + 3);
                 valuePortions.add(valuePortions.size(), value);
-                scalePortions.add(scalePortions.size(), MultiLanguageString.importFromString(scale));
+                scalePortions.add(scalePortions.size(), LocaleUtils.importFromString(scale));
             }
             iter = collonPosition + 1 + length;
         }
 
-        return new QuestionScale(scalePortions.toArray(new MultiLanguageString[] {}), valuePortions.toArray(new String[] {}));
+        return new QuestionScale(scalePortions.toArray(new LocalizedString[] {}), valuePortions.toArray(new String[] {}));
     }
 
     @Override
@@ -99,11 +100,11 @@ public class QuestionScale implements Serializable {
         return string.toString();
     }
 
-    public MultiLanguageString[] getScale() {
+    public LocalizedString[] getScale() {
         return scale;
     }
 
-    public void setScale(MultiLanguageString[] scale) {
+    public void setScale(LocalizedString[] scale) {
         this.scale = scale;
     }
 

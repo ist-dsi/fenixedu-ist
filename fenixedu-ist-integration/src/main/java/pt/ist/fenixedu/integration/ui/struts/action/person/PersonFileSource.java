@@ -23,7 +23,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.util.MultiLanguageString;
+import org.fenixedu.commons.i18n.LocalizedString;
 
 public interface PersonFileSource extends Serializable {
 
@@ -50,7 +50,7 @@ public interface PersonFileSource extends Serializable {
 
     };
 
-    public MultiLanguageString getName();
+    public LocalizedString getName();
 
     public List<PersonFileSource> getChildren();
 

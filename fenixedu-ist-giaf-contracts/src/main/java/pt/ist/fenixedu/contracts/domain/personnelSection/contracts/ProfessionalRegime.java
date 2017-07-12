@@ -21,7 +21,7 @@ package pt.ist.fenixedu.contracts.domain.personnelSection.contracts;
 import java.math.BigDecimal;
 
 import org.fenixedu.academic.domain.exceptions.DomainException;
-import org.fenixedu.academic.util.MultiLanguageString;
+import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.bennu.core.domain.Bennu;
 
 import pt.ist.fenixedu.contracts.domain.util.CategoryType;
@@ -29,7 +29,7 @@ import pt.ist.fenixframework.Atomic;
 
 public class ProfessionalRegime extends ProfessionalRegime_Base {
 
-    public ProfessionalRegime(final String giafId, final MultiLanguageString name, final Integer weighting,
+    public ProfessionalRegime(final String giafId, final LocalizedString name, final Integer weighting,
             final BigDecimal fullTimeEquivalent, final CategoryType categoryType) {
         super();
         String[] args1 = {};
@@ -49,7 +49,7 @@ public class ProfessionalRegime extends ProfessionalRegime_Base {
     }
 
     @Atomic
-    public void edit(final MultiLanguageString name, final Integer weighting, final BigDecimal fullTimeEquivalent,
+    public void edit(final LocalizedString name, final Integer weighting, final BigDecimal fullTimeEquivalent,
             final CategoryType categoryType) {
         String[] args = {};
         if (name == null) {

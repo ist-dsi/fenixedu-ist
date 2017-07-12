@@ -22,7 +22,8 @@ import java.io.PrintWriter;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import org.fenixedu.academic.util.MultiLanguageString;
+import org.fenixedu.commons.i18n.LocalizedString;
+import org.fenixedu.academic.util.LocaleUtils;
 import org.slf4j.Logger;
 
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.Absence;
@@ -81,11 +82,11 @@ class ImportTypesFromGiaf implements MetadataProcessor {
             if (Strings.isNullOrEmpty(nameString)) {
                 nameString = result.getString("tab_cod_dsc");
             }
-            final MultiLanguageString name = new MultiLanguageString(MultiLanguageString.pt, nameString);
+            final LocalizedString name = new LocalizedString(LocaleUtils.PT, nameString);
             if (type.equalsIgnoreCase(FUNCTIONS_ACCUMULATION)) {
                 FunctionsAccumulation accumulation = metadata.accumulation(giafId);
                 if (accumulation != null) {
-                    if (!accumulation.getName().equalInAnyLanguage(name)) {
+                    if (!LocaleUtils.equalInAnyLanguage(accumulation.getName(), name)) {
                         accumulation.edit(name);
                         updatedAccumulations++;
                     }
@@ -96,7 +97,7 @@ class ImportTypesFromGiaf implements MetadataProcessor {
             } else if (type.equalsIgnoreCase(GRANT_OWNER_EQUIVALENCE)) {
                 GrantOwnerEquivalent grantOwnerEquivalent = metadata.grantOwnerEquivalent(giafId);
                 if (grantOwnerEquivalent != null) {
-                    if (!grantOwnerEquivalent.getName().equalInAnyLanguage(name)) {
+                    if (!LocaleUtils.equalInAnyLanguage(grantOwnerEquivalent.getName(), name)) {
                         grantOwnerEquivalent.edit(name);
                         updatedGrantOwnerEquivalences++;
                     }
@@ -107,7 +108,7 @@ class ImportTypesFromGiaf implements MetadataProcessor {
             } else if (type.equalsIgnoreCase(SERVICE_EXEMPTION)) {
                 ServiceExemption exemption = metadata.exemption(giafId);
                 if (exemption != null) {
-                    if (!exemption.getName().equalInAnyLanguage(name)) {
+                    if (!LocaleUtils.equalInAnyLanguage(exemption.getName(), name)) {
                         exemption.edit(name);
                         updatedExemptions++;
                     }
@@ -118,7 +119,7 @@ class ImportTypesFromGiaf implements MetadataProcessor {
             } else if (type.equalsIgnoreCase(CONTRACT_TYPE)) {
                 ProfessionalContractType contractType = metadata.contractType(giafId);
                 if (contractType != null) {
-                    if (!contractType.getName().equalInAnyLanguage(name)) {
+                    if (!LocaleUtils.equalInAnyLanguage(contractType.getName(), name)) {
                         contractType.edit(name);
                         updatedContractTypes++;
                     }
@@ -129,7 +130,7 @@ class ImportTypesFromGiaf implements MetadataProcessor {
             } else if (type.equalsIgnoreCase(ABSENCE_TYPE)) {
                 Absence absence = metadata.absence(giafId);
                 if (absence != null) {
-                    if (!absence.getName().equalInAnyLanguage(name)) {
+                    if (!LocaleUtils.equalInAnyLanguage(absence.getName(), name)) {
                         absence.edit(name);
                         updatedAbsences++;
                     }

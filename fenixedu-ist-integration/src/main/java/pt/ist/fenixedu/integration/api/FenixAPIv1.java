@@ -132,7 +132,7 @@ import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.academic.util.ContentType;
 import org.fenixedu.academic.util.EvaluationType;
 import org.fenixedu.academic.util.HourMinuteSecond;
-import org.fenixedu.academic.util.MultiLanguageString;
+import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
@@ -248,7 +248,7 @@ public class FenixAPIv1 {
         gson = new GsonBuilder().setPrettyPrinting().create();
     }
 
-    private String mls(MultiLanguageString mls) {
+    private String mls(LocalizedString mls) {
         if (mls == null) {
             return "";
         }
@@ -1616,10 +1616,10 @@ public class FenixAPIv1 {
     private SummariesManagementBean fillSummaryManagementBean(ExecutionCourse executionCourse, Shift shift, Space space,
             String date, JsonObject title, JsonObject content, Boolean taught, int attendance) {
 
-        MultiLanguageString titleMLS, contentMLS;
+        LocalizedString titleMLS, contentMLS;
         try {
-            titleMLS = MultiLanguageString.fromLocalizedString(LocalizedString.fromJson(title));
-            contentMLS = MultiLanguageString.fromLocalizedString(LocalizedString.fromJson(content));
+            titleMLS = LocalizedString.fromJson(title);
+            contentMLS = LocalizedString.fromJson(content);
         } catch (Exception e) {
             throw newApplicationError(Status.PRECONDITION_FAILED, "invalid parameters", "'title' or 'content' is not a valid multi-language string");
         }

@@ -33,7 +33,7 @@ import org.fenixedu.academic.domain.organizationalStructure.AccountabilityType;
 import org.fenixedu.academic.domain.organizationalStructure.AccountabilityTypeEnum;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.util.Bundle;
-import org.fenixedu.academic.util.MultiLanguageString;
+import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.YearMonthDay;
@@ -45,18 +45,18 @@ public class Function extends Function_Base {
                     .thenComparing(Function::getFunctionType, nullsFirst(Comparator.naturalOrder()))
                     .thenComparing(Function::getName).thenComparing(Function::getExternalId);
 
-    public Function(MultiLanguageString functionName, YearMonthDay beginDate, YearMonthDay endDate, FunctionType type, Unit unit) {
+    public Function(LocalizedString functionName, YearMonthDay beginDate, YearMonthDay endDate, FunctionType type, Unit unit) {
         super();
         setValues(functionName, beginDate, endDate, type, unit, AccountabilityTypeEnum.MANAGEMENT_FUNCTION);
     }
 
-    public Function(MultiLanguageString functionName, YearMonthDay beginDate, YearMonthDay endDate, FunctionType type, Unit unit,
+    public Function(LocalizedString functionName, YearMonthDay beginDate, YearMonthDay endDate, FunctionType type, Unit unit,
             AccountabilityTypeEnum accountabilityTypeEnum) {
         super();
         setValues(functionName, beginDate, endDate, type, unit, accountabilityTypeEnum);
     }
 
-    protected void setValues(MultiLanguageString functionName, YearMonthDay beginDate, YearMonthDay endDate, FunctionType type,
+    protected void setValues(LocalizedString functionName, YearMonthDay beginDate, YearMonthDay endDate, FunctionType type,
             Unit unit, AccountabilityTypeEnum accountabilityTypeEnum) {
         edit(functionName, beginDate, endDate, type);
         setUnit(unit);
@@ -67,7 +67,7 @@ public class Function extends Function_Base {
         super();
     }
 
-    public void edit(MultiLanguageString functionName, YearMonthDay beginDate, YearMonthDay endDate, FunctionType type) {
+    public void edit(LocalizedString functionName, YearMonthDay beginDate, YearMonthDay endDate, FunctionType type) {
         setTypeName(functionName);
         setFunctionType(type);
         setBeginDateYearMonthDay(beginDate);
@@ -130,7 +130,7 @@ public class Function extends Function_Base {
         return start != null && (end == null || !start.isAfter(end));
     }
 
-    public static Function createVirtualFunction(Unit unit, MultiLanguageString name) {
+    public static Function createVirtualFunction(Unit unit, LocalizedString name) {
         return new Function(name, new YearMonthDay(), null, FunctionType.VIRTUAL, unit);
     }
 

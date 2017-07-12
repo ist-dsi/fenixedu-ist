@@ -54,7 +54,7 @@ import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 import org.fenixedu.academic.ui.faces.bean.base.FenixBackingBean;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.academic.util.DateFormatUtil;
-import org.fenixedu.academic.util.MultiLanguageString;
+import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.YearMonthDay;
@@ -595,8 +595,8 @@ public class OrganizationalStructureBackingBean extends FenixBackingBean {
 
         CreateNewUnitParameters parameters = new CreateNewUnitParameters(this, 1);
 
-        MultiLanguageString unitName =
-                new MultiLanguageString(MultiLanguageString.pt, this.getUnitName()).with(MultiLanguageString.en,
+        LocalizedString unitName =
+                new LocalizedString(org.fenixedu.academic.util.LocaleUtils.PT, this.getUnitName()).with(org.fenixedu.academic.util.LocaleUtils.EN,
                         this.getUnitNameEn());
 
         try {
@@ -629,9 +629,9 @@ public class OrganizationalStructureBackingBean extends FenixBackingBean {
 
         CreateNewUnitParameters parameters = new CreateNewUnitParameters(this, 1);
 
-        MultiLanguageString unitName = new MultiLanguageString();
-        unitName = unitName.with(MultiLanguageString.pt, this.getUnitName());
-        unitName = unitName.with(MultiLanguageString.en, this.getUnitNameEn());
+        LocalizedString unitName = new LocalizedString();
+        unitName = unitName.with(org.fenixedu.academic.util.LocaleUtils.PT, this.getUnitName());
+        unitName = unitName.with(org.fenixedu.academic.util.LocaleUtils.EN, this.getUnitNameEn());
 
         try {
             CreateUnit.run(this.getUnit(), unitName, this.getUnitNameCard(), this.getUnitCostCenter(), this.getUnitAcronym(),
@@ -655,9 +655,9 @@ public class OrganizationalStructureBackingBean extends FenixBackingBean {
 
         CreateNewUnitParameters parameters = new CreateNewUnitParameters(this, 1);
 
-        MultiLanguageString unitName = new MultiLanguageString();
-        unitName = unitName.with(MultiLanguageString.pt, this.getUnitName());
-        unitName = unitName.with(MultiLanguageString.en, this.getUnitNameEn());
+        LocalizedString unitName = new LocalizedString();
+        unitName = unitName.with(org.fenixedu.academic.util.LocaleUtils.PT, this.getUnitName());
+        unitName = unitName.with(org.fenixedu.academic.util.LocaleUtils.EN, this.getUnitNameEn());
 
         try {
             EditUnit.run(this.getChooseUnit().getExternalId(), unitName, this.getUnitNameCard(), this.getUnitCostCenter(),
@@ -735,9 +735,9 @@ public class OrganizationalStructureBackingBean extends FenixBackingBean {
 
         FunctionType type = getFunctionType();
 
-        MultiLanguageString functionName = new MultiLanguageString();
-        functionName = functionName.with(MultiLanguageString.pt, this.getFunctionName());
-        functionName = functionName.with(MultiLanguageString.en, this.getFunctionNameEn());
+        LocalizedString functionName = new LocalizedString();
+        functionName = functionName.with(org.fenixedu.academic.util.LocaleUtils.PT, this.getFunctionName());
+        functionName = functionName.with(org.fenixedu.academic.util.LocaleUtils.EN, this.getFunctionNameEn());
 
         try {
             CreateFunction.run(functionName, datesResult.getBeginDate(), datesResult.getEndDate(), type, this.getUnit()
@@ -760,9 +760,9 @@ public class OrganizationalStructureBackingBean extends FenixBackingBean {
 
         FunctionType type = getFunctionType();
 
-        MultiLanguageString functionName = new MultiLanguageString();
-        functionName = functionName.with(MultiLanguageString.pt, this.getFunctionName());
-        functionName = functionName.with(MultiLanguageString.en, this.getFunctionNameEn());
+        LocalizedString functionName = new LocalizedString();
+        functionName = functionName.with(org.fenixedu.academic.util.LocaleUtils.PT, this.getFunctionName());
+        functionName = functionName.with(org.fenixedu.academic.util.LocaleUtils.EN, this.getFunctionNameEn());
 
         try {
             EditFunction.run(this.getFunction().getExternalId(), functionName, datesResult.getBeginDate(),
@@ -952,7 +952,7 @@ public class OrganizationalStructureBackingBean extends FenixBackingBean {
 
     public String getUnitName() throws FenixServiceException {
         if (this.unitName == null && this.getChooseUnit() != null) {
-            this.unitName = this.getChooseUnit().getPartyName().getContent(MultiLanguageString.pt);
+            this.unitName = this.getChooseUnit().getPartyName().getContent(org.fenixedu.academic.util.LocaleUtils.PT);
         }
         return unitName;
     }
@@ -1096,7 +1096,7 @@ public class OrganizationalStructureBackingBean extends FenixBackingBean {
 
     public String getFunctionName() throws FenixServiceException {
         if (this.functionName == null && this.getFunction() != null) {
-            this.functionName = this.getFunction().getTypeName().getContent(MultiLanguageString.pt);
+            this.functionName = this.getFunction().getTypeName().getContent(org.fenixedu.academic.util.LocaleUtils.PT);
         }
         return functionName;
     }
@@ -1460,7 +1460,7 @@ public class OrganizationalStructureBackingBean extends FenixBackingBean {
 
     public String getFunctionNameEn() throws FenixServiceException {
         if (this.functionNameEn == null && this.getFunction() != null) {
-            this.functionNameEn = this.getFunction().getTypeName().getContent(MultiLanguageString.en);
+            this.functionNameEn = this.getFunction().getTypeName().getContent(org.fenixedu.academic.util.LocaleUtils.EN);
         }
         return functionNameEn;
     }
@@ -1471,7 +1471,7 @@ public class OrganizationalStructureBackingBean extends FenixBackingBean {
 
     public String getUnitNameEn() throws FenixServiceException {
         if (this.unitNameEn == null && this.getChooseUnit() != null) {
-            this.unitNameEn = this.getChooseUnit().getPartyName().getContent(MultiLanguageString.en);
+            this.unitNameEn = this.getChooseUnit().getPartyName().getContent(org.fenixedu.academic.util.LocaleUtils.EN);
         }
         return unitNameEn;
     }

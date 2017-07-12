@@ -21,7 +21,7 @@ package pt.ist.fenixedu.integration.service.services.manager.organizationalStruc
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
-import org.fenixedu.academic.util.MultiLanguageString;
+import org.fenixedu.commons.i18n.LocalizedString;
 import org.joda.time.YearMonthDay;
 
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.Function;
@@ -32,7 +32,7 @@ import pt.ist.fenixframework.FenixFramework;
 public class CreateFunction {
 
     @Atomic
-    public static void run(MultiLanguageString functionName, YearMonthDay begin, YearMonthDay end, FunctionType type,
+    public static void run(LocalizedString functionName, YearMonthDay begin, YearMonthDay end, FunctionType type,
             String unitID) throws FenixServiceException, DomainException {
         Unit unit = (Unit) FenixFramework.getDomainObject(unitID);
         if (unit == null) {

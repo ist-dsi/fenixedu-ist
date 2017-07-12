@@ -20,7 +20,7 @@ package pt.ist.fenixedu.integration.service.services.manager.organizationalStruc
 
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
-import org.fenixedu.academic.util.MultiLanguageString;
+import org.fenixedu.commons.i18n.LocalizedString;
 import org.joda.time.YearMonthDay;
 
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.Function;
@@ -31,7 +31,7 @@ import pt.ist.fenixframework.FenixFramework;
 public class EditFunction {
 
     @Atomic
-    public static void run(String functionID, MultiLanguageString functionName, YearMonthDay begin, YearMonthDay end,
+    public static void run(String functionID, LocalizedString functionName, YearMonthDay begin, YearMonthDay end,
             FunctionType type) throws FenixServiceException, DomainException {
         Function function = (Function) FenixFramework.getDomainObject(functionID);
         if (function == null) {

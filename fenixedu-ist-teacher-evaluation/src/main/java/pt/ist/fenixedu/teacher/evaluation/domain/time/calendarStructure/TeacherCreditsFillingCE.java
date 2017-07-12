@@ -25,7 +25,8 @@ import org.fenixedu.academic.domain.time.calendarStructure.AcademicCalendarEntry
 import org.fenixedu.academic.domain.time.calendarStructure.AcademicCalendarRootEntry;
 import org.fenixedu.academic.domain.time.calendarStructure.AcademicPeriod;
 import org.fenixedu.academic.util.Bundle;
-import org.fenixedu.academic.util.MultiLanguageString;
+import org.fenixedu.commons.i18n.I18N;
+import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
@@ -40,7 +41,7 @@ public abstract class TeacherCreditsFillingCE extends TeacherCreditsFillingCE_Ba
     }
 
     @Override
-    public AcademicCalendarEntry edit(MultiLanguageString title, MultiLanguageString description, DateTime begin, DateTime end,
+    public AcademicCalendarEntry edit(LocalizedString title, LocalizedString description, DateTime begin, DateTime end,
             AcademicCalendarRootEntry rootEntry, AcademicCalendarEntry templateEntry) {
 
         throw new DomainException("error.unsupported.operation");
@@ -113,7 +114,7 @@ public abstract class TeacherCreditsFillingCE extends TeacherCreditsFillingCE_Ba
             AcademicCalendarEntry parentEntry = executionSemester.getAcademicInterval().getAcademicCalendarEntry();
             AcademicCalendarRootEntry rootEntry = executionSemester.getAcademicInterval().getAcademicCalendar();
 
-            new TeacherCreditsFillingForTeacherCE(parentEntry, new MultiLanguageString(BundleUtil.getString(Bundle.APPLICATION,
+            new TeacherCreditsFillingForTeacherCE(parentEntry, new LocalizedString(I18N.getLocale(), BundleUtil.getString(Bundle.APPLICATION,
                     "label.TeacherCreditsFillingCE.entry.title")), null, begin, end, rootEntry);
             new CreditsPersonFunctionsSharedQueueJob(executionSemester);
         } else {
@@ -131,7 +132,7 @@ public abstract class TeacherCreditsFillingCE extends TeacherCreditsFillingCE_Ba
             AcademicCalendarEntry parentEntry = executionSemester.getAcademicInterval().getAcademicCalendarEntry();
             AcademicCalendarRootEntry rootEntry = executionSemester.getAcademicInterval().getAcademicCalendar();
 
-            new TeacherCreditsFillingForDepartmentAdmOfficeCE(parentEntry, new MultiLanguageString(BundleUtil.getString(
+            new TeacherCreditsFillingForDepartmentAdmOfficeCE(parentEntry, new LocalizedString(I18N.getLocale(), BundleUtil.getString(
                     Bundle.APPLICATION, "label.TeacherCreditsFillingCE.entry.title")), null, begin, end, rootEntry);
 
         } else {

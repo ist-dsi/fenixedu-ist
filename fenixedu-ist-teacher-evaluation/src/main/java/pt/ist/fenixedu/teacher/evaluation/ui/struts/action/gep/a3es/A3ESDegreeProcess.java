@@ -59,7 +59,7 @@ import org.fenixedu.academic.domain.phd.PhdParticipant;
 import org.fenixedu.academic.domain.phd.PhdProgram;
 import org.fenixedu.academic.domain.thesis.ThesisEvaluationParticipant;
 import org.fenixedu.academic.util.Bundle;
-import org.fenixedu.academic.util.MultiLanguageString;
+import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.commons.spreadsheet.SheetData;
 import org.fenixedu.commons.spreadsheet.SpreadsheetBuilder;
@@ -78,6 +78,7 @@ import pt.ist.fenixedu.teacher.evaluation.dto.externalServices.TeacherCurricular
 import pt.ist.fenixedu.teacher.evaluation.dto.externalServices.TeacherPublicationsInformation;
 
 public class A3ESDegreeProcess implements Serializable {
+
     private static final String BASE_URL = "http://www.a3es.pt/si/iportal.php";
 //    private static final String BASE_URL = "http://formacao.a3es.pt/iportal.php";
 
@@ -313,15 +314,15 @@ public class A3ESDegreeProcess implements Serializable {
                 json.put("q-6.2.1.3", teachersAndTeachingHours);
 
                 JSONObject q6214 = new JSONObject();
-                MultiLanguageString objectives = competence.getObjectivesI18N(executionSemester);
-                q6214.put("en", cut("objectivos em ingles", objectives.getContent(MultiLanguageString.en), output, 1000));
-                q6214.put("pt", cut("objectivos em portugues", objectives.getContent(MultiLanguageString.pt), output, 1000));
+                LocalizedString objectives = competence.getObjectivesI18N(executionSemester);
+                q6214.put("en", cut("objectivos em ingles", objectives.getContent(org.fenixedu.academic.util.LocaleUtils.EN), output, 1000));
+                q6214.put("pt", cut("objectivos em portugues", objectives.getContent(org.fenixedu.academic.util.LocaleUtils.PT), output, 1000));
                 json.put("q-6.2.1.4", q6214);
 
                 JSONObject q6215 = new JSONObject();
-                MultiLanguageString program = competence.getProgramI18N(executionSemester);
-                q6215.put("en", cut("programa em ingles", program.getContent(MultiLanguageString.en), output, 1000));
-                q6215.put("pt", cut("programa em portugues", program.getContent(MultiLanguageString.pt), output, 1000));
+                LocalizedString program = competence.getProgramI18N(executionSemester);
+                q6215.put("en", cut("programa em ingles", program.getContent(org.fenixedu.academic.util.LocaleUtils.EN), output, 1000));
+                q6215.put("pt", cut("programa em portugues", program.getContent(org.fenixedu.academic.util.LocaleUtils.PT), output, 1000));
                 json.put("q-6.2.1.5", q6215);
 
                 JSONObject q6216 = new JSONObject();

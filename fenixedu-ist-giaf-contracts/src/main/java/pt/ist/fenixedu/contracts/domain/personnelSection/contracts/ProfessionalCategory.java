@@ -25,7 +25,7 @@ import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.OccupationPeriod;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.exceptions.DomainException;
-import org.fenixedu.academic.util.MultiLanguageString;
+import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.joda.time.LocalDate;
 
@@ -34,7 +34,7 @@ import pt.ist.fenixframework.Atomic;
 
 public class ProfessionalCategory extends ProfessionalCategory_Base implements Comparable<ProfessionalCategory> {
 
-    public ProfessionalCategory(final String giafId, final MultiLanguageString name, final CategoryType categoryType) {
+    public ProfessionalCategory(final String giafId, final LocalizedString name, final CategoryType categoryType) {
         super();
         String[] args1 = {};
         if (giafId == null || giafId.isEmpty()) {
@@ -51,7 +51,7 @@ public class ProfessionalCategory extends ProfessionalCategory_Base implements C
     }
 
     @Atomic
-    public void edit(final MultiLanguageString name, final CategoryType categoryType) {
+    public void edit(final LocalizedString name, final CategoryType categoryType) {
         String[] args = {};
         if (name == null) {
             throw new DomainException("", args);
@@ -88,7 +88,7 @@ public class ProfessionalCategory extends ProfessionalCategory_Base implements C
     }
 
     public boolean isTeacherMonitorCategory() {
-        return isTeacherCategoryType() && getName().getContent(MultiLanguageString.pt).matches("(?i).*Monitor.*");
+        return isTeacherCategoryType() && getName().getContent(org.fenixedu.academic.util.LocaleUtils.PT).matches("(?i).*Monitor.*");
     }
 
     public boolean isTeacherProfessorCategory() {
@@ -98,9 +98,9 @@ public class ProfessionalCategory extends ProfessionalCategory_Base implements C
     public boolean isTeacherInvitedCategory() {
         return isTeacherCategoryType()
                 && !isTeacherMonitorCategory()
-                && (getName().getContent(MultiLanguageString.pt).matches("(?i).*Convidado.*")
-                        || getName().getContent(MultiLanguageString.pt).matches("(?i).*Equip.*") || getName().getContent(
-                        MultiLanguageString.pt).matches("(?i).*Colaborador.*"));
+                && (getName().getContent(org.fenixedu.academic.util.LocaleUtils.PT).matches("(?i).*Convidado.*")
+                        || getName().getContent(org.fenixedu.academic.util.LocaleUtils.PT).matches("(?i).*Equip.*") || getName().getContent(
+                        org.fenixedu.academic.util.LocaleUtils.PT).matches("(?i).*Colaborador.*"));
     }
 
     public boolean isTeacherInvitedProfessorCategory() {
@@ -119,7 +119,7 @@ public class ProfessionalCategory extends ProfessionalCategory_Base implements C
 
     public boolean isTeacherAssistantCategory() {
         return isTeacherCategoryType() && !isTeacherMonitorCategory() && !isTeacherInvitedCategory()
-                && getName().getContent(MultiLanguageString.pt).matches("(?i).*Assistente.*");
+                && getName().getContent(org.fenixedu.academic.util.LocaleUtils.PT).matches("(?i).*Assistente.*");
     }
 
     public static ProfessionalCategory find(final String string, final CategoryType categoryType) {

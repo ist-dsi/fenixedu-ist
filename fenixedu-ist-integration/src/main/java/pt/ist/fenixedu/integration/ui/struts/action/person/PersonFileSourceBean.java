@@ -24,7 +24,7 @@ import java.util.List;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.predicate.AccessControl;
-import org.fenixedu.academic.util.MultiLanguageString;
+import org.fenixedu.commons.i18n.LocalizedString;
 
 import pt.ist.fenixedu.integration.domain.UnitFile;
 
@@ -44,7 +44,7 @@ public class PersonFileSourceBean implements PersonFileSource {
     }
 
     @Override
-    public MultiLanguageString getName() {
+    public LocalizedString getName() {
         return getUnit().getNameI18n();
     }
 

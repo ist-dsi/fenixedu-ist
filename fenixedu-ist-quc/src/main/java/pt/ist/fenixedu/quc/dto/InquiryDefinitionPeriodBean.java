@@ -25,7 +25,7 @@ import java.io.Serializable;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.predicate.RolePredicates;
-import org.fenixedu.academic.util.MultiLanguageString;
+import org.fenixedu.commons.i18n.LocalizedString;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixedu.quc.domain.CurricularCourseInquiryTemplate;
@@ -41,13 +41,13 @@ public class InquiryDefinitionPeriodBean implements Serializable {
     private InquiryTemplate inquiryTemplate;
     private DateTime begin;
     private DateTime end;
-    private MultiLanguageString message;
+    private LocalizedString message;
     private ExecutionSemester executionPeriod;
     private InquiryResponsePeriodType responsePeriodType;
     private boolean changedLanguage = false;
 
     public InquiryDefinitionPeriodBean() {
-        setMessage(new MultiLanguageString());
+        setMessage(new LocalizedString());
         setResponsePeriodType(InquiryResponsePeriodType.STUDENT);
     }
 
@@ -67,11 +67,11 @@ public class InquiryDefinitionPeriodBean implements Serializable {
         this.end = end;
     }
 
-    public void setMessage(MultiLanguageString message) {
+    public void setMessage(LocalizedString message) {
         this.message = message;
     }
 
-    public MultiLanguageString getMessage() {
+    public LocalizedString getMessage() {
         return message;
     }
 
