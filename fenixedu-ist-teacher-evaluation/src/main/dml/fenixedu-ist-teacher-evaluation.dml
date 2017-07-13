@@ -4,7 +4,7 @@ enum pt.ist.fenixedu.teacher.evaluation.domain.TeacherEvaluationFileType as Teac
 enum pt.ist.fenixedu.teacher.evaluation.domain.TeacherEvaluationMark as TeacherEvaluationMark;
 
 class FacultyEvaluationProcess  {
-    MultiLanguageString title;
+    LocalizedString title;
     Interval autoEvaluationInterval;
     Interval evaluationInterval;
     boolean allowNoEval;

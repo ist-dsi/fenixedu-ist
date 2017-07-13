@@ -27,7 +27,7 @@ import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.person.IDDocumentType;
 import org.fenixedu.academic.domain.person.MaritalStatus;
-import org.fenixedu.academic.util.MultiLanguageString;
+import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.commons.StringNormalizer;
 import org.slf4j.Logger;
@@ -139,7 +139,7 @@ class GiafMetadata {
         return absences.get(giafId);
     }
 
-    public void registerAbsence(String giafId, final MultiLanguageString name) {
+    public void registerAbsence(String giafId, final LocalizedString name) {
         absences.put(giafId, new Absence(giafId, name));
     }
 
@@ -151,7 +151,7 @@ class GiafMetadata {
         return functionsAccumulations.get(giafId);
     }
 
-    public void registerAccumulation(String giafId, final MultiLanguageString name) {
+    public void registerAccumulation(String giafId, final LocalizedString name) {
         functionsAccumulations.put(giafId, new FunctionsAccumulation(giafId, name));
     }
 
@@ -159,7 +159,7 @@ class GiafMetadata {
         return professionalCategories.get(giafId);
     }
 
-    public void registerCategory(String giafId, CategoryType categoryType, MultiLanguageString description) {
+    public void registerCategory(String giafId, CategoryType categoryType, LocalizedString description) {
         professionalCategories.put(giafId, new ProfessionalCategory(giafId, description, categoryType));
     }
 
@@ -167,7 +167,7 @@ class GiafMetadata {
         return professionalContractTypes.get(giafId);
     }
 
-    public void registerContractType(String giafId, final MultiLanguageString name) {
+    public void registerContractType(String giafId, final LocalizedString name) {
         professionalContractTypes.put(giafId, new ProfessionalContractType(giafId, name));
     }
 
@@ -179,7 +179,7 @@ class GiafMetadata {
         return serviceExemptions.get(giafId);
     }
 
-    public void registerExemption(String giafId, final MultiLanguageString name) {
+    public void registerExemption(String giafId, final LocalizedString name) {
         serviceExemptions.put(giafId, new ServiceExemption(giafId, name));
     }
 
@@ -215,7 +215,7 @@ class GiafMetadata {
         return grantOwnerEquivalences.get(giafId);
     }
 
-    public void registerGrantOwnerEquivalent(String giafId, final MultiLanguageString name) {
+    public void registerGrantOwnerEquivalent(String giafId, final LocalizedString name) {
         grantOwnerEquivalences.put(giafId, new GrantOwnerEquivalent(giafId, name));
     }
 
@@ -224,7 +224,7 @@ class GiafMetadata {
     }
 
     public void registerRegime(String giafId, Integer weighting, BigDecimal fullTimeEquivalent, CategoryType categoryType,
-            MultiLanguageString name) {
+            LocalizedString name) {
         professionalRegimes.put(giafId, new ProfessionalRegime(giafId, name, weighting, fullTimeEquivalent, categoryType));
     }
 
@@ -232,7 +232,7 @@ class GiafMetadata {
         return professionalRelations.get(giafId);
     }
 
-    public void registerRelation(String giafId, Boolean fullTimeEquivalent, MultiLanguageString name) {
+    public void registerRelation(String giafId, Boolean fullTimeEquivalent, LocalizedString name) {
         professionalRelations.put(giafId, new ProfessionalRelation(giafId, name, fullTimeEquivalent));
     }
 
@@ -240,7 +240,7 @@ class GiafMetadata {
         return contractSituations.get(giafId);
     }
 
-    public void registerSituation(String giafId, Boolean endSituation, Boolean serviceExemption, MultiLanguageString description) {
+    public void registerSituation(String giafId, Boolean endSituation, Boolean serviceExemption, LocalizedString description) {
         contractSituations.put(giafId, new ContractSituation(giafId, description, endSituation, serviceExemption));
     }
 

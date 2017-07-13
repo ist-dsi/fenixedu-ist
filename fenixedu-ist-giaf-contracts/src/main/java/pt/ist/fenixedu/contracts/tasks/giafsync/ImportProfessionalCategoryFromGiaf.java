@@ -22,7 +22,7 @@ import java.io.PrintWriter;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import org.fenixedu.academic.util.MultiLanguageString;
+import org.fenixedu.commons.i18n.LocalizedString;
 import org.slf4j.Logger;
 
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalCategory;
@@ -56,7 +56,7 @@ class ImportProfessionalCategoryFromGiaf implements MetadataProcessor {
         while (result.next()) {
             String giafId = result.getString("emp_cat_func");
             String descriptionString = result.getString("cat_func_dsc");
-            MultiLanguageString description = new MultiLanguageString(MultiLanguageString.pt, descriptionString);
+            LocalizedString description = new LocalizedString(org.fenixedu.academic.util.LocaleUtils.PT, descriptionString);
             CategoryType categoryType = null;
             String agrupamento = (result.getString("agrupamento"));
             if (agrupamento != null) {

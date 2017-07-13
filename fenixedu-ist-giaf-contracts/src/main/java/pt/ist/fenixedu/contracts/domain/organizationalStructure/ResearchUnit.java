@@ -43,7 +43,7 @@ import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.organizationalStructure.UnitClassification;
 import org.fenixedu.academic.domain.util.email.UnitBasedSender;
 import org.fenixedu.academic.predicate.AccessControl;
-import org.fenixedu.academic.util.MultiLanguageString;
+import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.YearMonthDay;
@@ -61,7 +61,7 @@ public class ResearchUnit extends ResearchUnit_Base {
         super.setType(PartyTypeEnum.RESEARCH_UNIT);
     }
 
-    public static ResearchUnit createNewResearchUnit(MultiLanguageString name, String unitNameCard, Integer costCenterCode,
+    public static ResearchUnit createNewResearchUnit(LocalizedString name, String unitNameCard, Integer costCenterCode,
             String acronym, YearMonthDay beginDate, YearMonthDay endDate, Unit parentUnit, AccountabilityType accountabilityType,
             String webAddress, UnitClassification classification, Boolean canBeResponsibleOfSpaces, Space campus) {
 
@@ -84,7 +84,7 @@ public class ResearchUnit extends ResearchUnit_Base {
     }
 
     @Override
-    public void edit(MultiLanguageString unitName, String unitNameCard, Integer unitCostCenter, String acronym,
+    public void edit(LocalizedString unitName, String unitNameCard, Integer unitCostCenter, String acronym,
             YearMonthDay beginDate, YearMonthDay endDate, String webAddress, UnitClassification classification,
             Department department, Degree degree, AdministrativeOffice administrativeOffice, Boolean canBeResponsibleOfSpaces,
             Space campus) {

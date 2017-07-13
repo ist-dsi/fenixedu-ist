@@ -61,7 +61,7 @@ public class CompetenceCourseComponent extends UnitSiteComponent {
 
     private Map<String, Object> wrap(CompetenceCourse competenceCourse, ExecutionSemester semester) {
         HashMap<String, Object> wrap = Maps.newHashMap();
-        wrap.put("name", competenceCourse.getNameI18N(semester).toLocalizedString());
+        wrap.put("name", competenceCourse.getNameI18N(semester));
         wrap.put("courseLoads", competenceCourse.getSortedCompetenceCourseLoads(semester));
         wrap.put("mainBibliographicReferences",
                 bibliographicReferences(competenceCourse, BibliographicReferences.BibliographicReferenceType.MAIN, semester));
@@ -69,8 +69,8 @@ public class CompetenceCourseComponent extends UnitSiteComponent {
                 bibliographicReferences(competenceCourse, BibliographicReferences.BibliographicReferenceType.SECONDARY, semester));
         wrap.put("executionSemester", semester);
         wrap.put("evaluationMethod", competenceCourse.getLocalizedEvaluationMethod(semester));
-        wrap.put("program", competenceCourse.getProgramI18N(semester).toLocalizedString());
-        wrap.put("objectives", competenceCourse.getObjectivesI18N(semester).toLocalizedString());
+        wrap.put("program", competenceCourse.getProgramI18N(semester));
+        wrap.put("objectives", competenceCourse.getObjectivesI18N(semester));
         wrap.put("regime", competenceCourse.getRegime(semester).getLocalizedName());
         wrap.put("isBasic", competenceCourse.isBasic(semester));
         wrap.put("competenceCourseLevel", competenceCourse.getLocalizedEvaluationMethod(semester));

@@ -25,7 +25,7 @@ import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.time.calendarStructure.AcademicCalendarRootEntry;
 import org.fenixedu.academic.domain.time.calendarStructure.AcademicSemesterCE;
 import org.fenixedu.academic.domain.time.calendarStructure.AcademicYearCE;
-import org.fenixedu.academic.util.MultiLanguageString;
+import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.academic.util.PeriodState;
 import org.fenixedu.commons.i18n.I18N;
 import org.joda.time.YearMonthDay;
@@ -38,7 +38,7 @@ public class CreateExecutionYears {
         final YearMonthDay today = new YearMonthDay();
         final YearMonthDay yearMonthDay = new YearMonthDay(today.getYear() - numYearsToCreate + 2, 9, 1);
         AcademicCalendarRootEntry rootEntry =
-                new AcademicCalendarRootEntry(new MultiLanguageString("Calendario Academico"), null, null);
+                new AcademicCalendarRootEntry(new LocalizedString(I18N.getLocale(), "Calendario Academico"), null, null);
         for (int i = 0; i < numYearsToCreate; createExecutionYear(yearMonthDay, i++, rootEntry)) {
             ;
         }
@@ -51,7 +51,7 @@ public class CreateExecutionYears {
         final YearMonthDay end = new YearMonthDay(year + 1, 8, 31);
 
         AcademicYearCE academicYear =
-                new AcademicYearCE(rootEntry, new MultiLanguageString(getYearString(year)), null, start.toDateTimeAtMidnight(),
+                new AcademicYearCE(rootEntry, new LocalizedString(I18N.getLocale(), getYearString(year)), null, start.toDateTimeAtMidnight(),
                         end.toDateTimeAtMidnight(), rootEntry);
 
         ExecutionYear executionYear = ExecutionYear.getExecutionYear(academicYear);
@@ -77,7 +77,7 @@ public class CreateExecutionYears {
         final YearMonthDay end = getEndYearMonthDay(executionYear, semester);
 
         AcademicSemesterCE academicSemester =
-                new AcademicSemesterCE(academicYear, new MultiLanguageString(getPeriodString(semester)), null,
+                new AcademicSemesterCE(academicYear, new LocalizedString(I18N.getLocale(), getPeriodString(semester)), null,
                         start.toDateTimeAtMidnight(), end.toDateTimeAtMidnight(), academicYear.getRootEntry());
 
         ExecutionSemester executionPeriod = ExecutionSemester.getExecutionPeriod(academicSemester);

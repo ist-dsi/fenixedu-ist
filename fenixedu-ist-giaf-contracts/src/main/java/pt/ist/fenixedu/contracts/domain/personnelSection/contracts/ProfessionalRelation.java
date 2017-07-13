@@ -19,14 +19,14 @@
 package pt.ist.fenixedu.contracts.domain.personnelSection.contracts;
 
 import org.fenixedu.academic.domain.exceptions.DomainException;
-import org.fenixedu.academic.util.MultiLanguageString;
+import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.bennu.core.domain.Bennu;
 
 import pt.ist.fenixframework.Atomic;
 
 public class ProfessionalRelation extends ProfessionalRelation_Base {
 
-    public ProfessionalRelation(final String giafId, final MultiLanguageString name, final Boolean fullTimeEquivalent) {
+    public ProfessionalRelation(final String giafId, final LocalizedString name, final Boolean fullTimeEquivalent) {
         super();
         String[] args1 = {};
         if (giafId == null || giafId.isEmpty()) {
@@ -43,7 +43,7 @@ public class ProfessionalRelation extends ProfessionalRelation_Base {
     }
 
     @Atomic
-    public void edit(final MultiLanguageString name, final Boolean fullTimeEquivalent) {
+    public void edit(final LocalizedString name, final Boolean fullTimeEquivalent) {
         String[] args = {};
         if (name == null) {
             throw new DomainException("", args);

@@ -25,7 +25,7 @@ class InquiriesRoot {
 class InquiryTemplate  {
     DateTime responsePeriodBegin;
     DateTime responsePeriodEnd;
-    MultiLanguageString inquiryMessage;
+    LocalizedString inquiryMessage;
 }
 
     class StudentInquiryTemplate extends InquiryTemplate {
@@ -84,14 +84,14 @@ class InquiryGroupQuestion  {
 }
 
 class InquiryQuestionHeader  {
-    MultiLanguageString title;
-    MultiLanguageString toolTip;
+    LocalizedString title;
+    LocalizedString toolTip;
     QuestionScale scaleHeaders;
 }
 
 class InquiryQuestion  {
-    MultiLanguageString label;
-    MultiLanguageString toolTip;
+    LocalizedString label;
+    LocalizedString toolTip;
     Boolean required;
     Boolean showRequiredMark;
     Boolean newRow;

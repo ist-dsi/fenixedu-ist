@@ -1,16 +1,17 @@
 package pt.ist.fenixedu.integration.api;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonRawValue;
-import com.google.api.client.repackaged.com.google.common.base.Strings;
 import org.fenixedu.academic.domain.LessonInstance;
 import org.fenixedu.academic.domain.Shift;
 import org.fenixedu.academic.domain.Summary;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.DateTime;
-import pt.ist.fenixedu.integration.api.beans.publico.FenixSpace;
 
-import static com.fasterxml.jackson.annotation.JsonInclude.*;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonRawValue;
+import com.google.api.client.repackaged.com.google.common.base.Strings;
+
+import pt.ist.fenixedu.integration.api.beans.publico.FenixSpace;
 
 public class FenixLessonSummary {
     private String shift;
@@ -92,13 +93,13 @@ public class FenixLessonSummary {
             this.teacher = !Strings.isNullOrEmpty(summary.getTeacherName()) ?
                     summary.getTeacherName() :
                     summary.getProfessorship().getPerson().getName();
-            this.title = summary.getTitle().exportAsString();
+            this.title = summary.getTitle().json().toString();
             this.attendanceCount = summary.getStudentsNumber() != null ? summary.getStudentsNumber() : 0;
             this.taught = summary.getTaught();
             if(summary.getTaught()) {
-                this.content = summary.getSummaryText().exportAsString();
+                this.content = summary.getSummaryText().json().toString();
             } else {
-                this.reason = summary.getSummaryText().exportAsString();
+                this.reason = summary.getSummaryText().json().toString();
             }
         }
 

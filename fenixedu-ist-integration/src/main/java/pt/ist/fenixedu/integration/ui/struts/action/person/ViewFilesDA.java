@@ -38,7 +38,7 @@ import org.fenixedu.academic.domain.organizationalStructure.PedagogicalCouncilUn
 import org.fenixedu.academic.domain.organizationalStructure.ScientificCouncilUnit;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.organizationalStructure.UnitUtils;
-import org.fenixedu.academic.util.MultiLanguageString;
+import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
@@ -74,8 +74,8 @@ public class ViewFilesDA extends UnitFunctionalities {
             HttpServletResponse response) {
         List<PersonFileSource> result = new ArrayList<PersonFileSource>();
 
-        MultiLanguageString departmentsName =
-                new MultiLanguageString().with(MultiLanguageString.pt, "Departamentos").with(MultiLanguageString.en,
+        LocalizedString departmentsName =
+                new LocalizedString().with(org.fenixedu.academic.util.LocaleUtils.PT, "Departamentos").with(org.fenixedu.academic.util.LocaleUtils.EN,
                         "Departments");
         PersonFileSourceGroupBean departmentsGroup = new PersonFileSourceGroupBean(departmentsName);
 
@@ -85,8 +85,8 @@ public class ViewFilesDA extends UnitFunctionalities {
             departmentsGroup.add(new PersonFileSourceBean(department.getDepartmentUnit()));
         }
 
-        MultiLanguageString researchUnitsName =
-                new MultiLanguageString().with(MultiLanguageString.pt, "Unidades de Investigação").with(MultiLanguageString.en,
+        LocalizedString researchUnitsName =
+                new LocalizedString().with(org.fenixedu.academic.util.LocaleUtils.PT, "Unidades de Investigação").with(org.fenixedu.academic.util.LocaleUtils.EN,
                         "Research Units");
         PersonFileSourceGroupBean researchUnitsGroup = new PersonFileSourceGroupBean(researchUnitsName);
 
@@ -96,8 +96,8 @@ public class ViewFilesDA extends UnitFunctionalities {
             researchUnitsGroup.add(new PersonFileSourceBean(unit));
         }
 
-        MultiLanguageString scientificAreaName =
-                new MultiLanguageString().with(MultiLanguageString.pt, "Áreas Ciêntificas").with(MultiLanguageString.en,
+        LocalizedString scientificAreaName =
+                new LocalizedString().with(org.fenixedu.academic.util.LocaleUtils.PT, "Áreas Ciêntificas").with(org.fenixedu.academic.util.LocaleUtils.EN,
                         "Scientific Areas");
         PersonFileSourceGroupBean scientificAreaUnits = new PersonFileSourceGroupBean(scientificAreaName);
 

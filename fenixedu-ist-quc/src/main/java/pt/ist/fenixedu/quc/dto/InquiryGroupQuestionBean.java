@@ -23,7 +23,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.fenixedu.academic.util.MultiLanguageString;
+import org.fenixedu.commons.i18n.LocalizedString;
 
 import pt.ist.fenixedu.quc.domain.InquiryAnswer;
 import pt.ist.fenixedu.quc.domain.InquiryGroupQuestion;
@@ -165,7 +165,7 @@ public class InquiryGroupQuestionBean implements Comparable<InquiryGroupQuestion
         return null;
     }
 
-    private String getQuestionIdentifier(MultiLanguageString label) {
+    private String getQuestionIdentifier(LocalizedString label) {
         if (label != null) {
             int endIndex = label.toString().indexOf(" ");
             return label.toString().substring(0, endIndex);

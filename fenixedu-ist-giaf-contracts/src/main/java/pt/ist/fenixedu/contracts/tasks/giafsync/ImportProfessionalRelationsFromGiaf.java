@@ -22,7 +22,8 @@ import java.io.PrintWriter;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import org.fenixedu.academic.util.MultiLanguageString;
+import org.fenixedu.commons.i18n.LocalizedString;
+import org.fenixedu.academic.util.LocaleUtils;
 import org.slf4j.Logger;
 
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalRelation;
@@ -56,9 +57,9 @@ class ImportProfessionalRelationsFromGiaf implements MetadataProcessor {
             Boolean fullTimeEquivalent = getBoolean(result.getString("eti"));
 
             ProfessionalRelation professionalRelation = metadata.relation(giafId);
-            MultiLanguageString name = new MultiLanguageString(MultiLanguageString.pt, nameString);
+            LocalizedString name = new LocalizedString(LocaleUtils.PT, nameString);
             if (professionalRelation != null) {
-                if (!professionalRelation.getName().equalInAnyLanguage(name)) {
+                if (!LocaleUtils.equalInAnyLanguage(professionalRelation.getName(), name)) {
                     professionalRelation.edit(name, fullTimeEquivalent);
                     updatedRelations++;
                 }

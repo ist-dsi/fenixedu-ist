@@ -1,13 +1,9 @@
 package pt.ist.fenixedu.cmscomponents.domain.unit;
 
 import org.fenixedu.academic.domain.Department;
-import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.bennu.core.domain.Bennu;
-import org.fenixedu.bennu.core.groups.Group;
-import org.fenixedu.cms.domain.Role;
 import org.fenixedu.cms.domain.Site;
-import org.fenixedu.cms.domain.SiteBuilder;
 import org.fenixedu.commons.i18n.LocalizedString;
 
 /**
@@ -34,12 +30,12 @@ public class UnitSiteBuilder extends UnitSiteBuilder_Base {
     }
     
     public Site create(Unit unit) {
-        return create(unit.getNameI18n().toLocalizedString(), unit.getNameI18n().toLocalizedString(), unit.getAcronym());
+        return create(unit.getNameI18n(), unit.getNameI18n(), unit.getAcronym());
     }
     
     public Site create(Department department) {
-        return create(department.getDepartmentUnit().getNameI18n().toLocalizedString(),
-                department.getDepartmentUnit().getNameI18n().toLocalizedString(),
+        return create(department.getDepartmentUnit().getNameI18n(),
+                department.getDepartmentUnit().getNameI18n(),
                 department.getAcronym());
     }
     

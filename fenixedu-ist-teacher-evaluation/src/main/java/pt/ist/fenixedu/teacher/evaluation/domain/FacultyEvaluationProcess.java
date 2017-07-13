@@ -28,7 +28,7 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.util.Bundle;
-import org.fenixedu.academic.util.MultiLanguageString;
+import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
@@ -61,10 +61,10 @@ public class FacultyEvaluationProcess extends FacultyEvaluationProcess_Base impl
         setAreApprovedMarksPublished(false);
     }
 
-    public FacultyEvaluationProcess(final MultiLanguageString title, final Interval autoEvaluationInterval,
+    public FacultyEvaluationProcess(final LocalizedString title, final Interval autoEvaluationInterval,
             final Interval evaluationInterval) {
         this();
-        if (title == null || !title.hasContent()) {
+        if (title == null || !title.isEmpty()) {
             throw new DomainException("error.title.cannot.be.null");
         }
         setTitle(title);

@@ -12,7 +12,8 @@ import org.fenixedu.academic.domain.organizationalStructure.AccountabilityTypeEn
 import org.fenixedu.academic.domain.organizationalStructure.CountryUnit;
 import org.fenixedu.academic.domain.organizationalStructure.Party;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
-import org.fenixedu.academic.util.MultiLanguageString;
+import org.fenixedu.commons.i18n.I18N;
+import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.scheduler.CronTask;
 import org.fenixedu.bennu.scheduler.annotation.Task;
@@ -59,7 +60,7 @@ public class ImportCreditorsFromGiaf extends CronTask {
                     if (match.isPresent()) {
                         Bennu.getInstance().addExternalScholarshipProvider(match.get());
                     } else {
-                        Unit externalUnit = Unit.createNewUnit(new MultiLanguageString(name), null, null, acronym, today, null,
+                        Unit externalUnit = Unit.createNewUnit(new LocalizedString(I18N.getLocale(), name), null, null, acronym, today, null,
                                 CountryUnit.getCountryUnitByCountry(Country.readCountryByNationality(country)),
                                 AccountabilityType.readByType(AccountabilityTypeEnum.ORGANIZATIONAL_STRUCTURE), null, null, null,
                                 false, null);

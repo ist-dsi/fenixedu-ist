@@ -1,7 +1,6 @@
 package pt.ist.fenixedu.integration.api;
 
 import java.util.Iterator;
-import java.util.Locale;
 import java.util.function.BiConsumer;
 import java.util.stream.Collector;
 import java.util.stream.Collector.Characteristics;
@@ -52,10 +51,10 @@ import org.fenixedu.academic.domain.student.PrecedentDegreeInformation;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.curriculum.ConclusionProcess;
 import org.fenixedu.academic.domain.student.registrationStates.RegistrationState;
-import org.fenixedu.academic.util.MultiLanguageString;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.oauth.annotation.OAuthEndpoint;
+import org.fenixedu.commons.i18n.LocalizedString;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
@@ -672,11 +671,8 @@ public class FenixPhdThesisProcessApi {
 	}
 
 	@SuppressWarnings("deprecation")
-	private void fillMLS(final JsonObject result, final MultiLanguageString name) {
-    	for (final Locale locale : name.getAllLocales()) {
-    		final String content = name.getContent(locale);
-    		result.addProperty(locale.getLanguage(), content);
-    	}
+	private void fillMLS(final JsonObject result, final LocalizedString name) {
+	    name.forEach((l, c) -> result.addProperty(l.getLanguage(), c));
 	}
 
 	private <T> JsonArray toJsonArray(final BiConsumer<JsonObject, T> filler, final Iterable<T> origins) {

@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
-import org.fenixedu.academic.util.MultiLanguageString;
+import org.fenixedu.commons.i18n.LocalizedString;
 
 public class PersonFileSourceGroupBean implements PersonFileSource {
 
@@ -32,11 +32,11 @@ public class PersonFileSourceGroupBean implements PersonFileSource {
      */
     private static final long serialVersionUID = 1L;
 
-    private MultiLanguageString name;
+    private LocalizedString name;
     private List<PersonFileSource> children;
     private int count;
 
-    public PersonFileSourceGroupBean(MultiLanguageString name) {
+    public PersonFileSourceGroupBean(LocalizedString name) {
         this.name = name;
         this.children = new ArrayList<PersonFileSource>();
         this.count = -1; // not initialized
@@ -47,7 +47,7 @@ public class PersonFileSourceGroupBean implements PersonFileSource {
     }
 
     @Override
-    public MultiLanguageString getName() {
+    public LocalizedString getName() {
         return name;
     }
 

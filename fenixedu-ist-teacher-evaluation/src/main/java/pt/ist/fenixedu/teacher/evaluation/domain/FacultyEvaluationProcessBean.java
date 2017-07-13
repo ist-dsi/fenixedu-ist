@@ -20,7 +20,7 @@ package pt.ist.fenixedu.teacher.evaluation.domain;
 
 import java.io.Serializable;
 
-import org.fenixedu.academic.util.MultiLanguageString;
+import org.fenixedu.commons.i18n.LocalizedString;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 
@@ -30,7 +30,7 @@ public class FacultyEvaluationProcessBean implements Serializable {
 
     static private final long serialVersionUID = 1L;
 
-    private MultiLanguageString title;
+    private LocalizedString title;
     private DateTime autoEvaluationIntervalStart;
     private DateTime autoEvaluationIntervalEnd;
     private DateTime evaluationIntervalStart;
@@ -59,11 +59,11 @@ public class FacultyEvaluationProcessBean implements Serializable {
         setFacultyEvaluationProcess(facultyEvaluationProcess);
     }
 
-    public MultiLanguageString getTitle() {
+    public LocalizedString getTitle() {
         return title;
     }
 
-    public void setTitle(MultiLanguageString title) {
+    public void setTitle(LocalizedString title) {
         this.title = title;
     }
 

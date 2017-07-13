@@ -64,7 +64,7 @@ import org.fenixedu.academic.domain.studentCurriculum.CycleCurriculumGroup;
 import org.fenixedu.academic.domain.thesis.Thesis;
 import org.fenixedu.academic.dto.student.RegistrationConclusionBean;
 import org.fenixedu.academic.util.ContentType;
-import org.fenixedu.academic.util.MultiLanguageString;
+import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.UserProfile;
@@ -513,9 +513,9 @@ public class JerseyServices {
                 JsonObject mscInfo = new JsonObject();
                 mscInfo.addProperty("id", t.getExternalId());
                 mscInfo.addProperty("author", t.getStudent().getPerson().getUsername());
-                String title = t.getFinalFullTitle().getContent(MultiLanguageString.en);
+                String title = t.getFinalFullTitle().getContent(org.fenixedu.academic.util.LocaleUtils.EN);
                 if (title == null) {
-                    title = t.getFinalFullTitle().getContent(MultiLanguageString.pt);
+                    title = t.getFinalFullTitle().getContent(org.fenixedu.academic.util.LocaleUtils.PT);
                 }
                 mscInfo.addProperty("title", title);
                 mscInfo.addProperty("year", t.getDiscussed().year().getAsShortText());

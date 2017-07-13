@@ -25,12 +25,12 @@ import java.util.List;
 import org.fenixedu.academic.domain.organizationalStructure.Accountability;
 import org.fenixedu.academic.domain.organizationalStructure.AccountabilityTypeEnum;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
-import org.fenixedu.academic.util.MultiLanguageString;
+import org.fenixedu.commons.i18n.LocalizedString;
 import org.joda.time.YearMonthDay;
 
 public class SharedFunction extends SharedFunction_Base {
 
-    public SharedFunction(MultiLanguageString functionName, YearMonthDay beginDate, YearMonthDay endDate, FunctionType type,
+    public SharedFunction(LocalizedString functionName, YearMonthDay beginDate, YearMonthDay endDate, FunctionType type,
             Unit unit, BigDecimal credits) {
         setValues(functionName, beginDate, endDate, type, unit, AccountabilityTypeEnum.MANAGEMENT_FUNCTION);
         setCredits(credits);

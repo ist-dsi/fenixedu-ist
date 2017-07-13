@@ -23,7 +23,7 @@ package pt.ist.fenixedu.quc.ui.renderers;
 
 import java.util.Properties;
 
-import org.fenixedu.academic.util.MultiLanguageString;
+import org.fenixedu.commons.i18n.LocalizedString;
 
 import pt.ist.fenixWebFramework.renderers.InputRenderer;
 import pt.ist.fenixWebFramework.renderers.components.HtmlComponent;
@@ -252,7 +252,7 @@ public class InquiryGroupQuestionRenderer extends InputRenderer {
             return mainTable;
         }
 
-        private String getFinalMLString(MultiLanguageString label, String[] conditionValues) {
+        private String getFinalMLString(LocalizedString label, String[] conditionValues) {
             String text = label.toString();
             if (conditionValues != null) {
                 text =
@@ -283,8 +283,8 @@ public class InquiryGroupQuestionRenderer extends InputRenderer {
             }
         }
 
-        private String getQuestionToolTip(final MultiLanguageString multiLanguageString) {
-            return multiLanguageString != null ? "<a href=\"#\" class=\"help\"> [?] <span>" + multiLanguageString + "</span></a>" : "";
+        private String getQuestionToolTip(final LocalizedString multiLanguageString) {
+            return multiLanguageString != null ? "<a href=\"#\" class=\"help\"> [?] <span>" + multiLanguageString.toString() + "</span></a>" : "";
         }
 
         private String getQuestionRequiredIndication(final InquiryQuestion inquiryQuestion) {
@@ -317,7 +317,7 @@ public class InquiryGroupQuestionRenderer extends InputRenderer {
             if (inquiryQuestionHeader.getScaleHeaders() != null && inquiryQuestionHeader.getScaleHeaders().getScaleLength() > 0) {
                 String cssClass = "col";
                 int iter = 1;
-                for (MultiLanguageString scale : inquiryQuestionHeader.getScaleHeaders().getScale()) {
+                for (LocalizedString scale : inquiryQuestionHeader.getScaleHeaders().getScale()) {
                     HtmlTableCell headerCell = headerRow.createCell(CellType.HEADER);
                     headerCell.setBody(new HtmlText(scale.toString(), false));
                     headerCell.addClass(cssClass + iter);

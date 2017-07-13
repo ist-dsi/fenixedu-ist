@@ -26,13 +26,13 @@ import org.fenixedu.academic.domain.time.calendarStructure.AcademicInterval;
 import org.fenixedu.academic.domain.time.calendarStructure.AcademicSemesterCE;
 import org.fenixedu.academic.domain.time.chronologies.AcademicChronology;
 import org.fenixedu.academic.domain.time.chronologies.dateTimeFields.AcademicSemesterDateTimeFieldType;
-import org.fenixedu.academic.util.MultiLanguageString;
+import org.fenixedu.commons.i18n.LocalizedString;
 import org.joda.time.DateTime;
 
 public class TeacherCreditsFillingForDepartmentAdmOfficeCE extends TeacherCreditsFillingForDepartmentAdmOfficeCE_Base {
 
-    public TeacherCreditsFillingForDepartmentAdmOfficeCE(AcademicCalendarEntry parentEntry, MultiLanguageString title,
-            MultiLanguageString description, DateTime begin, DateTime end, AcademicCalendarRootEntry rootEntry) {
+    public TeacherCreditsFillingForDepartmentAdmOfficeCE(AcademicCalendarEntry parentEntry, LocalizedString title,
+            LocalizedString description, DateTime begin, DateTime end, AcademicCalendarRootEntry rootEntry) {
 
         super();
         super.initEntry(parentEntry, title, description, begin, end, rootEntry);
