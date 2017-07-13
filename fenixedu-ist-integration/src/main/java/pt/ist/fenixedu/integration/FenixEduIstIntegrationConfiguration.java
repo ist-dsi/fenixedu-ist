@@ -116,6 +116,12 @@ public class FenixEduIstIntegrationConfiguration {
     
         @ConfigurationProperty(key = "scheduler.watchdog.file", defaultValue = "/tmp/fenix-scheduler-watchdog")
         public String getSchedulerWatchdogFilePath();
+
+        @ConfigurationProperty(key = "ticketing.url", defaultValue = "http://127.0.0.1:8000/")
+        public String getTicketingUrl();
+
+        @ConfigurationProperty(key = "ticketing.jwt.secret")
+        public String getTicketingJwtSecret();
     }
 
     public static ConfigurationProperties getConfiguration() {
