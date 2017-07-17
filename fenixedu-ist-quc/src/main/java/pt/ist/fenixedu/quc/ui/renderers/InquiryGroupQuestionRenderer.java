@@ -319,7 +319,7 @@ public class InquiryGroupQuestionRenderer extends InputRenderer {
                 int iter = 1;
                 for (LocalizedString scale : inquiryQuestionHeader.getScaleHeaders().getScale()) {
                     HtmlTableCell headerCell = headerRow.createCell(CellType.HEADER);
-                    headerCell.setBody(new HtmlText(scale.toString(), false));
+                    headerCell.setBody(new HtmlText(scale.getContent(), false));
                     headerCell.addClass(cssClass + iter);
                     iter++;
                 }

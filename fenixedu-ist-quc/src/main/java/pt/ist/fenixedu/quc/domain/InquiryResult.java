@@ -366,7 +366,7 @@ public class InquiryResult extends InquiryResult_Base {
 
     public void delete() {
         if (!getInquiryResultCommentsSet().isEmpty()) {
-            throw new DomainException("error.inquiryResult.hasComments", getInquiryQuestion().getLabel().toString(),
+            throw new DomainException("error.inquiryResult.hasComments", getInquiryQuestion().getLabel().getContent(),
                     GepReportFile.getExecutionCourseCode(getExecutionCourse()),
                     getExecutionDegree() != null ? GepReportFile.getExecutionDegreeCode(getExecutionDegree()) : "",
                     getProfessorship() != null ? GepReportFile.getProfessorshipCode(getProfessorship()) : "");

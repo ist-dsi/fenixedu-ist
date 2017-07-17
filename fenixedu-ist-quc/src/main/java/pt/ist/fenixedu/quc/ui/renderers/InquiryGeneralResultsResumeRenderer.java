@@ -64,7 +64,7 @@ public class InquiryGeneralResultsResumeRenderer extends OutputRenderer {
                 resultCell.setBody(divComponent);
                 HtmlTableCell labelCell = row.createCell(CellType.HEADER);
                 String tooltip = getTooltip(summaryBean.getInquiryQuestion());
-                HtmlText htmlText = new HtmlText(summaryBean.getInquiryQuestion().getLabel().toString() + tooltip);
+                HtmlText htmlText = new HtmlText(summaryBean.getInquiryQuestion().getLabel().getContent() + tooltip);
                 htmlText.setEscaped(false);
                 labelCell.setBody(htmlText);
             }
@@ -74,7 +74,7 @@ public class InquiryGeneralResultsResumeRenderer extends OutputRenderer {
         private String getTooltip(InquiryQuestion inquiryQuestion) {
             if (inquiryQuestion.getToolTip() != null) {
                 StringBuilder sb = new StringBuilder(" <a href=\"#\" class=\"helpleft\">[?]<span>");
-                sb.append(inquiryQuestion.getToolTip().toString()).append("</span></a>");
+                sb.append(inquiryQuestion.getToolTip().getContent()).append("</span></a>");
                 return sb.toString();
             }
             return "";

@@ -197,7 +197,7 @@ public class TeacherCreditsReportFile extends TeacherCreditsReportFile_Base {
         if (country == null || country.getCountryNationality() == null) {
             return null;
         }
-        return country.getCountryNationality().toString();
+        return country.getCountryNationality().getContent();
     }
 
     private ProfessionalRegime getProfessionalRegime(PersonContractSituation teacherContractSituation, Interval interval) {

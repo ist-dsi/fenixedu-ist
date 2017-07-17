@@ -124,7 +124,7 @@ public class ViewQucCoordinatorsStatus extends FenixDispatchAction {
         for (Coordinator coordinator : coordinatorsSet) {
             Row row = spreadsheet.addRow();
             row.setCell(coordinator.getExecutionDegree().getDegreeType().getName().getContent());
-            row.setCell(coordinator.getExecutionDegree().getDegree().getNameI18N().toString());
+            row.setCell(coordinator.getExecutionDegree().getDegree().getNameI18N().getContent());
             row.setCell(coordinator.getPerson().getName());
             row.setCell(coordinator.getPerson().getUsername());
             row.setCell(coordinator.getPerson().getDefaultMobilePhoneNumber());
