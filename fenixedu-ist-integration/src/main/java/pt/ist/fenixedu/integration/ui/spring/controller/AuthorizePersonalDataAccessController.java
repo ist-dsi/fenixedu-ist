@@ -24,6 +24,7 @@ import org.fenixedu.bennu.spring.portal.SpringApplication;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.joda.time.LocalDate;
 import org.joda.time.Years;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,12 +34,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 import pt.ist.fenixedu.integration.domain.BpiCard;
 import pt.ist.fenixedu.integration.domain.SantanderCard;
 import pt.ist.fenixedu.integration.domain.cgd.CgdCard;
+import pt.ist.fenixedu.integration.ui.spring.service.SendCgdCardService;
 
 @SpringApplication(group = "logged", path = "authorize-personal-data-access", title = "authorize.personal.data.access.title")
 @SpringFunctionality(app = AuthorizePersonalDataAccessController.class, title = "authorize.personal.data.access.title")
 @Controller
 @RequestMapping("/authorize-personal-data-access")
 public class AuthorizePersonalDataAccessController {
+
+    public SendCgdCardService sendCgdCardService;
+
+    @Autowired
+    public AuthorizePersonalDataAccessController(SendCgdCardService sendCgdCardService) {
+        this.sendCgdCardService = sendCgdCardService;
+    }
 
     @RequestMapping(method = RequestMethod.GET)
     public String viewAuthorizationDetails(Model model) {
@@ -52,7 +61,7 @@ public class AuthorizePersonalDataAccessController {
             @RequestParam(required = false) String qs, Model model) {
         final CgdCard card = CgdCard.setGrantAccess(allowAccessCgd);
         if (card != null) {
-            card.send();
+            sendCgdCardService.asyncSendCgdCard(card);
         }
 
         if (allowAccessBpi != null) {

@@ -1,6 +1,7 @@
 package pt.ist.registration.process.ui;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.student.Registration;
@@ -14,11 +15,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.google.common.base.Joiner;
 
 import io.jsonwebtoken.Jwts;
+import pt.ist.registration.process.domain.RegistrationDeclarationFile;
 import pt.ist.registration.process.ui.exception.UnauthorizedException;
 import pt.ist.registration.process.ui.service.SignCertAndStoreService;
 
@@ -39,38 +42,43 @@ public class SignedDeclarationsController {
     @SkipCSRF
     @RequestMapping(method = RequestMethod.POST, value = "sign/{registration}")
     public String signCallback(@PathVariable Registration registration, @RequestParam MultipartFile file,
-            @RequestParam String nounce) throws IOException {
+            @RequestParam String nounce) {
         String uniqueIdentifier = Jwts.parser().setSigningKey(RegistrationProcessConfiguration.signerJwtSecret())
                 .parseClaimsJws(nounce).getBody().getSubject();
-        if (registration.getRegistrationDeclarationFile().getUniqueIdentifier().equals(uniqueIdentifier)) {
-            logger.debug("Registration Declaration {} of student {} was signed.", registration.getRegistrationDeclarationFile().getUniqueIdentifier(), registration.getNumber());
-            logger.debug("Registration Declaration {} of student {} sent to be certified", registration.getRegistrationDeclarationFile().getUniqueIdentifier(),  registration.getNumber());
-            signCertAndStoreService.sendDocumentToBeCertified(registration.getExternalId(), getFilename(registration), file,
-                    uniqueIdentifier);
+        Optional<RegistrationDeclarationFile> registrationDeclarationFile =
+                RegistrationDeclarationFile.getRegistrationDeclarationFile(registration, uniqueIdentifier);
+        return registrationDeclarationFile.map(declarationFile -> {
+            try {
+                logger.debug("Registration Declaration {} of student {} was signed.",uniqueIdentifier, registration.getNumber());
+                logger.debug("Registration Declaration {} of student {} sent to be certified", uniqueIdentifier, registration.getNumber());
+                signCertAndStoreService.sendDocumentToBeCertified(registration.getExternalId(), declarationFile.getFilename(), file,
+                        uniqueIdentifier, true);
+            } catch (IOException e) {
+                throw new Error(e);
+            }
             return "ok";
-        }
-        throw new UnauthorizedException();
+        }).orElseThrow(UnauthorizedException::new);
     }
 
     @SkipCSRF
     @RequestMapping(method = RequestMethod.POST, value = "cert/{registration}")
     public String certifierCallback(@PathVariable Registration registration, @RequestParam MultipartFile file,
-            @RequestParam String nounce) throws IOException {
+            @RequestParam String nounce) {
         String uniqueIdentifier = Jwts.parser().setSigningKey(RegistrationProcessConfiguration.certifierJwtSecret())
                 .parseClaimsJws(nounce).getBody().getSubject();
-        if (registration.getRegistrationDeclarationFile().getUniqueIdentifier().equals(uniqueIdentifier)) {
-            logger.debug("Registration Declaration {} of student {} was certified.", registration.getRegistrationDeclarationFile().getUniqueIdentifier(), registration.getNumber());
-            logger.debug("Registration Declaration {} of student {} sent out to be stored.", registration.getRegistrationDeclarationFile().getUniqueIdentifier(), registration.getNumber());
-            signCertAndStoreService.sendDocumentToBeStored(registration.getPerson().getUsername(),
-                    registration.getPerson().getEmailForSendingEmails(), getFilename(registration), file, uniqueIdentifier);
-            return "ok";
-        }
-        throw new UnauthorizedException();
-    }
-
-    private String getFilename(Registration registration) {
-        return Joiner.on("_").join("declaracao", registration.getDegree().getSigla(), ExecutionYear.readCurrentExecutionYear().getQualifiedName().replaceAll("/", "-"),
-                registration.getNumber()) + ".pdf";
+        Optional<RegistrationDeclarationFile> registrationDeclarationFile =
+                RegistrationDeclarationFile.getRegistrationDeclarationFile(registration, uniqueIdentifier);
+        return registrationDeclarationFile.map(declarationFile -> {
+            try {
+                logger.debug("Registration Declaration {} of student {} was certified.", uniqueIdentifier, registration.getNumber());
+                logger.debug("Registration Declaration {} of student {} sent out to be stored.", uniqueIdentifier, registration.getNumber());
+                signCertAndStoreService.sendDocumentToBeStored(registration.getPerson().getUsername(),
+                        registration.getPerson().getEmailForSendingEmails(), declarationFile.getFilename(), file, uniqueIdentifier);
+                return "ok";
+            } catch (IOException e) {
+                throw new Error(e);
+            }
+        }).orElseThrow(UnauthorizedException::new);
     }
 
 }

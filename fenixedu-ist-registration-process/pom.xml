@@ -15,6 +15,7 @@
     <properties>
         <version.com.itextpdf.itextpdf>5.5.9</version.com.itextpdf.itextpdf>
         <version.io.jsonwebtoken.jjwt>0.7.0</version.io.jsonwebtoken.jjwt>
+        <version.papyrus.client>1.2.0</version.papyrus.client>
     </properties>
 
     <dependencies>
@@ -67,6 +68,11 @@
         <dependency>
             <groupId>pt.ist</groupId>
             <artifactId>drive-sdk</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>pt.ist</groupId>
+            <artifactId>papyrus-client</artifactId>
+            <version>${version.papyrus.client}</version>
         </dependency>
     </dependencies>
 

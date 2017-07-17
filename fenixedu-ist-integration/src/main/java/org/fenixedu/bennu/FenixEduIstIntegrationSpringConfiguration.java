@@ -19,7 +19,9 @@
 package org.fenixedu.bennu;
 
 import org.fenixedu.bennu.spring.BennuSpringModule;
+import org.springframework.scheduling.annotation.EnableAsync;
 
+@EnableAsync
 @BennuSpringModule(basePackages = { "pt.ist.fenixedu.integration.ui.spring" }, bundles = "FenixEduIstIntegrationResources")
 public class FenixEduIstIntegrationSpringConfiguration {
 
