@@ -212,7 +212,7 @@ public class ProfessionalCategory extends ProfessionalCategory_Base implements C
 
     public static ProfessionalCategory getCategoryByPeriod(Teacher teacher, ExecutionSemester executionSemester) {
         OccupationPeriod lessonsPeriod = executionSemester.getLessonsPeriod();
-        return getLastCategory(teacher, lessonsPeriod.getStartYearMonthDay().toLocalDate(), lessonsPeriod
+        return lessonsPeriod == null ? null : getLastCategory(teacher, lessonsPeriod.getStartYearMonthDay().toLocalDate(), lessonsPeriod
                 .getEndYearMonthDayWithNextPeriods().toLocalDate());
     }
 }
