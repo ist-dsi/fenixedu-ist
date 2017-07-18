@@ -119,7 +119,7 @@ public class QuestionScale implements Serializable {
     public String getLabelByValue(String scaleValue) {
         for (int iter = 0; iter < getScaleValues().length; iter++) {
             if (scaleValue.equals(getScaleValues()[iter])) {
-                return getScale()[iter].toString();
+                return getScale()[iter].getContent();
             }
         }
         return null;

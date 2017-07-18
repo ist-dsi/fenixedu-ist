@@ -107,7 +107,7 @@ Sê o mais objectivo possível. O teu contributo é indispensável para os probl
 			<logic:notEmpty name="blockResult" property="blockResultClassification">
 				<div class="<%= "bar-" + blockResult.getBlockResultClassification().name().toLowerCase() %>"><div>&nbsp;</div></div>
 			</logic:notEmpty>			
-			<bean:write name="blockResult" property="inquiryBlock.inquiryQuestionHeader.title"/>
+			<bean:write name="blockResult" property="inquiryBlock.inquiryQuestionHeader.title.content"/>
 			<bean:define id="expand" value=""/>
 			<logic:equal name="hasNotRelevantData" value="false"> <!-- if group is GREY -->				
 				<logic:notEqual value="true" name="blockResult" property="mandatoryComments">
@@ -176,7 +176,7 @@ Sê o mais objectivo possível. O teu contributo é indispensável para os probl
 							<logic:notEmpty name="blockResult" property="blockResultClassification">
 								<div class="<%= "bar-" + blockResult.getBlockResultClassification().name().toLowerCase() %>"><div>&nbsp;</div></div>
 							</logic:notEmpty>
-							<bean:write name="blockResult" property="inquiryBlock.inquiryQuestionHeader.title"/>
+							<bean:write name="blockResult" property="inquiryBlock.inquiryQuestionHeader.title.content"/>
 							<bean:define id="expand" value=""/>
 							<logic:notEqual value="true" name="blockResult" property="mandatoryComments">
 								<span style="font-weight: normal;">| 

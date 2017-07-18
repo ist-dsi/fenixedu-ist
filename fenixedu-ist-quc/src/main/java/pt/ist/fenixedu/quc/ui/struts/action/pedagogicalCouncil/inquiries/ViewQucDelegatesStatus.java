@@ -146,7 +146,7 @@ public class ViewQucDelegatesStatus extends FenixDispatchAction {
         for (Degree degree : delegatesMap.keySet()) {
             for (DelegateBean delegateBean : delegatesMap.get(degree)) {
                 Row row = spreadsheet.addRow();
-                row.setCell(degree.getDegreeType().getName().getContent() + " - " + degree.getNameI18N().toString());
+                row.setCell(degree.getDegreeType().getName().getContent() + " - " + degree.getNameI18N().getContent());
                 row.setCell(delegateBean.getYearDelegate().getUser().getPerson().getName());
                 row.setCell(delegateBean.getYearDelegate().getCurricularYear().getYear());
                 row.setCell(delegateBean.getYearDelegate().getUser().getPerson().getDefaultMobilePhoneNumber());

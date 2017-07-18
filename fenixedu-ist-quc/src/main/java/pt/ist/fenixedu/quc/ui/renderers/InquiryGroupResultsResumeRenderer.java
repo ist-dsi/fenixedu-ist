@@ -116,7 +116,7 @@ public class InquiryGroupResultsResumeRenderer extends InputRenderer {
 
             HtmlTableRow row = mainTable.createRow();
             HtmlTableCell nameCell = row.createCell(CellType.HEADER);
-            nameCell.setBody(new HtmlText(questionResultsSummaryBean.getInquiryQuestion().getLabel().toString()));
+            nameCell.setBody(new HtmlText(questionResultsSummaryBean.getInquiryQuestion().getLabel().getContent()));
             HtmlTableCell numberOfAnswersCell = row.createCell();
             numberOfAnswersCell.setBody(new HtmlText(
                     questionResultsSummaryBean.getNumberOfResponses() != null ? questionResultsSummaryBean.getNumberOfResponses()
@@ -181,9 +181,9 @@ public class InquiryGroupResultsResumeRenderer extends InputRenderer {
         HtmlBlockContainer blockContainer = new HtmlBlockContainer();
         String groupTitle = null;
         if (groupResultsSummaryBean.getInquiryGroupQuestion().getResultQuestionHeader() != null) {
-            groupTitle = groupResultsSummaryBean.getInquiryGroupQuestion().getResultQuestionHeader().getTitle().toString();
+            groupTitle = groupResultsSummaryBean.getInquiryGroupQuestion().getResultQuestionHeader().getTitle().getContent();
         } else {
-            groupTitle = groupResultsSummaryBean.getInquiryGroupQuestion().getInquiryQuestionHeader().getTitle().toString();
+            groupTitle = groupResultsSummaryBean.getInquiryGroupQuestion().getInquiryQuestionHeader().getTitle().getContent();
         }
         HtmlText groupTitleText = new HtmlText("<p><strong>" + groupTitle + "</strong></p>");
         groupTitleText.setEscaped(false);
@@ -199,7 +199,7 @@ public class InquiryGroupResultsResumeRenderer extends InputRenderer {
         for (QuestionResultsSummaryBean questionResultsSummaryBean : groupResultsSummaryBean.getQuestionsResults()) {
             HtmlTableRow row = mainTable.createRow();
             HtmlTableCell nameCell = row.createCell(CellType.HEADER);
-            nameCell.setBody(new HtmlText(questionResultsSummaryBean.getInquiryQuestion().getLabel().toString()));
+            nameCell.setBody(new HtmlText(questionResultsSummaryBean.getInquiryQuestion().getLabel().getContent()));
             HtmlTableCell valueCell = row.createCell();
             valueCell.setStyle("width: 110px;");
             Double value = 0.0;
@@ -228,7 +228,7 @@ public class InquiryGroupResultsResumeRenderer extends InputRenderer {
         StringBuilder labelAndValue = new StringBuilder();
         InquiryResult resultQuestion = groupResultsSummaryBean.getGroupTotalResult();
         if (resultQuestion != null) {
-            labelAndValue.append(resultQuestion.getInquiryQuestion().getLabel().toString()).append(" ")
+            labelAndValue.append(resultQuestion.getInquiryQuestion().getLabel().getContent()).append(" ")
                     .append(resultQuestion.getValue());
         }
         firstRowCell.setText(labelAndValue.toString());
@@ -329,7 +329,7 @@ public class InquiryGroupResultsResumeRenderer extends InputRenderer {
         if (groupResultsSummaryBean.getInquiryGroupQuestion().getInquiryQuestionHeader() != null
                 && groupResultsSummaryBean.getInquiryGroupQuestion().getInquiryQuestionHeader().getTitle() != null) {
             firstCell.setBody(new HtmlText(groupResultsSummaryBean.getInquiryGroupQuestion().getInquiryQuestionHeader()
-                    .getTitle().toString()));
+                    .getTitle().getContent()));
         }
         firstCell.setClasses("first");
         HtmlTableCell totalNumber = headerRow.createCell(CellType.HEADER);

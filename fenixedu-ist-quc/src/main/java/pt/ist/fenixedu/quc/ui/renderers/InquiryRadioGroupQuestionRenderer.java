@@ -67,7 +67,7 @@ public class InquiryRadioGroupQuestionRenderer extends InputRenderer {
                     HtmlRadioButton button = group.createRadioButton();
                     button.setUserValue(choices.getScaleValues()[iter]);
                     if (!((InquiryRadioGroupQuestion) radioQuestion.getInquiryQuestion()).getIsMatrix()) {
-                        button.setText(choices.getScale()[iter].toString());
+                        button.setText(choices.getScale()[iter].getContent());
                     }
                     if (!Strings.isNullOrEmpty(radioQuestion.getResponseValue())
                             && choices.getScaleValues()[iter].equals(radioQuestion.getResponseValue())) {

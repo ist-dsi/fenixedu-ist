@@ -421,7 +421,7 @@ jQuery(document).ready(function() {
 					<bean:write name="ucData" property="inquiryQuestion.label"/>
 					<logic:notEmpty name="ucData" property="inquiryQuestion.toolTip">
 						<a href="#" class="helpleft">[?]
-							<span><bean:write name="ucData" property="inquiryQuestion.toolTip"/></span>
+							<span><bean:write name="ucData" property="inquiryQuestion.toolTip.content"/></span>
 						</a>	
 					</logic:notEmpty>
 				</th>
@@ -454,7 +454,7 @@ jQuery(document).ready(function() {
 			<logic:notEmpty name="blockResult" property="blockResultClassification">
 				<div class="<%= "bar-" + blockResult.getBlockResultClassification().toString().toLowerCase() %>"><div>&nbsp;</div></div>
 			</logic:notEmpty>
-			<bean:write name="blockResult" property="inquiryBlock.inquiryQuestionHeader.title"/>
+			<bean:write name="blockResult" property="inquiryBlock.inquiryQuestionHeader.title.content"/>
 			<logic:equal value="0" name="iter">
 				<a href="#" class="helpleft">[?]
 					<span> 

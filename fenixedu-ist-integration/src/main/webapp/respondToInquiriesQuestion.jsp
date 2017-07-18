@@ -71,7 +71,7 @@
             </div>
 
             <div id="txt">
-				<bean:write name="inquiryTemplate" property="inquiryMessage" filter="false"/>
+				<bean:write name="inquiryTemplate" property="inquiryMessage.content" filter="false"/>
             </div>
 
             <br />
