@@ -20,6 +20,7 @@ package pt.ist.fenixedu.integration.domain.cgd;
 
 import java.time.Year;
 
+import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.bennu.core.domain.User;
 
@@ -35,6 +36,9 @@ public class NumberObfuscationAdaptor implements IMemberIDAdapter {
 
     @Override
     public Person readPerson(final String memberId) {
+        if (!StringUtils.isNumeric(memberId)) {
+            return null;
+        }
         final CgdCardCounter counter = CgdCardCounter.findCounterForYear(CgdCard.yearFor(memberId));
         final int serialNumber = CgdCard.serialNumberFor(memberId);
         return counter == null ? null : counter.getCgdCardSet().stream().filter(c -> c.getSerialNumber() == serialNumber)
