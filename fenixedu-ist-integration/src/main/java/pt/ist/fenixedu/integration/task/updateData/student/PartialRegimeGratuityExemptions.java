@@ -22,6 +22,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.Normalizer;
+import java.text.Normalizer.Form;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -31,6 +33,7 @@ import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.accounting.Event;
+import org.fenixedu.academic.domain.accounting.Exemption;
 import org.fenixedu.academic.domain.accounting.Installment;
 import org.fenixedu.academic.domain.accounting.PaymentPlan;
 import org.fenixedu.academic.domain.accounting.PostingRule;
@@ -55,14 +58,17 @@ import pt.ist.fenixframework.Atomic.TxMode;
 public class PartialRegimeGratuityExemptions extends CronTask {
 
     final static YearMonthDay DISPATCH_DATE = new YearMonthDay(2015, 12, 01);
-    final static String JUSTIFICATION_TEXT = "Aplicação da fórmula de calculo de propina em tempo parcial 15/16";
+    static String JUSTIFICATION_TEXT = "Aplicação da fórmula de cálculo de propina em tempo parcial ";
     static int exemptionsCreated = 0;
+    final static int DECIMAL_PRECISION = 6;
 
     @Override
     public void runTask() throws Exception {
         exemptionsCreated = 0;
         int processedStudents = 0;
-        for (AnnualEvent event : ExecutionYear.readCurrentExecutionYear().getAnnualEventsSet()) {
+        ExecutionYear currentExecutionYear = ExecutionYear.readCurrentExecutionYear();
+        JUSTIFICATION_TEXT = JUSTIFICATION_TEXT + currentExecutionYear.getName();
+        for (AnnualEvent event : currentExecutionYear.getAnnualEventsSet()) {
             if (event instanceof GratuityEventWithPaymentPlan) {
                 GratuityEventWithPaymentPlan gratuityEvent = (GratuityEventWithPaymentPlan) event;
                 if (gratuityEvent.getGratuityPaymentPlan() instanceof FullGratuityPaymentPlanForPartialRegime
@@ -72,9 +78,7 @@ public class PartialRegimeGratuityExemptions extends CronTask {
                     try {
                         Money amountToPay =
                                 calculateOriginalDebtAmount(gratuityEvent, gratuityEvent.getWhenOccured().plusSeconds(1), false);
-                        Money newAmountToPay =
-                                calculateAmountToPay(gratuityEvent.getWhenOccured().plusSeconds(1), gratuityEvent,
-                                        gratuityEvent.getGratuityPaymentPlan());
+                        Money newAmountToPay = calculateAmountToPay(gratuityEvent, gratuityEvent.getGratuityPaymentPlan());
                         taskLog("Valor antigo: %s - Valor novo: %s\n", amountToPay.getAmountAsString(),
                                 newAmountToPay.getAmountAsString());
                         //since the exemption is given in % and the system only counts up to 2 decimal cases round up, there maybe values off by 1 cent
@@ -94,9 +98,8 @@ public class PartialRegimeGratuityExemptions extends CronTask {
 
     private Money calculateOriginalDebtAmount(final Event event, final DateTime when, final boolean applyDiscount) {
         try {
-            final Method method =
-                    PostingRule.class
-                            .getDeclaredMethod("doCalculationForAmountToPay", Event.class, DateTime.class, boolean.class);
+            final Method method = PostingRule.class.getDeclaredMethod("doCalculationForAmountToPay", Event.class, DateTime.class,
+                    boolean.class);
             method.setAccessible(true);
             return (Money) method.invoke(event.getPostingRule(), event, when, applyDiscount);
         } catch (final NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
@@ -110,22 +113,21 @@ public class PartialRegimeGratuityExemptions extends CronTask {
     @Atomic(mode = TxMode.WRITE)
     private void createExemption(GratuityEventWithPaymentPlan event, Money amountToPay, Money newAmountToPay) {
         if (event.getExemptionsSet().isEmpty()) {
-            BigDecimal percentage =
-                    BigDecimal.ONE.subtract(newAmountToPay.getAmount().divide(amountToPay.getAmount(), 4, RoundingMode.HALF_UP));
+            BigDecimal percentage = BigDecimal.ONE.subtract(
+                    newAmountToPay.getAmount().divide(amountToPay.getAmount(), DECIMAL_PRECISION, RoundingMode.HALF_UP));
             new PercentageGratuityExemption((GratuityEventWithPaymentPlan) event,
                     GratuityExemptionJustificationType.DIRECTIVE_COUNCIL_AUTHORIZATION, JUSTIFICATION_TEXT, DISPATCH_DATE,
                     percentage);
             exemptionsCreated++;
             taskLog("Created an exemption for %s\n", event.getPerson().getUsername());
         } else {
-            event.getExemptionsSet().stream().forEach(ex -> {
+            event.getExemptionsSet().stream().filter(this::isAutomaticExemption).forEach(ex -> {
                 taskLog("Deleted exemption from %s\n", event.getPerson().getUsername());
                 ex.delete();
             });
-            Money cleanNewAmountToPay = calculateAmountToPay(new DateTime(), event, event.getGratuityPaymentPlan());
-            BigDecimal percentage =
-                    BigDecimal.ONE.subtract(cleanNewAmountToPay.getAmount().divide(amountToPay.getAmount(), 4,
-                            RoundingMode.HALF_UP));
+            Money cleanNewAmountToPay = calculateAmountToPay(event, event.getGratuityPaymentPlan());
+            BigDecimal percentage = BigDecimal.ONE.subtract(
+                    cleanNewAmountToPay.getAmount().divide(amountToPay.getAmount(), DECIMAL_PRECISION, RoundingMode.HALF_UP));
             new PercentageGratuityExemption((GratuityEventWithPaymentPlan) event,
                     GratuityExemptionJustificationType.DIRECTIVE_COUNCIL_AUTHORIZATION, JUSTIFICATION_TEXT, DISPATCH_DATE,
                     percentage);
@@ -134,9 +136,15 @@ public class PartialRegimeGratuityExemptions extends CronTask {
         }
     }
 
-    private Money calculateAmountToPay(DateTime whenRegistered, GratuityEventWithPaymentPlan gratuityEvent,
-            PaymentPlan paymentPlan) {
-        final Money totalAmountToPay = calculateTotalAmountToPay(gratuityEvent, whenRegistered, true, paymentPlan);
+    private boolean isAutomaticExemption(Exemption exemption) {
+        String reason = Normalizer.normalize(exemption.getReason(), Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+        String justification =
+                Normalizer.normalize(JUSTIFICATION_TEXT, Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+        return reason.contains(justification.substring(0, justification.length() - 10)); //to remove the execution year, in the older version is YY/YY and in this one is YYYY/YYYY
+    }
+
+    private Money calculateAmountToPay(GratuityEventWithPaymentPlan gratuityEvent, PaymentPlan paymentPlan) {
+        final Money totalAmountToPay = doCalculationForAmountToPay(gratuityEvent, true, paymentPlan);
 
         if (totalAmountToPay == null) {
             return Money.ZERO;
@@ -144,17 +152,16 @@ public class PartialRegimeGratuityExemptions extends CronTask {
         return totalAmountToPay;
     }
 
-    private Money calculateTotalAmount(final Event event, final DateTime when, final BigDecimal discountPercentage,
-            PaymentPlan paymentPlan) {
+    private Money calculateTotalAmount(final Event event, final BigDecimal discountPercentage, PaymentPlan paymentPlan) {
         Money result = Money.ZERO;
-        for (final Money amount : calculateInstallmentTotalAmounts(event, when, discountPercentage, paymentPlan).values()) {
+        for (final Money amount : calculateInstallmentTotalAmounts(event, discountPercentage, paymentPlan).values()) {
             result = result.add(amount);
         }
         return result;
     }
 
-    private Map<Installment, Money> calculateInstallmentTotalAmounts(final Event event, final DateTime when,
-            final BigDecimal discountPercentage, PaymentPlan paymentPlan) {
+    private Map<Installment, Money> calculateInstallmentTotalAmounts(final Event event, final BigDecimal discountPercentage,
+            PaymentPlan paymentPlan) {
         final Map<Installment, Money> result = new HashMap<Installment, Money>();
         for (final Installment installment : paymentPlan.getInstallmentsSortedByEndDate()) {
             result.put(installment, calculateBaseAmount(event, (PartialRegimeInstallment) installment));
@@ -162,18 +169,10 @@ public class PartialRegimeGratuityExemptions extends CronTask {
         return result;
     }
 
-    private final Money calculateTotalAmountToPay(Event event, DateTime when, boolean applyDiscount, PaymentPlan paymentPlan) {
-        Money amountToPay = doCalculationForAmountToPay(event, when, applyDiscount, paymentPlan);
-        if (!event.isExemptionAppliable()) {
-            return amountToPay;
-        }
-        return amountToPay;
-    }
-
     //we want to calculate the value without the exemptions that were created by the script
-    private Money doCalculationForAmountToPay(Event event, DateTime when, boolean applyDiscount, PaymentPlan paymentPlan) {
+    private Money doCalculationForAmountToPay(Event event, boolean applyDiscount, PaymentPlan paymentPlan) {
         final BigDecimal discountPercentage = BigDecimal.ZERO;
-        return calculateTotalAmount(event, when, discountPercentage, paymentPlan);
+        return calculateTotalAmount(event, discountPercentage, paymentPlan);
     }
 
     /**
