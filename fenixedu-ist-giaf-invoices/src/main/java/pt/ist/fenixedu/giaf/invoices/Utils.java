@@ -43,12 +43,15 @@ import org.fenixedu.academic.domain.accounting.accountingTransactions.detail.Sib
 import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeAndInsuranceEvent;
 import org.fenixedu.academic.domain.accounting.events.AnnualEvent;
 import org.fenixedu.academic.domain.accounting.events.ImprovementOfApprovedEnrolmentEvent;
+import org.fenixedu.academic.domain.accounting.events.PastAdministrativeOfficeFeeAndInsuranceEvent;
 import org.fenixedu.academic.domain.accounting.events.SpecialSeasonEnrolmentEvent;
 import org.fenixedu.academic.domain.accounting.events.candidacy.IndividualCandidacyEvent;
 import org.fenixedu.academic.domain.accounting.events.dfa.DFACandidacyEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEventWithPaymentPlan;
 import org.fenixedu.academic.domain.accounting.events.insurance.InsuranceEvent;
+import org.fenixedu.academic.domain.accounting.postingRules.AdministrativeOfficeFeeAndInsurancePR;
+import org.fenixedu.academic.domain.accounting.postingRules.PastAdministrativeOfficeFeeAndInsurancePR;
 import org.fenixedu.academic.domain.contacts.PartyContact;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
 import org.fenixedu.academic.domain.degreeStructure.CycleType;
@@ -519,6 +522,8 @@ public class Utils {
         } else if (event instanceof PhdGratuityEvent) {
             final PhdGratuityEvent phdGratuityEvent = (PhdGratuityEvent) event;
             dueDate = phdGratuityEvent.getLimitDateToPay();
+        } else if (event instanceof PastAdministrativeOfficeFeeAndInsuranceEvent) {
+            dueDate = getDueDateByPaymentCodes(event);
         } else if (event instanceof AdministrativeOfficeFeeAndInsuranceEvent) {
             final AdministrativeOfficeFeeAndInsuranceEvent insuranceEvent = (AdministrativeOfficeFeeAndInsuranceEvent) event;
             final YearMonthDay ymd = insuranceEvent.getAdministrativeOfficeFeePaymentLimitDate();
