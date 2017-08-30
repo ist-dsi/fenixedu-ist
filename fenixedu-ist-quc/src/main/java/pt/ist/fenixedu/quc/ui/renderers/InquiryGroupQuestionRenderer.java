@@ -284,7 +284,8 @@ public class InquiryGroupQuestionRenderer extends InputRenderer {
         }
 
         private String getQuestionToolTip(final LocalizedString multiLanguageString) {
-            return multiLanguageString != null ? "<a href=\"#\" class=\"help\"> [?] <span>" + multiLanguageString.toString() + "</span></a>" : "";
+            return multiLanguageString != null ? "<a href=\"#\" class=\"help\"> [?] <span>" + multiLanguageString.getContent()
+                    + "</span></a>" : "";
         }
 
         private String getQuestionRequiredIndication(final InquiryQuestion inquiryQuestion) {

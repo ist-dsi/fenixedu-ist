@@ -94,7 +94,7 @@ public class QuestionScale implements Serializable {
     public String toString() {
         StringBuilder string = new StringBuilder();
         for (int iter = 0; iter < getScaleLength(); iter++) {
-            string.append(getScale()[iter].toString());
+            string.append(getScale()[iter].getContent());
             string.append(" -#- ");
         }
         return string.toString();
