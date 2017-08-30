@@ -150,7 +150,7 @@ public abstract class InquiryBlocksResumeRenderer extends OutputRenderer {
 
             for (InquiryResult inquiryResult : blocksResults) {
                 final HtmlTableCell firstGrouptInnerCell = headerRow.createCell(CellType.HEADER);
-                firstGrouptInnerCell.setBody(new HtmlText(inquiryResult.getInquiryQuestion().getLabel().toString()));
+                firstGrouptInnerCell.setBody(new HtmlText(inquiryResult.getInquiryQuestion().getLabel().getContent()));
                 firstGrouptInnerCell.setClasses("col-bar");
             }
 

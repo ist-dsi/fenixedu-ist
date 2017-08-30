@@ -24,6 +24,9 @@ package pt.ist.fenixedu.quc.ui.renderers;
 import java.text.NumberFormat;
 import java.util.Locale;
 
+import com.google.common.base.CharMatcher;
+import com.google.common.base.Strings;
+
 import pt.ist.fenixWebFramework.renderers.InputRenderer;
 import pt.ist.fenixWebFramework.renderers.components.HtmlBlockContainer;
 import pt.ist.fenixWebFramework.renderers.components.HtmlComponent;
@@ -39,9 +42,6 @@ import pt.ist.fenixedu.quc.domain.InquiryResultComment;
 import pt.ist.fenixedu.quc.domain.ResultClassification;
 import pt.ist.fenixedu.quc.dto.GroupResultsSummaryBean;
 import pt.ist.fenixedu.quc.dto.QuestionResultsSummaryBean;
-
-import com.google.common.base.CharMatcher;
-import com.google.common.base.Strings;
 
 /**
  * @author - Ricardo Rodrigues (ricardo.rodrigues@ist.utl.pt)
@@ -366,7 +366,7 @@ public class InquiryGroupResultsResumeRenderer extends InputRenderer {
                 String value = questionHeader.getScaleHeaders().getScaleValues()[iter];
                 if (CharMatcher.DIGIT.matchesAllOf(value) && Integer.valueOf(value) > 0) {
                     StringBuilder builder = new StringBuilder("<span class=\"legend-bar\">");
-                    builder.append(questionHeader.getScaleHeaders().getScale()[iter]);
+                    builder.append(questionHeader.getScaleHeaders().getScale()[iter].getContent());
                     builder.append("&nbsp;<span class=\"legend-bar-1");
                     builder.append(endAt).append("-").append(startAt).append("\">&nbsp;</span>");
                     builder.append("</span>");

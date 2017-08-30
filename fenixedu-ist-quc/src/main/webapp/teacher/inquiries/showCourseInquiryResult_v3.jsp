@@ -49,8 +49,8 @@ page-break-after: always;
  
 </style>
 
-<bean:define id="resultsTitle" name="answersResultsSummaryBean" property="inquiryGroupQuestion.inquiryQuestionHeader.title"/>
-<bean:define id="totalAnswersLabel" name="totalAnswers" property="inquiryQuestion.label"/>
+<bean:define id="resultsTitle" name="answersResultsSummaryBean" property="inquiryGroupQuestion.inquiryQuestionHeader.title" type="org.fenixedu.commons.i18n.LocalizedString"/>
+<bean:define id="totalAnswersLabel" name="totalAnswers" property="inquiryQuestion.label" type="org.fenixedu.commons.i18n.LocalizedString"/>
 <bean:define id="totalAnswersNumber" name="totalAnswers" property="questionResult.value"/>
 
 <logic:equal value="true" name="isAvailableForInquiries">
@@ -70,10 +70,10 @@ jQuery(document).ready(function() {
 	   	 marginBottom: 45
 	  },
       title: {
-         text: <%= "'" + resultsTitle.toString() + "'"%>
+         text: <%= "'" + resultsTitle.getContent() + "'"%>
       },
       subtitle: {
-          text: <%= "'" + totalAnswersLabel + ": " + totalAnswersNumber + "'" %>,
+          text: <%= "'" + totalAnswersLabel.getContent() + ": " + totalAnswersNumber + "'" %>,
  		 y: 35
       },
       credits: {
@@ -111,10 +111,10 @@ jQuery(document).ready(function() {
          name: 'Browser share',
          data: [
             <logic:iterate id="questionResult" name="answersResultsSummaryBean" property="questionsResults">
-				<bean:define id="questionLabel" name="questionResult" property="inquiryQuestion.label"/>				
+				<bean:define id="questionLabel" name="questionResult" property="inquiryQuestion.label" type="org.fenixedu.commons.i18n.LocalizedString"/>				
 				<bean:define id="questionValue" name="questionResult" property="presentationValue"/>	  
 				<logic:notEqual value="0" name="questionValue">          
-	            	<%= "['" + questionLabel.toString().replace("'","\\'") + "', " + questionValue + "],"%>
+	            	<%= "['" + questionLabel.getContent().replace("'","\\'") + "', " + questionValue + "],"%>
 	            </logic:notEqual>  	            
             </logic:iterate>
          ]
@@ -126,7 +126,7 @@ jQuery(document).ready(function() {
 </bean:define>
 </logic:equal>
 
-<bean:define id="workLoadTitle" name="workLoadSummaryBean" property="inquiryGroupQuestion.inquiryQuestionHeader.title"/>
+<bean:define id="workLoadTitle" name="workLoadSummaryBean" property="inquiryGroupQuestion.inquiryQuestionHeader.title" type="org.fenixedu.commons.i18n.LocalizedString"/>
 
 <bean:define id="workloadJS">
 <script type="text/javascript"> 
@@ -141,7 +141,7 @@ jQuery(document).ready(function() {
          defaultSeriesType: 'bar'
       },
       title: {
-         text: <%= "'" + workLoadTitle.toString() + "'" %>
+         text: <%= "'" + workLoadTitle.getContent() + "'" %>
       },
       credits: {
          enabled: false
@@ -175,14 +175,14 @@ jQuery(document).ready(function() {
       },
            series: [			
 			<logic:iterate indexId="iter" id="questionResult" name="workLoadSummaryBean" property="questionsResults">
-				<bean:define id="questionLabel" name="questionResult" property="inquiryQuestion.label"/>
+				<bean:define id="questionLabel" name="questionResult" property="inquiryQuestion.label" type="org.fenixedu.commons.i18n.LocalizedString"/>
 				<bean:define id="questionValue" name="questionResult" property="presentationValue"/>
 				<bean:define id="espectedValue" value="0"/>
 				<logic:equal name="iter" value="2">
 					{ name: 'Trabalho Autónomo', data: [ <bean:write name="autonumousWorkEcts"/>, 0 ]},
 					<bean:define id="espectedValue"><bean:write name="contactLoadEcts"/></bean:define>
 				</logic:equal>  
-	            <%= "{ name: '" + questionLabel.toString() + "', data: [" + espectedValue + "," + (questionValue.equals("") ? "0" : questionValue) + "]},"%>
+	            <%= "{ name: '" + questionLabel.getContent() + "', data: [" + espectedValue + "," + (questionValue.equals("") ? "0" : questionValue) + "]},"%>
 			</logic:iterate>
 			]
    });
@@ -205,7 +205,7 @@ var highchartsOptions = Highcharts.setOptions(Highcharts.theme)
 </script> 
 </bean:define> 
 
-<bean:define id="ucEvaluationsTitle" name="ucEvaluationsGroupBean" property="inquiryGroupQuestion.inquiryBlock.inquiryQuestionHeader.title"/>
+<bean:define id="ucEvaluationsTitle" name="ucEvaluationsGroupBean" property="inquiryGroupQuestion.inquiryBlock.inquiryQuestionHeader.title" type="org.fenixedu.commons.i18n.LocalizedString"/>
 
 <bean:define id="ucEvaluationsJS">
 <script type="text/javascript"> 
@@ -220,7 +220,7 @@ jQuery(document).ready(function() {
          defaultSeriesType: 'column'
       },
       title: {
-         text: <%= "'" + ucEvaluationsTitle.toString() + "'" %>
+         text: <%= "'" + ucEvaluationsTitle.getContent() + "'" %>
       },
       credits: {
          enabled: false
@@ -231,8 +231,8 @@ jQuery(document).ready(function() {
       xAxis: {
          categories: [
              <logic:iterate id="questionSummary" name="ucEvaluationsGroupBean" property="questionsResults">
-             	<logic:iterate id="category" name="questionSummary" property="inquiryQuestion.inquiryQuestionHeader.scaleHeaders.scale">
-             		<%= "'" + category.toString().replace("'","\\'") + "'," %>
+             	<logic:iterate id="category" name="questionSummary" property="inquiryQuestion.inquiryQuestionHeader.scaleHeaders.scale" type="org.fenixedu.commons.i18n.LocalizedString">
+             		<%= "'" + category.getContent().replace("'","\\'") + "'," %>
              	</logic:iterate>
              </logic:iterate>
          ]
@@ -384,13 +384,13 @@ jQuery(document).ready(function() {
 					<span>Opção "Não responder":</span>
 					<bean:size id="size" name="nonAnswersResultsSummaryBean" property="questionsResults"/>
 					<logic:iterate indexId="index" length="length" id="questionResult" name="nonAnswersResultsSummaryBean" property="questionsResults">
-						<bean:define id="questionLabel" name="questionResult" property="inquiryQuestion.label"/>				
+						<bean:define id="questionLabel" name="questionResult" property="inquiryQuestion.label" type="org.fenixedu.commons.i18n.LocalizedString"/>				
 						<bean:define id="questionValue" name="questionResult" property="presentationValue"/>
 						<logic:notEmpty name="questionValue">
 							<logic:notEqual value="0" name="questionValue">
 								<bean:define id="labelValue">
-					            	<%= index+1 != size ? "<span>" + questionLabel.toString() + " " + questionValue + "% - </span>" 
-					            	: "<span>" + questionLabel.toString() + " " + questionValue + "% </span>" %>		            	
+					            	<%= index+1 != size ? "<span>" + questionLabel.getContent() + " " + questionValue + "% - </span>" 
+					            	: "<span>" + questionLabel.getContent() + " " + questionValue + "% </span>" %>		            	
 					            </bean:define>
 					            <bean:write name="labelValue" filter="false"/>
 				            </logic:notEqual>
@@ -418,7 +418,7 @@ jQuery(document).ready(function() {
 		<logic:iterate id="ucData" name="ucGeneralDataSummaryBean" property="questionsResults">
 			<tr>
 				<th style="width: 240px;">
-					<bean:write name="ucData" property="inquiryQuestion.label"/>
+					<bean:write name="ucData" property="inquiryQuestion.label.content"/>
 					<logic:notEmpty name="ucData" property="inquiryQuestion.toolTip">
 						<a href="#" class="helpleft">[?]
 							<span><bean:write name="ucData" property="inquiryQuestion.toolTip.content"/></span>

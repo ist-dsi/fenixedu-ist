@@ -102,15 +102,15 @@ margin-top: 0px;
 	</ul>
 
 	<logic:iterate indexId="iter" id="blockResult" name="blockResultsSummaryBeans">
-		<h2 style="clear: both"><bean:write name="blockResult" property="inquiryBlock.inquiryQuestionHeader.title"/></h2>
+		<h2 style="clear: both"><bean:write name="blockResult" property="inquiryBlock.inquiryQuestionHeader.title.content"/></h2>
 		<logic:iterate id="groupResult" name="blockResult" property="groupsResults">		
 			<fr:view name="groupResult" />
 		</logic:iterate>
 	</logic:iterate>
 	
 	<logic:notEmpty name="teacherEvaluation">
-		<a href="#" class="helpleft">[?]<span style="width: 500px;"><bean:write name="teacherEvaluation" property="inquiryQuestion.toolTip"/></span></a>
-		<bean:write name="teacherEvaluation" property="inquiryQuestion.label"/>:	
+		<a href="#" class="helpleft">[?]<span style="width: 500px;"><bean:write name="teacherEvaluation" property="inquiryQuestion.toolTip.content"/></span></a>
+		<bean:write name="teacherEvaluation" property="inquiryQuestion.label.content"/>:	
 		<logic:notEmpty name="teacherEvaluation" property="value">
 			<bean:write name="teacherEvaluation" property="value"/>
 		</logic:notEmpty>
