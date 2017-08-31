@@ -35,12 +35,11 @@ import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEvent;
 import org.fenixedu.academic.domain.alumni.CerimonyInquiryPerson;
 import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.academic.domain.student.Student;
+import org.fenixedu.academic.ui.struts.action.HomeAction;
 import org.fenixedu.academic.ui.struts.action.base.FenixAction;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.exceptions.AuthorizationException;
 import org.fenixedu.bennu.core.security.Authenticate;
-import org.fenixedu.bennu.portal.domain.MenuItem;
-import org.fenixedu.bennu.portal.domain.PortalConfiguration;
 import org.fenixedu.bennu.struts.annotations.Mapping;
 
 import pt.ist.fenixWebFramework.renderers.components.HtmlLink;
@@ -275,19 +274,8 @@ public class BaseAuthenticationAction extends FenixAction {
 
     private ActionForward handleSessionCreationAndGetForward(ActionMapping mapping, HttpServletRequest request, User userView,
             final HttpSession session) {
-        final MenuItem initialMenuEntry = findTopLevelContainer();
-        final String contextPath = request.getContextPath();
-        final String path = initialMenuEntry == null ? contextPath : contextPath + initialMenuEntry.getFullPath();
+        final String path = HomeAction.findFirstFuntionalityPath(request);
         return new ActionForward(path, true);
-    }
-
-    private MenuItem findTopLevelContainer() {
-        for (final MenuItem item : PortalConfiguration.getInstance().getMenu().getOrderedChild()) {
-            if (item.isVisible() && item.isAvailableForCurrentUser()) {
-                return item;
-            }
-        }
-        return null;
     }
 
     private ActionForward handleSessionCreationAndForwardToTeachingService(HttpServletRequest request, User userView,
