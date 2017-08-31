@@ -18,16 +18,11 @@
     along with FenixEdu IST Integration.  If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-
-<c:if test="${empty LOGGED_USER_ATTRIBUTE}">
-	<c:set var="url" scope="request" value="${pageContext.request.contextPath}/login"/>
-</c:if>
-
-<c:if test="${not empty LOGGED_USER_ATTRIBUTE}">
-	<c:set var="url" scope="request" value="${pageContext.request.contextPath}/home.do"/>
-</c:if>
+<%@page import="org.fenixedu.bennu.core.security.Authenticate"%>
+<%@page import="org.fenixedu.academic.ui.struts.action.HomeAction"%>
 
 <%
-	response.sendRedirect((String) pageContext.findAttribute("url"));
+    final Object logged = request.getSession().getAttribute("LOGGED_USER_ATTRIBUTE");
+    final String path = logged == null ? request.getContextPath() + "/login" : HomeAction.findFirstFuntionalityPath(request);
+    response.sendRedirect(path);
 %>

@@ -35,12 +35,13 @@ import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEvent;
 import org.fenixedu.academic.domain.alumni.CerimonyInquiryPerson;
 import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.academic.domain.student.Student;
+import org.fenixedu.academic.ui.struts.action.HomeAction;
 import org.fenixedu.academic.ui.struts.action.base.FenixAction;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.exceptions.AuthorizationException;
 import org.fenixedu.bennu.core.security.Authenticate;
-
 import org.fenixedu.bennu.struts.annotations.Mapping;
+
 import pt.ist.fenixWebFramework.renderers.components.HtmlLink;
 import pt.ist.fenixWebFramework.servlets.filters.contentRewrite.GenericChecksumRewriter;
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveEmployees;
@@ -273,7 +274,8 @@ public class BaseAuthenticationAction extends FenixAction {
 
     private ActionForward handleSessionCreationAndGetForward(ActionMapping mapping, HttpServletRequest request, User userView,
             final HttpSession session) {
-        return new ActionForward("/home.do", true);
+        final String path = HomeAction.findFirstFuntionalityPath(request);
+        return new ActionForward(path, true);
     }
 
     private ActionForward handleSessionCreationAndForwardToTeachingService(HttpServletRequest request, User userView,
