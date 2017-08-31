@@ -39,8 +39,10 @@ import org.fenixedu.academic.ui.struts.action.base.FenixAction;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.exceptions.AuthorizationException;
 import org.fenixedu.bennu.core.security.Authenticate;
-
+import org.fenixedu.bennu.portal.domain.MenuItem;
+import org.fenixedu.bennu.portal.domain.PortalConfiguration;
 import org.fenixedu.bennu.struts.annotations.Mapping;
+
 import pt.ist.fenixWebFramework.renderers.components.HtmlLink;
 import pt.ist.fenixWebFramework.servlets.filters.contentRewrite.GenericChecksumRewriter;
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveEmployees;
@@ -273,7 +275,19 @@ public class BaseAuthenticationAction extends FenixAction {
 
     private ActionForward handleSessionCreationAndGetForward(ActionMapping mapping, HttpServletRequest request, User userView,
             final HttpSession session) {
-        return new ActionForward("/home.do", true);
+        final MenuItem initialMenuEntry = findTopLevelContainer();
+        final String contextPath = request.getContextPath();
+        final String path = initialMenuEntry == null ? contextPath : contextPath + initialMenuEntry.getFullPath();
+        return new ActionForward(path, true);
+    }
+
+    private MenuItem findTopLevelContainer() {
+        for (final MenuItem item : PortalConfiguration.getInstance().getMenu().getOrderedChild()) {
+            if (item.isVisible() && item.isAvailableForCurrentUser()) {
+                return item;
+            }
+        }
+        return null;
     }
 
     private ActionForward handleSessionCreationAndForwardToTeachingService(HttpServletRequest request, User userView,
