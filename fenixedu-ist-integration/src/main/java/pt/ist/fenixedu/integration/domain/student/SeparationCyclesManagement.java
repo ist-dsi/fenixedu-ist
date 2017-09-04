@@ -228,7 +228,7 @@ public class SeparationCyclesManagement {
     private YearMonthDay getBeginDate(final StudentCurricularPlan sourceStudentCurricularPlan,
             final ExecutionSemester executionSemester) {
 
-        if (!sourceStudentCurricularPlan.getRegistration().hasConcluded()) {
+        if (!sourceStudentCurricularPlan.getRegistration().hasConcludedFirstCycle()) {
             throw new DomainException("error.SeparationCyclesManagement.source.studentCurricularPlan.is.not.concluded");
         }
 
@@ -572,9 +572,14 @@ public class SeparationCyclesManagement {
             stateDate = getExecutionYear().getEndDateYearMonthDay().toLocalDate();
         }
 
+        RegistrationStateType stateType = RegistrationStateType.CONCLUDED;
+        if (oldStudentCurricularPlan.getDegreeType().isIntegratedMasterDegree()) {
+            stateType = RegistrationStateType.INTERNAL_ABANDON;
+        }
+
         final RegistrationState state =
                 RegistrationState.createRegistrationState(oldStudentCurricularPlan.getRegistration(), null,
-                        stateDate.toDateTimeAtStartOfDay(), RegistrationStateType.CONCLUDED);
+                        stateDate.toDateTimeAtStartOfDay(), stateType);
         state.setResponsiblePerson(null);
     }
 
