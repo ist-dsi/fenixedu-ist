@@ -18,9 +18,8 @@
  */
 package pt.ist.fenixedu.integration.task.updateData.enrolment;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.InputStreamReader;
+import java.io.File;
+import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,35 +29,68 @@ import org.fenixedu.academic.domain.util.email.Message;
 import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.academic.domain.util.email.Sender;
 import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.security.Authenticate;
-import org.fenixedu.bennu.io.domain.GenericFile;
 import org.fenixedu.bennu.scheduler.custom.CustomTask;
 
 import pt.ist.fenixframework.FenixFramework;
 
 public class SendEmailToLowPerformanceStudents extends CustomTask {
 
+    private final String SUBJECT = "Baixo rendimento académico";
+    private final String BODY = "Caro aluno do TÉCNICO,\n" + 
+            "\n" + 
+            "Apesar de não constar da lista de prescrições em 2017/18, verificou-se \n" + 
+            "que o seu rendimento académico tem sido claramente abaixo do esperado. \n" + 
+            "Sabemos que vários são os motivos que podem ter condicionado o seu \n" + 
+            "desempenho académico ao longo dos últimos anos. Provavelmente já terá \n" + 
+            "tentado inverter esta situação, o Núcleo de Desenvolvimento Académico \n" + 
+            "(NDA/GATu) disponibiliza-se a traçar consigo um plano específico e \n" + 
+            "individualizado para melhorar o seu rendimento académico.\n" + 
+            "\n" + 
+            "Por forma a evitar a sua prescrição nos próximos anos é aconselhado a:\n" + 
+            "\n" + 
+            "·contactar o NDA/GATu para:\n" + 
+            "\n" + 
+            "   perceber as vantagens ou esclarecer dúvidas caso pretenda alterar a sua \n" + 
+            "inscrição em 2017/18 para o regime de “tempo parcial”. Para mais \n" + 
+            "informações sobre o Regime de Tempo Parcial consulte o Guia Académico em \n" + 
+            "https://tecnico.ulisboa.pt/pt/recursos/documentos-importantes/\n" + 
+            "\n" + 
+            "   esclarecer qualquer questão que tenha relativa à Lei das Prescrições e \n" + 
+            "às condições de exceção que evitaram a sua prescrição. Para mais \n" + 
+            "informações sobre a Lei das Prescrições consulte a parte 2 do Guia \n" + 
+            "Académico em https://tecnico.ulisboa.pt/pt/recursos/documentos-importantes/\n" + 
+            "\n" + 
+            "·Informar-se sobre o Workshop “Para Prescrever a Prescrição”, que \n" + 
+            "decorrerá no mês de setembro.\n" + 
+            "\n" + 
+            "GATu: Há mais de 10 anos ao lado dos alunos a contribuir para a melhoria \n" + 
+            "do rendimento académico!\n" + 
+            "\n" + 
+            "Com os melhores cumprimentos e votos de um bom ano escolar de 2017/18,\n" + 
+            "\n" + 
+            "Professora Fátima Montemor\n" + 
+            "\n" + 
+            "Conselho de Gestão do Instituto Superior Técnico,\n" + 
+            "\n" + 
+            "Assuntos Académicos";
+
     @Override
     public void runTask() throws Exception {
         User user = User.findByUsername("ist24616");
         Authenticate.mock(user);
 
-        GenericFile file = FenixFramework.getDomainObject("566729524642563"); //file with the students numbers, one in each line
-
-        BufferedReader br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(file.getContent())));
-        String line;
-        Set<Person> students = new HashSet<Person>();
-        while ((line = br.readLine()) != null) {
-            Student student = Student.readStudentByNumber(Integer.valueOf(line));
-            if (student == null) {
-                taskLog("Can't find student -> " + line);
-                continue;
-            }
-            students.add(student.getPerson());
-        }
-        br.close();
-
-        createEmail(students);
+        final String filename = "/afs/ist.utl.pt/ciist/fenix/fenix015/ist/lowPerformers.txt";
+        Files.readAllLines(new File(filename).toPath())
+            .forEach(line -> {
+                Student student = Student.readStudentByNumber(Integer.valueOf(line));
+                if (student == null) {
+                    taskLog("Can't find student -> " + line);
+                } else {
+                    createEmail(student.getPerson());
+                }
+            });
 
         taskLog("Done.");
     }
@@ -67,45 +99,15 @@ public class SendEmailToLowPerformanceStudents extends CustomTask {
         return FenixFramework.getDomainObject("4196183080395");
     }
 
-    private void createEmail(final Set<Person> students) {
-
-        Sender sender = getConcelhoDeGestaoSender();
+    private void createEmail(final Person students) {
+        final Sender sender = getConcelhoDeGestaoSender();
         final Set<Recipient> tos = new HashSet<Recipient>();
-        tos.add(new Recipient(students));
+        tos.add(new Recipient(Group.users(students.getUser())));
 
         final Set<String> bccs = new HashSet<String>();
         bccs.add("marta.graca@ist.utl.pt");
 
-        new Message(sender, null, tos, getSubject(), getBody(), bccs);
-        taskLog("Sent: " + students.size() + " emails");
+        new Message(sender, null, tos, SUBJECT, BODY, bccs);
     }
 
-    private String getSubject() {
-        return "Baixo rendimento académico";
-    }
-
-    private String getBody() {
-        StringBuilder builder = new StringBuilder();
-
-        builder.append("Caro aluno do IST,\n");
-        builder.append("Apesar de não constar da lista de prescrições em 2014/205, verificou-se que o seu rendimento académico tem sido claramente abaixo da média.\n");
-        builder.append("\n");
-        builder.append("Por forma a evitar a sua prescrição no próximo ano é aconselhado a:\n");
-        builder.append("\n");
-        builder.append("1 - ler atentamente o regulamento de prescrições do IST que poderá descarregar em http://www.ist.utl.pt/pt/alunos;\n");
-        builder.append("\n");
-        builder.append("2 - alterar a sua inscrição em 2014/2015 para o regime de tempo parcial (consulte a Parte II do Guia Académico em http://www.ist.utl.pt/pt/alunos);\n");
-        builder.append("\n");
-        builder.append("3 - contactar durante o próximo ano lectivo o Gabinete de Apoio ao Tutorado (GATu).\n");
-        builder.append("\n");
-        builder.append("Com os melhores cumprimentos e votos de um bom ano escolar de 2014/2015,\n");
-        builder.append("\n");
-        builder.append("Prof. Jorge Morgado");
-        builder.append("\n");
-        builder.append("Conselho de Gestão do Instituto Superior Técnico,");
-        builder.append("\n");
-        builder.append("Assuntos Académicos\n");
-
-        return builder.toString();
-    }
 }
