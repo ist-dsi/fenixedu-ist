@@ -11,7 +11,7 @@
 
     <groupId>pt.ist</groupId>
     <artifactId>fenixedu-ist</artifactId>
-    <version>10.2.0-SNAPSHOT</version>
+    <version>10.1.3</version>
     <packaging>pom</packaging>
 
     <name>FenixEdu IST Contribution Modules</name>
