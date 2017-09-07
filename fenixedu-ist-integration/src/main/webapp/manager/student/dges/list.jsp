@@ -28,6 +28,19 @@
 
 <h2><bean:message key="title.dges.importation.process" bundle="MANAGER_RESOURCES" /></h2>
 
+    <ul>
+        <li>
+            <fr:form id="cancelPreviousForm" action="/dgesStudentImportationProcess.do?method=cancelStandByCandidaciesFromPreviousYears">
+                <fr:edit id="importation.bean.cancel" name="importationBean" visible="false" />
+
+                <html:link href="#" onclick="document.getElementById('cancelPreviousForm').submit();">
+                    <bean:message key="link.dges.importation.process.cancel.stand.by.candidacies.from.previous.years" bundle="FENIXEDU_IST_INTEGRATION_RESOURCES"/>
+                    (<bean:write name="countStandByCandidaciesFromPreviousYear"/>)
+                </html:link>
+            </fr:form>
+        </li>
+    </ul>
+
 <fr:form action="/dgesStudentImportationProcess.do?method=createNewImportationProcess">
 	<fr:edit id="importation.bean" name="importationBean" visible="false" />
 

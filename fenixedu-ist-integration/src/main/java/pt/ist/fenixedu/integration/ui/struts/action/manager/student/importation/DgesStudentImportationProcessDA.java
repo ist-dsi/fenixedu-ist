@@ -70,22 +70,27 @@ public class DgesStudentImportationProcessDA extends FenixDispatchAction {
         RenderUtils.invalidateViewState("importation.bean");
         request.setAttribute("importationBean", bean);
 
-        request.setAttribute("importationJobsDone", DgesStudentImportationProcess.readDoneJobs(bean.getExecutionYear()));
-        request.setAttribute("importationJobsPending", DgesStudentImportationProcess.readUndoneJobs(bean.getExecutionYear()));
+        final ExecutionYear executionYear = bean.getExecutionYear();
+
+        request.setAttribute("importationJobsDone", DgesStudentImportationProcess.readDoneJobs(executionYear));
+        request.setAttribute("importationJobsPending", DgesStudentImportationProcess.readUndoneJobs(executionYear));
         request.setAttribute("exportationPasswordsDone",
-                ExportDegreeCandidaciesByDegreeForPasswordGeneration.readDoneJobs(bean.getExecutionYear()));
+                ExportDegreeCandidaciesByDegreeForPasswordGeneration.readDoneJobs(executionYear));
         request.setAttribute("exportationPasswordsPending",
-                ExportDegreeCandidaciesByDegreeForPasswordGeneration.readUndoneJobs(bean.getExecutionYear()));
+                ExportDegreeCandidaciesByDegreeForPasswordGeneration.readUndoneJobs(executionYear));
         request.setAttribute("exportationAlreadyStudentsDone",
-                ExportExistingStudentsFromImportationProcess.readDoneJobs(bean.getExecutionYear()));
+                ExportExistingStudentsFromImportationProcess.readDoneJobs(executionYear));
         request.setAttribute("exportionAlreadyStudentsPending",
-                ExportExistingStudentsFromImportationProcess.readUndoneJobs(bean.getExecutionYear()));
+                ExportExistingStudentsFromImportationProcess.readUndoneJobs(executionYear));
 
         request.setAttribute("canRequestJobImportationProcess", DgesStudentImportationProcess.canRequestJob());
         request.setAttribute("canRequestJobExportationPasswords",
                 ExportDegreeCandidaciesByDegreeForPasswordGeneration.canRequestJob());
         request.setAttribute("canRequestJobExportationAlreadyStudents",
                 ExportExistingStudentsFromImportationProcess.canRequestJob());
+
+        request.setAttribute("countStandByCandidaciesFromPreviousYear",
+                DgesStudentImportationProcess.countStandByCandidaciesFromPreviousYear(executionYear));
 
         return mapping.findForward("list");
     }
@@ -168,6 +173,14 @@ public class DgesStudentImportationProcessDA extends FenixDispatchAction {
     public ActionForward createNewExportationCandidaciesForPasswordGenerationProcessInvalid(ActionMapping mapping,
             ActionForm form, HttpServletRequest request, HttpServletResponse response) {
         return prepareCreateNewExportationCandidaciesForPasswordGenerationJob(mapping, form, request, response);
+    }
+
+    public ActionForward cancelStandByCandidaciesFromPreviousYears(final ActionMapping mapping, final ActionForm form, final HttpServletRequest request, final HttpServletResponse response) {
+        final DgesBaseProcessBean bean = getRenderedBean();
+        final ExecutionYear executionYear = bean == null || bean.getExecutionYear() == null ?
+                ExecutionYear.readCurrentExecutionYear() : bean.getExecutionYear();
+        DgesStudentImportationProcess.cancelStandByCandidaciesFromPreviousYears(executionYear);
+        return list(mapping, form, request, response);
     }
 
     public static class DgesBaseProcessBean implements java.io.Serializable {
