@@ -23,6 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.Degree;
@@ -44,11 +45,16 @@ import org.fenixedu.academic.domain.accounting.postingRules.AdministrativeOffice
 import org.fenixedu.academic.domain.accounting.postingRules.AdministrativeOfficeFeePR;
 import org.fenixedu.academic.domain.administrativeOffice.AdministrativeOffice;
 import org.fenixedu.academic.domain.candidacy.Candidacy;
+import org.fenixedu.academic.domain.candidacy.CandidacySituation;
+import org.fenixedu.academic.domain.candidacy.CandidacySituationType;
 import org.fenixedu.academic.domain.candidacy.DegreeCandidacy;
 import org.fenixedu.academic.domain.candidacy.IMDCandidacy;
 import org.fenixedu.academic.domain.candidacy.StandByCandidacySituation;
 import org.fenixedu.academic.domain.candidacy.StudentCandidacy;
 import org.fenixedu.academic.domain.exceptions.DomainException;
+import org.fenixedu.academic.domain.organizationalStructure.Accountability;
+import org.fenixedu.academic.domain.organizationalStructure.Party;
+import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.organizationalStructure.UnitUtils;
 import org.fenixedu.academic.domain.student.PrecedentDegreeInformation;
 import org.fenixedu.academic.domain.student.Student;
@@ -65,6 +71,7 @@ import org.slf4j.LoggerFactory;
 
 import pt.ist.fenixedu.contracts.domain.Employee;
 import pt.ist.fenixedu.tutorship.domain.TutorshipIntention;
+import pt.ist.fenixframework.Atomic;
 
 public class DgesStudentImportationProcess extends DgesStudentImportationProcess_Base {
 
@@ -183,6 +190,7 @@ public class DgesStudentImportationProcess extends DgesStudentImportationProcess
 
     private void createDegreeCandidacies(final PrintWriter LOG_WRITER, final Employee employee,
             final List<DegreeCandidateDTO> degreeCandidateDTOs) {
+        final Map<String,Unit> highSchoolCache = loadExternalInstitutionUnits();
         int processed = 0;
         for (final DegreeCandidateDTO degreeCandidateDTO : degreeCandidateDTOs) {
 
@@ -231,7 +239,7 @@ public class DgesStudentImportationProcess extends DgesStudentImportationProcess
             voidPreviousCandidacies(person,
                     degreeCandidateDTO.getExecutionDegree(getExecutionYear(), getDgesStudentImportationForCampus()));
 
-            final StudentCandidacy studentCandidacy = createCandidacy(employee, degreeCandidateDTO, person);
+            final StudentCandidacy studentCandidacy = createCandidacy(employee, degreeCandidateDTO, person, highSchoolCache);
             new StandByCandidacySituation(studentCandidacy, employee.getPerson());
 
             createAvailableAccountingEventsPaymentCodes(person, studentCandidacy);
@@ -240,16 +248,17 @@ public class DgesStudentImportationProcess extends DgesStudentImportationProcess
     }
 
     private void createAdministrativeOfficeFeePaymentCode(Person person, StudentCandidacy studentCandidacy) {
-        AdministrativeOffice office = getAdministrativeOffice(studentCandidacy.getDegreeCurricularPlan());
-        AdministrativeOfficeFeeAndInsurancePR administrativeOfficePostingRule =
+        final AdministrativeOffice office = getAdministrativeOffice(studentCandidacy.getDegreeCurricularPlan());
+        final AdministrativeOfficeFeeAndInsurancePR administrativeOfficePostingRule =
                 findAdministrativeOfficeFeeAndInsurancePostingRule(office);
 
+        final Money officeFeeAndInsuranceAmount = calculateAdministrativeOfficeFeeAndInsuranceAmount(office);
+        final ExecutionYear executionYear = getExecutionYear();
         studentCandidacy.addAvailablePaymentCodes(AccountingEventPaymentCode.create(
                 PaymentCodeType.ADMINISTRATIVE_OFFICE_FEE_AND_INSURANCE, new YearMonthDay(), administrativeOfficePostingRule
-                        .getAdministrativeOfficeFeePaymentLimitDate(getExecutionYear().getBeginDateYearMonthDay()
-                                .toDateTimeAtMidnight(), getExecutionYear().getEndDateYearMonthDay().toDateTimeAtMidnight()),
-                null, calculateAdministrativeOfficeFeeAndInsuranceAmount(office),
-                calculateAdministrativeOfficeFeeAndInsuranceAmount(office), person));
+                        .getAdministrativeOfficeFeePaymentLimitDate(executionYear.getBeginDateYearMonthDay()
+                                .toDateTimeAtMidnight(), executionYear.getEndDateYearMonthDay().toDateTimeAtMidnight()),
+                null, officeFeeAndInsuranceAmount, officeFeeAndInsuranceAmount, person));
     }
 
     private Money calculateAdministrativeOfficeFeeAndInsuranceAmount(final AdministrativeOffice office) {
@@ -333,7 +342,7 @@ public class DgesStudentImportationProcess extends DgesStudentImportationProcess
     }
 
     private StudentCandidacy createCandidacy(final Employee employee, final DegreeCandidateDTO degreeCandidateDTO,
-            final Person person) {
+            final Person person, final Map<String,Unit> highSchoolCache) {
         final ExecutionDegree executionDegree =
                 degreeCandidateDTO.getExecutionDegree(getExecutionYear(), getDgesStudentImportationForCampus());
         StudentCandidacy candidacy = null;
@@ -356,21 +365,40 @@ public class DgesStudentImportationProcess extends DgesStudentImportationProcess
 
         candidacy.setHighSchoolType(degreeCandidateDTO.getHighSchoolType());
         candidacy.setFirstTimeCandidacy(true);
-        createPrecedentDegreeInformation(candidacy, degreeCandidateDTO);
+        createPrecedentDegreeInformation(candidacy, degreeCandidateDTO, highSchoolCache);
         candidacy.setDgesStudentImportationProcess(this);
 
         return candidacy;
     }
 
     private void createPrecedentDegreeInformation(final StudentCandidacy studentCandidacy,
-            final DegreeCandidateDTO degreeCandidateDTO) {
+            final DegreeCandidateDTO degreeCandidateDTO, final Map<String,Unit> highSchoolCache) {
         final PrecedentDegreeInformation precedentDegreeInformation = studentCandidacy.getPrecedentDegreeInformation();
         precedentDegreeInformation.setStudentCandidacy(studentCandidacy);
 
         precedentDegreeInformation.setConclusionGrade(degreeCandidateDTO.getHighSchoolFinalGrade());
         precedentDegreeInformation.setDegreeDesignation(degreeCandidateDTO.getHighSchoolDegreeDesignation());
-        precedentDegreeInformation.setInstitution(UnitUtils.readExternalInstitutionUnitByName(degreeCandidateDTO
-                .getHighSchoolName()));
+        precedentDegreeInformation.setInstitution(highSchoolCache.get(degreeCandidateDTO.getHighSchoolName()));
+    }
+
+    private Map<String, Unit> loadExternalInstitutionUnits() {
+        final Map<String, Unit> cache = new HashMap<>();
+        loadExternalInstitutionUnits(cache, UnitUtils.readExternalInstitutionUnit());
+        return cache;
+    }
+
+    private void loadExternalInstitutionUnits(final Map<String, Unit> cache, final Unit unit) {
+        final String unitName = unit.getName();
+        if (!cache.containsKey(unitName)) {
+            cache.put(unitName, unit);
+        }
+        for (final Accountability acc : unit.getChildsSet()) {
+            final Party child = acc.getChildParty();
+            if (child instanceof Unit) {
+                final Unit childUnit = (Unit) child;
+                loadExternalInstitutionUnits(cache, childUnit);
+            }
+        }
     }
 
     private void voidPreviousCandidacies(Person person, ExecutionDegree executionDegree) {
@@ -466,6 +494,39 @@ public class DgesStudentImportationProcess extends DgesStudentImportationProcess
         return InstallmentPaymentCode.create(PaymentCodeType.GRATUITY_FIRST_INSTALLMENT, new YearMonthDay(), entry
                 .getInstallment().getEndDate(), null, entry.getInstallment(), entry.getAmountToPay(), entry.getAmountToPay(),
                 student);
+    }
+
+    @Atomic
+    public static void cancelStandByCandidaciesFromPreviousYears(final ExecutionYear executionYear) {
+        final ExecutionYear previous = executionYear.getPreviousExecutionYear();
+        if (previous != null) {
+            previous.getExecutionDegreesSet().stream()
+                .flatMap(ed -> ed.getStudentCandidaciesSet().stream())
+                .filter(sc -> !sc.getCandidacySituationsSet().isEmpty() && isToRemove(sc))
+                .forEach(sc -> sc.cancelCandidacy());
+
+            cancelStandByCandidaciesFromPreviousYears(previous);
+        }
+    }
+
+    private static boolean isToRemove(final StudentCandidacy candidacy) {
+        return (candidacy instanceof DegreeCandidacy || candidacy instanceof IMDCandidacy) && isInStandBy(candidacy);
+    }
+
+    private static boolean isInStandBy(final StudentCandidacy candidacy) {
+        final CandidacySituation situation = candidacy.getActiveCandidacySituation();
+        return situation != null && situation.getCandidacySituationType() == CandidacySituationType.STAND_BY;
+    }
+
+    public static long countStandByCandidaciesFromPreviousYear(final ExecutionYear executionYear) {
+        final ExecutionYear previous = executionYear.getPreviousExecutionYear();
+        if (previous != null) {
+            return previous.getExecutionDegreesSet().stream()
+                .flatMap(ed -> ed.getStudentCandidaciesSet().stream())
+                .filter(sc -> !sc.getCandidacySituationsSet().isEmpty() && isToRemove(sc))
+                .count();
+        }
+        return 0l;
     }
 
 }
