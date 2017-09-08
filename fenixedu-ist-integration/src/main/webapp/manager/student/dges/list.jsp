@@ -39,14 +39,21 @@
                 </html:link>
             </fr:form>
         </li>
+        <logic:equal name="canRequestJobImportationProcess" value="true">
+            <li>
+                <html:link page="/dgesStudentImportationProcess.do?method=prepareCreateNewImportationProcess">
+                    <bean:message key="link.dges.importation.process.request" bundle="MANAGER_RESOURCES"/>
+                </html:link>
+            </li>
+        </logic:equal>
     </ul>
 
-<fr:form action="/dgesStudentImportationProcess.do?method=createNewImportationProcess">
+<fr:form action="/dgesStudentImportationProcess.do?method=list">
 	<fr:edit id="importation.bean" name="importationBean" visible="false" />
 
 	<fr:edit id="importation.bean.edit" name="importationBean">
 		<fr:schema bundle="MANAGER_RESOURCES" type="pt.ist.fenixedu.integration.ui.struts.action.manager.student.importation.DgesStudentImportationProcessDA$DgesBaseProcessBean">
-			<fr:slot name="executionYear" layout="menu-select" key="label.dges.importation.process.execution.year" required="true" >
+			<fr:slot name="executionYear" layout="menu-select-postback" key="label.dges.importation.process.execution.year" required="true" >
 				<fr:property name="providerClass" value="org.fenixedu.academic.ui.renderers.providers.ExecutionYearsProvider"/>
 				<fr:property name="format" value="${name}" />
 				<fr:property name="sortBy" value="name=desc"/>
@@ -106,15 +113,6 @@
 		</fr:layout>
 	</fr:view>
 </logic:notEmpty>
-
-<logic:equal name="canRequestJobImportationProcess" value="true">
-<p>
-	<html:link page="/dgesStudentImportationProcess.do?method=prepareCreateNewImportationProcess">
-		<bean:message key="link.dges.importation.process.request" bundle="MANAGER_RESOURCES"/>
-	</html:link>
-</p>
-</logic:equal>
-
 
 <hr/>
 
