@@ -20,15 +20,13 @@ package pt.ist.fenixedu.integration.ui;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Consumer;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -41,12 +39,16 @@ import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.ExecutionCourse;
+import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.OccupationPeriod;
 import org.fenixedu.academic.domain.OccupationPeriodType;
 import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.Summary;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.VatNumberResolver;
+import org.fenixedu.academic.domain.accounting.events.AccountingEventsManager;
+import org.fenixedu.academic.domain.candidacy.workflow.RegistrationOperation.RegistrationCreatedByCandidacy;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
 import org.fenixedu.academic.domain.degreeStructure.Context;
 import org.fenixedu.academic.domain.enrolment.DegreeModuleToEnrol;
@@ -70,8 +72,8 @@ import org.fenixedu.cms.domain.CMSFolder;
 import org.fenixedu.cms.domain.Category;
 import org.fenixedu.cms.domain.Site;
 
-import com.google.common.base.Strings;
 import com.google.common.base.CharMatcher;
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 import pt.ist.fenixedu.giaf.invoices.ClientMap;
@@ -80,6 +82,8 @@ import pt.ist.fenixedu.integration.domain.student.AffinityCyclesManagement;
 import pt.ist.fenixedu.integration.domain.student.PreEnrolment;
 import pt.ist.fenixedu.integration.dto.QucProfessorshipEvaluation;
 import pt.ist.fenixedu.teacher.evaluation.domain.ProfessorshipEvaluationBean;
+import pt.ist.fenixframework.Atomic;
+import pt.ist.fenixframework.Atomic.TxMode;
 import pt.ist.fenixframework.FenixFramework;
 import pt.ist.fenixframework.dml.runtime.RelationAdapter;
 
@@ -227,6 +231,25 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
                 return warnings;
             };
         });
+
+        Signal.registerWithoutTransaction("academic.candidacy.registration.created",
+                new Consumer<RegistrationCreatedByCandidacy>() {
+                    @Override
+                    public void accept(final RegistrationCreatedByCandidacy candidacy) {
+                        createEvents(candidacy);
+                    }
+
+                    @Atomic(mode = TxMode.WRITE)
+                    private void createEvents(RegistrationCreatedByCandidacy candidacy) {
+                        final Registration registration = candidacy.getInstance();
+                        final StudentCurricularPlan studentCurricularPlan = registration.getLastStudentCurricularPlan();
+                        final ExecutionYear executionYear = registration.getStartExecutionYear();
+                        final AccountingEventsManager manager = new AccountingEventsManager();
+                        manager.createGratuityEvent(studentCurricularPlan, executionYear);
+                        manager.createAdministrativeOfficeFeeAndInsuranceEvent(studentCurricularPlan, executionYear);
+                    }
+                });
+
     }
 
     private static boolean isOverDue(final Event event) {
