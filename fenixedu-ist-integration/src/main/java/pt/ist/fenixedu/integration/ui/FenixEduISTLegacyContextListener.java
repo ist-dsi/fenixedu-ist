@@ -83,6 +83,7 @@ import pt.ist.fenixedu.integration.domain.student.PreEnrolment;
 import pt.ist.fenixedu.integration.dto.QucProfessorshipEvaluation;
 import pt.ist.fenixedu.teacher.evaluation.domain.ProfessorshipEvaluationBean;
 import pt.ist.fenixframework.Atomic;
+import pt.ist.fenixframework.Atomic.TxMode;
 import pt.ist.fenixframework.FenixFramework;
 import pt.ist.fenixframework.dml.runtime.RelationAdapter;
 
@@ -238,7 +239,7 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
                         createEvents(candidacy);
                     }
 
-                    @Atomic
+                    @Atomic(mode = TxMode.WRITE)
                     private void createEvents(RegistrationCreatedByCandidacy candidacy) {
                         final Registration registration = candidacy.getInstance();
                         final StudentCurricularPlan studentCurricularPlan = registration.getLastStudentCurricularPlan();
