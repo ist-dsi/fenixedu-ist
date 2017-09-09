@@ -18,8 +18,11 @@
  */
 package pt.ist.fenixedu.integration.domain.cgd;
 
+import java.io.InputStream;
 import java.time.Year;
+import java.util.Locale;
 
+import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
@@ -29,8 +32,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import pt.ist.fenixframework.Atomic;
+import pt.ist.fenixframework.Atomic.TxMode;
 import pt.ist.fenixframework.FenixFramework;
+import pt.ist.registration.process.ui.service.RegistrationDeclarationCreatorService;
 
+import com.google.gson.JsonObject;
 import com.qubit.solution.fenixedu.integration.cgd.services.form43.CgdForm43Sender;
 
 public class CgdCard extends CgdCard_Base {
@@ -102,48 +108,4 @@ public class CgdCard extends CgdCard_Base {
         final int year = Year.now().getValue();
         return user != null && user.getCgdCardSet().stream().anyMatch(c -> c.getCgdCardCounter().getYear() == year);
     }
-
-    private static class Sender extends Thread {
-
-        private final String cardId;
-
-        public Sender(final String externalId) {
-            this.cardId = externalId;
-        }
-
-        @Override
-        public void run() {
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-            }
-            doit();
-        }
-
-        @Atomic
-        private void doit() {
-            final CgdCard card = FenixFramework.getDomainObject(cardId);
-            final Person person = card.getUser().getPerson();
-            if (person != null) {
-                final Student student = person.getStudent();
-                if (student != null) {
-                    for (final Registration registration : student.getRegistrationsSet()) {
-                        if (registration.isActive()) {
-                            CgdForm43Sender sender = new CgdForm43Sender();
-                            boolean form = sender.sendForm43For(registration);
-                            boolean attachment = sender.uploadFormAttachment(registration,registration.getRegistrationDeclarationFile().getStream());
-                            LOGGER.info("Sent Form43 ({}) and registration declaration file ({}) for registration {}",
-                                form, attachment, registration.getExternalId() );
-                        }
-                    }
-                }
-            }
-        }
-
-    }
-
-    public void send() {
-        new Sender(this.getExternalId()).start();
-    }
-
 }

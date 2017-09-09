@@ -42,9 +42,8 @@ public class RegistrationProcessConfiguration {
         @ConfigurationProperty(key = "store.user")
         public String storeAppUser();
 
-        @ConfigurationProperty(key = "store.directory.name", defaultValue = "Documentos Oficiais")
+        @ConfigurationProperty(key = "store.directory.name", defaultValue = "documentos-oficiais/declaracoes")
         public String storeDirectoryName();
-
     }
 
     public static ConfigurationProperties getConfiguration() {
@@ -58,4 +57,7 @@ public class RegistrationProcessConfiguration {
     public static byte[] certifierJwtSecret() {
         return getConfiguration().certifierJwtSecret().getBytes();
     }
+
+    public final static String RESOURCE_BUNDLE = "resources.RegistrationProcessResources";
+
 }

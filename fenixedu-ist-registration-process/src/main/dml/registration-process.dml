@@ -2,13 +2,24 @@ package pt.ist.registration.process.domain;
 
 class RegistrationDeclarationFile extends .org.fenixedu.bennu.io.domain.GenericFile {
     String uniqueIdentifier (REQUIRED);
+    Locale locale (REQUIRED);
 }
 
-relation RegistrationDeclarationStudentCandidacy {
+relation RegistrationDeclarationRegistration {
     RegistrationDeclarationFile playsRole registrationDeclarationFile {
-        multiplicity 0..1;
+        multiplicity *;
     }
     .org.fenixedu.academic.domain.student.Registration playsRole registration {
+        multiplicity 1..1;
+    }
+}
+
+relation RegistrationDeclarationFileExecutionYear {
+    RegistrationDeclarationFile playsRole registrationDeclarationFile {
+        multiplicity *;
+    }
+
+    .org.fenixedu.academic.domain.ExecutionYear playsRole executionYear {
         multiplicity 1..1;
     }
 }
