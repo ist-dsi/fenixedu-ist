@@ -61,7 +61,7 @@ public class ActiveStudentsWebService extends BennuWebService {
         return toActiveStudentBeans(getStudentsWithCardsIssuedToday());
     }
 
-    public Collection<ActiveStudentBean> toActiveStudentBeans(final Stream<Student> students) {
+    private Collection<ActiveStudentBean> toActiveStudentBeans(final Stream<Student> students) {
         final Stream<Registration> stream = students
                 .flatMap(s -> s.getRegistrationsSet().stream())
                 .filter(r -> isActive(r));
