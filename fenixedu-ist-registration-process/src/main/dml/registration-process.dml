@@ -1,5 +1,25 @@
 package pt.ist.registration.process.domain;
 
+class DeclarationTemplate {
+    String name;
+    LocalizedString displayName (REQUIRED);
+    String templateHtml (REQUIRED);
+    Locale locale (REQUIRED);
+    // first %s = executionYearName
+    // second %s = locale
+    // third %s = degreeSigla
+    // forth %s = username
+    String filenameFormat (REQUIRED);
+
+    // first %s - username
+    // second %s - language
+    // third %s - degreeName
+    // forth %s - executionYearName
+    String displayNameFormat (REQUIRED);
+
+    protected JsonElement signatureFieldSettingsElement;
+}
+
 class RegistrationDeclarationFile extends .org.fenixedu.bennu.io.domain.GenericFile {
     String uniqueIdentifier (REQUIRED);
     Locale locale (REQUIRED);
@@ -21,5 +41,34 @@ relation RegistrationDeclarationFileExecutionYear {
 
     .org.fenixedu.academic.domain.ExecutionYear playsRole executionYear {
         multiplicity 1..1;
+    }
+}
+
+relation BennuDeclarationTemplates {
+    .org.fenixedu.bennu.core.domain.Bennu playsRole bennuTemplates {
+        multiplicity 1..1;
+    }
+    DeclarationTemplate playsRole declarationTemplate {
+        multiplicity *;
+    }
+}
+
+relation DeclarationTemplateGroup {
+    protected .org.fenixedu.bennu.core.domain.groups.PersistentGroup playsRole persistentAccessGroup {
+        multiplicity 1..1;
+    }
+
+    protected DeclarationTemplate playsRole DeclarationTemplate {
+        multiplicity *;
+    }
+}
+
+relation DeclarationTemplateFirstTimeRegistration {
+    .org.fenixedu.bennu.core.domain.Bennu playsRole bennuFirstTimeRegistrationTemplate {
+        multiplicity 0..1;
+    }
+
+    DeclarationTemplate playsRole firstTimeRegistrationTemplate {
+        multiplicity *;
     }
 }

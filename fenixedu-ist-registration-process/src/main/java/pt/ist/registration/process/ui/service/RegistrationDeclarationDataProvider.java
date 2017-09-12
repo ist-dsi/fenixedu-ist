@@ -1,20 +1,16 @@
 package pt.ist.registration.process.ui.service;
 
-import static org.fenixedu.bennu.RegistrationProcessConfiguration.RESOURCE_BUNDLE;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.administrativeOffice.AdministrativeOffice;
 import org.fenixedu.academic.domain.organizationalStructure.UniversityUnit;
+import org.fenixedu.academic.domain.space.SpaceUtils;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
-import org.fenixedu.commons.i18n.LocalizedString;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
@@ -45,12 +41,29 @@ public class RegistrationDeclarationDataProvider {
         String username = person.getUsername();
         String documentType = person.getIdDocumentType().getLocalizedName(locale);
         String idNumber = person.getDocumentIdNumber();
-        String curricularYear = BundleUtil.getString(Bundle.ENUMERATION, locale,
-                Integer.toString(registration.getCurricularYear(executionYear)) + ".ordinal");
+        String address = person.getAddress();
+        String parishName = person.getParishOfResidence();
+        String county = person.getDistrictOfResidence();
+        String postalCode = person.getPostalCode();
+
+        JsonObject curricularYear = new JsonObject();
+        int curricularYearNumber = registration.getCurricularYear(executionYear);
+        curricularYear.addProperty("ordinal", BundleUtil.getString(Bundle.ENUMERATION, locale, curricularYearNumber + ".ordinal"));
+        curricularYear.addProperty("number", curricularYearNumber);
+
         String degreeName = getDegreeDescription(registration, executionYear, locale);
         String nationality = person.getCountry().getCountryNationality().getContent(locale);
 
         JsonObject payload = new JsonObject();
+
+        payload.addProperty("idDocValidationDate",person.getExpirationDateOfDocumentIdYearMonthDay().toString("dd/MM/yyyy"));
+        payload.addProperty("dateOfBirth",person.getDateOfBirthYearMonthDay().toString("dd/MM/yyyy"));
+        payload.addProperty("address",address);
+        payload.addProperty("parish",parishName);
+        payload.addProperty("county",county);
+        payload.addProperty("postalCode",postalCode);
+        payload.addProperty("executionYearName",executionYearName);
+        payload.addProperty("degreeName",degreeName);
         payload.addProperty("responsibleName", responsibleName);
         payload.addProperty("unitName", unitName);
         payload.addProperty("institutionName", institutionName);
@@ -61,10 +74,52 @@ public class RegistrationDeclarationDataProvider {
         payload.addProperty("idDocType", documentType);
         payload.addProperty("idDocNumber", idNumber);
         payload.addProperty("nationality", nationality);
-        payload.addProperty("curricularYear", curricularYear);
+        payload.add("curricularYear", curricularYear);
         payload.addProperty("degreeName", degreeName);
         payload.addProperty("numberOfEnrollments", registration.getEnrolments(executionYear).size());
+
+        if (registration.getCampus(executionYear).equals(SpaceUtils.getDefaultCampus())) {
+            setAlamedaAddress(payload);
+        } else {
+            setTagusparkAddress(payload);
+        }
+
+        setTodayDate(payload);
         return payload;
+    }
+
+    private void setAddress(JsonObject payload, String institutionName, String institutionCode, String
+            institutionStreetAddress, String institutionParishName, String institutionCountyName, String institutionPostalCode, String
+            institutionPhoneNumber, String institutionFaxNumber, String institutionEmail) {
+        payload.addProperty("institutionName",institutionName);
+        payload.addProperty("institutionCode",institutionCode);
+        payload.addProperty("institutionStreetAddress",institutionStreetAddress);
+        payload.addProperty("institutionParishName",institutionParishName);
+        payload.addProperty("institutionCountyName",institutionCountyName);
+        payload.addProperty("institutionPostalCode",institutionPostalCode);
+        payload.addProperty("institutionPhoneNumber",institutionPhoneNumber);
+        payload.addProperty("institutionFaxNumber",institutionFaxNumber);
+        payload.addProperty("institutionEmail",institutionEmail);
+    }
+
+    private void setAlamedaAddress(JsonObject payload) {
+        setAddress(payload, "Instituto Superior Técnico","1518", "Av. Rovisco Pais, 1", "Areeiro", "Lisboa",
+                "1049-001",
+                "+351"
+                        + " 218 417 000", "+351 219 499 242", "mail@tecnico.ulisboa.pt");
+    }
+
+    private void setTagusparkAddress(JsonObject payload) {
+        setAddress(payload, "Instituto Superior Técnico", "1529", "Av. Prof. Doutor Cavaco Silva", "Porto Salvo",
+                "Oeiras", "2744-016 Porto Salvo", "+351 214 233 200", "+351 214 233 268", "mail@tecnico.ulisboa.pt");
+    }
+
+    private void setTodayDate(JsonObject payload) {
+        DateTime todayDate = new DateTime();
+        String[] months = new String[] {"Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto",
+                "Setembro", "Outubro", "Novembro", "Dezembro"};
+        payload.addProperty("todayDate", String.format("%d de %s de %d", todayDate.getDayOfMonth(), months[todayDate
+                .getMonthOfYear() - 1], todayDate.getYear()));
     }
 
     private String getDegreeDescription(Registration registration, ExecutionYear executionYear, Locale locale) {

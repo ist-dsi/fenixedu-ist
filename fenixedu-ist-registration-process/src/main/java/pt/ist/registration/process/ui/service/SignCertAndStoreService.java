@@ -2,8 +2,8 @@ package pt.ist.registration.process.ui.service;
 
 import static org.fenixedu.bennu.RegistrationProcessConfiguration.RESOURCE_BUNDLE;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -32,8 +32,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import io.jsonwebtoken.Jwts;
@@ -42,6 +40,7 @@ import pt.ist.drive.sdk.ClientFactory;
 import pt.ist.drive.sdk.DriveClient;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
+import pt.ist.registration.process.domain.RegistrationDeclarationFile;
 import pt.ist.registration.process.handler.CandidacySignalHandler;
 
 @Service
@@ -66,14 +65,15 @@ public class SignCertAndStoreService {
     }
 
     public void sendDocumentToBeSigned(String registrationExternalId, String queue, String title, String description,
-            String filename, byte[] documentWithSignatureField, String uniqueIdentifier) throws Error {
+            String filename, InputStream contentStream, String uniqueIdentifier) throws Error {
         logger.debug("Sending document to be signed with id {}", uniqueIdentifier);
-        String compactJws = Jwts.builder().setSubject(RegistrationProcessConfiguration.getConfiguration().signerJwtUser())
-        .setExpiration(DateTime.now().plusHours(6).toDate())
-                .signWith(SignatureAlgorithm.HS512, RegistrationProcessConfiguration.signerJwtSecret()).compact();
-        final StreamDataBodyPart streamDataBodyPart = new StreamDataBodyPart("file",
-                new ByteArrayInputStream(documentWithSignatureField), filename, new MediaType("application", "pdf"));
+        String compactJws = Jwts.builder()
+                                .setSubject(RegistrationProcessConfiguration.getConfiguration().signerJwtUser())
+                                .setExpiration(DateTime.now().plusHours(6).toDate())
+                                .signWith(SignatureAlgorithm.HS512, RegistrationProcessConfiguration.signerJwtSecret()).compact();
+
         try (final FormDataMultiPart formDataMultiPart = new FormDataMultiPart()) {
+            final StreamDataBodyPart streamDataBodyPart = new StreamDataBodyPart("file", contentStream, filename, new MediaType("application", "pdf"));
             formDataMultiPart.bodyPart(streamDataBodyPart);
             formDataMultiPart.bodyPart(new FormDataBodyPart("queue", queue));
             formDataMultiPart.bodyPart(
@@ -95,16 +95,17 @@ public class SignCertAndStoreService {
             logger.debug(result);
         } catch (final IOException e) {
             throw new Error(e);
-        }
+        } 
     }
 
     public void sendDocumentToBeCertified(String registrationExternalId, String filename, MultipartFile file,
             String uniqueIdentifier, boolean alreadyCertified) throws IOException {
         String compactJws = Jwts.builder().setSubject(uniqueIdentifier)
                 .signWith(SignatureAlgorithm.HS512, RegistrationProcessConfiguration.certifierJwtSecret()).compact();
-        final StreamDataBodyPart streamDataBodyPart =
-                new StreamDataBodyPart("file", file.getInputStream(), filename, new MediaType("application", "pdf"));
-        try (final FormDataMultiPart formDataMultiPart = new FormDataMultiPart()) {
+
+        try (final FormDataMultiPart formDataMultiPart = new FormDataMultiPart(); InputStream fileStream = file.getInputStream()) {
+            final StreamDataBodyPart streamDataBodyPart =
+                    new StreamDataBodyPart("file", fileStream, filename, new MediaType("application", "pdf"));
             formDataMultiPart.bodyPart(streamDataBodyPart);
             formDataMultiPart.bodyPart(new FormDataBodyPart("filename", filename));
             formDataMultiPart.bodyPart(new FormDataBodyPart("mimeType", "application/json"));
@@ -124,21 +125,23 @@ public class SignCertAndStoreService {
         }
     }
 
-    public void sendDocumentToBeStored(String username, String email, String filename, MultipartFile file,
-            String uniqueIdentifier) throws IOException {
+    public void sendDocumentToBeStored(String username, String email, RegistrationDeclarationFile declarationFile, MultipartFile file) throws
+            IOException {
         DriveClient driveClient = ClientFactory.driveCLient(driveUrl, appId, appUser, refreshToken);
         String directory = uploadDirectoryFor(driveClient, username).get();
-        JsonObject result = driveClient.uploadWithInfo(directory, filename, file.getInputStream(), file.getContentType
-                ());
-        logger.debug("Registration Declaration {} of student {} stored", uniqueIdentifier, username);
-        logger.debug("Registration Declaration {} of student {} is being emailed.", uniqueIdentifier, username);
-        sendEmailNotification(email, result.get("downloadFileLink").getAsString());
+        try (InputStream fileStream = file.getInputStream()) {
+            JsonObject result = driveClient.uploadWithInfo(directory, declarationFile.getFilename(), fileStream, file.getContentType());
+            logger.debug("Registration Declaration {} of student {} stored", declarationFile.getUniqueIdentifier(), username);
+            logger.debug("Registration Declaration {} of student {} is being emailed.", declarationFile.getUniqueIdentifier(), username);
+            sendEmailNotification(email, declarationFile.getDisplayName(), result.get("downloadFileLink").getAsString());
+        }
     }
 
     @Atomic(mode = TxMode.WRITE)
-    private void sendEmailNotification(String email, String link) {
-        String title = BundleUtil.getString(RESOURCE_BUNDLE, "registration.document.email.title");
-        String body = BundleUtil.getString(RESOURCE_BUNDLE, "registration.document.email.body", link);
+    private void sendEmailNotification(String email, String displayName,  String link) {
+        String title = BundleUtil.getString(RESOURCE_BUNDLE, "registration.document.email.title", displayName);
+        String body = BundleUtil.getString(RESOURCE_BUNDLE, "registration.document.email.body", displayName, link);
+
         SystemSender systemSender = Bennu.getInstance().getSystemSender();
         new Message(systemSender, systemSender.getConcreteReplyTos(), Collections.EMPTY_LIST, title, body, email);
     }
@@ -148,5 +151,5 @@ public class SignCertAndStoreService {
         List<String> slugParts = Splitter.on("/").splitToList(directoryName);
         JsonObject directory = driveClient.getDirectoryWithSlug(slugParts);
         return Optional.ofNullable(directory).map(o -> o.get("id").getAsString());
-    }                                       
+    }
 }
