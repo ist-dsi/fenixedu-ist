@@ -253,7 +253,7 @@ public class InquiryGroupQuestionRenderer extends InputRenderer {
         }
 
         private String getFinalMLString(LocalizedString label, String[] conditionValues) {
-            String text = label.toString();
+            String text = label.getContent();
             if (conditionValues != null) {
                 text =
                         text.replace(ECTSVisibleCondition.UC_ECTS_MARKER,
