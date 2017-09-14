@@ -34,21 +34,14 @@ public class RegistrationDeclarationForBanksService {
 
     public InputStream getRegistrationDeclarationFileForBanks(Registration registration) {
         try {
+            JsonObject registrationDeclarationPayload = dataProvider
+                    .getBasicRegistrationData(registration, ExecutionYear.readCurrentExecutionYear(), Locale
+                            .forLanguageTag("pt-PT"));
             return pdfRendererService.render(pdfTemplateResolver.resolve("declaracao-matricula-banks.html"),
-                    getRegistrationDeclarationPayloadForBanks(registration));
+                    registrationDeclarationPayload);
         } catch (UnresolvableTemplateException e) {
             throw new Error(e);
         }
     }
 
-    private JsonObject getRegistrationDeclarationPayloadForBanks(Registration registration) {
-        JsonObject registrationDeclarationPayload = dataProvider
-                .getBasicRegistrationData(registration, ExecutionYear.readCurrentExecutionYear(), Locale
-                        .forLanguageTag("pt-PT"));
-        String address = registration.getPerson().getAddress();
-        String postalCode = registration.getPerson().getPostalCode();
-        registrationDeclarationPayload.addProperty("address", address);
-        registrationDeclarationPayload.addProperty("postalCode", postalCode);
-        return registrationDeclarationPayload;
-    }
 }

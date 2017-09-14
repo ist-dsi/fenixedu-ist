@@ -72,8 +72,7 @@ public class SignedDeclarationsController {
             try {
                 logger.debug("Registration Declaration {} of student {} was certified.", uniqueIdentifier, registration.getNumber());
                 logger.debug("Registration Declaration {} of student {} sent out to be stored.", uniqueIdentifier, registration.getNumber());
-                signCertAndStoreService.sendDocumentToBeStored(registration.getPerson().getUsername(),
-                        registration.getPerson().getEmailForSendingEmails(), declarationFile.getFilename(), file, uniqueIdentifier);
+                signCertAndStoreService.sendDocumentToBeStored(registration.getPerson().getUsername(), registration.getPerson().getEmailForSendingEmails(), declarationFile, file);
                 return "ok";
             } catch (IOException e) {
                 throw new Error(e);
