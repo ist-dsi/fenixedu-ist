@@ -33,6 +33,13 @@
             ${fr:message('resources.FenixeduIstIntegrationResources', 'label.support.form.welcome')}
             <hr />
                 <div class="form-group">
+                    <label class="col-sm-2 control-label">${fr:message('resources.FenixeduIstIntegrationResources', 'label.error.page.support')}:</label>
+                    <div class="col-sm-10">
+                        <select name="support" id="support" class="form-control">
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
                     <label for="subject" class="col-sm-2 control-label">${fr:message('resources.FenixeduIstIntegrationResources', 'label.error.page.subject')}:</label>
                     <div class="col-sm-10">
                         <input type="text" name="subject" id="subject" class="form-control" required />
@@ -86,6 +93,20 @@
 
 <script>
 var data = { 'functionality': window.current$functionality };
+$.get('${pageContext.request.contextPath}/api/fenix-ist/support-form/' + window.current$functionality, function(data){
+  $('#support').append($('<option>', {
+            value: data.default.id,
+            text : data.default.title
+  }));
+  $.each(data.options, function (i, item) {
+      $('#support').append($('<option>', {
+          value: item.id,
+          text : item.title
+      }));
+  });
+});
+
+
 $.ajaxSetup({ headers: {'Content-Type':'application/json; charset=UTF-8'} });
 $('#supportForm input[type=file]').on('change', function (event) {
     var file = event.target.files[0]; $('#largeFile').hide();
