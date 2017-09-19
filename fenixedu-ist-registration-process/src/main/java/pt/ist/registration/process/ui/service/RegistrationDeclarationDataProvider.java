@@ -43,7 +43,7 @@ public class RegistrationDeclarationDataProvider {
         String idNumber = person.getDocumentIdNumber();
         String address = person.getAddress();
         String parishName = person.getParishOfResidence();
-        String county = person.getDistrictOfResidence();
+        String county = person.getDistrictSubdivisionOfResidence();
         String postalCode = person.getPostalCode();
 
         JsonObject curricularYear = new JsonObject();
