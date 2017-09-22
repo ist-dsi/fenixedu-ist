@@ -127,8 +127,8 @@ public class RegistrationDeclarationDataProvider {
         if (registration.getDegree().isEmpty()) {
             return degreeName;
         }
-        String degreeTypeName = registration.getDegreeType().getName().getContent(locale).replaceAll("Bolonha", ""); //dirty
-        // hack until degree type has display form ?
+        
+        String degreeTypeName = registration.getDegreeType().getName().getContent(locale).replaceAll("Bolonha", "").replaceAll("Bologna", "");
         return BundleUtil.getString("resources.RegistrationProcessResources", locale, "registration.document.degree.full.name",
                 degreeTypeName, degreeName);
     }
