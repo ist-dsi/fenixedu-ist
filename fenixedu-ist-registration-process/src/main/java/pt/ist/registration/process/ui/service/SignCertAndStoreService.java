@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import javax.ws.rs.client.Client;
@@ -133,14 +134,15 @@ public class SignCertAndStoreService {
             JsonObject result = driveClient.uploadWithInfo(directory, declarationFile.getFilename(), fileStream, file.getContentType());
             logger.debug("Registration Declaration {} of student {} stored", declarationFile.getUniqueIdentifier(), username);
             logger.debug("Registration Declaration {} of student {} is being emailed.", declarationFile.getUniqueIdentifier(), username);
-            sendEmailNotification(email, declarationFile.getDisplayName(), result.get("downloadFileLink").getAsString());
+            sendEmailNotification(email, declarationFile.getDisplayName(), result.get("downloadFileLink").getAsString(),
+                    declarationFile.getLocale());
         }
     }
 
     @Atomic(mode = TxMode.WRITE)
-    private void sendEmailNotification(String email, String displayName,  String link) {
-        String title = BundleUtil.getString(RESOURCE_BUNDLE, "registration.document.email.title", displayName);
-        String body = BundleUtil.getString(RESOURCE_BUNDLE, "registration.document.email.body", displayName, link);
+    private void sendEmailNotification(String email, String displayName,  String link, Locale locale) {
+        String title = BundleUtil.getString(RESOURCE_BUNDLE, locale,"registration.document.email.title", displayName);
+        String body = BundleUtil.getString(RESOURCE_BUNDLE, locale, "registration.document.email.body", displayName, link);
 
         SystemSender systemSender = Bennu.getInstance().getSystemSender();
         new Message(systemSender, systemSender.getConcreteReplyTos(), Collections.EMPTY_LIST, title, body, email);
