@@ -31,9 +31,10 @@ import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.academic.domain.Teacher;
+import org.fenixedu.academic.domain.accessControl.ActiveTeachersGroup;
 import org.fenixedu.academic.domain.organizationalStructure.AccountabilityTypeEnum;
-import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.core.groups.DynamicGroup;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.joda.time.Interval;
 
@@ -66,22 +67,24 @@ public class AnnualTeachingCreditsByPeriodBean implements Serializable {
         User user = Authenticate.getUser();
         boolean inValidCreditsPeriod = TeacherCreditsFillingCE.isInValidCreditsPeriod(executionPeriod, user);
         boolean isLocked = teacherService != null && teacherService.getTeacherServiceLock() != null;
-        if (RoleType.DEPARTMENT_MEMBER.isMember(user)) {
+        boolean isTeacher = new ActiveTeachersGroup().isMember(user);
+        boolean isCCMember = DynamicGroup.get("scientificCouncil").isMember(user);
+        if (new CreditsManagerGroup().isMember(user) || isCCMember) {
+            boolean inValidTeacherCreditsPeriod = TeacherCreditsFillingCE.isInValidTeacherCreditsPeriod(executionPeriod);
+            setCanUnlockTeacherCredits(inValidCreditsPeriod && inValidTeacherCreditsPeriod && isLocked);
+            setCanEditTeacherCredits(isCCMember
+                    || (inValidCreditsPeriod && (isLocked || !inValidTeacherCreditsPeriod)));
+        }else if (isTeacher) {
             boolean canLockAndEditTeacherCredits = inValidCreditsPeriod && !isLocked;
             setCanLockTeacherCredits(canLockAndEditTeacherCredits);
             setCanEditTeacherCredits(canLockAndEditTeacherCredits);
-        } else if (new CreditsManagerGroup().isMember(user) || RoleType.SCIENTIFIC_COUNCIL.isMember(user)) {
-            boolean inValidTeacherCreditsPeriod = TeacherCreditsFillingCE.isInValidTeacherCreditsPeriod(executionPeriod);
-            setCanUnlockTeacherCredits(inValidCreditsPeriod && inValidTeacherCreditsPeriod && isLocked);
-            setCanEditTeacherCredits(RoleType.SCIENTIFIC_COUNCIL.isMember(user)
-                    || (inValidCreditsPeriod && (isLocked || !inValidTeacherCreditsPeriod)));
-        }
+        } 
         setShowTeacherCreditsLockedMessage(isLocked);
         setShowTeacherCreditsUnlockedMessage(!isLocked);
         ReductionService creditsReductionService = getCreditsReductionService();
-        setCanEditTeacherCreditsReductions(RoleType.DEPARTMENT_MEMBER.isMember(user) && getCanEditTeacherCredits()
+        setCanEditTeacherCreditsReductions(isTeacher && getCanEditTeacherCredits()
                 && (creditsReductionService == null || creditsReductionService.getAttributionDate() == null));
-        setCanEditTeacherManagementFunctions(RoleType.DEPARTMENT_MEMBER.isMember(user) ? false : getCanEditTeacherCredits());
+        setCanEditTeacherManagementFunctions(isTeacher ? false : getCanEditTeacherCredits());
     }
 
     public List<Professorship> getProfessorships() {
