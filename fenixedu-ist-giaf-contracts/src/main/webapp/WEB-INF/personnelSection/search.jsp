@@ -35,7 +35,11 @@
 		<small><spring:message code="label.search" /></small>
 	</h1>
 </div>
-
+<c:if test="${not empty error}">
+	<div class="alert alert-danger">
+		<c:out value="${error}"/>
+	</div>
+</c:if>
 <form:form role="form" modelAttribute="search" method="GET" class="form-horizontal">
 	${csrf.field()}
 	<div class="form-group">
@@ -111,7 +115,7 @@
 						<td><c:out value="${person.employee.employeeNumber}"/></td>  
 						<td><c:out value="${profile.fullName}"/></td>
 						<td><c:out value="${person.documentIdNumber}"/></td>
-						<td<c:out value=">${person.emailForSendingEmails}"/></td>
+						<td><c:out value="${person.emailForSendingEmails}"/></td>
 						<td>
 						  <c:if test="${person.user != null}">
 						      <c:out value="${pt.ist.fenixedu.contracts.domain.LegacyRoleUtils.mainRolesStr(person.user)}" />
@@ -119,8 +123,8 @@
 						</td>
 						<c:choose>
 							<c:when test="${person.employee == null}">
-								<td><a href="#" data-toggle="modal" data-target="#create-contract-dialog<c:out value='${person.username}'/>"><span class="glyphicon glyphicon-edit"></span> <spring:message code="label.create.contract"/></a></td>
-								<div class="modal fade" id="create-contract-dialog<c:out value='${person.username}'/>">
+								<td><a href="#" data-toggle="modal" data-target="#create-contract-dialog<c:out value='${person.externalId}'/>"><span class="glyphicon glyphicon-edit"></span> <spring:message code="label.create.contract"/></a></td>
+								<div class="modal fade" id="create-contract-dialog<c:out value='${person.externalId}'/>">
 									<div class="modal-dialog">
 										<div class="modal-content">
 											<div class="modal-header">
