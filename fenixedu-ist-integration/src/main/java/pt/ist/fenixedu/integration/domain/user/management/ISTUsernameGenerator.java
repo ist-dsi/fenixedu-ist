@@ -39,6 +39,6 @@ public class ISTUsernameGenerator implements UsernameGenerator {
     }
 
     private boolean isStudent(UserProfile profile) {
-        return profile.getPerson().getStudent() != null || !profile.getPerson().getPhdIndividualProgramProcessesSet().isEmpty();
+        return profile.getPerson().getStudent() != null;
     }
 }
