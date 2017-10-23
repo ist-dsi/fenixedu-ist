@@ -69,16 +69,22 @@ public class AnnualTeachingCreditsByPeriodBean implements Serializable {
         boolean isLocked = teacherService != null && teacherService.getTeacherServiceLock() != null;
         boolean isTeacher = new ActiveTeachersGroup().isMember(user);
         boolean isCCMember = DynamicGroup.get("scientificCouncil").isMember(user);
-        if (new CreditsManagerGroup().isMember(user) || isCCMember) {
-            boolean inValidTeacherCreditsPeriod = TeacherCreditsFillingCE.isInValidTeacherCreditsPeriod(executionPeriod);
-            setCanUnlockTeacherCredits(inValidCreditsPeriod && inValidTeacherCreditsPeriod && isLocked);
-            setCanEditTeacherCredits(isCCMember
-                    || (inValidCreditsPeriod && (isLocked || !inValidTeacherCreditsPeriod)));
-        }else if (isTeacher) {
+        
+        if (isTeacher && teacher.getPerson().getUser().equals(user)) {
             boolean canLockAndEditTeacherCredits = inValidCreditsPeriod && !isLocked;
             setCanLockTeacherCredits(canLockAndEditTeacherCredits);
             setCanEditTeacherCredits(canLockAndEditTeacherCredits);
-        } 
+        }
+        
+        if (new CreditsManagerGroup().isMember(user) || isCCMember) {
+            boolean inValidTeacherCreditsPeriod = TeacherCreditsFillingCE.isInValidTeacherCreditsPeriod(executionPeriod);
+            setCanUnlockTeacherCredits(inValidCreditsPeriod && inValidTeacherCreditsPeriod && isLocked);
+            if(!getCanEditTeacherCredits()) {
+            setCanEditTeacherCredits(isCCMember
+                    || (inValidCreditsPeriod && (isLocked || !inValidTeacherCreditsPeriod)));
+            }
+        }
+        
         setShowTeacherCreditsLockedMessage(isLocked);
         setShowTeacherCreditsUnlockedMessage(!isLocked);
         ReductionService creditsReductionService = getCreditsReductionService();
