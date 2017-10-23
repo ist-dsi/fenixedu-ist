@@ -80,7 +80,7 @@
                                     <span aria-hidden="true">&times;</span>
                                     <span class="sr-only"><spring:message code="action.close"/></span>
                                 </button>
-                                <h4><c:out value="${announcement.name.content}"/></h4>
+                                <h4><c:out value="${announcement.name.content}" escapeXml="false"/></h4>
                             </div>
 
                             <div class="modal-body">
