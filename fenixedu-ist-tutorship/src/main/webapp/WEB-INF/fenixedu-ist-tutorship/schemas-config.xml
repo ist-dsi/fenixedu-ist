@@ -265,7 +265,7 @@
         <property name="key" value="true" />
         <property name="defaultText" value="label.dropDown.all" />
         <property name="bundle" value="PEDAGOGICAL_COUNCIL" />
-        <property name="format" value="${nameI18n}" />
+        <property name="format" value="${nameI18n.content}" />
         <property name="sortBy" value="name" />
         <property name="destination" value="departmentPostBack" />
     </slot>
