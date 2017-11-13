@@ -24,16 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -56,36 +47,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
 
-import org.fenixedu.academic.domain.AdHocEvaluation;
-import org.fenixedu.academic.domain.Attends;
-import org.fenixedu.academic.domain.CompetenceCourse;
-import org.fenixedu.academic.domain.Coordinator;
-import org.fenixedu.academic.domain.CurricularCourse;
-import org.fenixedu.academic.domain.Degree;
-import org.fenixedu.academic.domain.DegreeCurricularPlan;
-import org.fenixedu.academic.domain.DegreeInfo;
-import org.fenixedu.academic.domain.Enrolment;
-import org.fenixedu.academic.domain.Evaluation;
-import org.fenixedu.academic.domain.Exam;
-import org.fenixedu.academic.domain.ExecutionCourse;
-import org.fenixedu.academic.domain.ExecutionDegree;
-import org.fenixedu.academic.domain.ExecutionInterval;
-import org.fenixedu.academic.domain.ExecutionSemester;
-import org.fenixedu.academic.domain.ExecutionYear;
-import org.fenixedu.academic.domain.Grouping;
-import org.fenixedu.academic.domain.Lesson;
-import org.fenixedu.academic.domain.LessonInstance;
-import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.Photograph;
-import org.fenixedu.academic.domain.Professorship;
-import org.fenixedu.academic.domain.Project;
-import org.fenixedu.academic.domain.Shift;
-import org.fenixedu.academic.domain.ShiftType;
-import org.fenixedu.academic.domain.StudentCurricularPlan;
-import org.fenixedu.academic.domain.Summary;
-import org.fenixedu.academic.domain.Teacher;
-import org.fenixedu.academic.domain.WrittenEvaluation;
-import org.fenixedu.academic.domain.WrittenEvaluationEnrolment;
+import org.fenixedu.academic.domain.*;
 import org.fenixedu.academic.domain.accessControl.ActiveStudentsGroup;
 import org.fenixedu.academic.domain.accessControl.ActiveTeachersGroup;
 import org.fenixedu.academic.domain.accessControl.AllAlumniGroup;
@@ -98,6 +60,7 @@ import org.fenixedu.academic.domain.degreeStructure.BibliographicReferences.Bibl
 import org.fenixedu.academic.domain.degreeStructure.CourseGroup;
 import org.fenixedu.academic.domain.degreeStructure.DegreeModule;
 import org.fenixedu.academic.domain.degreeStructure.ProgramConclusion;
+import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.space.SpaceUtils;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
@@ -132,6 +95,7 @@ import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.academic.util.ContentType;
 import org.fenixedu.academic.util.EvaluationType;
 import org.fenixedu.academic.util.HourMinuteSecond;
+import org.fenixedu.bennu.core.domain.Avatar;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
@@ -144,11 +108,7 @@ import org.fenixedu.commons.stream.StreamUtils;
 import org.fenixedu.spaces.domain.BlueprintFile;
 import org.fenixedu.spaces.domain.Space;
 import org.fenixedu.spaces.services.SpaceBlueprintsDWGProcessor;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.Partial;
-import org.joda.time.TimeOfDay;
-import org.joda.time.YearMonthDay;
+import org.joda.time.*;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
@@ -170,7 +130,13 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import net.fortuna.ical4j.model.Calendar;
+import pt.ist.fenixedu.contracts.domain.Employee;
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveEmployees;
+import pt.ist.fenixedu.contracts.domain.organizationalStructure.Contract;
+import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonContractSituation;
+import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalData;
+import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalCategory;
+import pt.ist.fenixedu.contracts.domain.util.CategoryType;
 import pt.ist.fenixedu.integration.FenixEduIstIntegrationConfiguration;
 import pt.ist.fenixedu.integration.api.beans.FenixCalendar;
 import pt.ist.fenixedu.integration.api.beans.FenixCalendar.FenixCalendarEvent;
@@ -187,23 +153,11 @@ import pt.ist.fenixedu.integration.api.beans.FenixPerson.FenixPhoto;
 import pt.ist.fenixedu.integration.api.beans.FenixPerson.FenixRole;
 import pt.ist.fenixedu.integration.api.beans.FenixPersonCourses;
 import pt.ist.fenixedu.integration.api.beans.FenixPersonCourses.FenixEnrolment;
-import pt.ist.fenixedu.integration.api.beans.publico.FenixAbout;
-import pt.ist.fenixedu.integration.api.beans.publico.FenixCourseEvaluation;
-import pt.ist.fenixedu.integration.api.beans.publico.FenixCourseExtended;
+import pt.ist.fenixedu.integration.api.beans.publico.*;
 import pt.ist.fenixedu.integration.api.beans.publico.FenixCourseExtended.FenixCompetence;
 import pt.ist.fenixedu.integration.api.beans.publico.FenixCourseExtended.FenixCompetence.BiblioRef;
-import pt.ist.fenixedu.integration.api.beans.publico.FenixCourseGroup;
-import pt.ist.fenixedu.integration.api.beans.publico.FenixCourseStudents;
-import pt.ist.fenixedu.integration.api.beans.publico.FenixDegree;
-import pt.ist.fenixedu.integration.api.beans.publico.FenixDegreeExtended;
 import pt.ist.fenixedu.integration.api.beans.publico.FenixDegreeExtended.FenixDegreeInfo;
 import pt.ist.fenixedu.integration.api.beans.publico.FenixDegreeExtended.FenixTeacher;
-import pt.ist.fenixedu.integration.api.beans.publico.FenixDomainModel;
-import pt.ist.fenixedu.integration.api.beans.publico.FenixExecutionCourse;
-import pt.ist.fenixedu.integration.api.beans.publico.FenixPeriod;
-import pt.ist.fenixedu.integration.api.beans.publico.FenixRoomEvent;
-import pt.ist.fenixedu.integration.api.beans.publico.FenixSchedule;
-import pt.ist.fenixedu.integration.api.beans.publico.FenixSpace;
 import pt.ist.fenixedu.integration.api.infra.FenixAPIFromExternalServer;
 import pt.ist.fenixedu.integration.dto.PersonInformationBean;
 import pt.ist.fenixedu.integration.service.services.externalServices.CreatePreEnrolment;
@@ -999,6 +953,146 @@ public class FenixAPIv1 {
     @Path("shuttle")
     public String shuttle() {
         return FenixAPIFromExternalServer.getShuttle();
+    }
+
+    private static Unit getSectionOrScientificArea(Unit unit) {
+        if (unit == null || unit.isScientificAreaUnit() || unit.isSectionUnit()) {
+            return unit;
+        }
+        return unit.getParentUnits().stream()
+                .map(FenixAPIv1::getSectionOrScientificArea)
+                .filter(Objects::nonNull).findFirst().orElse(null);
+    }
+
+    private static String localizedName(CategoryType type) {
+        return BundleUtil.getString("resources.FenixeduIstIntegrationResources", "label.contract.category.type." + type.getName());
+    }
+
+    private static Duration getDuration(PersonContractSituation s) {
+        return s.getEndDate() != null ? new Duration(s.getBeginDate().toDateTimeAtStartOfDay(), s.getEndDate().toDateTimeAtStartOfDay()) : null;
+    }
+
+    private static Duration getDuration(Contract c) {
+        return c.getEndDate() != null ? new Duration(c.getBeginDate().toDateMidnight(), c.getEndDate().toDateMidnight()) : null;
+    }
+
+    private static Duration getDuration(TeacherAuthorization ta) {
+        ExecutionSemester semester = ta.getExecutionSemester();
+        return new Duration(semester.getBeginLocalDate().toDateTimeAtCurrentTime(), semester.getEndLocalDate().toDateTimeAtCurrentTime());
+    }
+
+    private static boolean overlaps(TeacherAuthorization ta, AcademicInterval interval) {
+        return ta.getExecutionSemester().getAcademicInterval().overlaps(interval);
+    }
+
+    private static boolean overlaps(PersonContractSituation situation, AcademicInterval interval) {
+        try {
+            return situation.getBeginDate() != null && situation.overlaps(interval.toInterval());
+        } catch (Exception e) { //XXX erroneous contract dates
+            return false;
+        }
+    }
+
+    private static <T, C> Optional<C> getLongestLasting(Function<T, C> get, Stream<T> stream, Function<T, Duration> getDuration) {
+        return stream.collect(Collectors.groupingBy(get, Collectors.reducing(Duration.ZERO, getDuration, Duration::plus)))
+                .entrySet().stream().max(Comparator.comparing(Map.Entry::getValue)).map(Map.Entry::getKey);
+    }
+
+    private static Unit getPersonDepartmentArea(Employee employee, AcademicInterval interval, boolean direct, Unit defaultArea) {
+        if (employee != null) {
+            Stream<Contract> contracts = employee.getWorkingContracts(interval.getBeginYearMonthDayWithoutChronology(), interval.getEndYearMonthDayWithoutChronology()).stream();
+            Optional<Unit> workingUnit = getLongestLasting(Contract::getWorkingUnit, contracts, FenixAPIv1::getDuration);
+            if (!direct) {
+                workingUnit = workingUnit.map(FenixAPIv1::getSectionOrScientificArea);
+            }
+            if (workingUnit.isPresent()) {
+                return workingUnit.get();
+            }
+        }
+        return defaultArea;
+    }
+
+    private static FenixDepartment.FenixDepartmentMember getFenixDepartmentMember(Person person) {
+        String username = person.getUsername();
+        String name = person.getDisplayName();
+        String email = person.getEmailForSendingEmails();
+        String photo = Avatar.mysteryManUrl(person.getUser());
+        if (person.getProfile() != null) {
+            photo = person.getProfile().getAvatarUrl();
+        }
+
+        return new FenixDepartment.FenixDepartmentMember(username, name, email, photo);
+    }
+
+    private static FenixDepartment.FenixDepartmentMember getFenixDepartmentTeacher(Department department, Person person, AcademicInterval interval) {
+        FenixDepartment.FenixDepartmentMember member = getFenixDepartmentMember(person);
+
+        Stream<TeacherAuthorization> authorizations = person.getTeacher().getTeacherAuthorizationStream().filter(ta -> overlaps(ta, interval));
+        TeacherCategory category = getLongestLasting(TeacherAuthorization::getTeacherCategory, authorizations, FenixAPIv1::getDuration).get();
+
+        member.setRole(localizedName(CategoryType.TEACHER));
+        member.setCategory(category.getName().getContent());
+        member.setArea(getPersonDepartmentArea(person.getEmployee(), interval, false, department.getDepartmentUnit()).getName());
+
+        return member;
+    }
+
+    private static FenixDepartment.FenixDepartmentMember getFenixDepartmentEmployee(Department department, Person person, AcademicInterval interval) {
+        FenixDepartment.FenixDepartmentMember member = getFenixDepartmentMember(person);
+        YearMonthDay begin = interval.getBeginYearMonthDayWithoutChronology();
+        YearMonthDay end = interval.getEndYearMonthDayWithoutChronology();
+
+        CategoryType type = CategoryType.EMPLOYEE;
+        String category = "";
+        Optional<ProfessionalCategory> data = Optional.ofNullable(person.getPersonProfessionalData())
+                .map(PersonProfessionalData::getGiafProfessionalData)
+                .flatMap(gpd -> getLongestLasting(PersonContractSituation::getProfessionalCategory, gpd.getPersonContractSituationsSet().stream().filter(s -> overlaps(s, interval)), FenixAPIv1::getDuration));
+        if (data.isPresent()) {
+            ProfessionalCategory pcat = data.get();
+            type = pcat.getCategoryType();
+            category = pcat.getName().getContent();
+        }
+        String role = localizedName(type);
+        boolean direct = type.equals(CategoryType.EMPLOYEE) || type.equals(CategoryType.GRANT_OWNER);
+        String area = getPersonDepartmentArea(person.getEmployee(), interval, direct, department.getDepartmentUnit()).getName();
+
+        member.setRole(role);
+        member.setCategory(category);
+        member.setArea(area);
+
+        return member;
+    }
+
+    private static FenixDepartment getFenixDepartment(Department department, AcademicInterval interval) {
+        String name = department.getName();
+        String acronym = department.getAcronym();
+
+        List<Employee> employees = Employee.getAllWorkingEmployees(department, interval.getBeginYearMonthDayWithoutChronology(), interval.getEndYearMonthDayWithoutChronology());
+        Set<Person> employeePeople = employees.stream().map(Employee::getPerson).collect(Collectors.toSet());
+        //XXX Teachers are obtained separately through their TeacherAuthorizations so external teachers are taken into account
+        //XXX Internal teachers with missing authorizations are present in the employee stream and are displayed in the same way as others
+        List<Teacher> teachers = department.getAllTeachers(interval);
+        Set<Person> teacherPeople = teachers.stream().map(Teacher::getPerson).collect(Collectors.toSet());
+        employeePeople.removeAll(teacherPeople);
+
+        List<FenixDepartment.FenixDepartmentMember> members = new ArrayList<>();
+        teacherPeople.stream().map(p -> getFenixDepartmentTeacher(department, p, interval)).forEach(members::add);
+        employeePeople.stream().map(p -> getFenixDepartmentEmployee(department, p, interval)).forEach(members::add);
+
+        return new FenixDepartment(name, acronym, members);
+    }
+
+    @GET
+    @Produces(JSON_UTF8)
+    @Path("departments/{acronym}")
+    public FenixDepartment departmentByAcronym(@PathParam("acronym") String acronym, @QueryParam("academicTerm") String academicTerm) {
+        final AcademicInterval interval = getAcademicInterval(academicTerm);
+        Optional<Department> department = Bennu.getInstance().getDepartmentsSet().stream().filter(d -> d.getAcronym().equals(acronym)).findFirst();
+        if (department.isPresent()) {
+            return getFenixDepartment(department.get(), interval);
+        } else {
+            throw newApplicationError(Status.NOT_FOUND, "department not found", "department not found");
+        }
     }
 
     @GET
