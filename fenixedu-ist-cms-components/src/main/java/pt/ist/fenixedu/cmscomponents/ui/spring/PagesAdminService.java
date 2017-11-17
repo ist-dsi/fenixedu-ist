@@ -22,9 +22,13 @@ import static java.util.Comparator.comparing;
 
 import java.io.IOException;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -371,7 +375,21 @@ public class PagesAdminService {
     private Post clonePost(Post oldPost, Site newSite) {
         Post newPost = new Post(newSite);
         newPost.setName(oldPost.getName());
-        newPost.setBodyAndExcerpt( sanitizeOrNew(oldPost.getBody()),  sanitizeOrNew(oldPost.getExcerpt()));
+        
+        HashMap<String, String> clonedFilesAddress = new HashMap<>();
+        oldPost.getFilesSorted().forEach(postFile -> {
+            GroupBasedFile file = postFile.getFiles();
+            GroupBasedFile attachmentCopy =
+                    new GroupBasedFile(file.getDisplayName(), file.getFilename(), file.getContent(),
+                    		EquivalentGroup(newSite, file.getAccessGroup()));
+            new PostFile(newPost, attachmentCopy, postFile.getIsEmbedded(), newPost.getFilesSet().size());
+            
+            clonedFilesAddress.put(FileDownloadServlet.getDownloadUrl(file), FileDownloadServlet.getDownloadUrl(attachmentCopy));
+        });
+        
+        LocalizedString postBody = parsePostBodyLinks(oldPost.getBody(), clonedFilesAddress);
+        
+        newPost.setBodyAndExcerpt(sanitizeOrNew(postBody), sanitizeOrNew(oldPost.getExcerpt()));
         newPost.setCreationDate(new DateTime());
         newPost.setCreatedBy(Authenticate.getUser());
         newPost.setActive(oldPost.getActive());
@@ -381,20 +399,55 @@ public class PagesAdminService {
             newPost.addCategories(newCategory);
         }
 
-        oldPost.getFilesSorted().forEach(postFile -> {
-            GroupBasedFile file = postFile.getFiles();
-            GroupBasedFile attachmentCopy =
-                    new GroupBasedFile(file.getDisplayName(), file.getFilename(), file.getContent(),
-                            Optional.ofNullable(newSite.getDefaultRoleTemplateRole())
-                                    .map(r->r.getGroup()).orElseGet(()->Group.users(Authenticate.getUser())));
-            new PostFile(newPost, attachmentCopy, postFile.getIsEmbedded(), newPost.getFilesSet().size());
-
-        });
+        
         return newPost;
     }
 
     private LocalizedString sanitizeOrNew(LocalizedString body) {
-        return body !=null ? Post.sanitize(body) : new LocalizedString();
+        return body != null ? Post.sanitize(body) : new LocalizedString();
+    }
+    
+    private LocalizedString parsePostBodyLinks(LocalizedString body, HashMap<String, String> filesAddresses) {
+        if (body != null) {
+            String url_regex = "((https?|ftp|gopher|telnet|file|Unsure):((//)|(\\\\))[\\w\\d:#@%/;$~_?\\+-=\\\\\\.&]*)";
+
+            Pattern urlPattern = Pattern.compile(url_regex, Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+
+            
+            LocalizedString result = new LocalizedString();
+    
+            for (Locale l: body.getLocales()) {
+                String bodyContent = body.getContent(l);
+                Matcher matcher = urlPattern.matcher(bodyContent);
+                StringBuffer parsedBody = new StringBuffer();
+                while (matcher.find()) {
+                    if (filesAddresses != null && filesAddresses.containsKey(matcher.group(0)))
+                        matcher.appendReplacement(parsedBody, filesAddresses.get(matcher.group(0)));
+                }
+                matcher.appendTail(parsedBody);
+    
+                result = result.with(l, parsedBody.toString());
+            }
+    
+            return result;
+        }
+        return new LocalizedString();
+    }
+    
+    private Group EquivalentGroup(Site newSite, Group oldSiteGroup) {
+        String groupExpression = oldSiteGroup.getExpression();
+        if (groupExpression.contains("executionCourse=")) {
+            Pattern executionCoursePattern = Pattern.compile("(executionCourse)(=)(\\d+)");
+            Matcher matcher = executionCoursePattern.matcher(groupExpression);
+            StringBuffer newGroupExpression = new StringBuffer();
+            while (matcher.find()) {
+            	matcher.appendReplacement(newGroupExpression, "executionCourse=" + newSite.getExecutionCourse().getExternalId());
+            }
+            matcher.appendTail(newGroupExpression);
+            
+            return Group.parse(newGroupExpression.toString());
+        }
+        return Group.parse(groupExpression);
     }
 
     private Optional<Post> staticPost(Page page) {
