@@ -994,7 +994,7 @@ public class FenixAPIv1 {
     }
 
     private static <T, C> Optional<C> getLongestLasting(Function<T, C> get, Stream<T> stream, Function<T, Duration> getDuration) {
-        return stream.collect(Collectors.groupingBy(get, Collectors.reducing(Duration.ZERO, getDuration, Duration::plus)))
+        return stream.filter(i->get.apply(i)!=null).collect(Collectors.groupingBy(get, Collectors.reducing(Duration.ZERO, getDuration, Duration::plus)))
                 .entrySet().stream().max(Comparator.comparing(Map.Entry::getValue)).map(Map.Entry::getKey);
     }
 
