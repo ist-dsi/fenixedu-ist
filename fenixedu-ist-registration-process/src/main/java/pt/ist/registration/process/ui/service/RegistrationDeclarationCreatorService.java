@@ -14,6 +14,9 @@ import javax.ws.rs.core.UriBuilder;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.bennu.RegistrationProcessConfiguration;
+import org.fenixedu.bennu.papyrus.domain.SignatureFieldSettings;
+import org.fenixedu.bennu.papyrus.service.PdfRendererService;
+import org.fenixedu.bennu.papyrus.service.QRCodeGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,22 +35,18 @@ import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
 import pt.ist.registration.process.domain.DeclarationTemplate;
 import pt.ist.registration.process.domain.RegistrationDeclarationFile;
-import pt.ist.registration.process.domain.SignatureFieldSettings;
 import pt.ist.registration.process.ui.service.exception.ProblemsGeneratingDocumentException;
 
 @Service
 public class RegistrationDeclarationCreatorService {
 
     private PdfRendererService pdfRendererService;
-    private PdfTemplateResolver pdfTemplateResolver;
     private RegistrationDeclarationDataProvider dataProvider;
     private QRCodeGenerator qrCodeGenerator;
 
     @Autowired
-    public RegistrationDeclarationCreatorService(PdfRendererService pdfRendererService, PdfTemplateResolver pdfTemplateResolver,
-            RegistrationDeclarationDataProvider dataProvider, QRCodeGenerator qrCodeGenerator) {
+    public RegistrationDeclarationCreatorService(PdfRendererService pdfRendererService, RegistrationDeclarationDataProvider dataProvider, QRCodeGenerator qrCodeGenerator) {
         this.pdfRendererService = pdfRendererService;
-        this.pdfTemplateResolver = pdfTemplateResolver;
         this.dataProvider = dataProvider;
         this.qrCodeGenerator = qrCodeGenerator;
     }
@@ -73,8 +72,7 @@ public class RegistrationDeclarationCreatorService {
             byte[] document = null;
             InputStream documentStream = pdfRendererService.render(templateStream, payload);
             if (declarationTemplate.getSignatureFieldsSettings() != null) {
-                document = generateDocumentWithSignatureField(documentStream, declarationTemplate
-                        .getSignatureFieldsSettings());
+                document = generateDocumentWithSignatureField(documentStream, declarationTemplate.getSignatureFieldsSettings());
             } else {
                 document = ByteStreams.toByteArray(documentStream);
             }

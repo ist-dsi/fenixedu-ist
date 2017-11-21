@@ -9,7 +9,7 @@
 	<parameter name="universityName" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="universityStatus" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="institutionName" class="java.lang.String" isForPrompting="false"/>
-	<parameter name="institutionStatus" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="institutionsWhereStudiesWereTaught" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="universityPrincipal" class="org.fenixedu.academic.domain.Person" isForPrompting="false"/>
 	<parameter name="day" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="registration" class="org.fenixedu.academic.domain.student.Registration" isForPrompting="false"/>
@@ -106,8 +106,8 @@
 				<subreportParameter name="academicUnitIdentifiers">
 					<subreportParameterExpression><![CDATA[$P{academicUnitIdentifiers}]]></subreportParameterExpression>
 				</subreportParameter>
-				<subreportParameter name="institutionStatus">
-					<subreportParameterExpression><![CDATA[$P{institutionStatus}]]></subreportParameterExpression>
+				<subreportParameter name="institutionsWhereStudiesWereTaught">
+					<subreportParameterExpression><![CDATA[$P{institutionsWhereStudiesWereTaught}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="languages">
 					<subreportParameterExpression><![CDATA[$P{languages}]]></subreportParameterExpression>

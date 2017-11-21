@@ -67,8 +67,9 @@
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{secondParagraph}]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="false">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
 				<reportElement key="textField-4" positionType="Float" x="0" y="93" width="455" height="50"/>
+				<box topPadding="7" bottomPadding="7"></box>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="styled">
 					<font fontName="Times New Roman" size="14" pdfFontName="tnr.ttf" isPdfEmbedded="true"/>
 				</textElement>
@@ -76,6 +77,7 @@
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="false">
 				<reportElement key="textField-5" positionType="Float" x="0" y="136" width="455" height="15"/>
+				<box topPadding="7"></box>
 				<textElement textAlignment="Center">
 					<font fontName="Times New Roman" size="10" pdfFontName="tnr.ttf" isPdfEmbedded="true"/>
 				</textElement>
