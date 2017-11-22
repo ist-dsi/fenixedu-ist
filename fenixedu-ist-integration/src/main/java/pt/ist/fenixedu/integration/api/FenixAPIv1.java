@@ -1032,7 +1032,7 @@ public class FenixAPIv1 {
 
         member.setRole(localizedName(CategoryType.TEACHER));
         member.setCategory(category.getName().getContent());
-        member.setArea(getPersonDepartmentArea(person.getEmployee(), interval, false, department.getDepartmentUnit()).getName());
+        member.setArea(getPersonDepartmentArea(person.getEmployee(), interval, false, department.getDepartmentUnit()).getNameI18n().getContent());
 
         return member;
     }
@@ -1054,7 +1054,7 @@ public class FenixAPIv1 {
         }
         String role = localizedName(type);
         boolean direct = type.equals(CategoryType.EMPLOYEE) || type.equals(CategoryType.GRANT_OWNER);
-        String area = getPersonDepartmentArea(person.getEmployee(), interval, direct, department.getDepartmentUnit()).getName();
+        String area = getPersonDepartmentArea(person.getEmployee(), interval, direct, department.getDepartmentUnit()).getNameI18n().getContent();
 
         member.setRole(role);
         member.setCategory(category);
@@ -1064,7 +1064,7 @@ public class FenixAPIv1 {
     }
 
     private static FenixDepartment getFenixDepartment(Department department, AcademicInterval interval) {
-        String name = department.getName();
+        String name = department.getNameI18n().getContent();
         String acronym = department.getAcronym();
 
         List<Employee> employees = Employee.getAllWorkingEmployees(department, interval.getBeginYearMonthDayWithoutChronology(), interval.getEndYearMonthDayWithoutChronology());
