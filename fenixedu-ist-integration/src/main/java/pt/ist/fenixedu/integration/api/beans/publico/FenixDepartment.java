@@ -18,7 +18,12 @@
  */
 package pt.ist.fenixedu.integration.api.beans.publico;
 
+import org.fenixedu.academic.domain.organizationalStructure.Unit;
+import org.fenixedu.commons.i18n.LocalizedString;
+import org.joda.time.Interval;
+
 import java.util.List;
+import java.util.Locale;
 
 public class FenixDepartment {
         private String name, acronym;
@@ -128,6 +133,51 @@ public class FenixDepartment {
 
         public void setIstId(String istId) {
             this.istId = istId;
+        }
+    }
+
+    public static class FenixDepartmentPosition {
+        private Interval interval;
+        private LocalizedString role, category;
+        private Unit area;
+
+        public FenixDepartmentPosition(Interval interval, LocalizedString role, LocalizedString category, Unit area) {
+            this.interval = interval;
+            this.role = role;
+            this.category = category;
+            this.area = area;
+        }
+
+        public Interval getInterval() {
+            return interval;
+        }
+
+        public void setInterval(Interval interval) {
+            this.interval = interval;
+        }
+
+        public LocalizedString getRole() {
+            return role;
+        }
+
+        public void setRole(LocalizedString role) {
+            this.role = role;
+        }
+
+        public LocalizedString getCategory() {
+            return category;
+        }
+
+        public void setCategory(LocalizedString category) {
+            this.category = category;
+        }
+
+        public Unit getArea() {
+            return area;
+        }
+
+        public void setArea(Unit area) {
+            this.area = area;
         }
     }
 }

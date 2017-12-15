@@ -954,62 +954,79 @@ public class FenixAPIv1 {
     public String shuttle() {
         return FenixAPIFromExternalServer.getShuttle();
     }
-
-    private static Unit getSectionOrScientificArea(Unit unit) {
+    private static Unit getSectionOrScientificArea(Unit unit, Interval interval) {
         if (unit == null || unit.isScientificAreaUnit() || unit.isSectionUnit()) {
             return unit;
         }
         return unit.getParentUnits().stream()
-                .map(FenixAPIv1::getSectionOrScientificArea)
-                .filter(Objects::nonNull).findFirst().orElse(null);
+                .filter(parent -> getInterval(parent).overlaps(interval))
+                .map(p -> getSectionOrScientificArea(p, interval))
+                .filter(Objects::nonNull).findFirst().orElse(null); //FIXME find first??
     }
 
-    private static String localizedName(CategoryType type) {
-        return BundleUtil.getString("resources.FenixeduIstIntegrationResources", "label.contract.category.type." + type.getName());
+    private static LocalizedString localizedName(CategoryType type) {
+        return BundleUtil.getLocalizedString("resources.FenixeduIstIntegrationResources", "label.contract.category.type." + type.getName());
     }
 
-    private static Duration getDuration(PersonContractSituation s) {
-        return s.getEndDate() != null ? new Duration(s.getBeginDate().toDateTimeAtStartOfDay(), s.getEndDate().toDateTimeAtStartOfDay()) : null;
+    private static final DateTime FIRST_DATETIME = new DateTime(Long.MIN_VALUE), LAST_DATETIME = new DateTime(Long.MAX_VALUE);
+
+    private static Interval getInterval(PersonContractSituation s) {
+        return getInterval(s.getBeginDate(), s.getEndDate());
     }
 
-    private static Duration getDuration(Contract c) {
-        return c.getEndDate() != null ? new Duration(c.getBeginDate().toDateMidnight(), c.getEndDate().toDateMidnight()) : null;
+    private static Interval getInterval(Contract contract) {
+        return getInterval(contract.getBeginDate(), contract.getEndDate());
     }
 
-    private static Duration getDuration(TeacherAuthorization ta) {
-        ExecutionSemester semester = ta.getExecutionSemester();
-        return new Duration(semester.getBeginLocalDate().toDateTimeAtCurrentTime(), semester.getEndLocalDate().toDateTimeAtCurrentTime());
+    private static Interval getInterval(Unit unit) {
+        return getInterval(unit.getBeginDateYearMonthDay(), unit.getEndDateYearMonthDay());
     }
 
-    private static boolean overlaps(TeacherAuthorization ta, AcademicInterval interval) {
-        return ta.getExecutionSemester().getAcademicInterval().overlaps(interval);
+    private static Interval getInterval(TeacherAuthorization ta) {
+        return ta.getExecutionSemester().getAcademicInterval().toInterval();
     }
 
-    private static boolean overlaps(PersonContractSituation situation, AcademicInterval interval) {
-        try {
-            return situation.getBeginDate() != null && situation.overlaps(interval.toInterval());
-        } catch (Exception e) { //XXX erroneous contract dates
-            return false;
-        }
+    private static Interval getInterval(YearMonthDay begin, YearMonthDay end) {
+        return getInterval(begin != null ? begin.toDateTimeAtMidnight() : null, end != null ? end.toDateTimeAtMidnight() : null);
+    }
+
+    private static Interval getInterval(LocalDate begin, LocalDate end) {
+        return getInterval(begin != null ? begin.toDateTimeAtStartOfDay() : null, end != null ? end.toDateTimeAtStartOfDay() : null);
+    }
+
+    private static Interval getInterval(DateTime dt1, DateTime dt2) {
+        //XXX Some domain objects (at least some PersonContractSituation) may have the begin/end dates switched. If one is null we assume it to be the end date.
+        List<Optional<DateTime>> lst = Stream.of(dt1, dt2)
+                .sorted(Comparator.nullsLast(Comparator.naturalOrder()))
+                .map(Optional::ofNullable).collect(Collectors.toList());
+        DateTime begin = lst.get(0).orElse(FIRST_DATETIME),
+                end = lst.get(1).orElse(LAST_DATETIME);
+        return new Interval(begin, end);
+    }
+
+    private static Duration getDuration(PersonContractSituation s, Interval i) {
+        Interval overlap = getInterval(s).overlap(i);
+        return overlap != null ? overlap.toDuration() : Duration.ZERO;
+    }
+
+    private static Duration getDuration(Contract c, Interval i) {
+        Interval overlap = getInterval(c).overlap(i);
+        return overlap != null ? overlap.toDuration() : Duration.ZERO;
+    }
+
+    private static Duration getDuration(TeacherAuthorization a, Interval i) {
+        Interval overlap = getInterval(a).overlap(i);
+        return overlap != null ? overlap.toDuration() : Duration.ZERO;
+    }
+
+    private static Duration getDuration(Unit u, Interval i) {
+        Interval overlap = getInterval(u).overlap(i);
+        return overlap != null ? overlap.toDuration() : Duration.ZERO;
     }
 
     private static <T, C> Optional<C> getLongestLasting(Function<T, C> get, Stream<T> stream, Function<T, Duration> getDuration) {
-        return stream.filter(i->get.apply(i)!=null).collect(Collectors.groupingBy(get, Collectors.reducing(Duration.ZERO, getDuration, Duration::plus)))
+        return stream.filter(i -> get.apply(i) != null).collect(Collectors.groupingBy(get, Collectors.reducing(Duration.ZERO, getDuration, Duration::plus)))
                 .entrySet().stream().max(Comparator.comparing(Map.Entry::getValue)).map(Map.Entry::getKey);
-    }
-
-    private static Unit getPersonDepartmentArea(Employee employee, AcademicInterval interval, boolean direct, Unit defaultArea) {
-        if (employee != null) {
-            Stream<Contract> contracts = employee.getWorkingContracts(interval.getBeginYearMonthDayWithoutChronology(), interval.getEndYearMonthDayWithoutChronology()).stream();
-            Optional<Unit> workingUnit = getLongestLasting(Contract::getWorkingUnit, contracts, FenixAPIv1::getDuration);
-            if (!direct) {
-                workingUnit = workingUnit.map(FenixAPIv1::getSectionOrScientificArea);
-            }
-            if (workingUnit.isPresent()) {
-                return workingUnit.get();
-            }
-        }
-        return defaultArea;
     }
 
     private static FenixDepartment.FenixDepartmentMember getFenixDepartmentMember(Person person) {
@@ -1024,60 +1041,102 @@ public class FenixAPIv1 {
         return new FenixDepartment.FenixDepartmentMember(username, name, email, photo);
     }
 
-    private static FenixDepartment.FenixDepartmentMember getFenixDepartmentTeacher(Department department, Person person, AcademicInterval interval) {
-        FenixDepartment.FenixDepartmentMember member = getFenixDepartmentMember(person);
+    private static Comparator<FenixDepartment.FenixDepartmentPosition> positionByRelevance =
+            Comparator.comparing(FenixDepartment.FenixDepartmentPosition::getCategory, ProfessionalCategoryOrder.comparator);
 
-        Stream<TeacherAuthorization> authorizations = person.getTeacher().getTeacherAuthorizationStream().filter(ta -> overlaps(ta, interval));
-        TeacherCategory category = getLongestLasting(TeacherAuthorization::getTeacherCategory, authorizations, FenixAPIv1::getDuration).get();
-
-        member.setRole(localizedName(CategoryType.TEACHER));
-        member.setCategory(category.getName().getContent());
-        member.setArea(getPersonDepartmentArea(person.getEmployee(), interval, false, department.getDepartmentUnit()).getName());
-
-        return member;
-    }
-
-    private static FenixDepartment.FenixDepartmentMember getFenixDepartmentEmployee(Department department, Person person, AcademicInterval interval) {
-        FenixDepartment.FenixDepartmentMember member = getFenixDepartmentMember(person);
-        YearMonthDay begin = interval.getBeginYearMonthDayWithoutChronology();
-        YearMonthDay end = interval.getEndYearMonthDayWithoutChronology();
-
-        CategoryType type = CategoryType.EMPLOYEE;
-        String category = "";
-        Optional<ProfessionalCategory> data = Optional.ofNullable(person.getPersonProfessionalData())
-                .map(PersonProfessionalData::getGiafProfessionalData)
-                .flatMap(gpd -> getLongestLasting(PersonContractSituation::getProfessionalCategory, gpd.getPersonContractSituationsSet().stream().filter(s -> overlaps(s, interval)), FenixAPIv1::getDuration));
-        if (data.isPresent()) {
-            ProfessionalCategory pcat = data.get();
-            type = pcat.getCategoryType();
-            category = pcat.getName().getContent();
+    private static Department getDepartment(Unit unit, Interval interval) {
+        if (unit == null) {
+            return null;
         }
-        String role = localizedName(type);
-        boolean direct = type.equals(CategoryType.EMPLOYEE) || type.equals(CategoryType.GRANT_OWNER);
-        String area = getPersonDepartmentArea(person.getEmployee(), interval, direct, department.getDepartmentUnit()).getName();
+        if (unit.isDepartmentUnit()) {
+            return unit.getDepartment();
+        }
+        return unit.getParentUnits().stream()
+                .filter(parent -> getInterval(parent).overlaps(interval))
+                .map(p -> getDepartment(p, interval))
+                .filter(Objects::nonNull).findFirst().orElse(null);
+    }
 
-        member.setRole(role);
-        member.setCategory(category);
-        member.setArea(area);
+    private static Unit getDepartmentWorkArea(Interval positionInterval, boolean direct, Stream<Map.Entry<Interval, Unit>> workingPlaces, Unit defaultArea) {
+        Optional<Unit> workingUnit = getLongestLasting(Map.Entry::getValue, workingPlaces.filter(e -> e.getKey().overlaps(positionInterval)), e -> e.getKey().overlap(positionInterval).toDuration());
+        if (!direct) {
+            workingUnit = workingUnit.map(wu -> getSectionOrScientificArea(wu, positionInterval));
+        }
+        return workingUnit.orElse(defaultArea);
+    }
 
+    private static FenixDepartment.FenixDepartmentPosition getDepartmentPosition(TeacherAuthorization ta, Set<Map.Entry<Interval, Unit>> workingPlaces, Department department) {
+        Interval taInterval = getInterval(ta);
+        TeacherCategory category = ta.getTeacherCategory();
+        CategoryType role = Optional.ofNullable(category).map(TeacherCategory::getProfessionalCategory)
+                .map(ProfessionalCategory::getCategoryType).orElse(CategoryType.TEACHER);
+        LocalizedString catName = Optional.ofNullable(category).map(TeacherCategory::getName).orElse(new LocalizedString().append(""));
+        LocalizedString roleName = localizedName(role);
+        Unit area = getDepartmentWorkArea(taInterval, false, workingPlaces.stream(), department.getDepartmentUnit());
+        return new FenixDepartment.FenixDepartmentPosition(taInterval, roleName, catName, area);
+    }
+
+    private static FenixDepartment.FenixDepartmentPosition getDepartmentPosition(PersonContractSituation pcs, Set<Map.Entry<Interval, Unit>> workingPlaces, Department department) {
+        Interval gcpsInterval = getInterval(pcs);
+        ProfessionalCategory category = pcs.getProfessionalCategory();
+        CategoryType role = Optional.ofNullable(category).map(ProfessionalCategory::getCategoryType).orElse(CategoryType.EMPLOYEE);
+        LocalizedString catName = Optional.ofNullable(category).map(ProfessionalCategory::getName).orElse(new LocalizedString());
+        LocalizedString roleName = localizedName(role);
+        boolean direct = role.equals(CategoryType.EMPLOYEE) || role.equals(CategoryType.GRANT_OWNER);
+        Unit area = getDepartmentWorkArea(gcpsInterval, direct, workingPlaces.stream(), department.getDepartmentUnit());
+        return new FenixDepartment.FenixDepartmentPosition(gcpsInterval, roleName, catName, area);
+    }
+
+    private static FenixDepartment.FenixDepartmentMember getFenixDepartmentPerson(Department department, Person person, Interval interval) {
+        FenixDepartment.FenixDepartmentMember member = getFenixDepartmentMember(person);
+
+        Set<Map.Entry<Interval, Unit>> workingPlaces = Optional.ofNullable(person.getEmployee()) //XXX Not a map because there are cases of duplicate intervals
+                .map(Stream::of).orElseGet(Stream::empty).flatMap(e -> e.getWorkingContracts().stream())
+                .filter(c -> getInterval(c).overlaps(interval))
+                .filter(wc -> department.equals(getDepartment(wc.getWorkingUnit(), getInterval(wc).overlap(interval))))
+                .map(wc -> new AbstractMap.SimpleEntry<>(getInterval(wc).overlap(interval), wc.getWorkingUnit()))
+                .collect(Collectors.toSet());
+
+        Set<FenixDepartment.FenixDepartmentPosition> positions = new HashSet<>();
+        Optional.ofNullable(person.getTeacher())
+                .map(Stream::of).orElseGet(Stream::empty)
+                .flatMap(Teacher::getTeacherAuthorizationStream)
+                .filter(ta -> ta.getDepartment().equals(department))
+                .filter(ta -> getInterval(ta).overlaps(interval))
+                .map(ta -> getDepartmentPosition(ta, workingPlaces, department))
+                .forEach(positions::add);
+
+        Optional.ofNullable(person.getPersonProfessionalData())
+                .map(PersonProfessionalData::getGiafProfessionalData)
+                .map(Stream::of).orElseGet(Stream::empty)
+                .flatMap(gdp -> gdp.getPersonContractSituationsSet().stream())
+                //XXX simultaneous guarantee that situation is within both provided interval and department
+                .filter(pcs -> workingPlaces.stream().anyMatch(e -> e.getKey().overlaps(getInterval(pcs))))
+                .map(pcs -> getDepartmentPosition(pcs, workingPlaces, department))
+                .forEach(positions::add);
+
+        FenixDepartment.FenixDepartmentPosition chosen = positions.stream().sorted(positionByRelevance).findFirst().orElse(null);
+
+        if (chosen != null) {
+            member.setRole(chosen.getRole().getContent());
+            member.setCategory(chosen.getCategory().getContent());
+            member.setArea(chosen.getArea().getNameI18n().getContent());
+        }
         return member;
     }
 
-    private static FenixDepartment getFenixDepartment(Department department, AcademicInterval interval) {
+    private static FenixDepartment getFenixDepartment(Department department, AcademicInterval aInterval) {
         String name = department.getName();
         String acronym = department.getAcronym();
 
-        List<Employee> employees = Employee.getAllWorkingEmployees(department, interval.getBeginYearMonthDayWithoutChronology(), interval.getEndYearMonthDayWithoutChronology());
-        Set<Person> employeePeople = employees.stream().map(Employee::getPerson).collect(Collectors.toSet());
-        //XXX Teachers are obtained separately through their TeacherAuthorizations so external teachers are taken into account
-        //XXX Internal teachers with missing authorizations are present in the employee stream and are displayed in the same way as others
-        List<Teacher> teachers = department.getAllTeachers(interval);
-        Set<Person> teacherPeople = teachers.stream().map(Teacher::getPerson).collect(Collectors.toSet());
-        employeePeople.removeAll(teacherPeople);
+        Set<Person> people = new HashSet<>();
+        Employee.getAllWorkingEmployees(department, aInterval.getBeginYearMonthDayWithoutChronology(), aInterval.getEndYearMonthDayWithoutChronology())
+                .stream().map(Employee::getPerson).forEach(people::add);
+        department.getAllTeachers(aInterval).stream().map(Teacher::getPerson).forEach(people::add);
 
-        List<FenixDepartment.FenixDepartmentMember> members = new ArrayList<>();
-        teacherPeople.stream().map(p -> getFenixDepartmentTeacher(department, p, interval)).forEach(members::add);
-        employeePeople.stream().map(p -> getFenixDepartmentEmployee(department, p, interval)).forEach(members::add);
+        final Interval interval = aInterval.toInterval();
+        List<FenixDepartment.FenixDepartmentMember> members = people.stream()
+                .map(person -> getFenixDepartmentPerson(department, person, interval)).collect(Collectors.toList());
 
         return new FenixDepartment(name, acronym, members);
     }
