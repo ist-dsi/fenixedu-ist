@@ -149,6 +149,7 @@ public class PagesAdminService {
 
         if (canViewGroup != null && !post.getCanViewGroup().equals(canViewGroup)) {
             post.setCanViewGroup(canViewGroup);
+            menuItem.getChildrenSorted().stream().filter(isStaticPage).forEach(subitem -> postForPage(subitem.getPage()).setCanViewGroup(canViewGroup));
         }
 
         return menuItem;
