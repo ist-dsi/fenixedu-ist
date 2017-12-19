@@ -103,14 +103,14 @@ public class PagesAdminService {
     }
 
     @Atomic(mode = Atomic.TxMode.WRITE)
-    protected Optional<MenuItem> create(Site site, MenuItem parent, LocalizedString name, LocalizedString body, LocalizedString excerpt) {
+    protected Optional<MenuItem> create(Site site, MenuItem parent, LocalizedString name, LocalizedString body, LocalizedString excerpt, Boolean visible) {
         Menu menu = site.getMenusSet().stream()
                 .filter(m -> PermissionEvaluation.canDoThis(site, Permission.EDIT_PRIVILEGED_MENU) || !m.getPrivileged())
                 .findFirst().orElse(null);
-        Page page = Page.create(site, menu, parent, Post.sanitize(name), true, "view", Authenticate.getUser());
+        Page page = Page.create(site, menu, parent, Post.sanitize(name), visible, "view", Authenticate.getUser());
         Category category = site.getOrCreateCategoryForSlug("content", new LocalizedString().with(I18N.getLocale(), "Content"));
         Post post = Post.create(site, page, Post.sanitize(name), sanitizeOrNew(body), sanitizeOrNew(excerpt),
-            category, true,
+            category, visible,
             Authenticate.getUser());
         page.addComponents(new StaticPost(post));
         MenuItem menuItem = page.getMenuItemsSet().stream().findFirst().get();
