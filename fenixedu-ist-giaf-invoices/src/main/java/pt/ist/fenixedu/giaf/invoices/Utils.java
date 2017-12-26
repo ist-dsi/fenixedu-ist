@@ -19,8 +19,6 @@
 package pt.ist.fenixedu.giaf.invoices;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -50,8 +48,6 @@ import org.fenixedu.academic.domain.accounting.events.dfa.DFACandidacyEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEventWithPaymentPlan;
 import org.fenixedu.academic.domain.accounting.events.insurance.InsuranceEvent;
-import org.fenixedu.academic.domain.accounting.postingRules.AdministrativeOfficeFeeAndInsurancePR;
-import org.fenixedu.academic.domain.accounting.postingRules.PastAdministrativeOfficeFeeAndInsurancePR;
 import org.fenixedu.academic.domain.contacts.PartyContact;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
 import org.fenixedu.academic.domain.degreeStructure.CycleType;
@@ -324,16 +320,7 @@ public class Utils {
     }
 
     private static Money call(final PostingRule rule, final Event event, final DateTime when, final boolean applyDiscount) {
-        try {
-            final Method method =
-                    PostingRule.class
-                            .getDeclaredMethod("doCalculationForAmountToPay", Event.class, DateTime.class, boolean.class);
-            method.setAccessible(true);
-            return (Money) method.invoke(rule, event, when, applyDiscount);
-        } catch (final NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
-                | InvocationTargetException e) {
-            throw new Error(e);
-        }
+        return rule.doCalculationForAmountToPayWithoutExemptions(event, when, applyDiscount);
     }
 
     public static ExecutionYear executionYearOf(final Event event) {
