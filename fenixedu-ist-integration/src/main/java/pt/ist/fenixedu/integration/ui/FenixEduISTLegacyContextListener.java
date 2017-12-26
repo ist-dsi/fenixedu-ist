@@ -18,6 +18,8 @@
  */
 package pt.ist.fenixedu.integration.ui;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -220,12 +222,19 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
                     }
                 }
 
-                final Stream<Event> events = person.getEventsSet().stream();
-                final String overDueEvents = events.filter(FenixEduISTLegacyContextListener::isOverDue)
-                        .map(e -> e.getDescription().toString())
-                        .collect(Collectors.joining(","));
-                if (!Strings.isNullOrEmpty(overDueEvents)) {
-                    warnings.add(BundleUtil.getString("resources.FenixeduIstIntegrationResources", "label.event.overdue", overDueEvents));
+                try {
+                    final Stream<Event> events = person.getEventsSet().stream();
+                    final String overDueEvents = events.filter(FenixEduISTLegacyContextListener::isOverDue)
+                            .map(e -> e.getDescription().toString())
+                            .collect(Collectors.joining(","));
+                    if (!Strings.isNullOrEmpty(overDueEvents)) {
+                        warnings.add(BundleUtil.getString("resources.FenixeduIstIntegrationResources", "label.event.overdue", overDueEvents));
+                    }
+                } catch (final NullPointerException npe) {
+                    final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    final PrintStream printStream = new PrintStream(stream);
+                    npe.printStackTrace(printStream);
+                    warnings.add(BundleUtil.getString("resources.FenixeduIstIntegrationResources", "label.event.not.consistent", new String(stream.toByteArray())));
                 }
 
                 return warnings;
