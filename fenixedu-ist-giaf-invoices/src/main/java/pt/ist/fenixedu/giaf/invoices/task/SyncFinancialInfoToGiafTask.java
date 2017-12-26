@@ -24,9 +24,15 @@ import pt.ist.fenixedu.giaf.invoices.EventLogger;
 import pt.ist.fenixedu.giaf.invoices.EventProcessor;
 import pt.ist.fenixedu.giaf.invoices.EventWrapper;
 import pt.ist.fenixedu.giaf.invoices.task.TaskUtils.LockManager;
+import pt.ist.fenixframework.Atomic.TxMode;
 
 @Task(englishTitle = "Sync financial information (debts, reciepts, exemptions and clients) with GIAF.")
 public class SyncFinancialInfoToGiafTask extends CronTask {
+
+    @Override
+    protected TxMode getTxMode() {
+        return TxMode.READ;
+    }
 
     @Override
     public void runTask() throws Exception {
