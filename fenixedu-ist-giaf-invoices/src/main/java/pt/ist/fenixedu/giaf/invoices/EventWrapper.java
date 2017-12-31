@@ -1,9 +1,9 @@
 package pt.ist.fenixedu.giaf.invoices;
 
-import java.time.Year;
 import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.accounting.AccountingTransaction;
 import org.fenixedu.academic.domain.accounting.AccountingTransactionDetail;
 import org.fenixedu.academic.domain.accounting.CreditNoteEntry;
 import org.fenixedu.academic.domain.accounting.Entry;
@@ -32,14 +32,17 @@ public class EventWrapper {
 
     public final static DateTime THRESHOLD = new DateTime(2015, 12, 1, 0, 0, 0, 0);
 
+    public final static DateTime LIMIT = new DateTime(2017, 12, 31, 23, 59, 59, 999);
+
     public static Stream<Event> eventsToProcess(final ErrorLogConsumer consumer,
             final Stream<Event> eventStream, final Stream<AccountingTransactionDetail> txStream) {
         final Stream<Event> currentEvents = eventStream
                 .filter(EventWrapper::needsProcessing)
                 .filter(e -> Utils.validate(consumer, e))
+                .filter(e -> e.getWhenOccured().isBefore(LIMIT))
                 ;
 
-        final int currentYear = Year.now().getValue();
+        final int currentYear = 2017;
         final Stream<Event> pastEvents = txStream
             .filter(d -> d.getWhenRegistered().getYear() == currentYear)
             .map(d -> d.getEvent())
@@ -47,7 +50,17 @@ public class EventWrapper {
             .filter(e -> Utils.validate(consumer, e))
             ;
 
-        return Stream.concat(currentEvents, pastEvents).distinct();        
+        return Stream.concat(currentEvents, pastEvents).distinct()
+                .filter(e -> okToProcessPayments(e));
+    }
+
+    private static boolean okToProcessPayments(final Event e) {
+        for (final AccountingTransaction tx : e.getAccountingTransactionsSet()) {
+            if (tx.getWhenRegistered().isAfter(LIMIT)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static boolean needsProcessing(final Event event) {

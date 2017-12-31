@@ -389,7 +389,7 @@ public class GiafEvent {
         if (invoiceId != null) {
             o.addProperty("invoiceId", invoiceId);
         }
-        o.addProperty("date", toString(new Date()));
+        o.addProperty("date", toString(new Date(2017, 12, 31, 0, 0, 0)));
         o.addProperty("type", type);
         o.addProperty("series", "13");
         o.addProperty("group", "212");
