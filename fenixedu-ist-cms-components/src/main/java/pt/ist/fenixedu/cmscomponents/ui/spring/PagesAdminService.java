@@ -182,7 +182,7 @@ public class PagesAdminService {
     protected PostFile addAttachment(String name, MultipartFile attachment, MenuItem menuItem) throws IOException {
         Post post = postForPage(menuItem.getPage());
         GroupBasedFile file =
-                new GroupBasedFile(name, attachment.getOriginalFilename(), attachment.getBytes(), Group.anyone());
+                new GroupBasedFile(name, attachment.getOriginalFilename(), attachment.getBytes(), post.getCanViewGroup());
         return new PostFile(post, file, false, post.getFilesSet().size());
     }
 
