@@ -300,6 +300,9 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
         List<IDegreeModuleToEvaluate> degreeModulesToEnrol = new ArrayList<IDegreeModuleToEvaluate>();
         if (registration.getEnrolments(bolonhaStudentEnrollmentBean.getExecutionPeriod()).size() == 0) {
             for (PreEnrolment preEnrolment : user.getPreEnrolmentsSet()) {
+                if (!preEnrolment.getExecutionSemester().isCurrent()) {
+                    continue;
+                }
                 Optional<Context> courseContext =
                         preEnrolment
                                 .getCourseGroup()
