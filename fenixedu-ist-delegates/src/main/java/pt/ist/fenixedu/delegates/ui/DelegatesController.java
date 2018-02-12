@@ -51,7 +51,7 @@ public class DelegatesController {
                 degree = student.getLastActiveRegistration().getDegree();
             }
             if (degree == null && student.getLastRegistration() != null) {
-                degree = student.getLastActiveRegistration().getDegree();
+                degree = student.getLastRegistration().getDegree();
             }
         }
         delegateSearchBean.setDegree(degree);

@@ -64,7 +64,7 @@
 	<div class="form-group">
 		<label for="degree" class="col-md-1 control-label"><spring:message code="label.delegates.select.degree.sel"/></label>
 		<div class="col-md-11">
-			<form:select path="degree" items="${searchBean.degrees}" itemLabel="nameI18N" itemValue="externalId" onchange="onchangeDegree(); submit();" class="form-control"/>
+			<form:select path="degree" items="${searchBean.degrees}" itemLabel="nameI18N.content" itemValue="externalId" onchange="onchangeDegree(); submit();" class="form-control"/>
 		</div>
 	</div>
 </form:form>
