@@ -79,7 +79,7 @@ public class PagesAdminController {
         if (bean.getParent() != null && bean.getParent().getMenu().getPrivileged()) {
             ensureCanDoThis(site, Permission.EDIT_PRIVILEGED_MENU);
         }
-        Optional<MenuItem> menuItem = service.create(site, bean.getParent(), bean.getTitle(), bean.getBody(),bean.getExcerpt());
+        Optional<MenuItem> menuItem = service.create(site, bean.getParent(), bean.getTitle(), bean.getBody(),bean.getExcerpt(), bean.isVisible());
         return service.serialize(menuItem.get(), true).toString();
     }
 

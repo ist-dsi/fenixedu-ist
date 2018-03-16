@@ -107,7 +107,7 @@ public class TeacherPagesController extends ExecutionCourseController {
         LocalizedString newPageName =
                 new LocalizedString()
                         .with(Locale.getDefault(), from.getExecutionCourse().getExecutionPeriod().getQualifiedName());
-        MenuItem emptyPageParent = service.create(to, null, newPageName, new LocalizedString(), new LocalizedString()).get();
+        MenuItem emptyPageParent = service.create(to, null, newPageName, new LocalizedString(), new LocalizedString(), false).get();
         emptyPageParent.getPage().setPublished(false);
         emptyPageParent.setTop(newMenu);
         for (Menu oldMenu : from.getMenusSet()) {

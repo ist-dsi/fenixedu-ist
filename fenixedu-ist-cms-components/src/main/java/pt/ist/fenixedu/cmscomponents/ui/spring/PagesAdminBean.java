@@ -66,7 +66,7 @@ public class PagesAdminBean {
             Integer.parseInt(asString(jsonObj, "canViewGroupIndex").get());
             this.canViewGroup = executionCourseGroup(Integer.parseInt(asString(jsonObj, "canViewGroupIndex").get()));
         }
-        this.visible = jsonObj.has("visible") ? jsonObj.get("visible").getAsBoolean() : null;
+        this.visible = jsonObj.has("visible") ? jsonObj.get("visible").getAsBoolean() : false;
     }
 
     public MenuItem getMenuItem() {
