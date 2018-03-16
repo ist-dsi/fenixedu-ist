@@ -133,6 +133,7 @@ public class PagesAdminService {
 
         if (visible != null) {
             menuItem.getPage().setPublished(visible);
+            post.setActive(visible);
         }
 
         if (!menuItem.getPage().getName().equals(name)) {
