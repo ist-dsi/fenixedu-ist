@@ -40,7 +40,7 @@ public class EnrolledLessonBean {
         setWeekDay(lesson.getDiaSemana().getDiaSemanaString());
         setBegin(lesson.getBeginHourMinuteSecond().toDateTimeAtCurrentTime().toDate());
         setEnd(lesson.getEndHourMinuteSecond().toDateTimeAtCurrentTime().toDate());
-        if (lesson.getRoomOccupation() != null) {
+        if (lesson.getRoomOccupation() != null && lesson.getRoomOccupation().getRoom() != null) {
             setRoom(lesson.getRoomOccupation().getRoom().getName());
         } else if (lesson.getLastLessonInstance() != null && lesson.getLastLessonInstance().getRoom() != null) {
             setRoom(lesson.getLastLessonInstance().getRoom().getName());
