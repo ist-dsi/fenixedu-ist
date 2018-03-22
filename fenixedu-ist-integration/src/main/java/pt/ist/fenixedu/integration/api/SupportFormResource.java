@@ -38,31 +38,39 @@ import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.google.common.base.MoreObjects;
 import org.fenixedu.academic.FenixEduAcademicConfiguration;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.academic.util.Bundle;
+import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.rest.BennuRestResource;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.core.util.CoreConfiguration;
+import org.fenixedu.bennu.portal.api.json.SupportConfigurationViewer;
 import org.fenixedu.bennu.portal.domain.MenuFunctionality;
+import org.fenixedu.bennu.portal.domain.SupportConfiguration;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import pt.ist.fenixedu.contracts.domain.LegacyRoleUtils;
-import pt.ist.fenixframework.FenixFramework;
-
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import pt.ist.fenixedu.contracts.domain.LegacyRoleUtils;
+import pt.ist.fenixframework.FenixFramework;
 
 @Path("/fenix-ist/support-form")
 public class SupportFormResource extends BennuRestResource {
@@ -92,6 +100,18 @@ public class SupportFormResource extends BennuRestResource {
         }
     }
 
+    @Path("{oid}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public JsonElement getSupportConfigurations(@PathParam("oid") final String menuOid) {
+        JsonObject jsonObject = new JsonObject();
+        MenuFunctionality menuFunctionality = Strings.isNullOrEmpty(menuOid) ? null : FenixFramework.getDomainObject(menuOid);
+        jsonObject.add("default", view(menuFunctionality.getSupport(), SupportConfigurationViewer.class));
+        jsonObject.add("options", view(Bennu.getInstance().getSupportConfigurationSet().stream()
+                .filter(support -> !support.equals(menuFunctionality.getSupport())), SupportConfigurationViewer.class));
+        return jsonObject;
+    }
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response sendSupportForm(String jsonStr, @Context HttpServletRequest request) {
@@ -103,7 +123,7 @@ public class SupportFormResource extends BennuRestResource {
         String mailBody = generateEmailBody(bean);
 
         if (CoreConfiguration.getConfiguration().developmentMode()) {
-            logger.warn("Submitted error form from {}: '{}'\n{}", email, mailSubject, mailBody);
+            logger.warn("Submitted error form from {} to {}: '{}'\n{}", email, bean.getSupportEmail(), mailSubject, mailBody);
         } else {
             sendEmail(validateEmail(email) ? email : CoreConfiguration.getConfiguration().defaultSupportEmailAddress(),
                     mailSubject, mailBody, bean);
@@ -196,8 +216,7 @@ public class SupportFormResource extends BennuRestResource {
         MimeMessage message = new MimeMessage(session);
         try {
             message.setFrom(new InternetAddress(from));
-            message.addRecipient(Message.RecipientType.TO, new InternetAddress(CoreConfiguration.getConfiguration()
-                    .defaultSupportEmailAddress()));
+            message.addRecipient(Message.RecipientType.TO, new InternetAddress(bean.getSupportEmail()));
             message.setSubject(subject);
             message.setText(body);
 
@@ -230,6 +249,7 @@ public class SupportFormResource extends BennuRestResource {
         public String exceptionInfo;
         public String description;
         private String functionality;
+        private String support;
         private String email;
         public String subject;
         public String type = "exception";
@@ -249,6 +269,15 @@ public class SupportFormResource extends BennuRestResource {
 
         public MenuFunctionality getFunctionality() {
             return Strings.isNullOrEmpty(functionality) ? null : FenixFramework.getDomainObject(functionality);
+        }
+
+        public String getSupportEmail() {
+            if (Strings.isNullOrEmpty(support)) {
+                return getFunctionality().getSupport() != null ? getFunctionality().getSupport()
+                        .getEmailAddress() : CoreConfiguration.getConfiguration().defaultSupportEmailAddress();
+            }
+            SupportConfiguration supportConfiguration = FenixFramework.getDomainObject(support);
+            return supportConfiguration.getEmailAddress();
         }
     }
 
