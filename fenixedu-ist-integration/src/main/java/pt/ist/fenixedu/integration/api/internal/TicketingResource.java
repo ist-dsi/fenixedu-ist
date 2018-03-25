@@ -112,7 +112,7 @@ public class TicketingResource {
                 .setIssuedAt(DateTime.now().toDate())
                 .setExpiration(DateTime.now().plusHours(JWT_EXPIRATION_PERIOD).toDate())
                 .setSubject(user.getUsername())
-                .claim("name", user.getName())
+                .claim("name", user.getDisplayName())
                 .signWith(signatureAlgorithm, signingKey);
 
         return builder.compact();
