@@ -18,8 +18,9 @@
  */
 package pt.ist.fenixedu.integration.ui.renderers.providers;
 
-import java.util.HashSet;
+import java.util.Comparator;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.bennu.core.groups.Group;
@@ -32,6 +33,13 @@ import pt.ist.fenixedu.integration.ui.struts.action.research.researchUnit.UnitFi
 
 public class GroupsForUnitFiles implements DataProvider {
 
+    private Comparator<Group> COMPARATOR_BY_NAME = new Comparator<Group>() {
+        @Override
+        public int compare(final Group g1, final Group g2) {
+            return g1.toString().compareTo(g2.toString());
+        }
+    };
+
     @Override
     public Converter getConverter() {
         return null;
@@ -39,7 +47,7 @@ public class GroupsForUnitFiles implements DataProvider {
 
     @Override
     public Object provide(Object source, Object currentValue) {
-        Set<Group> groups = new HashSet<>();
+        Set<Group> groups = new TreeSet<Group>(COMPARATOR_BY_NAME);
         Unit unit = ((UnitFileBean) source).getUnit();
         groups.addAll(unit.getGroups());
         for (final PersistentGroupMembers persistentMembers : unit.getPersistentGroupsSet()) {
