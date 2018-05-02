@@ -72,6 +72,8 @@ public class ISTPhoneNumberHandler extends AcademicPhoneNumberHandler implements
             if (isExtension(numberText)) {
                 numberText = getExternalNumberForExtension(numberText);
             }
+            
+            numberText = numberText.replaceAll("[^0-9+]","");
 
             try {
                 final PhoneNumber phoneNumber = PHONE_UTIL.parse(numberText, COUNTRY_CODE);
