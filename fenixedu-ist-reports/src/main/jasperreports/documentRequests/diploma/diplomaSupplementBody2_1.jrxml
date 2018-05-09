@@ -10,8 +10,9 @@
 	</parameter>
 	<parameter name="bundle" class="java.util.ResourceBundle" isForPrompting="false"/>
 	<parameter name="universityName" class="java.lang.String" isForPrompting="false"/>
-	<field name="identifier" class="java.lang.String"/>
-	<field name="name" class="java.lang.String"/>
+	<!--<field name="identifier" class="java.lang.String"/>-->
+	<!--<field name="name" class="java.lang.String"/>-->
+	<field name="presentationName" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -37,7 +38,7 @@
 				<textElement textAlignment="Left" verticalAlignment="Top">
 					<font fontName="Serif" size="7" pdfFontName="Times-Roman" isPdfEmbedded="false"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA["[" +  $F{identifier} + "] "+ $P{bundle}.getString("diploma.supplement.four.three.table.legend.one") + $F{name}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{presentationName}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
