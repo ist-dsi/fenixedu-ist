@@ -960,7 +960,7 @@
 					<textElement textAlignment="Left" lineSpacing="Single">
 						<font fontName="Serif" size="8" isBold="false" isItalic="false" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
 					</textElement>
-					<textFieldExpression class="java.lang.String"><![CDATA["(*)"]]></textFieldExpression>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{bundle}.getString("diploma.supplement.observations")]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupFooter>
