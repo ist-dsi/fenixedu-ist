@@ -18,23 +18,22 @@
  */
 package pt.ist.fenixedu.delegates.ui;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.DegreeModuleScope;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.accessControl.StudentGroup;
-import org.fenixedu.academic.domain.util.email.Recipient;
-
+import org.fenixedu.bennu.core.groups.Group;
 import pt.ist.fenixedu.delegates.domain.student.CycleDelegate;
 import pt.ist.fenixedu.delegates.domain.student.DegreeDelegate;
 import pt.ist.fenixedu.delegates.domain.student.Delegate;
 import pt.ist.fenixedu.delegates.domain.student.YearDelegate;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class DelegateStudentSelectBean {
 
@@ -111,8 +110,8 @@ public class DelegateStudentSelectBean {
         }
     }
 
-    public List<Recipient> getRecipients() {
-        List<Recipient> toRet = new ArrayList<Recipient>();
+    public List<Group> getRecipients() {
+        List<Group> toRet = new ArrayList<>();
         if (selectedExecutionCourses != null && selectedExecutionCourses.size() > 0) {
 
             List<DelegateCurricularCourseBean> lccb =
@@ -128,7 +127,7 @@ public class DelegateStudentSelectBean {
                                             .filter(ec -> (ec.getDegreesSortedByDegreeName().contains(selectedPosition
                                                     .getDegree())))).collect(Collectors.toList());
 
-            selectedStudentCourses.stream().map(ec -> StudentGroup.get(ec)).forEach(sg -> toRet.add(Recipient.newInstance(sg)));
+            selectedStudentCourses.stream().map(ec -> StudentGroup.get(ec)).forEach(sg -> toRet.add(sg));
 
         }
         if (selectedYearStudents && selectedPosition instanceof YearDelegate) {
@@ -136,18 +135,18 @@ public class DelegateStudentSelectBean {
             StudentGroup sg =
                     StudentGroup.get(selectedPosition.getDegree(), yearDelegate.getCurricularYear(),
                             ExecutionYear.getExecutionYearByDate(yearDelegate.getStart().toYearMonthDay()));
-            toRet.add(Recipient.newInstance(sg));
+            toRet.add(sg);
         }
         if (selectedDegreeOrCycleStudents) {
             if (selectedPosition instanceof CycleDelegate) {
                 CycleDelegate cycleDelegate = (CycleDelegate) selectedPosition;
                 StudentGroup sg = StudentGroup.get(selectedPosition.getDegree(), cycleDelegate.getCycle());
-                toRet.add(Recipient.newInstance(sg));
+                toRet.add(sg);
             }
             if (selectedPosition instanceof DegreeDelegate) {
                 DegreeDelegate degreeDelegate = (DegreeDelegate) selectedPosition;
                 StudentGroup sg = StudentGroup.get(degreeDelegate.getDegree(), null);
-                toRet.add(Recipient.newInstance(sg));
+                toRet.add(sg);
             }
         }
 

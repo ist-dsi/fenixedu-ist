@@ -18,6 +18,10 @@
         </dependency>
         <dependency>
             <groupId>org.fenixedu</groupId>
+            <artifactId>messaging-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.fenixedu</groupId>
             <artifactId>bennu-core</artifactId>
         </dependency>
         <dependency>

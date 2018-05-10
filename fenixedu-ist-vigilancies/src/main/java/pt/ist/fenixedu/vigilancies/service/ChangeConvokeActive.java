@@ -18,18 +18,14 @@
  */
 package pt.ist.fenixedu.vigilancies.service;
 
-import java.util.Collections;
-
 import org.fenixedu.academic.domain.EvaluationManagementLog;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.WrittenEvaluation;
-import org.fenixedu.academic.domain.util.email.ConcreteReplyTo;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.PersonSender;
-import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.academic.util.Bundle;
+import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.messaging.core.domain.Message;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixedu.vigilancies.domain.ExamCoordinator;
@@ -74,12 +70,17 @@ public class ChangeConvokeActive {
         String beginDateString = date.getDayOfMonth() + "-" + date.getMonthOfYear() + "-" + date.getYear();
 
         String subject =
-                BundleUtil.getString("resources.VigilancyResources", "email.convoke.subject",
-                        new String[] { writtenEvaluation.getName(), group.getName(), beginDateString, time });
+                BundleUtil.getString("resources.VigilancyResources", "email.convoke.subject", writtenEvaluation.getName(), group.getName(),
+                        beginDateString, time);
 
-        new Message(PersonSender.newInstance(person), new ConcreteReplyTo(replyTo).asCollection(), new Recipient(
-                VigilancyGroup.get(convoke)).asCollection(), Collections.EMPTY_LIST, Collections.EMPTY_LIST, subject,
-                emailMessage, convoke.getSitesAndGroupEmails());
+        Group tos = VigilancyGroup.get(convoke);
+        Message.from(person.getSender())
+                .replyTo(replyTo)
+                .to(tos)
+                .singleBcc(convoke.getSitesAndGroupEmails())
+                .subject(subject)
+                .textBody(emailMessage)
+                .send();
 
     }
 
@@ -91,11 +92,9 @@ public class ChangeConvokeActive {
 
         return BundleUtil.getString(
                 "resources.VigilancyResources",
-                "email.convoke.active.body",
-                new String[] {
-                        convoke.getVigilantWrapper().getPerson().getName(),
-                        (bool) ? BundleUtil.getString("resources.VigilancyResources", "email.convoke.convokedAgain") : BundleUtil
-                                .getString("resources.VigilancyResources", "email.convoke.uncovoked"),
-                        writtenEvaluation.getFullName(), date, writtenEvaluation.getBeginningDateHourMinuteSecond().toString() });
+                "email.convoke.active.body", convoke.getVigilantWrapper().getPerson().getName(),
+                (bool) ? BundleUtil.getString("resources.VigilancyResources", "email.convoke.convokedAgain") : BundleUtil
+                        .getString("resources.VigilancyResources", "email.convoke.uncovoked"), writtenEvaluation.getFullName(),
+                date, writtenEvaluation.getBeginningDateHourMinuteSecond().toString());
     }
 }

@@ -18,17 +18,13 @@
  */
 package pt.ist.fenixedu.teacher.evaluation.domain;
 
-import java.util.Collections;
 import java.util.Set;
 
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.util.EmailAddressList;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Recipient;
-import org.fenixedu.academic.domain.util.email.SystemSender;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.messaging.core.domain.Message;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixframework.Atomic;
@@ -90,19 +86,17 @@ public abstract class TeacherEvaluation extends TeacherEvaluation_Base {
         final Person evaluee = teacherEvaluationProcess.getEvaluee();
         if (evaluee != AccessControl.getPerson()) {
             final Person evaluator = teacherEvaluationProcess.getEvaluator();
-            final Recipient recipient = new Recipient(Collections.singletonList(evaluee));
-            final Recipient ccRecipient = new Recipient(Collections.singletonList(evaluator));
             final FacultyEvaluationProcess facultyEvaluationProcess = teacherEvaluationProcess.getFacultyEvaluationProcess();
             final String title = facultyEvaluationProcess.getTitle().getContent();
             final String body =
                     BundleUtil.getString("resources.TeacherEvaluationResources",
                             "message.email.stamp.teacher.evaluation.process", title);
-            final SystemSender systemSender = Bennu.getInstance().getSystemSender();
-            final Message message =
-                    new Message(systemSender, Collections.EMPTY_LIST, Collections.EMPTY_LIST, title, body, new EmailAddressList(
-                            Collections.EMPTY_LIST).toString());
-            message.addTos(recipient);
-            message.addCcs(ccRecipient);
+            Message.fromSystem()
+                    .to(evaluee.getPersonGroup())
+                    .cc(evaluator.getPersonGroup())
+                    .subject(title)
+                    .textBody(body)
+                    .send();
         }
     }
 

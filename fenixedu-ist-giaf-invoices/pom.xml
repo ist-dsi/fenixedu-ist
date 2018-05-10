@@ -21,6 +21,10 @@
             <artifactId>fenixedu-academic</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.fenixedu</groupId>
+            <artifactId>messaging-core</artifactId>
+        </dependency>
+        <dependency>
             <groupId>pt.ist</groupId>
             <artifactId>giaf-client-financial-documents</artifactId>
             <version>${version.pt.ist.giaf-client-financial-documents}</version>
@@ -52,10 +56,6 @@
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
         </dependency>
     </dependencies>
 

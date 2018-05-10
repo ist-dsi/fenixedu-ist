@@ -18,22 +18,20 @@
  */
 package pt.ist.fenixedu.delegates.domain.student;
 
-import static org.fenixedu.bennu.FenixEduDelegatesConfiguration.BUNDLE;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.CurricularYear;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionYear;
-import org.fenixedu.academic.domain.util.email.Recipient;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
-
 import pt.ist.fenixedu.delegates.domain.accessControl.DelegateGroup;
 import pt.ist.fenixedu.delegates.domain.util.email.DelegateSender;
 import pt.ist.fenixedu.delegates.ui.DelegateBean;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.fenixedu.bennu.FenixEduDelegatesConfiguration.BUNDLE;
 
 public class YearDelegate extends YearDelegate_Base {
 
@@ -53,7 +51,7 @@ public class YearDelegate extends YearDelegate_Base {
     public void setSender(DelegateSender sender) {
         super.setSender(sender);
         getSender().setMembers(getUser().groupOf());
-        getSender().addRecipients(Recipient.getRecipientFromGroup(DelegateGroup.get(getDegree())));
+        getSender().addRecipient(DelegateGroup.get(getDegree()));
     }
 
     @Override
@@ -61,16 +59,13 @@ public class YearDelegate extends YearDelegate_Base {
         String delegate = BundleUtil.getString(BUNDLE, "delegate");
         String of = BundleUtil.getString(BUNDLE, "delegate.of");
         String year = BundleUtil.getString(BUNDLE, "delegate.year");
-        return delegate + " " + of + " " + getCurricularYear().getYear() + " " + year;
+        return String.format("%s %s %d %s", delegate, of, getCurricularYear().getYear(), year);
     }
 
     @Override
     public Boolean samePosition(Delegate delegate) {
         YearDelegate yearDelegate = (YearDelegate) delegate;
-        if (getDegree().equals(yearDelegate.getDegree()) && getCurricularYear().equals(yearDelegate.getCurricularYear())) {
-            return true;
-        }
-        return false;
+        return getDegree().equals(yearDelegate.getDegree()) && getCurricularYear().equals(yearDelegate.getCurricularYear());
     }
 
     @Override
@@ -78,11 +73,8 @@ public class YearDelegate extends YearDelegate_Base {
 
         ExecutionYear execYear = ExecutionYear.getExecutionYearByDate(getStart().toYearMonthDay());
 
-        return getDegree()
-                .getDegreeCurricularPlansForYear(execYear)
-                .stream()
-                .flatMap(
-                        p -> p.getCurricularCoursesByExecutionYearAndCurricularYear(execYear, getCurricularYear().getYear())
+        return getDegree().getDegreeCurricularPlansForYear(execYear).stream()
+                .flatMap(p -> p.getCurricularCoursesByExecutionYearAndCurricularYear(execYear, getCurricularYear().getYear())
                                 .stream()).collect(Collectors.toList());
     }
 

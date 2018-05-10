@@ -4,7 +4,6 @@ import static org.fenixedu.bennu.RegistrationProcessConfiguration.RESOURCE_BUNDL
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -14,13 +13,11 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.SystemSender;
 import org.fenixedu.bennu.RegistrationProcessConfiguration;
-import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.rest.JsonBodyReaderWriter;
 import org.fenixedu.bennu.core.util.CoreConfiguration;
+import org.fenixedu.messaging.core.domain.Message;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
@@ -100,7 +97,7 @@ public class SignCertAndStoreService {
     }
 
     public void sendDocumentToBeCertified(String registrationExternalId, String filename, MultipartFile file,
-            String uniqueIdentifier, boolean alreadyCertified) throws IOException {
+            String uniqueIdentifier, boolean alreadyCertified) {
         String compactJws = Jwts.builder().setSubject(uniqueIdentifier)
                 .signWith(SignatureAlgorithm.HS512, RegistrationProcessConfiguration.certifierJwtSecret()).compact();
 
@@ -144,8 +141,12 @@ public class SignCertAndStoreService {
         String title = BundleUtil.getString(RESOURCE_BUNDLE, locale,"registration.document.email.title", displayName);
         String body = BundleUtil.getString(RESOURCE_BUNDLE, locale, "registration.document.email.body", displayName, link);
 
-        SystemSender systemSender = Bennu.getInstance().getSystemSender();
-        new Message(systemSender, systemSender.getConcreteReplyTos(), Collections.EMPTY_LIST, title, body, email);
+        Message.fromSystem()
+                .replyToSender()
+                .singleBcc(email)
+                .subject(title)
+                .textBody(body)
+                .send();
     }
 
     private Optional<String> uploadDirectoryFor(DriveClient driveClient, String username) {
