@@ -1497,7 +1497,7 @@ public class FenixAPIv1 {
             for (CurricularCourse curricularCourse : entry.getValue()) {
                 String id = curricularCourse.getDegree().getExternalId();
                 String dName = curricularCourse.getDegree().getPresentationName();
-                String dacronym = curricularCourse.getAcronym();
+                String dacronym = curricularCourse.getDegree().getSigla();
 
                 degrees.add(new FenixCourseExtended.FenixCompetence.Degree(id, dName, dacronym));
             }
