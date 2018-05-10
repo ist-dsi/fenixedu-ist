@@ -1,6 +1,6 @@
 package pt.ist.fenixedu.delegates.domain;
 
-class util.email.DelegateSender extends .org.fenixedu.academic.domain.util.email.Sender {}
+class util.email.DelegateSender extends .org.fenixedu.messaging.core.domain.Sender {}
 
 class accessControl.PersistentDelegateGroup extends .org.fenixedu.academic.domain.accessControl.FenixPredicateGroup {
     protected Boolean yearDelegate;

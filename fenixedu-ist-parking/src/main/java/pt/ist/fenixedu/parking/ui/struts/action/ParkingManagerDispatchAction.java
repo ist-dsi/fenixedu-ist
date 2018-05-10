@@ -51,11 +51,7 @@ import org.fenixedu.academic.domain.contacts.EmailAddress;
 import org.fenixedu.academic.domain.organizationalStructure.Party;
 import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.academic.domain.student.Registration;
-import org.fenixedu.academic.domain.util.email.ConcreteReplyTo;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Sender;
 import org.fenixedu.academic.service.services.commons.ExecuteFactoryMethod;
-import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
 import org.fenixedu.academic.ui.struts.action.exceptions.FenixActionException;
 import org.fenixedu.academic.util.ContentType;
@@ -70,6 +66,7 @@ import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
 import org.fenixedu.commons.StringNormalizer;
 import org.fenixedu.commons.i18n.I18N;
 import org.fenixedu.commons.spreadsheet.StyledExcelSpreadsheet;
+import org.fenixedu.messaging.core.domain.Message;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixWebFramework.renderers.components.state.IViewState;
@@ -105,7 +102,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
 
     @EntryPoint
     public ActionForward entryPoint(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
+            HttpServletResponse response) {
 
         ParkingRequestSearch parkingRequestSearch = new ParkingRequestSearch();
         parkingRequestSearch.setParkingRequestState(ParkingRequestState.PENDING);
@@ -117,7 +114,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
     }
 
     public ActionForward showParkingRequests(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
+            HttpServletResponse response) {
         // verificar autorização
         ParkingRequestSearch parkingRequestSearch = getRenderedObject("parkingRequestSearch");
 
@@ -156,7 +153,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
     }
 
     public ActionForward showRequest(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
+            HttpServletResponse response) {
         // verificar autorização
 
         final ParkingRequest parkingRequest = getDomainObject(request, "externalId");
@@ -333,9 +330,9 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
             }
             Integer mostSignificantNumber =
                     getMostSignificantNumber((Person) parkingRequest.getParkingParty().getParty(),
-                            FenixFramework.<ParkingGroup> getDomainObject(group));
+                            FenixFramework.getDomainObject(group));
             updateParkingParty(parkingRequest, ParkingRequestState.ACCEPTED, cardNumber,
-                    FenixFramework.<ParkingGroup> getDomainObject(group), note, parkingPartyBean.getCardStartDate(),
+                    FenixFramework.getDomainObject(group), note, parkingPartyBean.getCardStartDate(),
                     parkingPartyBean.getCardEndDate(), mostSignificantNumber);
         } else if (request.getParameter("reject") != null) {
             updateParkingParty(parkingRequest, ParkingRequestState.REJECTED, null, null, note, null, null, null);
@@ -375,13 +372,13 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
             parkingGroup = parkingParty.getParkingGroup();
         }
 
-        Map<String, Object> parameters = new HashMap<String, Object>();
+        Map<String, Object> parameters = new HashMap<>();
         parameters.put("imageUrl", "images/Logo_IST_color.tiff");
 
         Person person = (Person) parkingParty.getParty();
         parameters.put("number", getMostSignificantNumberString(person, parkingGroup));
 
-        List<Person> persons = new ArrayList<Person>();
+        List<Person> persons = new ArrayList<>();
         persons.add(person);
 
         ReportResult report = ReportsUtils.generateReport("parkingManager.parkingCard", parameters, persons);
@@ -522,8 +519,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
         }
     }
 
-    private void setupParkingRequests(HttpServletRequest request, Party party, String carPlateNumber, Long parkingCardNumber)
-            throws FenixServiceException {
+    private void setupParkingRequests(HttpServletRequest request, Party party, String carPlateNumber, Long parkingCardNumber) {
         if (party.getParkingParty() != null) {
             request.setAttribute("parkingRequests", party.getParkingParty().getParkingRequestsSet());
         }
@@ -531,7 +527,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
     }
 
     public ActionForward prepareEditParkingParty(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
+            HttpServletResponse response) {
 
         ParkingParty parkingParty = null;
         ParkingPartyBean parkingPartyBean = (ParkingPartyBean) getFactoryObject();
@@ -594,7 +590,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
         }
         boolean vehicleDataCorrect = true;
         boolean deleteAllVehicles = true;
-        Set<String> vehiclePlates = new HashSet<String>();
+        Set<String> vehiclePlates = new HashSet<>();
         for (final Iterator<VehicleBean> iter = parkingPartyBean.getVehicles().iterator(); iter.hasNext();) {
             VehicleBean vehicle = iter.next();
             if (!vehicle.getDeleteVehicle()) {
@@ -685,7 +681,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
     }
 
     public ActionForward showHistory(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
+            HttpServletResponse response) {
         final String codeString = request.getParameter("externalId");
         String code = null;
         if (codeString == null) {
@@ -695,7 +691,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
         }
         final ParkingRequest parkingRequest = FenixFramework.getDomainObject(code);
         List<ParkingPartyHistory> parkingPartyHistories =
-                new ArrayList<ParkingPartyHistory>(parkingRequest.getParkingParty().getParty().getParkingPartyHistoriesSet());
+                new ArrayList<>(parkingRequest.getParkingParty().getParty().getParkingPartyHistoriesSet());
 
         Collections.sort(parkingPartyHistories, Comparator.comparing(ParkingPartyHistory::getHistoryDate));
         request.setAttribute("parkingPartyHistories", parkingPartyHistories);
@@ -704,7 +700,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
     }
 
     public ActionForward showParkingPartyHistory(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
+            HttpServletResponse response) {
         final String codeString = request.getParameter("externalId");
         String code = null;
         if (codeString == null) {
@@ -713,8 +709,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
             code = codeString;
         }
         final ParkingParty parkingParty = FenixFramework.getDomainObject(code);
-        List<ParkingPartyHistory> parkingPartyHistories =
-                new ArrayList<ParkingPartyHistory>(parkingParty.getParty().getParkingPartyHistoriesSet());
+        List<ParkingPartyHistory> parkingPartyHistories = new ArrayList<>(parkingParty.getParty().getParkingPartyHistoriesSet());
 
         Collections.sort(parkingPartyHistories, Comparator.comparing(ParkingPartyHistory::getHistoryDate));
         request.setAttribute("parkingPartyHistories", parkingPartyHistories);
@@ -756,20 +751,22 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
 
         if (note != null && note.trim().length() != 0 && email != null) {
             ResourceBundle bundle = ResourceBundle.getBundle("resources.ParkingResources", I18N.getLocale());
-            Sender sender = Bennu.getInstance().getSystemSender();
-            ConcreteReplyTo replyTo = new ConcreteReplyTo(bundle.getString("label.fromAddress"));
-            new Message(sender, replyTo.asCollection(), Collections.EMPTY_LIST, bundle.getString("label.subject"), note, email);
+            Message.fromSystem()
+                    .replyTo(bundle.getString("label.fromAddress"))
+                    .singleBcc(email)
+                    .subject(bundle.getString("label.subject"))
+                    .textBody(note)
+                    .send();
         }
     }
 
     private boolean changedObject(Object oldObject, Object newObject) {
-        return oldObject == null && newObject == null ? false : (oldObject != null && newObject != null ? (!oldObject
-                .equals(newObject)) : true);
+        return (oldObject != null || newObject != null) && (oldObject == null || newObject == null || (!oldObject.equals(newObject)));
     }
 
     @Atomic
     private List<Party> searchPartyCarPlate(String nameSearch, String carPlateNumber, Long parkingCardNumber) {
-        List<Party> result = new ArrayList<Party>();
+        List<Party> result = new ArrayList<>();
         if (!Strings.isNullOrEmpty(carPlateNumber) || !Strings.isNullOrEmpty(nameSearch) || parkingCardNumber != null) {
             Collection<ParkingParty> parkingParties = Bennu.getInstance().getParkingPartiesSet();
             for (ParkingParty parkingParty : parkingParties) {
@@ -793,22 +790,18 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
     }
 
     private boolean satisfiedParkingCardNumber(ParkingParty parkingParty, Long parkingCardNumber) {
-        if (parkingCardNumber != null) {
-            return (parkingParty.getCardNumber() != null && parkingParty.getCardNumber().toString()
-                    .contains(parkingCardNumber.toString())) ? true : false;
-        }
-        return true;
+        return parkingCardNumber == null || parkingParty.getCardNumber() != null && parkingParty.getCardNumber().toString()
+                .contains(parkingCardNumber.toString());
     }
 
     private boolean satisfiedPlateNumber(ParkingParty parkingParty, String carPlateNumber) {
-        return !Strings.isNullOrEmpty(carPlateNumber) ? (parkingParty.hasVehicleContainingPlateNumber(carPlateNumber.trim())) : true;
+        return Strings.isNullOrEmpty(carPlateNumber) || parkingParty.hasVehicleContainingPlateNumber(carPlateNumber.trim());
     }
 
     private static boolean areNamesPresent(String name, String[] searchNameParts) {
         String nameNormalized = StringNormalizer.normalize(name);
         for (String searchNamePart : searchNameParts) {
-            String namePart = searchNamePart;
-            if (!nameNormalized.contains(namePart)) {
+            if (!nameNormalized.contains(searchNamePart)) {
                 return false;
             }
         }

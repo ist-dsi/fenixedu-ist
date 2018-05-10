@@ -3,7 +3,6 @@ package pt.ist.registration.process.ui;
 import java.io.IOException;
 import java.util.Optional;
 
-import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.bennu.RegistrationProcessConfiguration;
 import org.fenixedu.bennu.core.security.SkipCSRF;
@@ -15,10 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.google.common.base.Joiner;
 
 import io.jsonwebtoken.Jwts;
 import pt.ist.registration.process.domain.RegistrationDeclarationFile;
@@ -48,14 +44,10 @@ public class SignedDeclarationsController {
         Optional<RegistrationDeclarationFile> registrationDeclarationFile =
                 RegistrationDeclarationFile.getRegistrationDeclarationFile(registration, uniqueIdentifier);
         return registrationDeclarationFile.map(declarationFile -> {
-            try {
-                logger.debug("Registration Declaration {} of student {} was signed.",uniqueIdentifier, registration.getNumber());
-                logger.debug("Registration Declaration {} of student {} sent to be certified", uniqueIdentifier, registration.getNumber());
-                signCertAndStoreService.sendDocumentToBeCertified(registration.getExternalId(), declarationFile.getFilename(), file,
-                        uniqueIdentifier, true);
-            } catch (IOException e) {
-                throw new Error(e);
-            }
+            logger.debug("Registration Declaration {} of student {} was signed.",uniqueIdentifier, registration.getNumber());
+            logger.debug("Registration Declaration {} of student {} sent to be certified", uniqueIdentifier, registration.getNumber());
+            signCertAndStoreService.sendDocumentToBeCertified(registration.getExternalId(), declarationFile.getFilename(), file,
+                    uniqueIdentifier, true);
             return "ok";
         }).orElseThrow(UnauthorizedException::new);
     }

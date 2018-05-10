@@ -18,21 +18,19 @@
  */
 package pt.ist.fenixedu.delegates.domain.student;
 
-import static org.fenixedu.bennu.FenixEduDelegatesConfiguration.BUNDLE;
+import org.fenixedu.academic.domain.CurricularCourse;
+import org.fenixedu.academic.domain.Degree;
+import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
+import pt.ist.fenixedu.delegates.domain.accessControl.DelegateGroup;
+import pt.ist.fenixedu.delegates.domain.util.email.DelegateSender;
+import pt.ist.fenixedu.delegates.ui.DelegateBean;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.fenixedu.academic.domain.CurricularCourse;
-import org.fenixedu.academic.domain.Degree;
-import org.fenixedu.academic.domain.ExecutionYear;
-import org.fenixedu.academic.domain.util.email.Recipient;
-import org.fenixedu.bennu.core.domain.User;
-import org.fenixedu.bennu.core.i18n.BundleUtil;
-
-import pt.ist.fenixedu.delegates.domain.accessControl.DelegateGroup;
-import pt.ist.fenixedu.delegates.domain.util.email.DelegateSender;
-import pt.ist.fenixedu.delegates.ui.DelegateBean;
+import static org.fenixedu.bennu.FenixEduDelegatesConfiguration.BUNDLE;
 
 public class DegreeDelegate extends DegreeDelegate_Base {
 
@@ -48,9 +46,9 @@ public class DegreeDelegate extends DegreeDelegate_Base {
     }
 
     private void setupRecipients() {
-        getSender().addRecipients(Recipient.getRecipientFromGroup(DelegateGroup.get()));
-        getSender().addRecipients(Recipient.getRecipientFromGroup(DelegateGroup.get(true)));
-        getSender().addRecipients(Recipient.getRecipientFromGroup(DelegateGroup.get(getDegree())));
+        getSender().addRecipient(DelegateGroup.get());
+        getSender().addRecipient(DelegateGroup.get(true));
+        getSender().addRecipient(DelegateGroup.get(getDegree()));
     }
 
     @Override
@@ -64,16 +62,13 @@ public class DegreeDelegate extends DegreeDelegate_Base {
     public String getTitle() {
         String delegate = BundleUtil.getString(BUNDLE, "delegate");
         String of = BundleUtil.getString(BUNDLE, "delegate.of");
-        return delegate + " " + of + " " + getDegree().getDegreeType().getName().getContent();
+        return String.format("%s %s %s", delegate, of, getDegree().getDegreeType().getName().getContent());
     }
 
     @Override
     public Boolean samePosition(Delegate delegate) {
         DegreeDelegate degreeDelegate = (DegreeDelegate) delegate;
-        if (getDegree().equals(degreeDelegate.getDegree())) {
-            return true;
-        }
-        return false;
+        return getDegree().equals(degreeDelegate.getDegree());
     }
 
     @Override

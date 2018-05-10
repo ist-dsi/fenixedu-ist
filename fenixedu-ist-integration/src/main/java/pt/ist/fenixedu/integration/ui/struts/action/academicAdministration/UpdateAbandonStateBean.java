@@ -18,12 +18,6 @@
  */
 package pt.ist.fenixedu.integration.ui.struts.action.academicAdministration;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.function.Predicate;
-
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.ExecutionSemester;
@@ -38,15 +32,14 @@ import org.fenixedu.academic.domain.studentCurriculum.CurriculumLine;
 import org.fenixedu.academic.domain.studentCurriculum.CurriculumModule;
 import org.fenixedu.academic.domain.studentCurriculum.CurriculumModule.CurriculumModulePredicateByType;
 import org.fenixedu.academic.domain.studentCurriculum.CycleCurriculumGroup;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Recipient;
-import org.fenixedu.academic.domain.util.email.SystemSender;
 import org.fenixedu.academic.util.predicates.AndPredicate;
-import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.messaging.core.domain.Message;
 import org.joda.time.YearMonthDay;
-
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
 import pt.ist.fenixframework.Atomic;
+
+import java.io.Serializable;
+import java.util.function.Predicate;
 
 public class UpdateAbandonStateBean implements Serializable {
 
@@ -161,7 +154,7 @@ public class UpdateAbandonStateBean implements Serializable {
     }
 
     private boolean hasAnyCurriculumLines(final Registration registration, final ExecutionSemester semester) {
-        final AndPredicate<CurriculumModule> andPredicate = new AndPredicate<CurriculumModule>();
+        final AndPredicate<CurriculumModule> andPredicate = new AndPredicate<>();
         andPredicate.add(new CurriculumModulePredicateByType(CurriculumLine.class));
         andPredicate.add(new CurriculumLinePredicateByExecutionSemester(semester));
 
@@ -195,17 +188,15 @@ public class UpdateAbandonStateBean implements Serializable {
 
     private void sendEmail(final Registration registration) {
         final Person person = registration.getPerson();
+        final String body = buildMessage(registration);
+        final String subject = RenderUtils
+                .getFormatedResourceString(RESOURCE_BUNDLE, "message.academicAdministration.abandonState.mail.subject");
 
-        SystemSender systemSender = Bennu.getInstance().getSystemSender();
-        List<Recipient> recipientList = new ArrayList<Recipient>();
-        recipientList.add(new Recipient(person.getUser().groupOf()));
-
-        String body = buildMessage(registration);
-        String subject =
-                RenderUtils
-                        .getFormatedResourceString(RESOURCE_BUNDLE, "message.academicAdministration.abandonState.mail.subject");
-        new Message(systemSender, systemSender.getConcreteReplyTos(), recipientList, null, null, subject, body,
-                new HashSet<String>());
+        Message.fromSystem().replyToSender()
+                .to(person.getPersonGroup())
+                .subject(subject)
+                .textBody(body)
+                .send();
     }
 
     private String buildMessage(final Registration registration) {

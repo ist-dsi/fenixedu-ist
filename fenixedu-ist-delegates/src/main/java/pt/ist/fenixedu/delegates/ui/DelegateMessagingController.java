@@ -18,19 +18,10 @@
  */
 package pt.ist.fenixedu.delegates.ui;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import javax.ws.rs.core.UriBuilder;
-
-import org.fenixedu.academic.domain.util.email.Recipient;
-import org.fenixedu.academic.domain.util.email.Sender;
-import org.fenixedu.academic.ui.struts.action.messaging.EmailsDA;
+import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
+import org.fenixedu.messaging.core.ui.MessageBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -39,11 +30,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
-
-import pt.ist.fenixWebFramework.servlets.filters.contentRewrite.GenericChecksumRewriter;
 import pt.ist.fenixedu.delegates.domain.student.Delegate;
+import pt.ist.fenixedu.delegates.domain.util.email.DelegateSender;
 import pt.ist.fenixedu.delegates.ui.services.DelegateService;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @SpringFunctionality(app = DelegatesController.class, title = "title.delegates.messaging")
 @RequestMapping("/delegates-messaging")
@@ -88,42 +85,19 @@ public class DelegateMessagingController {
 
     @RequestMapping(value = "/messaging/", method = RequestMethod.POST)
     public RedirectView messaging(@ModelAttribute DelegateStudentSelectBean delegateStudentsBean, Model model,
-            BindingResult errors, HttpSession session, HttpServletRequest request) {
+            BindingResult errors, HttpSession session, HttpServletRequest request, final RedirectAttributes redirectAttributes) {
         DelegateMessageBean delegateMessageBean = new DelegateMessageBean(delegateStudentsBean);
-        Sender sender = delegateMessageBean.getSelectedSender().getSender();
-        List<Recipient> recipients = delegateMessageBean.getRecipients();
-        //EmailsDA.sendEmail(request, sender, recipients.toArray(new Recipient[] {}));
-        String sendEmailUrl =
-                UriBuilder
-                        .fromUri("/messaging/emails.do")
-                        .queryParam("method", "newEmail")
-                        .queryParam("sender", sender.getExternalId())
-                        .queryParam("recipient", recipients.stream().filter(r -> r != null).map(r -> r.getExternalId()).toArray())
-                        .build().toString();
-        String sendEmailWithChecksumUrl =
-                GenericChecksumRewriter.injectChecksumInUrl(request.getContextPath(), sendEmailUrl, session);
-        return new RedirectView(sendEmailWithChecksumUrl, true);
-    }
+        DelegateSender sender = delegateMessageBean.getSelectedSender().getSender();
+        List<Group> recipients = delegateMessageBean.getRecipients();
 
-    @RequestMapping(value = "/sendmessage/", method = RequestMethod.POST)
-    public RedirectView sendMessage(@ModelAttribute DelegateMessageBean delegateMessageBean, Model model, BindingResult errors,
-            HttpSession session, HttpServletRequest request) {
-        Sender sender = delegateMessageBean.getSelectedSender().getSender();
-        List<Recipient> recipients = delegateMessageBean.getRecipients();
-        EmailsDA.sendEmail(request, sender, recipients.toArray(new Recipient[] {}));
-        return new RedirectView(GenericChecksumRewriter.calculateChecksum("x", session));
-    }
-
-    @RequestMapping(value = "/sendmessage/", method = RequestMethod.GET)
-    public String sendMessage(@ModelAttribute DelegateStudentSelectBean delegateStudentsBean, Model model) {
-
-        List<DelegateCurricularCourseBean> executionCourses = new ArrayList<DelegateCurricularCourseBean>();
-        for (Delegate delegate : Authenticate.getUser().getDelegatesSet()) {
-            executionCourses.addAll(delegateService.getCurricularCourses(delegate));
+        MessageBean bean = new MessageBean();
+        bean.setLockedSender(sender);
+        for (Group recipient : recipients) {
+            bean.selectRecipient(recipient);
+            bean.addAdHocRecipient(recipient);
         }
-        model.addAttribute("action", "/delegates-messaging/sendmessage/");
-        model.addAttribute("message", new DelegateMessageBean(delegateStudentsBean));
-        model.addAttribute("receivers", delegateService.getSelectedUsers(delegateStudentsBean));
-        return "delegates/sendmessage";
+        redirectAttributes.addFlashAttribute("messageBean",bean);
+        return new RedirectView("/messaging/message",true);
     }
+
 }

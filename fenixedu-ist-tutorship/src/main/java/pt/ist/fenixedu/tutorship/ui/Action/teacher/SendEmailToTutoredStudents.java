@@ -18,33 +18,30 @@
  */
 package pt.ist.fenixedu.tutorship.ui.Action.teacher;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Teacher;
-import org.fenixedu.academic.domain.util.email.PersonSender;
-import org.fenixedu.academic.domain.util.email.Recipient;
-import org.fenixedu.academic.domain.util.email.Sender;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
-import org.fenixedu.academic.ui.struts.action.messaging.EmailsDA;
+import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
 import org.fenixedu.bennu.struts.portal.EntryPoint;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
-
+import org.fenixedu.messaging.core.ui.MessageBean;
+import org.fenixedu.messaging.core.ui.MessagingUtils;
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
 import pt.ist.fenixedu.tutorship.domain.Tutorship;
 import pt.ist.fenixedu.tutorship.dto.teacher.tutor.StudentsByTutorBean;
 import pt.ist.fenixedu.tutorship.dto.teacher.tutor.TutorshipBean;
 import pt.ist.fenixedu.tutorship.ui.TutorshipApplications.TeacherTutorApp;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
 
 @StrutsFunctionality(app = TeacherTutorApp.class, path = "send-email-to-students",
         titleKey = "link.teacher.tutorship.sendMailToTutoredStudents")
@@ -56,16 +53,16 @@ public class SendEmailToTutoredStudents extends FenixDispatchAction {
         return getLoggedPerson(request).getTeacher();
     }
 
-    protected List<Recipient> getRecipients(HttpServletRequest request) {
+    protected List<Group> getRecipients(HttpServletRequest request) {
 
         StudentsByTutorBean receivers = (StudentsByTutorBean) request.getAttribute("receivers");
 
-        List<Recipient> recipients = new ArrayList<Recipient>();
+        List<Group> recipients = new ArrayList<>();
 
         if (receivers != null) {
             for (TutorshipBean tutorshipBean : receivers.getStudentsList()) {
                 Person person = tutorshipBean.getTutorship().getStudent().getPerson();
-                recipients.add(Recipient.newInstance(person.getName(), person.getUser().groupOf()));
+                recipients.add(person.getPersonGroup());
             }
         }
 
@@ -74,7 +71,7 @@ public class SendEmailToTutoredStudents extends FenixDispatchAction {
 
     @EntryPoint
     public ActionForward prepare(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
+            HttpServletResponse response) {
 
         final Teacher teacher = getTeacher(request);
 
@@ -100,7 +97,7 @@ public class SendEmailToTutoredStudents extends FenixDispatchAction {
             HttpServletResponse response) throws Exception {
         final Teacher teacher = getTeacher(request);
 
-        StudentsByTutorBean receivers = null;
+        StudentsByTutorBean receivers;
         if (RenderUtils.getViewState("receivers") != null) {
             receivers = (StudentsByTutorBean) RenderUtils.getViewState("receivers").getMetaObject().getObject();
 
@@ -120,7 +117,14 @@ public class SendEmailToTutoredStudents extends FenixDispatchAction {
     public ActionForward createMail(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
             HttpServletResponse response) throws Exception {
         final Person teacherPerson = getLoggedPerson(request);
-        Sender sender = PersonSender.newInstance(teacherPerson);
-        return EmailsDA.sendEmail(request, sender, getRecipients(request).toArray(new Recipient[] {}));
+
+        MessageBean messageBean = new MessageBean();
+        messageBean.setLockedSender(teacherPerson.getSender());
+        for (Group group : getRecipients(request)) {
+            messageBean.addAdHocRecipient(group);
+            messageBean.selectRecipient(group);
+        }
+
+        return MessagingUtils.redirectToNewMessage(request, response, messageBean);
     }
 }

@@ -42,10 +42,10 @@ public class ExportExistingStudentsFromImportationProcess extends ExportExisting
 
     @Override
     public QueueJobResult execute() throws Exception {
-        Spreadsheet spreasheet = retrieveStudentsExistingInSystem();
+        Spreadsheet spreadsheet = retrieveStudentsExistingInSystem();
         ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
 
-        spreasheet.exportToCSV(byteArrayOS, ";");
+        spreadsheet.exportToCSV(byteArrayOS, ";");
         byteArrayOS.close();
 
         final QueueJobResult queueJobResult = new QueueJobResult();
@@ -56,11 +56,10 @@ public class ExportExistingStudentsFromImportationProcess extends ExportExisting
     }
 
     private Spreadsheet retrieveStudentsExistingInSystem() {
-        Set<Person> personSet = new HashSet<Person>();
+        Set<Person> personSet = new HashSet<>();
 
         final Spreadsheet spreadsheet = new Spreadsheet("Shifts");
-        spreadsheet
-                .setHeaders(new String[] { "Número de Aluno", "Nome", "BI", "Curso", "Ano", "Campus", "Ficheiro de importacao" });
+        spreadsheet.setHeaders("Número de Aluno", "Nome", "BI", "Curso", "Ano", "Campus", "Ficheiro de importacao");
 
         for (DgesStudentImportationProcess importationProcess : DgesStudentImportationProcess.readDoneJobs(getExecutionYear())) {
             if (!importationProcess.getEntryPhase().equals(getEntryPhase())) {
@@ -72,12 +71,10 @@ public class ExportExistingStudentsFromImportationProcess extends ExportExisting
                             importationProcess.getUniversityAcronym(), getEntryPhase());
 
             for (DegreeCandidateDTO dto : degreeCandidateDTOs) {
-                Person person = null;
+                Person person;
                 try {
                     person = dto.getMatchingPerson();
-                } catch (DegreeCandidateDTO.NotFoundPersonException e) {
-                    continue;
-                } catch (DegreeCandidateDTO.TooManyMatchedPersonsException e) {
+                } catch (DegreeCandidateDTO.NotFoundPersonException | DegreeCandidateDTO.TooManyMatchedPersonsException e) {
                     continue;
                 } catch (DegreeCandidateDTO.MatchingPersonException e) {
                     throw new RuntimeException(e);
@@ -96,7 +93,6 @@ public class ExportExistingStudentsFromImportationProcess extends ExportExisting
                                     .getDgesStudentImportationFile().getFilename());
 
                     personSet.add(person);
-                    continue;
                 }
             }
         }
