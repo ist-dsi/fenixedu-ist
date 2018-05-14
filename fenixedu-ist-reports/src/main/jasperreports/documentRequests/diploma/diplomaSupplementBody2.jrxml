@@ -950,7 +950,7 @@
 					<textFieldExpression class="java.lang.String"><![CDATA[$P{thesisFinalGrade}]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="false">
-					<reportElement key="textField-117" positionType="Float" x="0" y="0" width="34" height="12"/>
+					<reportElement key="textField-117" positionType="Float" x="0" y="0" width="100" height="12"/>
 					<box>
 						<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 						<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
