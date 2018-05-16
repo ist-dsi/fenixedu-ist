@@ -18,22 +18,27 @@
  */
 package pt.ist.fenixedu.contracts.domain.accessControl;
 
+import java.util.Collections;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.annotation.GroupOperator;
-import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.groups.GroupStrategy;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
 
+import com.google.common.collect.Iterables;
+
 import pt.ist.fenixedu.contracts.domain.Employee;
-import pt.ist.fenixedu.contracts.domain.util.CategoryType;
+import pt.ist.sap.group.integration.domain.SapGroup;
+import pt.ist.sap.group.integration.domain.SapWrapper;
 
 @GroupOperator("activeResearchers")
 public class ActiveResearchers extends GroupStrategy {
     private static final long serialVersionUID = -6648971466827719165L;
+    private static final String SAP_GROUP = " Investigadores";
 
     @Override
     public String getPresentationName() {
@@ -42,8 +47,14 @@ public class ActiveResearchers extends GroupStrategy {
 
     @Override
     public Stream<User> getMembers() {
-        return Bennu.getInstance().getEmployeesSet().stream().filter(ActiveResearchers::isResearcher)
-                .map(employee -> employee.getPerson().getUser());
+        final SapGroup sapGroup = new SapGroup();
+        Iterable<String> result = Collections.emptySet();
+        for (final String institution : SapWrapper.institutions) {
+            final String institutionCode = SapWrapper.institutionCode.apply(institution);
+            sapGroup.setGroup(institutionCode + SAP_GROUP);
+            result = Iterables.concat(result, sapGroup.list());
+        }
+        return StreamSupport.stream(result.spliterator(), false).map(username -> User.findByUsername(username));
     }
 
     @Override
@@ -53,8 +64,17 @@ public class ActiveResearchers extends GroupStrategy {
 
     @Override
     public boolean isMember(User user) {
-        return user != null && user.getPerson() != null && user.getPerson().getEmployee() != null
-                && isResearcher(user.getPerson().getEmployee());
+        final SapGroup sapGroup = new SapGroup();
+        if (user != null && user.getPerson() != null) {
+            for (final String institution : SapWrapper.institutions) {
+                final String institutionCode = SapWrapper.institutionCode.apply(institution);
+                sapGroup.setGroup(institutionCode + SAP_GROUP);
+                if (sapGroup.isMember(user.getUsername())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @Override
@@ -62,8 +82,8 @@ public class ActiveResearchers extends GroupStrategy {
         return isMember(user);
     }
 
+    @Deprecated
     protected static boolean isResearcher(Employee employee) {
-        return (employee.getPerson().getPersonProfessionalData() != null ? employee.getPerson().getPersonProfessionalData()
-                .getCurrentPersonContractSituationByCategoryType(CategoryType.RESEARCHER) : null) != null;
+        return new ActiveResearchers().isMember(employee.getPerson().getUser());
     }
 }

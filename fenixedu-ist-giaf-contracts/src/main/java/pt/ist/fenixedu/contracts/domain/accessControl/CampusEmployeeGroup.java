@@ -29,11 +29,6 @@ import org.fenixedu.bennu.core.domain.groups.PersistentGroup;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.DateTime;
 
-import pt.ist.fenixedu.contracts.domain.Employee;
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.GiafProfessionalData;
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalData;
-import pt.ist.fenixedu.contracts.domain.util.CategoryType;
-
 import com.google.common.base.Objects;
 
 @GroupOperator("campusEmployee")
@@ -68,8 +63,7 @@ public class CampusEmployeeGroup extends FenixGroup {
 
     @Override
     public Stream<User> getMembers(DateTime when) {
-        return Employee.EMPLOYEE_GROUP.getMembers().filter(
-                user -> user.getPerson() != null && isMember(user.getPerson(), campus, when));
+        throw new RuntimeException("error.deprecated.group");
     }
 
     @Override
@@ -83,20 +77,7 @@ public class CampusEmployeeGroup extends FenixGroup {
     }
 
     public boolean isMember(final Person person, final Space campus, DateTime when) {
-        //when is ignored, professional data doesn't seem to have proper historic
-        if (person != null) {
-            PersonProfessionalData personProfessionalData = person.getPersonProfessionalData();
-            if (personProfessionalData != null) {
-                GiafProfessionalData giafProfessionalDataByCategoryType =
-                        personProfessionalData.getGiafProfessionalDataByCategoryType(CategoryType.EMPLOYEE);
-                if (giafProfessionalDataByCategoryType != null && giafProfessionalDataByCategoryType.getCampus() != null
-                        && giafProfessionalDataByCategoryType.getCampus().equals(campus)
-                        && !giafProfessionalDataByCategoryType.getContractSituation().getEndSituation()) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        throw new RuntimeException("error.deprecated.group");
     }
 
     @Override
