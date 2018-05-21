@@ -4,7 +4,7 @@
     <parent>
         <groupId>pt.ist</groupId>
         <artifactId>fenixedu-ist</artifactId>
-        <version>12.3.0-SNAPSHOT</version>
+        <version>12.2.4</version>
     </parent>
 
     <artifactId>fenixedu-ist-cms-components</artifactId>
