@@ -18,10 +18,11 @@
  */
 package pt.ist.fenixedu.delegates.domain.util.email;
 
-import org.fenixedu.academic.domain.util.email.CurrentUserReplyTo;
-import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.academic.domain.Installation;
+import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.bennu.core.groups.Group;
 
+import org.fenixedu.messaging.core.domain.MessagingSystem;
 import pt.ist.fenixedu.delegates.domain.student.Delegate;
 
 public class DelegateSender extends DelegateSender_Base {
@@ -31,11 +32,11 @@ public class DelegateSender extends DelegateSender_Base {
     }
 
     public DelegateSender(Delegate delegate) {
-        setFromName(delegate.getUser().getPerson().getName() + " (" + delegate.getTitle() + ")");
-        setFromAddress(getNoreplyMail());
+        setName(delegate.getUser().getPerson().getName() + " (" + delegate.getTitle() + ")");
+        setAddress(Installation.getInstance().getInstituitionalEmailAddress("noreply"));
         setMembers(delegate.getUser().groupOf());
-        setRootDomainObject(Bennu.getInstance());
-        addReplyTos(new CurrentUserReplyTo());
+        setMessagingSystem(MessagingSystem.getInstance());
+        setReplyTo(AccessControl.getPerson().getDefaultEmailAddressValue());
     }
 
     @Override

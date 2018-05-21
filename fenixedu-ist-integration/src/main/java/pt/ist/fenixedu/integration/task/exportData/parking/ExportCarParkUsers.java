@@ -42,14 +42,13 @@ import javax.mail.util.ByteArrayDataSource;
 import org.fenixedu.academic.FenixEduAcademicConfiguration;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.exceptions.DomainException;
-import org.fenixedu.academic.domain.util.email.Sender;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.scheduler.CronTask;
 import org.fenixedu.bennu.scheduler.annotation.Task;
-import org.fenixedu.bennu.scheduler.custom.CustomTask;
 import org.fenixedu.commons.StringNormalizer;
 import org.fenixedu.idcards.domain.SantanderCardInformation;
+import org.fenixedu.messaging.core.domain.MessagingSystem;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixedu.parking.domain.ParkingGroup;
@@ -238,7 +237,7 @@ public class ExportCarParkUsers extends CronTask {
         ;
     }
 
-    private void sendParkingInfoToRemoteCarPark(String filename, byte[] byteArray) throws AddressException, MessagingException {
+    private void sendParkingInfoToRemoteCarPark(String filename, byte[] byteArray) throws MessagingException {
         final Properties properties = new Properties();
         properties.put("mail.smtp.host", FenixEduAcademicConfiguration.getConfiguration().getMailSmtpHost());
         properties.put("mail.smtp.name", FenixEduAcademicConfiguration.getConfiguration().getMailSmtpName());
@@ -247,10 +246,10 @@ public class ExportCarParkUsers extends CronTask {
         properties.put("mail.debug", "false");
         final Session session = Session.getDefaultInstance(properties, null);
 
-        final Sender sender = Bennu.getInstance().getSystemSender();
+        final org.fenixedu.messaging.core.domain.Sender sender = MessagingSystem.systemSender();
 
         final Message message = new MimeMessage(session);
-        message.setFrom(new InternetAddress(sender.getFromAddress()));
+        message.setFrom(new InternetAddress(sender.getAddress()));
         message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(EMAIL_ADDRESSES_TO_SEND_DATA));
         message.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(EMAIL_ADDRESSES_BCC_SEND_DATA));
         message.setSubject("Utentes IST - Atualização");

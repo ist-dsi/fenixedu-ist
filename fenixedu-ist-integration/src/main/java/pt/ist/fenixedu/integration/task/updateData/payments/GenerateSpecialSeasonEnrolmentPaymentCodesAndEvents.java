@@ -1,7 +1,5 @@
 package pt.ist.fenixedu.integration.task.updateData.payments;
 
-import java.util.Collections;
-
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.EnrolmentEvaluation;
 import org.fenixedu.academic.domain.ExecutionYear;
@@ -11,17 +9,16 @@ import org.fenixedu.academic.domain.accounting.events.SpecialSeasonEnrolmentEven
 import org.fenixedu.academic.domain.accounting.paymentCodes.AccountingEventPaymentCode;
 import org.fenixedu.academic.domain.administrativeOffice.AdministrativeOffice;
 import org.fenixedu.academic.domain.student.Registration;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Recipient;
-import org.fenixedu.academic.domain.util.email.SystemSender;
 import org.fenixedu.academic.util.EnrolmentEvaluationState;
 import org.fenixedu.academic.util.Money;
-import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.scheduler.CronTask;
 import org.fenixedu.bennu.scheduler.annotation.Task;
+import org.fenixedu.messaging.core.domain.Message;
 import org.joda.time.YearMonthDay;
+
+import java.util.Collections;
 
 @Task(englishTitle = "Create Events and Payment Codes for Special Season Enrolments", readOnly = false)
 public class GenerateSpecialSeasonEnrolmentPaymentCodesAndEvents extends CronTask {
@@ -30,20 +27,15 @@ public class GenerateSpecialSeasonEnrolmentPaymentCodesAndEvents extends CronTas
     private static final String EVENT_DESCRIPTION = "Inscrição em época especial à disciplina ";
 
     @Override
-    public void runTask() throws Exception {
-        final ExecutionYear year = ExecutionYear.readCurrentExecutionYear();
+    public void runTask() {
 
-        year.getExecutionPeriodsSet().stream().flatMap(es -> es.getEnrolmentsSet().stream())
-
-        .flatMap(e -> e.getEvaluationsSet().stream())
-
-        .filter(ee -> ee.getEvaluationSeason().isSpecial())
-        
-        .filter(ee -> !ee.getEnrolmentEvaluationState().equals(EnrolmentEvaluationState.ANNULED_OBJ))
-        
-        .filter(this::missingEvent)
-
-        .forEach(this::createEvent);
+        ExecutionYear.readCurrentExecutionYear().getExecutionPeriodsSet().stream()
+                .flatMap(es -> es.getEnrolmentsSet().stream())
+                .flatMap(e -> e.getEvaluationsSet().stream())
+                .filter(ee -> ee.getEvaluationSeason().isSpecial())
+                .filter(ee -> !ee.getEnrolmentEvaluationState().equals(EnrolmentEvaluationState.ANNULED_OBJ))
+                .filter(this::missingEvent)
+                .forEach(this::createEvent);
     }
 
     private boolean missingEvent(final EnrolmentEvaluation ee) {
@@ -64,9 +56,6 @@ public class GenerateSpecialSeasonEnrolmentPaymentCodesAndEvents extends CronTas
 
         final User user = registration.getPerson().getUser();
         final String eventDescription = eventDescription(ee);
-
-        final SystemSender sender = Bennu.getInstance().getSystemSender();
-        final Recipient recipient = Recipient.getRecipientFromGroup(Group.users(user));
 
         taskLog("Generated payment codes for: %s -> %s%n", user.getUsername(), eventDescription);
 
@@ -95,8 +84,12 @@ public class GenerateSpecialSeasonEnrolmentPaymentCodesAndEvents extends CronTas
                 "Valor: " + AMOUNT_TO_PAY.toString() + " €" +
                 "\n\n"
                 ;
-
-        new Message(sender, sender.getReplyTosSet(), recipient.asCollection(), subject, body, "");
+        Message.fromSystem()
+                .replyToSender()
+                .to(Group.users(user))
+                .subject(subject)
+                .textBody(body)
+                .send();
     }
 
     private String eventDescription(final EnrolmentEvaluation ee) {

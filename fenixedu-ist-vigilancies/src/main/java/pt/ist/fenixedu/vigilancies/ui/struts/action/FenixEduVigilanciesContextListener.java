@@ -30,16 +30,12 @@ import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.WrittenEvaluation;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
-import org.fenixedu.academic.domain.util.email.ConcreteReplyTo;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Recipient;
-import org.fenixedu.academic.domain.util.email.Sender;
 import org.fenixedu.academic.service.services.manager.MergeExecutionCourses;
 import org.fenixedu.academic.service.services.resourceAllocationManager.exams.EditWrittenEvaluation.EditWrittenEvaluationEvent;
 import org.fenixedu.academic.util.Bundle;
-import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.signals.Signal;
+import org.fenixedu.messaging.core.domain.Message;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixedu.vigilancies.domain.Vigilancy;
@@ -78,7 +74,7 @@ public class FenixEduVigilanciesContextListener implements ServletContextListene
 
     private static void notifyVigilantsOfDeletedEvaluation(WrittenEvaluation writtenEvaluation) {
         if (!writtenEvaluation.getVigilanciesSet().isEmpty()) {
-            final Set<Person> tos = new HashSet<Person>();
+            final Set<Person> tos = new HashSet<>();
 
             for (VigilantGroup group : VigilantGroup.getAssociatedVigilantGroups(writtenEvaluation)) {
                 tos.clear();
@@ -87,19 +83,21 @@ public class FenixEduVigilanciesContextListener implements ServletContextListene
                 String beginDateString = date.getDayOfMonth() + "-" + date.getMonthOfYear() + "-" + date.getYear();
 
                 String subject =
-                        BundleUtil.getString("resources.VigilancyResources", "email.convoke.subject", new String[] {
-                                writtenEvaluation.getName(), group.getName(), beginDateString, time });
+                        BundleUtil.getString("resources.VigilancyResources", "email.convoke.subject",
+                                writtenEvaluation.getName(), group.getName(), beginDateString, time);
                 String body =
                         BundleUtil.getString("resources.VigilancyResources", "label.writtenEvaluationDeletedMessage",
-                                new String[] { writtenEvaluation.getName(), beginDateString, time });
+                                writtenEvaluation.getName(), beginDateString, time);
                 for (Vigilancy vigilancy : writtenEvaluation.getVigilanciesSet()) {
                     Person person = vigilancy.getVigilantWrapper().getPerson();
                     tos.add(person);
                 }
-                Sender sender = Bennu.getInstance().getSystemSender();
-                new Message(sender, new ConcreteReplyTo(group.getContactEmail()).asCollection(), new Recipient(
-                        Person.convertToUserGroup(tos)).asCollection(), subject, body, "");
-
+                Message.fromSystem()
+                        .replyTo(group.getContactEmail())
+                        .to(Person.convertToUserGroup(tos))
+                        .subject(subject)
+                        .textBody(body)
+                        .send();
             }
         }
     }
@@ -111,7 +109,7 @@ public class FenixEduVigilanciesContextListener implements ServletContextListene
         if (!writtenEvaluation.getVigilanciesSet().isEmpty()
                 && (dayDate != writtenEvaluation.getDayDate() || timeModificationIsBiggerThanFiveMinutes(beginDate,
                         writtenEvaluation.getBeginningDate()))) {
-            final HashSet<Person> tos = new HashSet<Person>();
+            final HashSet<Person> tos = new HashSet<>();
 
             // VigilantGroup group =
             // writtenEvaluation.getAssociatedVigilantGroups().iterator().next();
@@ -122,20 +120,22 @@ public class FenixEduVigilanciesContextListener implements ServletContextListene
                 String beginDateString = date.getDayOfMonth() + "-" + date.getMonthOfYear() + "-" + date.getYear();
 
                 String subject =
-                        String.format("[ %s - %s - %s %s ]", new Object[] { writtenEvaluation.getName(), group.getName(),
-                                beginDateString, time });
+                        String.format("[ %s - %s - %s %s ]", writtenEvaluation.getName(), group.getName(), beginDateString, time);
                 String body =
                         String.format(
                                 "Caro Vigilante,\n\nA prova de avaliação: %1$s %2$s - %3$s foi alterada para  %4$td-%4$tm-%4$tY - %5$tH:%5$tM.",
-                                new Object[] { writtenEvaluation.getName(), beginDateString, time, dayDate, beginDate });
+                                writtenEvaluation.getName(), beginDateString, time, dayDate, beginDate);
 
                 for (Vigilancy vigilancy : writtenEvaluation.getVigilanciesSet()) {
                     Person person = vigilancy.getVigilantWrapper().getPerson();
                     tos.add(person);
                 }
-                Sender sender = Bennu.getInstance().getSystemSender();
-                new Message(sender, new ConcreteReplyTo(group.getContactEmail()).asCollection(), new Recipient(
-                        Person.convertToUserGroup(tos)).asCollection(), subject, body, "");
+                Message.fromSystem()
+                        .replyTo(group.getContactEmail())
+                        .to(Person.convertToUserGroup(tos))
+                        .subject(subject)
+                        .textBody(body)
+                        .send();
             }
         }
     }

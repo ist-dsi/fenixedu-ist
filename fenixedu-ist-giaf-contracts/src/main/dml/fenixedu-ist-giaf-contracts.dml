@@ -250,7 +250,9 @@ class organizationalStructure.PersonFunctionShared extends organizationalStructu
     BigDecimal percentage;
 }
 
-class util.email.ResearchUnitBasedSender extends .org.fenixedu.academic.domain.util.email.UnitBasedSender {
+relation ResearchUnitSender {
+    organizationalStructure.ResearchUnit playsRole researchunit;
+    .org.fenixedu.messaging.core.domain.Sender playsRole researchsender;
 }
 
 class accessControl.PersistentCampusEmployeeGroup extends .org.fenixedu.bennu.core.domain.groups.PersistentGroup;

@@ -37,7 +37,6 @@ import javax.mail.internet.MimeMultipart;
 
 import com.google.common.base.MoreObjects;
 import org.fenixedu.academic.FenixEduAcademicConfiguration;
-import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.io.domain.FileStorage;
 import org.fenixedu.bennu.io.domain.FileSupport;
 import org.fenixedu.bennu.io.domain.LocalFileSystemStorage;
@@ -45,6 +44,7 @@ import org.fenixedu.bennu.portal.domain.PortalConfiguration;
 import org.fenixedu.bennu.scheduler.CronTask;
 import org.fenixedu.bennu.scheduler.annotation.Task;
 
+import org.fenixedu.messaging.core.domain.MessagingSystem;
 import pt.ist.fenixedu.integration.FenixEduIstIntegrationConfiguration;
 
 import com.google.common.io.ByteStreams;
@@ -94,7 +94,7 @@ public class CheckStoreQuota extends CronTask {
                 MoreObjects.firstNonNull(FenixEduAcademicConfiguration.getConfiguration().getMailSmtpHost(), "localhost"));
         Session session = Session.getDefaultInstance(props, null);
         MimeMessage message = new MimeMessage(session);
-        message.setFrom(new InternetAddress(Bennu.getInstance().getSystemSender().getFromAddress()));
+        message.setFrom(new InternetAddress(MessagingSystem.systemSender().getAddress()));
         message.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
         message.setSubject(subject);
         message.setText(body);

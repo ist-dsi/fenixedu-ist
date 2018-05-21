@@ -21,7 +21,6 @@ package pt.ist.fenixedu.parking.domain;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -135,8 +134,8 @@ public class ParkingParty extends ParkingParty_Base {
     }
 
     public List<ParkingRequest> getOrderedParkingRequests() {
-        List<ParkingRequest> requests = new ArrayList<ParkingRequest>(getParkingRequestsSet());
-        Collections.sort(requests, Comparator.comparing(ParkingRequest::getCreationDate));
+        List<ParkingRequest> requests = new ArrayList<>(getParkingRequestsSet());
+        requests.sort(Comparator.comparing(ParkingRequest::getCreationDate));
         return requests;
     }
 
@@ -177,8 +176,8 @@ public class ParkingParty extends ParkingParty_Base {
             }
         }
 
-        return MessageFormat.format(bundle.getString("message.acceptedRegulation"),
-                new Object[] { name, number, Unit.getInstitutionAcronym(), Unit.getInstitutionName().getContent() });
+        return MessageFormat.format(bundle.getString("message.acceptedRegulation"), name, number, Unit.getInstitutionAcronym(),
+                Unit.getInstitutionName().getContent());
     }
 
     public boolean isStudent() {
@@ -224,7 +223,7 @@ public class ParkingParty extends ParkingParty_Base {
     }
 
     public List<String> getSubmitAsRoles() {
-        Set<String> roles = new HashSet<String>();
+        Set<String> roles = new HashSet<>();
         if (getParty().isPerson()) {
             Person person = (Person) getParty();
             Teacher teacher = person.getTeacher();
@@ -279,7 +278,7 @@ public class ParkingParty extends ParkingParty_Base {
     }
 
     public List<String> getOccupations() {
-        List<String> occupations = new ArrayList<String>();
+        List<String> occupations = new ArrayList<>();
         if (getParty().isPerson()) {
             Person person = (Person) getParty();
             Teacher teacher = person.getTeacher();
@@ -335,8 +334,7 @@ public class ParkingParty extends ParkingParty_Base {
                 if (currentResearcherContractSituation != null) {
                     StringBuilder stringBuilder =
                             new StringBuilder(BundleUtil.getString("resources.ParkingResources", "message.person.identification",
-                                    new String[] { RoleType.RESEARCHER.getLocalizedName(),
-                                            PartyClassification.getMostSignificantNumber(person).toString() }));
+                                    RoleType.RESEARCHER.getLocalizedName(), PartyClassification.getMostSignificantNumber(person).toString()));
                     Unit currentUnit = person.getEmployee() != null ? person.getEmployee().getCurrentWorkingPlace() : null;
                     if (currentUnit != null) {
                         stringBuilder.append(currentUnit.getName()).append("<br/>");
@@ -360,8 +358,8 @@ public class ParkingParty extends ParkingParty_Base {
                         if (stringBuilder == null) {
                             stringBuilder =
                                     new StringBuilder(BundleUtil.getString("resources.ParkingResources",
-                                            "message.person.identification", new String[] { RoleType.STUDENT.getLocalizedName(),
-                                                    student.getNumber().toString() }));
+                                            "message.person.identification",
+                                            RoleType.STUDENT.getLocalizedName(), student.getNumber().toString()));
 
                         }
                         stringBuilder.append("\n").append(scp.getDegreeCurricularPlan().getName());
@@ -408,7 +406,7 @@ public class ParkingParty extends ParkingParty_Base {
     private String getOccupation(String type, String identification, String workingPlace) {
         StringBuilder stringBuilder =
                 new StringBuilder(BundleUtil.getString("resources.ParkingResources", "message.person.identification",
-                        new String[] { type, identification }));
+                        type, identification));
         if (!Strings.isNullOrEmpty(workingPlace)) {
             stringBuilder.append(workingPlace).append("<br/>");
         }
@@ -431,7 +429,7 @@ public class ParkingParty extends ParkingParty_Base {
     }
 
     public List<String> getDegreesInformation() {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         if (getParty().isPerson()) {
             Person person = (Person) getParty();
             Student student = person.getStudent();
@@ -496,7 +494,7 @@ public class ParkingParty extends ParkingParty_Base {
     }
 
     public String getAllNumbers() {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         if (getParty().isPerson()) {
             final Person person = (Person) getParty();
             final Employee employee = person.getEmployee();
@@ -601,13 +599,11 @@ public class ParkingParty extends ParkingParty_Base {
     }
 
     private boolean changedDates(DateTime oldDate, DateTime newDate, Boolean cardAlwaysValid) {
-        return cardAlwaysValid ? (oldDate == null ? false : true) : ((oldDate == null || (!oldDate.equals(newDate))) ? true : oldDate
-                .equals(newDate));
+        return cardAlwaysValid ? (oldDate != null) : ((oldDate == null || (!oldDate.equals(newDate))) || oldDate.equals(newDate));
     }
 
     private boolean changedObject(Object oldObject, Object newObject) {
-        return oldObject == null && newObject == null ? false : (oldObject != null && newObject != null ? (!oldObject
-                .equals(newObject)) : true);
+        return (oldObject != null || newObject != null) && (oldObject == null || newObject == null || (!oldObject.equals(newObject)));
     }
 
     public void edit(ParkingRequest parkingRequest) {
@@ -824,14 +820,14 @@ public class ParkingParty extends ParkingParty_Base {
     }
 
     public Vehicle getFirstVehicle() {
-        List<Vehicle> vehicles = new ArrayList<Vehicle>(getVehiclesSet());
-        Collections.sort(vehicles, Comparator.comparing(Vehicle::getPlateNumber));
+        List<Vehicle> vehicles = new ArrayList<>(getVehiclesSet());
+        vehicles.sort(Comparator.comparing(Vehicle::getPlateNumber));
         return vehicles.size() > 0 ? vehicles.iterator().next() : null;
     }
 
     public Vehicle getSecondVehicle() {
-        List<Vehicle> vehicles = new ArrayList<Vehicle>(getVehiclesSet());
-        Collections.sort(vehicles, Comparator.comparing(Vehicle::getPlateNumber));
+        List<Vehicle> vehicles = new ArrayList<>(getVehiclesSet());
+        vehicles.sort(Comparator.comparing(Vehicle::getPlateNumber));
         return vehicles.size() > 1 ? vehicles.get(1) : null;
     }
 

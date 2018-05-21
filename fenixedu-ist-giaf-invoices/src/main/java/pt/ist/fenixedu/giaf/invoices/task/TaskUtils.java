@@ -16,7 +16,6 @@ import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.Transport;
-import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
@@ -24,9 +23,8 @@ import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
 
 import org.fenixedu.academic.FenixEduAcademicConfiguration;
-import org.fenixedu.academic.domain.util.email.Sender;
 import org.fenixedu.academic.util.ConnectionManager;
-import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.messaging.core.domain.MessagingSystem;
 
 public class TaskUtils {
 
@@ -34,7 +32,8 @@ public class TaskUtils {
     static final String EMAIL_ADDRESSES_BCC_SEND_DATA_FILENAME = "/afs/ist.utl.pt/ciist/fenix/fenix015/ist/giaf_sync_errors_bcc.txt";
     static final String LOCK_VARIABLE = "GIAF_INVOICE_SYNC_VAR";
 
-    static void sendReport(final String filename, final byte[] byteArray, final String subject, final String body) throws AddressException, MessagingException {
+    static void sendReport(final String filename, final byte[] byteArray, final String subject, final String body)
+            throws MessagingException {
         final Properties properties = new Properties();
         properties.put("mail.smtp.host", FenixEduAcademicConfiguration.getConfiguration().getMailSmtpHost());
         properties.put("mail.smtp.name", FenixEduAcademicConfiguration.getConfiguration().getMailSmtpName());
@@ -42,10 +41,10 @@ public class TaskUtils {
         properties.put("mail.debug", "false");
         final Session session = Session.getDefaultInstance(properties, null);
 
-        final Sender sender = Bennu.getInstance().getSystemSender();
+        final org.fenixedu.messaging.core.domain.Sender sender = MessagingSystem.systemSender();
 
         final Message message = new MimeMessage(session);
-        message.setFrom(new InternetAddress(sender.getFromAddress()));
+        message.setFrom(new InternetAddress(sender.getAddress()));
         message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(fileContent(EMAIL_ADDRESSES_TO_SEND_DATA_FILENAME)));
         message.setRecipients(Message.RecipientType.BCC, InternetAddress.parse(fileContent(EMAIL_ADDRESSES_BCC_SEND_DATA_FILENAME)));
         message.setSubject(subject);
@@ -106,7 +105,7 @@ public class TaskUtils {
         }
 
         @Override
-        public void close() throws Exception {
+        public void close() {
             releaseLock();
             connection = null;
         }

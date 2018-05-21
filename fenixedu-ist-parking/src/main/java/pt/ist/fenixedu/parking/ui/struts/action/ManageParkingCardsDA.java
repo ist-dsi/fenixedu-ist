@@ -18,7 +18,6 @@
  */
 package pt.ist.fenixedu.parking.ui.struts.action;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -32,17 +31,14 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.fenixedu.academic.domain.contacts.EmailAddress;
-import org.fenixedu.academic.domain.util.email.ConcreteReplyTo;
-import org.fenixedu.academic.domain.util.email.Message;
-import org.fenixedu.academic.domain.util.email.Sender;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
-import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
 import org.fenixedu.bennu.struts.portal.EntryPoint;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
 import org.fenixedu.commons.i18n.I18N;
+import org.fenixedu.messaging.core.domain.Message;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -70,7 +66,7 @@ public class ManageParkingCardsDA extends FenixDispatchAction {
 
     @EntryPoint
     public ActionForward prepareCardsSearch(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
+            HttpServletResponse response) {
 
         ParkingCardSearchBean parkingCardSearchBean = null;
         if (getRenderedObject("parkingCardSearchBean") != null) {
@@ -197,10 +193,12 @@ public class ManageParkingCardsDA extends FenixDispatchAction {
 
             if (emailText != null && emailText.trim().length() != 0 && email != null) {
                 ResourceBundle bundle = ResourceBundle.getBundle("resources.ParkingResources", I18N.getLocale());
-                Sender sender = Bennu.getInstance().getSystemSender();
-                ConcreteReplyTo replyTo = new ConcreteReplyTo(bundle.getString("label.fromAddress"));
-                new Message(sender, replyTo.asCollection(), Collections.EMPTY_LIST, bundle.getString("label.subject"), emailText,
-                        email);
+                Message.fromSystem()
+                        .replyTo(bundle.getString("label.fromAddress"))
+                        .singleBcc(email)
+                        .subject(bundle.getString("label.subject"))
+                        .textBody(emailText)
+                        .send();
             }
         }
     }

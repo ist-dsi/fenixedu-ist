@@ -22,12 +22,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.Department;
+import org.fenixedu.academic.domain.Installation;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.accessControl.UnitGroup;
@@ -41,18 +43,17 @@ import org.fenixedu.academic.domain.organizationalStructure.PartyType;
 import org.fenixedu.academic.domain.organizationalStructure.PartyTypeEnum;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.organizationalStructure.UnitClassification;
-import org.fenixedu.academic.domain.util.email.UnitBasedSender;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.bennu.core.groups.Group;
+import org.fenixedu.messaging.core.domain.Sender;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.YearMonthDay;
 
 import pt.ist.fenixedu.contracts.domain.Employee;
-import pt.ist.fenixedu.contracts.domain.util.email.ResearchUnitBasedSender;
-import pt.ist.fenixframework.Atomic;
 
 import com.google.common.base.Strings;
+import pt.ist.fenixframework.Atomic;
 
 public class ResearchUnit extends ResearchUnit_Base {
 
@@ -104,8 +105,7 @@ public class ResearchUnit extends ResearchUnit_Base {
         PartyType type = PartyType.readPartyTypeByType(PartyTypeEnum.RESEARCH_UNIT);
         for (Party party : type.getPartiesSet()) {
             ResearchUnit unit = (ResearchUnit) party;
-            if (!unit.equals(researchUnit) && unit instanceof ResearchUnit
-                    && researchUnit.getName().equalsIgnoreCase(unit.getName())
+            if (!unit.equals(researchUnit) && researchUnit.getName().equalsIgnoreCase(unit.getName())
                     && researchUnit.getAcronym().equalsIgnoreCase(unit.getAcronym())) {
                 throw new DomainException("error.unit.already.exists.unit.with.same.name.or.acronym");
             }
@@ -120,7 +120,7 @@ public class ResearchUnit extends ResearchUnit_Base {
     public Collection<Person> getActivePeopleForContract(Class clazz) {
         AccountabilityType accountabilityType = Function.readByType(AccountabilityTypeEnum.RESEARCH_CONTRACT);
         YearMonthDay today = new YearMonthDay();
-        List<Person> people = new ArrayList<Person>();
+        List<Person> people = new ArrayList<>();
         for (Accountability accountability : getChildsSet()) {
             if (accountability.getAccountabilityType().equals(accountabilityType)
                     && (accountability.getEndDate() == null || accountability.getEndDate().isAfter(today))
@@ -134,7 +134,7 @@ public class ResearchUnit extends ResearchUnit_Base {
     public Collection<Accountability> getActiveResearchContracts(Class clazz) {
         AccountabilityType accountabilityType = Function.readByType(AccountabilityTypeEnum.RESEARCH_CONTRACT);
         YearMonthDay today = new YearMonthDay();
-        List<Accountability> accountabilities = new ArrayList<Accountability>();
+        List<Accountability> accountabilities = new ArrayList<>();
         for (Accountability accountability : getChildsSet()) {
             if (accountability.getAccountabilityType().equals(accountabilityType)
                     && (accountability.getEndDate() == null || accountability.getEndDate().isAfter(today))
@@ -150,7 +150,7 @@ public class ResearchUnit extends ResearchUnit_Base {
     }
 
     public Collection<Unit> getAllCurrentActiveSubUnitsOrdered() {
-        SortedSet<Unit> subUnits = new TreeSet<Unit>(Unit.COMPARATOR_BY_NAME_AND_ID);
+        SortedSet<Unit> subUnits = new TreeSet<>(Unit.COMPARATOR_BY_NAME_AND_ID);
         subUnits.addAll(getAllCurrentActiveSubUnits());
         return subUnits;
     }
@@ -207,18 +207,9 @@ public class ResearchUnit extends ResearchUnit_Base {
         getPublicationCollaboratorsSet().addAll(collaborators);
     }
 
-    @Override
-    @Atomic
-    public UnitBasedSender getOneUnitBasedSender() {
-        if (!getUnitBasedSenderSet().isEmpty()) {
-            return getUnitBasedSenderSet().iterator().next();
-        } else {
-            return ResearchUnitBasedSender.newInstance(this);
-        }
-    }
 
     public static List<ResearchUnit> getWorkingResearchUnits(Person person) {
-        final List<ResearchUnit> units = new ArrayList<ResearchUnit>();
+        final List<ResearchUnit> units = new ArrayList<>();
         final Collection<? extends Accountability> parentAccountabilities =
                 person.getParentAccountabilities(AccountabilityTypeEnum.RESEARCH_CONTRACT);
 
@@ -233,7 +224,7 @@ public class ResearchUnit extends ResearchUnit_Base {
     }
 
     public static List<ResearchUnit> getWorkingResearchUnitsAndParents(Person person) {
-        final Set<ResearchUnit> baseUnits = new HashSet<ResearchUnit>();
+        final Set<ResearchUnit> baseUnits = new HashSet<>();
         for (final ResearchUnit unit : ResearchUnit.getWorkingResearchUnits(person)) {
             baseUnits.add(unit);
             for (final Unit parentUnit : unit.getAllActiveParentUnits(new YearMonthDay())) {
@@ -242,11 +233,11 @@ public class ResearchUnit extends ResearchUnit_Base {
                 }
             }
         }
-        return new ArrayList<ResearchUnit>(baseUnits);
+        return new ArrayList<>(baseUnits);
     }
 
     public List<Teacher> getAllTeachers() {
-        List<Teacher> teachers = new ArrayList<Teacher>();
+        List<Teacher> teachers = new ArrayList<>();
         List<Employee> employees = getAllWorkingEmployees();
         for (Employee employee : employees) {
             Teacher teacher = employee.getPerson().getTeacher();
@@ -258,7 +249,7 @@ public class ResearchUnit extends ResearchUnit_Base {
     }
 
     public List<Employee> getAllWorkingEmployees() {
-        Set<Employee> employees = new HashSet<Employee>();
+        Set<Employee> employees = new HashSet<>();
         for (Contract contract : EmployeeContract.getWorkingContracts(this)) {
             employees.add(contract.getEmployee());
         }
@@ -267,7 +258,23 @@ public class ResearchUnit extends ResearchUnit_Base {
                 employees.addAll(((ResearchUnit) subUnit).getAllWorkingEmployees());
             }
         }
-        return new ArrayList<Employee>(employees);
+        return new ArrayList<>(employees);
+    }
+
+
+    @Override
+    public Sender getSender() {
+        return Optional.ofNullable(super.getSender()).orElseGet(this::buildDefaultSender);
+    }
+
+    @Atomic
+    protected Sender buildDefaultSender() {
+        Sender sender = Sender.from(Installation.getInstance().getInstituitionalEmailAddress("noreply"))
+                .as(String.format("%s (%s)", Unit.getInstitutionAcronym(), getName()))
+                .members(UnitGroup.get(this, AccountabilityTypeEnum.RESEARCH_CONTRACT, false))
+                .build();
+        setSender(sender);
+        return sender;
     }
 
 }
