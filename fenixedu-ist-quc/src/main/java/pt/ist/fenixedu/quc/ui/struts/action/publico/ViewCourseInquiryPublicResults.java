@@ -129,6 +129,7 @@ public class ViewCourseInquiryPublicResults extends ViewInquiryPublicResults {
                         .iterator().next()));
 
         List<TeacherShiftTypeGeneralResultBean> teachersSummaryBeans = getTeachersShiftsResults(executionCourse);
+        List<TeacherShiftTypeGeneralResultBean> teachersEmptyResultsSummaryBeans = getTeachersEmptyResults(executionCourse);
         Collections.sort(
                 teachersSummaryBeans,
                 Comparator.comparing(TeacherShiftTypeGeneralResultBean::getProfessorship,
@@ -148,6 +149,7 @@ public class ViewCourseInquiryPublicResults extends ViewInquiryPublicResults {
         request.setAttribute("ucEvaluationsGroupBean", ucEvaluationsGroupBean);
         request.setAttribute("estimatedEvaluationBeanQuestion", estimatedEvaluationBeanQuestion);
         request.setAttribute("teachersSummaryBeans", teachersSummaryBeans);
+        request.setAttribute("teachersEmptyResultsSummaryBeans", teachersEmptyResultsSummaryBeans);
 
         CurricularCourseInquiryTemplate courseInquiryTemplate =
                 CurricularCourseInquiryTemplate.getTemplateByExecutionPeriod(executionPeriod);
@@ -211,6 +213,18 @@ public class ViewCourseInquiryPublicResults extends ViewInquiryPublicResults {
                         .getShiftType(), inquiryResult));
             }
         }
+        return teachersSummaries;
+    }
+
+    private static List<TeacherShiftTypeGeneralResultBean> getTeachersEmptyResults(ExecutionCourse executionCourse) {
+        List<TeacherShiftTypeGeneralResultBean> teachersSummaries = new ArrayList<TeacherShiftTypeGeneralResultBean>();
+        for (Professorship professorship : executionCourse.getProfessorshipsSet()) {
+            if (professorship.getInquiryResultsSet().isEmpty()) {
+                teachersSummaries.add(new TeacherShiftTypeGeneralResultBean(professorship,
+                        null, null));
+            }
+        }
+
         return teachersSummaries;
     }
 
