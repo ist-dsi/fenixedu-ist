@@ -18,53 +18,29 @@
  */
 package pt.ist.fenixedu.contracts.domain.accessControl;
 
-import java.util.stream.Stream;
-
-import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.annotation.GroupOperator;
-import org.fenixedu.bennu.core.domain.Bennu;
-import org.fenixedu.bennu.core.domain.User;
-import org.fenixedu.bennu.core.groups.GroupStrategy;
-import org.fenixedu.bennu.core.i18n.BundleUtil;
-import org.joda.time.DateTime;
 
 import pt.ist.fenixedu.contracts.domain.Employee;
-import pt.ist.fenixedu.contracts.domain.util.CategoryType;
 
 @GroupOperator("activeGrantOwner")
-public class ActiveGrantOwner extends GroupStrategy {
-    private static final long serialVersionUID = 3734411152566615242L;
+public class ActiveGrantOwner extends SapBackedGroup {
 
-    @Override
-    public String getPresentationName() {
-        return BundleUtil.getString(Bundle.GROUP, "label.name.ActiveGrantOwnersGroup");
-    }
+	private static final long serialVersionUID = 3734411152566615242L;
 
-    @Override
-    public Stream<User> getMembers() {
-        return Bennu.getInstance().getEmployeesSet().stream().filter(ActiveGrantOwner::isGrantOwner)
-                .map(employee -> employee.getPerson().getUser());
-    }
+	private static final String[] SAP_GROUPS = new String[] { " Bolseiros", " Bols. Investigação" };
 
-    @Override
-    public Stream<User> getMembers(DateTime when) {
-        return getMembers();
-    }
+	@Override
+	protected String presentationNameLable() {
+		return "label.name.ActiveGrantOwnersGroup";
+	}
 
-    @Override
-    public boolean isMember(User user) {
-        return user != null && user.getPerson() != null && user.getPerson().getEmployee() != null
-                && isGrantOwner(user.getPerson().getEmployee());
-    }
+	@Override
+	protected String[] sapGroups() {
+		return SAP_GROUPS;
+	}
 
-    @Override
-    public boolean isMember(User user, DateTime when) {
-        return isMember(user);
-    }
-
-    public static boolean isGrantOwner(Employee employee) {
-        return (employee.getPerson().getPersonProfessionalData() != null ? employee.getPerson().getPersonProfessionalData()
-                .getCurrentPersonContractSituationByCategoryType(CategoryType.GRANT_OWNER) : null) != null;
+    public static boolean isGrantOwner(final Employee employee) {
+        return new ActiveGrantOwner().isMember(employee.getPerson().getUser());
     }
 
 }

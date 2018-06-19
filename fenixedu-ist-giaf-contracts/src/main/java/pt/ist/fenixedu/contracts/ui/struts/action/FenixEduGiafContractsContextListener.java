@@ -30,6 +30,8 @@ import org.fenixedu.academic.domain.organizationalStructure.AccountabilityTypeEn
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.thesis.ThesisEvaluationParticipant;
 import org.fenixedu.academic.util.Bundle;
+import org.fenixedu.bennu.SapSdkConfiguration;
+import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.signals.DomainObjectEvent;
 import org.fenixedu.bennu.core.signals.Signal;
@@ -37,23 +39,54 @@ import org.fenixedu.bennu.core.signals.Signal;
 import pt.ist.fenixedu.contracts.domain.Employee;
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.ExternalContract;
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.PersonFunction;
+import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
+import pt.ist.sap.client.UsernameProvider;
+import pt.ist.sap.group.integration.domain.SapWrapper;
+import pt.ist.sap.group.integration.scripts.RoleSyncTask;
 
 @WebListener
 public class FenixEduGiafContractsContextListener implements ServletContextListener {
+
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        FenixFramework.getDomainModel().registerDeletionBlockerListener(
-                Person.class,
-                (person, blockers) -> {
-                    if (person.getEmployee() != null) {
-                        blockers.add(BundleUtil.getString(Bundle.APPLICATION, "error.person.cannot.be.deleted"));
-                    }
-                    if (!((Collection<PersonFunction>) person.getParentAccountabilities(
-                            AccountabilityTypeEnum.MANAGEMENT_FUNCTION, PersonFunction.class)).isEmpty()) {
-                        blockers.add(BundleUtil.getString(Bundle.APPLICATION, "error.person.cannot.be.deleted"));
-                    }
-                });
+        final UsernameProvider usernameProvider = new UsernameProvider() {
+            @Override
+            public String getUsername() {
+                return SapSdkConfiguration.getConfiguration().sapSamlSystemUser() ;
+            }
+
+            @Override
+            public String toUsername(final String sapNumber) {
+                if (sapNumber == null || sapNumber.isEmpty()) {
+                    return null;
+                }
+                final int offset = sapNumber.startsWith("1") || sapNumber.startsWith("2") ? 2 : 1;
+                return "ist" + Integer.valueOf(sapNumber.substring(offset));
+            }
+
+            @Override
+            public String[] toSapNumbers(final String username) {
+                final String subString = username.substring(3);
+                final int number = Integer.parseInt(subString);
+                final String string = number < 1_000_000 ? String.format("%06d", number) : subString;
+                return number < 1_000_000 ? new String[] { "19" + string, "20" + string, "21" + string, "22" + string }
+                    : new String[] { "3" + string, "4" + string, "5" + string, "6" + string };
+            }
+        };
+        
+        SapSdkConfiguration.setUsernameProvider(usernameProvider);
+        initSapWrapper();
+        FenixFramework.getDomainModel().registerDeletionBlockerListener(Person.class, (person, blockers) -> {
+            if (person.getEmployee() != null) {
+                blockers.add(BundleUtil.getString(Bundle.APPLICATION, "error.person.cannot.be.deleted"));
+            }
+            if (!((Collection<PersonFunction>) person.getParentAccountabilities(AccountabilityTypeEnum.MANAGEMENT_FUNCTION,
+                    PersonFunction.class)).isEmpty()) {
+                blockers.add(BundleUtil.getString(Bundle.APPLICATION, "error.person.cannot.be.deleted"));
+            }
+        });
+        
         FenixFramework.getDomainModel().registerDeletionListener(Person.class, (person) -> {
             if (person.getResearcher() != null) {
                 person.getResearcher().delete();
@@ -66,6 +99,33 @@ public class FenixEduGiafContractsContextListener implements ServletContextListe
         });
         Signal.register("academic.thesis.participant.created",
                 FenixEduGiafContractsContextListener::fillParticipantAffiliationAndCategory);
+    }
+
+    private void initSapWrapper() {
+        if (SapWrapper.institutions.isEmpty()) {
+            SapWrapper.institutionCode =
+                    i -> "1018".equals(i) ? "IST" : "1801".equals(i) ? "IST-ID" : "1802".equals(i) ? "ADIST" : null;
+            SapWrapper.institutions.add("1018");
+            SapWrapper.institutions.add("1801");
+            SapWrapper.institutions.add("1802");
+        }
+        SapSdkConfiguration.setSapUserValidator(() -> true);
+
+        new Thread() {
+            @Atomic
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(10000);
+                } catch (final InterruptedException e) {
+                }
+                if (Bennu.getInstance().getSapWrapperCacheEntrySet().isEmpty()) {
+                    new RoleSyncTask().run();
+                } else {
+                    SapWrapper.initFromCache().complete();
+                }
+            }
+        }.start();
     }
 
     private static void fillParticipantAffiliationAndCategory(DomainObjectEvent<ThesisEvaluationParticipant> event) {

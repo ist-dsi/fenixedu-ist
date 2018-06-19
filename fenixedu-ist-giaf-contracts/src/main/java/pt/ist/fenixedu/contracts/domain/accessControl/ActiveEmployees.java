@@ -18,48 +18,23 @@
  */
 package pt.ist.fenixedu.contracts.domain.accessControl;
 
-import java.util.stream.Stream;
-
-import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.annotation.GroupOperator;
-import org.fenixedu.bennu.core.domain.Bennu;
-import org.fenixedu.bennu.core.domain.User;
-import org.fenixedu.bennu.core.groups.GroupStrategy;
-import org.fenixedu.bennu.core.i18n.BundleUtil;
-import org.joda.time.DateTime;
-
-import pt.ist.fenixedu.contracts.domain.Employee;
 
 @GroupOperator("activeEmployees")
-public class ActiveEmployees extends GroupStrategy {
+public class ActiveEmployees extends SapBackedGroup {
 
-    private static final long serialVersionUID = -2985536595609345377L;
+	private static final long serialVersionUID = -2985536595609345377L;
 
-    @Override
-    public String getPresentationName() {
-        return BundleUtil.getString(Bundle.GROUP, "label.name.ActiveEmployeesGroup");
-    }
+	private static final String[] SAP_GROUPS = new String[] { " Não Docente", " Dirigentes", " Técnicos e Administ." };
 
-    @Override
-    public Stream<User> getMembers() {
-        return Bennu.getInstance().getEmployeesSet().stream().filter(Employee::isActive)
-                .map(employee -> employee.getPerson().getUser());
-    }
+	@Override
+	protected String presentationNameLable() {
+		return "label.name.ActiveEmployeesGroup";
+	}
 
-    @Override
-    public Stream<User> getMembers(DateTime when) {
-        return getMembers();
-    }
-
-    @Override
-    public boolean isMember(User user) {
-        return user != null && user.getPerson() != null && user.getPerson().getEmployee() != null
-                && user.getPerson().getEmployee().isActive();
-    }
-
-    @Override
-    public boolean isMember(User user, DateTime when) {
-        return isMember(user);
-    }
+	@Override
+	protected String[] sapGroups() {
+		return SAP_GROUPS;
+	}
 
 }

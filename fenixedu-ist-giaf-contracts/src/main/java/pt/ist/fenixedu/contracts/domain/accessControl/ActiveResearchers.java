@@ -18,52 +18,23 @@
  */
 package pt.ist.fenixedu.contracts.domain.accessControl;
 
-import java.util.stream.Stream;
-
-import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.annotation.GroupOperator;
-import org.fenixedu.bennu.core.domain.Bennu;
-import org.fenixedu.bennu.core.domain.User;
-import org.fenixedu.bennu.core.groups.GroupStrategy;
-import org.fenixedu.bennu.core.i18n.BundleUtil;
-import org.joda.time.DateTime;
-
-import pt.ist.fenixedu.contracts.domain.Employee;
-import pt.ist.fenixedu.contracts.domain.util.CategoryType;
 
 @GroupOperator("activeResearchers")
-public class ActiveResearchers extends GroupStrategy {
-    private static final long serialVersionUID = -6648971466827719165L;
+public class ActiveResearchers extends SapBackedGroup {
 
-    @Override
-    public String getPresentationName() {
-        return BundleUtil.getString(Bundle.GROUP, "label.name.ActiveResearchersGroup");
-    }
+	private static final long serialVersionUID = -6648971466827719165L;
 
-    @Override
-    public Stream<User> getMembers() {
-        return Bennu.getInstance().getEmployeesSet().stream().filter(ActiveResearchers::isResearcher)
-                .map(employee -> employee.getPerson().getUser());
-    }
+	private static final String[] SAP_GROUP = new String[] { " Investigadores" };
 
-    @Override
-    public Stream<User> getMembers(DateTime when) {
-        return getMembers();
-    }
+	@Override
+	protected String presentationNameLable() {
+		return "label.name.ActiveResearchersGroup";
+	}
 
-    @Override
-    public boolean isMember(User user) {
-        return user != null && user.getPerson() != null && user.getPerson().getEmployee() != null
-                && isResearcher(user.getPerson().getEmployee());
-    }
+	@Override
+	protected String[] sapGroups() {
+		return SAP_GROUP;
+	}
 
-    @Override
-    public boolean isMember(User user, DateTime when) {
-        return isMember(user);
-    }
-
-    protected static boolean isResearcher(Employee employee) {
-        return (employee.getPerson().getPersonProfessionalData() != null ? employee.getPerson().getPersonProfessionalData()
-                .getCurrentPersonContractSituationByCategoryType(CategoryType.RESEARCHER) : null) != null;
-    }
 }
