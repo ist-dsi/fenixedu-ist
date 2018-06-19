@@ -18,76 +18,23 @@
  */
 package pt.ist.fenixedu.contracts.domain.accessControl;
 
-import java.util.Collections;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-
-import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.annotation.GroupOperator;
-import org.fenixedu.bennu.core.domain.User;
-import org.fenixedu.bennu.core.groups.GroupStrategy;
-import org.fenixedu.bennu.core.i18n.BundleUtil;
-import org.joda.time.DateTime;
-
-import com.google.common.collect.Iterables;
-
-import pt.ist.sap.group.integration.domain.SapGroup;
-import pt.ist.sap.group.integration.domain.SapWrapper;
 
 @GroupOperator("activeEmployees")
-public class ActiveEmployees extends GroupStrategy {
+public class ActiveEmployees extends SapBackedGroup {
 
-    private static final String[] SAP_GROUPS = new String[] { " Não Docente", " Dirigentes", " Técnicos e Administ." };
-    private static final long serialVersionUID = -2985536595609345377L;
+	private static final long serialVersionUID = -2985536595609345377L;
 
-    public ActiveEmployees() {
-        super();
-    }
+	private static final String[] SAP_GROUPS = new String[] { " Não Docente", " Dirigentes", " Técnicos e Administ." };
 
-    @Override
-    public String getPresentationName() {
-        return BundleUtil.getString(Bundle.GROUP, "label.name.ActiveEmployeesGroup");
-    }
+	@Override
+	protected String presentationNameLable() {
+		return "label.name.ActiveEmployeesGroup";
+	}
 
-    @Override
-    public Stream<User> getMembers() {
-        final SapGroup sapGroup = new SapGroup();
-        Iterable<String> result = Collections.emptySet();
-        for (final String institution : SapWrapper.institutions) {
-            final String institutionCode = SapWrapper.institutionCode.apply(institution);
-            for (String sapGroupName : SAP_GROUPS) {
-                sapGroup.setGroup(institutionCode + sapGroupName);
-                result = Iterables.concat(result, sapGroup.list());
-            }
-        }
-        return StreamSupport.stream(result.spliterator(), false).map(username -> User.findByUsername(username));
-    }
-
-    @Override
-    public Stream<User> getMembers(DateTime when) {
-        return getMembers();
-    }
-
-    @Override
-    public boolean isMember(User user) {
-        final SapGroup sapGroup = new SapGroup();
-        if (user != null && user.getPerson() != null) {
-            for (final String institution : SapWrapper.institutions) {
-                final String institutionCode = SapWrapper.institutionCode.apply(institution);
-                for (String sapGroupName : SAP_GROUPS) {
-                    sapGroup.setGroup(institutionCode + sapGroupName);
-                    if (sapGroup.isMember(user.getUsername())) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean isMember(User user, DateTime when) {
-        return isMember(user);
-    }
+	@Override
+	protected String[] sapGroups() {
+		return SAP_GROUPS;
+	}
 
 }
