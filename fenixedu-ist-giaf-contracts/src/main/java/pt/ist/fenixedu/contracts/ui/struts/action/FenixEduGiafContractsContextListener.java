@@ -33,10 +33,8 @@ import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.SapSdkConfiguration;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
-import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.core.signals.DomainObjectEvent;
 import org.fenixedu.bennu.core.signals.Signal;
-import org.springframework.context.annotation.Bean;
 
 import pt.ist.fenixedu.contracts.domain.Employee;
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.ExternalContract;
