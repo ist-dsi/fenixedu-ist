@@ -18,22 +18,31 @@
  */
 package pt.ist.fenixedu.contracts.domain.accessControl;
 
+import java.util.Collections;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.annotation.GroupOperator;
-import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.groups.GroupStrategy;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
 
-import pt.ist.fenixedu.contracts.domain.Employee;
+import com.google.common.collect.Iterables;
+
+import pt.ist.sap.group.integration.domain.SapGroup;
+import pt.ist.sap.group.integration.domain.SapWrapper;
 
 @GroupOperator("activeEmployees")
 public class ActiveEmployees extends GroupStrategy {
 
+    private static final String[] SAP_GROUPS = new String[] { " Não Docente", " Dirigentes", " Técnicos e Administ." };
     private static final long serialVersionUID = -2985536595609345377L;
+
+    public ActiveEmployees() {
+        super();
+    }
 
     @Override
     public String getPresentationName() {
@@ -42,8 +51,16 @@ public class ActiveEmployees extends GroupStrategy {
 
     @Override
     public Stream<User> getMembers() {
-        return Bennu.getInstance().getEmployeesSet().stream().filter(Employee::isActive)
-                .map(employee -> employee.getPerson().getUser());
+        final SapGroup sapGroup = new SapGroup();
+        Iterable<String> result = Collections.emptySet();
+        for (final String institution : SapWrapper.institutions) {
+            final String institutionCode = SapWrapper.institutionCode.apply(institution);
+            for (String sapGroupName : SAP_GROUPS) {
+                sapGroup.setGroup(institutionCode + sapGroupName);
+                result = Iterables.concat(result, sapGroup.list());
+            }
+        }
+        return StreamSupport.stream(result.spliterator(), false).map(username -> User.findByUsername(username));
     }
 
     @Override
@@ -53,8 +70,19 @@ public class ActiveEmployees extends GroupStrategy {
 
     @Override
     public boolean isMember(User user) {
-        return user != null && user.getPerson() != null && user.getPerson().getEmployee() != null
-                && user.getPerson().getEmployee().isActive();
+        final SapGroup sapGroup = new SapGroup();
+        if (user != null && user.getPerson() != null) {
+            for (final String institution : SapWrapper.institutions) {
+                final String institutionCode = SapWrapper.institutionCode.apply(institution);
+                for (String sapGroupName : SAP_GROUPS) {
+                    sapGroup.setGroup(institutionCode + sapGroupName);
+                    if (sapGroup.isMember(user.getUsername())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     @Override
