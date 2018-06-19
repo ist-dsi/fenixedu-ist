@@ -19,6 +19,7 @@
 package pt.ist.fenixedu.cmscomponents.domain.executionCourse;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -59,6 +60,8 @@ public class ExecutionCourseQUCComponent extends BaseExecutionCourseComponent {
                 Collection<InquiryResult> professorshipResults = professorship.getInquiryResultsSet();
                 if (!professorshipResults.isEmpty()) {
                     professorships.put(professorship, getShiftTypes(professorshipResults));
+                } else {
+                    professorships.put(professorship, Collections.emptySet());
                 }
             }
 

@@ -508,6 +508,26 @@ jQuery(document).ready(function() {
 			</tr>
 		</logic:iterate>
 	</table>
+	<logic:notEmpty name="teachersEmptyResultsSummaryBeans">
+		<table class="structural">
+			<tr>
+				<td>
+					<p><strong><bean:message key="title.inquiry.teachersWithNoResults.regent" bundle="INQUIRIES_RESOURCES"/>:</strong></p>
+					<table class="graph teacher-results">
+						<logic:iterate id="teacherResult" name="teachersEmptyResultsSummaryBeans" type="pt.ist.fenixedu.quc.dto.TeacherShiftTypeGeneralResultBean">
+							<tr>
+								<th>
+									<bean:write name="teacherResult" property="professorship.person.name"/>
+									<bean:write name="teacherResult" property="teacherId"/>
+								</th>
+							</tr>
+						</logic:iterate>
+					</table>
+				</td>
+			</tr>
+
+		</table>
+	</logic:notEmpty>
 </logic:notEmpty>
 </div>
 
