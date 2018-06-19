@@ -84,7 +84,7 @@
 					<fr:destination name="postback"
 						path="/findPersonIST.do?method=postback" />
 					<fr:property name="destination" value="postback" />
-					<fr:property name="format" value="\${nameI18n}" />
+					<fr:property name="format" value="\${nameI18n.content}" />
 				</fr:slot>
 			</logic:equal>
 		</logic:present>
