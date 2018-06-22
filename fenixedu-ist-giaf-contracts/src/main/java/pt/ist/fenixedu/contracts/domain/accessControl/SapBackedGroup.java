@@ -44,7 +44,7 @@ public abstract class SapBackedGroup extends GroupStrategy {
 
 	@Override
 	public Stream<User> getMembers(final DateTime when) {
-		return getMembers();
+	    throw new RuntimeException("information.not.available");
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public abstract class SapBackedGroup extends GroupStrategy {
 
 	@Override
 	public boolean isMember(final User user, final DateTime when) {
-		return isMember(user);
+	    throw new RuntimeException("information.not.available");
 	}
 
 }
