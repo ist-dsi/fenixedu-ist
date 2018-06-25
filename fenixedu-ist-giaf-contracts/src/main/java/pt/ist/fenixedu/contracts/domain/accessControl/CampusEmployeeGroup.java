@@ -18,7 +18,9 @@
  */
 package pt.ist.fenixedu.contracts.domain.accessControl;
 
+import java.util.Collections;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.accessControl.FenixGroup;
@@ -30,13 +32,20 @@ import org.fenixedu.spaces.domain.Space;
 import org.joda.time.DateTime;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.Iterables;
+
+import pt.ist.sap.group.integration.domain.SapGroup;
+import pt.ist.sap.group.integration.domain.SapWrapper;
 
 @GroupOperator("campusEmployee")
 public class CampusEmployeeGroup extends FenixGroup {
     private static final long serialVersionUID = 4185082898828533195L;
 
+    private static final String[] SAP_GROUPS = new String[] { " Não Docente", " Dirigentes", " Técnicos e Administ." };
+
     @GroupArgument
     private Space campus;
+    private String sapCampusCode;
 
     private CampusEmployeeGroup() {
         super();
@@ -45,6 +54,13 @@ public class CampusEmployeeGroup extends FenixGroup {
     private CampusEmployeeGroup(Space campus) {
         this();
         this.campus = campus;
+        sapCampusCode = campus == null ? null
+                : "Alameda".equals(campus.getName()) ? "Alameda"
+                : "Taguspark".equals(campus.getName()) ? "Tagus Park"
+                //: "Tecnológico e Nuclear".equals(campus.getName()) ? "N603"
+                : null
+                ;
+        // Other unknown values N201, N203, N301, N603
     }
 
     public static CampusEmployeeGroup get(Space campus) {
@@ -58,26 +74,55 @@ public class CampusEmployeeGroup extends FenixGroup {
 
     @Override
     public Stream<User> getMembers() {
-        return getMembers(new DateTime());
+        if (sapCampusCode == null) {
+            return Stream.empty();
+        }
+        final SapGroup sapGroup = new SapGroup();
+        Iterable<String> result = Collections.emptySet();
+        for (final String institution : SapWrapper.institutions) {
+            final String institutionCode = SapWrapper.institutionCode.apply(institution);
+            for (String sapGroupName : SAP_GROUPS) {
+                sapGroup.setGroup(institutionCode + sapGroupName);
+                sapGroup.setCampus(institutionCode + " " + sapCampusCode);
+                result = Iterables.concat(result, sapGroup.list());
+            }
+        }
+        return StreamSupport.stream(result.spliterator(), false).map(username -> User.findByUsername(username));
     }
 
     @Override
     public Stream<User> getMembers(DateTime when) {
-        throw new RuntimeException("error.deprecated.group");
+        throw new RuntimeException("information.not.available");
     }
 
     @Override
     public boolean isMember(User user) {
-        return isMember(user, new DateTime());
+        if (sapCampusCode == null) {
+            return false;
+        }
+        final SapGroup sapGroup = new SapGroup();
+        if (user != null && user.getPerson() != null) {
+            for (final String institution : SapWrapper.institutions) {
+                final String institutionCode = SapWrapper.institutionCode.apply(institution);
+                for (String sapGroupName : SAP_GROUPS) {
+                    sapGroup.setGroup(institutionCode + sapGroupName);
+                    sapGroup.setCampus(institutionCode + " " + sapCampusCode);
+                    if (sapGroup.isMember(user.getUsername())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     @Override
     public boolean isMember(User user, DateTime when) {
-        return user != null && isMember(user.getPerson(), campus, when);
+        throw new RuntimeException("information.not.available");
     }
 
     public boolean isMember(final Person person, final Space campus, DateTime when) {
-        throw new RuntimeException("error.deprecated.group");
+        throw new RuntimeException("information.not.available");
     }
 
     @Override
@@ -87,10 +132,7 @@ public class CampusEmployeeGroup extends FenixGroup {
 
     @Override
     public boolean equals(Object object) {
-        if (object instanceof CampusEmployeeGroup) {
-            return Objects.equal(campus, ((CampusEmployeeGroup) object).campus);
-        }
-        return false;
+        return object instanceof CampusEmployeeGroup && Objects.equal(campus, ((CampusEmployeeGroup) object).campus);
     }
 
     @Override
