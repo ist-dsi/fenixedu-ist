@@ -13,7 +13,7 @@
 
     <properties>
         <version.com.oracle.ojdbc14>9.0.2.0.0</version.com.oracle.ojdbc14>
-	<version.pt.ist.sap-group-integration>1.4.1</version.pt.ist.sap-group-integration>
+	<version.pt.ist.sap-group-integration>1.4.2</version.pt.ist.sap-group-integration>
     </properties>
 
     <dependencies>
