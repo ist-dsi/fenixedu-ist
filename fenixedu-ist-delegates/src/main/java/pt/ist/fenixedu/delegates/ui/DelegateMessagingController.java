@@ -22,23 +22,21 @@ import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.fenixedu.messaging.core.ui.MessageBean;
+import org.fenixedu.messaging.core.ui.MessagingUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 import pt.ist.fenixedu.delegates.domain.student.Delegate;
-import pt.ist.fenixedu.delegates.domain.util.email.DelegateSender;
 import pt.ist.fenixedu.delegates.ui.services.DelegateService;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,26 +49,24 @@ public class DelegateMessagingController {
 
     @RequestMapping
     public String home(Model model) {
-        return messaging(Authenticate.getUser().getDelegatesSet().iterator().next(), true, model);
+        return messaging(Authenticate.getUser().getDelegatesSet().iterator().next(), true, false, model);
     }
 
     @RequestMapping(value = "/messaging/{delegate}", method = RequestMethod.GET)
     public String messaging(@PathVariable Delegate delegate, @RequestParam(defaultValue = "true") Boolean studentGroups,
-            Model model) {
+            @RequestParam(defaultValue = "false") Boolean responsibleTeachers, Model model) {
         DelegateStudentSelectBean delegateStudentsBean = new DelegateStudentSelectBean();
         delegateStudentsBean.setSelectedPosition(delegate);
-        List<DelegateCurricularCourseBean> executionCourses = null;
-        if (studentGroups == false) {
-            executionCourses = new ArrayList<DelegateCurricularCourseBean>();
-            executionCourses.addAll(delegateService.getCurricularCourses(delegateStudentsBean.getSelectedPosition()));
+        if (studentGroups) {
+            model.addAttribute("executionCourses", null);
         }
-        if (executionCourses != null) {
+        else {
+            List<DelegateCurricularCourseBean> executionCourses = delegateService.getCurricularCourses(delegateStudentsBean.getSelectedPosition());
             model.addAttribute("executionCourses", executionCourses.stream().distinct().collect(Collectors.toList()));
-        } else {
-            model.addAttribute("executionCourses", executionCourses);
         }
         model.addAttribute("yearStudents", delegateStudentsBean.getSelectedPosition().isYearDelegate());
         model.addAttribute("degreeOrCycleStudents", delegateStudentsBean.getSelectedPosition().isDegreeOrCycleDelegate());
+        model.addAttribute("responsibleTeachers", responsibleTeachers);
         model.addAttribute("action", "/delegates-messaging/messaging/");
         model.addAttribute("reload", "/delegates-messaging/messaging-reload/");
         model.addAttribute("students", delegateStudentsBean);
@@ -78,26 +74,20 @@ public class DelegateMessagingController {
     }
 
     @RequestMapping(value = "/messaging-reload/", method = RequestMethod.POST)
-    public String messagingReload(@ModelAttribute DelegateStudentSelectBean delegateStudentsBean, Model model,
-            BindingResult errors) {
-        return messaging(delegateStudentsBean.getSelectedPosition(), true, model);
+    public String messagingReload(@ModelAttribute DelegateStudentSelectBean delegateStudentsBean, Model model) {
+        return messaging(delegateStudentsBean.getSelectedPosition(), true, false, model);
     }
 
     @RequestMapping(value = "/messaging/", method = RequestMethod.POST)
-    public RedirectView messaging(@ModelAttribute DelegateStudentSelectBean delegateStudentsBean, Model model,
-            BindingResult errors, HttpSession session, HttpServletRequest request, final RedirectAttributes redirectAttributes) {
-        DelegateMessageBean delegateMessageBean = new DelegateMessageBean(delegateStudentsBean);
-        DelegateSender sender = delegateMessageBean.getSelectedSender().getSender();
-        List<Group> recipients = delegateMessageBean.getRecipients();
-
+    public RedirectView messaging(@ModelAttribute final DelegateStudentSelectBean delegateStudentsBean, final HttpServletResponse response,
+            final HttpServletRequest request) throws IOException {
         MessageBean bean = new MessageBean();
-        bean.setLockedSender(sender);
-        for (Group recipient : recipients) {
+        bean.setLockedSender(delegateStudentsBean.getSelectedPosition().getSender());
+        for (final Group recipient : delegateStudentsBean.getRecipients()) {
             bean.selectRecipient(recipient);
             bean.addAdHocRecipient(recipient);
         }
-        redirectAttributes.addFlashAttribute("messageBean",bean);
-        return new RedirectView("/messaging/message",true);
+        return MessagingUtils.redirectToNewMessage(request, response, bean);
     }
 
 }

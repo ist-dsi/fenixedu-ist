@@ -20,10 +20,7 @@ package pt.ist.fenixedu.delegates.ui.services;
 
 import static org.fenixedu.bennu.FenixEduDelegatesConfiguration.BUNDLE;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -32,6 +29,7 @@ import org.fenixedu.academic.domain.CurricularYear;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.DegreeModuleScope;
 import org.fenixedu.academic.domain.EmptyDegree;
+import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.degree.DegreeType;
@@ -48,7 +46,6 @@ import pt.ist.fenixedu.delegates.ui.DelegateBean;
 import pt.ist.fenixedu.delegates.ui.DelegateCurricularCourseBean;
 import pt.ist.fenixedu.delegates.ui.DelegatePositionBean;
 import pt.ist.fenixedu.delegates.ui.DelegateSearchBean;
-import pt.ist.fenixedu.delegates.ui.DelegateStudentSelectBean;
 import pt.ist.fenixframework.Atomic;
 
 @Service
@@ -63,18 +60,18 @@ public class DelegateService {
         delegateSearchBean.setDegreeTypes(executionYear.getExecutionDegreesSet().stream().map(d -> d.getDegree().getDegreeType())
                 .distinct().sorted().collect(Collectors.toList()));
         if (degreeType == null && (degree == null || EmptyDegree.class.isInstance(degree))) {
-            delegateSearchBean.setDegrees(executionYear.getExecutionDegreesSet().stream().map(d -> d.getDegree()).distinct()
+            delegateSearchBean.setDegrees(executionYear.getExecutionDegreesSet().stream().map(ExecutionDegree::getDegree).distinct()
                     .sorted(Degree.COMPARATOR_BY_DEGREE_TYPE_DEGREE_NAME_AND_ID).collect(Collectors.toList()));
             return delegateSearchBean;
         }
         if (degree == null || EmptyDegree.class.isInstance(degree)) {
             delegateSearchBean.setDegrees(executionYear.getExecutionDegreesSet().stream()
-                    .filter(d -> d.getDegree().getDegreeType().equals(degreeType)).map(d -> d.getDegree()).distinct()
+                    .filter(d -> d.getDegree().getDegreeType().equals(degreeType)).map(ExecutionDegree::getDegree).distinct()
                     .sorted(Degree.COMPARATOR_BY_DEGREE_TYPE_DEGREE_NAME_AND_ID).collect(Collectors.toList()));
             return delegateSearchBean;
         }
         delegateSearchBean.setDegrees(executionYear.getExecutionDegreesSet().stream()
-                .filter(d -> d.getDegree().getDegreeType().equals(degreeType)).map(d -> d.getDegree()).distinct()
+                .filter(d -> d.getDegree().getDegreeType().equals(degreeType)).map(ExecutionDegree::getDegree).distinct()
                 .sorted(Degree.COMPARATOR_BY_DEGREE_TYPE_DEGREE_NAME_AND_ID).collect(Collectors.toList()));
         return delegateSearchBean;
     }
@@ -83,54 +80,55 @@ public class DelegateService {
         DateTime activeWhen;
         if (delegateSearchBean.getExecutionYear().equals(ExecutionYear.readCurrentExecutionYear())) {
             activeWhen = DateTime.now();
-        } else {
+        }
+        else {
             activeWhen = delegateSearchBean.getExecutionYear().getAcademicInterval().toInterval().getEnd();
         }
-        List<Delegate> toRemove = new ArrayList<Delegate>();
+
         Stream<Delegate> stream;
-        List<Delegate> withDuplicates;
-        if (delegateSearchBean.getDegree() != null) {
-            stream = delegateSearchBean.getDegree().getDelegateSet().stream();
-        } else {
+        if (delegateSearchBean.getDegree() == null) {
             stream = Bennu.getInstance().getDelegatesSet().stream();
         }
-        withDuplicates = stream.filter(d -> d.isActive(activeWhen)).collect(Collectors.toList());
+        else {
+            stream = delegateSearchBean.getDegree().getDelegateSet().stream();
+        }
 
+        List<Delegate> withDuplicates = stream.filter(d -> d.isActive(activeWhen)).collect(Collectors.toList());
+
+        List<Delegate> toRemove = new ArrayList<>();
         for (Delegate delegate : withDuplicates) {
-            for (Delegate delegate2 : withDuplicates) {
-                if (delegate.getClass().isInstance(delegate2)) {
-                    if (delegate.samePosition(delegate2) && delegate.getStart().isBefore(delegate2.getStart())) {
-                        toRemove.add(delegate);
-                    }
-                }
-            }
+            withDuplicates.stream().filter(delegate2 -> delegate.getClass().isInstance(delegate2))
+                    .filter(delegate2 -> delegate.samePosition(delegate2) && delegate.getStart().isBefore(delegate2.getStart()))
+                    .map(delegate2 -> delegate).forEach(toRemove::add);
         }
         withDuplicates.removeAll(toRemove);
 
-        return withDuplicates.stream().map(p -> p.getBean()).collect(Collectors.toList());
+        return withDuplicates.stream().map(Delegate::getBean).collect(Collectors.toList());
     }
 
     public Stream<DelegateBean> search(DelegateSearchBean delegateSearchBean, DateTime when) {
         Stream<Delegate> delegateStream;
         if (delegateSearchBean.getDegree() != null) {
             delegateStream = delegateSearchBean.getDegree().getDelegateSet().stream();
-        } else if (delegateSearchBean.getDegreeType() != null) {
+        }
+        else if (delegateSearchBean.getDegreeType() != null) {
             delegateStream = delegateSearchBean.getDegrees().stream().flatMap(d -> d.getDelegateSet().stream());
-        } else {
+        }
+        else {
             delegateStream = Bennu.getInstance().getDelegatesSet().stream();
         }
-        return delegateStream.filter(d -> d.isActive(when)).distinct().map(d -> d.getBean());
+        return delegateStream.filter(d -> d.isActive(when)).distinct().map(Delegate::getBean);
     }
 
     public List<DelegateCurricularCourseBean> getCurricularCourses(Delegate delegate) {
-        return getCurricularCoursesBeans(delegate, delegate.getDelegateCourses().stream().collect(Collectors.toSet()));
+        return getCurricularCoursesBeans(delegate, new HashSet<>(delegate.getDelegateCourses()));
     }
 
     public List<DelegateCurricularCourseBean> getCurricularCoursesBeans(Delegate delegate, Set<CurricularCourse> curricularCourses) {
         final Class delegateFunctionType = delegate.getClass();
         final ExecutionYear executionYear = ExecutionYear.getExecutionYearByDate(delegate.getStart().toYearMonthDay());
 
-        List<DelegateCurricularCourseBean> result = new ArrayList<DelegateCurricularCourseBean>();
+        List<DelegateCurricularCourseBean> result = new ArrayList<>();
 
         for (CurricularCourse curricularCourse : curricularCourses) {
             for (ExecutionSemester executionSemester : executionYear.getExecutionPeriodsSet()) {
@@ -158,40 +156,12 @@ public class DelegateService {
                 }
             }
         }
-        Collections.sort(result,
-                DelegateCurricularCourseBean.CURRICULAR_COURSE_COMPARATOR_BY_CURRICULAR_YEAR_AND_CURRICULAR_SEMESTER);
-
+        result.sort(DelegateCurricularCourseBean.CURRICULAR_COURSE_COMPARATOR_BY_CURRICULAR_YEAR_AND_CURRICULAR_SEMESTER);
         return result;
     }
 
     private boolean scopeBelongsToDelegateCurricularYear(DegreeModuleScope scope, Integer curricularYear) {
-        if (scope.getCurricularYear().equals(curricularYear)) {
-            return true;
-        }
-        return false;
-    }
-
-    public List<User> getSelectedUsers(DelegateStudentSelectBean delegateStudentSelectBean) {
-        Delegate selectedSender = delegateStudentSelectBean.getSelectedPosition();
-        if (delegateStudentSelectBean.getSelectedExecutionCourses() != null
-                && delegateStudentSelectBean.getSelectedExecutionCourses().size() > 0) {
-            List<DelegateCurricularCourseBean> courseBeans =
-                    getCurricularCoursesBeans(selectedSender, delegateStudentSelectBean.getSelectedExecutionCourses().stream()
-                            .collect(Collectors.toSet()));
-            return courseBeans.stream().flatMap(dcb -> dcb.getEnrolledStudents().stream()).map(s -> s.getPerson().getUser())
-                    .collect(Collectors.toList());
-        } else {
-            if (delegateStudentSelectBean.getSelectedDegreeOrCycleStudents() == true) {
-                return getCurricularCourses(selectedSender).stream().flatMap(dcb -> dcb.getEnrolledStudents().stream())
-                        .map(s -> s.getPerson().getUser()).collect(Collectors.toList());
-            } else {
-                if (delegateStudentSelectBean.getSelectedYearStudents() == true) {
-                    return getCurricularCourses(selectedSender).stream().flatMap(dcb -> dcb.getEnrolledStudents().stream())
-                            .map(s -> s.getPerson().getUser()).collect(Collectors.toList());
-                }
-            }
-        }
-        return new ArrayList<User>();
+        return scope.getCurricularYear().equals(curricularYear);
     }
 
     @Atomic
@@ -201,7 +171,7 @@ public class DelegateService {
 
     public List<DelegateBean> getDegreePositions(Degree degree) {
         DegreeType degreeType = degree.getDegreeType();
-        List<DelegateBean> ldpb = new ArrayList<DelegateBean>();
+        List<DelegateBean> ldpb = new ArrayList<>();
         ldpb.add(new DelegatePositionBean(null, null, CurricularYear.readByYear(1), degree));
         ldpb.add(new DelegatePositionBean(null, null, CurricularYear.readByYear(2), degree));
         if (degreeType.isBolonhaMasterDegree()) {
@@ -228,8 +198,8 @@ public class DelegateService {
     public boolean attributeDelegatePosition(DelegatePositionBean delegatePositionBean) {
         User user = User.findByUsername(delegatePositionBean.getName());
         if (user == null) {
-            delegatePositionBean.setErrorMessage(BundleUtil.getString(BUNDLE, "user.not.found") + " "
-                    + delegatePositionBean.getName());
+            delegatePositionBean.setErrorMessage(
+                    String.format("%s %s", BundleUtil.getString(BUNDLE, "user.not.found"), delegatePositionBean.getName()));
             return false;
         }
         Delegate oldDelegate = delegatePositionBean.getDelegate();

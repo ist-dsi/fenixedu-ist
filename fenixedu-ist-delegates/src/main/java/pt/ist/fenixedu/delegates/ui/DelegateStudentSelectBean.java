@@ -24,40 +24,46 @@ import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.accessControl.StudentGroup;
+import org.fenixedu.academic.domain.accessControl.TeacherResponsibleOfExecutionCourseGroup;
 import org.fenixedu.bennu.core.groups.Group;
+import org.springframework.util.CollectionUtils;
 import pt.ist.fenixedu.delegates.domain.student.CycleDelegate;
 import pt.ist.fenixedu.delegates.domain.student.DegreeDelegate;
 import pt.ist.fenixedu.delegates.domain.student.Delegate;
 import pt.ist.fenixedu.delegates.domain.student.YearDelegate;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class DelegateStudentSelectBean {
 
-    List<CurricularCourse> selectedExecutionCourses;
-    Delegate selectedPosition;
-    Set<Delegate> positions;
-    Boolean selectedYearStudents;
-    Boolean selectedDegreeOrCycleStudents;
+    private List<CurricularCourse> selectedCurricularCourses;
+    private Delegate selectedPosition;
+    private Set<Delegate> positions;
+    private Boolean selectedYearStudents;
+    private Boolean selectedDegreeOrCycleStudents;
+    private Boolean selectedResponsibleTeachers;
 
     public DelegateStudentSelectBean(Set<Delegate> delegates) {
-        selectedYearStudents = false;
-        selectedDegreeOrCycleStudents = false;
+        selectedCurricularCourses = new ArrayList<>();
         positions = null;
         selectedPosition = null;
         setInfo(delegates);
-        selectedExecutionCourses = new ArrayList<CurricularCourse>();
+        selectedYearStudents = false;
+        selectedDegreeOrCycleStudents = false;
+        selectedResponsibleTeachers = false;
     }
 
     public DelegateStudentSelectBean() {
-        selectedExecutionCourses = new ArrayList<CurricularCourse>();
-        selectedYearStudents = false;
-        positions = null;
+        selectedCurricularCourses = new ArrayList<>();
         selectedPosition = null;
+        positions = null;
+        selectedYearStudents = false;
         selectedDegreeOrCycleStudents = false;
+        selectedResponsibleTeachers = false;
     }
 
     public void setInfo(Set<Delegate> delegates) {
@@ -75,32 +81,32 @@ public class DelegateStudentSelectBean {
         }
     }
 
-    public List<CurricularCourse> getSelectedExecutionCourses() {
-        return selectedExecutionCourses;
+    public List<CurricularCourse> getSelectedCurricularCourses() {
+        return selectedCurricularCourses;
     }
 
-    public void setSelectedExecutionCourses(List<CurricularCourse> selectedExecutionCourses) {
-        this.selectedExecutionCourses = selectedExecutionCourses;
+    public Delegate getSelectedPosition() {
+        return selectedPosition;
+    }
+
+    public Set<Delegate> getPositions() {
+        return positions;
     }
 
     public Boolean getSelectedYearStudents() {
         return selectedYearStudents;
     }
 
-    public void setSelectedYearStudents(Boolean selectedYearStudents) {
-        this.selectedYearStudents = selectedYearStudents;
-    }
-
     public Boolean getSelectedDegreeOrCycleStudents() {
         return selectedDegreeOrCycleStudents;
     }
 
-    public void setSelectedDegreeOrCycleStudents(Boolean selectedDegreeOrCycleStudents) {
-        this.selectedDegreeOrCycleStudents = selectedDegreeOrCycleStudents;
+    public Boolean getSelectedResponsibleTeachers() {
+        return selectedResponsibleTeachers;
     }
 
-    public Delegate getSelectedPosition() {
-        return selectedPosition;
+    public void setSelectedCurricularCourses(List<CurricularCourse> selectedCurricularCourses) {
+        this.selectedCurricularCourses = selectedCurricularCourses;
     }
 
     public void setSelectedPosition(Delegate selectedPosition) {
@@ -110,63 +116,62 @@ public class DelegateStudentSelectBean {
         }
     }
 
-    public List<Group> getRecipients() {
-        List<Group> toRet = new ArrayList<>();
-        if (selectedExecutionCourses != null && selectedExecutionCourses.size() > 0) {
-
-            List<DelegateCurricularCourseBean> lccb =
-                    getCurricularCoursesBeans(selectedPosition, selectedExecutionCourses.stream().collect(Collectors.toSet()));
-
-            List<ExecutionCourse> selectedStudentCourses =
-                    lccb.stream()
-                            .flatMap(
-                                    ccb -> ccb
-                                            .getCurricularCourse()
-                                            .getExecutionCoursesByExecutionPeriod(ccb.getExecutionPeriod())
-                                            .stream()
-                                            .filter(ec -> (ec.getDegreesSortedByDegreeName().contains(selectedPosition
-                                                    .getDegree())))).collect(Collectors.toList());
-
-            selectedStudentCourses.stream().map(ec -> StudentGroup.get(ec)).forEach(sg -> toRet.add(sg));
-
-        }
-        if (selectedYearStudents && selectedPosition instanceof YearDelegate) {
-            YearDelegate yearDelegate = (YearDelegate) selectedPosition;
-            StudentGroup sg =
-                    StudentGroup.get(selectedPosition.getDegree(), yearDelegate.getCurricularYear(),
-                            ExecutionYear.getExecutionYearByDate(yearDelegate.getStart().toYearMonthDay()));
-            toRet.add(sg);
-        }
-        if (selectedDegreeOrCycleStudents) {
-            if (selectedPosition instanceof CycleDelegate) {
-                CycleDelegate cycleDelegate = (CycleDelegate) selectedPosition;
-                StudentGroup sg = StudentGroup.get(selectedPosition.getDegree(), cycleDelegate.getCycle());
-                toRet.add(sg);
-            }
-            if (selectedPosition instanceof DegreeDelegate) {
-                DegreeDelegate degreeDelegate = (DegreeDelegate) selectedPosition;
-                StudentGroup sg = StudentGroup.get(degreeDelegate.getDegree(), null);
-                toRet.add(sg);
-            }
-        }
-
-        return toRet;
-    }
-
-    public Set<Delegate> getPositions() {
-        return positions;
-    }
-
     public void setPositions(Set<Delegate> positions) {
         this.positions = positions;
     }
 
-    private List<DelegateCurricularCourseBean> getCurricularCoursesBeans(Delegate delegate,
-            Set<CurricularCourse> curricularCourses) {
-        final Class delegateFunctionType = delegate.getClass();
-        final ExecutionYear executionYear = ExecutionYear.getExecutionYearByDate(delegate.getStart().toYearMonthDay());
+    public void setSelectedYearStudents(Boolean selectedYearStudents) {
+        this.selectedYearStudents = selectedYearStudents;
+    }
 
-        List<DelegateCurricularCourseBean> result = new ArrayList<DelegateCurricularCourseBean>();
+    public void setSelectedDegreeOrCycleStudents(Boolean selectedDegreeOrCycleStudents) {
+        this.selectedDegreeOrCycleStudents = selectedDegreeOrCycleStudents;
+    }
+
+    public void setSelectedResponsibleTeachers(Boolean selectedResponsibleTeachers) {
+        this.selectedResponsibleTeachers = selectedResponsibleTeachers;
+    }
+
+    public List<Group> getRecipients() {
+        List<Group> toRet = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(selectedCurricularCourses)) {
+            List<ExecutionCourse> selectedStudentCourses =
+                    getCurricularCoursesBeans(selectedPosition, selectedCurricularCourses).stream()
+                            .flatMap(ccb -> ccb.getCurricularCourse()
+                                            .getExecutionCoursesByExecutionPeriod(ccb.getExecutionPeriod()).stream()
+                                            .filter(ec -> ec.getDegreesSortedByDegreeName().contains(selectedPosition.getDegree())))
+                            .collect(Collectors.toList());
+
+            if (selectedResponsibleTeachers){
+                selectedStudentCourses.stream().map(TeacherResponsibleOfExecutionCourseGroup::get).forEach(toRet::add);
+            }
+            else {
+                selectedStudentCourses.stream().map(StudentGroup::get).forEach(toRet::add);
+            }
+        }
+        if (selectedYearStudents && selectedPosition instanceof YearDelegate) {
+            YearDelegate yearDelegate = (YearDelegate) selectedPosition;
+            toRet.add(StudentGroup.get(selectedPosition.getDegree(), yearDelegate.getCurricularYear(),
+                    ExecutionYear.getExecutionYearByDate(yearDelegate.getStart().toYearMonthDay())));
+        }
+        if (selectedDegreeOrCycleStudents) {
+            if (selectedPosition instanceof CycleDelegate) {
+                CycleDelegate cycleDelegate = (CycleDelegate) selectedPosition;
+                toRet.add(StudentGroup.get(selectedPosition.getDegree(), cycleDelegate.getCycle()));
+            }
+            if (selectedPosition instanceof DegreeDelegate) {
+                DegreeDelegate degreeDelegate = (DegreeDelegate) selectedPosition;
+                toRet.add(StudentGroup.get(degreeDelegate.getDegree(), null));
+            }
+        }
+        return toRet;
+    }
+
+
+    private List<DelegateCurricularCourseBean> getCurricularCoursesBeans(Delegate delegate,
+            Collection<CurricularCourse> curricularCourses) {
+        final ExecutionYear executionYear = ExecutionYear.getExecutionYearByDate(delegate.getStart().toYearMonthDay());
+        List<DelegateCurricularCourseBean> result = new ArrayList<>();
 
         for (CurricularCourse curricularCourse : curricularCourses) {
             for (ExecutionSemester executionSemester : executionYear.getExecutionPeriodsSet()) {
@@ -176,7 +181,7 @@ public class DelegateStudentSelectBean {
                             continue;
                         }
 
-                        if (delegateFunctionType.equals(YearDelegate.class)) {
+                        if (delegate.getClass().equals(YearDelegate.class)) {
                             YearDelegate yearDelegate = (YearDelegate) delegate;
                             if (!scopeBelongsToDelegateCurricularYear(scope, yearDelegate.getCurricularYear().getYear())) {
                                 continue;
@@ -194,15 +199,11 @@ public class DelegateStudentSelectBean {
                 }
             }
         }
-
         return result;
     }
 
     private boolean scopeBelongsToDelegateCurricularYear(DegreeModuleScope scope, Integer curricularYear) {
-        if (scope.getCurricularYear().equals(curricularYear)) {
-            return true;
-        }
-        return false;
+        return scope.getCurricularYear().equals(curricularYear);
     }
 
 }

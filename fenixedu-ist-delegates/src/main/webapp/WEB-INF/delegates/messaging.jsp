@@ -45,74 +45,84 @@
 	action="${formActionUrl}" enctype="multipart/form-data"
 	class="form-horizontal">
 	${csrf.field()}
-	<p>
-		<form:input type="hidden"
-			value="${students.selectedPosition.externalId}"
-			path="selectedPosition" />
+	<form:input type="hidden" value="${students.selectedPosition.externalId}" path="selectedPosition" />
+	<form:input type="hidden" value="${responsibleTeachers}" path="selectedResponsibleTeachers" />
 	<div class="row">
 		<div class="col-sm-2"><spring:message code="delegates.messaging.send.mail.to"/>:</div>
-		<div class="col-sm-5">
-			<a
-				href="${formActionUrl}${students.selectedPosition.externalId}?studentGroups=true"><spring:message code="delegates.messaging.student.groups"/></a>, <a
-				href="${formActionUrl}${students.selectedPosition.externalId}?studentGroups=false"><spring:message code="delegates.messaging.student.selected.courses"/></a>
+		<div class="col-sm-8">
+			<a href="${formActionUrl}${students.selectedPosition.externalId}?studentGroups=true"><spring:message code="delegates.messaging.student.groups"/></a>,
+			<a href="${formActionUrl}${students.selectedPosition.externalId}?studentGroups=false"><spring:message code="delegates.messaging.student.selected.courses"/></a>
+			<a href="${formActionUrl}${students.selectedPosition.externalId}?studentGroups=false&responsibleTeachers=true"><spring:message code="delegates.messaging.responsibleTeachers.selected.courses"/></a>
 		</div>
 	</div>
-	<p>
-		<c:if test="${executionCourses == null}">
-			<div class="row">
-				<div class="col-sm-2"><spring:message code="delegates.messaging.bcc"/>:</div>
-				<div class="col-sm-5">
-					<c:if test="${yearStudents}">
-						<div class="row">
-							<div class="col-md-5">
-								<form:checkbox value="${execCourse.curricularCourse.externalId}"
-									path="selectedYearStudents" />
-								<spring:message code="delegates.messaging.year.students"/>
-							</div>
+	<c:if test="${executionCourses == null}">
+		<div class="row">
+			<div class="col-sm-2"><spring:message code="delegates.messaging.bcc"/>:</div>
+			<div class="col-sm-5">
+				<c:if test="${yearStudents}">
+					<div class="row">
+						<div class="col-md-5">
+							<form:checkbox path="selectedYearStudents" />
+							<spring:message code="delegates.messaging.year.students"/>
 						</div>
-					</c:if>
-					<c:if test="${degreeOrCycleStudents}">
-						<div class="row">
-							<div class="col-md-5">
-								<form:checkbox value="${execCourse.curricularCourse.externalId}"
-									path="selectedDegreeOrCycleStudents" />
-								<spring:message code="delegates.messaging.degreeCycle.students"/>
-							</div>
+					</div>
+				</c:if>
+				<c:if test="${degreeOrCycleStudents}">
+					<div class="row">
+						<div class="col-md-5">
+							<form:checkbox path="selectedDegreeOrCycleStudents" />
+							<spring:message code="delegates.messaging.degreeCycle.students"/>
 						</div>
-					</c:if>
-				</div>
+					</div>
+				</c:if>
 			</div>
-		</c:if>
-		<c:if test="${executionCourses != null}">
-			<div class="row">
-				<div class="col-md-5">
-					<table class="table table-condensed">
+		</div>
+	</c:if>
+	<c:if test="${executionCourses != null and responsibleTeachers}">
+		<div class="row">
+			<div class="col-md-5">
+				<table class="table table-condensed">
+					<tr>
+						<td class="col-sm-1"></td>
+						<td class="col-sm-8"><spring:message code="delegates.messaging.table.name"/></td>
+						<td class="col-sm-1"><spring:message code="delegates.messaging.table.year"/></td>
+						<td class="col-sm-1"><spring:message code="delegates.messaging.table.semester"/></td>
+					</tr>
+					<c:forEach var="execCourse" items="${executionCourses}">
 						<tr>
-							<td class="col-sm-1"></td>
-							<td class="col-sm-8"><spring:message code="delegates.messaging.table.name"/></td>
-							<td class="col-sm-1"><spring:message code="delegates.messaging.table.year"/></td>
-							<td class="col-sm-1"><spring:message code="delegates.messaging.table.semester"/></td>
-							<td class="col-sm-1"><spring:message code="delegates.messaging.table.students"/></td>
+							<td class="col-sm-1"><form:checkbox value="${execCourse.curricularCourse.externalId}" path="selectedCurricularCourses" /></td>
+							<td class="col-sm-8"><c:out value="${execCourse.curricularCourse.name}"/></td>
+							<td class="col-sm-1"><c:out value="${execCourse.curricularYear}"/></td>
+							<td class="col-sm-1"><c:out value="${execCourse.semester}"/></td>
 						</tr>
-						<c:forEach var="execCourse" items="${executionCourses}">
-							<tr>
-								<td class="col-sm-1"><form:checkbox
-										value="${execCourse.curricularCourse.externalId}"
-										path="selectedExecutionCourses" /></td>
-								<td class="col-sm-8"><c:out value="${execCourse.curricularCourse.name}"/></td>
-								<td class="col-sm-1"><c:out value="${execCourse.curricularYear}"/></td>
-								<td class="col-sm-1"><c:out value="${execCourse.semester}"/></td>
-								<td class="col-sm-1">${execCourse.enrolledStudents.size()}</td>
-							</tr>
-						</c:forEach>
-					</table>
-				</div>
+					</c:forEach>
+				</table>
 			</div>
-
-		</c:if>
-	</p>
-	</p>
-	<button type="submit" class="btn btn-default">
-		<spring:message code="label.submit" />
-	</button>
+		</div>
+	</c:if>
+	<c:if test="${executionCourses != null and not responsibleTeachers}">
+		<div class="row">
+			<div class="col-md-5">
+				<table class="table table-condensed">
+					<tr>
+						<td class="col-sm-1"></td>
+						<td class="col-sm-8"><spring:message code="delegates.messaging.table.name"/></td>
+						<td class="col-sm-1"><spring:message code="delegates.messaging.table.year"/></td>
+						<td class="col-sm-1"><spring:message code="delegates.messaging.table.semester"/></td>
+						<td class="col-sm-1"><spring:message code="delegates.messaging.table.students"/></td>
+					</tr>
+					<c:forEach var="execCourse" items="${executionCourses}">
+						<tr>
+							<td class="col-sm-1"><form:checkbox value="${execCourse.curricularCourse.externalId}" path="selectedCurricularCourses" /></td>
+							<td class="col-sm-8"><c:out value="${execCourse.curricularCourse.name}"/></td>
+							<td class="col-sm-1"><c:out value="${execCourse.curricularYear}"/></td>
+							<td class="col-sm-1"><c:out value="${execCourse.semester}"/></td>
+							<td class="col-sm-1">${execCourse.enrolledStudents.size()}</td>
+						</tr>
+					</c:forEach>
+				</table>
+			</div>
+		</div>
+	</c:if>
+	<button type="submit" class="btn btn-default"><spring:message code="label.submit" /></button>
 </form:form>

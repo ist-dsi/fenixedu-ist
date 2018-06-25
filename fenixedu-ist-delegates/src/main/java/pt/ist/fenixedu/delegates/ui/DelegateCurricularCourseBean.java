@@ -38,12 +38,11 @@ package pt.ist.fenixedu.delegates.ui;
  */
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.CurricularCourse;
-import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.student.Student;
@@ -96,27 +95,18 @@ public class DelegateCurricularCourseBean {
     }
 
     public List<Student> getEnrolledStudents() {
-        List<Student> result = new ArrayList<Student>();
-        for (Student studentDR : this.enrolledStudents) {
-            result.add(studentDR);
-        }
-        return result;
+        return new ArrayList<>(this.enrolledStudents);
     }
 
     public void setEnrolledStudents(List<Student> students) {
-        this.enrolledStudents = new ArrayList<Student>();
-        for (Student student : students) {
-            this.enrolledStudents.add(student);
-        }
+        this.enrolledStudents = new ArrayList<>(students);
     }
 
     public void calculateEnrolledStudents() {
-        List<Student> enrolledStudents = new ArrayList<Student>();
-        for (Enrolment enrolment : getCurricularCourse().getEnrolmentsByAcademicInterval(
-                getExecutionPeriod().getAcademicInterval())) {
-            enrolledStudents.add(enrolment.getRegistration().getStudent());
-        }
-        Collections.sort(enrolledStudents, Student.NUMBER_COMPARATOR);
+        List<Student> enrolledStudents = getCurricularCourse()
+                .getEnrolmentsByAcademicInterval(getExecutionPeriod().getAcademicInterval()).stream()
+                .map(enrolment -> enrolment.getRegistration().getStudent())
+                .sorted(Student.NUMBER_COMPARATOR).collect(Collectors.toList());
         setEnrolledStudents(enrolledStudents);
     }
 
@@ -136,16 +126,9 @@ public class DelegateCurricularCourseBean {
         this.curricularYear = curricularYear;
     }
 
-    public Integer getEnrolledStudentsNumber() {
-        if (this.enrolledStudents != null) {
-            return this.enrolledStudents.size();
-        }
-        return 0;
-    }
-
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof DelegateCurricularCourseBean ? equals((DelegateCurricularCourseBean) obj) : false;
+        return obj instanceof DelegateCurricularCourseBean && equals((DelegateCurricularCourseBean) obj);
     }
 
     public boolean equals(DelegateCurricularCourseBean delegateCurricularCourseBean) {
@@ -157,7 +140,6 @@ public class DelegateCurricularCourseBean {
 
     @Override
     public int hashCode() {
-        return getCurricularCourse().hashCode() + getCurricularYear().hashCode() + getExecutionPeriod().hashCode()
-                + getExecutionYear().hashCode();
+        return getCurricularCourse().hashCode() + getCurricularYear().hashCode() + getExecutionPeriod().hashCode() + getExecutionYear().hashCode();
     }
 }
