@@ -36,7 +36,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.poi.hssf.util.Region;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -69,6 +69,7 @@ import org.fenixedu.commons.spreadsheet.StyledExcelSpreadsheet;
 import org.fenixedu.messaging.core.domain.Message;
 import org.joda.time.DateTime;
 
+import com.google.common.base.Strings;
 import pt.ist.fenixWebFramework.renderers.components.state.IViewState;
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonContractSituation;
@@ -86,8 +87,6 @@ import pt.ist.fenixedu.parking.dto.SearchParkingPartyBean;
 import pt.ist.fenixedu.parking.dto.VehicleBean;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
-
-import com.google.common.base.Strings;
 
 @StrutsFunctionality(app = ParkingManagerApp.class, path = "parking", titleKey = "label.requests")
 @Mapping(path = "/parking", module = "parkingManager", formBean = "parkingForm")
@@ -665,7 +664,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
                     int lastRow = firstRow + parkingRequest.getParkingParty().getDegreesInformation().size() - 1;
                     if (firstRow != lastRow) {
                         for (int iter = 0; iter < 7; iter++) {
-                            spreadsheet.getSheet().addMergedRegion(new Region(firstRow, (short) iter, lastRow, (short) iter));
+                            spreadsheet.getSheet().addMergedRegion(new CellRangeAddress(firstRow, (short) iter, lastRow, (short) iter));
                         }
                     }
                 }

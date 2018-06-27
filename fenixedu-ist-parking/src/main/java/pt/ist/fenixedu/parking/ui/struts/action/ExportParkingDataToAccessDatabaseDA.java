@@ -30,6 +30,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -53,16 +54,15 @@ import org.fenixedu.idcards.ui.OpenFileBean;
 import org.joda.time.DateTime;
 import org.joda.time.YearMonthDay;
 
-import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
-import pt.ist.fenixedu.parking.domain.ParkingGroup;
-import pt.ist.fenixedu.parking.domain.ParkingParty;
-import pt.ist.fenixedu.parking.domain.Vehicle;
-
 import com.google.common.io.Files;
 import com.healthmarketscience.jackcess.Column;
 import com.healthmarketscience.jackcess.DataType;
 import com.healthmarketscience.jackcess.Database;
 import com.healthmarketscience.jackcess.Table;
+import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
+import pt.ist.fenixedu.parking.domain.ParkingGroup;
+import pt.ist.fenixedu.parking.domain.ParkingParty;
+import pt.ist.fenixedu.parking.domain.Vehicle;
 
 @StrutsFunctionality(app = ParkingManagerApp.class, path = "export-parking-data", titleKey = "link.mergeFiles")
 @Mapping(module = "parkingManager", path = "/exportParkingDB", input = "/exportParkingDB.do?method=prepareExportFile",
@@ -116,7 +116,7 @@ public class ExportParkingDataToAccessDatabaseDA extends FenixDispatchAction {
             response.setContentType("text/plain");
             response.setHeader("Content-disposition", "attachment; filename=parkingDB_merge.xls");
             final ServletOutputStream writer = response.getOutputStream();
-            parkingBDSpreadsheet.exportToXLSSheet(workbook, excelStyle.getHeaderStyle(), excelStyle.getStringStyle());
+            parkingBDSpreadsheet.exportToXLSSheet(workbook, (HSSFCellStyle) excelStyle.getHeaderStyle(), (HSSFCellStyle) excelStyle.getStringStyle());
             workbook.write(writer);
             writer.flush();
 
