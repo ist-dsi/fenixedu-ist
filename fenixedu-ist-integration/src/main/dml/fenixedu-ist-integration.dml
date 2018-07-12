@@ -338,3 +338,12 @@ relation RemoteSystemDomainRoot {
     .pt.ist.fenixframework.DomainRoot playsRole domainRoot;
 }
 
+relation SpecialSeasonStatuteException {
+	.org.fenixedu.bennu.core.domain.Bennu playsRole bennu {
+		multiplicity 0..1;
+	}
+	.org.fenixedu.academic.domain.student.StatuteType playsRole specialSeasonStatuteException {
+		multiplicity *;
+	}
+}
+
