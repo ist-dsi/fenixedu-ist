@@ -19,7 +19,11 @@
 package pt.ist.fenixedu.integration.ui.struts.action.research.researchUnit;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.bennu.core.groups.Group;
@@ -35,20 +39,20 @@ public class UnitFileBean implements Serializable {
 
     private String description;
 
-    private Group group;
+    private List<Group> groups;
 
     private String tags;
 
     protected UnitFileBean() {
         this.file = null;
-        group = Group.nobody();
+        groups = new ArrayList<>();
     }
 
     public UnitFileBean(UnitFile file) {
         this.file = file;
         this.name = file.getDisplayName();
         this.description = file.getDescription();
-        this.group = file.getPermittedGroup();
+        setGroup(file.getPermittedGroup());
         setupTags(file.getUnitFileTagsSet());
     }
 
@@ -85,7 +89,12 @@ public class UnitFileBean implements Serializable {
     }
 
     public Group getGroup() {
-        return group;
+        return groups.stream().reduce(Group.nobody(), (g1, g2) -> g1.or(g2));
+    }
+
+    public void setGroup(Group group) {
+        String[] groupsExpressions = group.getExpression().split("[ ][|][ ]");
+        this.groups = Arrays.stream(groupsExpressions).map(s -> Group.parse(s)).collect(Collectors.toList());
     }
 
 //    public List<Group> getGroups() {
@@ -111,4 +120,11 @@ public class UnitFileBean implements Serializable {
         this.tags = tags;
     }
 
+    public List<Group> getGroups() {
+        return this.groups;
+    }
+
+    public void setGroups(List<Group> groups) {
+        this.groups = groups;
+    }
 }
