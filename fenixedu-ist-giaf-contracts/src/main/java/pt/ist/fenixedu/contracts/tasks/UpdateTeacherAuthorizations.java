@@ -23,22 +23,27 @@ import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.bennu.scheduler.CronTask;
 import org.fenixedu.bennu.scheduler.annotation.Task;
 
-import pt.ist.fenixedu.contracts.service.UpdateTeacherAuthorizationsForSemester;
+import pt.ist.fenixedu.contracts.service.UpdateTeacherAuthorizationsForSemesterFromSap;
 
 @Task(englishTitle = "UpdateTeacherAuthorizations")
 public class UpdateTeacherAuthorizations extends CronTask {
 
-    @Override
-    public void runTask() {
-        for (ExecutionYear executionYear = ExecutionYear.readCurrentExecutionYear(); executionYear != null; executionYear =
-                executionYear.getNextExecutionYear()) {
-            taskLog(executionYear.getQualifiedName());
-            executionYear.getExecutionPeriodsSet().stream().sorted(ExecutionSemester.COMPARATOR_BY_SEMESTER_AND_YEAR)
-                    .filter(executionSemester -> executionSemester.getTeacherAuthorizationStream().findAny().isPresent())
-                    .forEach(executionSemester -> {
-                        taskLog(new UpdateTeacherAuthorizationsForSemester().updateTeacherAuthorization(executionSemester));
-                    });
+	private static final ExecutionYear FIRST_EXECUTION_YEAR = ExecutionYear.readExecutionYearByName("2018/2019");
 
-        }
-    }
+	@Override
+	public void runTask() {
+		for (ExecutionYear executionYear = ExecutionYear.readCurrentExecutionYear(); executionYear != null
+				&& executionYear
+						.isAfterOrEquals(FIRST_EXECUTION_YEAR); executionYear = executionYear.getNextExecutionYear()) {
+			taskLog(executionYear.getQualifiedName());
+			executionYear.getExecutionPeriodsSet().stream().sorted(ExecutionSemester.COMPARATOR_BY_SEMESTER_AND_YEAR)
+					.filter(executionSemester -> executionSemester.getTeacherAuthorizationStream().findAny()
+							.isPresent())
+					.forEach(executionSemester -> {
+						taskLog(new UpdateTeacherAuthorizationsForSemesterFromSap()
+								.updateTeacherAuthorization(executionSemester));
+					});
+
+		}
+	}
 }
