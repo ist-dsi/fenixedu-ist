@@ -59,7 +59,7 @@ public class YearDelegate extends YearDelegate_Base {
         String delegate = BundleUtil.getString(BUNDLE, "delegate");
         String of = BundleUtil.getString(BUNDLE, "delegate.of");
         String year = BundleUtil.getString(BUNDLE, "delegate.year");
-        return String.format("%s %s %d %s", delegate, of, getCurricularYear().getYear(), year);
+        return String.format("%s %s %d %s %s %s", delegate, of, getCurricularYear().getYear(), year, of, getDegree().getSigla());
     }
 
     @Override
