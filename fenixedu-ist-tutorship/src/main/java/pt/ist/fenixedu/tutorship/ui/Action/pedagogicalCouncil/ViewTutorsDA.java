@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -121,6 +122,61 @@ public class ViewTutorsDA extends FenixDispatchAction {
         return null;
     }
 
+    public ActionForward exportToExcelAllDegrees(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
+                                       HttpServletResponse response) throws IOException {
+
+        ExecutionSemester executionSemester = getDomainObject(request, "executionSemester");
+        ExecutionYear executionYear = executionSemester.getExecutionYear();
+
+        Map<String, List<TutorshipIntention>> tutorsListByDegree = TutorshipIntention.getTutorshipIntentions(executionYear);
+
+        StyledExcelSpreadsheet spreadsheet = new StyledExcelSpreadsheet("Tutores-Tutorandos", 15);
+        spreadsheet.newHeaderRow();
+        spreadsheet.addHeader("Tutor-Username");
+        spreadsheet.addHeader("Tutor-Nome", 12500);
+        spreadsheet.addHeader("Curso", 17000);
+        spreadsheet.addHeader("Tutorando-Nº");
+        spreadsheet.addHeader("Tutorando-Nome", 12500);
+        spreadsheet.addHeader("Tutorando-Telemóvel", 7000);
+        spreadsheet.addHeader("Tutorando-Email");
+
+        for (Map.Entry<String, List<TutorshipIntention>> entry : tutorsListByDegree.entrySet()) {
+            String degreeName = entry.getKey();
+
+            for (TutorshipIntention tutorshipIntention : entry.getValue()) {
+                if (tutorshipIntention.getTutorships().size() > 0) {
+                    for (Tutorship tutorship : tutorshipIntention.getTutorships()) {
+                        spreadsheet.newRow();
+                        spreadsheet.addCell(tutorshipIntention.getTeacher().getPerson().getUsername());
+                        spreadsheet.addCell(tutorshipIntention.getTeacher().getPerson().getName());
+                        spreadsheet.addCell(degreeName);
+                        spreadsheet.addCell(tutorship.getStudent().getNumber());
+                        spreadsheet.addCell(tutorship.getStudent().getName());
+                        spreadsheet.addCell(tutorship.getStudent().getPerson().getDefaultMobilePhoneNumber());
+                        spreadsheet.addCell(tutorship.getStudent().getPerson().getDefaultEmailAddressValue());
+                    }
+                }
+                else {
+                    spreadsheet.newRow();
+                    spreadsheet.addCell(tutorshipIntention.getTeacher().getPerson().getUsername());
+                    spreadsheet.addCell(tutorshipIntention.getTeacher().getPerson().getName());
+                    spreadsheet.addCell(degreeName);
+                }
+            }
+        }
+
+        response.setContentType("application/vnd.ms-excel");
+        response.setHeader("Content-Disposition", "attachment; filename="
+                + StringNormalizer.slugify(executionYear.getQualifiedName() + " "
+                + "todos os cursos")
+                + "\".xls");
+        final ServletOutputStream writer = response.getOutputStream();
+        spreadsheet.getWorkbook().write(writer);
+        writer.flush();
+        response.flushBuffer();
+        return null;
+    }
+
     public ActionForward viewStudentsOfTutorship(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
             HttpServletResponse response) throws Exception {
         String tutorshipIntentionID = (String) getFromRequest(request, "tutorshipIntentionID");
@@ -155,7 +211,6 @@ public class ViewTutorsDA extends FenixDispatchAction {
         public Converter getConverter() {
             return new DomainObjectKeyConverter();
         }
-
         @Override
         public Object provide(Object source, Object arg1) {
             final List<ExecutionDegree> executionDegrees = new ArrayList<ExecutionDegree>();

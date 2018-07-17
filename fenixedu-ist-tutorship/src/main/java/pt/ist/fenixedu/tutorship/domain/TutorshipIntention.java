@@ -21,10 +21,14 @@ package pt.ist.fenixedu.tutorship.domain;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.ExecutionDegree;
+import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.time.calendarStructure.AcademicInterval;
@@ -93,6 +97,30 @@ public class TutorshipIntention extends TutorshipIntention_Base {
             }
         }
         return null;
+    }
+
+    public static Map<String, List<TutorshipIntention>> getTutorshipIntentions(ExecutionYear executionYear) {
+        Map<String, List<TutorshipIntention>> result = new LinkedHashMap<>();
+
+        List<ExecutionDegree> degrees = executionYear.getExecutionDegreesSet().stream()
+                .filter(executionDegree -> executionDegree.getDegreeType().isIntegratedMasterDegree() || executionDegree.getDegreeType().isBolonhaDegree())
+                .sorted(ExecutionDegree.EXECUTION_DEGREE_COMPARATORY_BY_DEGREE_TYPE_AND_NAME)
+                .collect(Collectors.toList());
+
+        for (ExecutionDegree executionDegree : degrees) {
+
+            List<TutorshipIntention> degreeTutorshipIntentions = new ArrayList<>();
+            for (TutorshipIntention tutorshipIntention : executionDegree.getDegreeCurricularPlan().getTutorshipIntentionSet()) {
+                if (tutorshipIntention.getAcademicInterval().equals(executionDegree.getAcademicInterval())) {
+                    degreeTutorshipIntentions.add(tutorshipIntention);
+                }
+            }
+            degreeTutorshipIntentions.sort(TutorshipIntention.COMPARATOR_FOR_ATTRIBUTING_TUTOR_STUDENTS);
+            result.put(executionDegree.getPresentationName(), degreeTutorshipIntentions);
+        }
+
+
+        return result;
     }
 
     public static List<TutorshipIntention> getTutorshipIntentions(ExecutionDegree executionDegree) {
