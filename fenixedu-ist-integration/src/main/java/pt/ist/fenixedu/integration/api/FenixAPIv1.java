@@ -96,6 +96,7 @@ import org.fenixedu.academic.util.ContentType;
 import org.fenixedu.academic.util.EvaluationType;
 import org.fenixedu.academic.util.HourMinuteSecond;
 import org.fenixedu.bennu.core.domain.Avatar;
+import org.fenixedu.cms.domain.Category;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
@@ -1550,6 +1551,31 @@ public class FenixAPIv1 {
 
         return groupings;
 
+    }
+
+    /**
+     * Returns announcements for course by id
+     *
+
+     * @param oid
+     *            course id
+     * @return
+     */
+    @GET
+    @Produces(JSON_UTF8)
+    @Path("courses/{id}/announcements")
+    @OAuthEndpoint(PERSONAL_SCOPE)
+    public List<FenixCourseAnnouncement> courseAnnouncementsByOid(@PathParam("id") String oid) {
+        final ExecutionCourse executionCourse = getDomainObject(oid, ExecutionCourse.class);
+
+        List<FenixCourseAnnouncement> announcements = executionCourse.getSite().getCategoriesSet().stream()
+                .filter(category -> category.getSlug().equals("announcement"))
+                .flatMap(category -> category.getPostsSet().stream())
+                .filter(post -> post.isVisible() && post.getCanViewGroup().isMember(null))
+                .map(FenixCourseAnnouncement::new)
+                .collect(Collectors.toList());
+
+        return announcements;
     }
 
     /**
