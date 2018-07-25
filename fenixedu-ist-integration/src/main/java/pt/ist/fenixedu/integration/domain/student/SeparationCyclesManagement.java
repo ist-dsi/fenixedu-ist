@@ -146,7 +146,6 @@ public class SeparationCyclesManagement {
         moveExtraCurriculumGroupInformation(oldStudentCurricularPlan, newStudentCurricularPlan);
         moveExtraAttends(oldStudentCurricularPlan, newStudentCurricularPlan);
         tryRemoveOldSecondCycle(oldSecondCycle);
-        moveGratuityEventsInformation(oldStudentCurricularPlan, newStudentCurricularPlan);
         createAdministrativeOfficeFeeAndInsurance(newStudentCurricularPlan);
 
         markOldRegistrationWithConcludedState(oldStudentCurricularPlan);
@@ -581,32 +580,6 @@ public class SeparationCyclesManagement {
                 RegistrationState.createRegistrationState(oldStudentCurricularPlan.getRegistration(), null,
                         stateDate.toDateTimeAtStartOfDay(), stateType);
         state.setResponsiblePerson(null);
-    }
-
-    private void moveGratuityEventsInformation(final StudentCurricularPlan oldStudentCurricularPlan,
-            final StudentCurricularPlan newStudentCurricularPlan) {
-
-        if (!oldStudentCurricularPlan.hasGratuityEvent(getExecutionYear(), GratuityEventWithPaymentPlan.class)
-                || oldStudentCurricularPlan.getGratuityEvent(getExecutionYear(), GratuityEventWithPaymentPlan.class)
-                        .get().isCancelled()) {
-            return;
-        }
-
-        if (!newStudentCurricularPlan.hasGratuityEvent(getExecutionYear(), GratuityEventWithPaymentPlan.class)) {
-            correctRegistrationRegime(oldStudentCurricularPlan, newStudentCurricularPlan);
-            createGratuityEvent(newStudentCurricularPlan);
-        }
-
-        final GratuityEvent firstEvent =
-                oldStudentCurricularPlan.getGratuityEvent(getExecutionYear(), GratuityEventWithPaymentPlan.class).get();
-        final GratuityEvent secondEvent =
-                newStudentCurricularPlan.getGratuityEvent(getExecutionYear(), GratuityEventWithPaymentPlan.class).get();
-
-        if (!firstEvent.isGratuityEventWithPaymentPlan() || !secondEvent.isGratuityEventWithPaymentPlan()) {
-            throw new DomainException("error.SeparationCyclesManagement.unexpected.event.types");
-        }
-
-        movePayments((GratuityEventWithPaymentPlan) firstEvent, (GratuityEventWithPaymentPlan) secondEvent);
     }
 
     private void createGratuityEvent(final StudentCurricularPlan newStudentCurricularPlan) {
