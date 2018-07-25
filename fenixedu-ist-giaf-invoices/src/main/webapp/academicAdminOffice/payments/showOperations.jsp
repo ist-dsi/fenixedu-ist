@@ -86,6 +86,11 @@
 			<bean:message bundle="GIAF_INVOICES_RESOURCES" key="title.giaf.invoice.viewer" />
 		</html:link></li>
 	</ul>
+    <ul>
+        <li><html:link href="<%= request.getContextPath() + "/sap-invoice-viewer" %>" paramId="username" paramName="person" paramProperty="username">
+            <bean:message bundle="GIAF_INVOICES_RESOURCES" key="title.sap.invoice.viewer" />
+        </html:link></li>
+    </ul>
 	
 	<br/>
 	<strong><bean:message bundle="ACADEMIC_OFFICE_RESOURCES" key="label.documents"/></strong>

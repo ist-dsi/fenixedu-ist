@@ -78,6 +78,7 @@ import com.google.common.base.CharMatcher;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
+import eu.europa.ec.taxud.tin.algorithm.TINValid;
 import pt.ist.fenixedu.giaf.invoices.ClientMap;
 import pt.ist.fenixedu.giaf.invoices.Utils;
 import pt.ist.fenixedu.integration.domain.student.AffinityCyclesManagement;
@@ -197,7 +198,16 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
                     warnings.add(BundleUtil.getString("resources.FenixeduIstIntegrationResources", "label.person.details.country.none"));
                 }
 
-                final PhysicalAddress address = Utils.toAddress(person);
+                final String tin = ClientMap.uVATNumberFor(person);
+                final String tinCountryCode = tin != null && tin.length() > 2 && Character.isAlphabetic(tin.charAt(0)) && Character.isAlphabetic(tin.charAt(1)) ?
+                        tin.substring(0, 2) : null;
+                if (tin == null || tin.isEmpty()) {
+                    warnings.add(BundleUtil.getString("resources.FenixeduIstIntegrationResources", "label.person.details.vatNumber.none"));
+                } else if ("PT999999990".equals(tin) || tinCountryCode == null || TINValid.checkTIN(tinCountryCode, tin.substring(2)) != 0) {
+                    warnings.add(BundleUtil.getString("resources.FenixeduIstIntegrationResources", "label.person.details.vatNumber.invalid"));
+                }
+
+                final PhysicalAddress address = tinCountryCode == null ? null : Utils.toAddress(person, tinCountryCode);
                 final Country countryOfAddress = address == null ? null : address.getCountryOfResidence();
                 if (address == null) {
                     warnings.add(BundleUtil.getString("resources.FenixeduIstIntegrationResources", "label.person.details.address.none"));
@@ -208,17 +218,6 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
                         if (!isValidPostCode(hackAreaCodePT(address.getAreaCode(), countryOfAddress))) {
                             warnings.add(BundleUtil.getString("resources.FenixeduIstIntegrationResources", "label.person.details.address.postCode.invalid"));
                         }
-                    }
-                }
-
-                final String vat = ClientMap.uVATNumberFor(person);
-                if (vat == null) {
-                    warnings.add(BundleUtil.getString("resources.FenixeduIstIntegrationResources", "label.person.details.vatNumber.none"));
-                } else if ("PT999999990".equals(vat)) {
-                    warnings.add(BundleUtil.getString("resources.FenixeduIstIntegrationResources", "label.person.details.vatNumber.invalid"));
-                } else if ((country != null && "PT".equals(country.getCode())) || (countryOfAddress != null && "PT".equals(countryOfAddress.getCode()))) {
-                    if (!ClientMap.isVatValidForPT(vat.substring(2))) {
-                        warnings.add(BundleUtil.getString("resources.FenixeduIstIntegrationResources", "label.person.details.vatNumber.invalid"));
                     }
                 }
 

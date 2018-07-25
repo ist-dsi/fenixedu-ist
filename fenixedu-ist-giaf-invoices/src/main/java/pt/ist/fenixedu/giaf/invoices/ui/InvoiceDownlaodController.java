@@ -21,6 +21,7 @@ package pt.ist.fenixedu.giaf.invoices.ui;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -38,14 +39,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.google.common.io.ByteStreams;
 
+import pt.ist.fenixedu.domain.SapDocumentFile;
+import pt.ist.fenixedu.domain.SapRequest;
 import pt.ist.fenixedu.giaf.invoices.GiafEvent;
 
 @SpringFunctionality(app = InvoiceController.class, title = "title.giaf.invoice.viewer")
-@RequestMapping("/giaf-invoice-downloader")
+@RequestMapping("/invoice-downloader")
 public class InvoiceDownlaodController {
 
-    @RequestMapping(value = "/{event}/{filename}", method = RequestMethod.GET, produces = "application/pdf")
-    public void invoice(@PathVariable Event event, @PathVariable String filename, final HttpServletResponse response) {
+    @RequestMapping(value = "/giaf/{event}/{filename}", method = RequestMethod.GET, produces = "application/pdf")
+    public void giafInvoice(@PathVariable Event event, @PathVariable String filename, final HttpServletResponse response) {
         if (sAllowedToAccess(event)) {
             final File file =  GiafEvent.receiptFile(event, filename);
             if (file != null && file.exists()) {
@@ -61,6 +64,30 @@ public class InvoiceDownlaodController {
             response.setStatus(HttpStatus.FORBIDDEN.value());
             response.getClass();
         }
+    }
+
+    @RequestMapping(value = "/sap/{sapRequest}/{filename}", method = RequestMethod.GET, produces = "application/pdf")
+    public void sapInvoice(@PathVariable SapRequest sapRequest, @PathVariable String filename, final HttpServletResponse response) {
+        if (sAllowedToAccess(sapRequest.getEvent())) {
+            final SapDocumentFile sapDocumentFile = sapRequest.getSapDocumentFile();
+            if (sapDocumentFile == null) {
+                response.setStatus(HttpStatus.NOT_FOUND.value());
+            } else {
+                try (final InputStream inputStream = sapDocumentFile.getStream()) {
+                    response.setHeader("Content-Disposition", "attachment; filename=" + fullFilename(filename));
+                    ByteStreams.copy(inputStream, response.getOutputStream());
+                } catch (final IOException e) {
+                    throw new Error(e);
+                }
+            }
+        } else {
+            response.setStatus(HttpStatus.FORBIDDEN.value());
+        }
+        try {
+            response.flushBuffer();
+        } catch (final IOException e) {
+            throw new Error(e);
+        };
     }
 
     private String fullFilename(final String filename) {

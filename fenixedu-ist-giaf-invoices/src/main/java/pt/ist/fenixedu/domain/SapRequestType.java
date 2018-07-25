@@ -1,0 +1,7 @@
+package pt.ist.fenixedu.domain;
+
+public enum SapRequestType {
+
+    ADVANCEMENT, CREDIT, DEBT, DEBT_CREDIT, INVOICE, INVOICE_INTEREST, PAYMENT, PAYMENT_INTEREST, REIMBURSEMENT, ANNULMENT, FINE;
+
+}

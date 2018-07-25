@@ -95,7 +95,7 @@
 		}
         $(events).each(function(i, entry) {
 			if (entry.type == "payment" || entry.type == "fine") {
-				var link = contextPath + '/giaf-invoice-downloader/' + entry.eventId + '/' + entry.receiptNumber + '.pdf';
+				var link = contextPath + '/invoice-downloader/giaf/' + entry.eventId + '/' + entry.receiptNumber + '.pdf';
 				row = $('<tr/>').appendTo($('#invoiceList'))
 					.append($('<td/>').text(entry.paymentDate))
 					.append($('<td/>').text(entry.eventDescription))
