@@ -45,11 +45,9 @@ public class InitializeSapData extends CustomTask {
 
     @Override
     public void runTask() throws Exception {
-        payments = Money.ZERO;
-        exemptions = Money.ZERO;
-
         startYear = ExecutionYear.readExecutionYearByName("2015/2016");
         SAP_3RD_CYCLE_THRESHOLD = ExecutionYear.readExecutionYearByName("2014/2015");
+
         // in case transaction restarts... reset state.
         payments = Money.ZERO;
         exemptions = Money.ZERO;
@@ -128,6 +126,7 @@ public class InitializeSapData extends CustomTask {
                     SapRequestType.PAYMENT_INTEREST, Money.ZERO, EMPTY_JSON_OBJECT);
             sapPaymentRequest.setWhenSent(FIRST_DAY);
             sapPaymentRequest.setSent(true);
+            sapPaymentRequest.setIntegrated(true);
         }
 
         if (paidAmount.add(interestAndfineAmount).isZero()) {
@@ -164,6 +163,7 @@ public class InitializeSapData extends CustomTask {
 //                    amountToRegister = originalAmount.subtract(amountPayed);
                 }
             }
+
             exemptions = exemptions.add(amountToRegister);
 
             final String clientId;

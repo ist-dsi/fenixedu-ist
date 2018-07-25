@@ -245,7 +245,18 @@ public class SapEvent {
         if (creditEntry.getAmount().compareTo(remainingAmount.getAmount()) == 1) {
             if (openInvoices.size() > 1) {
                 // dividir o valor da isenção pelas várias facturas....
-                return registerCreditList(event, openInvoices, creditAmount, remainingAmount, clientId, null, errorLog, elogger);
+                return registerCreditList(event, openInvoices, creditEntry, new Money(creditEntry.getAmount()), remainingAmount,
+                        clientId, errorLog, elogger);
+            } else {
+                // o valor da isenção é superior ao valor em dívida
+                String invoiceNumber = "";
+                if (openInvoices.size() == 1) { // mas só existe uma factura abertura
+                    invoiceNumber = openInvoices.get(0).getDocumentNumber();
+                } else { // não existe nenhuma factura aberta, ir buscar a última
+                    invoiceNumber = getLastInvoiceNumber();
+                }
+                return registerCredit(clientId, event, creditEntry, new Money(creditEntry.getAmount()), invoiceNumber, errorLog,
+                        elogger);
             }
         } else {
             //tudo normal
