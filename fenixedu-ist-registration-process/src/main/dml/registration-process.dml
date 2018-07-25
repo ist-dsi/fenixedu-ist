@@ -1,5 +1,7 @@
 package pt.ist.registration.process.domain;
 
+enum pt.ist.registration.process.domain.RegistrationDeclarationFileState as RegistrationDeclarationFileState;
+
 class DeclarationTemplate {
     String name;
     LocalizedString displayName (REQUIRED);
@@ -23,6 +25,9 @@ class DeclarationTemplate {
 class RegistrationDeclarationFile extends .org.fenixedu.bennu.io.domain.GenericFile {
     String uniqueIdentifier (REQUIRED);
     Locale locale (REQUIRED);
+    RegistrationDeclarationFileState state;
+    String downloadSignedFileLink;
+    DateTime lastUpdated;
 }
 
 relation RegistrationDeclarationRegistration {
@@ -40,6 +45,15 @@ relation RegistrationDeclarationFileExecutionYear {
     }
 
     .org.fenixedu.academic.domain.ExecutionYear playsRole executionYear {
+        multiplicity 1..1;
+    }
+}
+
+relation RegistrationDeclarationPerson {
+    RegistrationDeclarationFile playsRole registrationDeclarationFile {
+        multiplicity *;
+    }
+    .org.fenixedu.bennu.core.domain.User playsRole creator {
         multiplicity 1..1;
     }
 }
