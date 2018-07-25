@@ -13,7 +13,7 @@
 
     <properties>
         <version.pt.ist.giaf-client-financial-documents>1.2.0</version.pt.ist.giaf-client-financial-documents>
-        <version.pt.ist.sap-sdk-java>DEV-SNAPSHOT</version.pt.ist.sap-sdk-java>
+        <version.pt.ist.sap-sdk-java>4.0.0</version.pt.ist.sap-sdk-java>
     </properties>
 
     <dependencies>
