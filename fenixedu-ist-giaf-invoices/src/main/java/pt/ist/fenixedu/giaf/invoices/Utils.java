@@ -126,6 +126,7 @@ public class Utils {
                 return false;
             }
         }
+
         final String eventDescription;
         try {
             eventDescription = event.getDescription().toString();
