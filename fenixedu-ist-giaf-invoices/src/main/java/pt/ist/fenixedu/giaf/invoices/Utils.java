@@ -213,7 +213,7 @@ public class Utils {
             .sorted((a1, a2) -> {
                 boolean d1 = a1.getDefaultContact();
                 boolean d2 = a2.getDefaultContact();
-                return d1 && !d2 ? 1 : d2 && !d1 ? -1 : a1.getExternalId().compareTo(a2.getExternalId());
+                return d1 && !d2 ? -1 : d2 && !d1 ? 1 : a1.getExternalId().compareTo(a2.getExternalId());
             })
             .findFirst().orElse(null);
     }
