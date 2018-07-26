@@ -609,7 +609,7 @@ public class SapEvent {
     }
 
     private boolean isToProcessDebt(Event event, boolean isGratuity) {
-        return isGratuity && !event.getWhenOccured().isAfter(EventWrapper.LIMIT);
+        return isGratuity && event.getWhenOccured().isAfter(EventWrapper.LIMIT);
     }
     /**
      * Sends the data to SAP
