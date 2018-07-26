@@ -44,12 +44,14 @@ import org.fenixedu.academic.domain.accounting.events.PastAdministrativeOfficeFe
 import org.fenixedu.academic.domain.accounting.events.SpecialSeasonEnrolmentEvent;
 import org.fenixedu.academic.domain.accounting.events.candidacy.IndividualCandidacyEvent;
 import org.fenixedu.academic.domain.accounting.events.dfa.DFACandidacyEvent;
+import org.fenixedu.academic.domain.accounting.events.gratuity.ExternalScholarshipGratuityContributionEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEventWithPaymentPlan;
 import org.fenixedu.academic.domain.accounting.events.insurance.InsuranceEvent;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
 import org.fenixedu.academic.domain.degreeStructure.CycleType;
 import org.fenixedu.academic.domain.exceptions.DomainException;
+import org.fenixedu.academic.domain.organizationalStructure.Party;
 import org.fenixedu.academic.domain.phd.debts.PhdEvent;
 import org.fenixedu.academic.domain.phd.debts.PhdGratuityEvent;
 import org.fenixedu.academic.domain.student.Registration;
@@ -110,6 +112,9 @@ public class Utils {
         if (event.isCancelled()) {
             return false;
         }
+        if (event instanceof ExternalScholarshipGratuityContributionEvent) {
+            return false;
+        }
         final String eventDescription;
         try {
             eventDescription = event.getDescription().toString();
@@ -128,57 +133,58 @@ public class Utils {
             return false;
         }
 
-        if (event.getParty().isPerson()) {
-            final Person person = event.getPerson();
-            final Country country = person.getCountry();
+        final Party party = event.getParty();
+        final Country country = party.getCountry();
 
-            final String articleCode = Utils.mapToArticleCode(event, eventDescription);
-            if (articleCode == null) {
-                if (eventDescription.indexOf("Pagamento da resid") != 0) {
-                    logError(consumer, "No Article Code", event, null, "", null, null, null, null, event);
-                }
-                return false;
+        final String articleCode = Utils.mapToArticleCode(event, eventDescription);
+        if (articleCode == null) {
+            if (eventDescription.indexOf("Pagamento da resid") != 0) {
+                logError(consumer, "No Article Code", event, null, "", null, null, null, null, event);
             }
-
-            if (country == null) {
-                logError(consumer, "No Country", event, person.getUsername(), "", country, person, null, null, event);
-                return false;
-            }
-            final PhysicalAddress address = toAddress(person, country.getCode());
-            if (address == null) {
-                logError(consumer, "No Address", event, person.getUsername(), "", country, person, address, null, event);
-                return false;
-            }
-            final Country countryOfAddress = address.getCountryOfResidence();
-            if (countryOfAddress == null) {
-                logError(consumer, "No Valid Country for Address", event, person.getUsername(), "", country, person, address, countryOfAddress, event);
-                return false;
-            } else if ("PT".equals(countryOfAddress.getCode()) /* || "PT".equals(country.getCode()) */) {
-                if (!isValidPostCode(hackAreaCodePT(address.getAreaCode(), countryOfAddress))) {
-                    logError(consumer, "No Valid Post Code For Address For", event, person.getUsername(), "", country, person, address, countryOfAddress, event);
-                    return false;
-                }
-            }
-
-            final String vat = ClientMap.uVATNumberFor(person);
-            if (vat == null) {
-                logError(consumer, "No VAT Number", event, person.getUsername(), vat, country, person, address, countryOfAddress, event);
-                return false;
-            }
-            if ("PT".equals(country.getCode())) {
-                if (!ClientMap.isVatValidForPT(vat.substring(2))) {
-                    logError(consumer, "Not a Valid PT VAT Number", event, person.getUsername(), vat, country, person, address, countryOfAddress, event);
-                    return false;
-                }
-            }
-            if ("PT999999990".equals(vat) && originalAmountToPay.greaterThan(new Money(100))) {
-                logError(consumer, "No VAT Number", event, person.getUsername(), vat, country, person, address, countryOfAddress, event);            
-                return false;
-            }
-        } else {
-            //consumer.accept(t, "Not a person", event.getParty().toString());
             return false;
         }
+
+        if (country == null) {
+            logError(consumer, "No Country", event, getUserIdentifier(party), "", country, party, null, null, event);
+            return false;
+        }
+        final PhysicalAddress address = toAddress(party, country.getCode());
+        if (address == null) {
+            logError(consumer, "No Address", event, getUserIdentifier(party), "", country, party, address, null, event);
+            return false;
+        }
+        final Country countryOfAddress = address.getCountryOfResidence();
+        if (countryOfAddress == null) {
+            logError(consumer, "No Valid Country for Address", event, getUserIdentifier(party), "", country, party, address,
+                    countryOfAddress, event);
+            return false;
+        } else if ("PT".equals(countryOfAddress.getCode()) /* || "PT".equals(country.getCode()) */) {
+            if (!isValidPostCode(hackAreaCodePT(address.getAreaCode(), countryOfAddress))) {
+                logError(consumer, "No Valid Post Code For Address For", event, getUserIdentifier(party), "", country, party,
+                        address, countryOfAddress, event);
+                return false;
+            }
+        }
+
+        final String vat = ClientMap.uVATNumberFor(party);
+        if (vat == null) {
+            logError(consumer, "No VAT Number", event, getUserIdentifier(party), vat, country, party, address, countryOfAddress,
+                    event);
+            return false;
+        }
+        if ("PT".equals(country.getCode())) {
+            if (!ClientMap.isVatValidForPT(vat.substring(2))) {
+                logError(consumer, "Not a Valid PT VAT Number", event, getUserIdentifier(party), vat, country, party, address,
+                        countryOfAddress, event);
+                return false;
+            }
+        }
+        if ("PT999999990".equals(vat) && originalAmountToPay.greaterThan(new Money(100))) {
+            logError(consumer, "No VAT Number", event, getUserIdentifier(party), vat, country, party, address, countryOfAddress,
+                    event);
+            return false;
+        }
+
 
         final BigDecimal amount = originalAmountToPay.getAmount();
         //final BigDecimal amount = event.getOriginalAmountToPay().getAmount();
@@ -194,6 +200,14 @@ public class Utils {
         return true;
     }
 
+    public static String getUserIdentifier(Party party) {
+        if (party.isPerson()) {
+            return ((Person) party).getUsername();
+        } else {
+            return party.getSocialSecurityNumber();
+        }
+    }
+
     public static String splitPath(final String id) {
         final StringBuilder b = new StringBuilder();
         for (int i = 0; i < id.length() - 1; i++, i++) {
@@ -204,8 +218,8 @@ public class Utils {
         return b.toString();
     }
 
-    public static PhysicalAddress toAddress(final Person person, final String countryCode) {
-        return person.getPartyContactsSet().stream()
+    public static PhysicalAddress toAddress(final Party party, final String countryCode) {
+        return party.getPartyContactsSet().stream()
             .filter(pc -> pc instanceof PhysicalAddress)
             .map(pc -> (PhysicalAddress) pc)
             .filter(a -> a.getCountryOfResidence() != null && countryCode.equals(a.getCountryOfResidence().getCode()))
@@ -236,7 +250,7 @@ public class Utils {
     }
 
     private static void logError(final ErrorLogConsumer consumer, final String error, final Event event, final String user, final String vat, final Country country,
-            final Person person, final PhysicalAddress address, final Country countryOfAddress, final Event e) {
+            final Party party, final PhysicalAddress address, final Country countryOfAddress, final Event e) {
 
         if (consumer == null) {
             return;
@@ -256,7 +270,7 @@ public class Utils {
         consumer.accept(
                 event.getExternalId(),
                 user,
-                person == null ? "" : person.getName(),
+                party == null ? "" : party.getName(),
                 amount == null ? "" : amount.toPlainString(),
                 cycleType == null ? "" : cycleType.getDescription(),
                 error,

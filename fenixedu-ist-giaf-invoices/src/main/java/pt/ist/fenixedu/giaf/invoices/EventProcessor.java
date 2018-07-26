@@ -245,7 +245,7 @@ public class EventProcessor {
             cycleType = null;
         }
 
-        errorLog.accept(event.getExternalId(), event.getPerson().getUsername(), event.getPerson().getName(),
+        errorLog.accept(event.getExternalId(), Utils.getUserIdentifier(event.getParty()), event.getParty().getName(),
                 amount == null ? "" : amount.toPlainString(), cycleType == null ? "" : cycleType.getDescription(), errorMessage,
                 "", "", "", "", "", "", "", "", "", "", "");
         elogger.log("%s: %s%n", event.getExternalId(), errorMessage);
@@ -272,7 +272,7 @@ public class EventProcessor {
             cycleType = null;
         }
 
-        errorLog.accept(event.getExternalId(), event.getPerson().getUsername(), event.getPerson().getName(),
+        errorLog.accept(event.getExternalId(), Utils.getUserIdentifier(event.getParty()), event.getParty().getName(),
                 amount == null ? "" : amount.toPlainString(), cycleType == null ? "" : cycleType.getDescription(), errorMessage,
                 "", "", "", "", "", "", "", "", "", "", "");
         elogger.log("%s: %s %s %s %n", event.getExternalId(), errorMessage, "", "");

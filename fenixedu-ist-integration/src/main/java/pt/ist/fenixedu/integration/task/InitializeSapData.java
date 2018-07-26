@@ -33,7 +33,7 @@ public class InitializeSapData extends CustomTask {
     private boolean needsProcessing(final Event event) {
         try {
             final ExecutionYear executionYear = Utils.executionYearOf(event);
-            return event.getSapRequestSet().isEmpty() && !event.isCancelled()
+            return !event.getParty().isPerson() && event.getSapRequestSet().isEmpty() && !event.isCancelled()
                     && (!executionYear.isBefore(startYear)
                             || (event instanceof PhdGratuityEvent && !executionYear.isBefore(SAP_3RD_CYCLE_THRESHOLD)))
                     && (!event.getAccountingTransactionsSet().isEmpty() || !event.getExemptionsSet().isEmpty());
@@ -79,14 +79,7 @@ public class InitializeSapData extends CustomTask {
 
         final Money paidAmount = new Money(debtInterestCalculator.getPaidDebtAmount());
 
-        final String clientId;
-        if (event.getParty().isPerson()) {
-            clientId = ClientMap.uVATNumberFor(event.getPerson());
-        } else {
-            //clientId = event.getParty().getExternalId();
-            //taskLog("Dívida de empresa!! - %s\n", clientId);
-            return Money.ZERO;
-        }
+        final String clientId = ClientMap.uVATNumberFor(event.getParty());
 
         if (paidAmount.isPositive()) {
             payments = payments.add(paidAmount);
@@ -139,7 +132,7 @@ public class InitializeSapData extends CustomTask {
                 sapAdvancementRequest.setIntegrated(true);
             }
         }
-        return Money.ZERO;
+        return paidAmount;
     }
 
     private boolean isPartialRegime(final Event event) {
@@ -166,14 +159,7 @@ public class InitializeSapData extends CustomTask {
 
             exemptions = exemptions.add(amountToRegister);
 
-            final String clientId;
-            if (event.getParty().isPerson()) {
-                clientId = ClientMap.uVATNumberFor(event.getPerson());
-            } else {
-                clientId = event.getParty().getExternalId();
-                //taskLog("Dívida de empresa!! - %s\n", clientId);
-                return;
-            }
+            final String clientId = ClientMap.uVATNumberFor(event.getParty());
 
             //an exemption should be considered as a payment for the initialization
             final SapRequest sapInvoiceRequest = new SapRequest(event, clientId, amountToRegister, "ND0", SapRequestType.INVOICE,
@@ -212,14 +198,8 @@ public class InitializeSapData extends CustomTask {
             taskLog("O evento: %s - tem nota de crédito associada, no valor de: %s\n", event.getExternalId(),
                     amountToRegister.toPlainString());
 
-            final String clientId;
-            if (event.getParty().isPerson()) {
-                clientId = ClientMap.uVATNumberFor(event.getPerson());
-            } else {
-                clientId = event.getParty().getExternalId();
-                //taskLog("Dívida de empresa!! - %s\n", clientId);
-                return;
-            }
+            final String clientId = ClientMap.uVATNumberFor(event.getParty());
+
             final SapRequest sapRequest = new SapRequest(event, clientId, amountToRegister, "NR0", SapRequestType.REIMBURSEMENT,
                     Money.ZERO, EMPTY_JSON_OBJECT);
             sapRequest.setWhenSent(FIRST_DAY);

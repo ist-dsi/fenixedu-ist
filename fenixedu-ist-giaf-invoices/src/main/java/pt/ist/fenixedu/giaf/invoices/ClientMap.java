@@ -12,6 +12,7 @@ import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
+import org.fenixedu.academic.domain.organizationalStructure.Party;
 import org.fenixedu.bennu.GiafInvoiceConfiguration;
 
 import com.google.common.base.Strings;
@@ -65,9 +66,9 @@ public class ClientMap {
         return getClientId(p) != null;
     }
 
-    public static String uVATNumberFor(final Person person) {
-        final Country country = person.getCountry();
-        final String ssn = person.getSocialSecurityNumber();
+    public static String uVATNumberFor(final Party party) {
+        final Country country = party.getCountry();
+        final String ssn = party.getSocialSecurityNumber();
 
         if (ssn != null && ssn.length() > 2 && TINValid.checkTIN(ssn.substring(0, 2), ssn.substring(2)) == 0) {
             return ssn;
