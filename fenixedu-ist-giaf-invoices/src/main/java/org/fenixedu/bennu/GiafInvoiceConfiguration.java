@@ -52,6 +52,10 @@ public class GiafInvoiceConfiguration {
         @ConfigurationProperty(key = "pt.sap.mails.bcc", defaultValue = "/dev/null",
                 description = "Filename with the bcc email addresses to report errors.")
         public String clientSapLogErrorsMailsBcc();
+
+        @ConfigurationProperty(key = "pt.sap.sync.active", defaultValue = "true",
+                description = "Filename with the bcc email addresses to report errors.")
+        public boolean sapSyncActive();
     }
 
     public static ConfigurationProperties getConfiguration() {

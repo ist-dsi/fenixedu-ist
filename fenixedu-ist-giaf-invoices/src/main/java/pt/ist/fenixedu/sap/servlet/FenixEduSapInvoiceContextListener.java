@@ -12,6 +12,7 @@ import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.EventState;
 import org.fenixedu.academic.domain.accounting.EventState.ChangeStateEvent;
 import org.fenixedu.academic.domain.accounting.Exemption;
+import org.fenixedu.bennu.GiafInvoiceConfiguration;
 import org.fenixedu.bennu.core.signals.DomainObjectEvent;
 import org.fenixedu.bennu.core.signals.Signal;
 
@@ -25,11 +26,13 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
 
     @Override
     public void contextInitialized(final ServletContextEvent sce) {
-        Signal.register(AccountingTransaction.SIGNAL_ANNUL, this::handlerAccountingTransactionAnnulment);
-        Signal.register(EventState.EVENT_STATE_CHANGED, this::handlerEventStateChange);
+        if (GiafInvoiceConfiguration.getConfiguration().sapSyncActive()) {
+            Signal.register(AccountingTransaction.SIGNAL_ANNUL, this::handlerAccountingTransactionAnnulment);
+            Signal.register(EventState.EVENT_STATE_CHANGED, this::handlerEventStateChange);
 
-        FenixFramework.getDomainModel().registerDeletionBlockerListener(Exemption.class, this::blockExemption);
-        FenixFramework.getDomainModel().registerDeletionBlockerListener(Discount.class, this::blockDiscount);
+            FenixFramework.getDomainModel().registerDeletionBlockerListener(Exemption.class, this::blockExemption);
+            FenixFramework.getDomainModel().registerDeletionBlockerListener(Discount.class, this::blockDiscount);
+        }
     }
     
     @Override
