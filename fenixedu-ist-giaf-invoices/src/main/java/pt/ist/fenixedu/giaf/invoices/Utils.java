@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -136,10 +137,10 @@ public class Utils {
         final Party party = event.getParty();
         final Country country = party.getCountry();
 
-        final String articleCode = Utils.mapToArticleCode(event, eventDescription);
+        final SimpleImmutableEntry<String, String> articleCode = SapEvent.mapToProduct(event, eventDescription, false, false);
         if (articleCode == null) {
             if (eventDescription.indexOf("Pagamento da resid") != 0) {
-                logError(consumer, "No Article Code", event, null, "", null, null, null, null, event);
+                logError(consumer, "No Article Code - Residence", event, null, "", null, null, null, null, event);
             }
             return false;
         }

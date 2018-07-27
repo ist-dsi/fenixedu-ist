@@ -1161,8 +1161,8 @@ public class SapEvent {
         }
     }
 
-    private SimpleImmutableEntry<String, String> mapToProduct(Event event, String eventDescription, boolean isDebtRegistration,
-            boolean isInterest) {
+    public static SimpleImmutableEntry<String, String> mapToProduct(Event event, String eventDescription,
+            boolean isDebtRegistration, boolean isInterest) {
         if (isInterest) {
             return new SimpleImmutableEntry<String, String>("0036", "MULTAS");
         }
