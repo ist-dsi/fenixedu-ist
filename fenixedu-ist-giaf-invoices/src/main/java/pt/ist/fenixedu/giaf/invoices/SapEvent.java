@@ -1218,6 +1218,9 @@ public class SapEvent {
                 return new SimpleImmutableEntry<String, String>("0029", "PROPINAS 3 CICLO");
             }
         }
+        if (event instanceof ExternalScholarshipPhdGratuityContribuitionEvent) {
+            return new SimpleImmutableEntry<String, String>("0029", "PROPINAS 3 CICLO");
+        }
         if (event.isResidenceEvent()) {
             return null;
         }
