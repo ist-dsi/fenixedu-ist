@@ -39,7 +39,6 @@ import org.fenixedu.bennu.core.signals.Signal;
 import pt.ist.fenixedu.contracts.domain.Employee;
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.ExternalContract;
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.PersonFunction;
-import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
 import pt.ist.sap.client.UsernameProvider;
 import pt.ist.sap.group.integration.domain.SapWrapper;
@@ -111,21 +110,11 @@ public class FenixEduGiafContractsContextListener implements ServletContextListe
         }
         SapSdkConfiguration.setSapUserValidator(() -> true);
 
-        new Thread() {
-            @Atomic
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(10000);
-                } catch (final InterruptedException e) {
-                }
-                if (Bennu.getInstance().getSapWrapperCacheEntrySet().isEmpty()) {
-                    new RoleSyncTask().run();
-                } else {
-                    SapWrapper.initFromCache().complete();
-                }
-            }
-        }.start();
+        if (Bennu.getInstance().getSapWrapperCacheEntrySet().isEmpty()) {
+            new RoleSyncTask().run();
+        } else {
+            SapWrapper.initFromCache().complete();
+        }
     }
 
     private static void fillParticipantAffiliationAndCategory(DomainObjectEvent<ThesisEvaluationParticipant> event) {
