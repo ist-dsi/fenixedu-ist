@@ -907,7 +907,7 @@ public class SapEvent {
     }
 
     private void checkValidDocumentNumber(String documentNumber, Event event) throws Exception {
-        if ("0".equals(documentNumber.charAt(2))) {
+        if ('0' == documentNumber.charAt(2)) {
             throw new Exception("Houve uma tentativa de efectuar uma operação sobre o documento: " + documentNumber
                     + " - evento: " + event.getExternalId());
         }
