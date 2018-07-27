@@ -39,6 +39,7 @@ import org.fenixedu.bennu.core.signals.Signal;
 import pt.ist.fenixedu.contracts.domain.Employee;
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.ExternalContract;
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.PersonFunction;
+import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
 import pt.ist.sap.client.UsernameProvider;
 import pt.ist.sap.group.integration.domain.SapWrapper;
@@ -100,6 +101,7 @@ public class FenixEduGiafContractsContextListener implements ServletContextListe
                 FenixEduGiafContractsContextListener::fillParticipantAffiliationAndCategory);
     }
 
+    @Atomic(mode = Atomic.TxMode.READ)
     private void initSapWrapper() {
         if (SapWrapper.institutions.isEmpty()) {
             SapWrapper.institutionCode =
