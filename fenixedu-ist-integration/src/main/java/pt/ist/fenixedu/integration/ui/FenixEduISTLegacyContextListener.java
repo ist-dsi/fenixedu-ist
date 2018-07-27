@@ -85,6 +85,7 @@ import pt.ist.fenixedu.integration.domain.student.AffinityCyclesManagement;
 import pt.ist.fenixedu.integration.domain.student.PreEnrolment;
 import pt.ist.fenixedu.integration.dto.QucProfessorshipEvaluation;
 import pt.ist.fenixedu.teacher.evaluation.domain.ProfessorshipEvaluationBean;
+import pt.ist.fenixedu.util.PostalCodeValidator;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
 import pt.ist.fenixframework.FenixFramework;
@@ -198,7 +199,7 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
                     warnings.add(BundleUtil.getString("resources.FenixeduIstIntegrationResources", "label.person.details.country.none"));
                 }
 
-                final String tin = ClientMap.uVATNumberFor(person);
+                final String tin = person.getSocialSecurityNumber();
                 final String tinCountryCode = tin != null && tin.length() > 2 && Character.isAlphabetic(tin.charAt(0)) && Character.isAlphabetic(tin.charAt(1)) ?
                         tin.substring(0, 2) : null;
                 if (tin == null || tin.isEmpty()) {
@@ -214,10 +215,19 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
                 } else {
                     if (countryOfAddress == null) {
                         warnings.add(BundleUtil.getString("resources.FenixeduIstIntegrationResources", "label.person.details.address.country.none"));
-                    } else if ("PT".equals(countryOfAddress.getCode())) {
-                        if (!isValidPostCode(hackAreaCodePT(address.getAreaCode(), countryOfAddress))) {
-                            warnings.add(BundleUtil.getString("resources.FenixeduIstIntegrationResources", "label.person.details.address.postCode.invalid"));
-                        }
+                    } else if (address.getAreaCode() == null || !PostalCodeValidator.isValidAreaCode(countryOfAddress.getCode(), address.getAreaCode())) {
+                        warnings.add(BundleUtil.getString("resources.FenixeduIstIntegrationResources", "label.person.details.address.postCode.invalid"));
+                    }
+                }
+
+                if (tinCountryCode != null) {
+                    final PhysicalAddress addressForTin = Utils.toAddress(person, tinCountryCode);
+                    if (addressForTin == null) {
+                        warnings.add(BundleUtil.getString("resources.FenixeduIstIntegrationResources", "label.person.details.no.address.for.tin"));
+                    } else if (addressForTin.getCountryOfResidence() == null) {
+                        throw new Error("should never happen because address lookup was by country code");
+                    } else if (addressForTin.getAreaCode() == null || !PostalCodeValidator.isValidAreaCode(tinCountryCode, addressForTin.getAreaCode())) {
+                        warnings.add(BundleUtil.getString("resources.FenixeduIstIntegrationResources", "label.person.details.no.valid.post.code.for.tin"));
                     }
                 }
 
