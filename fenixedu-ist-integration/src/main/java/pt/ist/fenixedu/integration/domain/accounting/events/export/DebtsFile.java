@@ -27,6 +27,7 @@ import org.fenixedu.academic.FenixEduAcademicConfiguration;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.accounting.Event;
+import org.fenixedu.academic.domain.accounting.EventState;
 import org.fenixedu.academic.domain.accounting.ResidenceEvent;
 import org.fenixedu.academic.domain.accounting.events.AnnualEvent;
 import org.fenixedu.academic.domain.residence.ResidenceMonth;
@@ -58,7 +59,7 @@ public abstract class DebtsFile extends DebtsFile_Base {
 
         for (final AnnualEvent event : executionYear.getAnnualEventsSet()) {
             try {
-                if (getAcceptedEventClasses().contains(event.getClass()) && event.isOpen()) {
+                if (getAcceptedEventClasses().contains(event.getClass()) && isOpen(event)) {
                     getEventsForPerson(result, event.getPerson()).add(event);
                 }
             } catch (Throwable e) {
@@ -69,7 +70,7 @@ public abstract class DebtsFile extends DebtsFile_Base {
         if (ResidenceYear.hasCurrentYear()) {
             for (final ResidenceMonth month : ResidenceYear.getCurrentYear().getMonthsSet()) {
                 for (final ResidenceEvent residenceEvent : month.getEventsSet()) {
-                    if (residenceEvent.isOpen() && residenceEvent.getPaymentLimitDate().isAfterNow()) {
+                    if (isOpen(residenceEvent) && residenceEvent.getPaymentLimitDate().isAfterNow()) {
                         getEventsForPerson(result, residenceEvent.getPerson()).add(residenceEvent);
                     }
                 }
@@ -79,6 +80,11 @@ public abstract class DebtsFile extends DebtsFile_Base {
         return result;
     }
 
+    private boolean isOpen(final Event event) {
+    	final EventState state = event.getCurrentEventState();
+    	return state != null && state == EventState.OPEN;
+    }
+    
     protected abstract List<Class> getAcceptedEventClasses();
 
     protected List<Event> getEventsForPerson(final Map<Person, List<Event>> result, final Person person) {

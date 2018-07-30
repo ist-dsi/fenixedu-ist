@@ -35,6 +35,7 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.accessControl.AcademicAuthorizationGroup;
 import org.fenixedu.academic.domain.accessControl.academicAdministration.AcademicOperationType;
 import org.fenixedu.academic.domain.accounting.Event;
+import org.fenixedu.academic.domain.accounting.EventState;
 import org.fenixedu.academic.domain.accounting.PaymentCode;
 import org.fenixedu.academic.domain.accounting.ResidenceEvent;
 import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeAndInsuranceEvent;
@@ -227,7 +228,7 @@ public class SIBSOutgoingPaymentFile extends SIBSOutgoingPaymentFile_Base {
 
         .filter(e -> e instanceof SpecialSeasonEnrolmentEvent)
 
-        .filter(Event::isOpen)
+        .filter(this::isOpen)
 
         .flatMap(e -> e.getAllPaymentCodes().stream())
 
@@ -236,6 +237,11 @@ public class SIBSOutgoingPaymentFile extends SIBSOutgoingPaymentFile_Base {
         .forEach(pc -> addPaymentCode(sibsFile, pc, errorsBuilder));
     }
 
+    private boolean isOpen(final Event event) {
+    	final EventState state = event.getCurrentEventState();
+    	return state != null && state == EventState.OPEN;
+    }
+    
     protected void addPaymentCode(final SibsOutgoingPaymentFile file, final PaymentCode paymentCode, StringBuilder errorsBuilder) {
         try {
             file.addAssociatedPaymentCode(paymentCode);
