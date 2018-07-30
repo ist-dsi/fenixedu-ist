@@ -105,12 +105,14 @@ public class SapEvent {
         if (checkAndRegisterIntegration(event, errorLog, elogger, data, documentNumber, sapRequest, result,
                 SapRequestType.INVOICE.name(), true)) {
             // if there are amounts in advancement we need to register them in the new invoice
-            Money advancementAmount = getAdvancementAmount();
-            if (advancementAmount.isPositive()) {
-                return registerPaymentFromAdvancement(event, clientId, advancementAmount, sapRequest, errorLog, elogger);
-            } else {
-                return true;
-            }
+            //TODO if we do this the value registered in the advancement will be counted 2 times in different categories
+//            Money advancementAmount = getAdvancementAmount();
+//            if (advancementAmount.isPositive()) {
+//                return registerPaymentFromAdvancement(event, clientId, advancementAmount, sapRequest, errorLog, elogger);
+//            } else {
+//                return true;
+//            }
+            return true;
         } else {
             return false;
         }
@@ -1055,7 +1057,7 @@ public class SapEvent {
     }
 
     public Money getPayedAmount() {
-        return addAll(SapRequestType.PAYMENT);
+        return addAll(SapRequestType.PAYMENT).add(addAll(SapRequestType.ADVANCEMENT));
     }
 
     public Money getCreditAmount() {
@@ -1063,7 +1065,7 @@ public class SapEvent {
     }
 
     public Money getAdvancementAmount() {
-        return event.getSapRequestSet().stream().filter(sr -> sr.getRequestType().equals(SapRequestType.PAYMENT))
+        return event.getSapRequestSet().stream().filter(sr -> sr.getRequestType().equals(SapRequestType.ADVANCEMENT))
                 .map(SapRequest::getAdvancement).reduce(Money.ZERO, Money::add);
     }
 
