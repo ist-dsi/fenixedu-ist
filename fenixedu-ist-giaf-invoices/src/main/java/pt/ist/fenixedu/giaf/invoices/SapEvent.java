@@ -1076,13 +1076,15 @@ public class SapEvent {
     }
 
     public boolean hasPayment(final String transactionDetailId) {
-        return event.getSapRequestSet().stream().filter(sr -> sr.getRequestType() == SapRequestType.PAYMENT)
+        return event.getSapRequestSet().stream()
+                .filter(sr -> sr.getRequestType() == SapRequestType.PAYMENT || sr.getRequestType() == SapRequestType.ADVANCEMENT)
                 .filter(sr -> sr.getPayment() != null)
                 .filter(sr -> transactionDetailId.equals(sr.getPayment().getExternalId())).findAny().isPresent();
     }
 
     public boolean hasPayment(final AccountingTransaction transaction, SapRequest sapRequest) {
-        return event.getSapRequestSet().stream().filter(sr -> sr.getRequestType() == SapRequestType.PAYMENT)
+        return event.getSapRequestSet().stream()
+                .filter(sr -> sr.getRequestType() == SapRequestType.PAYMENT || sr.getRequestType() == SapRequestType.ADVANCEMENT)
                 .filter(sr -> sr.getPayment() != null)
                 .filter(sr -> transaction == sr.getPayment()).filter(sr -> sr != sapRequest).findAny().isPresent();
     }
