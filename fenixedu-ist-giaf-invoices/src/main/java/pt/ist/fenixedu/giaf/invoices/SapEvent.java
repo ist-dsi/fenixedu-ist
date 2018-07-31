@@ -855,6 +855,12 @@ public class SapEvent {
 
         String postalCode =
                 physicalAddress == null ? null : Utils.limitFormat(MAX_SIZE_POSTAL_CODE, physicalAddress.getAreaCode()).trim();
+        //sometimes the address is correct but the vatNumber doesn't exists and a random one was generated from the birth country
+        //in that case we must send a valid postal code for that country, even if it is not the address country
+        if (physicalAddress.getCountryOfResidence() != null
+                && !physicalAddress.getCountryOfResidence().getCode().equals(countryCode)) {
+            postalCode = PostalCodeValidator.examplePostCodeFor(countryCode);
+        }
         clientData.addProperty("postalCode",
                 !Strings.isNullOrEmpty(postalCode) ? postalCode : PostalCodeValidator.examplePostCodeFor(countryCode));
 
