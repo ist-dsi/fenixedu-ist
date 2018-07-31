@@ -233,7 +233,6 @@ public class Utils {
         return party.getPartyContactsSet().stream()
             .filter(pc -> pc instanceof PhysicalAddress)
             .map(pc -> (PhysicalAddress) pc)
-            .filter(a -> a.getCountryOfResidence() != null && countryCode.equals(a.getCountryOfResidence().getCode()))
             .sorted((a1, a2) -> {
                 boolean d1 = a1.getDefaultContact();
                 boolean d2 = a2.getDefaultContact();
