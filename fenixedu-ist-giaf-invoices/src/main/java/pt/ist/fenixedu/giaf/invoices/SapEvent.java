@@ -71,6 +71,7 @@ public class SapEvent {
     private static final int MAX_SIZE_CITY = 50;
     private static final int MAX_SIZE_REGION = 50;
     private static final int MAX_SIZE_POSTAL_CODE = 20;
+    private static final int MAX_SIZE_VAT_NUMBER = 20;
     private static final DateTimeFormatter localDateFormatter =
             new DateTimeFormatterFactory("yyyy-MM-dd").createDateTimeFormatter();
     public LocalDate currentDate = new LocalDate();
@@ -618,9 +619,9 @@ public class SapEvent {
             String clientId, boolean isInterest) throws Exception {
         JsonObject data =
                 toJson(transactionDetail.getEvent(), clientId, transactionDetail.getWhenRegistered(), false, false, isInterest);
-        JsonObject paymentDocument =
-                toJsonPaymentDocument(amount, "NP", invoiceNumber, new DateTime(), getPaymentMechanism(transactionDetail),
-                        getPaymentMethodReference(transactionDetail), SAFTPTSettlementType.NL.toString(), true);
+        JsonObject paymentDocument = toJsonPaymentDocument(amount, "NP", invoiceNumber, transactionDetail.getWhenRegistered(),
+                getPaymentMechanism(transactionDetail), getPaymentMethodReference(transactionDetail),
+                SAFTPTSettlementType.NL.toString(), true);
 
         data.add("paymentDocument", paymentDocument);
         return data;
@@ -641,9 +642,9 @@ public class SapEvent {
             AccountingTransactionDetail transactionDetail) throws Exception {
         JsonObject data =
                 toJson(transactionDetail.getEvent(), clientId, transactionDetail.getWhenRegistered(), false, false, false);
-        JsonObject paymentDocument =
-                toJsonPaymentDocument(amount, "NP", invoiceNumber, new DateTime(), getPaymentMechanism(transactionDetail),
-                        getPaymentMethodReference(transactionDetail), SAFTPTSettlementType.NL.toString(), true);
+        JsonObject paymentDocument = toJsonPaymentDocument(amount, "NP", invoiceNumber, transactionDetail.getWhenRegistered(),
+                getPaymentMechanism(transactionDetail), getPaymentMethodReference(transactionDetail),
+                SAFTPTSettlementType.NL.toString(), true);
         paymentDocument.addProperty("excessPayment", excess.toPlainString());
         paymentDocument.addProperty("isAdvancedPayment", true);
 
@@ -667,7 +668,7 @@ public class SapEvent {
         json.add("workingDocument", workDocument);
 
         String workingDocumentNumber = workDocument.get("workingDocumentNumber").getAsString();
-        JsonObject paymentDocument = toJsonPaymentDocument(creditAmount, "NP", workingDocumentNumber, new DateTime(), "OU", "",
+        JsonObject paymentDocument = toJsonPaymentDocument(creditAmount, "NP", workingDocumentNumber, documentDate, "OU", "",
                 SAFTPTSettlementType.NN.toString(), false);
         paymentDocument.addProperty("isCreditNote", true);
         paymentDocument.addProperty("paymentOriginDocNumber", invoiceNumber);
@@ -748,7 +749,6 @@ public class SapEvent {
                     .toLocalDate() : phdEvent.getWhenOccured().toLocalDate();
             endDate = startDate.plusYears(1);
         }
-
 
         String metadata = String.format("{\"ANO_LECTIVO\":\"%s\", \"START_DATE\":\"%s\", \"END_DATE\":\"%s\"}",
                 executionYear.getName(), startDate.toString("yyyy-MM-dd"), endDate.toString("yyyy-MM-dd"));
@@ -858,7 +858,7 @@ public class SapEvent {
         clientData.addProperty("postalCode",
                 !Strings.isNullOrEmpty(postalCode) ? postalCode : PostalCodeValidator.examplePostCodeFor(countryCode));
 
-        clientData.addProperty("vatNumber", clientId);
+        clientData.addProperty("vatNumber", Utils.limitFormat(MAX_SIZE_VAT_NUMBER, clientId));
         clientData.addProperty("fiscalCountry", countryCode);
         clientData.addProperty("nationality", party.getCountry().getCode());
         clientData.addProperty("billingIndicator", 0);
