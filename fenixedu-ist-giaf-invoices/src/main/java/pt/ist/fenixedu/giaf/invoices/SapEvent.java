@@ -736,6 +736,9 @@ public class SapEvent {
 
         LocalDate startDate = isNewDate ? currentDate : documentDate.toLocalDate();
         ExecutionYear executionYear = Utils.executionYearOf(event);
+        if (startDate.isBefore(executionYear.getBeginLocalDate())) {
+            startDate = executionYear.getBeginLocalDate();
+        }
         LocalDate endDate = executionYear.getEndDateYearMonthDay().toLocalDate();
 
         //If it is a Phd the dates are not regulated by the execution year
