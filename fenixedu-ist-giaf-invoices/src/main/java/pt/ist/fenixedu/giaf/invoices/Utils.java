@@ -37,6 +37,7 @@ import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.accounting.AccountingTransaction;
 import org.fenixedu.academic.domain.accounting.AccountingTransactionDetail;
 import org.fenixedu.academic.domain.accounting.Event;
+import org.fenixedu.academic.domain.accounting.ResidenceEvent;
 import org.fenixedu.academic.domain.accounting.accountingTransactions.detail.SibsTransactionDetail;
 import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeAndInsuranceEvent;
 import org.fenixedu.academic.domain.accounting.events.AnnualEvent;
@@ -115,6 +116,9 @@ public class Utils {
             return false;
         }
         if (event instanceof ExternalScholarshipGratuityContributionEvent) {
+            return false;
+        }
+        if (event instanceof ResidenceEvent) {
             return false;
         }
         if (!event.getParty().isPerson()) {
