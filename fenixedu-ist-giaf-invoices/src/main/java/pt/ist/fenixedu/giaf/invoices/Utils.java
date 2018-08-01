@@ -71,7 +71,7 @@ import com.google.common.base.CharMatcher;
 public class Utils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
-    private static final String FCT_NIF = "PT503904040";
+    private static final String FCT_NIF = "503904040";
 
     public static boolean validate(final ErrorLogConsumer consumer,
             final AccountingTransactionDetail detail) {
@@ -208,7 +208,8 @@ public class Utils {
     }
 
     private static boolean isToIgnoreNIF(Party party) {
-        return FCT_NIF.equalsIgnoreCase(party.getSocialSecurityNumber());
+        return FCT_NIF.equalsIgnoreCase(party.getSocialSecurityNumber())
+                || ("PT" + FCT_NIF).equals(party.getSocialSecurityNumber());
     }
 
     public static String getUserIdentifier(Party party) {
