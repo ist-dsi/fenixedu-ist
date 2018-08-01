@@ -571,7 +571,7 @@ public class SapEvent {
     }
 
     private boolean isToProcessDebt(Event event, boolean isGratuity) {
-        return isGratuity && (event instanceof ExternalScholarshipPhdGratuityContribuitionEvent)
+        return (isGratuity || (event instanceof ExternalScholarshipPhdGratuityContribuitionEvent))
                 && event.getWhenOccured().isAfter(EventWrapper.LIMIT);
     }
 

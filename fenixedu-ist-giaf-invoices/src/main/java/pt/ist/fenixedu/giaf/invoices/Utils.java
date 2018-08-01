@@ -241,7 +241,22 @@ public class Utils {
             .sorted((a1, a2) -> {
                 boolean d1 = a1.getDefaultContact();
                 boolean d2 = a2.getDefaultContact();
-                return d1 && !d2 ? -1 : d2 && !d1 ? 1 : a1.getExternalId().compareTo(a2.getExternalId());
+                boolean ac1 = a1.getActive();
+                boolean ac2 = a2.getActive();
+                    // some addresses don't have an associated country and that is relevant for the postal codes
+                Country c1 = a1.getCountryOfResidence();
+                Country c2 = a2.getCountryOfResidence();
+                    return (c1 != null && c2 == null) ? -1 : 
+                        (
+                          (c2 != null && c1 == null) ? 1 :
+                          (
+                              (ac1 && !ac2) ? -1 : (ac2 && !ac1) ? 1 : 
+                              (
+                                  (d1 && !d2) ? -1 : (d2 && !d1) ? 1 :
+                                  a1.getExternalId().compareTo(a2.getExternalId())
+                              )
+                          )
+                        );
             })
             .findFirst().orElse(null);
     }
