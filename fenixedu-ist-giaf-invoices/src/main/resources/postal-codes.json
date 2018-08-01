@@ -5,7 +5,7 @@
     "ISO": "",
     "Format": "BIQQ 1ZZ",
     "Regex": "^[Bb][Ii][Qq]{2}\\s{0,1}[1][Zz]{2}$",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "U.S. ZIP codes. ZIP codes 006XX for NW PR, 007XX for SE PR, in which XX designates the town or post office and 009XX for the San Juan Metropolitan Area, in which XX designates the area or borough of San Juan. The last four digits identify an area within the post office. For example 00716-2604: 00716-for the east section of the city of Ponce and 2604 for Aceitillo St. in the neighborhood of Los Caobos. US Post office is changing the PR address format to the American one: 1234 No Name Avenue, San Juan, PR 00901.",
@@ -45,7 +45,7 @@
     "ISO": "QA",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "Single code used for all addresses. Part of UK system.",
@@ -69,7 +69,7 @@
     "ISO": "AE",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "The first two digits (ranging from 10–43) correspond to the province, while the last two digits correspond either to the city/delivery zone (range 01–50) or to the district/delivery zone (range 51–99). Afghanistan Postal code lookup",
@@ -85,7 +85,7 @@
     "ISO": "AG",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "Single code used for all addresses.",
@@ -117,7 +117,7 @@
     "ISO": "AO",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "Codigo Postal Argentino (CPA), where the first A is the province code as in ISO 3166-2:AR, the four numbers are the old postal codes, the three last letters indicate a side of the block. Previously NNNN which &#10;o the minimum requirement as of 2006.",
@@ -165,7 +165,7 @@
     "ISO": "AW",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "With Finland, first two numbers are 22.",
@@ -245,7 +245,7 @@
     "ISO": "BF",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "",
@@ -269,7 +269,7 @@
     "ISO": "BI",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "",
@@ -277,7 +277,7 @@
     "ISO": "BJ",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "Overseas Collectivity of France. French codes used.",
@@ -325,7 +325,7 @@
     "ISO": "BQ",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "",
@@ -333,7 +333,7 @@
     "ISO": "SB",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "Código de Endereçamento Postal (CEP): -000 to -899 are used for streets, roads, avenues, boulevards; -900 to -959 are used for buildings with a high postal use; -960 to -969 are for promotional use; -970 to -989 are post offices and regular P.O. boxes; and -990 to -998 are used for community P.O. boxes. -999 is used for special services.",
@@ -349,7 +349,7 @@
     "ISO": "SC",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "",
@@ -357,7 +357,7 @@
     "ISO": "BS",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "",
@@ -397,7 +397,7 @@
     "ISO": "BW",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "Single code used for all addresses.",
@@ -437,7 +437,7 @@
     "ISO": "BZ",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "with Czech Republic from west to east, Poštové smerovacie číslo (PSČ) - postal routing number.",
@@ -453,7 +453,7 @@
     "ISO": "SL",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "With Italy, uses a five-digit numeric CAP of Emilia Romagna. Range 47890 and 47899",
@@ -477,7 +477,7 @@
     "ISO": "SO",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "The system was gradually introduced starting in April 1971 in Ottawa. The letters D, F, I, O, Q, and U are not used to avoid confusion with other letters or numbers.",
@@ -493,7 +493,7 @@
     "ISO": "SR",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "Part of the Australian postal code system.",
@@ -517,7 +517,7 @@
     "ISO": "ST",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "",
@@ -525,7 +525,7 @@
     "ISO": "CF",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "Used for all inbound mail to El Salvador. The postal office then distributes the mail internally depending on their destination.",
@@ -541,7 +541,7 @@
     "ISO": "CG",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "",
@@ -549,7 +549,7 @@
     "ISO": "SX",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "With Liechtenstein, ordered from west to east. In Geneva and other big cities, like Basel, Bern, Zurich, there may be one or two digits after the name of the city when the generic City code (1211) is used instead of the area-specific code (1201, 1202...), e.g.: 1211 Geneva 13. The digit identifies the post office. This addressing is generally used for P.O. box deliveries.",
@@ -565,7 +565,7 @@
     "ISO": "CI",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "A 4-digit system has been announced. Status unknown.",
@@ -573,7 +573,7 @@
     "ISO": "SY",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "The letter identifies one of the country's four districts.",
@@ -589,7 +589,7 @@
     "ISO": "CK",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "May only be required for bulk mail.",
@@ -605,7 +605,7 @@
     "ISO": "CM",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "A postal code or youbian (邮编) in a subordinate division will have the same first two digits as its governing one (see Political divisions of China. The postal services in Macau or Hong Kong Special Administrative Regions remain separate from Mainland China, with no post code system currently used.",
@@ -661,7 +661,7 @@
     "ISO": "TF",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "The first digit indicates the island.",
@@ -677,7 +677,7 @@
     "ISO": "TG",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "",
@@ -685,7 +685,7 @@
     "ISO": "CW",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "The first two specify the province, numbers as in ISO 3166-2:TH, the third and fourth digits specify a district (amphoe)",
@@ -733,7 +733,7 @@
     "ISO": "TK",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "No postal code system in use since Indonesian withdrawal in 1999.",
@@ -741,7 +741,7 @@
     "ISO": "TL",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "Retained system from former Soviet Union.",
@@ -765,7 +765,7 @@
     "ISO": "TO",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "First two digits are the city numbers.[8]",
@@ -797,7 +797,7 @@
     "ISO": "TV",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "The first three digits of the postal code are required; the last two digits are optional. Codes are known as youdi quhao (郵遞區號), and are also assigned to Senkaku Islands (Diaoyutai), though Japanese-administered, the Pratas Islands and the Spratly Islands. See List of postal codes in Taiwan.",
@@ -813,7 +813,7 @@
     "ISO": "DJ",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "",
@@ -821,7 +821,7 @@
     "ISO": "TZ",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "Numbering follows the dispatch of postal trains from Copenhagen.[3] Also used by Greenland, e.g.: DK-3900 Nuuk.",
@@ -837,7 +837,7 @@
     "ISO": "DM",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "",
@@ -861,7 +861,7 @@
     "ISO": "UG",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "First two as in ISO 3166-2:DZ",
@@ -933,7 +933,7 @@
     "ISO": "ER",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "",
@@ -997,7 +997,7 @@
     "ISO": "VU",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "A lower first digit indicates a place in south (for example 00100 Helsinki), a higher indicates a place further to north (99800 in Ivalo). The last digit is usually 0, except for postal codes for PO Box number ranges, in which case it is 1. Country code for Finland: \"FI\". In the Åland Islands, the postal code is prefixed with \"AX\", not \"FI\". Some postal codes for rural settlements may end with 5, and there are some unique postal codes for large companies and institutions, e.g. 00014 HELSINGIN YLIOPISTO (university), 00102 EDUSKUNTA (parliament), 00020 NORDEA (a major Scandinavian bank).",
@@ -1013,7 +1013,7 @@
     "ISO": "FJ",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "UK territory, but not UK postcode",
@@ -1077,7 +1077,7 @@
     "ISO": "GD",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "",
@@ -1109,7 +1109,7 @@
     "ISO": "GH",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "Single code used for all addresses.",
@@ -1133,7 +1133,7 @@
     "ISO": "GM",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "",
@@ -1141,7 +1141,7 @@
     "ISO": "GN",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "Overseas Department of France. French codes used. Range 97100 - 97190.",
@@ -1157,7 +1157,7 @@
     "ISO": "GQ",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "",
@@ -1205,7 +1205,7 @@
     "ISO": "GY",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "A separate postal code for Kosovo was introduced by the UNMIK postal administration in 2004. Serbian postcodes are still widely used in the Serbian enclaves. No country code has been assigned.",
@@ -1221,7 +1221,7 @@
     "ISO": "HK",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "Part of the Australian postcode system.",
@@ -1261,7 +1261,7 @@
     "ISO": "YE",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "The code defines an area, usually one code per settlement except the six largest towns. One code can identify more (usually) small settlements as well.",
@@ -1293,7 +1293,7 @@
     "ISO": "IE",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "Postcode is always written BEFORE the city/place name, i.e. to the Right in Hebrew or Arabic script - to the Left in Latin script.",
@@ -1389,7 +1389,7 @@
     "ISO": "ZW",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "Jamaica currently has no national postal code system, except for Kingston and Lower St. Andrew, which are divided into postal districts numbered 1-20[4] &#10;Before the 2007 suspension, the first two letters of a national post code were always 'JM' (for Jamaica) while the third was for one of the four zones (A-D) into which the island was divided. The last two letters were for the parish, while the two digits were for the local post office.[5]",
@@ -1445,7 +1445,7 @@
     "ISO": "KI",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "",
@@ -1453,7 +1453,7 @@
     "ISO": "KM",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "",
@@ -1461,7 +1461,7 @@
     "ISO": "KN",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "",
@@ -1469,7 +1469,7 @@
     "ISO": "KP",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "",
@@ -1525,7 +1525,7 @@
     "ISO": "LC",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "With Switzerland, ordered from west to east. Range 9485 - 9498.",
@@ -1661,7 +1661,7 @@
     "ISO": "ML",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "",
@@ -1685,7 +1685,7 @@
     "ISO": "MO",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "U.S. ZIP codes. Range 96950 - 96952.",
@@ -1709,7 +1709,7 @@
     "ISO": "MR",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "",
@@ -1733,7 +1733,7 @@
     "ISO": "MU",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "",
@@ -1749,7 +1749,7 @@
     "ISO": "MW",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "The first two digits identify the state (or a part thereof), except for Nos. 00 to 16, which indicate delegaciones (boroughs) of the Federal District (Mexico City).",
@@ -1853,7 +1853,7 @@
     "ISO": "NR",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "",
@@ -1861,7 +1861,7 @@
     "ISO": "NU",
     "Format": "- no codes -",
     "Regex": "",
-    "Example": ""
+    "Example": "Desconhecido"
   },
   {
     "Note": "Postcodes were originally intended for bulk mailing and were not needed for addressing individual items. However, new post codes for general use were phased in from June 2006 and came into force by July 2008.",
