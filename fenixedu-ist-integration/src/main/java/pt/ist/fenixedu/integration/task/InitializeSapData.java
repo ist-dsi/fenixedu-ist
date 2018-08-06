@@ -14,10 +14,14 @@ import org.joda.time.DateTime;
 
 import com.google.gson.JsonObject;
 
+import pt.ist.esw.advice.pt.ist.fenixframework.AtomicInstance;
 import pt.ist.fenixedu.domain.SapRequest;
 import pt.ist.fenixedu.domain.SapRequestType;
 import pt.ist.fenixedu.giaf.invoices.ClientMap;
 import pt.ist.fenixedu.giaf.invoices.Utils;
+import pt.ist.fenixframework.Atomic.TxMode;
+import pt.ist.fenixframework.CallableWithoutException;
+import pt.ist.fenixframework.FenixFramework;
 
 public class InitializeSapData extends CustomTask {
 
@@ -30,10 +34,15 @@ public class InitializeSapData extends CustomTask {
     private Money payments = Money.ZERO;
     private Money exemptions = Money.ZERO;
 
+    @Override
+    public TxMode getTxMode() {
+        return TxMode.READ;
+    }
+
     private boolean needsProcessing(final Event event) {
         try {
             final ExecutionYear executionYear = Utils.executionYearOf(event);
-            return !event.getParty().isPerson() && event.getSapRequestSet().isEmpty() && !event.isCancelled()
+            return event.getParty().isPerson() && event.getSapRequestSet().isEmpty() && !event.isCancelled()
                     && (!executionYear.isBefore(startYear)
                             || (event instanceof PhdGratuityEvent && !executionYear.isBefore(SAP_3RD_CYCLE_THRESHOLD)))
                     && (!event.getAccountingTransactionsSet().isEmpty() || !event.getExemptionsSet().isEmpty());
@@ -55,8 +64,14 @@ public class InitializeSapData extends CustomTask {
         Bennu.getInstance().getAccountingEventsSet().stream()
             .filter(this::needsProcessing)
             .forEach(event -> {
-                try {
-                    process(event);
+                try {                    
+                    FenixFramework.getTransactionManager().withTransaction(new CallableWithoutException<Void>() {
+                        @Override
+                        public Void call() {
+                            process(event);                                
+                            return null;
+                        }
+                    }, new AtomicInstance(TxMode.SPECULATIVE_READ, false));                                         
                 } catch (final Exception e) {
                     taskLog("Erro no evento %s %s\n", event.getExternalId(), e.getMessage());
                     e.printStackTrace();
