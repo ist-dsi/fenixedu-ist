@@ -316,7 +316,7 @@
     "Country": "Saudi Arabia",
     "ISO": "SA",
     "Format": "NNNNN for PO Boxes. NNNNN-NNNN for home delivery.",
-    "Regex": "^\\d{5}(-{1}\\d{4})?$",
+    "Regex": "^\\d{5}$",
     "Example": "04378"
   },
   {
@@ -725,7 +725,7 @@
     "ISO": "CZ",
     "Format": "NNN NN",
     "Regex": "^\\d{3}\\s\\d{2}$",
-    "Example": "713\r59"
+    "Example": "713 59"
   },
   {
     "Note": "",
@@ -1164,8 +1164,8 @@
     "Country": "Greece",
     "ISO": "GR",
     "Format": "NNN NN",
-    "Regex": "^\\d{3}\\s{0,1}\\d{2}$",
-    "Example": "277 50"
+    "Regex": "^\\d{5}$",
+    "Example": "27750"
   },
   {
     "Note": "One code for all addresses.",
@@ -1348,8 +1348,8 @@
     "Country": "Iran",
     "ISO": "IR",
     "Format": "NNNNN-NNNNN",
-    "Regex": "^\\d{5}-\\d{5}$",
-    "Example": "34504-22165"
+    "Regex": "^\\d{5}$",
+    "Example": "34504"
   },
   {
     "Note": "",
@@ -1932,7 +1932,7 @@
     "Country": "Poland",
     "ISO": "PL",
     "Format": "NNNNN (NN-NNN)",
-    "Regex": "^\\d{2}[- ]{0,1}\\d{3}$",
+    "Regex": "^\\d{2}[- ]{1}\\d{3}$",
     "Example": "28-593"
   },
   {

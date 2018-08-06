@@ -46,8 +46,6 @@ import org.fenixedu.generated.sources.saft.sap.SAFTPTSourceBilling;
 import org.fenixedu.generated.sources.saft.sap.SAFTPTSourcePayment;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
-import org.joda.time.format.DateTimeFormatter;
-import org.springframework.format.datetime.joda.DateTimeFormatterFactory;
 
 import com.google.common.base.Strings;
 import com.google.gson.JsonArray;
@@ -72,8 +70,6 @@ public class SapEvent {
     private static final int MAX_SIZE_REGION = 50;
     private static final int MAX_SIZE_POSTAL_CODE = 20;
     private static final int MAX_SIZE_VAT_NUMBER = 20;
-    private static final DateTimeFormatter localDateFormatter =
-            new DateTimeFormatterFactory("yyyy-MM-dd").createDateTimeFormatter();
     public LocalDate currentDate = new LocalDate();
 
     public Event event = null;
@@ -859,6 +855,9 @@ public class SapEvent {
         //in that case we must send a valid postal code for that country, even if it is not the address country
         if (physicalAddress.getCountryOfResidence() != null
                 && !physicalAddress.getCountryOfResidence().getCode().equals(countryCode)) {
+            postalCode = PostalCodeValidator.examplePostCodeFor(countryCode);
+        }
+        if (!PostalCodeValidator.isValidAreaCode(countryCode, postalCode)) {
             postalCode = PostalCodeValidator.examplePostCodeFor(countryCode);
         }
         clientData.addProperty("postalCode",
