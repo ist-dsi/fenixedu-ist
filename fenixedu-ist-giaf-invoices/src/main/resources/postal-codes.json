@@ -317,7 +317,7 @@
     "ISO": "SA",
     "Format": "NNNNN for PO Boxes. NNNNN-NNNN for home delivery.",
     "Regex": "^\\d{5}(-{1}\\d{4})?$",
-    "Example": "04378-5692"
+    "Example": "04378"
   },
   {
     "Note": "",
@@ -484,7 +484,7 @@
     "Country": "Canada",
     "ISO": "CA",
     "Format": "ANA NAN",
-    "Regex": "^(?=[^DdFfIiOoQqUu\\d\\s])[A-Za-z]\\d(?=[^DdFfIiOoQqUu\\d\\s])[A-Za-z]\\s{0,1}\\d(?=[^DdFfIiOoQqUu\\d\\s])[A-Za-z]\\d$",
+    "Regex": "^(?=[^DdFfIiOoQqUu\\d\\s])[A-Za-z]\\d(?=[^DdFfIiOoQqUu\\d\\s])[A-Za-z]\\s{1}\\d(?=[^DdFfIiOoQqUu\\d\\s])[A-Za-z]\\d$",
     "Example": "M4C 1M5"
   },
   {
@@ -723,9 +723,9 @@
     "Note": "With Slovak Republic, Poštovní směrovací číslo (PSČ) - postal routing number.",
     "Country": "Czech Republic",
     "ISO": "CZ",
-    "Format": "NNNNN (NNN NN)",
-    "Regex": "^\\d{5}\\s\\(\\d{3}\\s\\d{2}\\)$",
-    "Example": "59735 (713\r59)"
+    "Format": "NNN NN",
+    "Regex": "^\\d{3}\\s\\d{2}$",
+    "Example": "713\r59"
   },
   {
     "Note": "",
@@ -1475,9 +1475,9 @@
     "Note": "",
     "Country": "South Korea",
     "ISO": "KR",
-    "Format": "NNNNNN (NNN-NNN)",
-    "Regex": "^\\d{6}\\s\\(\\d{3}-\\d{3}\\)$",
-    "Example": "215493 (595-682)"
+    "Format": "NNNNN",
+    "Regex": "^\\d{5}$",
+    "Example": "21549"
   },
   {
     "Note": "The first two digits represent the sector and the last three digits represents the post office.",
@@ -1828,7 +1828,7 @@
     "Country": "Netherlands",
     "ISO": "NL",
     "Format": "NNNN AA",
-    "Regex": "^\\d{4}\\s{0,1}[A-Za-z]{2}$",
+    "Regex": "^\\d{4}\\s{1}[A-Za-z]{2}$",
     "Example": "7577 LX"
   },
   {
@@ -1933,7 +1933,7 @@
     "ISO": "PL",
     "Format": "NNNNN (NN-NNN)",
     "Regex": "^\\d{2}[- ]{0,1}\\d{3}$",
-    "Example": "28593"
+    "Example": "28-593"
   },
   {
     "Note": "Overseas Collectivity of France. French codes used.",
