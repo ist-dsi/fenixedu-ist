@@ -1,10 +1,6 @@
 package pt.ist.fenixedu.giaf.invoices;
 
-import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -13,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -71,6 +68,8 @@ public class SapEvent {
     private static final int MAX_SIZE_POSTAL_CODE = 20;
     private static final int MAX_SIZE_VAT_NUMBER = 20;
     public LocalDate currentDate = new LocalDate();
+    public static Function<LocalDate, DateTime> documentDatePreviousYear =
+            (currentDate) -> new DateTime(currentDate.getYear() - 1, 12, 31, 23, 59);
 
     public Event event = null;
 
@@ -92,8 +91,8 @@ public class SapEvent {
         }
 
         String clientId = ClientMap.uVATNumberFor(event.getParty());
-        JsonObject data = toJsonInvoice(event, debtFenix, getDocumentDate(event.getWhenOccured()), new DateTime(), clientId,
-                false, isNewDate, false);
+        JsonObject data = toJsonInvoice(event, debtFenix, getDocumentDate(event.getWhenOccured(), isNewDate), new DateTime(),
+                clientId, false, isNewDate, false);
 
         String documentNumber = getDocumentNumber(data, false);
         SapRequest sapRequest =
@@ -142,8 +141,8 @@ public class SapEvent {
             throws Exception {
 
         String clientId = ClientMap.uVATNumberFor(event.getParty());
-        JsonObject data = toJsonDebt(event, debtFenix, clientId, getDocumentDate(event.getWhenOccured()), new DateTime(), true,
-                "NG", true, isNewDate);
+        JsonObject data = toJsonDebt(event, debtFenix, clientId, getDocumentDate(event.getWhenOccured(), isNewDate),
+                new DateTime(), true, "NG", true, isNewDate);
 
         String documentNumber = getDocumentNumber(data, false);
         SapRequest sapRequest = new SapRequest(event, clientId, debtFenix, documentNumber, SapRequestType.DEBT, Money.ZERO, data);
@@ -210,8 +209,9 @@ public class SapEvent {
             String debtCreditDocNumber, boolean isNewDate, ErrorLogConsumer errorLog, EventLogger elogger) throws Exception {
         checkValidDocumentNumber(debtCreditDocNumber, event);
 
-        JsonObject data = toJsonDebtCredit(event, amountToRegister, clientId, getDocumentDate(creditEntry.getCreated()),
-                new DateTime(), true, "NJ", false, isNewDate, debtCreditDocNumber);
+        JsonObject data =
+                toJsonDebtCredit(event, amountToRegister, clientId, getDocumentDate(creditEntry.getCreated(), isNewDate),
+                        new DateTime(), true, "NJ", false, isNewDate, debtCreditDocNumber);
         String documentNumber = getDocumentNumber(data, false);
         SapRequest sapRequest =
                 new SapRequest(event, clientId, amountToRegister, documentNumber, SapRequestType.DEBT_CREDIT, Money.ZERO, data);
@@ -292,8 +292,8 @@ public class SapEvent {
             String invoiceNumber, ErrorLogConsumer errorLog, EventLogger elogger) throws Exception {
         checkValidDocumentNumber(invoiceNumber, event);
 
-        JsonObject data = toJsonCredit(event, getDocumentDate(creditEntry.getCreated()), creditAmount, clientId, invoiceNumber,
-                false, true);
+        JsonObject data = toJsonCredit(event, getDocumentDate(creditEntry.getCreated(), false), creditAmount, clientId,
+                invoiceNumber, false, true);
         String documentNumber = getDocumentNumber(data, false);
         SapRequest sapRequest =
                 new SapRequest(event, clientId, creditAmount, documentNumber, SapRequestType.CREDIT, Money.ZERO, data);
@@ -339,7 +339,7 @@ public class SapEvent {
         } else {
             // registering the invoice
             invoiceNumber = registerInterestInvoice(payedInterest, clientId, transactionDetail,
-                    getDocumentDate(transactionDetail.getWhenProcessed()), errorLog, elogger);
+                    getDocumentDate(transactionDetail.getWhenProcessed(), false), errorLog, elogger);
         }
 
         // even if the invoice fails (in the integration with SAP) we want to register the request
@@ -490,7 +490,8 @@ public class SapEvent {
             if (hasPayment(transactionDetail.getTransaction(), sapRequest)) {
                 //TODO já existe um pagamento feito com este id (noutro request) o que quer dizer que isto é um pagamento que se dividiu por n facturas e um deles deu erro
                 // este pagamento não vai voltar a ser processado e é preciso dar uma mensagem de erro diferente para isto ser corrigido manualmente
-                logError(transactionDetail.getEvent(), errorLog, elogger, "WARNING: one of multiple payments has failed!!!",
+                logError(transactionDetail.getEvent(), errorLog, elogger,
+                        "WARNING: one of multiple payments has failed! ID: " + transactionDetail.getTransaction().getExternalId(),
                         documentNumber, SapRequestType.PAYMENT.name(), sapRequest);
             }
             return false;
@@ -559,9 +560,12 @@ public class SapEvent {
         }
     }
 
-    private DateTime getDocumentDate(DateTime documentDate) {
+    private DateTime getDocumentDate(DateTime documentDate, boolean isNewDate) {
+        if (isNewDate) {
+            return new DateTime();
+        }
         if (documentDate.getYear() < currentDate.getYear()) {
-            return new DateTime(currentDate.getYear() - 1, 12, 31, 23, 59);
+            return documentDatePreviousYear.apply(currentDate);
         }
         return documentDate;
     }
@@ -644,8 +648,8 @@ public class SapEvent {
         paymentDocument.addProperty("excessPayment", excess.toPlainString());
         paymentDocument.addProperty("isAdvancedPayment", true);
 
-        JsonObject workingDocument = toJsonWorkDocument(getDocumentDate(transactionDetail.getWhenRegistered()), new DateTime(),
-                excess, "NA", false, transactionDetail.getWhenRegistered());
+        JsonObject workingDocument = toJsonWorkDocument(getDocumentDate(transactionDetail.getWhenRegistered(), false),
+                new DateTime(), excess, "NA", false, transactionDetail.getWhenRegistered());
         workingDocument.addProperty("isAdvancedPayment", true);
         workingDocument.addProperty("paymentDocumentNumber", paymentDocument.get("paymentDocumentNumber").getAsString());
 
@@ -1013,14 +1017,10 @@ public class SapEvent {
 
     public Money getDebtAmount() {
         return addAll(SapRequestType.DEBT);
-//        return event.getSapRequestSet().stream().filter(sr -> sr.getRequestType().equals(SapRequestType.DEBT))
-//                .filter(sr -> sr.getValue().isPositive()).map(sr -> sr.getValue()).reduce(Money.ZERO, Money::add);
     }
 
     public Money getDebtCreditAmount() {
         return addAll(SapRequestType.DEBT_CREDIT);
-//        return event.getSapRequestSet().stream().filter(sr -> sr.getRequestType().equals(SapRequestType.DEBT))
-//                .filter(sr -> sr.getValue().isNegative()).map(sr -> sr.getValue().abs()).reduce(Money.ZERO, Money::add);
     }
 
     public Money getInvoiceAmount() {
@@ -1048,18 +1048,19 @@ public class SapEvent {
         return addAll(SapRequestType.REIMBURSEMENT);
     }
 
-    public boolean hasPayment(final String transactionDetailId) {
-        return event.getSapRequestSet().stream()
-                .filter(sr -> sr.getRequestType() == SapRequestType.PAYMENT || sr.getRequestType() == SapRequestType.ADVANCEMENT)
-                .filter(sr -> sr.getPayment() != null).filter(sr -> transactionDetailId.equals(sr.getPayment().getExternalId()))
-                .findAny().isPresent();
+    public boolean hasPayment(final String transactionId) {
+        return getPaymentsFor(transactionId).findAny().isPresent();
     }
 
     public boolean hasPayment(final AccountingTransaction transaction, SapRequest sapRequest) {
+        return getPaymentsFor(transaction.getTransactionDetail().getExternalId()).filter(sr -> transaction == sr.getPayment())
+                .filter(sr -> sr != sapRequest).findAny().isPresent();
+    }
+
+    private Stream<SapRequest> getPaymentsFor(final String transactionDetailId) {
         return event.getSapRequestSet().stream()
                 .filter(sr -> sr.getRequestType() == SapRequestType.PAYMENT || sr.getRequestType() == SapRequestType.ADVANCEMENT)
-                .filter(sr -> sr.getPayment() != null).filter(sr -> transaction == sr.getPayment()).filter(sr -> sr != sapRequest)
-                .findAny().isPresent();
+                .filter(sr -> sr.getPayment() != null).filter(sr -> transactionDetailId.equals(sr.getPayment().getExternalId()));
     }
 
     public boolean hasInterestPayment(final AccountingTransaction transaction) {
@@ -1075,65 +1076,6 @@ public class SapEvent {
     public boolean hasCredit(String creditId) {
         return event.getSapRequestSet().stream().filter(sr -> sr.getRequestType() == SapRequestType.CREDIT)
                 .filter(sr -> creditId.equals(sr.getCreditId())).findAny().isPresent();
-    }
-
-    private void logPastPayments(final AccountingTransactionDetail d, final String clientId, final Money txAmount,
-            final String receiptNumber, final String now, final String registryDate) {
-        final Event event = d.getEvent();
-        final ExecutionYear debtYear = Utils.executionYearOf(event);
-
-        final StringBuilder builder = new StringBuilder();
-        builder.append(event.getExternalId());
-        builder.append("\t");
-        builder.append(d.getExternalId());
-        builder.append("\t");
-        builder.append(clientId == null ? " " : clientId);
-        builder.append("\t");
-        builder.append(txAmount.toPlainString());
-        builder.append("\t");
-        builder.append(receiptNumber);
-        builder.append("\t");
-        builder.append(now);
-        builder.append("\t");
-        builder.append(registryDate);
-        builder.append("\t");
-        builder.append(debtYear.getName());
-        builder.append("\n");
-        appendPastLog(builder.toString());
-    }
-
-    private void appendPastLog(final String line) {
-        final File file = new File("/afs/ist.utl.pt/ciist/fenix/fenix015/ist/sap_past_event_log.csv");
-        if (!file.exists()) {
-            final StringBuilder builder = new StringBuilder();
-            builder.append("Event");
-            builder.append("\t");
-            builder.append("Transaction");
-            builder.append("\t");
-            builder.append("ClientId");
-            builder.append("\t");
-            builder.append("TX Amount");
-            builder.append("\t");
-            builder.append("Receipt Number");
-            builder.append("\t");
-            builder.append("Sent To Accounting");
-            builder.append("\t");
-            builder.append("Registry Date");
-            builder.append("\t");
-            builder.append("Debt Year");
-            builder.append("\n");
-            append(file, builder.toString());
-        }
-        append(file, line);
-    }
-
-    private void append(final File file, final String line) {
-        try {
-            Files.write(file.toPath(), line.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND,
-                    StandardOpenOption.WRITE);
-        } catch (final IOException e) {
-            throw new Error(e);
-        }
     }
 
     public static SimpleImmutableEntry<String, String> mapToProduct(Event event, String eventDescription,

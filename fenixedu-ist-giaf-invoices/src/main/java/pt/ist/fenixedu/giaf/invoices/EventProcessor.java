@@ -11,6 +11,7 @@ import org.fenixedu.academic.domain.accounting.calculator.DebtInterestCalculator
 import org.fenixedu.academic.domain.accounting.calculator.Payment;
 import org.fenixedu.academic.util.Money;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 import pt.ist.esw.advice.pt.ist.fenixframework.AtomicInstance;
 import pt.ist.fenixedu.giaf.invoices.GiafEvent.GiafEventEntry;
@@ -127,8 +128,7 @@ public class EventProcessor {
         }
     }
 
-    private static void processSap(final ErrorLogConsumer errorLog, final EventLogger elogger,
-            final Event event) {
+    private static void processSap(final ErrorLogConsumer errorLog, final EventLogger elogger, final Event event) {
         try {
             if (EventWrapper.needsProcessingSap(event)) {
 
@@ -140,51 +140,44 @@ public class EventProcessor {
                     return;
                 }
 
-                //System.out.println(eventWrapper.event.getExternalId());
                 final Money debtFenix = eventWrapper.debt;
                 final Money invoiceSap = sapEvent.getInvoiceAmount();
 
-                boolean debtResult = true;
+                boolean debtResult = false;
                 if (debtFenix.isPositive()) {
                     if (invoiceSap.isZero()) {
-                        //System.out.println("divida sap igual a zero");
-                        debtResult = sapEvent.registerInvoice(debtFenix, event, eventWrapper.isGratuity(), false,
-                                errorLog, elogger);
-//                        return debtFenix;
+                        debtResult =
+                                sapEvent.registerInvoice(debtFenix, event, eventWrapper.isGratuity(), false, errorLog, elogger);
                     } else if (invoiceSap.isNegative()) {
                         logError(event, errorLog, elogger, "A dívida no SAP é negativa");
                     } else if (!debtFenix.equals(invoiceSap)) {
                         logError(event, errorLog, elogger, "A dívida no SAP é: " + invoiceSap.getAmountAsString()
                                 + " e no Fénix é: " + debtFenix.getAmountAsString());
                         if (debtFenix.greaterThan(invoiceSap)) {
+                            // criar invoice com a diferença entre debtFenix e invoiceDebtSap (se for propina aumentar a dívida no sap)
+                            // passar data actual (o valor do evento mudou, não dá para saber quando, vamos assumir que mudou quando foi detectada essa diferença)
                             logError(event, errorLog, elogger, "A dívida no Fénix é superior à dívida registada no SAP");
                             debtResult = sapEvent.registerInvoice(debtFenix.subtract(invoiceSap), eventWrapper.event,
                                     eventWrapper.isGratuity(), true, errorLog, elogger);
-//                            return debtFenix.subtract(invoiceSap);
-                            // criar invoice com a diferença entre debtFenix e invoiceDebtSap (se for propina aumentar a dívida no sap)
-                            //passar data actual (o valor do evento mudou, não dá para saber quando, vamos assumir que mudou qd foi detectada essa diferença)
-//                        } else {
-//                             diminuir divida no sap e credit note da diferença na última factura existente
-//                            se o valor pago nesta factura for superior à nova dívida, o que fazer? terá que existir nota crédito no fenix -> sim
-//                            logError(event, errorLog, elogger, "A dívida no Fénix é inferior à dívida registada no SAP");
-//                            debtResult = sapEvent.registerCredit(eventWrapper.event, invoiceSap.subtract(debtFenix),
-//                                    eventWrapper.isGratuity(), errorLog, elogger);
-//                            logError(event, errorLog, elogger, "A dívida no SAP é maior que a dívida no Fénix!");
+                        } else {
+                            // diminuir divida no sap e registar credit note da diferença na última factura existente
+                            logError(event, errorLog, elogger, "A dívida no SAP é superior à dívida registada no Fénix");
+                            CreditEntry creditEntry = getCreditEntry(debtFenix, invoiceSap);
+                            debtResult = sapEvent.registerCredit(eventWrapper.event, creditEntry, eventWrapper.isGratuity(),
+                                    errorLog, elogger);
                         }
-//                        debtResult = false;
                     }
                 }
 
                 // there could have been an error comunicating a debt, we can not comunicate payments and such, since there is nothing registered in SAP
                 if (debtResult) {
-                    //System.out.println("pagamentos");
                     //Payments!!
                     DebtInterestCalculator calculator = event.getDebtInterestCalculator(new DateTime());
                     List<Payment> payments = calculator.getPayments().collect(Collectors.toList());
                     for (Payment payment : payments) {
                         if (payment.isForDebt() && payment.getAmount().compareTo(BigDecimal.ZERO) > 0
                                 && !sapEvent.hasPayment(payment.getId())
-                                && payment.getDate().isAfter(EventWrapper.SAP_TRANSACTIONS_THRESHOLD)) {
+                                && payment.getCreated().isAfter(EventWrapper.SAP_TRANSACTIONS_THRESHOLD)) {
                             boolean result = sapEvent.registerPayment(payment, errorLog, elogger);
                             if (!result) {
                                 return;
@@ -196,7 +189,7 @@ public class EventProcessor {
                     for (CreditEntry creditEntry : calculator.getCreditEntries()) {
                         if (creditEntry instanceof DebtExemption) {
                             if (creditEntry.getAmount().compareTo(BigDecimal.ZERO) > 0 && !sapEvent.hasCredit(creditEntry.getId())
-                                    && creditEntry.getDate().isAfter(EventWrapper.SAP_TRANSACTIONS_THRESHOLD)) {
+                                    && creditEntry.getCreated().isAfter(EventWrapper.SAP_TRANSACTIONS_THRESHOLD)) {
                                 boolean result =
                                         sapEvent.registerCredit(event, creditEntry, eventWrapper.isGratuity(), errorLog, elogger);
                                 if (!result) {
@@ -206,6 +199,7 @@ public class EventProcessor {
                         }
                     }
 
+                    //Reimbursements
                     Money sapReimbursements = sapEvent.getReimbursementsAmount();
                     if (eventWrapper.reimbursements.greaterThan(sapReimbursements)) {
                         boolean result = sapEvent.registerReimbursement(eventWrapper.event,
@@ -214,9 +208,6 @@ public class EventProcessor {
                             return;
                         }
                     }
-
-                    final Money totalPayed = eventWrapper.payed.add(eventWrapper.fines); //TODO isto é o que??
-                    //TODO multas só podem ser comunicadas depois de a divida no fenix estar fechada e houver um pagamento
                 }
             } else {
                 //processing payments of past events
@@ -226,8 +217,34 @@ public class EventProcessor {
             }
         } catch (final Exception e) {
             logError(errorLog, elogger, event, e);
-//        throw e;
         }
+    }
+
+    private static CreditEntry getCreditEntry(final Money debtFenix, final Money invoiceSap) {
+        return new CreditEntry("", new DateTime(), new LocalDate(), "",
+                invoiceSap.subtract(debtFenix).getAmount()) {
+
+            @Override
+            public boolean isToApplyInterest() {
+                return false;
+            }
+            @Override
+            public boolean isToApplyFine() {
+                return false;
+            }
+            @Override
+            public boolean isForInterest() {
+                return false;
+            }
+            @Override
+            public boolean isForFine() {
+                return false;
+            }
+            @Override
+            public boolean isForDebt() {
+                return false;
+            }
+        };
     }
 
     private static void logError(final ErrorLogConsumer errorLog, final EventLogger elogger, final Event event,
@@ -249,13 +266,6 @@ public class EventProcessor {
                 amount == null ? "" : amount.toPlainString(), cycleType == null ? "" : cycleType.getDescription(), errorMessage,
                 "", "", "", "", "", "", "", "", "", "", "");
         elogger.log("%s: %s%n", event.getExternalId(), errorMessage);
-//            if (errorMessage.indexOf("digo de Entidade ") > 0 && errorMessage.indexOf(" invlido/inexistente!") > 0) {
-//                return;
-//            } else if (errorMessage.indexOf("O valor da factura") >= 0 && errorMessage.indexOf("inferior") >= 0 && errorMessage.indexOf("nota de cr") >= 0
-//                    && errorMessage.indexOf("encontrar a factura") >= 0) {
-//                elogger.log("%s: %s%n", eventWrapper.event.getExternalId(), errorMessage);
-//                return;
-//            }
         elogger.log(
                 "Unhandled SAP error for event " + event.getExternalId() + " : " + e.getClass().getName() + " - " + errorMessage);
         e.printStackTrace();
