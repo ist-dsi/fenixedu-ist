@@ -93,10 +93,10 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
     }
 
     private void syncEvent(final Event event) {
-        final String errors = SapInvoiceController.syncEvent(event);
-        if (!errors.isEmpty()) {
-            throw new Error("Unable to sync event: " + errors);
-        }
+//        final String errors = SapInvoiceController.syncEvent(event);
+//        if (!errors.isEmpty()) {
+//            throw new Error("Unable to sync event: " + errors);
+//        }
     }
 
 }
