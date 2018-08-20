@@ -1,10 +1,6 @@
 package pt.ist.fenixedu.giaf.invoices;
 
-import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -13,12 +9,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionYear;
-import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.accounting.AccountingTransaction;
 import org.fenixedu.academic.domain.accounting.AccountingTransactionDetail;
@@ -37,6 +33,8 @@ import org.fenixedu.academic.domain.accounting.events.dfa.DFACandidacyEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEvent;
 import org.fenixedu.academic.domain.accounting.events.insurance.InsuranceEvent;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
+import org.fenixedu.academic.domain.organizationalStructure.Party;
+import org.fenixedu.academic.domain.phd.debts.ExternalScholarshipPhdGratuityContribuitionEvent;
 import org.fenixedu.academic.domain.phd.debts.PhdGratuityEvent;
 import org.fenixedu.academic.util.Money;
 import org.fenixedu.generated.sources.saft.sap.SAFTPTPaymentType;
@@ -45,8 +43,6 @@ import org.fenixedu.generated.sources.saft.sap.SAFTPTSourceBilling;
 import org.fenixedu.generated.sources.saft.sap.SAFTPTSourcePayment;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
-import org.joda.time.format.DateTimeFormatter;
-import org.springframework.format.datetime.joda.DateTimeFormatterFactory;
 
 import com.google.common.base.Strings;
 import com.google.gson.JsonArray;
@@ -70,9 +66,10 @@ public class SapEvent {
     private static final int MAX_SIZE_CITY = 50;
     private static final int MAX_SIZE_REGION = 50;
     private static final int MAX_SIZE_POSTAL_CODE = 20;
-    private static final DateTimeFormatter localDateFormatter =
-            new DateTimeFormatterFactory("yyyy-MM-dd").createDateTimeFormatter();
+    private static final int MAX_SIZE_VAT_NUMBER = 20;
     public LocalDate currentDate = new LocalDate();
+    public static Function<LocalDate, DateTime> documentDatePreviousYear =
+            (currentDate) -> new DateTime(currentDate.getYear() - 1, 12, 31, 23, 59);
 
     public Event event = null;
 
@@ -93,8 +90,9 @@ public class SapEvent {
             }
         }
 
-        String clientId = ClientMap.uVATNumberFor(event.getPerson());
-        JsonObject data = toJsonInvoice(event, debtFenix, new DateTime(), getEntryDate(event), clientId, false, isNewDate, false);
+        String clientId = ClientMap.uVATNumberFor(event.getParty());
+        JsonObject data = toJsonInvoice(event, debtFenix, getDocumentDate(event.getWhenOccured(), isNewDate), new DateTime(),
+                clientId, false, isNewDate, false);
 
         String documentNumber = getDocumentNumber(data, false);
         SapRequest sapRequest =
@@ -104,12 +102,14 @@ public class SapEvent {
         if (checkAndRegisterIntegration(event, errorLog, elogger, data, documentNumber, sapRequest, result,
                 SapRequestType.INVOICE.name(), true)) {
             // if there are amounts in advancement we need to register them in the new invoice
-            Money advancementAmount = getAdvancementAmount();
-            if (advancementAmount.isPositive()) {
-                return registerPaymentFromAdvancement(event, clientId, advancementAmount, sapRequest, errorLog, elogger);
-            } else {
-                return true;
-            }
+            //TODO if we do this the value registered in the advancement will be counted 2 times in different categories
+//            Money advancementAmount = getAdvancementAmount();
+//            if (advancementAmount.isPositive()) {
+//                return registerPaymentFromAdvancement(event, clientId, advancementAmount, sapRequest, errorLog, elogger);
+//            } else {
+//                return true;
+//            }
+            return true;
         } else {
             return false;
         }
@@ -140,9 +140,9 @@ public class SapEvent {
     private boolean registerDebt(Money debtFenix, Event event, boolean isNewDate, ErrorLogConsumer errorLog, EventLogger elogger)
             throws Exception {
 
-        String clientId = ClientMap.uVATNumberFor(event.getPerson());
-        JsonObject data =
-                toJsonDebt(event, debtFenix, clientId, new DateTime(), getEntryDate(event), true, "NG", true, isNewDate);
+        String clientId = ClientMap.uVATNumberFor(event.getParty());
+        JsonObject data = toJsonDebt(event, debtFenix, clientId, getDocumentDate(event.getWhenOccured(), isNewDate),
+                new DateTime(), true, "NG", true, isNewDate);
 
         String documentNumber = getDocumentNumber(data, false);
         SapRequest sapRequest = new SapRequest(event, clientId, debtFenix, documentNumber, SapRequestType.DEBT, Money.ZERO, data);
@@ -155,7 +155,7 @@ public class SapEvent {
     private boolean registerDebtCredit(CreditEntry creditEntry, Event event, boolean isNewDate, ErrorLogConsumer errorLog,
             EventLogger elogger) throws Exception {
 
-        String clientId = ClientMap.uVATNumberFor(event.getPerson());
+        String clientId = ClientMap.uVATNumberFor(event.getParty());
         SimpleImmutableEntry<List<SapRequest>, Money> openDebtsAndRemainingValue = getOpenDebtsAndRemainingValue();
         List<SapRequest> openDebts = openDebtsAndRemainingValue.getKey();
         Money remainingAmount = openDebtsAndRemainingValue.getValue();
@@ -209,8 +209,9 @@ public class SapEvent {
             String debtCreditDocNumber, boolean isNewDate, ErrorLogConsumer errorLog, EventLogger elogger) throws Exception {
         checkValidDocumentNumber(debtCreditDocNumber, event);
 
-        JsonObject data = toJsonDebtCredit(event, amountToRegister, clientId, new DateTime(), creditEntry.getCreated(), true,
-                "NJ", false, isNewDate, debtCreditDocNumber);
+        JsonObject data =
+                toJsonDebtCredit(event, amountToRegister, clientId, getDocumentDate(creditEntry.getCreated(), isNewDate),
+                        new DateTime(), true, "NJ", false, isNewDate, debtCreditDocNumber);
         String documentNumber = getDocumentNumber(data, false);
         SapRequest sapRequest =
                 new SapRequest(event, clientId, amountToRegister, documentNumber, SapRequestType.DEBT_CREDIT, Money.ZERO, data);
@@ -237,7 +238,7 @@ public class SapEvent {
             }
         }
 
-        String clientId = ClientMap.uVATNumberFor(event.getPerson());
+        String clientId = ClientMap.uVATNumberFor(event.getParty());
 
         SimpleImmutableEntry<List<SapRequest>, Money> openInvoicesAndRemainingValue = getOpenInvoicesAndRemainingValue();
         List<SapRequest> openInvoices = openInvoicesAndRemainingValue.getKey();
@@ -291,7 +292,8 @@ public class SapEvent {
             String invoiceNumber, ErrorLogConsumer errorLog, EventLogger elogger) throws Exception {
         checkValidDocumentNumber(invoiceNumber, event);
 
-        JsonObject data = toJsonCredit(event, creditEntry.getCreated(), creditAmount, clientId, invoiceNumber, false, true);
+        JsonObject data = toJsonCredit(event, getDocumentDate(creditEntry.getCreated(), false), creditAmount, clientId,
+                invoiceNumber, false, true);
         String documentNumber = getDocumentNumber(data, false);
         SapRequest sapRequest =
                 new SapRequest(event, clientId, creditAmount, documentNumber, SapRequestType.CREDIT, Money.ZERO, data);
@@ -309,7 +311,7 @@ public class SapEvent {
         String invoiceNumber = getLastInvoiceNumber();
         checkValidDocumentNumber(invoiceNumber, event);
 
-        String clientId = ClientMap.uVATNumberFor(event.getPerson());
+        String clientId = ClientMap.uVATNumberFor(event.getParty());
         JsonObject data = toJsonReimbursement(event, amount, clientId, invoiceNumber, false, true);
 
         String documentNumber = getDocumentNumber(data, true);
@@ -337,7 +339,7 @@ public class SapEvent {
         } else {
             // registering the invoice
             invoiceNumber = registerInterestInvoice(payedInterest, clientId, transactionDetail,
-                    transactionDetail.getWhenProcessed(), errorLog, elogger);
+                    getDocumentDate(transactionDetail.getWhenProcessed(), false), errorLog, elogger);
         }
 
         // even if the invoice fails (in the integration with SAP) we want to register the request
@@ -349,7 +351,7 @@ public class SapEvent {
     private String registerInterestInvoice(final Money payedInterest, final String clientId,
             final AccountingTransactionDetail transactionDetail, DateTime paymentDate, final ErrorLogConsumer errorLog,
             final EventLogger elogger) throws Exception {
-        JsonObject data = toJsonInvoice(transactionDetail.getEvent(), payedInterest, new DateTime(), paymentDate, clientId, false,
+        JsonObject data = toJsonInvoice(transactionDetail.getEvent(), payedInterest, paymentDate, new DateTime(), clientId, false,
                 true, true);
 
         String documentNumber = getDocumentNumber(data, false);
@@ -377,15 +379,15 @@ public class SapEvent {
         sapRequest.setPayment(transactionDetail.getTransaction());
         JsonObject result = sendDataToSap(sapRequest, data);
 
-        return checkAndRegisterIntegration(transactionDetail.getEvent(), errorLog, elogger, data, documentNumber, sapRequest, result,
-                SapRequestType.PAYMENT_INTEREST.name(), true);
+        return checkAndRegisterIntegration(transactionDetail.getEvent(), errorLog, elogger, data, documentNumber, sapRequest,
+                result, SapRequestType.PAYMENT_INTEREST.name(), true);
     }
 
     public boolean registerPayment(Payment payment, ErrorLogConsumer errorLog, EventLogger elogger) throws Exception {
 
         AccountingTransactionDetail transactionDetail =
                 ((AccountingTransaction) FenixFramework.getDomainObject(payment.getId())).getTransactionDetail();
-        String clientId = ClientMap.uVATNumberFor(transactionDetail.getEvent().getPerson());
+        String clientId = ClientMap.uVATNumberFor(transactionDetail.getEvent().getParty());
 
         // ir buscar a ultima factura aberta e verificar se o pagamento ultrapassa o valor da factura
         // e associar o restante à(s) factura(s) seguinte(s)
@@ -488,7 +490,8 @@ public class SapEvent {
             if (hasPayment(transactionDetail.getTransaction(), sapRequest)) {
                 //TODO já existe um pagamento feito com este id (noutro request) o que quer dizer que isto é um pagamento que se dividiu por n facturas e um deles deu erro
                 // este pagamento não vai voltar a ser processado e é preciso dar uma mensagem de erro diferente para isto ser corrigido manualmente
-                logError(transactionDetail.getEvent(), errorLog, elogger, "WARNING: one of multiple payments has failed!!!",
+                logError(transactionDetail.getEvent(), errorLog, elogger,
+                        "WARNING: one of multiple payments has failed! ID: " + transactionDetail.getTransaction().getExternalId(),
                         documentNumber, SapRequestType.PAYMENT.name(), sapRequest);
             }
             return false;
@@ -506,8 +509,8 @@ public class SapEvent {
         sapRequest.setPayment(transactionDetail.getTransaction());
         JsonObject result = sendDataToSap(sapRequest, data);
 
-        return checkAndRegisterIntegration(transactionDetail.getEvent(), errorLog, elogger, data, documentNumber, sapRequest, result,
-                SapRequestType.ADVANCEMENT.name(), true);
+        return checkAndRegisterIntegration(transactionDetail.getEvent(), errorLog, elogger, data, documentNumber, sapRequest,
+                result, SapRequestType.ADVANCEMENT.name(), true);
     }
 
     public boolean processPendingRequests(Event event, ErrorLogConsumer errorLog, EventLogger elogger) {
@@ -518,7 +521,6 @@ public class SapEvent {
                 JsonParser jsonParser = new JsonParser();
                 JsonObject data = (JsonObject) jsonParser.parse(sr.getRequest());
 
-                checkAndCorrectDates(sr, data);
                 JsonObject result = sendDataToSap(sr, data);
 
                 return checkAndRegisterIntegration(event, errorLog, elogger, data, sr.getDocumentNumber(), sr, result,
@@ -558,59 +560,21 @@ public class SapEvent {
         }
     }
 
-    private void checkAndCorrectDates(SapRequest sr, JsonObject data) {
-        LocalDate now = new LocalDate();
-        boolean changed = false;
-
-        if (sr.getRequestType() == SapRequestType.DEBT) {
-            JsonObject workingDocument = data.get("workingDocument").getAsJsonObject();
-            String metadata = workingDocument.get("debtMetadata").getAsString();
-            String stripMetadata = metadata.replace("\\", "");
-            JsonObject metadataJson = new JsonParser().parse(stripMetadata).getAsJsonObject();
-
-            LocalDate startDate = LocalDate.parse(metadataJson.get("START_DATE").getAsString(), localDateFormatter);
-            if (startDate.isBefore(now)) {
-                metadata = metadata.replace(metadataJson.get("START_DATE").getAsString(), now.toString("yyyy-MM-dd"));
-                workingDocument.addProperty("debtMetadata", metadata);
-                changed = true;
-            }
-
-            LocalDate endDate = LocalDate.parse(metadataJson.get("END_DATE").getAsString(), localDateFormatter);
-            if (endDate.isBefore(now)) {
-                metadata = metadata.replace(metadataJson.get("END_DATE").getAsString(), now.toString("yyyy-MM-dd"));
-                workingDocument.addProperty("debtMetadata", metadata);
-                changed = true;
-            }
+    private DateTime getDocumentDate(DateTime documentDate, boolean isNewDate) {
+        if (isNewDate) {
+            return new DateTime();
         }
-
-        if (sr.getRequestType() == SapRequestType.INVOICE || sr.getRequestType() == SapRequestType.DEBT
-                || sr.getRequestType() == SapRequestType.CREDIT || sr.getRequestType() == SapRequestType.INVOICE_INTEREST
-                || sr.getRequestType() == SapRequestType.REIMBURSEMENT || sr.getRequestType() == SapRequestType.ADVANCEMENT) {
-            data.get("workingDocument").getAsJsonObject().addProperty("documentDate", new DateTime().toString(DT_FORMAT));
-            changed = true;
+        if (documentDate.getYear() < currentDate.getYear()) {
+            return documentDatePreviousYear.apply(currentDate);
         }
-        if (sr.getRequestType() == SapRequestType.PAYMENT || sr.getRequestType() == SapRequestType.PAYMENT_INTEREST
-                || sr.getRequestType() == SapRequestType.REIMBURSEMENT || sr.getRequestType() == SapRequestType.ADVANCEMENT
-                || sr.getRequestType() == SapRequestType.CREDIT) {
-            data.get("paymentDocument").getAsJsonObject().addProperty("paymentDate", new DateTime().toString(DT_FORMAT));
-            changed = true;
-        }
-
-        if (changed) {
-            sr.setRequest(data.toString());
-        }
-    }
-
-    private DateTime getEntryDate(Event event) {
-        if (event.getWhenOccured().getYear() < currentDate.getYear()) {
-            return new DateTime(currentDate.getYear() - 1, 12, 31, 23, 59);
-        }
-        return event.getWhenOccured();
+        return documentDate;
     }
 
     private boolean isToProcessDebt(Event event, boolean isGratuity) {
-        return isGratuity && event.getWhenOccured().isAfter(EventWrapper.LIMIT);
+        return (isGratuity || (event instanceof ExternalScholarshipPhdGratuityContribuitionEvent))
+                && event.getWhenOccured().isAfter(EventWrapper.LIMIT);
     }
+
     /**
      * Sends the data to SAP
      * 
@@ -655,9 +619,9 @@ public class SapEvent {
             String clientId, boolean isInterest) throws Exception {
         JsonObject data =
                 toJson(transactionDetail.getEvent(), clientId, transactionDetail.getWhenRegistered(), false, false, isInterest);
-        JsonObject paymentDocument =
-                toJsonPaymentDocument(amount, "NP", invoiceNumber, new DateTime(), getPaymentMechanism(transactionDetail),
-                        getPaymentMethodReference(transactionDetail), SAFTPTSettlementType.NL.toString(), true);
+        JsonObject paymentDocument = toJsonPaymentDocument(amount, "NP", invoiceNumber, transactionDetail.getWhenRegistered(),
+                getPaymentMechanism(transactionDetail), getPaymentMethodReference(transactionDetail),
+                SAFTPTSettlementType.NL.toString(), true);
 
         data.add("paymentDocument", paymentDocument);
         return data;
@@ -678,14 +642,14 @@ public class SapEvent {
             AccountingTransactionDetail transactionDetail) throws Exception {
         JsonObject data =
                 toJson(transactionDetail.getEvent(), clientId, transactionDetail.getWhenRegistered(), false, false, false);
-        JsonObject paymentDocument =
-                toJsonPaymentDocument(amount, "NP", invoiceNumber, new DateTime(), getPaymentMechanism(transactionDetail),
-                        getPaymentMethodReference(transactionDetail), SAFTPTSettlementType.NL.toString(), true);
+        JsonObject paymentDocument = toJsonPaymentDocument(amount, "NP", invoiceNumber, transactionDetail.getWhenRegistered(),
+                getPaymentMechanism(transactionDetail), getPaymentMethodReference(transactionDetail),
+                SAFTPTSettlementType.NL.toString(), true);
         paymentDocument.addProperty("excessPayment", excess.toPlainString());
         paymentDocument.addProperty("isAdvancedPayment", true);
 
-        JsonObject workingDocument = toJsonWorkDocument(transactionDetail.getWhenRegistered(),
-                transactionDetail.getWhenRegistered(), excess, "NA", false, transactionDetail.getWhenRegistered());
+        JsonObject workingDocument = toJsonWorkDocument(getDocumentDate(transactionDetail.getWhenRegistered(), false),
+                new DateTime(), excess, "NA", false, transactionDetail.getWhenRegistered());
         workingDocument.addProperty("isAdvancedPayment", true);
         workingDocument.addProperty("paymentDocumentNumber", paymentDocument.get("paymentDocumentNumber").getAsString());
 
@@ -696,15 +660,15 @@ public class SapEvent {
         return data;
     }
 
-    private JsonObject toJsonCredit(Event event, DateTime entryDate, Money creditAmount, String clientId, String invoiceNumber,
+    private JsonObject toJsonCredit(Event event, DateTime documentDate, Money creditAmount, String clientId, String invoiceNumber,
             boolean isDebtRegistration, boolean isNewDate) throws Exception {
         JsonObject json = toJson(event, clientId, new DateTime(), isDebtRegistration, isNewDate, false);
-        JsonObject workDocument = toJsonWorkDocument(new DateTime(), entryDate, creditAmount, "NA", false, new DateTime());
+        JsonObject workDocument = toJsonWorkDocument(documentDate, new DateTime(), creditAmount, "NA", false, new DateTime());
         workDocument.addProperty("workOriginDocNumber", invoiceNumber);
         json.add("workingDocument", workDocument);
 
         String workingDocumentNumber = workDocument.get("workingDocumentNumber").getAsString();
-        JsonObject paymentDocument = toJsonPaymentDocument(creditAmount, "NP", workingDocumentNumber, new DateTime(), "OU", "",
+        JsonObject paymentDocument = toJsonPaymentDocument(creditAmount, "NP", workingDocumentNumber, documentDate, "OU", "",
                 SAFTPTSettlementType.NN.toString(), false);
         paymentDocument.addProperty("isCreditNote", true);
         paymentDocument.addProperty("paymentOriginDocNumber", invoiceNumber);
@@ -757,7 +721,7 @@ public class SapEvent {
 
     private JsonObject toJsonInvoice(Event event, Money debtFenix, DateTime documentDate, DateTime entryDate, String clientId,
             boolean isDebtRegistration, boolean isNewDate, boolean isInterest) throws Exception {
-        JsonObject json = toJson(event, clientId, documentDate, isDebtRegistration, isNewDate, isInterest);
+        JsonObject json = toJson(event, clientId, documentDate, isDebtRegistration, true, isInterest);
         JsonObject workDocument =
                 toJsonWorkDocument(documentDate, entryDate, debtFenix, "ND", true, new DateTime(Utils.getDueDate(event)));
 
@@ -771,15 +735,21 @@ public class SapEvent {
         JsonObject workDocument =
                 toJsonWorkDocument(documentDate, entryDate, debtFenix, docType, isToDebit, new DateTime(Utils.getDueDate(event)));
 
+        LocalDate startDate = isNewDate ? currentDate : documentDate.toLocalDate();
         ExecutionYear executionYear = Utils.executionYearOf(event);
-        LocalDate startDate = isNewDate ? currentDate : event.getWhenOccured().toLocalDate();
-        if (startDate.getYear() < currentDate.getYear()) {
-            startDate = new LocalDate(currentDate.getYear() - 1, 12, 31);
+        if (startDate.isBefore(executionYear.getBeginLocalDate())) {
+            startDate = executionYear.getBeginLocalDate();
         }
         LocalDate endDate = executionYear.getEndDateYearMonthDay().toLocalDate();
-        if (endDate.isBefore(startDate)) {
-            endDate = startDate;
+
+        //If it is a Phd the dates are not regulated by the execution year
+        if (event instanceof PhdGratuityEvent) {
+            PhdGratuityEvent phdEvent = (PhdGratuityEvent) event;
+            startDate = phdEvent.getPhdGratuityDate().getYear() == phdEvent.getYear() ? phdEvent.getPhdGratuityDate()
+                    .toLocalDate() : phdEvent.getWhenOccured().toLocalDate();
+            endDate = startDate.plusYears(1);
         }
+
         String metadata = String.format("{\"ANO_LECTIVO\":\"%s\", \"START_DATE\":\"%s\", \"END_DATE\":\"%s\"}",
                 executionYear.getName(), startDate.toString("yyyy-MM-dd"), endDate.toString("yyyy-MM-dd"));
         workDocument.addProperty("debtMetadata", metadata);
@@ -798,10 +768,10 @@ public class SapEvent {
         return json;
     }
 
-    private JsonObject toJsonWorkDocument(DateTime eventDate, DateTime entryDate, Money amount, String documentType,
+    private JsonObject toJsonWorkDocument(DateTime documentDate, DateTime entryDate, Money amount, String documentType,
             boolean isToDebit, DateTime dueDate) throws Exception {
         JsonObject workDocument = new JsonObject();
-        workDocument.addProperty("documentDate", eventDate.toString(DT_FORMAT));
+        workDocument.addProperty("documentDate", documentDate.toString(DT_FORMAT));
         workDocument.addProperty("entryDate", entryDate.toString(DT_FORMAT));
         workDocument.addProperty("dueDate", dueDate.toString(DT_FORMAT));
         workDocument.addProperty("workingDocumentNumber", documentType + getDocumentNumber());
@@ -857,40 +827,49 @@ public class SapEvent {
         json.addProperty("productDescription", product.getValue());
         json.addProperty("productCode", product.getKey());
 
-        final JsonObject clientData = toJsonClient(event.getPerson(), clientId);
+        final JsonObject clientData = toJsonClient(event.getParty(), clientId);
         json.add("clientData", clientData);
 
         return json;
     }
 
-    private JsonObject toJsonClient(final Person person, final String clientId) {
+    private JsonObject toJsonClient(final Party party, final String clientId) {
         final JsonObject clientData = new JsonObject();
         clientData.addProperty("accountId", "STUDENT");
-        clientData.addProperty("companyName", person.getName());
+        clientData.addProperty("companyName", party.getName());
         clientData.addProperty("clientId", clientId);
         //country must be the same as the fiscal country
         final String countryCode = clientId.substring(0, 2);
         clientData.addProperty("country", countryCode);
 
-        PhysicalAddress physicalAddress = Utils.toAddress(person, countryCode);
+        PhysicalAddress physicalAddress = Utils.toAddress(party, countryCode);
         clientData.addProperty("street",
                 physicalAddress != null && !Strings.isNullOrEmpty(physicalAddress.getAddress().trim()) ? Utils
                         .limitFormat(MAX_SIZE_ADDRESS, physicalAddress.getAddress()) : MORADA_DESCONHECIDO);
 
-        String city = Utils.limitFormat(MAX_SIZE_CITY, person.getDistrictSubdivisionOfResidence()).trim();
+        String city = Utils.limitFormat(MAX_SIZE_CITY, party.getDistrictSubdivisionOfResidence()).trim();
         clientData.addProperty("city", !Strings.isNullOrEmpty(city) ? city : MORADA_DESCONHECIDO);
 
-        String region = Utils.limitFormat(MAX_SIZE_REGION, person.getDistrictOfResidence()).trim();
+        String region = Utils.limitFormat(MAX_SIZE_REGION, party.getDistrictOfResidence()).trim();
         clientData.addProperty("region", !Strings.isNullOrEmpty(region) ? region : MORADA_DESCONHECIDO);
 
         String postalCode =
                 physicalAddress == null ? null : Utils.limitFormat(MAX_SIZE_POSTAL_CODE, physicalAddress.getAreaCode()).trim();
+        //sometimes the address is correct but the vatNumber doesn't exists and a random one was generated from the birth country
+        //in that case we must send a valid postal code for that country, even if it is not the address country
+        if (physicalAddress.getCountryOfResidence() != null
+                && !physicalAddress.getCountryOfResidence().getCode().equals(countryCode)) {
+            postalCode = PostalCodeValidator.examplePostCodeFor(countryCode);
+        }
+        if (!PostalCodeValidator.isValidAreaCode(countryCode, postalCode)) {
+            postalCode = PostalCodeValidator.examplePostCodeFor(countryCode);
+        }
         clientData.addProperty("postalCode",
                 !Strings.isNullOrEmpty(postalCode) ? postalCode : PostalCodeValidator.examplePostCodeFor(countryCode));
 
-        clientData.addProperty("vatNumber", clientId);
+        clientData.addProperty("vatNumber", Utils.limitFormat(MAX_SIZE_VAT_NUMBER, clientId));
         clientData.addProperty("fiscalCountry", countryCode);
-        clientData.addProperty("nationality", person.getCountry().getCode());
+        clientData.addProperty("nationality", party.getCountry().getCode());
         clientData.addProperty("billingIndicator", 0);
 
         return clientData;
@@ -905,7 +884,7 @@ public class SapEvent {
     }
 
     private void checkValidDocumentNumber(String documentNumber, Event event) throws Exception {
-        if ("0".equals(documentNumber.charAt(2))) {
+        if ('0' == documentNumber.charAt(2)) {
             throw new Exception("Houve uma tentativa de efectuar uma operação sobre o documento: " + documentNumber
                     + " - evento: " + event.getExternalId());
         }
@@ -1038,14 +1017,10 @@ public class SapEvent {
 
     public Money getDebtAmount() {
         return addAll(SapRequestType.DEBT);
-//        return event.getSapRequestSet().stream().filter(sr -> sr.getRequestType().equals(SapRequestType.DEBT))
-//                .filter(sr -> sr.getValue().isPositive()).map(sr -> sr.getValue()).reduce(Money.ZERO, Money::add);
     }
 
     public Money getDebtCreditAmount() {
         return addAll(SapRequestType.DEBT_CREDIT);
-//        return event.getSapRequestSet().stream().filter(sr -> sr.getRequestType().equals(SapRequestType.DEBT))
-//                .filter(sr -> sr.getValue().isNegative()).map(sr -> sr.getValue().abs()).reduce(Money.ZERO, Money::add);
     }
 
     public Money getInvoiceAmount() {
@@ -1053,7 +1028,7 @@ public class SapEvent {
     }
 
     public Money getPayedAmount() {
-        return addAll(SapRequestType.PAYMENT);
+        return addAll(SapRequestType.PAYMENT).add(addAll(SapRequestType.ADVANCEMENT));
     }
 
     public Money getCreditAmount() {
@@ -1061,7 +1036,7 @@ public class SapEvent {
     }
 
     public Money getAdvancementAmount() {
-        return event.getSapRequestSet().stream().filter(sr -> sr.getRequestType().equals(SapRequestType.PAYMENT))
+        return event.getSapRequestSet().stream().filter(sr -> sr.getRequestType().equals(SapRequestType.ADVANCEMENT))
                 .map(SapRequest::getAdvancement).reduce(Money.ZERO, Money::add);
     }
 
@@ -1073,16 +1048,19 @@ public class SapEvent {
         return addAll(SapRequestType.REIMBURSEMENT);
     }
 
-    public boolean hasPayment(final String transactionDetailId) {
-        return event.getSapRequestSet().stream().filter(sr -> sr.getRequestType() == SapRequestType.PAYMENT)
-                .filter(sr -> sr.getPayment() != null)
-                .filter(sr -> transactionDetailId.equals(sr.getPayment().getExternalId())).findAny().isPresent();
+    public boolean hasPayment(final String transactionId) {
+        return getPaymentsFor(transactionId).findAny().isPresent();
     }
 
     public boolean hasPayment(final AccountingTransaction transaction, SapRequest sapRequest) {
-        return event.getSapRequestSet().stream().filter(sr -> sr.getRequestType() == SapRequestType.PAYMENT)
-                .filter(sr -> sr.getPayment() != null)
-                .filter(sr -> transaction == sr.getPayment()).filter(sr -> sr != sapRequest).findAny().isPresent();
+        return getPaymentsFor(transaction.getTransactionDetail().getExternalId()).filter(sr -> transaction == sr.getPayment())
+                .filter(sr -> sr != sapRequest).findAny().isPresent();
+    }
+
+    private Stream<SapRequest> getPaymentsFor(final String transactionDetailId) {
+        return event.getSapRequestSet().stream()
+                .filter(sr -> sr.getRequestType() == SapRequestType.PAYMENT || sr.getRequestType() == SapRequestType.ADVANCEMENT)
+                .filter(sr -> sr.getPayment() != null).filter(sr -> transactionDetailId.equals(sr.getPayment().getExternalId()));
     }
 
     public boolean hasInterestPayment(final AccountingTransaction transaction) {
@@ -1100,67 +1078,8 @@ public class SapEvent {
                 .filter(sr -> creditId.equals(sr.getCreditId())).findAny().isPresent();
     }
 
-    private void logPastPayments(final AccountingTransactionDetail d, final String clientId, final Money txAmount,
-            final String receiptNumber, final String now, final String registryDate) {
-        final Event event = d.getEvent();
-        final ExecutionYear debtYear = Utils.executionYearOf(event);
-
-        final StringBuilder builder = new StringBuilder();
-        builder.append(event.getExternalId());
-        builder.append("\t");
-        builder.append(d.getExternalId());
-        builder.append("\t");
-        builder.append(clientId == null ? " " : clientId);
-        builder.append("\t");
-        builder.append(txAmount.toPlainString());
-        builder.append("\t");
-        builder.append(receiptNumber);
-        builder.append("\t");
-        builder.append(now);
-        builder.append("\t");
-        builder.append(registryDate);
-        builder.append("\t");
-        builder.append(debtYear.getName());
-        builder.append("\n");
-        appendPastLog(builder.toString());
-    }
-
-    private void appendPastLog(final String line) {
-        final File file = new File("/afs/ist.utl.pt/ciist/fenix/fenix015/ist/sap_past_event_log.csv");
-        if (!file.exists()) {
-            final StringBuilder builder = new StringBuilder();
-            builder.append("Event");
-            builder.append("\t");
-            builder.append("Transaction");
-            builder.append("\t");
-            builder.append("ClientId");
-            builder.append("\t");
-            builder.append("TX Amount");
-            builder.append("\t");
-            builder.append("Receipt Number");
-            builder.append("\t");
-            builder.append("Sent To Accounting");
-            builder.append("\t");
-            builder.append("Registry Date");
-            builder.append("\t");
-            builder.append("Debt Year");
-            builder.append("\n");
-            append(file, builder.toString());
-        }
-        append(file, line);
-    }
-
-    private void append(final File file, final String line) {
-        try {
-            Files.write(file.toPath(), line.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND,
-                    StandardOpenOption.WRITE);
-        } catch (final IOException e) {
-            throw new Error(e);
-        }
-    }
-
-    private SimpleImmutableEntry<String, String> mapToProduct(Event event, String eventDescription, boolean isDebtRegistration,
-            boolean isInterest) {
+    public static SimpleImmutableEntry<String, String> mapToProduct(Event event, String eventDescription,
+            boolean isDebtRegistration, boolean isInterest) {
         if (isInterest) {
             return new SimpleImmutableEntry<String, String>("0036", "MULTAS");
         }
@@ -1215,6 +1134,9 @@ public class SapEvent {
             } else {
                 return new SimpleImmutableEntry<String, String>("0029", "PROPINAS 3 CICLO");
             }
+        }
+        if (event instanceof ExternalScholarshipPhdGratuityContribuitionEvent) {
+            return new SimpleImmutableEntry<String, String>("0029", "PROPINAS 3 CICLO");
         }
         if (event.isResidenceEvent()) {
             return null;
@@ -1278,20 +1200,20 @@ public class SapEvent {
 
     private void logError(Event event, String clientId, ErrorLogConsumer errorLog, EventLogger elogger, String returnMessage,
             String action, JsonObject sentData, SapRequest sr) {
-        final Person person = event.getPerson();
-        errorLog.accept(event.getExternalId(), clientId, person.getName(), "", "", returnMessage, "", "",
+        final Party party = event.getParty();
+        errorLog.accept(event.getExternalId(), clientId, party.getName(), "", "", returnMessage, "", "",
                 sentData.get("clientData").getAsJsonObject().get("fiscalCountry").getAsString(), clientId,
                 sentData.get("clientData").getAsJsonObject().get("street").getAsString(), "",
                 sentData.get("clientData").getAsJsonObject().get("postalCode").getAsString(), "", "", "", action);
-        elogger.log("Pessoa %s (%s): evento: %s %s %s %s %n", person.getExternalId(), person.getUsername(), event.getExternalId(),
-                clientId, returnMessage, action);
+        elogger.log("Pessoa %s (%s): evento: %s %s %s %s %n", party.getExternalId(), Utils.getUserIdentifier(party),
+                event.getExternalId(), clientId, returnMessage, action);
 
         //Write to SapRequest in json format
         JsonObject errorMessage = new JsonObject();
         errorMessage.addProperty("ID Evento", event.getExternalId());
-        errorMessage.addProperty("Utilizador", person.getUsername());
+        errorMessage.addProperty("Utilizador", Utils.getUserIdentifier(party));
         errorMessage.addProperty("Nº Contribuinte", clientId);
-        errorMessage.addProperty("Nome", person.getName());
+        errorMessage.addProperty("Nome", party.getName());
         errorMessage.addProperty("Mensagem", returnMessage);
         errorMessage.addProperty("País Fiscal", sentData.get("clientData").getAsJsonObject().get("fiscalCountry").getAsString());
         errorMessage.addProperty("Morada", sentData.get("clientData").getAsJsonObject().get("street").getAsString());
@@ -1305,9 +1227,9 @@ public class SapEvent {
             String action, SapRequest sr) {
         BigDecimal amount = null;
         DebtCycleType cycleType = Utils.cycleType(event);
-        final Person person = event.getPerson();
+        final Party party = event.getParty();
 
-        errorLog.accept(event.getExternalId(), person.getUsername(), person.getName(),
+        errorLog.accept(event.getExternalId(), Utils.getUserIdentifier(party), party.getName(),
                 amount == null ? "" : amount.toPlainString(), cycleType == null ? "" : cycleType.getDescription(), errorMessage,
                 "", "", "", "", "", "", "", "", "", documentNumber, action);
         elogger.log("%s: %s %s %s %n", event.getExternalId(), errorMessage, documentNumber, action);
@@ -1315,8 +1237,8 @@ public class SapEvent {
         //Write to SapRequest in json format
         JsonObject returnMessage = new JsonObject();
         returnMessage.addProperty("ID Evento", event.getExternalId());
-        returnMessage.addProperty("Utilizador", person.getUsername());
-        returnMessage.addProperty("Nome", person.getName());
+        returnMessage.addProperty("Utilizador", Utils.getUserIdentifier(party));
+        returnMessage.addProperty("Nome", party.getName());
         returnMessage.addProperty("Ciclo", cycleType != null ? cycleType.getDescription() : "");
         returnMessage.addProperty("Mensagem", errorMessage);
         returnMessage.addProperty("Nº Documento", documentNumber);

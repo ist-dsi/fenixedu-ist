@@ -10,17 +10,14 @@ import org.fenixedu.academic.domain.accounting.CreditNoteEntry;
 import org.fenixedu.academic.domain.accounting.CreditNoteState;
 import org.fenixedu.academic.domain.accounting.Entry;
 import org.fenixedu.academic.domain.accounting.Event;
-import org.fenixedu.academic.domain.phd.debts.PhdGratuityEvent;
 import org.fenixedu.academic.util.Money;
 import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
 
 public class EventWrapper {
 
     public final static DateTime THRESHOLD = new DateTime(2015, 12, 1, 0, 0, 0, 0);
-    public final static ExecutionYear SAP_THRESHOLD = ExecutionYear.readExecutionYearByName("2015/2016");
-    public final static ExecutionYear SAP_3RD_CYCLE_THRESHOLD = ExecutionYear.readExecutionYearByName("2014/2015");
-    public final static LocalDate SAP_TRANSACTIONS_THRESHOLD = new LocalDate(2017, 12, 31);
+    public final static ExecutionYear SAP_THRESHOLD = ExecutionYear.readExecutionYearByName("2013/2014");
+    public final static DateTime SAP_TRANSACTIONS_THRESHOLD = new DateTime(2017, 12, 31, 23, 59, 59, 999);
 
     public final static DateTime LIMIT = new DateTime(2017, 12, 31, 23, 59, 59, 999);
 
@@ -53,8 +50,7 @@ public class EventWrapper {
 
     public static boolean needsProcessingSap(final Event event) {
         final ExecutionYear executionYear = Utils.executionYearOf(event);
-        return !executionYear.isBefore(SAP_THRESHOLD)
-                || (event instanceof PhdGratuityEvent && !executionYear.isBefore(SAP_3RD_CYCLE_THRESHOLD));
+        return !executionYear.isBefore(SAP_THRESHOLD);
     }
 
     public static Stream<Event> eventsToProcessSap(final ErrorLogConsumer consumer, final Stream<Event> eventStream,
@@ -86,7 +82,7 @@ public class EventWrapper {
         final Money payedAfterThreshhold = payedTotal.subtract(payedBeforThreshold);
 
         // calculate debt        
-        final Money value = /*event.isCancelled() ? Money.ZERO :*/ event.getOriginalAmountToPay();
+        final Money value = event.getOriginalAmountToPay();
         final Money diff = value.subtract(payedBeforThreshold);
         debt = diff.isPositive() ? diff : Money.ZERO;
 
@@ -149,13 +145,6 @@ public class EventWrapper {
                 .filter(d -> d.getWhenRegistered().isAfter(THRESHOLD)).filter(d -> !isCreditNote(d))
                 .filter(d -> Utils.validate(null, d));
     }
-//
-//    public List<AccountingTransactionDetail> paymentsSap() {
-//        final Stream<AccountingTransactionDetail> stream =
-//                event.getAccountingTransactionsSet().stream().map(at -> at.getTransactionDetail());
-//        return stream.filter(d -> d.getWhenRegistered().isAfter(SAP_TRANSACTIONS_THRESHOLD)).filter(d -> !isCreditNote(d))
-//                .filter(d -> Utils.validate(null, d)).collect(Collectors.toList());
-//    }
 
     private boolean isCreditNote(AccountingTransactionDetail detail) {
         final Entry entry = detail.getTransaction().getToAccountEntry();
