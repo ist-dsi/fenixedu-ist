@@ -20,6 +20,7 @@ class SapRequest {
 	boolean integrated;
 	String integrationMessage;
 	String request;
+	Integer order;
 }
 
 class SapDocumentFile extends .org.fenixedu.bennu.io.domain.GenericFile {

@@ -25,6 +25,7 @@ import javax.mail.util.ByteArrayDataSource;
 
 import org.fenixedu.academic.FenixEduAcademicConfiguration;
 import org.fenixedu.academic.util.ConnectionManager;
+import org.fenixedu.bennu.GiafInvoiceConfiguration;
 import org.fenixedu.messaging.core.domain.MessagingSystem;
 
 public class TaskUtils {
@@ -40,8 +41,8 @@ public class TaskUtils {
 
     static void sendSapReport(final String filename, final byte[] byteArray, final String subject, final String body)
             throws AddressException, MessagingException {
-//        send(filename, byteArray, subject, body, GiafInvoiceConfiguration.getConfiguration().clientSapLogErrorsMails(),
-//                GiafInvoiceConfiguration.getConfiguration().clientSapLogErrorsMailsBcc());
+        send(filename, byteArray, subject, body, GiafInvoiceConfiguration.getConfiguration().clientSapLogErrorsMails(),
+                GiafInvoiceConfiguration.getConfiguration().clientSapLogErrorsMailsBcc());
     }
 
     private static void send(final String filename, final byte[] byteArray, final String subject, final String body,

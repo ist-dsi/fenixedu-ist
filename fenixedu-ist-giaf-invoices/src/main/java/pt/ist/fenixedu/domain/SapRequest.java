@@ -1,6 +1,7 @@
 package pt.ist.fenixedu.domain;
 
 import java.util.Comparator;
+import java.util.Optional;
 
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.util.Money;
@@ -33,9 +34,19 @@ public class SapRequest extends SapRequest_Base {
         }
     };
 
+    public static final Comparator<SapRequest> COMPARATOR_BY_ORDER = new Comparator<SapRequest>() {
+        @Override
+        public int compare(SapRequest r1, SapRequest r2) {
+            return r1.getOrder().compareTo(r2.getOrder());
+        }
+    };
+
     public SapRequest(Event event, String clientId, Money amount, String documentNumber, SapRequestType requestType,
             Money advancement,
             JsonObject request) {
+        Optional<SapRequest> maxRequest = event.getSapRequestSet().stream().filter(sr -> sr != this).max(COMPARATOR_BY_ORDER);
+        Integer order = maxRequest.isPresent() ? maxRequest.get().getOrder() : 0;
+
         setEvent(event);
         setClientId(clientId);
         setValue(amount);
@@ -45,6 +56,7 @@ public class SapRequest extends SapRequest_Base {
         setRequest(request.toString());
         setSent(false);
         setWhenCreated(new DateTime());
+        setOrder(order + 1);
     }
 
     public JsonObject getIntegrationMessageAsJson() {
@@ -55,6 +67,12 @@ public class SapRequest extends SapRequest_Base {
     public void addIntegrationMessage(final String key, final JsonObject message) {
         final JsonObject messages = getIntegrationMessageAsJson();
         messages.add(key, message);
+        setIntegrationMessage(messages.toString());
+    }
+
+    public void removeIntegrationMessage(final String key) {
+        final JsonObject messages = getIntegrationMessageAsJson();
+        messages.remove(key);
         setIntegrationMessage(messages.toString());
     }
   

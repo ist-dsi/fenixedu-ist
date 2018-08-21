@@ -105,6 +105,7 @@ public class InitializeSapData extends CustomTask {
                         sapInvoiceRequest.setWhenSent(FIRST_DAY);
                         sapInvoiceRequest.setSent(true);
                         sapInvoiceRequest.setIntegrated(true);
+                        sapInvoiceRequest.setOrder(0);
 
                         if (isToProcessDebt(event, event.isGratuity())) {
                             final SapRequest sapDebtRequest = new SapRequest(event, clientId, usedAmountInDebts, "NG0",
@@ -113,6 +114,7 @@ public class InitializeSapData extends CustomTask {
                             sapDebtRequest.setWhenSent(FIRST_DAY);
                             sapDebtRequest.setSent(true);
                             sapDebtRequest.setIntegrated(true);
+                            sapDebtRequest.setOrder(0);
                         }
 
                         final SapRequest sapPaymentRequest = new SapRequest(event, clientId, usedAmountInDebts, "NP0",
@@ -121,6 +123,7 @@ public class InitializeSapData extends CustomTask {
                         sapPaymentRequest.setWhenSent(FIRST_DAY);
                         sapPaymentRequest.setSent(true);
                         sapPaymentRequest.setIntegrated(true);
+                        sapPaymentRequest.setOrder(0);
                     });
         }
 
@@ -142,6 +145,7 @@ public class InitializeSapData extends CustomTask {
                         sapInvoiceRequest.setWhenSent(FIRST_DAY);
                         sapInvoiceRequest.setSent(true);
                         sapInvoiceRequest.setIntegrated(true);
+                        sapInvoiceRequest.setOrder(0);
 
                         final SapRequest sapPaymentRequest = new SapRequest(event, clientId, payedInterestAndFineAmount, "NP0",
                                 SapRequestType.PAYMENT_INTEREST, Money.ZERO, EMPTY_JSON_OBJECT);
@@ -149,6 +153,7 @@ public class InitializeSapData extends CustomTask {
                         sapPaymentRequest.setWhenSent(FIRST_DAY);
                         sapPaymentRequest.setSent(true);
                         sapPaymentRequest.setIntegrated(true);
+                        sapPaymentRequest.setOrder(0);
                     });
         }
 
@@ -162,6 +167,7 @@ public class InitializeSapData extends CustomTask {
                 sapAdvancementRequest.setWhenSent(FIRST_DAY);
                 sapAdvancementRequest.setSent(true);
                 sapAdvancementRequest.setIntegrated(true);
+                sapAdvancementRequest.setOrder(0);
             }
         });
 
@@ -204,6 +210,7 @@ public class InitializeSapData extends CustomTask {
                     sapInvoiceRequest.setWhenSent(FIRST_DAY);
                     sapInvoiceRequest.setSent(true);
                     sapInvoiceRequest.setIntegrated(true);
+                    sapInvoiceRequest.setOrder(0);
 
                     final SapRequest sapCreditRequest = new SapRequest(event, clientId, amountToRegister, "NA0",
                             SapRequestType.CREDIT, Money.ZERO, EMPTY_JSON_OBJECT);
@@ -211,6 +218,7 @@ public class InitializeSapData extends CustomTask {
                     sapCreditRequest.setWhenSent(FIRST_DAY);
                     sapCreditRequest.setSent(true);
                     sapCreditRequest.setIntegrated(true);
+                    sapCreditRequest.setOrder(0);
                     if (isToProcessDebt(event, event.isGratuity())) {
                         final SapRequest sapDebtRequest = new SapRequest(event, clientId, amountToRegister, "NG0",
                                 SapRequestType.DEBT, Money.ZERO, EMPTY_JSON_OBJECT);
@@ -218,6 +226,7 @@ public class InitializeSapData extends CustomTask {
                         sapDebtRequest.setWhenSent(FIRST_DAY);
                         sapDebtRequest.setSent(true);
                         sapDebtRequest.setIntegrated(true);
+                        sapDebtRequest.setOrder(0);
 
                         final SapRequest sapDebtCreditRequest = new SapRequest(event, clientId, amountToRegister, "NJ0",
                                 SapRequestType.DEBT_CREDIT, Money.ZERO, EMPTY_JSON_OBJECT);
@@ -225,6 +234,7 @@ public class InitializeSapData extends CustomTask {
                         sapDebtCreditRequest.setWhenSent(FIRST_DAY);
                         sapDebtCreditRequest.setSent(true);
                         sapDebtCreditRequest.setIntegrated(true);
+                        sapDebtCreditRequest.setOrder(0);
                     }
                 });
     }
@@ -245,6 +255,7 @@ public class InitializeSapData extends CustomTask {
             sapRequest.setWhenSent(FIRST_DAY);
             sapRequest.setSent(true);
             sapRequest.setIntegrated(true);
+            sapRequest.setOrder(0);
         }
     }
 
