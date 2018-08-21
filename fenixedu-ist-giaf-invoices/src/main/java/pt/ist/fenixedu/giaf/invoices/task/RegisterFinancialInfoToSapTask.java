@@ -25,13 +25,13 @@ import pt.ist.fenixedu.giaf.invoices.Utils;
 import pt.ist.fenixframework.Atomic.TxMode;
 
 @Task(englishTitle = "Sync financial information (debts, reciepts, exemptions and clients) with SAP.", readOnly = true)
-public class SyncFinancialInfoToSapTask extends CronTask {
+public class RegisterFinancialInfoToSapTask extends CronTask {
 
     @Override
     public void runTask() throws Exception {
         runSyncScript();
     }
-
+    
     @Override
     protected TxMode getTxMode() {
         return TxMode.READ;
@@ -74,14 +74,15 @@ public class SyncFinancialInfoToSapTask extends CronTask {
         final EventLogger elogger = (msg, args) -> taskLog(msg, args);
 
         touch("Processing events...");
-        getEventStream().forEach(e -> EventProcessor.syncEventWithSap(errorLogConsumer, elogger, e));
+        getEventStream(errorLogConsumer)
+                .forEach(e -> EventProcessor.registerEventSapRequests(errorLogConsumer, elogger, e));
 
         touch("Dumping error messages.");
         final ByteArrayOutputStream stream = new ByteArrayOutputStream();
         errors.exportToCSV(stream, "\t");
-        final String subject = "Problemas no envio de informação para o SAP";
+        final String subject = "Problemas nos dados do Fénix";
         final String body =
-                "Listagem atualizada com os problemas verificados na sincronização de informação financeira entre o Fénix e o SAP: "
+                "Listagem atualizada com os problemas verificados no registo da informação financeira a ser comunicada para o SAP: "
                         + new DateTime().toString("yyyy-MM-dd HH:mm");
 
         try {
@@ -90,7 +91,7 @@ public class SyncFinancialInfoToSapTask extends CronTask {
             if (!dir.exists()) {
                 dir.mkdirs();
             }
-            final File documentFile = new File(dir, "SapErrors.xls");
+            final File documentFile = new File(dir, "FenixErrors.xls");
             Utils.writeFileWithoutFailuer(documentFile.toPath(), stream.toByteArray(), false);
         } catch (Exception e) {
             System.out.println("Erro a gravar o ficheiro de erros! damn!");
@@ -107,8 +108,9 @@ public class SyncFinancialInfoToSapTask extends CronTask {
         taskLog("%s: %s%n", prefix, new DateTime().toString("yyyy-MM-dd HH:mm:ss"));
     }
 
-    private Stream<Event> getEventStream() {
-        return Bennu.getInstance().getAccountingEventsSet().stream().filter(e -> EventWrapper.needsProcessingSap(e));
+    private Stream<Event> getEventStream(final ErrorLogConsumer consumer) {
+        return EventWrapper.eventsToProcessSap(consumer, Bennu.getInstance().getAccountingEventsSet().stream(),
+                Bennu.getInstance().getAccountingTransactionDetailsSet().stream());
     }
 
 }

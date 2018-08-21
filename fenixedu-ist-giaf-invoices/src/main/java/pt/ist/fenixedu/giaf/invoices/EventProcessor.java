@@ -112,7 +112,32 @@ public class EventProcessor {
 
     }
 
-    public static void syncEventWithSap(final ErrorLogConsumer consumer, final EventLogger elogger, final Event event) {
+    public static void syncEventWithSap(final ErrorLogConsumer errorLog, final EventLogger elogger, final Event event) {
+        try {
+            FenixFramework.getTransactionManager().withTransaction(new CallableWithoutException<Void>() {
+
+                @Override
+                public Void call() {
+                    syncToSap(errorLog, elogger, event);
+                    return null;
+                }
+            }, new AtomicInstance(TxMode.SPECULATIVE_READ, false));
+        } catch (Exception e) {
+            logError(errorLog, elogger, event, e);
+            e.printStackTrace();
+        }
+    }
+
+    private static void syncToSap(final ErrorLogConsumer errorLog, final EventLogger elogger, final Event event) {
+        try {
+            SapEvent sapEvent = new SapEvent(event);
+            sapEvent.processPendingRequests(event, errorLog, elogger);
+        } catch (final Exception e) {
+            logError(errorLog, elogger, event, e);
+        }
+    }
+
+    public static void registerEventSapRequests(final ErrorLogConsumer consumer, final EventLogger elogger, final Event event) {
         try {
             FenixFramework.getTransactionManager().withTransaction(new CallableWithoutException<Void>() {
 
@@ -135,19 +160,12 @@ public class EventProcessor {
                 final EventWrapper eventWrapper = new EventWrapper(event, errorLog, true);
                 final SapEvent sapEvent = new SapEvent(event);
 
-                boolean successful = sapEvent.processPendingRequests(event, errorLog, elogger);
-                if (!successful) {
-                    return;
-                }
-
                 final Money debtFenix = eventWrapper.debt;
                 final Money invoiceSap = sapEvent.getInvoiceAmount();
 
-                boolean debtResult = false;
                 if (debtFenix.isPositive()) {
                     if (invoiceSap.isZero()) {
-                        debtResult =
-                                sapEvent.registerInvoice(debtFenix, event, eventWrapper.isGratuity(), false, errorLog, elogger);
+                        sapEvent.registerInvoice(debtFenix, event, eventWrapper.isGratuity(), false, errorLog, elogger);
                     } else if (invoiceSap.isNegative()) {
                         logError(event, errorLog, elogger, "A dívida no SAP é negativa");
                     } else if (!debtFenix.equals(invoiceSap)) {
@@ -157,57 +175,44 @@ public class EventProcessor {
                             // criar invoice com a diferença entre debtFenix e invoiceDebtSap (se for propina aumentar a dívida no sap)
                             // passar data actual (o valor do evento mudou, não dá para saber quando, vamos assumir que mudou quando foi detectada essa diferença)
                             logError(event, errorLog, elogger, "A dívida no Fénix é superior à dívida registada no SAP");
-                            debtResult = sapEvent.registerInvoice(debtFenix.subtract(invoiceSap), eventWrapper.event,
+                            sapEvent.registerInvoice(debtFenix.subtract(invoiceSap), eventWrapper.event,
                                     eventWrapper.isGratuity(), true, errorLog, elogger);
                         } else {
                             // diminuir divida no sap e registar credit note da diferença na última factura existente
                             logError(event, errorLog, elogger, "A dívida no SAP é superior à dívida registada no Fénix");
                             CreditEntry creditEntry = getCreditEntry(debtFenix, invoiceSap);
-                            debtResult = sapEvent.registerCredit(eventWrapper.event, creditEntry, eventWrapper.isGratuity(),
-                                    errorLog, elogger);
+                            sapEvent.registerCredit(eventWrapper.event, creditEntry, eventWrapper.isGratuity(), errorLog,
+                                    elogger);
                         }
                     }
                 }
 
-                // there could have been an error comunicating a debt, we can not comunicate payments and such, since there is nothing registered in SAP
-                if (debtResult) {
-                    //Payments!!
-                    DebtInterestCalculator calculator = event.getDebtInterestCalculator(new DateTime());
-                    List<Payment> payments = calculator.getPayments().collect(Collectors.toList());
-                    for (Payment payment : payments) {
-                        if (payment.isForDebt() && payment.getAmount().compareTo(BigDecimal.ZERO) > 0
-                                && !sapEvent.hasPayment(payment.getId())
-                                && payment.getCreated().isAfter(EventWrapper.SAP_TRANSACTIONS_THRESHOLD)) {
-                            boolean result = sapEvent.registerPayment(payment, errorLog, elogger);
-                            if (!result) {
-                                return;
-                            }
-                        }
+                //Payments!!
+                DebtInterestCalculator calculator = event.getDebtInterestCalculator(new DateTime());
+                List<Payment> payments = calculator.getPayments().collect(Collectors.toList());
+                for (Payment payment : payments) {
+                    if (payment.isForDebt() && payment.getAmount().compareTo(BigDecimal.ZERO) > 0
+                            && !sapEvent.hasPayment(payment.getId())
+                            && payment.getCreated().isAfter(EventWrapper.SAP_TRANSACTIONS_THRESHOLD)) {
+                        sapEvent.registerPayment(payment, errorLog, elogger);
                     }
+                }
 
-                    //Exemptions                    
-                    for (CreditEntry creditEntry : calculator.getCreditEntries()) {
-                        if (creditEntry instanceof DebtExemption) {
-                            if (creditEntry.getAmount().compareTo(BigDecimal.ZERO) > 0 && !sapEvent.hasCredit(creditEntry.getId())
-                                    && creditEntry.getCreated().isAfter(EventWrapper.SAP_TRANSACTIONS_THRESHOLD)) {
-                                boolean result =
-                                        sapEvent.registerCredit(event, creditEntry, eventWrapper.isGratuity(), errorLog, elogger);
-                                if (!result) {
-                                    return;
-                                }
-                            }
+                //Exemptions                    
+                for (CreditEntry creditEntry : calculator.getCreditEntries()) {
+                    if (creditEntry instanceof DebtExemption) {
+                        if (creditEntry.getAmount().compareTo(BigDecimal.ZERO) > 0 && !sapEvent.hasCredit(creditEntry.getId())
+                                && creditEntry.getCreated().isAfter(EventWrapper.SAP_TRANSACTIONS_THRESHOLD)) {
+                            sapEvent.registerCredit(event, creditEntry, eventWrapper.isGratuity(), errorLog, elogger);
                         }
                     }
+                }
 
-                    //Reimbursements
-                    Money sapReimbursements = sapEvent.getReimbursementsAmount();
-                    if (eventWrapper.reimbursements.greaterThan(sapReimbursements)) {
-                        boolean result = sapEvent.registerReimbursement(eventWrapper.event,
-                                eventWrapper.reimbursements.subtract(sapReimbursements), errorLog, elogger);
-                        if (!result) {
-                            return;
-                        }
-                    }
+                //Reimbursements
+                Money sapReimbursements = sapEvent.getReimbursementsAmount();
+                if (eventWrapper.reimbursements.greaterThan(sapReimbursements)) {
+                    sapEvent.registerReimbursement(eventWrapper.event, eventWrapper.reimbursements.subtract(sapReimbursements),
+                            errorLog, elogger);
                 }
             } else {
                 //processing payments of past events
@@ -221,25 +226,27 @@ public class EventProcessor {
     }
 
     private static CreditEntry getCreditEntry(final Money debtFenix, final Money invoiceSap) {
-        return new CreditEntry("", new DateTime(), new LocalDate(), "",
-                invoiceSap.subtract(debtFenix).getAmount()) {
-
+        return new CreditEntry("", new DateTime(), new LocalDate(), "", invoiceSap.subtract(debtFenix).getAmount()) {
             @Override
             public boolean isToApplyInterest() {
                 return false;
             }
+
             @Override
             public boolean isToApplyFine() {
                 return false;
             }
+
             @Override
             public boolean isForInterest() {
                 return false;
             }
+
             @Override
             public boolean isForFine() {
                 return false;
             }
+
             @Override
             public boolean isForDebt() {
                 return false;
