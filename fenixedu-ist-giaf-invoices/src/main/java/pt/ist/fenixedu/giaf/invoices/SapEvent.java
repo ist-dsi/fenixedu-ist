@@ -663,7 +663,7 @@ public class SapEvent {
         JsonObject workDocument =
                 toJsonWorkDocument(documentDate, entryDate, debtFenix, docType, isToDebit, new DateTime(Utils.getDueDate(event)));
 
-        if (originalMetadata != null) {
+        if (originalMetadata == null) {
             LocalDate startDate = isNewDate ? currentDate : documentDate.toLocalDate();
             ExecutionYear executionYear = Utils.executionYearOf(event);
             if (startDate.isBefore(executionYear.getBeginLocalDate())) {
