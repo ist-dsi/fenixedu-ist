@@ -21,10 +21,27 @@ class SapRequest {
 	String integrationMessage;
 	String request;
 	Integer order;
+	boolean ignore;
 }
 
 class SapDocumentFile extends .org.fenixedu.bennu.io.domain.GenericFile {
 }
+
+class ExternalClient {
+    String accountId;
+    String companyName;
+    String clientId;
+    String country;
+    String street;
+    String city;
+    String region;
+    String postalCode;
+    String vatNumber;
+    String fiscalCountry;
+    String nationality;
+    Integer billingIndicator;
+}
+
 
 relation SapRequestSapRequestAnnulled {
 	SapRequest playsRole originalRequest {
@@ -70,3 +87,13 @@ relation SapRootBennu {
         multiplicity 1..1;
     }
 }
+
+relation SapRootExternalClient {
+    SapRoot playsRole sapRoot {
+        multiplicity 1..1;
+    }
+    ExternalClient playsRole externalClient {
+        multiplicity *;
+    }
+}
+
