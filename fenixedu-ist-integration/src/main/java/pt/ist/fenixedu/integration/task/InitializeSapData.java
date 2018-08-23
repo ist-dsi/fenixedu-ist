@@ -54,7 +54,6 @@ public class InitializeSapData extends CustomTask {
     public void runTask() throws Exception {
         startYear = ExecutionYear.readExecutionYearByName("2013/2014");
 
-        Event.paymentsPredicate = (t, when) -> !t.getWhenRegistered().isAfter(when);
         // in case transaction restarts... reset state.
         payments = Money.ZERO;
         exemptions = Money.ZERO;
@@ -64,8 +63,13 @@ public class InitializeSapData extends CustomTask {
                 FenixFramework.getTransactionManager().withTransaction(new CallableWithoutException<Void>() {
                     @Override
                     public Void call() {
-                        process(event);
-                        return null;
+                        try {
+                            Event.paymentsPredicate = (t, when) -> !t.getWhenRegistered().isAfter(when);
+                            process(event);
+                            return null;
+                        } finally {
+                            Event.paymentsPredicate = (t, when) -> !t.getWhenProcessed().isAfter(when);
+                        }
                     }
                 }, new AtomicInstance(TxMode.SPECULATIVE_READ, false));
             } catch (final Exception e) {
@@ -79,7 +83,7 @@ public class InitializeSapData extends CustomTask {
     }
 
     public void process(final Event event) {
-        taskLog("Processing event: %s\n", event.getExternalId());
+        //taskLog("Processing event: %s\n", event.getExternalId());
         final DebtInterestCalculator debtInterestCalculator = event.getDebtInterestCalculator(LAST_DAY);
         final Money amountPayed = processPayments(event, debtInterestCalculator);
         processExemptions(event, amountPayed, debtInterestCalculator);
@@ -185,7 +189,7 @@ public class InitializeSapData extends CustomTask {
         debtInterestCalculator.getCreditEntries().stream().filter(DebtExemption.class::isInstance)
                 .filter(c -> c.getAmount().compareTo(BigDecimal.ZERO) > 0).forEach(c -> {
 
-                    final Money amountToRegister = new Money(c.getAmount());
+                    Money amountToRegister = new Money(c.getAmount());
 
                     //TODO remove when fully tested, if we register a different value for the exemption
                     //when the sync script runs it will detect a different amount for the exemptions and it will try to rectify
@@ -195,7 +199,7 @@ public class InitializeSapData extends CustomTask {
                         if (amountToRegister.add(amountPayed).greaterThan(originalAmount)) {
                             taskLog("Evento: %s # Montante original: %s # montante pago: %s # montante a registar: %s\n",
                                     event.getExternalId(), originalAmount, amountPayed, amountToRegister);
-//                    amountToRegister = originalAmount.subtract(amountPayed);
+                            amountToRegister = originalAmount.subtract(amountPayed);
                         }
                     }
 
