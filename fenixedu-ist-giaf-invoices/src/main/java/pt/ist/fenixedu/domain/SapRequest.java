@@ -7,6 +7,7 @@ import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.util.Money;
 import org.joda.time.DateTime;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -88,4 +89,37 @@ public class SapRequest extends SapRequest_Base {
         }
         deleteDomainObject();
     }
+
+    public boolean refersToDocument(final String documentNumber) {
+        final JsonObject o = new JsonParser().parse(getRequest()).getAsJsonObject();
+        final JsonElement paymentDocument = o.get("paymentDocument");
+        if (paymentDocument != null && !paymentDocument.isJsonNull()) {
+            final JsonObject paymentDocumentO = paymentDocument.getAsJsonObject();
+            if (hasValue(paymentDocumentO, "workingDocumentNumber", documentNumber)
+                    || hasValue(paymentDocumentO, "originatingOnDocumentNumber", documentNumber)
+                    || hasValue(paymentDocumentO, "paymentOriginDocNumber", documentNumber)) {
+                return true;
+            }
+        }
+        final JsonElement workingDocument = o.get("workingDocument");
+        if (workingDocument != null && !workingDocument.isJsonNull()) {
+            final JsonObject workingDocumentO = workingDocument.getAsJsonObject();
+            if (hasValue(workingDocumentO, "workOriginDocNumber", documentNumber)
+                    || hasValue(workingDocumentO, "paymentDocumentNumber", documentNumber)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean hasValue(final JsonObject o, final String key, final String value) {
+        final JsonElement e = o.get(key);
+        return e != null && !e.isJsonNull() && e.getAsString().equals(value);
+    }
+
+    public JsonObject getClientJson() {
+        final JsonObject o = new JsonParser().parse(getRequest()).getAsJsonObject();
+        return o.get("clientData").getAsJsonObject();
+    }
+
 }

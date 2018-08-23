@@ -156,9 +156,10 @@ public class EventProcessor {
     private static void processSap(final ErrorLogConsumer errorLog, final EventLogger elogger, final Event event) {
         try {
             if (EventWrapper.needsProcessingSap(event)) {
-
                 final EventWrapper eventWrapper = new EventWrapper(event, errorLog, true);
                 final SapEvent sapEvent = new SapEvent(event);
+
+                sapEvent.updateInvoiceWithNewClientData();
 
                 final Money debtFenix = eventWrapper.debt;
                 final Money invoiceSap = sapEvent.getInvoiceAmount();
@@ -180,7 +181,7 @@ public class EventProcessor {
                         } else {
                             // diminuir divida no sap e registar credit note da diferença na última factura existente
                             logError(event, errorLog, elogger, "A dívida no SAP é superior à dívida registada no Fénix");
-                            CreditEntry creditEntry = getCreditEntry(debtFenix, invoiceSap);
+                            CreditEntry creditEntry = getCreditEntry(invoiceSap.subtract(debtFenix));
                             sapEvent.registerCredit(eventWrapper.event, creditEntry, eventWrapper.isGratuity(), errorLog,
                                     elogger);
                         }
@@ -225,8 +226,8 @@ public class EventProcessor {
         }
     }
 
-    private static CreditEntry getCreditEntry(final Money debtFenix, final Money invoiceSap) {
-        return new CreditEntry("", new DateTime(), new LocalDate(), "", invoiceSap.subtract(debtFenix).getAmount()) {
+    static CreditEntry getCreditEntry(final Money creditAmount) {
+        return new CreditEntry("", new DateTime(), new LocalDate(), "", creditAmount.getAmount()) {
             @Override
             public boolean isToApplyInterest() {
                 return false;
