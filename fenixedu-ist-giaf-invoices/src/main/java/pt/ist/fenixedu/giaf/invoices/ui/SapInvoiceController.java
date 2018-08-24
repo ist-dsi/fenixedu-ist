@@ -184,6 +184,7 @@ public class SapInvoiceController {
         result.addProperty("value", sapRequest.getValue() == null ? null : sapRequest.getValue().toPlainString());
         result.addProperty("whenCreated", sapRequest.getWhenCreated() == null ? null : sapRequest.getWhenCreated().toString(DATE_TIME_FORMAT));
         result.addProperty("whenSent", sapRequest.getWhenSent() == null ? null : sapRequest.getWhenSent().toString(DATE_TIME_FORMAT));
+        result.addProperty("ignore", sapRequest.getIgnore());
         return result;
     }
 
