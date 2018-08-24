@@ -4,7 +4,7 @@
     <parent>
         <groupId>pt.ist</groupId>
         <artifactId>fenixedu-ist</artifactId>
-        <version>14.4.0-SNAPSHOT</version>
+        <version>14.4.0</version>
     </parent>
 
     <artifactId>fenixedu-ist-delegates</artifactId>
