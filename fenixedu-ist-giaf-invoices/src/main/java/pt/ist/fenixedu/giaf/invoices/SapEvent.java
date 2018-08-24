@@ -163,10 +163,11 @@ public class SapEvent {
             return;
         }
         final String clientId = ClientMap.uVATNumberFor(event.getParty());
-        if (clientId.equals(sapRequest.getClientId())) {
+        final String sapRequestClientId = sapRequest.getClientId();
+        if (clientId.equals(sapRequestClientId)) {
             return;
         }
-        if (SapRoot.getInstance().getExternalClientSet().stream().map(c -> c.getClientId()).anyMatch(s -> s.equals(clientId))) {
+        if (SapRoot.getInstance().getExternalClientSet().stream().map(c -> c.getClientId()).anyMatch(s -> s.equals(sapRequestClientId))) {
             return;
         }
 
