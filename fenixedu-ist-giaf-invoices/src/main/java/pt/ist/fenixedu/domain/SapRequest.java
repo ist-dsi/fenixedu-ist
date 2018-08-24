@@ -58,6 +58,7 @@ public class SapRequest extends SapRequest_Base {
         setSent(false);
         setWhenCreated(new DateTime());
         setOrder(order + 1);
+        setIgnore(false);
     }
 
     public JsonObject getIntegrationMessageAsJson() {
