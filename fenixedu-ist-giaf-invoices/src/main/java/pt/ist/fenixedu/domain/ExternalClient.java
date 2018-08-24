@@ -18,6 +18,7 @@ public class ExternalClient extends ExternalClient_Base {
         setVatNumber(vatNumber);
         setFiscalCountry(fiscalCountry);
         setNationality(nationality);
+        setBillingIndicator(billingIndicator);
     }
 
 }
