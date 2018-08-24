@@ -157,47 +157,31 @@ public class Utils {
             return false;
         }
 
-        String tin = party.getSocialSecurityNumber();
-        if (tin != null && tin.length() > 2 && TINValid.checkTIN(tin.substring(0, 2), tin.substring(2)) == 0) {
-
-        } else if (country != null) {
-            tin = ClientMap.uVATNumberFor(party);
-        } else {
-            logError(consumer, "No Country", event, getUserIdentifier(party), "", country, party, null, null, event);
+        final String ssn = ClientMap.uVATNumberFor(party);
+        if ("PT999999990".equals(ssn) && originalAmountToPay.greaterThan(new Money(100))) {
+            logError(consumer, "No Valid VAT Number", event, getUserIdentifier(party), ssn, country, party, null, null, event);
             return false;
         }
 
-        final PhysicalAddress address = toAddress(party, tin.substring(0, 2));
-        if (address == null) {
-            logError(consumer, "No Address", event, getUserIdentifier(party), "", country, party, address, null, event);
-            return false;
-        }
-        final Country countryOfAddress = address.getCountryOfResidence();
-        if (countryOfAddress == null) {
+        if (!"PT999999990".equals(ssn)) {
+            final PhysicalAddress address = toAddress(party, ssn.substring(0, 2));
+            if (address == null) {
+                logError(consumer, "No Address", event, getUserIdentifier(party), "", country, party, address, null, event);
+                return false;
+            }
+            final Country countryOfAddress = address.getCountryOfResidence();
+            if (countryOfAddress == null) {
 //            logError(consumer, "No Valid Country for Address", event, getUserIdentifier(party), "", country, party, address,
 //                    countryOfAddress, event);
 //            return false;
-        } else if ("PT".equals(countryOfAddress.getCode()) /* || "PT".equals(country.getCode()) */) {
-            if (!isValidPostCode(hackAreaCodePT(address.getAreaCode(), countryOfAddress))) {
-                logError(consumer, "No Valid Post Code For Address For", event, getUserIdentifier(party), "", country, party,
-                        address, countryOfAddress, event);
-                return false;
+            } else if ("PT".equals(countryOfAddress.getCode()) /* || "PT".equals(country.getCode()) */) {
+                if (!isValidPostCode(hackAreaCodePT(address.getAreaCode(), countryOfAddress))) {
+                    logError(consumer, "No Valid Post Code For Address For", event, getUserIdentifier(party), "", country, party,
+                            address, countryOfAddress, event);
+                    return false;
+                }
             }
         }
-
-        if ("PT".equals(country.getCode())) {
-            if (!ClientMap.isVatValidForPT(tin.substring(2))) {
-                logError(consumer, "Not a Valid PT VAT Number", event, getUserIdentifier(party), tin, country, party, address,
-                        countryOfAddress, event);
-                return false;
-            }
-        }
-        if ("PT999999990".equals(tin) && originalAmountToPay.greaterThan(new Money(100))) {
-            logError(consumer, "No VAT Number", event, getUserIdentifier(party), tin, country, party, address, countryOfAddress,
-                    event);
-            return false;
-        }
-
 
         final BigDecimal amount = originalAmountToPay.getAmount();
         //final BigDecimal amount = event.getOriginalAmountToPay().getAmount();

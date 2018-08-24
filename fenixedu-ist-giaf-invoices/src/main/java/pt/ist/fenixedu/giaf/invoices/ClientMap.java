@@ -67,27 +67,44 @@ public class ClientMap {
     }
 
     public static String uVATNumberFor(final Party party) {
+        final String tin = party.getSocialSecurityNumber();
+        if (tin != null && !tin.trim().isEmpty()) {
+            if (tin.length() > 2
+                    && Character.isAlphabetic(tin.charAt(0))
+                    && Character.isAlphabetic(tin.charAt(1))
+                    && Character.isUpperCase(tin.charAt(0))
+                    && Character.isUpperCase(tin.charAt(1))) {
+                final String countryCode = tin.substring(0, 2);
+                final String code = tin.substring(2);
+                if (TINValid.checkTIN(countryCode, code) == 0) {
+                    // all is ok
+                    return tin;
+                }
+            }
+            final Country country = getValidCountry(tin, party.getCountry(), party.getCountryOfResidence(), (party.isPerson() ? ((Person) party).getCountryOfBirth() : null), Country.readByTwoLetterCode("PT"));
+            if (country != null) {
+                return country.getCode() + tin;
+            }
+        }        
+        if (tin != null && tin.length() > 2 && !"PT".equals(tin.substring(0, 2)) && Country.readByTwoLetterCode(tin.substring(0, 2)) != null) {
+            return tin;
+        }
         final Country country = party.getCountry();
-        final String ssn = party.getSocialSecurityNumber();
-
-        if (ssn != null && ssn.length() > 2 && TINValid.checkTIN(ssn.substring(0, 2), ssn.substring(2)) == 0) {
-            return ssn;
+        if (country != null && !country.getCode().equals("PT")) {
+            return country.getCode() + party.getExternalId();
         }
-
-        final String vat = toVatNumber(ssn);
-        if (vat != null && isVatValidForPT(vat)) {
-            return "PT" + vat;
-        }
-        if (country == null || "PT".equals(country.getCode())) {
-            return "PT999999990";
-            //return null;
-        }
-        if (vat != null) {
-            return /*trimVatTo12Digits(*/country.getCode() + vat/*)*/;
-        }
-        return trimVatTo12Digits(country.getCode() + makeUpSomeRandomNumber(party));
+        return "PT999999990";
     }
 
+    private static Country getValidCountry(final String tin, final Country... countries) {
+        for (int i = 0; i < countries.length; i++) {
+            final Country country = countries[i];
+            if (country != null && TINValid.checkTIN(country.getCode().toUpperCase(), tin) == 0) {
+                return country;
+            }
+        }
+        return null;
+    }
     private static String trimVatTo12Digits(final String uVat) {
         return uVat.substring(0, 2) + StringUtils.right(uVat, Math.min(uVat.length() - 2, 10));
     }
