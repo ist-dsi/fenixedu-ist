@@ -18,11 +18,6 @@
  */
 package pt.ist.fenixedu.integration.domain.student;
 
-import java.text.MessageFormat;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.function.Predicate;
-
 import org.fenixedu.academic.domain.Attends;
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.Degree;
@@ -34,6 +29,7 @@ import org.fenixedu.academic.domain.IEnrolment;
 import org.fenixedu.academic.domain.OptionalEnrolment;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
+import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.Installment;
 import org.fenixedu.academic.domain.accounting.PaymentCode;
 import org.fenixedu.academic.domain.accounting.PaymentCodeState;
@@ -44,7 +40,6 @@ import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEventWith
 import org.fenixedu.academic.domain.candidacy.IngressionType;
 import org.fenixedu.academic.domain.candidacy.StudentCandidacy;
 import org.fenixedu.academic.domain.degree.DegreeType;
-import org.fenixedu.academic.domain.degreeStructure.Context;
 import org.fenixedu.academic.domain.degreeStructure.CourseGroup;
 import org.fenixedu.academic.domain.degreeStructure.CycleType;
 import org.fenixedu.academic.domain.degreeStructure.OptionalCurricularCourse;
@@ -79,6 +74,9 @@ import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.YearMonthDay;
+
+import java.text.MessageFormat;
+import java.util.function.Predicate;
 
 public class SeparationCyclesManagement {
 
@@ -146,6 +144,8 @@ public class SeparationCyclesManagement {
         moveExtraCurriculumGroupInformation(oldStudentCurricularPlan, newStudentCurricularPlan);
         moveExtraAttends(oldStudentCurricularPlan, newStudentCurricularPlan);
         tryRemoveOldSecondCycle(oldSecondCycle);
+        //TODO : cannot simply move events information between events
+        //moveGratuityEventsInformation(oldStudentCurricularPlan, newStudentCurricularPlan);
         createAdministrativeOfficeFeeAndInsurance(newStudentCurricularPlan);
 
         markOldRegistrationWithConcludedState(oldStudentCurricularPlan);
@@ -155,29 +155,16 @@ public class SeparationCyclesManagement {
 
     private void moveExtraAttends(final StudentCurricularPlan oldStudentCurricularPlan,
             final StudentCurricularPlan newStudentCurricularPlan) {
-
-        final Set<Attends> attends = new HashSet<Attends>();
-        for (final Attends attend : oldStudentCurricularPlan.getRegistration().getAssociatedAttendsSet()) {
-            if (!belongsTo(oldStudentCurricularPlan, attend)
-                    && isToMoveAttendsFrom(oldStudentCurricularPlan, newStudentCurricularPlan, attend)) {
-                attends.add(attend);
-            }
-        }
-
-        for (final Attends attend : attends) {
-            if (!newStudentCurricularPlan.getRegistration().attends(attend.getExecutionCourse())) {
-                attend.setRegistration(newStudentCurricularPlan.getRegistration());
-            }
-        }
+        oldStudentCurricularPlan.getRegistration().getAssociatedAttendsSet().stream()
+            .filter(attend -> !belongsTo(oldStudentCurricularPlan, attend))
+            .filter(attend -> isToMoveAttendsFrom(oldStudentCurricularPlan, newStudentCurricularPlan, attend))
+            .filter(attend -> !newStudentCurricularPlan.getRegistration().attends(attend.getExecutionCourse()))
+            .forEach(attend -> attend.setRegistration(newStudentCurricularPlan.getRegistration()));
     }
 
     private boolean belongsTo(final StudentCurricularPlan studentCurricularPlan, final Attends attend) {
-        for (final CurricularCourse curricularCourse : attend.getExecutionCourse().getAssociatedCurricularCoursesSet()) {
-            if (studentCurricularPlan.getDegreeCurricularPlan().hasDegreeModule(curricularCourse)) {
-                return true;
-            }
-        }
-        return false;
+        return attend.getExecutionCourse().getAssociatedCurricularCoursesSet().stream()
+                .anyMatch(curricularCourse -> studentCurricularPlan.getDegreeCurricularPlan().hasDegreeModule(curricularCourse));
     }
 
     private boolean isToMoveAttendsFrom(final StudentCurricularPlan oldStudentCurricularPlan,
@@ -227,7 +214,7 @@ public class SeparationCyclesManagement {
     private YearMonthDay getBeginDate(final StudentCurricularPlan sourceStudentCurricularPlan,
             final ExecutionSemester executionSemester) {
 
-        if (!sourceStudentCurricularPlan.getRegistration().hasConcludedFirstCycle()) {
+        if (!sourceStudentCurricularPlan.getRegistration().hasConcluded()) {
             throw new DomainException("error.SeparationCyclesManagement.source.studentCurricularPlan.is.not.concluded");
         }
 
@@ -298,12 +285,7 @@ public class SeparationCyclesManagement {
         if (source.getDegreeModule().getValidChildContexts(nowadays).size() > 0) {
             return true;
         }
-        for (CurriculumGroup childGroup : source.getChildCurriculumGroups()) {
-            if (groupIsStillValid(childGroup)) {
-                return true;
-            }
-        }
-        return false;
+        return source.getChildCurriculumGroups().stream().anyMatch(this::groupIsStillValid);
     }
 
     private void copyCurricumLineInformation(final CurriculumLine curriculumLine, final CurriculumGroup parent) {
@@ -404,7 +386,7 @@ public class SeparationCyclesManagement {
     private OptionalDismissal createNewOptionalDismissal(final Credits credits, final CurriculumGroup parent,
             final CurriculumLine curriculumLine, final OptionalCurricularCourse curricularCourse, final Double ectsCredits) {
 
-        if (ectsCredits == null || ectsCredits.doubleValue() == 0) {
+        if (ectsCredits == null || ectsCredits == 0) {
             throw new DomainException("error.OptionalDismissal.invalid.credits");
         }
 
@@ -427,13 +409,9 @@ public class SeparationCyclesManagement {
 
     private boolean hasCurricularCourseToDismissal(final CurriculumGroup curriculumGroup, final CurricularCourse curricularCourse) {
         final CourseGroup degreeModule = curriculumGroup.getDegreeModule();
-        for (final Context context : degreeModule.getChildContexts(CurricularCourse.class)) {
-            final CurricularCourse each = (CurricularCourse) context.getChildDegreeModule();
-            if (each.isEquivalent(curricularCourse) && !curriculumGroup.hasChildDegreeModule(degreeModule)) {
-                return true;
-            }
-        }
-        return false;
+        return degreeModule.getChildContexts(CurricularCourse.class).stream()
+                .map(context -> (CurricularCourse) context.getChildDegreeModule())
+                .anyMatch(each -> each.isEquivalent(curricularCourse) && !curriculumGroup.hasChildDegreeModule(degreeModule));
     }
 
     private void createDismissal(final Dismissal dismissal, final CurriculumGroup parent) {
@@ -489,12 +467,7 @@ public class SeparationCyclesManagement {
     }
 
     private boolean curriculumGroupHasSimilarDismissal(final CurriculumGroup curriculumGroup, final Dismissal dismissal) {
-        for (final Dismissal each : curriculumGroup.getChildDismissals()) {
-            if (each.isSimilar(dismissal)) {
-                return true;
-            }
-        }
-        return false;
+        return curriculumGroup.getChildDismissals().stream().anyMatch(each -> each.isSimilar(dismissal));
     }
 
     private void moveExtraCurriculumGroupInformation(final StudentCurricularPlan oldStudentCurricularPlan,
@@ -571,15 +544,40 @@ public class SeparationCyclesManagement {
             stateDate = getExecutionYear().getEndDateYearMonthDay().toLocalDate();
         }
 
-        RegistrationStateType stateType = RegistrationStateType.CONCLUDED;
-        if (oldStudentCurricularPlan.getDegreeType().isIntegratedMasterDegree()) {
-            stateType = RegistrationStateType.INTERNAL_ABANDON;
-        }
-
         final RegistrationState state =
                 RegistrationState.createRegistrationState(oldStudentCurricularPlan.getRegistration(), null,
-                        stateDate.toDateTimeAtStartOfDay(), stateType);
+                        stateDate.toDateTimeAtStartOfDay(), RegistrationStateType.CONCLUDED);
         state.setResponsiblePerson(null);
+    }
+
+    private void moveGratuityEventsInformation(final StudentCurricularPlan oldStudentCurricularPlan,
+            final StudentCurricularPlan newStudentCurricularPlan) {
+
+        if (!oldStudentCurricularPlan.hasGratuityEvent(getExecutionYear(), GratuityEventWithPaymentPlan.class)
+                || oldStudentCurricularPlan.getGratuityEvent(getExecutionYear(), GratuityEventWithPaymentPlan.class)
+                .anyMatch(Event::isCancelled)) {
+            return;
+        }
+
+        if (!newStudentCurricularPlan.hasGratuityEvent(getExecutionYear(), GratuityEventWithPaymentPlan.class)) {
+            correctRegistrationRegime(oldStudentCurricularPlan, newStudentCurricularPlan);
+            createGratuityEvent(newStudentCurricularPlan);
+        }
+
+        final GratuityEventWithPaymentPlan firstEvent =
+                oldStudentCurricularPlan.getGratuityEvent(getExecutionYear(), GratuityEventWithPaymentPlan.class)
+                        .findAny()
+                        .orElseThrow(UnsupportedOperationException::new);
+        final GratuityEventWithPaymentPlan secondEvent =
+                newStudentCurricularPlan.getGratuityEvent(getExecutionYear(), GratuityEventWithPaymentPlan.class)
+                        .findAny()
+                        .orElseThrow(UnsupportedOperationException::new);
+
+        if (!firstEvent.isGratuityEventWithPaymentPlan() || !secondEvent.isGratuityEventWithPaymentPlan()) {
+            throw new DomainException("error.SeparationCyclesManagement.unexpected.event.types");
+        }
+
+        movePayments(firstEvent, secondEvent);
     }
 
     private void createGratuityEvent(final StudentCurricularPlan newStudentCurricularPlan) {
@@ -616,10 +614,7 @@ public class SeparationCyclesManagement {
 
         // Second Event
         final Money originalTotalAmount = secondEvent.getGratuityPaymentPlan().calculateOriginalTotalAmount();
-        Money min = Money.min(amountLessPenalty, originalTotalAmount);
-        if (min.isPositive()) {
-            secondEvent.addDiscount(getPerson(), min);
-        }
+        secondEvent.addDiscount(getPerson(), Money.min(amountLessPenalty, originalTotalAmount));
         secondEvent.recalculateState(new DateTime());
     }
 

@@ -4,9 +4,8 @@ import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.EnrolmentEvaluation;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.accounting.PaymentCodeType;
 import org.fenixedu.academic.domain.accounting.events.SpecialSeasonEnrolmentEvent;
-import org.fenixedu.academic.domain.accounting.paymentCodes.AccountingEventPaymentCode;
+import org.fenixedu.academic.domain.accounting.paymentCodes.EventPaymentCodeEntry;
 import org.fenixedu.academic.domain.administrativeOffice.AdministrativeOffice;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.util.EnrolmentEvaluationState;
@@ -16,7 +15,7 @@ import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.scheduler.CronTask;
 import org.fenixedu.bennu.scheduler.annotation.Task;
 import org.fenixedu.messaging.core.domain.Message;
-import org.joda.time.YearMonthDay;
+import org.joda.time.LocalDate;
 
 import java.util.Collections;
 
@@ -49,10 +48,8 @@ public class GenerateSpecialSeasonEnrolmentPaymentCodesAndEvents extends CronTas
         final Person person = registration.getPerson();
         final SpecialSeasonEnrolmentEvent event = new SpecialSeasonEnrolmentEvent(office, person, Collections.singleton(ee));
 
-        final YearMonthDay today = new YearMonthDay();
-        final AccountingEventPaymentCode paymentCode =
-                AccountingEventPaymentCode.create(PaymentCodeType.SPECIAL_SEASON_ENROLMENT, today, today.plusDays(10), event,
-                        AMOUNT_TO_PAY, AMOUNT_TO_PAY, event.getPerson());
+        final EventPaymentCodeEntry eventPaymentCodeEntry =
+                EventPaymentCodeEntry.getOrCreate(event, AMOUNT_TO_PAY, new LocalDate().plusDays(10));
 
         final User user = registration.getPerson().getUser();
         final String eventDescription = eventDescription(ee);
@@ -77,11 +74,11 @@ public class GenerateSpecialSeasonEnrolmentPaymentCodesAndEvents extends CronTas
                 "das 20:00 do dia de hoje (ou das 20:00 do dia seguinte se esta mensagem " +
                 "tiver sido enviada depois das 18h00): " +
                 "\n\n" +
-                "Entidade: " + paymentCode.getEntityCode() + "\n" +
+                "Entidade: " + eventPaymentCodeEntry.getPaymentCode().getEntityCode() + "\n" +
                 "\n" +
-                "Referência: " + paymentCode.getCode() + "\n\n" +
+                "Referência: " + eventPaymentCodeEntry.getPaymentCode().getCode() + "\n\n" +
                 "\n" +
-                "Valor: " + AMOUNT_TO_PAY.toString() + " €" +
+                "Valor: " + eventPaymentCodeEntry.getAmount() + " €" +
                 "\n\n"
                 ;
         Message.fromSystem()

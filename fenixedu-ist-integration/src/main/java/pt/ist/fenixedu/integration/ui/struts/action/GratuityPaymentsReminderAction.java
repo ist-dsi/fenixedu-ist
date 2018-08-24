@@ -18,12 +18,6 @@
  */
 package pt.ist.fenixedu.integration.ui.struts.action;
 
-import java.util.Collection;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -32,7 +26,6 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.accounting.PaymentCode;
 import org.fenixedu.academic.domain.accounting.PaymentPlan;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEvent;
-import org.fenixedu.academic.domain.accounting.paymentCodes.AccountingEventPaymentCode;
 import org.fenixedu.academic.domain.accounting.paymentCodes.InstallmentPaymentCode;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
@@ -40,6 +33,11 @@ import org.fenixedu.academic.util.Money;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Objects;
+import java.util.Set;
 
 @Mapping(path = "/gratuityPaymentsReminder")
 @Forwards({
@@ -83,41 +81,16 @@ public class GratuityPaymentsReminderAction extends FenixDispatchAction {
 
         Set<GratuityEvent> gratuityEvents = person.getGratuityEvents();
 
-        for (GratuityEvent gratuityEvent : gratuityEvents) {
-
-            if (gratuityEvent.getExecutionYear() != currentExecutionYear) {
-                continue;
-            }
-
-            if (gratuityEvent.getAmountToPay().lessThan(THRESHOLD)) {
-                PaymentCode activePaymentCode = getActivePaymentCode(gratuityEvent);
-
-                if (activePaymentCode == null) {
-                    continue;
-
-                }
-
-                if (!(activePaymentCode instanceof InstallmentPaymentCode)) {
-                    continue;
-                }
-
-                return (InstallmentPaymentCode) activePaymentCode;
-            }
-        }
-
-        return null;
+        return (InstallmentPaymentCode) gratuityEvents.stream()
+                .filter(gratuityEvent -> gratuityEvent.getExecutionYear() == currentExecutionYear)
+                .filter(gratuityEvent -> gratuityEvent.getAmountToPay().lessThan(THRESHOLD))
+                .map(this::getActivePaymentCode)
+                .filter(activePaymentCode -> activePaymentCode instanceof InstallmentPaymentCode)
+                .findFirst().orElse(null);
     }
 
     private PaymentCode getActivePaymentCode(GratuityEvent gratuityEvent) {
-        Collection<AccountingEventPaymentCode> paymentCodesSet = gratuityEvent.getAllPaymentCodes();
-
-        for (AccountingEventPaymentCode accountingEventPaymentCode : paymentCodesSet) {
-            if (accountingEventPaymentCode.isNew()) {
-                return accountingEventPaymentCode;
-            }
-        }
-
-        return null;
+        return gratuityEvent.getAllPaymentCodes().stream().filter(PaymentCode::isNew).findFirst().orElse(null);
     }
 
 }

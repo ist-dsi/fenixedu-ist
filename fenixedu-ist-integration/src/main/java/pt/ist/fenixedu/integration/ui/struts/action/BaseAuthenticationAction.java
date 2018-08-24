@@ -29,8 +29,8 @@ import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeAndInsuranceEvent;
-import org.fenixedu.academic.domain.accounting.events.AnnualEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEvent;
 import org.fenixedu.academic.domain.alumni.CerimonyInquiryPerson;
 import org.fenixedu.academic.domain.person.RoleType;
@@ -173,12 +173,7 @@ public class BaseAuthenticationAction extends FenixAction {
     }
 
     private boolean isAlumniAndHasInquiriesToResponde(final User userView) {
-        for (final CerimonyInquiryPerson cerimonyInquiryPerson : userView.getPerson().getCerimonyInquiryPersonSet()) {
-            if (cerimonyInquiryPerson.isPendingResponse()) {
-                return true;
-            }
-        }
-        return false;
+        return userView.getPerson().getCerimonyInquiryPersonSet().stream().anyMatch(CerimonyInquiryPerson::isPendingResponse);
     }
 
     private ActionForward handleSessionCreationAndForwardToAlumniReminder(HttpServletRequest request, User userView,
@@ -221,15 +216,9 @@ public class BaseAuthenticationAction extends FenixAction {
 
     public static boolean hasGratuityOrAdministrativeOfficeFeeAndInsuranceDebtsFor(Person person,
             final ExecutionYear executionYear) {
-        for (final AnnualEvent annualEvent : person.getAnnualEventsFor(executionYear)) {
-            if (annualEvent instanceof GratuityEvent || annualEvent instanceof AdministrativeOfficeFeeAndInsuranceEvent) {
-                if (annualEvent.isOpen()) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return person.getAnnualEventsFor(executionYear).stream()
+                .filter(annualEvent -> annualEvent instanceof GratuityEvent || annualEvent instanceof AdministrativeOfficeFeeAndInsuranceEvent)
+                .anyMatch(Event::isOpen);
 
     }
 
