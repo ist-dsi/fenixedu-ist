@@ -18,6 +18,8 @@
     along with FenixEdu IST GIAF Invoices.  If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@page import="org.fenixedu.bennu.core.security.Authenticate"%>
+<%@page import="org.fenixedu.bennu.core.groups.Group"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <% final String contextPath = request.getContextPath(); %>
 
@@ -108,8 +110,9 @@
             <th colspan="3" style="text-align: center;"><spring:message code="label.event.debt" text="Debt"/></th>
             <th colspan="3" style="text-align: center;"><spring:message code="label.event.fine" text="Fine"/></th>
             <th colspan="3" style="text-align: center;"><spring:message code="label.event.interest" text="Interest"/></th>
-            <th></th>
-            <th></th>
+            <th rowspan="2"></th>
+            <th rowspan="2"></th>
+            <th rowspan="2"></th>
 		</tr>
 		<tr>
             <th><spring:message code="label.event.total" text="Total"/></th>
@@ -139,10 +142,10 @@
           <h4 class="modal-title"><spring:message code="label.sapRequest.requestAndResponseDetails" text="Integration Details"/></h4>
         </div>
         <div class="modal-body">
-            <h5><spring:message code="label.sapRequest.request" text="Request"/></h5>
-            <div id="sapRequestDetails"></div>
             <h5><spring:message code="label.sapRequest.response" text="Response"/></h5>
             <div id="sapResponseDetails"></div>
+            <h5><spring:message code="label.sapRequest.request" text="Request"/></h5>
+            <div id="sapRequestDetails"></div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -171,15 +174,32 @@
 		}
 	}
 
-    function syncEvent(eventId) {
+    function calculateRequests(eventId) {
+    	<% if (Group.dynamic("managers").isMember(Authenticate.getUser())) { %>
         return '<form method="post" action="' + contextPath + '/sap-invoice-viewer/' + eventId + '/sync">'
         	   + '${csrf.field()}'
-        	   + '<button type="submit" class="btn btn-warning"><spring:message code="label.repeat.request" text="Repeat Request"/></button>'
+        	   + '<button type="submit" class="btn btn-warning"><spring:message code="label.calculate.request" text="Calculate Requests"/></button>'
         	   + '</form>'
         	   ;
+        <% } else { %>
+            return '';
+        <% } %>
+    }
+
+    function syncEvent(eventId) {
+    	<% if (Group.dynamic("managers").isMember(Authenticate.getUser())) { %>
+    	return '<form method="post" action="' + contextPath + '/sap-invoice-viewer/' + eventId + '/sync">'
+               + '${csrf.field()}'
+               + '<button type="submit" class="btn btn-warning"><spring:message code="label.repeat.request" text="Sync"/></button>'
+               + '</form>'
+               ;
+    	<% } else { %>
+    	   return '';
+        <% } %>
     }
 
     function deleteRequest(sapRequest) {
+    	<% if (Group.dynamic("managers").isMember(Authenticate.getUser())) { %>
         if (!sapRequest.integrated) {
             return '<form method="post" action="' + contextPath + '/sap-invoice-viewer/' + sapRequest.id + '/delete">'
                + '${csrf.field()}'
@@ -187,6 +207,8 @@
                + '</form>'
                ;
         }
+        <% } %>
+        return '';
     }
 
     function sentPart(sapRequest) {
@@ -263,6 +285,7 @@
                 .append($('<td/>').text(event.interestExemptionAmount))
                 .append($('<td/>').text(event.paidInterestAmount))
                 .append($('<td/>').html(expandButton(i, hasSapRequests)))
+                .append($('<td/>').html(calculateRequests(event.eventId)))
                 .append($('<td/>').html(syncEvent(event.eventId)))
                 ;
 

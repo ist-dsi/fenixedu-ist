@@ -27,6 +27,8 @@ import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.EventState;
 import org.fenixedu.academic.domain.accounting.calculator.DebtInterestCalculator;
 import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.core.groups.Group;
+import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.joda.time.DateTime;
 import org.springframework.ui.Model;
@@ -50,6 +52,10 @@ public class SapInvoiceController {
 
     private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
+    public static interface EventProcessorInterface {
+        public void process(final ErrorLogConsumer consumer, final EventLogger logger, final Event event);
+    }
+
     @RequestMapping(method = RequestMethod.GET)
     public String home(@RequestParam(required = false) String username, final Model model) {
         final User user = InvoiceController.getUser(username);
@@ -65,14 +71,17 @@ public class SapInvoiceController {
         return "sap-invoice-viewer/home";
     }
 
-    @RequestMapping(value = "/{event}/sync", method = RequestMethod.POST)
-    public String syncEvent(final @PathVariable Event event, final Model model) {
-        final String errors = syncEvent(event);
-        model.addAttribute("errors", errors);
-        return home(event.getPerson().getUsername(), model);
+    @RequestMapping(value = "/{event}/calculateRequests", method = RequestMethod.POST)
+    public String calculateRequests(final @PathVariable Event event, final Model model) {
+        return processEvent(model, event, (c, l, e) -> EventProcessor.registerEventSapRequests(c, l, e));
     }
 
-    public static String syncEvent(final Event event) {
+    @RequestMapping(value = "/{event}/sync", method = RequestMethod.POST)
+    public String syncEvent(final @PathVariable Event event, final Model model) {
+        return processEvent(model, event, (c, l, e) -> EventProcessor.syncEventWithSap(c, l, e));
+    }
+
+    private String processEvent(final Model model, final Event event, final EventProcessorInterface processor) {
         final StringBuilder errors = new StringBuilder();
         final ErrorLogConsumer errorLogConsumer = new ErrorLogConsumer() {
 
@@ -100,15 +109,21 @@ public class SapInvoiceController {
                 errors.append(o);
             }
         };
-        EventProcessor.syncEventWithSap(errorLogConsumer, elogger, event);
+        if (Group.dynamic("managers").isMember(Authenticate.getUser())) {
+            processor.process(errorLogConsumer, elogger, event);
+        }
 
-        return errors.toString();
+        model.addAttribute("errors", errors.toString());
+
+        return home(event.getPerson().getUsername(), model);
     }
 
     @RequestMapping(value = "/{sapRequest}/delete", method = RequestMethod.POST)
     public String delete(final @PathVariable SapRequest sapRequest, final Model model) {
         final Event event = sapRequest.getEvent();
-        sapRequest.delete();
+        if (Group.dynamic("managers").isMember(Authenticate.getUser())) {
+            sapRequest.delete();
+        }
         return home(event.getPerson().getUsername(), model);
     }
 
