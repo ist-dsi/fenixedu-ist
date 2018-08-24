@@ -25,6 +25,10 @@
 
 <style>
 <!--
+.strikeLine {
+    text-decoration: line-through;
+}
+
 .json-viewer {
     color: #000;
     padding-left: 20px;
@@ -176,7 +180,7 @@
 
     function calculateRequests(eventId) {
     	<% if (Group.dynamic("managers").isMember(Authenticate.getUser())) { %>
-        return '<form method="post" action="' + contextPath + '/sap-invoice-viewer/' + eventId + '/sync">'
+        return '<form method="post" action="' + contextPath + '/sap-invoice-viewer/' + eventId + '/calculateRequests">'
         	   + '${csrf.field()}'
         	   + '<button type="submit" class="btn btn-warning"><spring:message code="label.calculate.request" text="Calculate Requests"/></button>'
         	   + '</form>'
@@ -307,7 +311,8 @@
 			    $('<tr id="eventDetailRow' + i + '" style="display: none;"/>').appendTo($('#eventList'))
                     .append($('<td colspan="12"/>').html(sapTable));
 			    $(event.sapRequests).each(function(j, sapRequest) {
-			        $('<tr/>').appendTo(sapTable)
+			    	var ignoreClass = sapRequest.ignore == true ? 'class="strikeLine"' : '';
+			        $('<tr ' + ignoreClass + '/>').appendTo(sapTable)
                         .append($('<td/>').text(sapRequest.whenCreated))
                         .append($('<td/>').text(sapRequest.requestType))
                         .append($('<td/>').text(sapRequest.documentNumber))
