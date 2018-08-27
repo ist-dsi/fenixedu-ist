@@ -54,6 +54,7 @@ import pt.ist.fenixedu.domain.SapRequest;
 import pt.ist.fenixedu.domain.SapRequestType;
 import pt.ist.fenixedu.domain.SapRoot;
 import pt.ist.fenixedu.util.PostalCodeValidator;
+import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
 import pt.ist.sap.client.SapFinantialClient;
 
@@ -115,6 +116,7 @@ public class SapEvent {
 //        }
     }
 
+    @Atomic
     public void transferInvoice(final SapRequest sapRequest, final ExternalClient externalClient, final Money amountToTransfer) throws Exception {
         final SapRequestType requestType = sapRequest.getRequestType();
         if (requestType != SapRequestType.INVOICE) {
