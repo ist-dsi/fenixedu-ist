@@ -182,7 +182,7 @@
     	<% if (Group.dynamic("managers").isMember(Authenticate.getUser())) { %>
         return '<form method="post" action="' + contextPath + '/sap-invoice-viewer/' + eventId + '/calculateRequests">'
         	   + '${csrf.field()}'
-        	   + '<button type="submit" class="btn btn-warning"><spring:message code="label.calculate.request" text="Calculate Requests"/></button>'
+        	   + '<button type="submit" class="btn btn-default"><spring:message code="label.calculate.request" text="Calculate Requests"/></button>'
         	   + '</form>'
         	   ;
         <% } else { %>
@@ -194,12 +194,25 @@
     	<% if (Group.dynamic("managers").isMember(Authenticate.getUser())) { %>
     	return '<form method="post" action="' + contextPath + '/sap-invoice-viewer/' + eventId + '/sync">'
                + '${csrf.field()}'
-               + '<button type="submit" class="btn btn-warning"><spring:message code="label.repeat.request" text="Sync"/></button>'
+               + '<button type="submit" class="btn btn-info"><spring:message code="label.repeat.request" text="Sync"/></button>'
                + '</form>'
                ;
     	<% } else { %>
     	   return '';
         <% } %>
+    }
+
+    function transfer(sapRequest) {
+        <% if (Group.dynamic("managers").isMember(Authenticate.getUser())) { %>
+        if (!sapRequest.referenced && !sapRequest.ignore) {
+            return '<form method="get" action="' + contextPath + '/sap-invoice-viewer/' + sapRequest.id + '/transfer">'
+               + '${csrf.field()}'
+               + '<button type="submit" class="btn btn-info"><spring:message code="label.transfer" text="Transfer"/></button>'
+               + '</form>'
+               ;
+        }
+        <% } %>
+        return '';
     }
 
     function deleteRequest(sapRequest) {
@@ -296,6 +309,7 @@
 			if (hasSapRequests) {
 			    sapTable = $('<table class="table" style="background-color:#F0F0F0;"/>');
 			    $('<tr id="eventDetails' + i + '"/>').appendTo(sapTable)
+                    .append($('<th/>').text('<spring:message code="label.sapRequest.id" text="Id"/>'))
                     .append($('<th/>').text('<spring:message code="label.sapRequest.created" text="Created"/>'))
                     .append($('<th/>').text('<spring:message code="label.sapRequest.requestType" text="Request Type"/>'))
                     .append($('<th/>').text('<spring:message code="label.sapRequest.documentNumber" text="Document Number"/>'))
@@ -309,10 +323,11 @@
                     .append($('<th/>').text(''))
                     ;
 			    $('<tr id="eventDetailRow' + i + '" style="display: none;"/>').appendTo($('#eventList'))
-                    .append($('<td colspan="12"/>').html(sapTable));
+                    .append($('<td colspan="19"/>').html(sapTable));
 			    $(event.sapRequests).each(function(j, sapRequest) {
 			    	var ignoreClass = sapRequest.ignore == true ? 'class="strikeLine"' : '';
 			        $('<tr ' + ignoreClass + '/>').appendTo(sapTable)
+			            .append($('<td/>').text(sapRequest.id))
                         .append($('<td/>').text(sapRequest.whenCreated))
                         .append($('<td/>').text(sapRequest.requestType))
                         .append($('<td/>').text(sapRequest.documentNumber))
@@ -327,6 +342,7 @@
 //                        .append($('<td/>').text(sapRequest.integrationMessage))
                         .append($('<td/>').text(sapRequest.clientId))
 //                        .append($('<td/>').text(sapRequest.integrationMessage))
+                        .append($('<td/>').html(transfer(sapRequest)))
                         .append($('<td/>').html(deleteRequest(sapRequest)))
                         ;
 			    });

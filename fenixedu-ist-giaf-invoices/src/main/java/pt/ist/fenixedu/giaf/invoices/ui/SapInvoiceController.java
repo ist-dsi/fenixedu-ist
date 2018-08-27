@@ -26,6 +26,7 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.EventState;
 import org.fenixedu.academic.domain.accounting.calculator.DebtInterestCalculator;
+import org.fenixedu.academic.util.Money;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.security.Authenticate;
@@ -41,10 +42,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import pt.ist.fenixedu.domain.ExternalClient;
 import pt.ist.fenixedu.domain.SapRequest;
 import pt.ist.fenixedu.giaf.invoices.ErrorLogConsumer;
 import pt.ist.fenixedu.giaf.invoices.EventLogger;
 import pt.ist.fenixedu.giaf.invoices.EventProcessor;
+import pt.ist.fenixedu.giaf.invoices.SapEvent;
 
 @SpringFunctionality(app = InvoiceController.class, title = "title.sap.invoice.viewer")
 @RequestMapping("/sap-invoice-viewer")
@@ -118,6 +121,56 @@ public class SapInvoiceController {
         return home(event.getPerson().getUsername(), model);
     }
 
+    @RequestMapping(value = "/{sapRequest}/transfer", method = RequestMethod.GET)
+    public String prepareTransfer(final @PathVariable SapRequest sapRequest, final Model model) {
+        model.addAttribute("sapRequest", toJsonObject(sapRequest));
+        final DateTime now = new DateTime();
+        model.addAttribute("event", toJsonObject(sapRequest.getEvent(), now));
+        return "sap-invoice-viewer/transferInvoice";
+    }
+
+    @RequestMapping(value = "/{sapRequest}/transfer", method = RequestMethod.POST)
+    public String transfer(final @PathVariable SapRequest sapRequest, final Model model,
+            @RequestParam final String uvat, @RequestParam final String valueToTransfer) {
+        if (Group.dynamic("managers").isMember(Authenticate.getUser())) {
+            try {
+                final Money value = toMoney(valueToTransfer);
+                if (value.isZero() || value.isNegative()) {
+                    model.addAttribute("error", "error.value.to.transfer.must.be.positive");
+                    return prepareTransfer(sapRequest, model);
+                }
+                if (value.greaterThan(sapRequest.getValue())) {
+                    model.addAttribute("error", "error.value.to.transfer.cannot.exceed.invouce.value");
+                    return prepareTransfer(sapRequest, model);                
+                }
+                final ExternalClient externalClient = ExternalClient.find(uvat);
+                if (externalClient == null) {
+                    model.addAttribute("error", "error.destination.client.not.found");
+                    return prepareTransfer(sapRequest, model);                
+                }
+                final SapEvent sapEvent = new SapEvent(sapRequest.getEvent());
+                try {
+                    sapEvent.transferInvoice(sapRequest, externalClient, value);
+                } catch (final Exception e) {
+                    model.addAttribute("exception", e.getMessage());
+                    return prepareTransfer(sapRequest, model);
+                }
+            } catch (final NumberFormatException ex) {
+                model.addAttribute("error", "error.value.to.transfer.must.be.positive");
+                return prepareTransfer(sapRequest, model);                
+            }
+        }
+        return home(sapRequest.getEvent().getPerson().getUsername(), model);
+    }
+
+    static Money toMoney(final String s) {
+        if (s == null || s.isEmpty()) {
+            return Money.ZERO;
+        }
+        final String v = s.matches("-?\\d+(\\,\\d+)?") ? s.replace(',', '.') : s;
+        return new Money(v);
+    }
+
     @RequestMapping(value = "/{sapRequest}/delete", method = RequestMethod.POST)
     public String delete(final @PathVariable SapRequest sapRequest, final Model model) {
         final Event event = sapRequest.getEvent();
@@ -185,6 +238,7 @@ public class SapInvoiceController {
         result.addProperty("whenCreated", sapRequest.getWhenCreated() == null ? null : sapRequest.getWhenCreated().toString(DATE_TIME_FORMAT));
         result.addProperty("whenSent", sapRequest.getWhenSent() == null ? null : sapRequest.getWhenSent().toString(DATE_TIME_FORMAT));
         result.addProperty("ignore", sapRequest.getIgnore());
+        result.addProperty("referenced", sapRequest.getReferenced());
         return result;
     }
 

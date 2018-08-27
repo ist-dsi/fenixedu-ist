@@ -123,4 +123,10 @@ public class SapRequest extends SapRequest_Base {
         return o.get("clientData").getAsJsonObject();
     }
 
+    public boolean getReferenced() {
+        final String documentNumber = getDocumentNumber();
+        return documentNumber.length() == 3 || getEvent().getSapRequestSet().stream()
+            .anyMatch(r -> r != this && r.getRequest().indexOf(documentNumber) > 0);
+    }
+
 }

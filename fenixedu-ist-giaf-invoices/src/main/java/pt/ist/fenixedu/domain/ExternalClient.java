@@ -21,4 +21,10 @@ public class ExternalClient extends ExternalClient_Base {
         setBillingIndicator(billingIndicator);
     }
 
+    public static ExternalClient find(final String uvat) {
+        return SapRoot.getInstance().getExternalClientSet().stream()
+            .filter(c -> c.getClientId().equals(uvat))
+            .findAny().orElse(null);
+    }
+
 }
