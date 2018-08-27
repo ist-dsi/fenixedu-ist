@@ -596,8 +596,8 @@
     "Country": "Chile",
     "ISO": "CL",
     "Format": "NNNNNNN (NNN-NNNN)",
-    "Regex": "^\\d{7}\\s\\(\\d{3}-\\d{4}\\)$",
-    "Example": "9495781 (896-5019)"
+    "Regex": "^\\d{7}$",
+    "Example": "9495781"
   },
   {
     "Note": "",
