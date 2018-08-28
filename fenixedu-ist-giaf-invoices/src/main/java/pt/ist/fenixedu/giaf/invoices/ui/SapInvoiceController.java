@@ -53,7 +53,7 @@ import pt.ist.fenixedu.giaf.invoices.SapEvent;
 @RequestMapping("/sap-invoice-viewer")
 public class SapInvoiceController {
 
-    private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     public static interface EventProcessorInterface {
         public void process(final ErrorLogConsumer consumer, final EventLogger logger, final Event event);
