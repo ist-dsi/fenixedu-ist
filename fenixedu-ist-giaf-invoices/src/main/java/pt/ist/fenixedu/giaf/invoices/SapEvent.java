@@ -807,14 +807,19 @@ public class SapEvent {
             boolean isNewDate, boolean isInterest) {
         final JsonObject json = toJsonCommon(documentDate, isNewDate);
 
-        final SimpleImmutableEntry<String, String> product =
-                mapToProduct(event, event.getDescription().toString(), isDebtRegistration, isInterest);
-        json.addProperty("productDescription", product.getValue());
+        final String description = event.getDescription().toString();
+        final SimpleImmutableEntry<String, String> product = mapToProduct(event, description, isDebtRegistration, isInterest);
         json.addProperty("productCode", product.getKey());
+        json.addProperty("productDescription", detailedDescription(product.getValue(), event));
 
         json.add("clientData", clientData);
 
         return json;
+    }
+
+    private String detailedDescription(final String description, final Event event) {
+        final Party party = event.getParty();
+        return party == null ? description : description + " : " + party.getName();
     }
 
     private JsonObject toJsonCommon(DateTime documentDate, boolean isNewDate) {
