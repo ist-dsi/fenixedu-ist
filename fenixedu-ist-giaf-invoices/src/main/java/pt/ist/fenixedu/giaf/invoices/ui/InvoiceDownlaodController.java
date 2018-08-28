@@ -29,15 +29,21 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.accessControl.AcademicAuthorizationGroup;
 import org.fenixedu.academic.domain.accessControl.academicAdministration.AcademicOperationType;
 import org.fenixedu.academic.domain.accounting.Event;
+import org.fenixedu.academic.domain.accounting.EventState;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.springframework.http.HttpStatus;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.google.common.io.ByteStreams;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import pt.ist.fenixedu.domain.SapDocumentFile;
 import pt.ist.fenixedu.domain.SapRequest;
@@ -46,6 +52,59 @@ import pt.ist.fenixedu.giaf.invoices.GiafEvent;
 @SpringFunctionality(app = InvoiceController.class, title = "title.giaf.invoice.viewer")
 @RequestMapping("/invoice-downloader")
 public class InvoiceDownlaodController {
+
+    @RequestMapping(method = RequestMethod.GET)
+    public String list(@RequestParam(required = false) String username, final Model model) {
+        final User user = InvoiceController.getUser(username);
+        if (InvoiceController.isAllowedToAccess(user)) {
+            final Person person = user.getPerson();
+            final JsonArray sapRequests = person.getEventsSet().stream()
+                    .flatMap(e -> e.getSapRequestSet().stream())
+                    .filter(r -> r.getRequest().length() > 2)
+                    .sorted(SapRequest.COMPARATOR_BY_EVENT_AND_ORDER)
+                    .map(r -> toJsonObject(r))
+                    .collect(SapInvoiceController.toJsonArray());
+            model.addAttribute("sapRequests", sapRequests);
+
+            final JsonArray giafDocuments = new JsonArray();
+            for (final Event event : person.getEventsSet()) {
+                final JsonArray jsonEvent = GiafEvent.readEventFile(event);
+                for (final JsonElement je : jsonEvent) {
+                    final JsonObject jo = je.getAsJsonObject();
+                    final JsonElement receiptId = jo.get("receiptId");
+                    if (receiptId != null && !receiptId.isJsonNull()) {
+                        giafDocuments.add(jo);
+                        jo.addProperty("description", event.getDescription().toString());
+                    }
+                }
+            }
+            model.addAttribute("giafDocuments", giafDocuments);
+        }
+        return "invoice-viewer/home";
+    }
+
+    private JsonObject toJsonObject(final SapRequest sapRequest) {
+        final JsonObject result = new JsonObject();
+        result.addProperty("id", sapRequest.getExternalId());
+        result.addProperty("advancement", sapRequest.getAdvancement() == null ? null : sapRequest.getAdvancement().toPlainString());
+        result.addProperty("integrationMessage", sapRequest.getIntegrationMessage());
+        result.addProperty("clientId", sapRequest.getClientId());
+        result.addProperty("documentNumber", sapRequest.getDocumentNumber());
+        result.addProperty("integrated", sapRequest.getIntegrated());
+        result.addProperty("integrationMessage", sapRequest.getIntegrationMessage());
+        result.addProperty("request", sapRequest.getRequest());
+        result.addProperty("requestType", sapRequest.getRequestType() == null ? null : sapRequest.getRequestType().name());
+        result.addProperty("sapDocumentNumber", sapRequest.getSapDocumentNumber());
+        result.addProperty("sent", sapRequest.getSent());
+        result.addProperty("value", sapRequest.getValue() == null ? null : sapRequest.getValue().toPlainString());
+        result.addProperty("whenCreated", sapRequest.getWhenCreated() == null ? null : sapRequest.getWhenCreated().toString(SapInvoiceController.DATE_TIME_FORMAT));
+        result.addProperty("whenSent", sapRequest.getWhenSent() == null ? null : sapRequest.getWhenSent().toString(SapInvoiceController.DATE_TIME_FORMAT));
+        result.addProperty("ignore", sapRequest.getIgnore());
+        result.addProperty("referenced", sapRequest.getReferenced());
+        result.addProperty("description", sapRequest.getEvent().getDescription().toString());
+        result.addProperty("isCanceled", sapRequest.getEvent().isInState(EventState.CANCELLED));
+        return result;
+    }
 
     @RequestMapping(value = "/giaf/{event}/{filename}", method = RequestMethod.GET, produces = "application/pdf")
     public void giafInvoice(@PathVariable Event event, @PathVariable String filename, final HttpServletResponse response) {
