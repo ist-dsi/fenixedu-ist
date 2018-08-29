@@ -215,10 +215,11 @@
         return '';
     }
 
+    onsubmit="return confirm('Are you sure you want to submit?');"
     function deleteRequest(sapRequest) {
     	<% if (Group.dynamic("managers").isMember(Authenticate.getUser())) { %>
         if (!sapRequest.integrated) {
-            return '<form method="post" action="' + contextPath + '/sap-invoice-viewer/' + sapRequest.id + '/delete">'
+            return '<form method="post" action="' + contextPath + '/sap-invoice-viewer/' + sapRequest.id + '/delete" onsubmit="return confirm(\'<spring:message code="label.delete.confirm" text="Are you sure?"/>\');">' 
                + '${csrf.field()}'
                + '<button type="submit" class="btn btn-warning"><spring:message code="label.delete" text="Repeat Request"/></button>'
                + '</form>'
