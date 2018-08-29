@@ -82,5 +82,20 @@
 </logic:notEmpty>	
 
 <logic:empty name="tutorsBean" property="tutors">
-	<p><bean:message key="message.tutorship.dontExist.tutors" bundle="PEDAGOGICAL_COUNCIL" /></p>
+	<logic:notEmpty name="tutorsBean" property="executionSemester">
+		<logic:empty name="tutorsBean" property="executionDegree">
+			<bean:define id="executionSemesterId" name="tutorsBean" property="executionSemester.externalId"/>
+			<bean:define id="query" value="<%="&executionSemester="+ executionSemesterId%>"/>
+			<html:img border="0" src="<%= request.getContextPath() + "/images/excel.gif"%>" altKey="excel" bundle="IMAGE_RESOURCES" />
+			<html:link page="<%= "/viewTutors.do?method=exportToExcelAllDegrees" + query.toString()%>">
+				Exportar para ficheiro Excel
+			</html:link>
+		</logic:empty>
+		<logic:notEmpty name="tutorsBean" property="executionDegree">
+			<p><bean:message key="message.tutorship.dontExist.tutors" bundle="PEDAGOGICAL_COUNCIL" /></p>
+		</logic:notEmpty>
+	</logic:notEmpty>
+	<logic:empty name="tutorsBean" property="executionSemester">
+		<p><bean:message key="message.tutorship.dontExist.tutors" bundle="PEDAGOGICAL_COUNCIL" /></p>
+	</logic:empty>
 </logic:empty>
