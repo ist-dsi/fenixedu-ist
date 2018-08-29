@@ -77,7 +77,8 @@ public class DelegateStudentSelectBean {
             return;
         }
         if (positions == null) {
-            positions = selectedPosition.getUser().getDelegatesSet();
+            positions = selectedPosition.getUser().getDelegatesSet().stream()
+                    .filter(Delegate::isActive).collect(Collectors.toSet());
         }
     }
 
