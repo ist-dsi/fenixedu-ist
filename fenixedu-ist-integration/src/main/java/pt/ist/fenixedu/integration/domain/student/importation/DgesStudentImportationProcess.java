@@ -26,24 +26,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.fenixedu.academic.domain.Degree;
-import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.EntryPhase;
 import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.QueueJob;
 import org.fenixedu.academic.domain.QueueJobResult;
-import org.fenixedu.academic.domain.accounting.EntryType;
-import org.fenixedu.academic.domain.accounting.EventType;
-import org.fenixedu.academic.domain.accounting.Installment;
-import org.fenixedu.academic.domain.accounting.PaymentCodeType;
-import org.fenixedu.academic.domain.accounting.paymentCodes.AccountingEventPaymentCode;
-import org.fenixedu.academic.domain.accounting.paymentCodes.InstallmentPaymentCode;
-import org.fenixedu.academic.domain.accounting.paymentPlans.GratuityPaymentPlan;
-import org.fenixedu.academic.domain.accounting.postingRules.AdministrativeOfficeFeeAndInsurancePR;
-import org.fenixedu.academic.domain.accounting.postingRules.AdministrativeOfficeFeePR;
-import org.fenixedu.academic.domain.administrativeOffice.AdministrativeOffice;
 import org.fenixedu.academic.domain.candidacy.Candidacy;
 import org.fenixedu.academic.domain.candidacy.CandidacySituation;
 import org.fenixedu.academic.domain.candidacy.CandidacySituationType;
@@ -58,14 +46,7 @@ import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.organizationalStructure.UnitUtils;
 import org.fenixedu.academic.domain.student.PrecedentDegreeInformation;
 import org.fenixedu.academic.domain.student.Student;
-import org.fenixedu.academic.dto.accounting.EntryDTO;
-import org.fenixedu.academic.dto.accounting.EntryWithInstallmentDTO;
-import org.fenixedu.academic.util.Bundle;
-import org.fenixedu.academic.util.LabelFormatter;
-import org.fenixedu.academic.util.Money;
 import org.fenixedu.spaces.domain.Space;
-import org.joda.time.DateTime;
-import org.joda.time.YearMonthDay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -242,90 +223,7 @@ public class DgesStudentImportationProcess extends DgesStudentImportationProcess
             final StudentCandidacy studentCandidacy = createCandidacy(employee, degreeCandidateDTO, person, highSchoolCache);
             new StandByCandidacySituation(studentCandidacy, employee.getPerson());
 
-            createAvailableAccountingEventsPaymentCodes(person, studentCandidacy);
-            createAdministrativeOfficeFeePaymentCode(person, studentCandidacy);
         }
-    }
-
-    private void createAdministrativeOfficeFeePaymentCode(Person person, StudentCandidacy studentCandidacy) {
-        final AdministrativeOffice office = getAdministrativeOffice(studentCandidacy.getDegreeCurricularPlan());
-        final AdministrativeOfficeFeeAndInsurancePR administrativeOfficePostingRule =
-                findAdministrativeOfficeFeeAndInsurancePostingRule(office);
-
-        final Money officeFeeAndInsuranceAmount = calculateAdministrativeOfficeFeeAndInsuranceAmount(office);
-        final ExecutionYear executionYear = getExecutionYear();
-        studentCandidacy.addAvailablePaymentCodes(AccountingEventPaymentCode.create(
-                PaymentCodeType.ADMINISTRATIVE_OFFICE_FEE_AND_INSURANCE, new YearMonthDay(), administrativeOfficePostingRule
-                        .getAdministrativeOfficeFeePaymentLimitDate(executionYear.getBeginDateYearMonthDay()
-                                .toDateTimeAtMidnight(), executionYear.getEndDateYearMonthDay().toDateTimeAtMidnight()),
-                null, officeFeeAndInsuranceAmount, officeFeeAndInsuranceAmount, person));
-    }
-
-    private Money calculateAdministrativeOfficeFeeAndInsuranceAmount(final AdministrativeOffice office) {
-        return calculateAdministrativeOfficeFeeAmount(office).add(calculateInsuranceAmount(office));
-    }
-
-    private Money calculateAdministrativeOfficeFeeAmount(AdministrativeOffice office) {
-        return findAdministrativeOfficeFeePostingRule(office).getFixedAmount();
-    }
-
-    private AdministrativeOfficeFeeAndInsurancePR findAdministrativeOfficeFeeAndInsurancePostingRule(AdministrativeOffice office) {
-        return (AdministrativeOfficeFeeAndInsurancePR) office.getServiceAgreementTemplate().findPostingRuleByEventType(
-                EventType.ADMINISTRATIVE_OFFICE_FEE_INSURANCE);
-    }
-
-    private AdministrativeOfficeFeePR findAdministrativeOfficeFeePostingRule(AdministrativeOffice office) {
-        return (AdministrativeOfficeFeePR) office.getServiceAgreementTemplate().findPostingRuleByEventType(
-                EventType.ADMINISTRATIVE_OFFICE_FEE);
-    }
-
-    private Money calculateInsuranceAmount(AdministrativeOffice office) {
-        AdministrativeOfficeFeeAndInsurancePR feeAndInsurancePostingRule =
-                findAdministrativeOfficeFeeAndInsurancePostingRule(office);
-        return feeAndInsurancePostingRule.getInsuranceAmount(
-                getExecutionYear().getBeginDateYearMonthDay().toDateTimeAtMidnight(), getExecutionYear().getEndDateYearMonthDay()
-                        .toDateTimeAtMidnight());
-    }
-
-    private AdministrativeOffice getAdministrativeOffice(final DegreeCurricularPlan degreeCurricularPlan) {
-        return degreeCurricularPlan.getDegree().getAdministrativeOffice();
-    }
-
-    private void createAvailableAccountingEventsPaymentCodes(final Person person, final StudentCandidacy studentCandidacy) {
-        ExecutionDegree executionDegree = studentCandidacy.getExecutionDegree();
-
-        GratuityPaymentPlan paymentPlan = getGratuityPaymentPlanForFirstTimeStudents(executionDegree);
-
-        Money totalAmount = Money.ZERO;
-        LabelFormatter descriptionForEntryType = getDescriptionForEntryType(executionDegree.getDegree(), EntryType.GRATUITY_FEE);
-        for (Installment installment : paymentPlan.getInstallmentsSortedByEndDate()) {
-            EntryWithInstallmentDTO entryDTO =
-                    new EntryWithInstallmentDTO(EntryType.GRATUITY_FEE, null, installment.getAmount(), descriptionForEntryType,
-                            installment);
-            studentCandidacy.addAvailablePaymentCodes(createInstallmentPaymentCode(entryDTO, person.getStudent()));
-            totalAmount = totalAmount.add(installment.getAmount());
-        }
-
-        EntryDTO fullPaymentEntryDTO =
-                new EntryDTO(EntryType.GRATUITY_FEE, null, totalAmount, Money.ZERO, totalAmount, descriptionForEntryType,
-                        totalAmount);
-
-        studentCandidacy.addAvailablePaymentCodes(createAccountingEventPaymentCode(fullPaymentEntryDTO, person.getStudent(),
-                paymentPlan));
-    }
-
-    private GratuityPaymentPlan getGratuityPaymentPlanForFirstTimeStudents(final ExecutionDegree executionDegree) {
-        List<GratuityPaymentPlan> paymentPlanList =
-                executionDegree.getDegreeCurricularPlan().getServiceAgreementTemplate()
-                        .getGratuityPaymentPlansFor(getExecutionYear());
-
-        for (GratuityPaymentPlan paymentPlan : paymentPlanList) {
-            if (paymentPlan.isForFirstTimeInstitutionStudents()) {
-                return paymentPlan;
-            }
-        }
-
-        return null;
     }
 
     private void logCreatedStudent(final PrintWriter LOG_WRITER, final Student student) {
@@ -464,38 +362,6 @@ public class DgesStudentImportationProcess extends DgesStudentImportationProcess
                 .collect(Collectors.toList());
     }
 
-    public LabelFormatter getDescriptionForEntryType(final Degree degree, EntryType entryType) {
-        final LabelFormatter labelFormatter = new LabelFormatter();
-        labelFormatter.appendLabel(entryType.name(), Bundle.ENUMERATION).appendLabel(" (")
-                .appendLabel(degree.getDegreeType().getName().getContent()).appendLabel(" - ")
-                .appendLabel(degree.getNameFor(getExecutionYear()).getContent()).appendLabel(" - ")
-                .appendLabel(getExecutionYear().getYear()).appendLabel(")");
-
-        return labelFormatter;
-    }
-
-    private AccountingEventPaymentCode createAccountingEventPaymentCode(final EntryDTO entryDTO, final Student student,
-            final GratuityPaymentPlan paymentPlan) {
-        final YearMonthDay installmentEndDate = new DateTime().plusDays(18).toYearMonthDay();
-
-        return AccountingEventPaymentCode.create(PaymentCodeType.GRATUITY_FIRST_INSTALLMENT, new YearMonthDay(),
-                installmentEndDate, null, entryDTO.getAmountToPay(), entryDTO.getAmountToPay(), student.getPerson());
-    }
-
-    private InstallmentPaymentCode createInstallmentPaymentCode(final EntryWithInstallmentDTO entry, final Student student) {
-        final YearMonthDay installmentEndDate = new DateTime().plusDays(18).toYearMonthDay();
-
-        if (entry.getInstallment().getOrder() == 1) {
-            return InstallmentPaymentCode.create(PaymentCodeType.GRATUITY_FIRST_INSTALLMENT, new YearMonthDay(),
-                    installmentEndDate, null, entry.getInstallment(), entry.getAmountToPay(), entry.getAmountToPay(), student);
-
-        }
-
-        return InstallmentPaymentCode.create(PaymentCodeType.GRATUITY_FIRST_INSTALLMENT, new YearMonthDay(), entry
-                .getInstallment().getEndDate(), null, entry.getInstallment(), entry.getAmountToPay(), entry.getAmountToPay(),
-                student);
-    }
-
     @Atomic
     public static void cancelStandByCandidaciesFromPreviousYears(final ExecutionYear executionYear) {
         final ExecutionYear previous = executionYear.getPreviousExecutionYear();
@@ -503,7 +369,7 @@ public class DgesStudentImportationProcess extends DgesStudentImportationProcess
             previous.getExecutionDegreesSet().stream()
                 .flatMap(ed -> ed.getStudentCandidaciesSet().stream())
                 .filter(sc -> !sc.getCandidacySituationsSet().isEmpty() && isToRemove(sc))
-                .forEach(sc -> sc.cancelCandidacy());
+                .forEach(StudentCandidacy::cancelCandidacy);
 
             cancelStandByCandidaciesFromPreviousYears(previous);
         }

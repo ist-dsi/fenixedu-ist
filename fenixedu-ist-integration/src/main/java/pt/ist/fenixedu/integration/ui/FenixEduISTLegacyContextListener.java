@@ -50,6 +50,7 @@ import org.fenixedu.academic.domain.Summary;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.VatNumberResolver;
 import org.fenixedu.academic.domain.accounting.events.AccountingEventsManager;
+import org.fenixedu.academic.domain.accounting.events.AnnualEvent;
 import org.fenixedu.academic.domain.candidacy.workflow.RegistrationOperation.RegistrationCreatedByCandidacy;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
 import org.fenixedu.academic.domain.degreeStructure.Context;
@@ -265,6 +266,11 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
                         final AccountingEventsManager manager = new AccountingEventsManager();
                         manager.createGratuityEvent(studentCurricularPlan, executionYear);
                         manager.createAdministrativeOfficeFeeAndInsuranceEvent(studentCurricularPlan, executionYear);
+                        registration.getPerson().getEventsSet().stream()
+                                .filter(event -> event instanceof AnnualEvent)
+                                .filter(e -> ((AnnualEvent) e).getExecutionYear() == executionYear)
+                                .forEach(Event::calculatePaymentCodeEntry);
+
                     }
                 });
 

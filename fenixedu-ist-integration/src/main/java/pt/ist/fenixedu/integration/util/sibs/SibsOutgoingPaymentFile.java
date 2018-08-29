@@ -201,18 +201,18 @@ public class SibsOutgoingPaymentFile {
 
     public SibsOutgoingPaymentFile(String sourceInstitutionId, String destinationInstitutionId, String entity) {
         this.header = new Header(sourceInstitutionId, destinationInstitutionId, entity);
-        this.lines = new ArrayList<Line>();
+        this.lines = new ArrayList<>();
         this.footer = new Footer();
-        this.existingCodes = new HashSet<String>();
+        this.existingCodes = new HashSet<>();
         this.associatedPaymentCodes = new PrintedPaymentCodes();
     }
 
     public SibsOutgoingPaymentFile(String sourceInstitutionId, String destinationInstitutionId, String entity,
             DateTime lastSuccessfulSentDate) {
         this.header = new Header(sourceInstitutionId, destinationInstitutionId, entity, lastSuccessfulSentDate);
-        this.lines = new ArrayList<Line>();
+        this.lines = new ArrayList<>();
         this.footer = new Footer();
-        this.existingCodes = new HashSet<String>();
+        this.existingCodes = new HashSet<>();
         this.associatedPaymentCodes = new PrintedPaymentCodes();
     }
 

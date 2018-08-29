@@ -23,24 +23,18 @@ import java.util.Set;
 
 import org.fenixedu.academic.domain.accounting.PaymentCode;
 
+import com.google.common.base.Splitter;
+
 public class PrintedPaymentCodes {
 
     private Set<String> paymentCodes;
 
     public PrintedPaymentCodes() {
-        this.paymentCodes = new HashSet<String>();
+        this.paymentCodes = new HashSet<>();
     }
 
     public String exportAsString() {
-        StringBuilder result = new StringBuilder();
-
-        for (String code : this.paymentCodes) {
-            result.append(code).append(",");
-        }
-
-        result.delete(result.length() - 1, result.length());
-
-        return result.toString();
+        return String.join(",", paymentCodes);
     }
 
     public Set<String> getPaymentCodes() {
@@ -52,14 +46,8 @@ public class PrintedPaymentCodes {
     }
 
     public static PrintedPaymentCodes importFromString(final String value) {
-        String[] codes = value.split(",");
-
         PrintedPaymentCodes printPaymentCodes = new PrintedPaymentCodes();
-
-        for (String c : codes) {
-            printPaymentCodes.paymentCodes.add(c);
-        }
-
+        printPaymentCodes.paymentCodes.addAll(Splitter.on(",").splitToList(value));
         return printPaymentCodes;
     }
 }
