@@ -150,6 +150,36 @@ public class SapEvent {
         }
     }
 
+    @Atomic
+    public void cancelDocument(final SapRequest sapRequest) {
+        final SapRequestType requestType = sapRequest.getRequestType();
+        if (requestType != SapRequestType.INVOICE && requestType != SapRequestType.PAYMENT) {
+            throw new Error("Document to cancel is not an invoice");
+        }
+        event.getSapRequestSet().stream()
+            .filter(r -> r != sapRequest && r.refersToDocument(sapRequest.getDocumentNumber()))
+            .findAny().ifPresent(r -> {
+                throw new Error("Document already used");
+            });
+
+        JsonObject jsonAnnulled = new JsonParser().parse(sapRequest.getRequest()).getAsJsonObject();
+        if (requestType == SapRequestType.INVOICE) {
+            final JsonObject workDocument = jsonAnnulled.get("workingDocument").getAsJsonObject();
+            workDocument.addProperty("workStatus", "A");
+            workDocument.addProperty("documentDate", new DateTime().toString("yyyy-MM-dd HH:mm:ss"));
+        } else if (requestType == SapRequestType.PAYMENT) {
+            final JsonObject workDocument = jsonAnnulled.get("paymentDocument").getAsJsonObject();
+            workDocument.addProperty("paymentStatus", "A");
+            workDocument.addProperty("paymentDate", new DateTime().toString("yyyy-MM-dd HH:mm:ss"));            
+        }
+
+        final SapRequest sapRequestAnnulled = new SapRequest(sapRequest.getEvent(), sapRequest.getClientId(), sapRequest.getValue(),
+                sapRequest.getDocumentNumber(), sapRequest.getRequestType(), sapRequest.getAdvancement(), jsonAnnulled);
+        sapRequest.setAnulledRequest(sapRequestAnnulled);
+        sapRequest.setIgnore(true);
+        sapRequestAnnulled.setIgnore(true);
+    }
+
     public void updateInvoiceWithNewClientData() throws Exception {
         for (final SapRequest sapRequest : getFilteredSapRequestStream().collect(Collectors.toSet())) {
             updateInvoiceWithNewClientData(sapRequest);
