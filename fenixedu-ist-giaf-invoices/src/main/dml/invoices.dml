@@ -97,3 +97,11 @@ relation SapRootExternalClient {
     }
 }
 
+relation SapRootEventToSkipEnrolmentBlockCheck {
+    SapRoot playsRole sapRoot {
+        multiplicity 0..1;
+    }
+    .org.fenixedu.academic.domain.accounting.Event playsRole eventToSkipEnrolmentBlockCheck {
+        multiplicity *;
+    }
+}

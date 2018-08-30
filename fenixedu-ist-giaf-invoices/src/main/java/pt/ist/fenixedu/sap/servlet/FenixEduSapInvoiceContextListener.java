@@ -6,17 +6,23 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
+import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.accounting.AccountingTransaction;
 import org.fenixedu.academic.domain.accounting.Discount;
+import org.fenixedu.academic.domain.accounting.EnrolmentBlocker;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.EventState;
 import org.fenixedu.academic.domain.accounting.EventState.ChangeStateEvent;
 import org.fenixedu.academic.domain.accounting.Exemption;
+import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeAndInsuranceEvent;
+import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEvent;
+import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.bennu.GiafInvoiceConfiguration;
 import org.fenixedu.bennu.core.signals.DomainObjectEvent;
 import org.fenixedu.bennu.core.signals.Signal;
 
-import pt.ist.fenixedu.giaf.invoices.ui.SapInvoiceController;
 import pt.ist.fenixframework.FenixFramework;
 
 @WebListener
@@ -33,6 +39,50 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
             FenixFramework.getDomainModel().registerDeletionBlockerListener(Exemption.class, this::blockExemption);
             FenixFramework.getDomainModel().registerDeletionBlockerListener(Discount.class, this::blockDiscount);
         }
+
+        EnrolmentBlocker.enrolmentBlocker = new EnrolmentBlocker() {
+
+            @Override
+            public boolean isAnyGratuityOrAdministrativeOfficeFeeAndInsuranceInDebt(final StudentCurricularPlan scp, final ExecutionYear executionYear) {
+                return isAnyTuitionInDebt(scp.getStudent().getStudent(), executionYear) || isAnyAdministrativeOfficeFeeAndInsuranceInDebtUntil(scp, executionYear);
+            }
+
+            private boolean isAnyAdministrativeOfficeFeeAndInsuranceInDebtUntil(final StudentCurricularPlan scp, final ExecutionYear executionYear) {
+                for (final Event event : scp.getPerson().getEventsSet()) {
+                    if (event.getSapRoot() == null
+                            && event instanceof AdministrativeOfficeFeeAndInsuranceEvent
+                            && ((AdministrativeOfficeFeeAndInsuranceEvent) event).getExecutionYear().isBefore(executionYear)
+                            && event.isOpen()) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            private boolean isAnyTuitionInDebt(final Student student, final ExecutionYear executionYear) {
+                return student.getRegistrationStream().anyMatch(r -> hasAnyNotPayedGratuityEventsForPreviousYears(r, executionYear));
+            }
+
+            public boolean hasAnyNotPayedGratuityEventsForPreviousYears(final Registration registration, final ExecutionYear limitExecutionYear) {
+                for (final StudentCurricularPlan studentCurricularPlan : registration.getStudentCurricularPlansSet()) {
+                    if (hasAnyNotPayedGratuityEventsForPreviousYears(studentCurricularPlan, limitExecutionYear)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            final public boolean hasAnyNotPayedGratuityEventsForPreviousYears(final StudentCurricularPlan scp, final ExecutionYear limitExecutionYear) {
+                for (final GratuityEvent gratuityEvent : scp.getGratuityEventsSet()) {
+                    if (gratuityEvent.getSapRoot() == null && gratuityEvent.getExecutionYear().isBefore(limitExecutionYear) && gratuityEvent.isInDebt()) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+        };
     }
     
     @Override
