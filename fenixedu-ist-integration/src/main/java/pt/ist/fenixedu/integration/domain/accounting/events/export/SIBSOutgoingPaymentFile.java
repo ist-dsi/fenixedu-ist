@@ -51,13 +51,13 @@ public class SIBSOutgoingPaymentFile extends SIBSOutgoingPaymentFile_Base {
     private static final Comparator<SIBSOutgoingPaymentFile> SUCCESSFUL_SENT_DATE_TIME_COMPARATOR =
             Comparator.comparing(SIBSOutgoingPaymentFile_Base::getSuccessfulSentDate);
 
-    public SIBSOutgoingPaymentFile(DateTime lastSuccessfulSentDateTime, Person person) {
+    public SIBSOutgoingPaymentFile(DateTime lastSuccessfulSentDateTime) {
         super();
         setExecutionYear(ExecutionYear.readCurrentExecutionYear());
 
         try {
             StringBuilder errorsBuilder = new StringBuilder();
-            byte[] paymentFileContents = createPaymentFile(lastSuccessfulSentDateTime, person, errorsBuilder).getBytes("ASCII");
+            byte[] paymentFileContents = createPaymentFile(lastSuccessfulSentDateTime, errorsBuilder).getBytes("ASCII");
             setErrors(errorsBuilder.toString());
             init(outgoingFilename(), outgoingFilename(), paymentFileContents, Group.managers().or(AcademicAuthorizationGroup.get(AcademicOperationType.CREATE_SIBS_PAYMENTS_REPORT)));
         } catch (UnsupportedEncodingException e) {
@@ -72,17 +72,15 @@ public class SIBSOutgoingPaymentFile extends SIBSOutgoingPaymentFile_Base {
     }
 
     private static class SetupPaymentCodePool extends Thread {
-        private Person person;
 
         @Atomic(mode = Atomic.TxMode.WRITE)
         @Override public void run() {
             final PaymentCodePool paymentCodePool = PaymentCodePool.getInstance();
-            paymentCodePool.enforceMinSize(person.getUser(), new LocalDate().withDayOfMonth(1));
+            paymentCodePool.enforceMinSize(new LocalDate().withDayOfMonth(1));
             paymentCodePool.refreshPaymentCodes(new LocalDate().withDayOfMonth(1));
         }
 
-        public SetupPaymentCodePool(Person person) {
-            this.person = person;
+        public SetupPaymentCodePool() {
             setName(this.getClass().getSimpleName());
         }
     }
@@ -106,13 +104,13 @@ public class SIBSOutgoingPaymentFile extends SIBSOutgoingPaymentFile_Base {
         }
     }
 
-    protected String createPaymentFile(DateTime lastSuccessfulSentDateTime, Person person, StringBuilder errorsBuilder) {
+    protected String createPaymentFile(DateTime lastSuccessfulSentDateTime, StringBuilder errorsBuilder) {
         final SibsOutgoingPaymentFile sibsOutgoingPaymentFile =
                 new SibsOutgoingPaymentFile(SOURCE_INSTITUTION_ID, DESTINATION_INSTITUTION_ID, ENTITY_CODE,
                         lastSuccessfulSentDateTime);
 
         try {
-            Thread thread = new SetupPaymentCodePool(person);
+            Thread thread = new SetupPaymentCodePool();
             thread.start();
             thread.join();
         } catch (InterruptedException e) {
