@@ -575,6 +575,8 @@ public class SapEvent {
      */
     private JsonObject sendDataToSap(SapRequest sapRequest, JsonObject data) {
         JsonObject result = null;
+        sapRequest.setWhenSent(new DateTime());
+        sapRequest.setSent(true);
         try {
             result = SapFinantialClient.comunicate(data);
         } catch (Exception e) {
@@ -583,8 +585,6 @@ public class SapEvent {
             result.addProperty("exception", responseFromException(e));
             return result;
         }
-        sapRequest.setWhenSent(new DateTime());
-        sapRequest.setSent(true);
         return result;
     }
 
