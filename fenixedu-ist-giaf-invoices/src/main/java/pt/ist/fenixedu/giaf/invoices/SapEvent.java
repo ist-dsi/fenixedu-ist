@@ -53,7 +53,7 @@ import pt.ist.fenixedu.domain.SapDocumentFile;
 import pt.ist.fenixedu.domain.SapRequest;
 import pt.ist.fenixedu.domain.SapRequestType;
 import pt.ist.fenixedu.domain.SapRoot;
-import pt.ist.fenixedu.util.PostalCodeValidator;
+import org.fenixedu.PostalCodeValidator;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
 import pt.ist.sap.client.SapFinantialClient;

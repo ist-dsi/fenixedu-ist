@@ -86,7 +86,7 @@ import pt.ist.fenixedu.integration.domain.student.AffinityCyclesManagement;
 import pt.ist.fenixedu.integration.domain.student.PreEnrolment;
 import pt.ist.fenixedu.integration.dto.QucProfessorshipEvaluation;
 import pt.ist.fenixedu.teacher.evaluation.domain.ProfessorshipEvaluationBean;
-import pt.ist.fenixedu.util.PostalCodeValidator;
+import org.fenixedu.PostalCodeValidator;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
 import pt.ist.fenixframework.FenixFramework;
