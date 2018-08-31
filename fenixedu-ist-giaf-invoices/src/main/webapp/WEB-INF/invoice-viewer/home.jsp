@@ -68,7 +68,7 @@
 
     function giafDocumentNumberPart(giafDocument) {
         var link = contextPath + '/invoice-downloader/giaf/' + giafDocument.eventId + '/' + giafDocument.receiptNumber + '.pdf';
-        return '<a href="' + link + '">' + entry.receiptNumber + '</a>';
+        return '<a href="' + link + '">' + giafDocument.receiptNumber + '</a>';
     }
 
     function documentType(requestType) {
