@@ -12,6 +12,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.fenixedu.PostalCodeValidator;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
@@ -53,7 +54,6 @@ import pt.ist.fenixedu.domain.SapDocumentFile;
 import pt.ist.fenixedu.domain.SapRequest;
 import pt.ist.fenixedu.domain.SapRequestType;
 import pt.ist.fenixedu.domain.SapRoot;
-import org.fenixedu.PostalCodeValidator;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
 import pt.ist.sap.client.SapFinantialClient;
@@ -163,20 +163,20 @@ public class SapEvent {
             });
 
         JsonObject jsonAnnulled = new JsonParser().parse(sapRequest.getRequest()).getAsJsonObject();
-        if (requestType == SapRequestType.INVOICE) {
+        if (requestType == SapRequestType.INVOICE || requestType == SapRequestType.CREDIT) {
             final JsonObject workDocument = jsonAnnulled.get("workingDocument").getAsJsonObject();
             workDocument.addProperty("workStatus", "A");
             workDocument.addProperty("documentDate", new DateTime().toString("yyyy-MM-dd HH:mm:ss"));
-        } else if (requestType == SapRequestType.PAYMENT) {
+        }
+        if (requestType == SapRequestType.PAYMENT || requestType == SapRequestType.CREDIT) {
             final JsonObject workDocument = jsonAnnulled.get("paymentDocument").getAsJsonObject();
             workDocument.addProperty("paymentStatus", "A");
-            workDocument.addProperty("paymentDate", new DateTime().toString("yyyy-MM-dd HH:mm:ss"));            
+            workDocument.addProperty("paymentDate", new DateTime().toString("yyyy-MM-dd HH:mm:ss"));
         }
-
+            
         final SapRequest sapRequestAnnulled = new SapRequest(sapRequest.getEvent(), sapRequest.getClientId(), sapRequest.getValue(),
                 sapRequest.getDocumentNumber(), sapRequest.getRequestType(), sapRequest.getAdvancement(), jsonAnnulled);
         sapRequest.setAnulledRequest(sapRequestAnnulled);
-        sapRequest.setIgnore(true);
         sapRequestAnnulled.setIgnore(true);
     }
 
@@ -539,6 +539,11 @@ public class SapEvent {
                         result, sr.getRequestType().toString(), true);
                 if (!isIntegrated) {
                     return isIntegrated;
+                }
+
+                final SapRequest originalRequest = sr.getOriginalRequest();
+                if (originalRequest != null) {
+                    originalRequest.setIgnore(true);
                 }
             }
         }
@@ -1123,7 +1128,7 @@ public class SapEvent {
 
     public boolean hasPayment(final AccountingTransaction transaction, SapRequest sapRequest) {
         return getPaymentsFor(transaction.getTransactionDetail().getExternalId()).filter(sr -> transaction == sr.getPayment())
-                .filter(sr -> sr != sapRequest).findAny().isPresent();
+                .anyMatch(sr -> sr != sapRequest);
     }
 
     private Stream<SapRequest> getPaymentsFor(final String transactionDetailId) {
@@ -1144,7 +1149,7 @@ public class SapEvent {
 
     public boolean hasCredit(String creditId) {
         return getFilteredSapRequestStream().filter(sr -> sr.getRequestType() == SapRequestType.CREDIT)
-                .filter(sr -> creditId.equals(sr.getCreditId())).findAny().isPresent();
+                .anyMatch(sr -> creditId.equals(sr.getCreditId()));
     }
 
     public static SimpleImmutableEntry<String, String> mapToProduct(Event event, String eventDescription,
@@ -1314,6 +1319,10 @@ public class SapEvent {
         returnMessage.addProperty("Tipo Documento", action);
 
         sr.addIntegrationMessage("Documento", returnMessage);
+    }
+
+    public boolean hasPendingDocumentCancelations() {
+        return event.getSapRequestSet().stream().anyMatch(r -> r.getIgnore() && !r.getIntegrated() && r.getOriginalRequest() != null);
     }
 
 }

@@ -156,8 +156,12 @@ public class EventProcessor {
     private static void processSap(final ErrorLogConsumer errorLog, final EventLogger elogger, final Event event) {
         try {
             if (EventWrapper.needsProcessingSap(event)) {
-                final EventWrapper eventWrapper = new EventWrapper(event, errorLog, true);
                 final SapEvent sapEvent = new SapEvent(event);
+                if (sapEvent.hasPendingDocumentCancelations()) {
+                    return;
+                }
+
+                final EventWrapper eventWrapper = new EventWrapper(event, errorLog, true);
 
                 sapEvent.updateInvoiceWithNewClientData();
 

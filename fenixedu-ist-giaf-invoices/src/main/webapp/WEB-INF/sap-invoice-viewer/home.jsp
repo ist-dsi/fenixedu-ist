@@ -29,6 +29,10 @@
     text-decoration: line-through;
 }
 
+.anulledRequest {
+    background-color: #ffcaba;
+}
+
 .json-viewer {
     color: #000;
     padding-left: 20px;
@@ -221,7 +225,21 @@
         if (!sapRequest.integrated) {
             return '<form method="post" action="' + contextPath + '/sap-invoice-viewer/' + sapRequest.id + '/delete" onsubmit="return confirm(\'<spring:message code="label.delete.confirm" text="Are you sure?"/>\');">' 
                + '${csrf.field()}'
-               + '<button type="submit" class="btn btn-warning"><spring:message code="label.delete" text="Repeat Request"/></button>'
+               + '<button type="submit" class="btn btn-warning"><spring:message code="label.delete" text="Delete Request"/></button>'
+               + '</form>'
+               ;
+        }
+        <% } %>
+        return '';
+    }
+
+    onsubmit="return confirm('Are you sure you want to submit?');"
+    function cancelRequest(sapRequest) {
+        <% if (Group.dynamic("managers").isMember(Authenticate.getUser())) { %>
+        if (sapRequest.integrated && !sapRequest.ignore && sapRequest.request.length > 2 && !sapRequest.anulledRequest) {
+            return '<form method="post" action="' + contextPath + '/sap-invoice-viewer/' + sapRequest.id + '/cancel" onsubmit="return confirm(\'<spring:message code="label.cancel.confirm" text="Are you sure?"/>\');">' 
+               + '${csrf.field()}'
+               + '<button type="submit" class="btn btn-warning"><spring:message code="label.cancel" text="Cancel Request"/></button>'
                + '</form>'
                ;
         }
@@ -322,12 +340,14 @@
                     .append($('<th/>').text('<spring:message code="label.sapRequest.request" text="Request / Response"/>'))
                     .append($('<th/>').text('<spring:message code="label.sapRequest.clientId" text="clientId"/>'))
                     .append($('<th/>').text(''))
+                    .append($('<th/>').text(''))
+                    .append($('<th/>').text(''))
                     ;
 			    $('<tr id="eventDetailRow' + i + '" style="display: none;"/>').appendTo($('#eventList'))
                     .append($('<td colspan="19"/>').html(sapTable));
 			    $(event.sapRequests).each(function(j, sapRequest) {
-			    	var ignoreClass = sapRequest.ignore == true ? 'class="strikeLine"' : '';
-			        $('<tr ' + ignoreClass + '/>').appendTo(sapTable)
+			    	var requestClass = sapRequest.ignore == true ? 'class="strikeLine"' : sapRequest.anulledRequest ? 'class="anulledRequest"' : '';
+			        $('<tr ' + requestClass + '/>').appendTo(sapTable)
 			            .append($('<td/>').text(sapRequest.id))
                         .append($('<td/>').text(sapRequest.whenCreated))
                         .append($('<td/>').text(sapRequest.requestType))
@@ -345,6 +365,7 @@
 //                        .append($('<td/>').text(sapRequest.integrationMessage))
                         .append($('<td/>').html(transfer(sapRequest)))
                         .append($('<td/>').html(deleteRequest(sapRequest)))
+                        .append($('<td/>').html(cancelRequest(sapRequest)))
                         ;
 			    });
 			}
