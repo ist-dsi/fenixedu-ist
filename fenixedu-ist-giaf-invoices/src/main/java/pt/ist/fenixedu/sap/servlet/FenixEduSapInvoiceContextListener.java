@@ -23,6 +23,7 @@ import org.fenixedu.bennu.GiafInvoiceConfiguration;
 import org.fenixedu.bennu.core.signals.DomainObjectEvent;
 import org.fenixedu.bennu.core.signals.Signal;
 
+import pt.ist.fenixedu.giaf.invoices.SapEvent;
 import pt.ist.fenixframework.FenixFramework;
 
 @WebListener
@@ -92,8 +93,9 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
     private void handlerAccountingTransactionAnnulment(final DomainObjectEvent<AccountingTransaction> domainEvent) {
         final AccountingTransaction transaction = domainEvent.getInstance();
         final Event event = transaction.getEvent();
-        syncEvent(event);
-        throw new Error("This transaction must be first canceled / undone in SAP"); // TODO
+        if (new SapEvent(event).hasPayment(transaction.getExternalId())) {
+            throw new Error("This transaction must be first canceled / undone in SAP");
+        }
     }
 
     private void handlerEventStateChange(final ChangeStateEvent eventStateChange) {
@@ -118,8 +120,9 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
         } else if (oldtState == EventState.OPEN && newState == EventState.CLOSED) {
             // Ack, normal SAP integration will be fine.
         } else if (oldtState == EventState.OPEN && newState == EventState.CANCELLED) {
-            syncEvent(event);
-            throw new Error("Event state change must first be canceled in SAP"); // TODO
+            if (new SapEvent(event).canCancel()) {
+                throw new Error("Event state change must first be canceled in SAP");
+            }
         } else if (allowCloseToOpen && oldtState == EventState.CLOSED && newState == EventState.OPEN) {
             // Ack. Fuck it...
         } else {
@@ -132,21 +135,16 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
 
     private void blockExemption(final Exemption exemption, final Collection<String> blockers) {
         final Event event = exemption.getEvent();
-        syncEvent(event);
-        blockers.add("Exemption must be first undone in SAP"); // TODO
+        if (new SapEvent(event).hasCredit(exemption.getExternalId())) {
+            blockers.add("Exemption must be first undone in SAP");
+        }
     }
 
     private void blockDiscount(final Discount discount, final Collection<String> blockers) {
         final Event event = discount.getEvent();
-        syncEvent(event);
-        blockers.add("Discount must first be removed from SAP"); // TODO
-    }
-
-    private void syncEvent(final Event event) {
-//        final String errors = SapInvoiceController.syncEvent(event);
-//        if (!errors.isEmpty()) {
-//            throw new Error("Unable to sync event: " + errors);
-//        }
+        if (new SapEvent(event).hasCredit(discount.getExternalId())) {
+            blockers.add("Discount must first be removed from SAP");
+        }
     }
 
 }

@@ -59,6 +59,10 @@ public class SapInvoiceController {
         public void process(final ErrorLogConsumer consumer, final EventLogger logger, final Event event);
     }
 
+    private String homeRedirect(final String username) {
+        return "redirect:/sap-invoice-viewer?username=" + username;
+    }
+
     @RequestMapping(method = RequestMethod.GET)
     public String home(@RequestParam(required = false) String username, final Model model) {
         final User user = InvoiceController.getUser(username);
@@ -118,7 +122,7 @@ public class SapInvoiceController {
 
         model.addAttribute("errors", errors.toString());
 
-        return home(event.getPerson().getUsername(), model);
+        return homeRedirect(event.getPerson().getUsername());
     }
 
     @RequestMapping(value = "/{sapRequest}/transfer", method = RequestMethod.GET)
@@ -151,7 +155,7 @@ public class SapInvoiceController {
                 final SapEvent sapEvent = new SapEvent(sapRequest.getEvent());
                 try {
                     sapEvent.transferInvoice(sapRequest, externalClient, value);
-                } catch (final Exception e) {
+                } catch (final Exception | Error e) {
                     model.addAttribute("exception", e.getMessage());
                     return prepareTransfer(sapRequest, model);
                 }
@@ -160,7 +164,7 @@ public class SapInvoiceController {
                 return prepareTransfer(sapRequest, model);                
             }
         }
-        return home(sapRequest.getEvent().getPerson().getUsername(), model);
+        return homeRedirect(sapRequest.getEvent().getPerson().getUsername());
     }
 
     static Money toMoney(final String s) {
@@ -177,14 +181,46 @@ public class SapInvoiceController {
         if (Group.dynamic("managers").isMember(Authenticate.getUser())) {
             sapRequest.delete();
         }
-        return home(event.getPerson().getUsername(), model);
+        return homeRedirect(event.getPerson().getUsername());
+    }
+
+    @RequestMapping(value = "/{sapRequest}/cancel", method = RequestMethod.POST)
+    public String cancel(final @PathVariable SapRequest sapRequest, final Model model) {
+        final Event event = sapRequest.getEvent();
+        if (Group.dynamic("managers").isMember(Authenticate.getUser())) {
+            final SapEvent sapEvent = new SapEvent(event);
+            try {
+                sapEvent.cancelDocument(sapRequest);
+            } catch (final Exception | Error e) {
+                model.addAttribute("exception", e.getMessage());
+            }
+        }
+        return homeRedirect(event.getPerson().getUsername());
+    }
+
+    @RequestMapping(value = "/{event}/cancelDebt", method = RequestMethod.POST)
+    public String cancelDebt(final @PathVariable Event event, final Model model) {
+        if (Group.dynamic("managers").isMember(Authenticate.getUser())) {
+            final SapEvent sapEvent = new SapEvent(event);
+            try {
+                sapEvent.cancelDebt();
+            } catch (final Exception | Error e) {
+                model.addAttribute("exception", e.getMessage());
+            }
+        }
+        return homeRedirect(event.getPerson().getUsername());
     }
 
     private JsonObject toJsonObject(final Event event, final DateTime when) {
         final JsonObject result = new JsonObject();
+
+        final SapEvent sapEvent = new SapEvent(event);
+
         result.addProperty("eventId", event.getExternalId());
         result.addProperty("eventDescription", event.getDescription().toString());
         result.addProperty("isCanceled", event.isInState(EventState.CANCELLED));
+        result.addProperty("canCancelDebt", !sapEvent.getFilteredSapRequestStream().anyMatch(r -> !r.isDebtDocument()) && sapEvent.calculateDebtValue().isPositive());
+        result.addProperty("hasAnyPendingSapRequests", event.getSapRequestSet().stream().anyMatch(r -> !r.getIntegrated()));
 
         final DebtInterestCalculator calculator = event.getDebtInterestCalculator(when);
 
@@ -228,7 +264,14 @@ public class SapInvoiceController {
         result.addProperty("documentNumber", sapRequest.getDocumentNumber());
         result.addProperty("integrated", sapRequest.getIntegrated());
         result.addProperty("integrationMessage", sapRequest.getIntegrationMessage());
-        //result.addProperty("originalRequest", sapRequest.getOriginalRequest());
+        final SapRequest originalRequest = sapRequest.getOriginalRequest();
+        if (originalRequest != null) {
+            result.addProperty("originalRequest", originalRequest.getExternalId());
+        }
+        final SapRequest anulledRequest = sapRequest.getAnulledRequest();
+        if (anulledRequest != null) {
+            result.addProperty("anulledRequest", anulledRequest.getExternalId());
+        }
         //result.addProperty("payment", sapRequest.getPayment());
         result.addProperty("request", sapRequest.getRequest());
         result.addProperty("requestType", sapRequest.getRequestType() == null ? null : sapRequest.getRequestType().name());

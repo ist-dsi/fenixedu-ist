@@ -97,6 +97,9 @@ public class SapRequest extends SapRequest_Base {
     }
 
     public boolean refersToDocument(final String documentNumber) {
+        if (getDocumentNumber().equals(documentNumber)) {
+            return true;
+        }
         final JsonObject o = new JsonParser().parse(getRequest()).getAsJsonObject();
         final JsonElement paymentDocument = o.get("paymentDocument");
         if (paymentDocument != null && !paymentDocument.isJsonNull()) {
@@ -132,6 +135,11 @@ public class SapRequest extends SapRequest_Base {
         final String documentNumber = getDocumentNumber();
         return documentNumber.length() == 3 || getEvent().getSapRequestSet().stream()
             .anyMatch(r -> r != this && r.getRequest().indexOf(documentNumber) > 0);
+    }
+
+    public boolean isDebtDocument() {
+        final SapRequestType requestType = getRequestType();
+        return requestType == SapRequestType.DEBT || requestType == SapRequestType.DEBT_CREDIT;
     }
 
 }
