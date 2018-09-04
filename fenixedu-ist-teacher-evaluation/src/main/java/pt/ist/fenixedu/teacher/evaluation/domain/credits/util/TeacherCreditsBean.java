@@ -31,6 +31,7 @@ import org.fenixedu.bennu.core.domain.User;
 
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalData;
 import pt.ist.fenixedu.teacher.evaluation.domain.TeacherCredits;
+import pt.ist.fenixedu.teacher.evaluation.domain.credits.AnnualCreditsState;
 import pt.ist.fenixedu.teacher.evaluation.domain.credits.AnnualTeachingCredits;
 import pt.ist.fenixedu.teacher.evaluation.dto.credits.CreditLineDTO;
 
@@ -90,14 +91,10 @@ public class TeacherCreditsBean implements Serializable {
                 return annualTeachingCreditsBean1.getExecutionYear().compareTo(annualTeachingCreditsBean2.getExecutionYear());
             }
         });
-        boolean hasCurrentYear = false;
-        ExecutionYear currentExecutionYear = ExecutionYear.readCurrentExecutionYear();
+
         for (AnnualTeachingCredits annualTeachingCredits : teacher.getAnnualTeachingCreditsSet()) {
             AnnualTeachingCreditsBean annualTeachingCreditsBean = new AnnualTeachingCreditsBean(annualTeachingCredits);
             this.annualTeachingCredits.add(annualTeachingCreditsBean);
-            if (annualTeachingCredits.getAnnualCreditsState().getExecutionYear().equals(currentExecutionYear)) {
-                hasCurrentYear = true;
-            }
             if (annualTeachingCredits.getHasAnyLimitation()) {
                 hasAnyYearWithCreditsLimitation = true;
             }
@@ -105,8 +102,16 @@ public class TeacherCreditsBean implements Serializable {
                 hasAnyYearWithCorrections = true;
             }
         }
-        if (!hasCurrentYear && isTeacherActiveForYear(currentExecutionYear)) {
-            this.annualTeachingCredits.add(new AnnualTeachingCreditsBean(currentExecutionYear, teacher));
+
+        ExecutionYear nextExecutionYear = AnnualCreditsState.getLastClosedAnnualCreditsState() != null ? AnnualCreditsState
+                .getLastClosedAnnualCreditsState().getExecutionYear()
+                .getNextExecutionYear() : ExecutionYear.readCurrentExecutionYear();
+        for (ExecutionYear executionYear = nextExecutionYear; executionYear != null
+                && !executionYear.isAfter(ExecutionYear.readCurrentExecutionYear()); executionYear =
+                        executionYear.getNextExecutionYear()) {
+            if (isTeacherActiveForYear(executionYear)) {
+                this.annualTeachingCredits.add(new AnnualTeachingCreditsBean(executionYear, teacher));
+            }
         }
 
         if (RoleType.SCIENTIFIC_COUNCIL.isMember(user) || RoleType.DEPARTMENT_MEMBER.isMember(user)) {
