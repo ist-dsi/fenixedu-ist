@@ -82,13 +82,12 @@ public class SapEvent {
         return event.getSapRequestSet().stream().filter(r -> !r.getIgnore());
     }
 
-    public void registerInvoice(Money debtFenix, Event event, boolean isGratuity, boolean isNewDate, ErrorLogConsumer errorLog,
-            EventLogger elogger) throws Exception {
+    public void registerInvoice(Money debtFenix, Event event, boolean isGratuity, boolean isNewDate) throws Exception {
 
         if (isToProcessDebt(event, isGratuity)) {
             //if debt is greater than invoice, then there was a debt registered and the correspondent invoice failed, don't register the debt again
             if (!getDebtAmount().greaterThan(getInvoiceAmount())) {
-                registerDebt(debtFenix, event, isNewDate, errorLog, elogger);
+                registerDebt(debtFenix, event, isNewDate);
             }
         }
 
@@ -120,20 +119,20 @@ public class SapEvent {
     public void transferInvoice(final SapRequest sapRequest, final ExternalClient externalClient, final Money amountToTransfer) throws Exception {
         final SapRequestType requestType = sapRequest.getRequestType();
         if (requestType != SapRequestType.INVOICE) {
-            throw new Error("Document to transfer is not an invoice");
+            throw new Error("label.error.document.is.not.an.invoice");
         }
         if (amountToTransfer.isZero()) {
-            throw new Error("Value to transfer must be positive");
+            throw new Error("label.error.value.to.transfer.must.be.posituve");
         }
         event.getSapRequestSet().stream()
             .filter(r -> r != sapRequest && r.refersToDocument(sapRequest.getDocumentNumber()))
             .findAny().ifPresent(r -> {
-                throw new Error("Invoice already used");
+                throw new Error("label.error.invoice.already.used");
             });
         final Money invoiceValue = sapRequest.getValue();
         final Money remainder = invoiceValue.subtract(amountToTransfer);
         if (remainder.isNegative()) {
-            throw new Error("Cannot transfer an amount greater than the invoice.");
+            throw new Error("label.error.amount.exceeds.invoice.value");
         } else {
             final SapRequest creditRequest = registerCredit(event, EventProcessor.getCreditEntry(invoiceValue), invoiceValue, sapRequest);
             sapRequest.setIgnore(true);
@@ -153,31 +152,58 @@ public class SapEvent {
     @Atomic
     public void cancelDocument(final SapRequest sapRequest) {
         final SapRequestType requestType = sapRequest.getRequestType();
-        if (requestType != SapRequestType.INVOICE && requestType != SapRequestType.PAYMENT) {
-            throw new Error("Document to cancel is not an invoice");
+        if (requestType != SapRequestType.INVOICE
+                && requestType != SapRequestType.INVOICE_INTEREST
+                && requestType != SapRequestType.CREDIT
+                && requestType != SapRequestType.PAYMENT
+                && requestType != SapRequestType.PAYMENT_INTEREST) {
+            throw new Error("label.document.type.cannot.be.canceled");
         }
         event.getSapRequestSet().stream()
             .filter(r -> r != sapRequest && r.refersToDocument(sapRequest.getDocumentNumber()))
             .findAny().ifPresent(r -> {
-                throw new Error("Document already used");
+                throw new Error("label.error.invoice.already.used");
             });
 
         JsonObject jsonAnnulled = new JsonParser().parse(sapRequest.getRequest()).getAsJsonObject();
-        if (requestType == SapRequestType.INVOICE || requestType == SapRequestType.CREDIT) {
+        if (requestType == SapRequestType.INVOICE
+                || requestType == SapRequestType.INVOICE_INTEREST
+                || requestType == SapRequestType.CREDIT) {
             final JsonObject workDocument = jsonAnnulled.get("workingDocument").getAsJsonObject();
             workDocument.addProperty("workStatus", "A");
             workDocument.addProperty("documentDate", new DateTime().toString("yyyy-MM-dd HH:mm:ss"));
         }
-        if (requestType == SapRequestType.PAYMENT || requestType == SapRequestType.CREDIT) {
+        if (requestType == SapRequestType.PAYMENT
+                || requestType == SapRequestType.PAYMENT_INTEREST
+                || requestType == SapRequestType.CREDIT) {
             final JsonObject workDocument = jsonAnnulled.get("paymentDocument").getAsJsonObject();
             workDocument.addProperty("paymentStatus", "A");
             workDocument.addProperty("paymentDate", new DateTime().toString("yyyy-MM-dd HH:mm:ss"));
+        }
+        if (requestType == SapRequestType.CREDIT) {
+            registerDebt(sapRequest.getValue(), event, true);
         }
             
         final SapRequest sapRequestAnnulled = new SapRequest(sapRequest.getEvent(), sapRequest.getClientId(), sapRequest.getValue(),
                 sapRequest.getDocumentNumber(), sapRequest.getRequestType(), sapRequest.getAdvancement(), jsonAnnulled);
         sapRequest.setAnulledRequest(sapRequestAnnulled);
         sapRequestAnnulled.setIgnore(true);
+    }
+
+    @Atomic
+    public void cancelDebt() throws Exception {
+        if (getFilteredSapRequestStream().anyMatch(r -> !r.isDebtDocument())) {
+            throw new Error("label.error.cannot.cancel.debt.active.documents");
+        }
+        final Money valueToCredit = calculateDebtValue();
+        if (valueToCredit.isZero()) {
+            throw new Error("label.error.debt.already.cancelled");
+        }
+        if (valueToCredit.isNegative()) {
+            throw new Error("label.error.negative.debt");
+        }
+        registerDebtCredit(EventProcessor.getCreditEntry(valueToCredit), event, true);
+        getFilteredSapRequestStream().forEach(r -> r.setIgnore(true));
     }
 
     public void updateInvoiceWithNewClientData() throws Exception {
@@ -231,19 +257,16 @@ public class SapEvent {
                 amountToRegister.negate(), data);
     }
 
-    private void registerDebt(Money debtFenix, Event event, boolean isNewDate, ErrorLogConsumer errorLog, EventLogger elogger)
-            throws Exception {
-
+    private SapRequest registerDebt(Money debtFenix, Event event, boolean isNewDate) {
         String clientId = ClientMap.uVATNumberFor(event.getParty());
         JsonObject data = toJsonDebt(event, debtFenix, clientId, getDocumentDate(event.getWhenOccured(), isNewDate),
                 new DateTime(), true, "NG", true, isNewDate, null);
 
         String documentNumber = getDocumentNumber(data, false);
-        SapRequest sapRequest = new SapRequest(event, clientId, debtFenix, documentNumber, SapRequestType.DEBT, Money.ZERO, data);
+        return new SapRequest(event, clientId, debtFenix, documentNumber, SapRequestType.DEBT, Money.ZERO, data);
     }
 
-    private void registerDebtCredit(CreditEntry creditEntry, Event event, boolean isNewDate, ErrorLogConsumer errorLog,
-            EventLogger elogger) throws Exception {
+    private void registerDebtCredit(CreditEntry creditEntry, Event event, boolean isNewDate) throws Exception {
 
         String clientId = ClientMap.uVATNumberFor(event.getParty());
         SimpleImmutableEntry<List<SapRequest>, Money> openDebtsAndRemainingValue = getOpenDebtsAndRemainingValue();
@@ -253,7 +276,7 @@ public class SapEvent {
             if (openDebts.size() > 1) {
                 // dividir o valor da isenção pelas várias dívidas
                 registerDebtCreditList(event, openDebts, new Money(creditEntry.getAmount()), creditEntry, remainingAmount,
-                        clientId, isNewDate, errorLog, elogger);
+                        clientId, isNewDate);
             } else {
                 // o valor da isenção é superior ao valor em dívida
                 SapRequest debt;
@@ -262,35 +285,32 @@ public class SapEvent {
                 } else { // não existe nenhuma dívida aberta, ir buscar a última
                     debt = getLastDebt();
                 }
-                registerDebtCredit(clientId, event, new Money(creditEntry.getAmount()), creditEntry, debt, isNewDate, errorLog,
-                        elogger);
+                registerDebtCredit(clientId, event, new Money(creditEntry.getAmount()), creditEntry, debt, isNewDate);
             }
         } else {
             //tudo normal
-            registerDebtCredit(clientId, event, new Money(creditEntry.getAmount()), creditEntry, openDebts.get(0), isNewDate,
-                    errorLog, elogger);
+            registerDebtCredit(clientId, event, new Money(creditEntry.getAmount()), creditEntry, openDebts.get(0), isNewDate);
         }
     }
 
     private void registerDebtCreditList(Event event, List<SapRequest> openDebts, Money amountToRegister, CreditEntry creditEntry,
-            Money remainingAmount, String clientId, boolean isNewDate, ErrorLogConsumer errorLog, EventLogger elogger)
+            Money remainingAmount, String clientId, boolean isNewDate)
             throws Exception {
         if (amountToRegister.greaterThan(remainingAmount)) {
             if (openDebts.size() > 1) {
-                registerDebtCredit(clientId, event, remainingAmount, creditEntry, openDebts.get(0), isNewDate, errorLog, elogger);
+                registerDebtCredit(clientId, event, remainingAmount, creditEntry, openDebts.get(0), isNewDate);
                 registerDebtCreditList(event, openDebts.subList(1, openDebts.size()), amountToRegister.subtract(remainingAmount),
-                        creditEntry, openDebts.get(1).getValue(), clientId, isNewDate, errorLog, elogger);
+                        creditEntry, openDebts.get(1).getValue(), clientId, isNewDate);
             } else {
-                registerDebtCredit(clientId, event, amountToRegister, creditEntry, openDebts.get(0), isNewDate, errorLog,
-                        elogger);
+                registerDebtCredit(clientId, event, amountToRegister, creditEntry, openDebts.get(0), isNewDate);
             }
         } else {
-            registerDebtCredit(clientId, event, amountToRegister, creditEntry, openDebts.get(0), isNewDate, errorLog, elogger);
+            registerDebtCredit(clientId, event, amountToRegister, creditEntry, openDebts.get(0), isNewDate);
         }
     }
 
     private void registerDebtCredit(String clientId, Event event, Money amountToRegister, CreditEntry creditEntry,
-            SapRequest debtRequest, boolean isNewDate, ErrorLogConsumer errorLog, EventLogger elogger) throws Exception {
+            SapRequest debtRequest, boolean isNewDate) throws Exception {
         checkValidDocumentNumber(debtRequest.getDocumentNumber(), event);
 
         JsonObject data = toJsonDebtCredit(event, amountToRegister, clientId,
@@ -310,7 +330,7 @@ public class SapEvent {
             //if the debt credit amount is greater than the credit amount it means that a credit debt was registered but the correspondent invoice credit failed
             //we don't register the credit debt again
             if (!getDebtCreditAmount().greaterThan(getCreditAmount())) {
-                registerDebtCredit(creditEntry, event, true, errorLog, elogger);
+                registerDebtCredit(creditEntry, event, true);
             }
         }
 
@@ -768,8 +788,7 @@ public class SapEvent {
     }
 
     private JsonObject toJsonDebt(Event event, Money debtFenix, String clientId, DateTime documentDate, DateTime entryDate,
-            boolean isDebtRegistration, String docType, boolean isToDebit, boolean isNewDate, String originalMetadata)
-            throws Exception {
+            boolean isDebtRegistration, String docType, boolean isToDebit, boolean isNewDate, String originalMetadata) {
         final JsonObject clientData = toJsonClient(event.getParty(), clientId);
         JsonObject json = toJson(event, clientData, documentDate, isDebtRegistration, isNewDate, false);
         JsonObject workDocument =
@@ -815,7 +834,7 @@ public class SapEvent {
     }
 
     private JsonObject toJsonWorkDocument(DateTime documentDate, DateTime entryDate, Money amount, String documentType,
-            boolean isToDebit, DateTime dueDate) throws Exception {
+            boolean isToDebit, DateTime dueDate) {
         JsonObject workDocument = new JsonObject();
         workDocument.addProperty("documentDate", documentDate.toString(DT_FORMAT));
         workDocument.addProperty("entryDate", entryDate.toString(DT_FORMAT));
@@ -962,7 +981,7 @@ public class SapEvent {
         }
     }
 
-    private Long getDocumentNumber() throws Exception {
+    private Long getDocumentNumber() {
         return SapRoot.getInstance().getAndSetNextDocumentNumber();
     }
 
@@ -1323,6 +1342,15 @@ public class SapEvent {
 
     public boolean hasPendingDocumentCancelations() {
         return event.getSapRequestSet().stream().anyMatch(r -> r.getIgnore() && !r.getIntegrated() && r.getOriginalRequest() != null);
+    }
+
+    public boolean canCancel() {
+        final boolean hasNonDebtDocument = getFilteredSapRequestStream().anyMatch(r -> !r.isDebtDocument());
+        return !hasNonDebtDocument && calculateDebtValue().isZero();
+    }
+
+    public Money calculateDebtValue() {
+        return getDebtAmount().subtract(getDebtCreditAmount());
     }
 
 }

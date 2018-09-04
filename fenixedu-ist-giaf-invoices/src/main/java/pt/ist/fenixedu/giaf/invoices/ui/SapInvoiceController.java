@@ -155,7 +155,7 @@ public class SapInvoiceController {
                 final SapEvent sapEvent = new SapEvent(sapRequest.getEvent());
                 try {
                     sapEvent.transferInvoice(sapRequest, externalClient, value);
-                } catch (final Exception e) {
+                } catch (final Exception | Error e) {
                     model.addAttribute("exception", e.getMessage());
                     return prepareTransfer(sapRequest, model);
                 }
@@ -189,16 +189,38 @@ public class SapInvoiceController {
         final Event event = sapRequest.getEvent();
         if (Group.dynamic("managers").isMember(Authenticate.getUser())) {
             final SapEvent sapEvent = new SapEvent(event);
-            sapEvent.cancelDocument(sapRequest);
+            try {
+                sapEvent.cancelDocument(sapRequest);
+            } catch (final Exception | Error e) {
+                model.addAttribute("exception", e.getMessage());
+            }
+        }
+        return homeRedirect(event.getPerson().getUsername());
+    }
+
+    @RequestMapping(value = "/{event}/cancelDebt", method = RequestMethod.POST)
+    public String cancelDebt(final @PathVariable Event event, final Model model) {
+        if (Group.dynamic("managers").isMember(Authenticate.getUser())) {
+            final SapEvent sapEvent = new SapEvent(event);
+            try {
+                sapEvent.cancelDebt();
+            } catch (final Exception | Error e) {
+                model.addAttribute("exception", e.getMessage());
+            }
         }
         return homeRedirect(event.getPerson().getUsername());
     }
 
     private JsonObject toJsonObject(final Event event, final DateTime when) {
         final JsonObject result = new JsonObject();
+
+        final SapEvent sapEvent = new SapEvent(event);
+
         result.addProperty("eventId", event.getExternalId());
         result.addProperty("eventDescription", event.getDescription().toString());
         result.addProperty("isCanceled", event.isInState(EventState.CANCELLED));
+        result.addProperty("canCancelDebt", !sapEvent.getFilteredSapRequestStream().anyMatch(r -> !r.isDebtDocument()) && sapEvent.calculateDebtValue().isPositive());
+        result.addProperty("hasAnyPendingSapRequests", event.getSapRequestSet().stream().anyMatch(r -> !r.getIntegrated()));
 
         final DebtInterestCalculator calculator = event.getDebtInterestCalculator(when);
 

@@ -120,7 +120,7 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
         } else if (oldtState == EventState.OPEN && newState == EventState.CLOSED) {
             // Ack, normal SAP integration will be fine.
         } else if (oldtState == EventState.OPEN && newState == EventState.CANCELLED) {
-            if (new SapEvent(event).getFilteredSapRequestStream().findAny().isPresent()) {
+            if (new SapEvent(event).canCancel()) {
                 throw new Error("Event state change must first be canceled in SAP");
             }
         } else if (allowCloseToOpen && oldtState == EventState.CLOSED && newState == EventState.OPEN) {

@@ -170,7 +170,7 @@ public class EventProcessor {
 
                 if (debtFenix.isPositive()) {
                     if (invoiceSap.isZero()) {
-                        sapEvent.registerInvoice(debtFenix, event, eventWrapper.isGratuity(), false, errorLog, elogger);
+                        sapEvent.registerInvoice(debtFenix, event, eventWrapper.isGratuity(), false);
                     } else if (invoiceSap.isNegative()) {
                         logError(event, errorLog, elogger, "A dívida no SAP é negativa");
                     } else if (!debtFenix.equals(invoiceSap)) {
@@ -181,7 +181,7 @@ public class EventProcessor {
                             // passar data actual (o valor do evento mudou, não dá para saber quando, vamos assumir que mudou quando foi detectada essa diferença)
                             logError(event, errorLog, elogger, "A dívida no Fénix é superior à dívida registada no SAP");
                             sapEvent.registerInvoice(debtFenix.subtract(invoiceSap), eventWrapper.event,
-                                    eventWrapper.isGratuity(), true, errorLog, elogger);
+                                    eventWrapper.isGratuity(), true);
                         } else {
                             // diminuir divida no sap e registar credit note da diferença na última factura existente
                             logError(event, errorLog, elogger, "A dívida no SAP é superior à dívida registada no Fénix");

@@ -108,6 +108,8 @@
 	</h1>
 </div>
 
+<div id="errors" style="display: none; margin-bottom: 25px;" class="alert-warning"></div>
+
 <h3 id="NoResults" style="display: none;"><spring:message code="label.events.none" text="No events found." /></h3>
 
 <table id="eventsTable" class="table tdmiddle" style="display: none;">
@@ -118,6 +120,7 @@
             <th colspan="3" style="text-align: center;"><spring:message code="label.event.debt" text="Debt"/></th>
             <th colspan="3" style="text-align: center;"><spring:message code="label.event.fine" text="Fine"/></th>
             <th colspan="3" style="text-align: center;"><spring:message code="label.event.interest" text="Interest"/></th>
+            <th rowspan="2"></th>
             <th rowspan="2"></th>
             <th rowspan="2"></th>
             <th rowspan="2"></th>
@@ -206,9 +209,21 @@
         <% } %>
     }
 
+    function cancelDebt(eventId) {
+        <% if (Group.dynamic("managers").isMember(Authenticate.getUser())) { %>
+        return '<form method="post" action="' + contextPath + '/sap-invoice-viewer/' + eventId + '/cancelDebt">'
+               + '${csrf.field()}'
+               + '<button type="submit" class="btn btn-info"><spring:message code="label.cancelDebt" text="Cancel Debt"/></button>'
+               + '</form>'
+               ;
+        <% } else { %>
+           return '';
+        <% } %>
+    }
+
     function transfer(sapRequest) {
         <% if (Group.dynamic("managers").isMember(Authenticate.getUser())) { %>
-        if (!sapRequest.referenced && !sapRequest.ignore) {
+        if (!sapRequest.referenced && !sapRequest.ignore && sapRequest.requestType == 'INVOICE') {
             return '<form method="get" action="' + contextPath + '/sap-invoice-viewer/' + sapRequest.id + '/transfer">'
                + '${csrf.field()}'
                + '<button type="submit" class="btn btn-info"><spring:message code="label.transfer" text="Transfer"/></button>'
@@ -292,6 +307,15 @@
     }
 
 	$(document).ready(function() {
+        if (${not empty error}) {
+            document.getElementById("errors").style.display = 'block';
+            $('#errors').html('${error}');
+        }
+        if (${not empty exception}) {
+            document.getElementById("errors").style.display = 'block';
+            $('#errors').html('<spring:message code="${exception}" text="Error"/>');
+        }
+
 		jsonViewerRequest = new JSONViewer();
 		jsonViewerResponse = new JSONViewer();
 		document.querySelector("#sapRequestDetails").appendChild(jsonViewerRequest.getContainer());
@@ -322,7 +346,8 @@
                 .append($('<td/>').text(event.paidInterestAmount))
                 .append($('<td/>').html(expandButton(i, hasSapRequests)))
                 .append($('<td/>').html(calculateRequests(event.eventId)))
-                .append($('<td/>').html(syncEvent(event.eventId)))
+                .append($('<td/>').html(event.hasAnyPendingSapRequests ? syncEvent(event.eventId) : ''))
+                .append($('<td/>').html(event.canCancelDebt ? cancelDebt(event.eventId) : ''))
                 ;
 
 			if (hasSapRequests) {

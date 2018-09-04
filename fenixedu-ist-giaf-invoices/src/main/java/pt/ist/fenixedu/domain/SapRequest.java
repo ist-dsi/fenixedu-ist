@@ -137,4 +137,9 @@ public class SapRequest extends SapRequest_Base {
             .anyMatch(r -> r != this && r.getRequest().indexOf(documentNumber) > 0);
     }
 
+    public boolean isDebtDocument() {
+        final SapRequestType requestType = getRequestType();
+        return requestType == SapRequestType.DEBT || requestType == SapRequestType.DEBT_CREDIT;
+    }
+
 }
