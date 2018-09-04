@@ -39,6 +39,7 @@
 <table id="invoiceTable" class="table tdmiddle">
 	<thead>
 		<tr>
+            <th><spring:message code="label.date" text="Date"/></th>
 			<th><spring:message code="label.id" text="ID"/></th>
 			<th><spring:message code="label.event.description" text="Event"/></th>
             <th><spring:message code="label.value" text="Value"/></th>
@@ -108,9 +109,24 @@
         return '';
     }
 
+    function sortGiaf(d1, d2) {
+        if (d1.paymentDate == d2.paymentDate) {
+            return d1.receiptId < d2.receiptId ? -1 : d1.receiptId > d2.receiptId ? 1 : 0;
+        }
+        return d1.paymentDate < d2.paymentDate ? -1 : 1;
+    }
+
+    function sortSap(d1, d2) {
+        if (d1.whenCreated == d2.whenCreated) {
+            return d1.documentNumber < d2.documentNumber ? -1 : d1.documentNumber > d2.documentNumber ? 1 : 0;
+        }
+        return d1.whenCreated < d2.whenCreated ? -1 : 1;
+    }
+
 	$(document).ready(function() {
-        $(giafDocuments).each(function(i, giafDocument) {
+        $(giafDocuments).sort(sortGiaf).each(function(i, giafDocument) {
 			row = $('<tr/>').appendTo($('#invoiceTable'))
+                .append($('<td/>').text(giafDocument.paymentDate))
                 .append($('<td/>').text(giafDocument.invoiceNumber))
                 .append($('<td/>').text(giafDocument.description))
                 .append($('<td/>').text(giafDocument.value))
@@ -119,9 +135,10 @@
                 .append($('<td/>').html(giafDocumentNumberPart(giafDocument)))
                 ;
         });
-        $(sapRequests).each(function(i, sapRequest) {
+        $(sapRequests).sort(sortSap).each(function(i, sapRequest) {
             rowStyle = sapRequest.isCanceled || sapRequest.ignore ? "text-decoration: line-through;" : "";
             row = $('<tr style="' + rowStyle + '"/>').appendTo($('#invoiceTable'))
+                .append($('<td/>').text(sapRequest.whenCreated))
                 .append($('<td/>').text(sapRequest.id))
                 .append($('<td/>').text(sapRequest.description))
                 .append($('<td/>').text(sapRequest.value))

@@ -71,6 +71,7 @@ public class InvoiceDownlaodController {
                 final JsonArray jsonEvent = GiafEvent.readEventFile(event);
                 for (final JsonElement je : jsonEvent) {
                     final JsonObject jo = je.getAsJsonObject();
+                    jo.addProperty("eventId", event.getExternalId());
                     final JsonElement receiptId = jo.get("receiptId");
                     if (receiptId != null && !receiptId.isJsonNull()) {
                         giafDocuments.add(jo);
