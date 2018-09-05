@@ -251,7 +251,12 @@
     onsubmit="return confirm('Are you sure you want to submit?');"
     function cancelRequest(sapRequest) {
         <% if (Group.dynamic("managers").isMember(Authenticate.getUser())) { %>
-        if (sapRequest.integrated && !sapRequest.ignore && sapRequest.request.length > 2 && !sapRequest.anulledRequest) {
+        if (sapRequest.integrated
+                && !sapRequest.ignore
+                && sapRequest.request.length > 2
+                && !sapRequest.anulledRequest
+                && sapRequest.requestType != 'DEBT'
+                && sapRequest.requestType != 'DEBT_CREDIT') {
             return '<form method="post" action="' + contextPath + '/sap-invoice-viewer/' + sapRequest.id + '/cancel" onsubmit="return confirm(\'<spring:message code="label.cancel.confirm" text="Are you sure?"/>\');">' 
                + '${csrf.field()}'
                + '<button type="submit" class="btn btn-warning"><spring:message code="label.cancel" text="Cancel Request"/></button>'
