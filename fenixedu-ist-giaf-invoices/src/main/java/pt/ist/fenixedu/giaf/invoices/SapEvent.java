@@ -427,11 +427,11 @@ public class SapEvent {
     private SapRequest registerInterestInvoice(final Money payedInterest, final String clientId,
             final AccountingTransactionDetail transactionDetail, DateTime paymentDate, final ErrorLogConsumer errorLog,
             final EventLogger elogger) throws Exception {
-        JsonObject data = toJsonInvoice(transactionDetail.getEvent(), payedInterest, paymentDate, new DateTime(), clientId, false,
+        JsonObject data = toJsonInvoice(event, payedInterest, paymentDate, new DateTime(), clientId, false,
                 true);
 
         String documentNumber = getDocumentNumber(data, false);
-        SapRequest sapRequest = new SapRequest(transactionDetail.getEvent(), clientId, payedInterest, documentNumber,
+        SapRequest sapRequest = new SapRequest(event, clientId, payedInterest, documentNumber,
                 SapRequestType.INVOICE_INTEREST, Money.ZERO, data);
         sapRequest.setPayment(transactionDetail.getTransaction());
         return sapRequest;
@@ -442,7 +442,7 @@ public class SapEvent {
         JsonObject data = toJsonPayment(transactionDetail, payedInterest, sapInvoiceRequest, true);
 
         String documentNumber = getDocumentNumber(data, true);
-        SapRequest sapRequest = new SapRequest(transactionDetail.getEvent(), sapInvoiceRequest.getClientId(), payedInterest, documentNumber,
+        SapRequest sapRequest = new SapRequest(event, sapInvoiceRequest.getClientId(), payedInterest, documentNumber,
                 SapRequestType.PAYMENT_INTEREST, Money.ZERO, data);
         sapRequest.setPayment(transactionDetail.getTransaction());
     }
@@ -451,7 +451,7 @@ public class SapEvent {
 
         AccountingTransactionDetail transactionDetail =
                 ((AccountingTransaction) FenixFramework.getDomainObject(payment.getId())).getTransactionDetail();
-        String clientId = ClientMap.uVATNumberFor(transactionDetail.getEvent().getParty());
+        String clientId = ClientMap.uVATNumberFor(event.getParty());
 
         // ir buscar a ultima factura aberta e verificar se o pagamento ultrapassa o valor da factura
         // e associar o restante à(s) factura(s) seguinte(s)
@@ -525,22 +525,22 @@ public class SapEvent {
     private void registerPayment(AccountingTransactionDetail transactionDetail, Money payedAmount, SapRequest sapInvoiceRequest,
             ErrorLogConsumer errorLog, EventLogger elogger) throws Exception {
 
-        checkValidDocumentNumber(sapInvoiceRequest.getDocumentNumber(), transactionDetail.getEvent());
+        checkValidDocumentNumber(sapInvoiceRequest.getDocumentNumber(), event);
 
         JsonObject data = toJsonPayment(transactionDetail, payedAmount, sapInvoiceRequest, false);
         String documentNumber = getDocumentNumber(data, true);
-        SapRequest sapRequest = new SapRequest(transactionDetail.getEvent(), sapInvoiceRequest.getClientId(), payedAmount, documentNumber,
+        SapRequest sapRequest = new SapRequest(event, sapInvoiceRequest.getClientId(), payedAmount, documentNumber,
                 SapRequestType.PAYMENT, Money.ZERO, data);
         sapRequest.setPayment(transactionDetail.getTransaction());
     }
 
     private void registerAdvancement(Money amount, Money advancement, SapRequest sapInvoiceRequest,
             AccountingTransactionDetail transactionDetail, ErrorLogConsumer errorLog, EventLogger elogger) throws Exception {
-        checkValidDocumentNumber(sapInvoiceRequest.getDocumentNumber(), transactionDetail.getEvent());
+        checkValidDocumentNumber(sapInvoiceRequest.getDocumentNumber(), event);
 
         JsonObject data = toJsonAdvancement(amount, advancement, sapInvoiceRequest, transactionDetail);
         String documentNumber = getDocumentNumber(data, true);
-        SapRequest sapRequest = new SapRequest(transactionDetail.getEvent(), sapInvoiceRequest.getClientId(), amount, documentNumber,
+        SapRequest sapRequest = new SapRequest(event, sapInvoiceRequest.getClientId(), amount, documentNumber,
                 SapRequestType.ADVANCEMENT, advancement, data);
         sapRequest.setPayment(transactionDetail.getTransaction());
     }
@@ -663,7 +663,7 @@ public class SapEvent {
     private JsonObject toJsonPayment(AccountingTransactionDetail transactionDetail, Money amount, SapRequest sapInvoiceRequest,
             boolean isInterest) throws Exception {
         JsonObject data =
-                toJson(transactionDetail.getEvent(), sapInvoiceRequest.getClientJson(), transactionDetail.getWhenRegistered(), false, false, isInterest);
+                toJson(event, sapInvoiceRequest.getClientJson(), transactionDetail.getWhenRegistered(), false, false, isInterest);
         JsonObject paymentDocument = toJsonPaymentDocument(amount, "NP", sapInvoiceRequest.getDocumentNumber(), transactionDetail.getWhenRegistered(),
                 getPaymentMechanism(transactionDetail), getPaymentMethodReference(transactionDetail),
                 SAFTPTSettlementType.NL.toString(), true);
@@ -686,7 +686,7 @@ public class SapEvent {
     private JsonObject toJsonAdvancement(Money amount, Money excess, SapRequest sapInvoiceRequest,
             AccountingTransactionDetail transactionDetail) throws Exception {
         JsonObject data =
-                toJson(transactionDetail.getEvent(), sapInvoiceRequest.getClientJson(), transactionDetail.getWhenRegistered(), false, false, false);
+                toJson(event, sapInvoiceRequest.getClientJson(), transactionDetail.getWhenRegistered(), false, false, false);
         JsonObject paymentDocument = toJsonPaymentDocument(amount, "NP", sapInvoiceRequest.getDocumentNumber(), transactionDetail.getWhenRegistered(),
                 getPaymentMechanism(transactionDetail), getPaymentMethodReference(transactionDetail),
                 SAFTPTSettlementType.NL.toString(), true);
