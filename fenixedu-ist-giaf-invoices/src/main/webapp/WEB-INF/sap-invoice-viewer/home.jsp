@@ -280,9 +280,13 @@
         if (sapRequest.sapDocumentNumber == null) {
         	return '';
         } else {
-            var docName = sapRequest.sapDocumentNumber.replace("\/", "_");
-            var link = contextPath + '/invoice-downloader/sap/' + sapRequest.id + '/' + docName + '.pdf';
-            return '<a href="' + link + '">' + sapRequest.sapDocumentNumber + '</a>';
+        	if(sapRequest.hasDocument){
+	            var docName = sapRequest.sapDocumentNumber.replace("\/", "_");
+	            var link = contextPath + '/invoice-downloader/sap/' + sapRequest.id + '/' + docName + '.pdf';
+	            return '<a href="' + link + '">' + sapRequest.sapDocumentNumber + '</a>';
+            } else {
+            	return sapRequest.sapDocumentNumber;
+            }
         }
     }
 

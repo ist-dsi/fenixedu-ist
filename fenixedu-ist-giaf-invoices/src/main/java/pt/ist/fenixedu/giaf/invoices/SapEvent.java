@@ -556,7 +556,7 @@ public class SapEvent {
                 JsonObject result = sendDataToSap(sr, data);
 
                 boolean isIntegrated = checkAndRegisterIntegration(event, errorLog, elogger, data, sr.getDocumentNumber(), sr,
-                        result, sr.getRequestType().toString(), true);
+                        result, sr.getRequestType().toString(), sr.getRequestType().isToGetDocument());
                 if (!isIntegrated) {
                     return isIntegrated;
                 }
@@ -1131,10 +1131,6 @@ public class SapEvent {
     public Money getAdvancementAmount() {
         return getFilteredSapRequestStream().filter(sr -> sr.getRequestType().equals(SapRequestType.ADVANCEMENT))
                 .map(SapRequest::getAdvancement).reduce(Money.ZERO, Money::add);
-    }
-
-    public Money getFinesAmount() {
-        return addAll(SapRequestType.FINE);
     }
 
     public Money getReimbursementsAmount() {
