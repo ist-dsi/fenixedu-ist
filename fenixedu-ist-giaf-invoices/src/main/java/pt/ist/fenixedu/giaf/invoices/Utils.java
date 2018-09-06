@@ -69,8 +69,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.CharMatcher;
 
-import eu.europa.ec.taxud.tin.algorithm.TINValid;
-
 public class Utils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);

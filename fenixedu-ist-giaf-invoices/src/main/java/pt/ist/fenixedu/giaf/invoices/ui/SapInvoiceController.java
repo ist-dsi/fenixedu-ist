@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.google.common.base.Strings;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -64,7 +65,8 @@ public class SapInvoiceController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public String home(@RequestParam(required = false) String username, final Model model) {
+    public String home(@RequestParam(required = false) String username, final Model model,
+            @RequestParam(required = false) String exception, @RequestParam(required = false) String errors) {
         final User user = InvoiceController.getUser(username);
         if (InvoiceController.isAllowedToAccess(user)) {
             final Person person = user.getPerson();
@@ -74,6 +76,12 @@ public class SapInvoiceController {
                     .map(e -> toJsonObject(e, now))
                     .collect(toJsonArray());
             model.addAttribute("events", events);
+        }
+        if (!Strings.isNullOrEmpty(exception)) {
+            model.addAttribute("exception", exception);
+        }
+        if (!Strings.isNullOrEmpty(errors)) {
+            model.addAttribute("errors", errors);
         }
         return "sap-invoice-viewer/home";
     }
