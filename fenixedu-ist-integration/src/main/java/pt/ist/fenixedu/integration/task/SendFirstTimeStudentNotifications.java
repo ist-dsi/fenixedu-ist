@@ -18,6 +18,7 @@ import org.fenixedu.academic.domain.accounting.PaymentCode;
 import org.fenixedu.academic.domain.accounting.PaymentCodeType;
 import org.fenixedu.academic.domain.accounting.paymentCodes.AccountingEventPaymentCode;
 import org.fenixedu.academic.domain.accounting.paymentCodes.InstallmentPaymentCode;
+import org.fenixedu.academic.domain.candidacy.StudentCandidacy;
 import org.fenixedu.academic.domain.contacts.EmailAddress;
 import org.fenixedu.academic.domain.contacts.MobilePhone;
 import org.fenixedu.academic.domain.contacts.Phone;
@@ -33,6 +34,7 @@ import org.fenixedu.bennu.scheduler.annotation.Task;
 import org.fenixedu.messaging.core.domain.Message;
 import org.joda.time.YearMonthDay;
 
+import pt.ist.fenixedu.integration.domain.student.importation.DgesStudentImportationProcess;
 import pt.ist.fenixedu.tutorship.domain.Tutorship;
 import pt.ist.fenixframework.Atomic.TxMode;
 import pt.ist.fenixframework.FenixFramework;
@@ -61,9 +63,16 @@ public class SendFirstTimeStudentNotifications extends CronTask {
     }
 
     private void sendNotifications(final Registration r) {
-        sendSMS(r);
+        final StudentCandidacy studentCandidacy = r.getStudentCandidacy();
+        final DgesStudentImportationProcess process = studentCandidacy == null ? null : studentCandidacy.getDgesStudentImportationProcess(); 
+        final boolean send = process != null;
+        if (send) {
+            sendSMS(r);
+        }
         FenixFramework.atomic(() -> {
-            sendEmail(r);
+            if (send) {
+                sendEmail(r);
+            }
             r.setBennuCompletedRegistration(null);
         });
     }
