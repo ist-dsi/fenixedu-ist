@@ -276,6 +276,7 @@ public class SapInvoiceController {
         result.addProperty("request", sapRequest.getRequest());
         result.addProperty("requestType", sapRequest.getRequestType() == null ? null : sapRequest.getRequestType().name());
         result.addProperty("sapDocumentNumber", sapRequest.getSapDocumentNumber());
+        result.addProperty("hasDocument", sapRequest.getSapDocumentFile() != null);
         result.addProperty("sent", sapRequest.getSent());
         result.addProperty("value", sapRequest.getValue() == null ? null : sapRequest.getValue().toPlainString());
         result.addProperty("whenCreated", sapRequest.getWhenCreated() == null ? null : sapRequest.getWhenCreated().toString(DATE_TIME_FORMAT));
