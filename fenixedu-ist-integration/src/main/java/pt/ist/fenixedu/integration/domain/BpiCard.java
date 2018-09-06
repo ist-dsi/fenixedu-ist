@@ -109,6 +109,6 @@ public class BpiCard extends BpiCard_Base {
     public static boolean hasAccessResponse() {
         final User user = Authenticate.getUser();
         final int year = Year.now().getValue();
-        return user.getBpiCard() != null && user.getBpiCard().getWhenAllowChanged().getYear() == year;
+        return user.getBpiCard() != null && user.getBpiCard().getWhenBankAllowChanged().getYear() == year;
     }
 }
