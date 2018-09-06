@@ -108,7 +108,7 @@ public class SantanderCard extends SantanderCard_Base {
     public static boolean hasAccessResponse() {
         final User user = Authenticate.getUser();
         final int year = Year.now().getValue();
-        return user.getSantanderCard() != null && user.getSantanderCard().getWhenAllowChanged().getYear() == year;
+        return user.getSantanderCard() != null && user.getSantanderCard().getWhenBankAllowChanged().getYear() == year;
     }
     
 }
