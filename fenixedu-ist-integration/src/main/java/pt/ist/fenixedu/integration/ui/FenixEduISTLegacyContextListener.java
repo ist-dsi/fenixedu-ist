@@ -37,6 +37,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
+import org.fenixedu.PostalCodeValidator;
 import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.Enrolment;
@@ -86,7 +87,6 @@ import pt.ist.fenixedu.integration.domain.student.AffinityCyclesManagement;
 import pt.ist.fenixedu.integration.domain.student.PreEnrolment;
 import pt.ist.fenixedu.integration.dto.QucProfessorshipEvaluation;
 import pt.ist.fenixedu.teacher.evaluation.domain.ProfessorshipEvaluationBean;
-import org.fenixedu.PostalCodeValidator;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
 import pt.ist.fenixframework.FenixFramework;
@@ -274,6 +274,12 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
                     }
                 });
 
+        Signal.register(Registration.REGISTRATION_PROCESS_COMPLETE, new Consumer<Registration>() {
+            @Override
+            public void accept(final Registration registration) {
+                registration.setBennuCompletedRegistration(Bennu.getInstance());
+            }
+        });
     }
 
     private static boolean isOverDue(final Event event) {
