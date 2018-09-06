@@ -18,26 +18,18 @@
  */
 package pt.ist.fenixedu.integration.domain.cgd;
 
-import java.io.InputStream;
 import java.time.Year;
-import java.util.Locale;
 
-import org.fenixedu.academic.domain.ExecutionYear;
-import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.student.Registration;
-import org.fenixedu.academic.domain.student.Student;
+import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import pt.ist.fenixedu.integration.domain.BpiCard;
+import pt.ist.fenixedu.integration.domain.CardDataAuthorizationLog;
 import pt.ist.fenixframework.Atomic;
-import pt.ist.fenixframework.Atomic.TxMode;
-import pt.ist.fenixframework.FenixFramework;
-import pt.ist.registration.process.ui.service.RegistrationDeclarationCreatorService;
-
-import com.google.gson.JsonObject;
-import com.qubit.solution.fenixedu.integration.cgd.services.form43.CgdForm43Sender;
 
 public class CgdCard extends CgdCard_Base {
 
@@ -87,12 +79,66 @@ public class CgdCard extends CgdCard_Base {
         return null;
     }
 
+    @Atomic
+    public static CgdCard setGrantCardAccess(final Boolean allowCardAccess, String title, String body) {
+        final User user = Authenticate.getUser();
+        if (user != null) {
+            final int year = Year.now().getValue();
+            final CgdCard card = findCardFor(user, year, allowCardAccess);
+            if (card != null) {
+                card.setAllowSendCardDetails(allowCardAccess);
+                new CardDataAuthorizationLog(title, body, BundleUtil.getString("resources.FenixeduIstIntegrationResources", "label.take.consent"));
+                if (allowCardAccess) {
+                    return card;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Atomic
+    public static CgdCard setGrantBankAccess(final Boolean allowBankAccess, String title, String body) {
+        final User user = Authenticate.getUser();
+        if (user != null) {
+            final int year = Year.now().getValue();
+            final CgdCard card = findCardFor(user, year, allowBankAccess);
+            if (card != null) {
+                card.setAllowSendBankDetails(allowBankAccess);
+                new CardDataAuthorizationLog(title, body, BundleUtil.getString(Bundle.ACADEMIC, allowBankAccess ? "label.yes" : "label.no"));
+                if (allowBankAccess) {
+                    return card;
+                }
+            }
+        }
+        return null;
+    }
+
     public static boolean getGrantAccess() {
         final User user = Authenticate.getUser();
         if (user != null) {
             final int year = Year.now().getValue();
             final CgdCard card = findCardFor(user, year, false);
             return card != null && card.getAllowSendDetails();
+        }
+        return false;
+    }
+
+    public static Boolean getAllowSendBank() {
+        final User user = Authenticate.getUser();
+        if (user != null) {
+            final int year = Year.now().getValue();
+            final CgdCard card = findCardFor(user, year, false);
+            return card != null && card.getAllowSendBankDetails();
+        }
+        return null;
+    }
+
+    public static boolean finishedCardDataAuthorization() {
+        final User user = Authenticate.getUser();
+        if (user != null) {
+            final int year = Year.now().getValue();
+            final CgdCard card = findCardFor(user, year, false);
+            return card != null && card.getAllowSendCardDetails() != null && card.getAllowSendBankDetails() != null;
         }
         return false;
     }
