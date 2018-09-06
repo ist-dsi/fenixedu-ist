@@ -160,10 +160,11 @@ public class SapEvent {
             throw new Error("label.document.type.cannot.be.canceled");
         }
         event.getSapRequestSet().stream()
-            .filter(r -> r != sapRequest && r.refersToDocument(sapRequest.getDocumentNumber()))
-            .findAny().ifPresent(r -> {
-                throw new Error("label.error.invoice.already.used");
-            });
+                .filter(r -> !r.getIgnore())
+                .filter(r -> r != sapRequest && r.refersToDocument(sapRequest.getDocumentNumber()))
+                .findAny().ifPresent(r -> {
+                    throw new Error("label.error.invoice.already.used");
+                });
 
         JsonObject jsonAnnulled = new JsonParser().parse(sapRequest.getRequest()).getAsJsonObject();
         if (requestType == SapRequestType.INVOICE
