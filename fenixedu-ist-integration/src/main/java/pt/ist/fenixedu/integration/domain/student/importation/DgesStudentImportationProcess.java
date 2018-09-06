@@ -32,6 +32,7 @@ import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.QueueJob;
 import org.fenixedu.academic.domain.QueueJobResult;
+import org.fenixedu.academic.domain.administrativeOffice.AdministrativeOffice;
 import org.fenixedu.academic.domain.candidacy.Candidacy;
 import org.fenixedu.academic.domain.candidacy.CandidacySituation;
 import org.fenixedu.academic.domain.candidacy.CandidacySituationType;
@@ -127,7 +128,7 @@ public class DgesStudentImportationProcess extends DgesStudentImportationProcess
         final List<DegreeCandidateDTO> degreeCandidateDTOs =
                 parseDgesFile(getDgesStudentImportationFile().getContent(), getUniversityAcronym(), getEntryPhase());
 
-        final Employee employee = Employee.readByNumber(4581);
+        final Employee employee = AdministrativeOffice.readDegreeAdministrativeOffice().getCoordinator().getPerson().getEmployee();
 
         LOG_WRITER.println(String.format("DGES Entries for %s : %s", getDgesStudentImportationForCampus().getName(),
                 degreeCandidateDTOs.size()));

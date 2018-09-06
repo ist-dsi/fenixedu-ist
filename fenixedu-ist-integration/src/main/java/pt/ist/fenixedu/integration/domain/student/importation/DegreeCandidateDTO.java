@@ -27,6 +27,7 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Locale;
 
+import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.EntryPhase;
 import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.ExecutionYear;
@@ -405,9 +406,13 @@ public class DegreeCandidateDTO {
         person.setDateOfBirthYearMonthDay(getDateOfBirth());
         person.setIdentificationDocumentSeriesNumber(digit);
 
+        final PhysicalAddressData data = new PhysicalAddressData(getAddress(), getAreaCode(), getAreaOfAreaCode(), null);
+        data.setCountryOfResidence(Country.readDefault());
+
         final PhysicalAddress createPhysicalAddress =
-                PhysicalAddress.createPhysicalAddress(person, new PhysicalAddressData(getAddress(), getAreaCode(),
-                        getAreaOfAreaCode(), null), PartyContactType.PERSONAL, true);
+                PhysicalAddress.createPhysicalAddress(person,
+                        data, PartyContactType.PERSONAL, true);
+        
         createPhysicalAddress.setValid();
 
         if (PhoneUtil.isMobileNumber(getPhoneNumber())) {
