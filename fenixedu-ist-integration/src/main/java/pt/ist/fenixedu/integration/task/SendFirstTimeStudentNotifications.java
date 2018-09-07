@@ -1,16 +1,7 @@
 package pt.ist.fenixedu.integration.task;
 
-import java.io.IOException;
 import java.util.stream.Stream;
 
-import org.apache.commons.httpclient.Credentials;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.fenixedu.academic.FenixEduAcademicConfiguration;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
@@ -23,14 +14,15 @@ import org.fenixedu.academic.domain.candidacy.StudentCandidacy;
 import org.fenixedu.academic.domain.contacts.EmailAddress;
 import org.fenixedu.academic.domain.contacts.MobilePhone;
 import org.fenixedu.academic.domain.contacts.Phone;
-import org.fenixedu.academic.domain.person.Gender;
 import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.academic.ui.struts.action.externalServices.PhoneValidationUtils;
 import org.fenixedu.academic.util.PhoneUtil;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.scheduler.CronTask;
 import org.fenixedu.bennu.scheduler.annotation.Task;
+import org.fenixedu.commons.StringNormalizer;
 import org.fenixedu.messaging.core.domain.Message;
 import org.fenixedu.messaging.core.template.DeclareMessageTemplate;
 import org.fenixedu.messaging.core.template.TemplateParameter;
@@ -71,15 +63,6 @@ import pt.ist.fenixframework.FenixFramework;
 )
 @Task(englishTitle = "Send First Time Student Notification Email and SMS.")
 public class SendFirstTimeStudentNotifications extends CronTask {
-
-    private String CIIST_SMS_GATEWAY_URL = FenixEduAcademicConfiguration.getConfiguration().getCIISTSMSGatewayUrl();
-    private HttpClient CIIST_CLIENT = new HttpClient();
-    {
-        final String CIIST_SMS_USERNAME = FenixEduAcademicConfiguration.getConfiguration().getCIISTSMSUsername();
-        final String CIIST_SMS_PASSWORD = FenixEduAcademicConfiguration.getConfiguration().getCIISTSMSPassword();
-        Credentials credentials = new UsernamePasswordCredentials(CIIST_SMS_USERNAME, CIIST_SMS_PASSWORD);
-        CIIST_CLIENT.getState().setCredentials(AuthScope.ANY, credentials);
-    }
 
     @Override
     public TxMode getTxMode() {
@@ -188,16 +171,9 @@ public class SendFirstTimeStudentNotifications extends CronTask {
             return;
         }
 
-        final StringBuilder message = new StringBuilder("Bem-vindo ao Técnico. ");
-        final Person tutor = tutorship.getTeacher().getPerson();
-        if (tutor.getGender() == Gender.FEMALE) {
-            message.append("Foi lhe atribuído o tutor "
-                    + tutorship.getTeacher().getPerson().getUser().getProfile().getDisplayName() + ". ");
-        } else {
-            message.append("Foi lhe atribuído o tutor "
-                    + tutorship.getTeacher().getPerson().getUser().getProfile().getDisplayName() + ". ");
-        }
-        message.append("Mais informações importantes no seu e-mail.");
+        final StringBuilder message = new StringBuilder("Já és aluno do Tecnico. Foi-te atribuído o Tutor ");
+        message.append(tutorship.getTeacher().getPerson().getUser().getProfile().getDisplayName());
+        message.append(". Mais informações importantes no e-mail.");
 
         final Stream<String> numbers1 = person.getPartyContactsSet().stream()
             .filter(pc -> pc instanceof Phone)
@@ -209,28 +185,25 @@ public class SendFirstTimeStudentNotifications extends CronTask {
         Stream.concat(numbers1, numbers2)
             .filter(n -> PhoneUtil.isMobileNumber(n))
             .map(n -> n.replace(" ", ""))
+            .map(n -> n.startsWith("+") ? n : "+351" + n)
             .distinct()
-            .forEach(n -> sendSMS(n, message.toString()));
+            .forEach(n -> sendSMS(n, normalize(message.toString())));
+    }
+
+    private String normalize(final String string) {
+        return StringNormalizer.normalizePreservingCapitalizedLetters(string);
     }
 
     private void sendSMS(final String number, final String message) {
         taskLog("Sending sms to number %s. SMS lenght: %s%n", number, message.length());
         taskLog("%s%n", message);
 
-        PostMethod method = new PostMethod(CIIST_SMS_GATEWAY_URL);
-        method.addParameter(new NameValuePair("number", number));
-        method.addParameter(new NameValuePair("msg", message));
         try {
-            CIIST_CLIENT.executeMethod(method);
-            if (method.getStatusCode() != 200) {
-                taskLog("Faild send sms with status code: %s%n", method.getStatusCode());
-            }
-        } catch (final HttpException e) {
-            taskLog("Faild send sms with exception: %s%n", e.getMessage());
-            e.printStackTrace();
-        } catch (final IOException e) {
-            taskLog("Faild send sms with exception: %s%n", e.getMessage());
-            e.printStackTrace();
+            final String sid = PhoneValidationUtils.getInstance().sendTwilioSMS(number, "TECNICO", message);
+            taskLog("Sent SMS via twilio to %s : %s%n", number, sid);
+        } catch (final Throwable t) {
+            taskLog("Faild send sms with exception: %s to number %s%n", t.getMessage(), number);
+            t.printStackTrace();
         }
     }
 
