@@ -49,6 +49,14 @@
         </div>
     </div>
     <div class="form-group">
+        <label class="control-label col-sm-2" for="type">
+            <spring:message code="label.invoice.transfer.pledgeNumber" text="Pledge Number" />
+        </label>
+        <div class="col-sm-10">
+            <input name="pledgeNumber" type="text" class="form-control" id="pledgeNumber" value=""/>
+        </div>
+    </div>
+    <div class="form-group">
         <div class="col-sm-10 col-sm-offset-2">
             <button id="submitRequest" class="btn btn-primary">
                 <spring:message code="label.transfer" text="Transferir" />

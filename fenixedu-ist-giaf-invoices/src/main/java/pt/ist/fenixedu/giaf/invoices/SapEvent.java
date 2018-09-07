@@ -116,7 +116,8 @@ public class SapEvent {
     }
 
     @Atomic
-    public void transferInvoice(final SapRequest sapRequest, final ExternalClient externalClient, final Money amountToTransfer) throws Exception {
+    public void transferInvoice(final SapRequest sapRequest, final ExternalClient externalClient, final Money amountToTransfer,
+            final String pledgeNumber) throws Exception {
         final SapRequestType requestType = sapRequest.getRequestType();
         if (requestType != SapRequestType.INVOICE) {
             throw new Error("label.error.document.is.not.an.invoice");
@@ -138,7 +139,8 @@ public class SapEvent {
             sapRequest.setIgnore(true);
             creditRequest.setIgnore(true);
 
-            final JsonObject data = toJsonInvoice(sapRequest, externalClient, amountToTransfer, getDocumentDate(event.getWhenOccured(), true), new DateTime(), false, false);
+            final JsonObject data = toJsonInvoice(sapRequest, externalClient, amountToTransfer,
+                    getDocumentDate(event.getWhenOccured(), true), new DateTime(), false, false, pledgeNumber);
             final String documentNumber = getDocumentNumber(data, false);
             new SapRequest(event, externalClient.getClientId(), amountToTransfer, documentNumber, SapRequestType.INVOICE, Money.ZERO, data);
         }
@@ -156,7 +158,8 @@ public class SapEvent {
                 && requestType != SapRequestType.INVOICE_INTEREST
                 && requestType != SapRequestType.CREDIT
                 && requestType != SapRequestType.PAYMENT
-                && requestType != SapRequestType.PAYMENT_INTEREST) {
+                && requestType != SapRequestType.PAYMENT_INTEREST
+                && requestType != SapRequestType.ADVANCEMENT) {
             throw new Error("label.document.type.cannot.be.canceled");
         }
         event.getSapRequestSet().stream()
@@ -169,19 +172,21 @@ public class SapEvent {
         JsonObject jsonAnnulled = new JsonParser().parse(sapRequest.getRequest()).getAsJsonObject();
         if (requestType == SapRequestType.INVOICE
                 || requestType == SapRequestType.INVOICE_INTEREST
-                || requestType == SapRequestType.CREDIT) {
+                || requestType == SapRequestType.CREDIT
+                || requestType == SapRequestType.ADVANCEMENT) {
             final JsonObject workDocument = jsonAnnulled.get("workingDocument").getAsJsonObject();
             workDocument.addProperty("workStatus", "A");
             workDocument.addProperty("documentDate", new DateTime().toString("yyyy-MM-dd HH:mm:ss"));
         }
         if (requestType == SapRequestType.PAYMENT
                 || requestType == SapRequestType.PAYMENT_INTEREST
-                || requestType == SapRequestType.CREDIT) {
+                || requestType == SapRequestType.CREDIT
+                || requestType == SapRequestType.ADVANCEMENT) {
             final JsonObject workDocument = jsonAnnulled.get("paymentDocument").getAsJsonObject();
             workDocument.addProperty("paymentStatus", "A");
             workDocument.addProperty("paymentDate", new DateTime().toString("yyyy-MM-dd HH:mm:ss"));
         }
-        if (requestType == SapRequestType.CREDIT) {
+        if (requestType == SapRequestType.CREDIT && isToProcessDebt(sapRequest.getEvent(), sapRequest.getEvent().isGratuity())) {
             registerDebt(sapRequest.getValue(), event, true);
         }
             
@@ -458,7 +463,6 @@ public class SapEvent {
         // e associar o restante à(s) factura(s) seguinte(s)
         SimpleImmutableEntry<List<SapRequest>, Money> openInvoicesAndRemainingAmount = getOpenInvoicesAndRemainingValue();
 
-        Money payedAmount = new Money(payment.getUsedAmountInDebts());
         Money firstRemainingAmount = openInvoicesAndRemainingAmount.getValue();
         List<SapRequest> openInvoices = openInvoicesAndRemainingAmount.getKey();
 
@@ -467,14 +471,10 @@ public class SapEvent {
             registerInterest(payedInterest, clientId, transactionDetail, errorLog, elogger);
         }
 
+        Money payedAmount = new Money(payment.getAmount()).subtract(payedInterest);
         if (payedAmount.isZero()) {
-            if (payedInterest.isZero()) {
-                //there was a payment made and the debt is already closed, it's an extra payment (advancement)
-                payedAmount = new Money(payment.getAmount());
-            } else {
-                //it was all used for interests, there is nothing more to register
-                return;
-            }
+            //it was all used for interests, there is nothing more to register
+            return;
         }
 
         if (firstRemainingAmount.isZero()) {
@@ -778,11 +778,12 @@ public class SapEvent {
 
     private JsonObject toJsonInvoice(final SapRequest sapRequest, final ExternalClient externalClient, final Money debtFenix,
             final DateTime documentDate, final DateTime entryDate, final boolean isDebtRegistration,
-            final boolean isInterest) throws Exception {
+            final boolean isInterest, final String pledgeNumber) throws Exception {
         final JsonObject clientData = toJsonClient(externalClient);
         JsonObject json = toJson(event, clientData, documentDate, isDebtRegistration, true, isInterest);
         JsonObject workDocument =
                 toJsonWorkDocument(documentDate, entryDate, debtFenix, "ND", true, new DateTime(Utils.getDueDate(event)));
+        workDocument.addProperty("compromiseMetadata", pledgeNumber);
 
         json.add("workingDocument", workDocument);
         return json;
@@ -849,8 +850,6 @@ public class SapEvent {
 
         workDocument.addProperty("isToDebit", isToDebit);
         workDocument.addProperty("isToCredit", !isToDebit);
-
-//        workDocument.addProperty("compromiseMetadata", "");
 
         workDocument.addProperty("taxExemptionReason", "M99");
         workDocument.addProperty("unitOfMeasure", "UNID");
