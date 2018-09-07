@@ -356,7 +356,7 @@ relation RemoteSystemDomainRoot {
 
 relation CompletedRegistrationToNotify {
     .org.fenixedu.bennu.core.domain.Bennu playsRole bennuCompletedRegistration {
-        multiplicity 1..1;
+        multiplicity 0..1;
     }
     .org.fenixedu.academic.domain.student.Registration playsRole registrationToNotify {
         multiplicity *;
