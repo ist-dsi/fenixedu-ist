@@ -48,7 +48,7 @@ import pt.ist.fenixframework.FenixFramework;
         subject = "message.template.registration.process.first.time.student.email.subject",
         text = "message.template.registration.process.first.time.student.email.body",
         parameters = {
-                @TemplateParameter(id = "name", description = "message.template.registration.process.first.time.student.email.parameter.name"),
+                @TemplateParameter(id = "studentName", description = "message.template.registration.process.first.time.student.email.parameter.studentName"),
                 @TemplateParameter(id = "tutorName", description = "message.template.registration.process.first.time.student.email.parameter.tutorName"),
                 @TemplateParameter(id = "tutorEmail", description = "message.template.registration.process.first.time.student.email.parameter.tutorEmail"),
 
@@ -132,7 +132,7 @@ public class SendFirstTimeStudentNotifications extends CronTask {
                 .singleTos(emails)
                 .to(Group.users(user))
                 .template("message.template.registration.process.first.time.student.email")
-                .parameter("name", user.getDisplayName())
+                .parameter("studentName", user.getDisplayName())
                 .parameter("tutorName", tutorship.getTeacher().getPerson().getUser().getProfile().getDisplayName())
                 .parameter("tutorEmail", tutorship.getTeacher().getPerson().getEmailForSendingEmails())
                 .parameter("paymentInfoInsuranceEntity", insuranceCode.getPaymentCode().getEntityCode())
