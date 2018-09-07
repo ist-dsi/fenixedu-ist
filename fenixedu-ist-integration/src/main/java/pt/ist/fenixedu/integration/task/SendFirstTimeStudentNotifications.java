@@ -14,17 +14,17 @@ import org.fenixedu.academic.FenixEduAcademicConfiguration;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
-import org.fenixedu.academic.domain.accounting.PaymentCode;
-import org.fenixedu.academic.domain.accounting.PaymentCodeType;
-import org.fenixedu.academic.domain.accounting.paymentCodes.AccountingEventPaymentCode;
-import org.fenixedu.academic.domain.accounting.paymentCodes.InstallmentPaymentCode;
+import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeEvent;
+import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEvent;
+import org.fenixedu.academic.domain.accounting.events.insurance.InsuranceEvent;
+import org.fenixedu.academic.domain.accounting.paymentCodes.EventPaymentCode;
+import org.fenixedu.academic.domain.accounting.paymentCodes.EventPaymentCodeEntry;
 import org.fenixedu.academic.domain.candidacy.StudentCandidacy;
 import org.fenixedu.academic.domain.contacts.EmailAddress;
 import org.fenixedu.academic.domain.contacts.MobilePhone;
 import org.fenixedu.academic.domain.contacts.Phone;
 import org.fenixedu.academic.domain.person.Gender;
 import org.fenixedu.academic.domain.student.Registration;
-import org.fenixedu.academic.util.Money;
 import org.fenixedu.academic.util.PhoneUtil;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
@@ -32,7 +32,9 @@ import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.scheduler.CronTask;
 import org.fenixedu.bennu.scheduler.annotation.Task;
 import org.fenixedu.messaging.core.domain.Message;
-import org.joda.time.YearMonthDay;
+import org.fenixedu.messaging.core.template.DeclareMessageTemplate;
+import org.fenixedu.messaging.core.template.TemplateParameter;
+import org.joda.time.DateTime;
 
 import pt.ist.fenixedu.integration.domain.student.importation.DgesStudentImportationProcess;
 import pt.ist.fenixedu.tutorship.domain.Tutorship;
@@ -40,6 +42,33 @@ import pt.ist.fenixframework.Atomic.TxMode;
 import pt.ist.fenixframework.FenixFramework;
 
 
+@DeclareMessageTemplate(
+        id = "message.template.registration.process.first.time.student.email",
+        description = "message.template.registration.process.first.time.student.email.description",
+        subject = "message.template.registration.process.first.time.student.email.subject",
+        text = "message.template.registration.process.first.time.student.email.body",
+        parameters = {
+                @TemplateParameter(id = "name", description = "message.template.registration.process.first.time.student.email.parameter.name"),
+                @TemplateParameter(id = "tutorName", description = "message.template.registration.process.first.time.student.email.parameter.tutorName"),
+                @TemplateParameter(id = "tutorEmail", description = "message.template.registration.process.first.time.student.email.parameter.tutorEmail"),
+
+                @TemplateParameter(id = "paymentInfoInsuranceEntity", description = "message.template.registration.process.first.time.student.email.parameter.paymentInfoInsuranceEntity"),
+                @TemplateParameter(id = "paymentInfoInsuranceReference", description = "message.template.registration.process.first.time.student.email.parameter.paymentInfoInsuranceReference"),
+                @TemplateParameter(id = "paymentInfoInsuranceDate", description = "message.template.registration.process.first.time.student.email.parameter.paymentInfoInsuranceDate"),
+                @TemplateParameter(id = "paymentInfoInsuranceValue", description = "message.template.registration.process.first.time.student.email.parameter.paymentInfoInsuranceValue"),
+
+                @TemplateParameter(id = "paymentInfoAcademicFeeEntity", description = "message.template.registration.process.first.time.student.email.parameter.paymentInfoAcademicFeeEntity"),
+                @TemplateParameter(id = "paymentInfoAcademicFeeReference", description = "message.template.registration.process.first.time.student.email.parameter.paymentInfoAcademicFeeReference"),
+                @TemplateParameter(id = "paymentInfoAcademicFeeDate", description = "message.template.registration.process.first.time.student.email.parameter.paymentInfoAcademicFeeDate"),
+                @TemplateParameter(id = "paymentInfoAcademicFeeValue", description = "message.template.registration.process.first.time.student.email.parameter.paymentInfoAcademicFeeValue"),
+
+                @TemplateParameter(id = "paymentInfoTuitionEntity", description = "message.template.registration.process.first.time.student.email.parameter.paymentInfoTuitionEntity"),
+                @TemplateParameter(id = "paymentInfoTuitionReference", description = "message.template.registration.process.first.time.student.email.parameter.paymentInfoTuitionReference"),
+                @TemplateParameter(id = "paymentInfoTuitionDate", description = "message.template.registration.process.first.time.student.email.parameter.paymentInfoTuitionDate"),
+                @TemplateParameter(id = "paymentInfoTuitionValue", description = "message.template.registration.process.first.time.student.email.parameter.paymentInfoTuitionValue"),
+        },
+        bundle = "resources.FenixeduIstIntegrationResources"
+)
 @Task(englishTitle = "Send First Time Student Notification Email and SMS.")
 public class SendFirstTimeStudentNotifications extends CronTask {
 
@@ -83,125 +112,57 @@ public class SendFirstTimeStudentNotifications extends CronTask {
         final StudentCurricularPlan studentCurricularPlan = getStudentCurricularPlan(registration);
         final Tutorship tutorship = getTutorship(studentCurricularPlan);
 
-        final String subject = "Bem-vindo ao Técnico - Informações Úteis";
+        final DateTime today = new DateTime();
+        final EventPaymentCodeEntry insuranceCode = getPaymentCode(today, person, InsuranceEvent.class);
+        final EventPaymentCodeEntry academicFeeCode = getPaymentCode(today, person, AdministrativeOfficeFeeEvent.class);
+        final EventPaymentCodeEntry tuitionCode = getPaymentCode(today, person, GratuityEvent.class);
 
-        final StringBuilder b = new StringBuilder();
-        b.append("Caro Estudante,\n");
-        b.append("\n");
-        b.append("Bem-vindo ao Técnico!\n");
-        b.append("\n");
-        b.append("Neste e-mail encontra informações úteis para a sua integração no Técnico. "
-                + "Em particular, encontra o nome do seu tutor, horário, referências "
-                + "multibanco para o pagamento das propinas, indicações sobre a declarações "
-                + "de matrícula com assinatura electrónica entre outras informações.\n");
-        b.append("\n");
-        b.append("O principal sistema de informação académico do Técnico é o FenixEdu, onde "
-                + "poderá consultar e gerir o seu percurso como estudante, ao longo dos "
-                + "próximos anos. Este sistema encontra-se disponível no seguinte endereço:\n");
-        b.append("\n");
-        b.append("   https://fenix.tecnico.ulisboa.pt\n");
-        b.append("\n");
-        b.append("Ao autenticar-se neste sistema, com as credenciais que lhe foram entregues "
-                + "no dia da sua matrícula, poderá aceder ao portal de estudante. Neste portal " + "poderá:\n");
-        b.append("\n");
-        b.append("   - consultar o seu horário;\n");
-        b.append("   - obter informações sobre o seu tutor;\n");
-        b.append("   - obter informações sobre o meio e o estado de pagamento das suas propinas;\n");
-        b.append("   - consultar o corpo de delegados, entre muitas outras opções.\n");
-        b.append("\n");
-        b.append("Pode encontrar no seguinte endereço informações em como configurar e utilizar o "
-                + "seu endereço de e-mail institucional:\n");
-        b.append("\n");
-        b.append("   https://dsi.tecnico.ulisboa.pt/servicos/recursos-e-mail/e-mail/\n");
-        b.append("\n");
-        if (tutorship != null) {
-            final Person tutor = tutorship.getTeacher().getPerson();
-            if (tutor.getGender() == Gender.FEMALE) {
-                b.append("O tutor que lhe foi designado é a Professora "
-                        + tutorship.getTeacher().getPerson().getUser().getProfile().getDisplayName() + ". ");
-            } else {
-                b.append("O tutor que lhe foi designado é o Professor "
-                        + tutorship.getTeacher().getPerson().getUser().getProfile().getDisplayName() + ". ");
-            }
-            b.append("Pode entrar em contacto com o seu tutor atraves do endereço: "
-                    + tutorship.getTeacher().getPerson().getEmailForSendingEmails() + "\n");
-            b.append("\n");
+        if (academicFeeCode == null || insuranceCode == null || tuitionCode == null) {
+            taskLog("Missing payment code information for user: %s%n", user.getUsername());
+            return;
         }
-        b.append("Brevemente deverá receber no seu endereço de e-mail institucional informações sobre como "
-                + "obter a sua declaração de matrícula. Trata-se de um documento eletrónico que deverá "
-                + "entregar em todas as entidades perante as quais necessite de comprovar que se encontra "
-                + "matriculado no Técnico. Por ser um documento eletrónico, pouco prático de transportar, "
-                + "o documento contém um link de acesso, podendo assim imprimir e que permitirá à "
-                + "entidade aceder facilmente ao documento eletrónico.\n");
-        b.append("\n");
-        b.append("A data limite para pagamento da propina é de 10 dias a partir da data da sua matricula. "
-                + "Deve optar entre o pagamento da propina na totalidade ou pagamento em sete prestações. "
-                + "Após a data limite referida é cobrado 1% ao mês sobre a propina da 1ª prestação. "
-                + "De seguida são apresentadas as referência multibanco para pagamento da taxa de "
-                + "secretaria/seguro escolar e da propina, na sua totalidade ou em prestações.\n");
-
-        b.append("\n");
-        b.append("Taxa de secretaria / seguro escolar\n");
-        for (final PaymentCode paymentCode : person.getPaymentCodesSet()) {
-            if (PaymentCodeType.ADMINISTRATIVE_OFFICE_FEE_AND_INSURANCE.equals(paymentCode.getType())) {
-                appendPaymentCodeInformation(b, paymentCode);
-            }
-        }
-        b.append("\n");
-        b.append("Propina na totalidade\n");
-        for (final PaymentCode paymentCode : person.getPaymentCodesSet()) {
-            if (PaymentCodeType.GRATUITY_FIRST_INSTALLMENT.equals(paymentCode.getType())
-                    && !(paymentCode instanceof InstallmentPaymentCode)) {
-                appendPaymentCodeInformation(b, paymentCode);
-            }
-        }
-        b.append("\n");
-        b.append("Propina em prestações\n");
-        final int i[] = { 0 };
-        person.getPaymentCodesSet().stream()
-                .filter(pc -> pc instanceof InstallmentPaymentCode).sorted((pc1, pc2) -> pc1.getCode().compareTo(pc2.getCode()))
-                .map(pc -> (InstallmentPaymentCode) pc)
-                .forEach(pc -> appendInstallmentPaymentCodeInformation(b, pc, ++i[0]));
-        b.append("\n");
-        b.append("Desejamos que tenha sucesso no seu percurso no Técnico, certos de que todos estarão ao "
-                + "seu dispor para que tal se concretize.\n");
-        b.append("\n");
-        b.append("---\n");
-        b.append("Esta mensagem foi enviada por meio do sistema FénixEdu, em nome do Técnico Lisboa\n");
 
         final String[] emails = person.getPartyContactsSet().stream()
-            .filter(c -> c instanceof EmailAddress)
-            .map(c -> (EmailAddress) c)
-            .map(e -> e.getValue())
-            .toArray(String[]::new);
-        FenixFramework.atomic(() -> send(subject, b, emails, user));
+                .filter(c -> c instanceof EmailAddress)
+                .map(c -> (EmailAddress) c)
+                .map(e -> e.getValue())
+                .toArray(String[]::new);
+
+        Message.fromSystem()
+                .singleTos(emails)
+                .to(Group.users(user))
+                .template("message.template.registration.process.first.time.student.email")
+                .parameter("name", user.getDisplayName())
+                .parameter("tutorName", tutorship.getTeacher().getPerson().getUser().getProfile().getDisplayName())
+                .parameter("tutorEmail", tutorship.getTeacher().getPerson().getEmailForSendingEmails())
+                .parameter("paymentInfoInsuranceEntity", insuranceCode.getPaymentCode().getEntityCode())
+                .parameter("paymentInfoInsuranceReference", insuranceCode.getPaymentCode().getCode())
+                .parameter("paymentInfoInsuranceDate", insuranceCode.getDueDate().toString("yyyy-MM-dd"))
+                .parameter("paymentInfoInsuranceValue", insuranceCode.getAmount().toPlainString())
+                .parameter("paymentInfoAcademicFeeEntity", academicFeeCode.getPaymentCode().getEntityCode())
+                .parameter("paymentInfoAcademicFeeReference", academicFeeCode.getPaymentCode().getCode())
+                .parameter("paymentInfoAcademicFeeDate", academicFeeCode.getDueDate().toString("yyyy-MM-dd"))
+                .parameter("paymentInfoAcademicFeeValue", academicFeeCode.getAmount().toPlainString())
+                .parameter("paymentInfoTuitionEntity", tuitionCode.getPaymentCode().getEntityCode())
+                .parameter("paymentInfoTuitionReference", tuitionCode.getPaymentCode().getCode())
+                .parameter("paymentInfoTuitionDate", tuitionCode.getDueDate().toString("yyyy-MM-dd"))
+                .parameter("paymentInfoTuitionValue", tuitionCode.getAmount().toPlainString())
+                .and()
+                .wrapped().send();
     }
 
-    private void send(final String subject, final StringBuilder b, final String[] toAddress, final User toUser) {
-        Message.fromSystem().content(subject, b.toString(), null).singleTos(toAddress).to(Group.users(toUser)).send();
+    private EventPaymentCodeEntry getPaymentCode(final DateTime today, final Person person, final Class clazz) {
+      return person.getPaymentCodesSet().stream()
+            .filter(pc -> pc instanceof EventPaymentCode)
+            .filter(pc -> isToday(today, pc.getWhenCreated()))
+            .map(pc -> (EventPaymentCode) pc)
+            .flatMap(pc -> pc.getEventPaymentCodeEntrySet().stream())
+            .filter(e -> e.getEvent().getClass().isAssignableFrom(clazz))
+            .findAny().orElse(null);
     }
 
-    private void appendInstallmentPaymentCodeInformation(final StringBuilder b, final AccountingEventPaymentCode paymentCode,
-            final int i) {
-        b.append("\n");
-        b.append("Prestação " + i + "\n");
-        appendPaymentCodeInformation(b, paymentCode);
-    }
-
-    private void appendPaymentCodeInformation(final StringBuilder b, final PaymentCode paymentCode) {
-        final String description = paymentCode.getDescription();
-        final YearMonthDay endDate = paymentCode.getEndDate();
-        final String entityCode = paymentCode.getEntityCode();
-        final String formattedCode = paymentCode.getFormattedCode();
-        final Money maxAmount = paymentCode.getMaxAmount();
-        final Money minAmount = paymentCode.getMinAmount();
-        final YearMonthDay startDate = paymentCode.getStartDate();
-        final PaymentCodeType type = paymentCode.getType();
-
-        b.append("   Entidade: " + entityCode + "\n");
-        b.append("   Referência: " + formattedCode + "\n");
-        b.append("   Data limite: " + endDate.toString("yyyy-MM-dd") + "\n");
-        b.append("   Valor: " + minAmount.toString() + "\n");
+    private boolean isToday(final DateTime today, final DateTime dt) {
+        return today.getYear() == dt.getYear() && today.getMonthOfYear() == dt.getMonthOfYear() && today.getDayOfMonth() == dt.getDayOfMonth();
     }
 
     private Tutorship getTutorship(final StudentCurricularPlan studentCurricularPlan) {
