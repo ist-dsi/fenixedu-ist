@@ -133,8 +133,8 @@ public class SendFirstTimeStudentNotifications extends CronTask {
                 .to(Group.users(user))
                 .template("message.template.registration.process.first.time.student.email")
                 .parameter("studentName", user.getDisplayName())
-                .parameter("tutorName", tutorship.getTeacher().getPerson().getUser().getProfile().getDisplayName())
-                .parameter("tutorEmail", tutorship.getTeacher().getPerson().getEmailForSendingEmails())
+                .parameter("tutorName", tutorship == null ? "Não Atribuido" : tutorship.getTeacher().getPerson().getUser().getProfile().getDisplayName())
+                .parameter("tutorEmail", tutorship == null ? "Não Atribuido" : tutorship.getTeacher().getPerson().getEmailForSendingEmails())
                 .parameter("paymentInfoInsuranceEntity", insuranceCode.getPaymentCode().getEntityCode())
                 .parameter("paymentInfoInsuranceReference", insuranceCode.getPaymentCode().getCode())
                 .parameter("paymentInfoInsuranceDate", insuranceCode.getDueDate().toString("yyyy-MM-dd"))
@@ -152,12 +152,13 @@ public class SendFirstTimeStudentNotifications extends CronTask {
     }
 
     private EventPaymentCodeEntry getPaymentCode(final DateTime today, final Person person, final Class clazz) {
-      return person.getPaymentCodesSet().stream()
+        return person.getPaymentCodesSet().stream()
             .filter(pc -> pc instanceof EventPaymentCode)
-            .filter(pc -> isToday(today, pc.getWhenCreated()))
             .map(pc -> (EventPaymentCode) pc)
             .flatMap(pc -> pc.getEventPaymentCodeEntrySet().stream())
-            .filter(e -> e.getEvent().getClass().isAssignableFrom(clazz))
+            .filter(entry -> clazz.isAssignableFrom(entry.getEvent().getClass()))
+            .filter(entry -> isToday(today, entry.getCreated()))
+            .peek(e -> taskLog("%s%n", e.getEvent().getClass().getName()))
             .findAny().orElse(null);
     }
 
