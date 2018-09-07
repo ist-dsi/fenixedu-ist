@@ -1,4 +1,15 @@
-<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+
+<c:if test="${not empty candidacy}">
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("#context,#topNav").remove();
+            $('.breadcrumb').remove();
+            $('#authorization-history').remove();
+        });
+    </script>
+</c:if>
 
 <style>
     .alert.well {
@@ -29,14 +40,13 @@
 
 
 </style>
-
 <spring:url value="/authorize-personal-data-access/history" var="baseUrl"/>
 
 <div class="page-header">
     <h2>
         <spring:message code="authorize.personal.data.access.title" />
     </h2>
-    <a href="${baseUrl}"><spring:message code="authorize.personal.data.access.history" /></a>
+    <a id="authorization-history" href="${baseUrl}"><spring:message code="authorize.personal.data.access.history" /></a>
 </div>
 
 <div>
@@ -54,7 +64,7 @@
                 <p><strong>Autoriza a cedência de dados acima descrita?</strong></p>
                 <form action="${requestScope['javax.servlet.forward.request_uri']}" method="post">
                     ${csrf.field()}
-
+                        <input type="hidden" name="candidacy" value="${candidacy}">
                     <p>
                         <span style="line-height: 20px; vertical-align: bottom; margin-right: 55px;">
                             <input type="radio" name="allowAccess" value="true" onclick="removeDisabled()">

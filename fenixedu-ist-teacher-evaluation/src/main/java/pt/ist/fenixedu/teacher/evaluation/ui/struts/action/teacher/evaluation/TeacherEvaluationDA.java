@@ -47,6 +47,7 @@ import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
 import org.fenixedu.academic.ui.struts.action.teacher.TeacherApplication.TeacherTeachingApp;
+import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.struts.annotations.Forward;
@@ -208,7 +209,7 @@ public class TeacherEvaluationDA extends FenixDispatchAction {
 
         public EvalueesMap(Person evaluee) {
             this.evaluee = evaluee;
-            final Set<FacultyEvaluationProcess> facultyEvaluationProcessSet = rootDomainObject.getFacultyEvaluationProcessSet();
+            final Set<FacultyEvaluationProcess> facultyEvaluationProcessSet = Bennu.getInstance().getFacultyEvaluationProcessSet();
             for (FacultyEvaluationProcess process : facultyEvaluationProcessSet) {
                 processes.put(process, null);
             }
@@ -237,7 +238,7 @@ public class TeacherEvaluationDA extends FenixDispatchAction {
             }
             evaluees.get(process.getEvaluee()).processes.put(process.getFacultyEvaluationProcess(), process);
         }
-        request.setAttribute("processes", rootDomainObject.getFacultyEvaluationProcessSet());
+        request.setAttribute("processes", Bennu.getInstance().getFacultyEvaluationProcessSet());
         request.setAttribute("evaluees", evaluees.values());
         return mapping.findForward("viewEvaluees");
     }
@@ -313,7 +314,7 @@ public class TeacherEvaluationDA extends FenixDispatchAction {
 
     public ActionForward viewManagementInterface(ActionMapping mapping, ActionForm form, HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        final Set<FacultyEvaluationProcess> facultyEvaluationProcessSet = rootDomainObject.getFacultyEvaluationProcessSet();
+        final Set<FacultyEvaluationProcess> facultyEvaluationProcessSet = Bennu.getInstance().getFacultyEvaluationProcessSet();
         request.setAttribute("facultyEvaluationProcessSet", facultyEvaluationProcessSet);
         return mapping.findForward("viewManagementInterface");
     }
@@ -448,7 +449,7 @@ public class TeacherEvaluationDA extends FenixDispatchAction {
         final String fileNameSeparator = "_";
         final String withoutDepartment = "Sem departamento";
         try {
-            for (FacultyEvaluationProcess facultyEvaluationProcess : rootDomainObject.getFacultyEvaluationProcessSet()) {
+            for (FacultyEvaluationProcess facultyEvaluationProcess : Bennu.getInstance().getFacultyEvaluationProcessSet()) {
                 String evaluationName =
                         (facultyEvaluationProcess.getSuffix() == null ? facultyEvaluationProcess.getTitle().getContent() : facultyEvaluationProcess
                                 .getSuffix());
@@ -495,7 +496,7 @@ public class TeacherEvaluationDA extends FenixDispatchAction {
         final String fileNameSeparator = "_";
         final String withoutDepartment = "Sem departamento";
         try {
-            for (FacultyEvaluationProcess facultyEvaluationProcess : rootDomainObject.getFacultyEvaluationProcessSet()) {
+            for (FacultyEvaluationProcess facultyEvaluationProcess : Bennu.getInstance().getFacultyEvaluationProcessSet()) {
                 String evaluationName =
                         (facultyEvaluationProcess.getSuffix() == null ? facultyEvaluationProcess.getTitle().getContent() : facultyEvaluationProcess
                                 .getSuffix());

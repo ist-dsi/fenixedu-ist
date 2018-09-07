@@ -55,6 +55,7 @@ import org.fenixedu.academic.domain.reports.WrittenEvaluationReportFile;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
 import org.fenixedu.academic.ui.struts.action.gep.GepApplication.GepPortalApp;
+import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
@@ -181,7 +182,7 @@ public class ReportsByDegreeTypeDA extends FenixDispatchAction {
     private int getCountReportsForParameters(DegreeType degreeType, ExecutionYear executionYear, Class reportClass) {
         FindSelectedGepReports predicate = new FindSelectedGepReports(executionYear, degreeType, reportClass);
 
-        return getValidCounterForReports((int) rootDomainObject.getQueueJobSet().stream().filter(j -> predicate.evaluate(j))
+        return getValidCounterForReports((int) Bennu.getInstance().getQueueJobSet().stream().filter(j -> predicate.evaluate(j))
                 .count());
     }
 
@@ -883,7 +884,7 @@ public class ReportsByDegreeTypeDA extends FenixDispatchAction {
         FindSelectedGepReports predicate = new FindSelectedGepReports(executionYear, degreeType, reportClass);
 
         List<GepReportFile> selectedJobs =
-                rootDomainObject.getQueueJobSet().stream().filter(j -> predicate.evaluate(j)).map(r -> (GepReportFile) r)
+                Bennu.getInstance().getQueueJobSet().stream().filter(j -> predicate.evaluate(j)).map(r -> (GepReportFile) r)
                         .collect(Collectors.toList());
         String reportName = "";
         if (selectedJobs.size() > 0) {

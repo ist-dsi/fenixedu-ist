@@ -37,6 +37,7 @@ import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
 import org.fenixedu.academic.util.Bundle;
+import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.struts.annotations.Forward;
@@ -188,7 +189,7 @@ public class ProjectTutorialExecutionCoursesDA extends FenixDispatchAction {
         executionCourse.changeProjectTutorialCourse();
         Department department = FenixFramework.getDomainObject((String) getFromRequest(request, "departmentOid"));
         DepartmentCreditsBean departmentCreditsBean =
-                new DepartmentCreditsBean(department, new ArrayList<Department>(rootDomainObject.getDepartmentsSet()));
+                new DepartmentCreditsBean(department, new ArrayList<Department>(Bennu.getInstance().getDepartmentsSet()));
         request.setAttribute("departmentCreditsBean", departmentCreditsBean);
         return mapping.findForward("showDepartmentExecutionCourses");
     }
