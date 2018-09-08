@@ -122,7 +122,7 @@ public class ExportUserInfoForKoha extends ExternalInterfaceDispatchAction {
         final Spreadsheet spreadsheet = new Spreadsheet("Degrees");
         spreadsheet.setHeader("*ID").setHeader("descrição").setHeader("abreviatura").setHeader("*grau");
 
-        for (final Degree degree : rootDomainObject.getDegreesSet()) {
+        for (final Degree degree : Bennu.getInstance().getDegreesSet()) {
             final Row row = spreadsheet.addRow();
             row.setCell(degree.getExternalId()).setCell(degree.getPresentationName()).setCell(degree.getSigla())
                     .setCell(degree.getDegreeType().getExternalId());
@@ -136,7 +136,7 @@ public class ExportUserInfoForKoha extends ExternalInterfaceDispatchAction {
         final Spreadsheet spreadsheet = new Spreadsheet("Departments");
         spreadsheet.setHeader("*ID").setHeader("descrição");
 
-        for (final Department department : rootDomainObject.getDepartmentsSet()) {
+        for (final Department department : Bennu.getInstance().getDepartmentsSet()) {
             final Row row = spreadsheet.addRow();
             row.setCell(department.getExternalId()).setCell(department.getName());
         }

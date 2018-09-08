@@ -19,6 +19,7 @@
 package pt.ist.fenixedu.integration.ui;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -66,12 +67,14 @@ import org.fenixedu.academic.dto.student.enrollment.bolonha.BolonhaStudentEnroll
 import org.fenixedu.academic.service.StudentWarningsService;
 import org.fenixedu.academic.thesis.domain.StudentThesisCandidacy;
 import org.fenixedu.academic.thesis.ui.service.ThesisProposalsService;
+import org.fenixedu.academic.ui.struts.action.candidate.degree.DegreeCandidacyManagementDispatchAction;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.signals.DomainObjectEvent;
 import org.fenixedu.bennu.core.signals.Signal;
+import org.fenixedu.bennu.core.util.CoreConfiguration;
 import org.fenixedu.cms.domain.CMSFolder;
 import org.fenixedu.cms.domain.Category;
 import org.fenixedu.cms.domain.Site;
@@ -79,7 +82,6 @@ import org.fenixedu.cms.domain.Site;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
-
 import eu.europa.ec.taxud.tin.algorithm.TINValid;
 import pt.ist.fenixedu.giaf.invoices.ClientMap;
 import pt.ist.fenixedu.giaf.invoices.Utils;
@@ -280,6 +282,16 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
                 registration.setBennuCompletedRegistration(Bennu.getInstance());
             }
         });
+
+        DegreeCandidacyManagementDispatchAction.finalStepRedirector = (request, response, candidacy) -> {
+            try {
+                response.sendRedirect(CoreConfiguration.getConfiguration().applicationUrl() +
+                        "/authorize-personal-data-access/santander-bank?candidacy=" + candidacy.getExternalId());
+            } catch (IOException e) {
+                throw new Error(e);
+            }
+            return null;
+        };
     }
 
     private static boolean isOverDue(final Event event) {

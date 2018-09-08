@@ -453,7 +453,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
     }
 
     private boolean isValidGroup(String groupId) {
-        for (ParkingGroup group : rootDomainObject.getParkingGroupsSet()) {
+        for (ParkingGroup group : Bennu.getInstance().getParkingGroupsSet()) {
             if (group.getExternalId().equals(groupId)) {
                 return true;
             }
@@ -462,7 +462,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
     }
 
     private boolean isRepeatedCardNumber(Long cardNumber, ParkingParty parkingParty) {
-        for (ParkingParty tempParkingParty : rootDomainObject.getParkingPartiesSet()) {
+        for (ParkingParty tempParkingParty : Bennu.getInstance().getParkingPartiesSet()) {
             if (tempParkingParty.getCardNumber() != null && tempParkingParty.getCardNumber() != 0
                     && tempParkingParty.getCardNumber().equals(cardNumber) && tempParkingParty != parkingParty) {
                 return false;

@@ -30,6 +30,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
+import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
@@ -50,7 +51,7 @@ public class ManageParkingPeriodsDA extends FenixDispatchAction {
     public ActionForward prepareManageRequestsPeriods(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
             HttpServletResponse response) throws Exception {
         List<ParkingRequestPeriod> parkingRequestPeriods =
-                new ArrayList<ParkingRequestPeriod>(rootDomainObject.getParkingRequestPeriodsSet());
+                new ArrayList<ParkingRequestPeriod>(Bennu.getInstance().getParkingRequestPeriodsSet());
         Collections.sort(parkingRequestPeriods, Comparator.comparing(ParkingRequestPeriod::getBeginDate));
         request.setAttribute("parkingRequestPeriods", parkingRequestPeriods);
         return mapping.findForward("manageRequestsPeriods");

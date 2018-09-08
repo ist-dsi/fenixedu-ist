@@ -28,6 +28,7 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
 import org.fenixedu.academic.ui.struts.action.manager.ManagerApplications.ManagerSystemManagementApp;
+import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
@@ -50,7 +51,7 @@ public class AccessControlPersistentGroupsManagementDA extends FenixDispatchActi
     public ActionForward listAllGroups(ActionMapping mapping, ActionForm form, HttpServletRequest request,
             HttpServletResponse response) throws FenixServiceException {
 
-        request.setAttribute("persistentGroups", rootDomainObject.getPersistentGroupMembersSet());
+        request.setAttribute("persistentGroups", Bennu.getInstance().getPersistentGroupMembersSet());
         return mapping.findForward("seeAllPersistentGroups");
     }
 

@@ -32,6 +32,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.fenixedu.academic.domain.QueueJob;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
+import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
@@ -57,7 +58,7 @@ public class UploadInquiriesResultsDA extends FenixDispatchAction {
     public ActionForward prepare(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
             HttpServletResponse response) {
         List<ResultsImportationProcess> lastQueueJobs =
-                rootDomainObject.getQueueJobSet().stream().filter(q -> q instanceof ResultsImportationProcess)
+                Bennu.getInstance().getQueueJobSet().stream().filter(q -> q instanceof ResultsImportationProcess)
                         .map(q -> (ResultsImportationProcess) q).sorted((q1, q2) -> q2.getResultsImportationFile()
                                 .getCreationDate().compareTo(q1.getResultsImportationFile().getCreationDate()))
                         .limit(5)

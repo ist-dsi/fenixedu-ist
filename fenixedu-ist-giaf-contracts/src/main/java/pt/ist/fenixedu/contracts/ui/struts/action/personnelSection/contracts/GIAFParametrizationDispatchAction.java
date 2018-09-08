@@ -26,6 +26,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
+import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.struts.annotations.Forward;
 import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
@@ -52,31 +53,31 @@ public class GIAFParametrizationDispatchAction extends FenixDispatchAction {
 
     public ActionForward showContractSituations(ActionMapping mapping, ActionForm form, HttpServletRequest request,
             HttpServletResponse response) throws FenixServiceException {
-        request.setAttribute("contractSituations", rootDomainObject.getContractSituationsSet());
+        request.setAttribute("contractSituations", Bennu.getInstance().getContractSituationsSet());
         return mapping.findForward("show-contract-situations");
     }
 
     public ActionForward showProfessionalCategories(ActionMapping mapping, ActionForm form, HttpServletRequest request,
             HttpServletResponse response) throws FenixServiceException {
-        request.setAttribute("professionalCategories", rootDomainObject.getProfessionalCategoriesSet());
+        request.setAttribute("professionalCategories", Bennu.getInstance().getProfessionalCategoriesSet());
         return mapping.findForward("show-professional-categories");
     }
 
     public ActionForward showGrantOwnerEquivalences(ActionMapping mapping, ActionForm form, HttpServletRequest request,
             HttpServletResponse response) throws FenixServiceException {
-        request.setAttribute("grantOwnerEquivalences", rootDomainObject.getGrantOwnerEquivalencesSet());
+        request.setAttribute("grantOwnerEquivalences", Bennu.getInstance().getGrantOwnerEquivalencesSet());
         return mapping.findForward("show-grantOwner-equivalences");
     }
 
     public ActionForward showServiceExemptions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
             HttpServletResponse response) throws FenixServiceException {
-        request.setAttribute("serviceExemptions", rootDomainObject.getServiceExemptionsSet());
+        request.setAttribute("serviceExemptions", Bennu.getInstance().getServiceExemptionsSet());
         return mapping.findForward("show-service-exemptions");
     }
 
     public ActionForward showAbsences(ActionMapping mapping, ActionForm form, HttpServletRequest request,
             HttpServletResponse response) throws FenixServiceException {
-        request.setAttribute("absences", rootDomainObject.getAbsencesSet());
+        request.setAttribute("absences", Bennu.getInstance().getAbsencesSet());
         return mapping.findForward("show-absences");
     }
 
