@@ -48,10 +48,14 @@ import org.fenixedu.academic.util.StringFormatter;
 import org.fenixedu.bennu.core.domain.UserProfile;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.YearMonthDay;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 
 public class DegreeCandidateDTO {
+
+    private static final Logger logger = LoggerFactory.getLogger(DegreeCandidateDTO.class);
 
     private static final SimpleDateFormat DATE_FORMAT;
 
@@ -370,6 +374,7 @@ public class DegreeCandidateDTO {
         }
 
         if (persons.size() > 1) {
+            logger.warn("Too many persons for docId {}", getDocumentIdNumber());
             throw new TooManyMatchedPersonsException();
         }
 
@@ -379,9 +384,15 @@ public class DegreeCandidateDTO {
             return person;
         }
 
+        logger.warn("Importing birthday {} different of {} already in the system for docId {}", getDateOfBirth(), person
+                .getDateOfBirthYearMonthDay(), getDocumentIdNumber());
+
         if (person.getName().equals(getName())) {
             return person;
         }
+
+        logger.warn("Importing name {} does not match {} for existing docId {}", getName(), person.getName(),
+                getDocumentIdNumber());
 
         throw new NotFoundPersonException();
     }
