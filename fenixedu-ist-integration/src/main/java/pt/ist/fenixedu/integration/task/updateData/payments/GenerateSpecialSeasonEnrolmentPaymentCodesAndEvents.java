@@ -15,7 +15,6 @@ import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.scheduler.CronTask;
 import org.fenixedu.bennu.scheduler.annotation.Task;
 import org.fenixedu.messaging.core.domain.Message;
-import org.joda.time.LocalDate;
 
 import java.util.Collections;
 
@@ -48,8 +47,8 @@ public class GenerateSpecialSeasonEnrolmentPaymentCodesAndEvents extends CronTas
         final Person person = registration.getPerson();
         final SpecialSeasonEnrolmentEvent event = new SpecialSeasonEnrolmentEvent(office, person, Collections.singleton(ee));
 
-        final EventPaymentCodeEntry eventPaymentCodeEntry =
-                EventPaymentCodeEntry.getOrCreate(event, AMOUNT_TO_PAY, new LocalDate().plusDays(10));
+        final EventPaymentCodeEntry eventPaymentCodeEntry = EventPaymentCodeEntry.create(event, AMOUNT_TO_PAY);
+        eventPaymentCodeEntry.setDueDate(eventPaymentCodeEntry.getCreated().plusDays(10).toLocalDate());
 
         final User user = registration.getPerson().getUser();
         final String eventDescription = eventDescription(ee);
