@@ -21,6 +21,7 @@
 <%@page import="org.fenixedu.bennu.core.security.Authenticate"%>
 <%@page import="org.fenixedu.bennu.core.groups.Group"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<html:xhtml />
 <% final String contextPath = request.getContextPath(); %>
 
 <style>
@@ -144,6 +145,7 @@
 </table>
 
 <div class="container">
+
   <!-- Modal -->
   <div class="modal fade" id="requestDetails" role="dialog">
     <div class="modal-dialog">
@@ -316,9 +318,9 @@
     }
 
 	$(document).ready(function() {
-        if (${not empty error}) {
+        if (${not empty errors}) {
             document.getElementById("errors").style.display = 'block';
-            $('#errors').html('${error}');
+            $('#errors').html('${errors}');
         }
         if (${not empty exception}) {
             document.getElementById("errors").style.display = 'block';

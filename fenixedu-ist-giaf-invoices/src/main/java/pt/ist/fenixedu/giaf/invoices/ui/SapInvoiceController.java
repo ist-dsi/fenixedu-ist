@@ -108,21 +108,16 @@ public class SapInvoiceController {
                     final String action) {
 
                 if (errors.length() > 0) {
-                    errors.append("\n");
+                    errors.append("<br/>");
                 }
                 errors.append(error);
             }
         };
         final EventLogger elogger = (msg, args) -> {
             if (errors.length() > 0) {
-                errors.append("\n");
+                errors.append("<br/>");
             }
-            errors.append(msg);
-            errors.append(": ");
-            for (final Object o : args) {
-                errors.append(", ");
-                errors.append(o);
-            }
+            errors.append(String.format(msg.replace("%n", ""), args));
         };
         if (Group.dynamic("managers").isMember(Authenticate.getUser())) {
             processor.process(errorLogConsumer, elogger, event);
@@ -143,7 +138,8 @@ public class SapInvoiceController {
 
     @RequestMapping(value = "/{sapRequest}/transfer", method = RequestMethod.POST)
     public String transfer(final @PathVariable SapRequest sapRequest, final Model model,
-            @RequestParam final String uvat, @RequestParam final String valueToTransfer) {
+            @RequestParam final String uvat, @RequestParam final String valueToTransfer,
+            @RequestParam final String pledgeNumber) {
         if (Group.dynamic("managers").isMember(Authenticate.getUser())) {
             try {
                 final Money value = toMoney(valueToTransfer);
@@ -162,7 +158,7 @@ public class SapInvoiceController {
                 }
                 final SapEvent sapEvent = new SapEvent(sapRequest.getEvent());
                 try {
-                    sapEvent.transferInvoice(sapRequest, externalClient, value);
+                    sapEvent.transferInvoice(sapRequest, externalClient, value, pledgeNumber);
                 } catch (final Exception | Error e) {
                     model.addAttribute("exception", e.getMessage());
                     return prepareTransfer(sapRequest, model);
