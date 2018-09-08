@@ -46,7 +46,8 @@ public class SantanderCard extends SantanderCard_Base {
                 santanderCard.setAllowSendCardDetails(allowCardAccess);
             }
 
-            new CardDataAuthorizationLog(title, body, BundleUtil.getString("resources.FenixeduIstIntegrationResources", "label.take.consent"));
+            CardDataAuthorizationLog cardDataAuthorizationLog = new CardDataAuthorizationLog(title, body,
+                    BundleUtil.getString("resources.FenixeduIstIntegrationResources", "label.take.consent"), user.getPerson());
         }
     }
 
@@ -60,7 +61,8 @@ public class SantanderCard extends SantanderCard_Base {
                 SantanderCard santanderCard = new SantanderCard(user);
                 santanderCard.setAllowSendBankDetails(allowBankAccess);
             }
-            new CardDataAuthorizationLog(title, body, BundleUtil.getString(Bundle.ACADEMIC, allowBankAccess ? "label.yes" : "label.no"));
+            new CardDataAuthorizationLog(title, body, BundleUtil.getString(Bundle.ACADEMIC, allowBankAccess ? "label.yes" :
+                    "label.no"), user.getPerson());
         }
     }
 

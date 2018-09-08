@@ -33,9 +33,7 @@ import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.core.util.CoreConfiguration;
 import org.fenixedu.bennu.spring.portal.SpringApplication;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
-import org.fenixedu.commons.i18n.I18N;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -50,7 +48,7 @@ import pt.ist.fenixedu.integration.domain.BpiCard;
 import pt.ist.fenixedu.integration.domain.CardDataAuthorizationLog;
 import pt.ist.fenixedu.integration.domain.SantanderCard;
 import pt.ist.fenixedu.integration.domain.cgd.CgdCard;
-import pt.ist.fenixedu.integration.ui.spring.service.SendCgdCardService;
+import pt.ist.fenixedu.integration.ui.spring.service.AuthorizePersonalDataAccessService;
 import pt.ist.fenixframework.FenixFramework;
 
 @SpringApplication(group = "logged", path = "authorize-personal-data-access", title = "authorize.personal.data.access.title")
@@ -59,26 +57,12 @@ import pt.ist.fenixframework.FenixFramework;
 @RequestMapping("/authorize-personal-data-access")
 public class AuthorizePersonalDataAccessController {
 
-    private static final String santanderCardTitle = "authorize.personal.data.access.title.santander.card";
-    private static final String santanderCardMessage = "authorize.personal.data.access.description.santander.card";
-    private static final String cgdCardTitle = "authorize.personal.data.access.title.cgd.card";
-    private static final String cgdCardMessage = "authorize.personal.data.access.description.cgd.card";
 
-    private static final String santanderBankTitle = "authorize.personal.data.access.title.santander.bank";
-    private static final String santanderBankMessage = "authorize.personal.data.access.description.santander.bank";
-    private static final String cgdBankTitle = "authorize.personal.data.access.title.cgd.bank";
-    private static final String cgdBankMessage = "authorize.personal.data.access.description.cgd.bank";
-    private static final String bpiBankTitle = "authorize.personal.data.access.title.bpi.bank";
-    private static final String bpiBankMessage = "authorize.personal.data.access.description.bpi.bank";
-    
-    public SendCgdCardService sendCgdCardService;
-    public MessageSource messageSource;
-
+    private final AuthorizePersonalDataAccessService dataService;
 
     @Autowired
-    public AuthorizePersonalDataAccessController(SendCgdCardService sendCgdCardService, MessageSource messageSource) {
-        this.sendCgdCardService = sendCgdCardService;
-        this.messageSource = messageSource;
+    public AuthorizePersonalDataAccessController(AuthorizePersonalDataAccessService authorizePersonalDataAccessService) {
+        this.dataService = authorizePersonalDataAccessService;
     }
 
 
@@ -97,13 +81,9 @@ public class AuthorizePersonalDataAccessController {
         return SantanderCard.finishedCardDataAuthorization(user) && BpiCard.finishedCardDataAuthorization(user) && CgdCard.finishedCardDataAuthorization();
     }
 
-    private String getMessage(String key) {
-        return messageSource.getMessage(key, new Object[0], I18N.getLocale());
-    }
-
-    private void addAuthorizationDetailsInfo(Model model, String titleKey, String messageKey) {
-        model.addAttribute("title", getMessage(titleKey));
-        model.addAttribute("message", getMessage(messageKey));
+    private void addAuthorizationDetailsInfo(Model model, String title, String message) {
+        model.addAttribute("title", title);
+        model.addAttribute("message", message);
     }
 
     private String checkAuthorizationDetails(Model model, String titleKey, String messageKey) {
@@ -130,12 +110,12 @@ public class AuthorizePersonalDataAccessController {
     public String reviewCardDataAuthorization(Model model) {
         User user = Authenticate.getUser();
 
-        model.addAttribute("santanderBankTitle", getMessage(santanderBankTitle));
-        model.addAttribute("santanderBankMessage", getMessage(santanderBankMessage));
-        model.addAttribute("cgdBankTitle", getMessage(cgdBankTitle));
-        model.addAttribute("cgdBankMessage", getMessage(cgdBankMessage));
-        model.addAttribute("bpiBankTitle", getMessage(bpiBankTitle));
-        model.addAttribute("bpiBankMessage", getMessage(bpiBankMessage));
+        model.addAttribute("santanderBankTitle", dataService.getSantanderBankTitle());
+        model.addAttribute("santanderBankMessage", dataService.getSantanderBankMessage());
+        model.addAttribute("cgdBankTitle", dataService.getCgdBankTitle());
+        model.addAttribute("cgdBankMessage", dataService.getCgdBankMessage());
+        model.addAttribute("bpiBankTitle", dataService.getBpiBankTitle());
+        model.addAttribute("bpiBankMessage", dataService.getBpiBankMessage());
 
         model.addAttribute("allowSantanderBankAccess", SantanderCard.getAllowSendBankDetails(user));
         model.addAttribute("allowCgdBankAccess", CgdCard.getAllowSendBank());
@@ -146,7 +126,8 @@ public class AuthorizePersonalDataAccessController {
 
     @RequestMapping(value = "/review/santander-bank", method = RequestMethod.POST)
     public String reviewSantanderCardDataAuthorizationSubmit(RedirectAttributes redirAttrs, @RequestParam boolean allowSantanderBankAccess) {
-        SantanderCard.setGrantBankAccess(allowSantanderBankAccess, Authenticate.getUser(), getMessage(santanderBankTitle), getMessage(santanderBankMessage));
+        dataService.setSantanderGrantBankAccess(allowSantanderBankAccess, Authenticate.getUser());
+
 
         redirAttrs.addFlashAttribute("success", true);
         return "redirect:/authorize-personal-data-access/review";
@@ -154,7 +135,8 @@ public class AuthorizePersonalDataAccessController {
 
     @RequestMapping(value = "/review/cgd-bank", method = RequestMethod.POST)
     public String reviewCgdCardDataAuthorizationSubmit(RedirectAttributes redirAttrs, @RequestParam boolean allowCgdBankAccess) {
-        CgdCard.setGrantBankAccess(allowCgdBankAccess, getMessage(cgdBankTitle), getMessage(cgdBankMessage));
+        dataService.setCgdGrantBankAccess(allowCgdBankAccess, Authenticate.getUser());
+
 
         redirAttrs.addFlashAttribute("success", true);
         return "redirect:/authorize-personal-data-access/review";
@@ -162,7 +144,9 @@ public class AuthorizePersonalDataAccessController {
 
     @RequestMapping(value = "/review/bpi-bank", method = RequestMethod.POST)
     public String reviewBpiCardDataAuthorizationSubmit(RedirectAttributes redirAttrs, @RequestParam boolean allowBpiBankAccess) {
-        BpiCard.setGrantBankAccess(allowBpiBankAccess, Authenticate.getUser(), getMessage(bpiBankTitle), getMessage(bpiBankMessage));
+        dataService.setBpiGrantBankAccess(allowBpiBankAccess, Authenticate.getUser());
+
+
 
         redirAttrs.addFlashAttribute("success", true);
         return "redirect:/authorize-personal-data-access/review";
@@ -174,12 +158,12 @@ public class AuthorizePersonalDataAccessController {
             return "redirect://authorize-personal-data-access/review";
         }
 
-        return checkAuthorizationDetails(model, santanderCardTitle, santanderCardMessage);
+        return checkAuthorizationDetails(model, dataService.getSantanderCardTitle(), dataService.getSantanderCardMessage());
     }
 
     @RequestMapping(value = "santander-card", method = RequestMethod.POST)
     public String santanderCardAuthorizationSubmit(RedirectAttributes redirectAttributes) {
-        SantanderCard.setGrantCardAccess(true, Authenticate.getUser(), getMessage(santanderCardTitle), getMessage(santanderCardMessage));
+        dataService.setSantanderGrantCardAccess(true, Authenticate.getUser());
 
         return "redirect:/authorize-personal-data-access/cgd-card";
     }
@@ -190,15 +174,12 @@ public class AuthorizePersonalDataAccessController {
             return "redirect://authorize-personal-data-access/review";
         }
 
-        return checkAuthorizationDetails(model, cgdCardTitle, cgdCardMessage);
+        return checkAuthorizationDetails(model, dataService.getCgdCardTitle(), dataService.getCgdCardMessage());
     }
 
     @RequestMapping(value = "/cgd-card", method = RequestMethod.POST)
     public String cgdCardAuthorizationSubmit() {
-        final CgdCard card = CgdCard.setGrantCardAccess(true, getMessage(cgdCardTitle), getMessage(cgdCardMessage));
-        if (card != null) {
-            sendCgdCardService.asyncSendCgdCard(card);
-        }
+        dataService.setCgdGrantCardAccess(true, Authenticate.getUser());
 
         return "redirect:/authorize-personal-data-access/bpi-card";
     }
@@ -214,7 +195,7 @@ public class AuthorizePersonalDataAccessController {
 
     @RequestMapping(value = "/bpi-card", method = RequestMethod.POST)
     public String bpiCardAuthorizationSubmit(@RequestParam boolean allowAccess) {
-//        BpiCard.setGrantCardAccess(allowAccess, Authenticate.getUser(), getMessage(bpiCardTitle), getMessage(bpiCardMessage));
+//        BpiCard.setGrantCardAccess(allowAccess, Authenticate.getUser(), dataService.getBpiCardTitle(), dataService.getBpiCardMessage());
 
         return "redirect:/authorize-personal-data-access/santander-bank";
     }
@@ -226,14 +207,14 @@ public class AuthorizePersonalDataAccessController {
             return "redirect://authorize-personal-data-access/review";
         }
         model.addAttribute("candidacy", candidacy);
-        return chooseAuthorizationDetails(model, santanderBankTitle, santanderBankMessage);
+        return chooseAuthorizationDetails(model, dataService.getSantanderBankTitle(), dataService.getSantanderBankMessage());
     }
 
     @RequestMapping(value = "/santander-bank", method = RequestMethod.POST)
     public String santanderBankAuthorizationSubmit(@RequestParam boolean allowAccess, @RequestParam(defaultValue = "") String
             candidacy, RedirectAttributes redirectAttributes) {
         validateCandidacy(candidacy);
-        SantanderCard.setGrantBankAccess(allowAccess, Authenticate.getUser(), getMessage(santanderBankTitle), getMessage(santanderBankMessage));
+        SantanderCard.setGrantBankAccess(allowAccess, Authenticate.getUser(), dataService.getSantanderBankTitle(), dataService.getSantanderBankMessage());
         redirectAttributes.addFlashAttribute("candidacy", candidacy);
         return "redirect:/authorize-personal-data-access/cgd-bank";
     }
@@ -247,13 +228,13 @@ public class AuthorizePersonalDataAccessController {
         }
         
         model.addAttribute("candidacy", candidacy);
-        return chooseAuthorizationDetails(model, cgdBankTitle, cgdBankMessage);
+        return chooseAuthorizationDetails(model, dataService.getCgdBankTitle(), dataService.getCgdBankMessage());
     }
 
     @RequestMapping(value = "/cgd-bank", method = RequestMethod.POST)
     public String cgdBankAuthorizationSubmit(@RequestParam boolean allowAccess, @ModelAttribute("candidacy") String candidacy, RedirectAttributes redirectAttributes) {
         validateCandidacy(candidacy);
-        CgdCard.setGrantBankAccess(allowAccess, getMessage(cgdBankTitle), getMessage(cgdBankMessage));
+        dataService.setCgdGrantBankAccess(allowAccess, Authenticate.getUser());
         redirectAttributes.addFlashAttribute("candidacy", candidacy);
         return "redirect:/authorize-personal-data-access/bpi-bank";
     }
@@ -264,14 +245,14 @@ public class AuthorizePersonalDataAccessController {
             return "redirect://authorize-personal-data-access/review";
         }
         model.addAttribute("candidacy", candidacy);
-        return chooseAuthorizationDetails(model, bpiBankTitle, bpiBankMessage);
+        return chooseAuthorizationDetails(model, dataService.getBpiBankTitle(), dataService.getBpiBankMessage());
     }
 
     @RequestMapping(value = "/bpi-bank", method = RequestMethod.POST)
     public String bpiBankAuthorizationSubmit(@RequestParam boolean allowAccess, @RequestParam(defaultValue = "") String
             candidacy, RedirectAttributes redirectAttributes) {
         validateCandidacy(candidacy);
-        BpiCard.setGrantBankAccess(allowAccess, Authenticate.getUser(), getMessage(bpiBankTitle), getMessage(bpiBankMessage));
+        BpiCard.setGrantBankAccess(allowAccess, Authenticate.getUser(), dataService.getBpiBankTitle(), dataService.getBpiBankMessage());
 
         redirectAttributes.addFlashAttribute("candidacy", candidacy);
         return "redirect:/authorize-personal-data-access/concluded";
@@ -280,13 +261,14 @@ public class AuthorizePersonalDataAccessController {
     @RequestMapping(value = "/concluded", method = RequestMethod.GET)
     public String concluded(Model model, @ModelAttribute("candidacy") String candidacy,
             HttpServletRequest request, HttpServletResponse response) throws IOException {
+
         validateCandidacy(candidacy);
         if (!Strings.isNullOrEmpty(candidacy)) {
             response.sendRedirect(finishRegistrationProcess(request, candidacy));
             return null;
         }
 
-        return "fenixedu-ist-integration/personalDataAccess/concludeRegistrationProcess";
+        return "fenixedu-ist-integration/personalDataAccess/concludedAuthorizationDetails";
     }
 
     private static String finishRegistrationProcess(HttpServletRequest request, final String candidacy) {
