@@ -39,7 +39,7 @@ public class SIBSOutgoingPaymentQueueJob extends SIBSOutgoingPaymentQueueJob_Bas
 
     @Override
     public QueueJobResult execute() throws Exception {
-        new SIBSOutgoingPaymentFile(getLastSuccessfulSentPaymentFileDate(), getPerson());
+        new SIBSOutgoingPaymentFile(getLastSuccessfulSentPaymentFileDate());
         return new QueueJobResult();
     }
 
