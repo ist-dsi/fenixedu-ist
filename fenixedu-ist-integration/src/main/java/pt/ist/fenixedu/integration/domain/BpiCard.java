@@ -45,7 +45,8 @@ public class BpiCard extends BpiCard_Base {
                 BpiCard bpiCard = new BpiCard(user, allowCardAccess);
                 bpiCard.setAllowSendCardDetails(allowCardAccess);
             }
-            new CardDataAuthorizationLog(title, body, BundleUtil.getString(Bundle.ACADEMIC,allowCardAccess ? "label.yes" : "label.no"));
+            new CardDataAuthorizationLog(title, body, BundleUtil.getString(Bundle.ACADEMIC,allowCardAccess ? "label.yes" :
+                    "label.no"), user.getPerson());
         }
     }
 
@@ -59,7 +60,8 @@ public class BpiCard extends BpiCard_Base {
                 BpiCard bpiCard = new BpiCard(user, allowBankAccess);
                 bpiCard.setAllowSendBankDetails(allowBankAccess);
             }
-            new CardDataAuthorizationLog(title, body, BundleUtil.getString(Bundle.ACADEMIC,allowBankAccess ? "label.yes" : "label.no"));
+            new CardDataAuthorizationLog(title, body, BundleUtil.getString(Bundle.ACADEMIC,allowBankAccess ? "label.yes" :
+                    "label.no"), user.getPerson());
         }
     }
 

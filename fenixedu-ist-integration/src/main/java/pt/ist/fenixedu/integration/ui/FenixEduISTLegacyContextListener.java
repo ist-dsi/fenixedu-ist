@@ -292,6 +292,7 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
             }
             return null;
         };
+
     }
 
     private static boolean isOverDue(final Event event) {
