@@ -27,6 +27,7 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Locale;
 
+import org.fenixedu.PostalCodeValidator;
 import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.EntryPhase;
 import org.fenixedu.academic.domain.ExecutionDegree;
@@ -417,8 +418,13 @@ public class DegreeCandidateDTO {
         person.setDateOfBirthYearMonthDay(getDateOfBirth());
         person.setIdentificationDocumentSeriesNumber(digit);
 
+
         final PhysicalAddressData data = new PhysicalAddressData(getAddress(), getAreaCode(), getAreaOfAreaCode(), null);
         data.setCountryOfResidence(Country.readDefault());
+
+        if (!PostalCodeValidator.isValidAreaCode(data.getCountryOfResidence().getCode(), areaCode)) {
+            logger.warn("Postal code {} not valid for docId {}", areaCode, getDocumentIdNumber());
+        }
 
         final PhysicalAddress createPhysicalAddress =
                 PhysicalAddress.createPhysicalAddress(person,
