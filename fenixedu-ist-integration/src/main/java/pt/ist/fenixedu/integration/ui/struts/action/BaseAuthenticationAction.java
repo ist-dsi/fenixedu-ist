@@ -30,8 +30,7 @@ import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.accounting.Event;
-import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeAndInsuranceEvent;
-import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEvent;
+import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeEvent;
 import org.fenixedu.academic.domain.alumni.CerimonyInquiryPerson;
 import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.academic.domain.student.Student;
@@ -217,9 +216,9 @@ public class BaseAuthenticationAction extends FenixAction {
     public static boolean hasGratuityOrAdministrativeOfficeFeeAndInsuranceDebtsFor(Person person,
             final ExecutionYear executionYear) {
         return person.getAnnualEventsFor(executionYear).stream()
-                .filter(annualEvent -> annualEvent instanceof GratuityEvent || annualEvent instanceof AdministrativeOfficeFeeAndInsuranceEvent)
+                .filter(annualEvent -> annualEvent.isGratuity() || annualEvent.isInsuranceEvent() || annualEvent
+                        .isAdministrativeOfficeAndInsuranceEvent() || annualEvent instanceof AdministrativeOfficeFeeEvent)
                 .anyMatch(Event::isOpen);
-
     }
 
     private boolean isTeacherAndHasInquiriesToRespond(User userView) {

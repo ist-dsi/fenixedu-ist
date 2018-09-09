@@ -88,7 +88,7 @@
             </div>
 
             <div align="center">
-                <a href="${pageContext.request.contextPath}/student/payments.do?method=showEvents" class="btn btn-default" tabindex="2"><bean:message bundle="APPLICATION_RESOURCES" key="label.view.payments"/></a>
+                <a href="${pageContext.request.contextPath}/owner-accounting-events" class="btn btn-default" tabindex="2"><bean:message bundle="APPLICATION_RESOURCES" key="label.view.payments"/></a>
                 <a href="${pageContext.request.contextPath}/home.do" class="btn btn-default" tabindex="1"><bean:message bundle="APPLICATION_RESOURCES" key="label.proceed"/></a>
             </div>
         </div>
