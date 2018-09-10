@@ -101,7 +101,7 @@ public class AuthorizePersonalDataAccessController {
     @RequestMapping(method = RequestMethod.GET)
     public String intro(RedirectAttributes redirectAttributes){
         if (checkCardDataAuthorizationWorkflowComplete()) {
-            return "redirect://authorize-personal-data-access/review";
+            return "redirect:/authorize-personal-data-access/review";
         }
         return "redirect:/authorize-personal-data-access/santander-card";
     }
