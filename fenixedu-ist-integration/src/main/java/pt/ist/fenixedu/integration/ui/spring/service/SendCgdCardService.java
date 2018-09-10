@@ -1,5 +1,6 @@
 package pt.ist.fenixedu.integration.ui.spring.service;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
@@ -31,23 +32,27 @@ public class SendCgdCardService {
     }
 
     @Atomic(mode = TxMode.READ)
-    protected void sendCgdCard(CgdCard card) {
+    public boolean sendCgdCard(CgdCard card) {
         final Person person = card.getUser().getPerson();
-        if (person != null) {
-            final Student student = person.getStudent();
-            if (student != null) {
-                for (final Registration registration : student.getRegistrationsSet()) {
-                    if (registration.isActive()) {
-                        CgdForm43Sender sender = new CgdForm43Sender();
-                        boolean form = sender.sendForm43For(registration);
-                        boolean attachment = sender.uploadFormAttachment(registration,registrationDeclarationForBanksService
-                        .getRegistrationDeclarationFileForBanks(registration));
-                        LOGGER.info("Sent Form43 ({}) and registration declaration file ({}) for registration {}",
-                                form, attachment, registration.getExternalId() );
+        if (BooleanUtils.isTrue(card.getAllowSendBankDetails())) {
+            if (person != null) {
+                final Student student = person.getStudent();
+                if (student != null) {
+                    for (final Registration registration : student.getRegistrationsSet()) {
+                        if (registration.isActive()) {
+                            CgdForm43Sender sender = new CgdForm43Sender();
+                            boolean form = sender.sendForm43For(registration);
+                            boolean attachment = sender.uploadFormAttachment(registration,registrationDeclarationForBanksService
+                                    .getRegistrationDeclarationFileForBanks(registration));
+                            LOGGER.info("Sent Form43 ({}) and registration declaration file ({}) for registration {}",
+                                    form, attachment, registration.getExternalId() );
+                            return true;
+                        }
                     }
                 }
             }
         }
+        return false;
     }
 
     @Async

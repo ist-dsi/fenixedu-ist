@@ -23,6 +23,7 @@ import static org.apache.commons.lang.BooleanUtils.isTrue;
 import java.time.Year;
 
 import org.fenixedu.academic.util.Bundle;
+import org.fenixedu.bennu.BennuSpringContextHelper;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.security.Authenticate;
@@ -30,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import pt.ist.fenixedu.integration.domain.CardDataAuthorizationLog;
+import pt.ist.fenixedu.integration.ui.spring.service.SendCgdCardService;
 import pt.ist.fenixframework.Atomic;
 
 public class CgdCard extends CgdCard_Base {
@@ -101,7 +103,7 @@ public class CgdCard extends CgdCard_Base {
     public static CgdCard setGrantBankAccess(final Boolean allowBankAccess, User user, String title, String body) {
         if (user != null) {
             final int year = Year.now().getValue();
-            final CgdCard card = findCardFor(user, year, allowBankAccess);
+            final CgdCard card = findCardFor(user, year, true);
             if (card != null) {
                 card.setAllowSendBankDetails(allowBankAccess);
                 new CardDataAuthorizationLog(title, body, BundleUtil.getString(Bundle.ACADEMIC, allowBankAccess ? "label.yes" :
@@ -112,6 +114,18 @@ public class CgdCard extends CgdCard_Base {
             }
         }
         return null;
+    }
+
+    public static boolean sendCard(User user) {
+        if (user != null) {
+            final int year = Year.now().getValue();
+            final CgdCard card = findCardFor(user, year, false);
+            if (card != null) {
+                SendCgdCardService bean = BennuSpringContextHelper.getBean(SendCgdCardService.class);
+                return bean.sendCgdCard(card);
+            }
+        }
+        return false;
     }
 
     public static boolean getGrantAccess() {

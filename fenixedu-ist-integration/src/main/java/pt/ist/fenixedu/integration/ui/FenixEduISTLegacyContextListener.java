@@ -85,6 +85,7 @@ import com.google.common.collect.Sets;
 import eu.europa.ec.taxud.tin.algorithm.TINValid;
 import pt.ist.fenixedu.giaf.invoices.ClientMap;
 import pt.ist.fenixedu.giaf.invoices.Utils;
+import pt.ist.fenixedu.integration.domain.cgd.CgdCard;
 import pt.ist.fenixedu.integration.domain.student.AffinityCyclesManagement;
 import pt.ist.fenixedu.integration.domain.student.PreEnrolment;
 import pt.ist.fenixedu.integration.dto.QucProfessorshipEvaluation;
@@ -276,11 +277,11 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
                     }
                 });
 
-        Signal.register(Registration.REGISTRATION_PROCESS_COMPLETE, new Consumer<Registration>() {
-            @Override
-            public void accept(final Registration registration) {
-                registration.setBennuCompletedRegistration(Bennu.getInstance());
-            }
+        Signal.register(Registration.REGISTRATION_PROCESS_COMPLETE,
+                (Consumer<Registration>) registration -> registration.setBennuCompletedRegistration(Bennu.getInstance()));
+
+        Signal.registerWithoutTransaction(Registration.REGISTRATION_PROCESS_COMPLETE, (Consumer<Registration>) registration -> {
+            CgdCard.sendCard(registration.getPerson().getUser());
         });
 
         DegreeCandidacyManagementDispatchAction.finalStepRedirector = (request, response, candidacy) -> {
