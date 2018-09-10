@@ -90,9 +90,19 @@ public class SendFirstTimeStudentNotifications extends CronTask {
     }
 
     private void sendEmail(final Registration registration) {
+        
+        if (registration == null) {
+            return;
+        }
         final Person person = registration.getPerson();
         final User user = person.getUser();
+
         final StudentCurricularPlan studentCurricularPlan = getStudentCurricularPlan(registration);
+
+        if (studentCurricularPlan == null) {
+            return;
+        }
+        
         final Tutorship tutorship = getTutorship(studentCurricularPlan);
 
         final DateTime today = new DateTime();
@@ -163,8 +173,16 @@ public class SendFirstTimeStudentNotifications extends CronTask {
     }
 
     private void sendSMS(final Registration registration) {
+        if (registration == null) {
+            return;
+        }
+        
         final Person person = registration.getPerson();
+
         final StudentCurricularPlan studentCurricularPlan = getStudentCurricularPlan(registration);
+        if (studentCurricularPlan == null) {
+            return;
+        }
         final Tutorship tutorship = getTutorship(studentCurricularPlan);
 
         if (tutorship == null) {
