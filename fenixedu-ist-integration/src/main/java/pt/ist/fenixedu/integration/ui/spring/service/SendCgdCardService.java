@@ -1,9 +1,5 @@
 package pt.ist.fenixedu.integration.ui.spring.service;
 
-import java.io.InputStream;
-import java.util.Locale;
-
-import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
@@ -13,16 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import com.google.gson.JsonObject;
 import com.qubit.solution.fenixedu.integration.cgd.services.form43.CgdForm43Sender;
-
 import pt.ist.fenixedu.integration.domain.cgd.CgdCard;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
-import pt.ist.registration.process.ui.service.PdfRendererService;
-import pt.ist.registration.process.ui.service.PdfTemplateResolver;
-import pt.ist.registration.process.ui.service.RegistrationDeclarationDataProvider;
-import pt.ist.registration.process.ui.service.UnresolvableTemplateException;
 
 /**
  * Created by Sérgio Silva (hello@fenixedu.org).

@@ -99,7 +99,10 @@ public class AuthorizePersonalDataAccessService {
     }
 
     public void setCgdGrantBankAccess(boolean allow, User user) {
-        CgdCard.setGrantBankAccess(allow, user, getCgdBankTitle(), getCgdBankMessage());
+        CgdCard cgdCard = CgdCard.setGrantBankAccess(allow, user, getCgdBankTitle(), getCgdBankMessage());
+        if (cgdCard != null && allow) {
+            sendCgdCardService.asyncSendCgdCard(cgdCard);
+        }
     }
 
     public void setBpiGrantBankAccess(boolean allow, User user) {
@@ -112,9 +115,6 @@ public class AuthorizePersonalDataAccessService {
 
     public void setCgdGrantCardAccess(boolean allow, User user) {
         final CgdCard card = CgdCard.setGrantCardAccess(allow, user, getCgdCardTitle(), getCgdCardMessage());
-        if (card != null) {
-            sendCgdCardService.asyncSendCgdCard(card);
-        }
     }
 
     public void setBpiGrantCardAccess(boolean allowBpiBankAccess, User user) {
