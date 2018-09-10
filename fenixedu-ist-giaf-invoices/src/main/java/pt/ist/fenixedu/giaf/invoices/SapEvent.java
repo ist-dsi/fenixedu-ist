@@ -213,7 +213,7 @@ public class SapEvent {
     }
 
     public void updateInvoiceWithNewClientData() throws Exception {
-        for (final SapRequest sapRequest : getFilteredSapRequestStream().collect(Collectors.toSet())) {
+        for (final SapRequest sapRequest : getFilteredSapRequestStream().filter(r -> r.getRequest().length() > 2).collect(Collectors.toSet())) {
             updateInvoiceWithNewClientData(sapRequest);
         }
     }
