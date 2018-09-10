@@ -20,6 +20,7 @@ package pt.ist.fenixedu.integration.domain.cgd;
 
 import java.time.Year;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.bennu.core.domain.User;
@@ -54,7 +55,7 @@ public class NumberObfuscationAdaptor implements IMemberIDAdapter {
         if (user != null) {
             final int year = Year.now().getValue();
             for (final CgdCard card : user.getCgdCardSet()) {
-                if (card.getAllowSendBankDetails() &&
+                if (BooleanUtils.isTrue(card.getAllowSendBankDetails()) &&
                         (card.getCgdCardCounter().getYear() == year || card.getCgdCardCounter().getYear() == (year - 1))) {
                     return true;
                 }
