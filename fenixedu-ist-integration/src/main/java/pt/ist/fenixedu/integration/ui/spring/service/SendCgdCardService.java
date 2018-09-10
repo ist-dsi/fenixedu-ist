@@ -1,9 +1,6 @@
 package pt.ist.fenixedu.integration.ui.spring.service;
 
-import java.io.InputStream;
-import java.util.Locale;
-
-import org.fenixedu.academic.domain.ExecutionYear;
+import org.apache.commons.lang.BooleanUtils;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
@@ -13,16 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import com.google.gson.JsonObject;
 import com.qubit.solution.fenixedu.integration.cgd.services.form43.CgdForm43Sender;
-
 import pt.ist.fenixedu.integration.domain.cgd.CgdCard;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
-import pt.ist.registration.process.ui.service.PdfRendererService;
-import pt.ist.registration.process.ui.service.PdfTemplateResolver;
-import pt.ist.registration.process.ui.service.RegistrationDeclarationDataProvider;
-import pt.ist.registration.process.ui.service.UnresolvableTemplateException;
 
 /**
  * Created by Sérgio Silva (hello@fenixedu.org).
@@ -41,23 +32,27 @@ public class SendCgdCardService {
     }
 
     @Atomic(mode = TxMode.READ)
-    protected void sendCgdCard(CgdCard card) {
+    public boolean sendCgdCard(CgdCard card) {
         final Person person = card.getUser().getPerson();
-        if (person != null) {
-            final Student student = person.getStudent();
-            if (student != null) {
-                for (final Registration registration : student.getRegistrationsSet()) {
-                    if (registration.isActive()) {
-                        CgdForm43Sender sender = new CgdForm43Sender();
-                        boolean form = sender.sendForm43For(registration);
-                        boolean attachment = sender.uploadFormAttachment(registration,registrationDeclarationForBanksService
-                        .getRegistrationDeclarationFileForBanks(registration));
-                        LOGGER.info("Sent Form43 ({}) and registration declaration file ({}) for registration {}",
-                                form, attachment, registration.getExternalId() );
+        if (BooleanUtils.isTrue(card.getAllowSendBankDetails())) {
+            if (person != null) {
+                final Student student = person.getStudent();
+                if (student != null) {
+                    for (final Registration registration : student.getRegistrationsSet()) {
+                        if (registration.isActive()) {
+                            CgdForm43Sender sender = new CgdForm43Sender();
+                            boolean form = sender.sendForm43For(registration);
+                            boolean attachment = sender.uploadFormAttachment(registration,registrationDeclarationForBanksService
+                                    .getRegistrationDeclarationFileForBanks(registration));
+                            LOGGER.info("Sent Form43 ({}) and registration declaration file ({}) for registration {}",
+                                    form, attachment, registration.getExternalId() );
+                            return true;
+                        }
                     }
                 }
             }
         }
+        return false;
     }
 
     @Async
