@@ -51,13 +51,18 @@
 
 <div>
 
+    <c:if test="${not empty invocationMessage}">
+        <p class="alert alert-info">
+            <c:out value="${invocationMessage}"/>
+        </p>
+    </c:if>
+    
     <h2>
         ${title}
     </h2>
 
     <div class="alert well">
         ${message}
-
 
         <div class="row">
             <div class="col-lg-12 text-left">

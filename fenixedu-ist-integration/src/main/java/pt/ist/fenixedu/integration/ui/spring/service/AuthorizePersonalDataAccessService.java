@@ -98,11 +98,9 @@ public class AuthorizePersonalDataAccessService {
         SantanderCard.setGrantBankAccess(allow, user, getSantanderBankTitle(), getSantanderBankMessage());
     }
 
-    public void setCgdGrantBankAccess(boolean allow, User user) {
+    public String setCgdGrantBankAccess(boolean allow, User user) {
         CgdCard cgdCard = CgdCard.setGrantBankAccess(allow, user, getCgdBankTitle(), getCgdBankMessage());
-        if (cgdCard != null && allow) {
-            sendCgdCardService.asyncSendCgdCard(cgdCard);
-        }
+        return sendCgdCardService.sendCgdCard(cgdCard);
     }
 
     public void setBpiGrantBankAccess(boolean allow, User user) {
