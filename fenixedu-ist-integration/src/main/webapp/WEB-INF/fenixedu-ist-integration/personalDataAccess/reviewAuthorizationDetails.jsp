@@ -40,6 +40,12 @@
     </h2>
     <a href="${historyUrl}"><spring:message code="authorize.personal.data.access.history" /></a>
 </div>
+<c:if test="${not empty invocationMessage}">
+    <div class="alert alert-info">
+        <p style="font-weight: bold; font-size: medium;"> <c:out value="${invocationMessage}"/></p>
+    </div>
+</c:if>
+
 <c:if test="${success}">
     <div class="success3" style="margin-top: 10px; margin-bottom: 10px;">
         <span><spring:message code="authorize.personal.data.access.saved" /></span>
@@ -47,7 +53,7 @@
 </c:if>
 
 <div>
-
+    
         <h2>
             ${santanderBankTitle}
         </h2>

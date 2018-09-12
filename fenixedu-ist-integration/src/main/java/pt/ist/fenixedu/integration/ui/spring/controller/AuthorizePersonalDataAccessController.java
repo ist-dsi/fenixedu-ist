@@ -135,9 +135,8 @@ public class AuthorizePersonalDataAccessController {
 
     @RequestMapping(value = "/review/cgd-bank", method = RequestMethod.POST)
     public String reviewCgdCardDataAuthorizationSubmit(RedirectAttributes redirAttrs, @RequestParam boolean allowCgdBankAccess) {
-        dataService.setCgdGrantBankAccess(allowCgdBankAccess, Authenticate.getUser());
-
-
+        final String result = dataService.setCgdGrantBankAccess(allowCgdBankAccess, Authenticate.getUser());
+        redirAttrs.addFlashAttribute("invocationMessage", result);
         redirAttrs.addFlashAttribute("success", true);
         return "redirect:/authorize-personal-data-access/review";
     }
@@ -234,7 +233,8 @@ public class AuthorizePersonalDataAccessController {
     @RequestMapping(value = "/cgd-bank", method = RequestMethod.POST)
     public String cgdBankAuthorizationSubmit(@RequestParam boolean allowAccess, @ModelAttribute("candidacy") String candidacy, RedirectAttributes redirectAttributes) {
         validateCandidacy(candidacy);
-        dataService.setCgdGrantBankAccess(allowAccess, Authenticate.getUser());
+        String result = dataService.setCgdGrantBankAccess(allowAccess, Authenticate.getUser());
+        redirectAttributes.addFlashAttribute("invocationMessage", result);
         redirectAttributes.addFlashAttribute("candidacy", candidacy);
         return "redirect:/authorize-personal-data-access/bpi-bank";
     }

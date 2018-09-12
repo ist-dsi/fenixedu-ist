@@ -104,19 +104,15 @@ public class CgdCard extends CgdCard_Base {
         if (user != null) {
             final int year = Year.now().getValue();
             final CgdCard card = findCardFor(user, year, true);
-            if (card != null) {
-                card.setAllowSendBankDetails(allowBankAccess);
-                new CardDataAuthorizationLog(title, body, BundleUtil.getString(Bundle.ACADEMIC, allowBankAccess ? "label.yes" :
+            card.setAllowSendBankDetails(allowBankAccess);
+            new CardDataAuthorizationLog(title, body, BundleUtil.getString(Bundle.ACADEMIC, allowBankAccess ? "label.yes" :
                         "label.no"), user.getPerson());
-                if (allowBankAccess) {
-                    return card;
-                }
-            }
+            return card;
         }
         return null;
     }
 
-    public static boolean sendCard(User user) {
+    public static String sendCard(User user) {
         if (user != null) {
             final int year = Year.now().getValue();
             final CgdCard card = findCardFor(user, year, false);
@@ -125,7 +121,7 @@ public class CgdCard extends CgdCard_Base {
                 return bean.sendCgdCard(card);
             }
         }
-        return false;
+        return "CGD: User is null";
     }
 
     public static boolean getGrantAccess() {
