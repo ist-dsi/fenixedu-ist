@@ -61,23 +61,22 @@
 		<li><html:link action="<%="/payments.do?method=showEvents&amp;personId=" + personId %>">
 			<bean:message bundle="ACADEMIC_OFFICE_RESOURCES" key="label.payments.currentEvents" />
 		</html:link></li>
-		<li><html:link
-			action="<%="/receipts.do?method=showPaymentsWithoutReceipt&amp;personId=" + personId %>">
-			<bean:message bundle="ACADEMIC_OFFICE_RESOURCES" key="label.payments.paymentsWithoutReceipt" />
-		</html:link></li>
-		<li><html:link action="<%="/receipts.do?method=showReceipts&amp;personId=" + personId%>">
-			<bean:message bundle="ACADEMIC_OFFICE_RESOURCES" key="label.payments.receipts" />
-		</html:link></li>
-		<li><html:link action="<%="/payments.do?method=showEventsWithPaymentCodes&amp;personId=" + personId%>">
-			<bean:message bundle="ACADEMIC_OFFICE_RESOURCES" key="label.payments.paymentCodes" />
-		</html:link></li>
-
 	</ul>
-	<ul>
-		<li><html:link action="<%="/payments.do?method=showEventsWithPayments&amp;personId=" + personId%>">
-			<bean:message bundle="ACADEMIC_OFFICE_RESOURCES" key="label.payments.extract" />
-		</html:link></li>
-	</ul>
+	<%--<ul>--%>
+		<%--<li><html:link--%>
+			<%--action="<%="/receipts.do?method=showPaymentsWithoutReceipt&amp;personId=" + personId %>">--%>
+			<%--<bean:message bundle="ACADEMIC_OFFICE_RESOURCES" key="label.payments.paymentsWithoutReceipt" />--%>
+		<%--</html:link></li>--%>
+		<%--<li><html:link action="<%="/receipts.do?method=showReceipts&amp;personId=" + personId%>">--%>
+			<%--<bean:message bundle="ACADEMIC_OFFICE_RESOURCES" key="label.payments.receipts" />--%>
+		<%--</html:link></li>--%>
+		<%--<li><html:link action="<%="/payments.do?method=showEventsWithPaymentCodes&amp;personId=" + personId%>">--%>
+			<%--<bean:message bundle="ACADEMIC_OFFICE_RESOURCES" key="label.payments.paymentCodes" />--%>
+		<%--</html:link></li>--%>
+		<%--<li><html:link action="<%="/payments.do?method=showEventsWithPayments&amp;personId=" + personId%>">--%>
+			<%--<bean:message bundle="ACADEMIC_OFFICE_RESOURCES" key="label.payments.extract" />--%>
+		<%--</html:link></li>--%>
+	<%--</ul>--%>
 	<ul>
 		<li><html:link href="<%= request.getContextPath() + "/giaf-invoice-viewer" %>" paramId="username" paramName="person" paramProperty="username">
 			<bean:message bundle="GIAF_INVOICES_RESOURCES" key="title.giaf.invoice.viewer" />
