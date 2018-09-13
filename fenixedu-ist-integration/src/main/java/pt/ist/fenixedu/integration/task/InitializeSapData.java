@@ -1,26 +1,28 @@
 package pt.ist.fenixedu.integration.task;
 
 import java.math.BigDecimal;
+import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.accounting.Event;
+import org.fenixedu.academic.domain.accounting.calculator.CreditEntry;
 import org.fenixedu.academic.domain.accounting.calculator.DebtExemption;
 import org.fenixedu.academic.domain.accounting.calculator.DebtInterestCalculator;
+import org.fenixedu.academic.domain.accounting.calculator.Payment;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEventWithPaymentPlan;
 import org.fenixedu.academic.util.Money;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.scheduler.custom.CustomTask;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 import com.google.gson.JsonObject;
 
-import pt.ist.esw.advice.pt.ist.fenixframework.AtomicInstance;
 import pt.ist.fenixedu.domain.SapRequest;
 import pt.ist.fenixedu.domain.SapRequestType;
 import pt.ist.fenixedu.giaf.invoices.ClientMap;
 import pt.ist.fenixedu.giaf.invoices.Utils;
 import pt.ist.fenixframework.Atomic.TxMode;
-import pt.ist.fenixframework.CallableWithoutException;
 import pt.ist.fenixframework.FenixFramework;
 
 public class InitializeSapData extends CustomTask {
@@ -29,9 +31,8 @@ public class InitializeSapData extends CustomTask {
 
     private ExecutionYear startYear = null;
     private static DateTime FIRST_DAY = new DateTime(2018, 01, 01, 00, 00);
-    private static DateTime LAST_DAY = new DateTime(2017, 12, 31, 23, 59, 59);
-    private Money payments = Money.ZERO;
-    private Money exemptions = Money.ZERO;
+    private static DateTime NOW = new DateTime();
+    private static LocalDate LAST_DAY = new LocalDate(2017, 12, 31);
 
     @Override
     public TxMode getTxMode() {
@@ -41,7 +42,7 @@ public class InitializeSapData extends CustomTask {
     private boolean needsProcessing(final Event event) {
         try {
             final ExecutionYear executionYear = Utils.executionYearOf(event);
-            return event.getParty().isPerson() && event.getSapRequestSet().isEmpty() && !event.isCancelled()
+            return event.getParty().isPerson() && !event.isCancelled()
                     && !executionYear.isBefore(startYear) && (!event.getNonAdjustingTransactions().isEmpty()
                             || !event.getExemptionsSet().isEmpty() || !event.getDiscountsSet().isEmpty());
         } catch (final Exception e) {
@@ -52,39 +53,38 @@ public class InitializeSapData extends CustomTask {
 
     @Override
     public void runTask() throws Exception {
+        Bennu.getInstance().getAccountingEventsSet().stream()
+            .parallel()
+            .forEach(this::clearInit);
+
         startYear = ExecutionYear.readExecutionYearByName("2013/2014");
 
-        // in case transaction restarts... reset state.
-        payments = Money.ZERO;
-        exemptions = Money.ZERO;
+        Bennu.getInstance().getAccountingEventsSet().stream()
+            .parallel()
+            .forEach(this::init);
+    }
 
-        Bennu.getInstance().getAccountingEventsSet().stream().filter(this::needsProcessing).forEach(event -> {
-            try {
-                FenixFramework.getTransactionManager().withTransaction(new CallableWithoutException<Void>() {
-                    @Override
-                    public Void call() {
-                        try {
-                            Event.paymentsPredicate = (t, when) -> !t.getWhenRegistered().isAfter(when);
-                            process(event);
-                            return null;
-                        } finally {
-                            Event.paymentsPredicate = (t, when) -> !t.getWhenProcessed().isAfter(when);
-                        }
-                    }
-                }, new AtomicInstance(TxMode.SPECULATIVE_READ, false));
-            } catch (final Exception e) {
-                taskLog("Erro no evento %s %s\n", event.getExternalId(), e.getMessage());
-                e.printStackTrace();
-            }
-        });
+    private void clearInit(final Event event) {
+        FenixFramework.atomic(() -> event.getSapRequestSet().stream()
+            .filter(sr -> sr.getRequest().equals("{}"))
+            .forEach(sr -> sr.delete()));
+    }
 
-        taskLog("O valor dos pagamentos foi de %s\n", payments.toPlainString());
-        taskLog("O valor das insenções foi de %s\n", exemptions.toPlainString());
+    private void init(final Event event) {
+        try {
+            FenixFramework.atomic(() -> {
+                if (needsProcessing(event)) {
+                    process(event);
+                }
+            });
+        } catch (final Exception e) {
+            taskLog("Erro no evento %s %s\n", event.getExternalId(), e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public void process(final Event event) {
-        //taskLog("Processing event: %s\n", event.getExternalId());
-        final DebtInterestCalculator debtInterestCalculator = event.getDebtInterestCalculator(LAST_DAY);
+        final DebtInterestCalculator debtInterestCalculator = event.getDebtInterestCalculator(NOW);
         final Money amountPayed = processPayments(event, debtInterestCalculator);
         processExemptions(event, amountPayed, debtInterestCalculator);
         processReimbursements(event);
@@ -97,9 +97,7 @@ public class InitializeSapData extends CustomTask {
         final String clientId = ClientMap.uVATNumberFor(event.getParty());
 
         if (paidAmount.isPositive()) {
-            payments = payments.add(paidAmount);
-
-            debtInterestCalculator.getPayments().filter(p -> p.getUsedAmountInDebts().compareTo(BigDecimal.ZERO) > 0)
+            getLastYearPayments(debtInterestCalculator).filter(p -> p.getUsedAmountInDebts().compareTo(BigDecimal.ZERO) > 0)
                     .forEach(payment -> {
 
                         Money usedAmountInDebts = new Money(payment.getUsedAmountInDebts());
@@ -135,9 +133,7 @@ public class InitializeSapData extends CustomTask {
                 new Money(debtInterestCalculator.getPaidInterestAmount().add(debtInterestCalculator.getPaidFineAmount()));
 
         if (interestAndFineAmount.isPositive()) {
-            payments = payments.add(interestAndFineAmount);
-
-            debtInterestCalculator.getPayments()
+            getLastYearPayments(debtInterestCalculator)
                     .filter(p -> p.getUsedAmountInFines().add(p.getUsedAmountInInterests()).compareTo(BigDecimal.ZERO) > 0)
                     .forEach(payment -> {
                         Money payedInterestAndFineAmount =
@@ -161,7 +157,7 @@ public class InitializeSapData extends CustomTask {
                     });
         }
 
-        debtInterestCalculator.getPayments().forEach(payment -> {
+        getLastYearPayments(debtInterestCalculator).forEach(payment -> {
 
             Money unusedAmount = new Money(payment.getUnusedAmount());
             if (unusedAmount.isPositive()) {
@@ -178,73 +174,80 @@ public class InitializeSapData extends CustomTask {
         return paidAmount;
     }
 
+    private Stream<Payment> getLastYearPayments(final DebtInterestCalculator debtInterestCalculator) {
+        return debtInterestCalculator.getPayments().filter(p -> !p.getDate().isAfter(LAST_DAY));
+    }
+
     private boolean isPartialRegime(final Event event) {
         return event instanceof GratuityEventWithPaymentPlan
                 && ((GratuityEventWithPaymentPlan) event).getGratuityPaymentPlan().isForPartialRegime();
     }
 
+    private Stream<CreditEntry> getLastYearExemptions(final DebtInterestCalculator debtInterestCalculator) {
+        return debtInterestCalculator.getCreditEntries().stream().filter(DebtExemption.class::isInstance)
+                .filter(c -> !c.getDate().isAfter(LAST_DAY));
+    }
+
     private void processExemptions(final Event event, final Money amountPayed,
             final DebtInterestCalculator debtInterestCalculator) {
 
-        debtInterestCalculator.getCreditEntries().stream().filter(DebtExemption.class::isInstance)
-                .filter(c -> c.getAmount().compareTo(BigDecimal.ZERO) > 0).forEach(c -> {
+        getLastYearExemptions(debtInterestCalculator).filter(c -> c.getAmount().compareTo(BigDecimal.ZERO) > 0).forEach(c -> {
 
-                    Money amountToRegister = new Money(c.getAmount());
+            Money amountToRegister = new Money(c.getUsedAmountInDebts());
 
-                    //TODO remove when fully tested, if we register a different value for the exemption
-                    //when the sync script runs it will detect a different amount for the exemptions and it will try to rectify
-                    //when the events are referring to partial regime
-                    if (amountPayed.isPositive() && isPartialRegime(event)) {
-                        final Money originalAmount = event.getOriginalAmountToPay();
-                        if (amountToRegister.add(amountPayed).greaterThan(originalAmount)) {
-                            taskLog("Evento: %s # Montante original: %s # montante pago: %s # montante a registar: %s\n",
-                                    event.getExternalId(), originalAmount, amountPayed, amountToRegister);
-                            amountToRegister = originalAmount.subtract(amountPayed);
-                        }
-                    }
+            //TODO remove when fully tested, if we register a different value for the exemption
+            //when the sync script runs it will detect a different amount for the exemptions and it will try to rectify
+            //when the events are referring to partial regime
+            if (amountPayed.isPositive() && isPartialRegime(event)) {
+                final Money originalAmount = event.getOriginalAmountToPay();
+                if (amountToRegister.add(amountPayed).greaterThan(originalAmount)) {
+                    taskLog("Evento: %s # Montante original: %s # montante pago: %s # montante a registar: %s\n",
+                            event.getExternalId(), originalAmount, amountPayed, amountToRegister);
+                    amountToRegister = originalAmount.subtract(amountPayed);
+                }
+            }
 
-                    exemptions = exemptions.add(amountToRegister);
+            final String clientId = ClientMap.uVATNumberFor(event.getParty());
 
-                    final String clientId = ClientMap.uVATNumberFor(event.getParty());
+            //an exemption should be considered as a payment for the initialization
+            final SapRequest sapInvoiceRequest = new SapRequest(event, clientId, amountToRegister, "ND0", SapRequestType.INVOICE,
+                    Money.ZERO, EMPTY_JSON_OBJECT);
+            sapInvoiceRequest.setCreditId(c.getId());
+            sapInvoiceRequest.setWhenSent(FIRST_DAY);
+            sapInvoiceRequest.setSent(true);
+            sapInvoiceRequest.setIntegrated(true);
+            sapInvoiceRequest.setOrder(0);
 
-                    //an exemption should be considered as a payment for the initialization
-                    final SapRequest sapInvoiceRequest = new SapRequest(event, clientId, amountToRegister, "ND0",
-                            SapRequestType.INVOICE, Money.ZERO, EMPTY_JSON_OBJECT);
-                    sapInvoiceRequest.setCreditId(c.getId());
-                    sapInvoiceRequest.setWhenSent(FIRST_DAY);
-                    sapInvoiceRequest.setSent(true);
-                    sapInvoiceRequest.setIntegrated(true);
-                    sapInvoiceRequest.setOrder(0);
+            final SapRequest sapCreditRequest = new SapRequest(event, clientId, amountToRegister, "NA0", SapRequestType.CREDIT,
+                    Money.ZERO, EMPTY_JSON_OBJECT);
+            sapCreditRequest.setCreditId(c.getId());
+            sapCreditRequest.setWhenSent(FIRST_DAY);
+            sapCreditRequest.setSent(true);
+            sapCreditRequest.setIntegrated(true);
+            sapCreditRequest.setOrder(0);
+            if (isToProcessDebt(event, event.isGratuity())) {
+                final SapRequest sapDebtRequest = new SapRequest(event, clientId, amountToRegister, "NG0", SapRequestType.DEBT,
+                        Money.ZERO, EMPTY_JSON_OBJECT);
+                sapDebtRequest.setCreditId(c.getId());
+                sapDebtRequest.setWhenSent(FIRST_DAY);
+                sapDebtRequest.setSent(true);
+                sapDebtRequest.setIntegrated(true);
+                sapDebtRequest.setOrder(0);
 
-                    final SapRequest sapCreditRequest = new SapRequest(event, clientId, amountToRegister, "NA0",
-                            SapRequestType.CREDIT, Money.ZERO, EMPTY_JSON_OBJECT);
-                    sapCreditRequest.setCreditId(c.getId());
-                    sapCreditRequest.setWhenSent(FIRST_DAY);
-                    sapCreditRequest.setSent(true);
-                    sapCreditRequest.setIntegrated(true);
-                    sapCreditRequest.setOrder(0);
-                    if (isToProcessDebt(event, event.isGratuity())) {
-                        final SapRequest sapDebtRequest = new SapRequest(event, clientId, amountToRegister, "NG0",
-                                SapRequestType.DEBT, Money.ZERO, EMPTY_JSON_OBJECT);
-                        sapDebtRequest.setCreditId(c.getId());
-                        sapDebtRequest.setWhenSent(FIRST_DAY);
-                        sapDebtRequest.setSent(true);
-                        sapDebtRequest.setIntegrated(true);
-                        sapDebtRequest.setOrder(0);
-
-                        final SapRequest sapDebtCreditRequest = new SapRequest(event, clientId, amountToRegister, "NJ0",
-                                SapRequestType.DEBT_CREDIT, Money.ZERO, EMPTY_JSON_OBJECT);
-                        sapDebtCreditRequest.setCreditId(c.getId());
-                        sapDebtCreditRequest.setWhenSent(FIRST_DAY);
-                        sapDebtCreditRequest.setSent(true);
-                        sapDebtCreditRequest.setIntegrated(true);
-                        sapDebtCreditRequest.setOrder(0);
-                    }
-                });
+                final SapRequest sapDebtCreditRequest = new SapRequest(event, clientId, amountToRegister, "NJ0",
+                        SapRequestType.DEBT_CREDIT, Money.ZERO, EMPTY_JSON_OBJECT);
+                sapDebtCreditRequest.setCreditId(c.getId());
+                sapDebtCreditRequest.setWhenSent(FIRST_DAY);
+                sapDebtCreditRequest.setSent(true);
+                sapDebtCreditRequest.setIntegrated(true);
+                sapDebtCreditRequest.setOrder(0);
+            }
+        });
     }
 
     private void processReimbursements(final Event event) {
-        final Money amountToRegister = event.getAccountingTransactionsSet().stream().flatMap(at -> at.getEntriesSet().stream())
+        final Money amountToRegister = event.getAccountingTransactionsSet().stream()
+                .filter(at -> at.getWhenRegistered().getYear() < 2018).flatMap(at -> at.getEntriesSet().stream())
                 .flatMap(e -> e.getReceiptsSet().stream()).flatMap(r -> r.getCreditNotesSet().stream())
                 .filter(cn -> !cn.isAnnulled()).flatMap(cn -> cn.getCreditNoteEntriesSet().stream()).map(cne -> cne.getAmount())
                 .reduce(Money.ZERO, Money::add);
