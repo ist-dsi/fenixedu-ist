@@ -16,17 +16,18 @@ import pt.ist.fenixframework.Atomic.TxMode;
 
 public class SapRequest extends SapRequest_Base {
 
-    public static final Comparator<? super SapRequest> COMPARATOR_BY_EVENT_AND_ORDER = (r1, r2) -> {
-        final int e = Event.COMPARATOR_BY_DATE.compare(r1.getEvent(), r2.getEvent());
-        return e == 0 ? r1.getOrder().compareTo(r2.getOrder()) : e;
-    };
-
     public static final Comparator<SapRequest> COMPARATOR_BY_DATE = new Comparator<SapRequest>() {
         @Override
         public int compare(SapRequest r1, SapRequest r2) {
             final int i = r1.getWhenCreated().compareTo(r2.getWhenCreated());
             return i == 0 ? r1.getExternalId().compareTo(r2.getExternalId()) : i;
         }
+    };
+
+    public static final Comparator<? super SapRequest> COMPARATOR_BY_EVENT_AND_ORDER = (r1, r2) -> {
+        final int e = Event.COMPARATOR_BY_DATE.compare(r1.getEvent(), r2.getEvent());
+        final int o = e == 0 ? r1.getOrder().compareTo(r2.getOrder()) : e;
+        return o == 0 ? COMPARATOR_BY_DATE.compare(r1, r2) : o;
     };
 
     public static final Comparator<SapRequest> DOCUMENT_NUMBER_COMPARATOR = new Comparator<SapRequest>() {
