@@ -41,10 +41,6 @@ public class GiafInvoiceConfiguration {
                 description = "File store used to store files regarding documents from SAP.")
         public String sapInvoiceDir();
 
-        @ConfigurationProperty(key = "pt.sap.client.map", defaultValue = "/dev/null",
-                description = "Filename to the client list from SAP and corresponding VAT numbers.")
-        public String clientSapMapFilename();
-
         @ConfigurationProperty(key = "pt.sap.mails.to", defaultValue = "/dev/null",
                 description = "Filename with the email addresses to report errors.")
         public String clientSapLogErrorsMails();

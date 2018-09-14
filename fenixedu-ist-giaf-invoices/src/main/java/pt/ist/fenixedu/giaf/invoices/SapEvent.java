@@ -82,7 +82,7 @@ public class SapEvent {
         return event.getSapRequestSet().stream().filter(r -> !r.getIgnore());
     }
 
-    public void registerInvoice(Money debtFenix, Event event, boolean isGratuity, boolean isNewDate) throws Exception {
+    public SapRequest registerInvoice(Money debtFenix, Event event, boolean isGratuity, boolean isNewDate) throws Exception {
 
         if (isToProcessDebt(event, isGratuity)) {
             //if debt is greater than invoice, then there was a debt registered and the correspondent invoice failed, don't register the debt again
@@ -96,8 +96,7 @@ public class SapEvent {
                 clientId, false, false);
 
         String documentNumber = getDocumentNumber(data, false);
-        SapRequest sapRequest =
-                new SapRequest(event, clientId, debtFenix, documentNumber, SapRequestType.INVOICE, Money.ZERO, data);
+        return new SapRequest(event, clientId, debtFenix, documentNumber, SapRequestType.INVOICE, Money.ZERO, data);
 
 //        if (checkAndRegisterIntegration(event, errorLog, elogger, data, documentNumber, sapRequest, result,
 //                SapRequestType.INVOICE.name(), true)) {
@@ -245,23 +244,23 @@ public class SapEvent {
         new SapRequest(event, clientId, invoiceValue, documentNumber, SapRequestType.INVOICE, Money.ZERO, data);
     }
 
-    private void registerPaymentFromAdvancement(Event event, String clientId, Money advancementAmount, SapRequest invoiceRequest,
-            ErrorLogConsumer errorLog, EventLogger elogger) throws Exception {
-
-        checkValidDocumentNumber(invoiceRequest.getDocumentNumber(), event);
-
-        // ver se o valor da divida é superior ou igual ao advancement, se for tudo ok, caso contrário é registar o pagamento no valor da factura
-        // e abater esse valor ao advancement
-        Money amountToRegister = advancementAmount;
-        if (advancementAmount.greaterThan(invoiceRequest.getValue())) {
-            amountToRegister = invoiceRequest.getValue();
-        }
-
-        JsonObject data = toJsonPaymentFromAdvancement(event, invoiceRequest, amountToRegister);
-        String documentNumber = getDocumentNumber(data, true);
-        SapRequest sapRequest = new SapRequest(event, clientId, amountToRegister, documentNumber, SapRequestType.PAYMENT,
-                amountToRegister.negate(), data);
-    }
+//    private SapRequest registerPaymentFromAdvancement(Event event, String clientId, Money advancementAmount, SapRequest invoiceRequest,
+//            ErrorLogConsumer errorLog, EventLogger elogger) throws Exception {
+//
+//        checkValidDocumentNumber(invoiceRequest.getDocumentNumber(), event);
+//
+//        // ver se o valor da divida é superior ou igual ao advancement, se for tudo ok, caso contrário é registar o pagamento no valor da factura
+//        // e abater esse valor ao advancement
+//        Money amountToRegister = advancementAmount;
+//        if (advancementAmount.greaterThan(invoiceRequest.getValue())) {
+//            amountToRegister = invoiceRequest.getValue();
+//        }
+//
+//        JsonObject data = toJsonPaymentFromAdvancement(event, invoiceRequest, amountToRegister);
+//        String documentNumber = getDocumentNumber(data, true);
+//        return new SapRequest(event, clientId, amountToRegister, documentNumber, SapRequestType.PAYMENT,
+//                amountToRegister.negate(), data);
+//    }
 
     private SapRequest registerDebt(Money debtFenix, Event event, boolean isNewDate) {
         String clientId = ClientMap.uVATNumberFor(event.getParty());
@@ -392,7 +391,7 @@ public class SapEvent {
         return sapRequest;
     }
 
-    public void registerReimbursement(Event event, Money amount, ErrorLogConsumer errorLog, EventLogger elogger)
+    public SapRequest registerReimbursement(Event event, Money amount, ErrorLogConsumer errorLog, EventLogger elogger)
             throws Exception {
 
         SapRequest sapInvoiceRequest = getLastInvoiceNumber();
@@ -402,8 +401,7 @@ public class SapEvent {
         JsonObject data = toJsonReimbursement(event, amount, sapInvoiceRequest, false, true);
 
         String documentNumber = getDocumentNumber(data, true);
-        SapRequest sapRequest =
-                new SapRequest(event, clientId, amount, documentNumber, SapRequestType.REIMBURSEMENT, Money.ZERO, data);
+        return new SapRequest(event, clientId, amount, documentNumber, SapRequestType.REIMBURSEMENT, Money.ZERO, data);
     }
 
     private void registerInterest(final Money payedInterest, final String clientId,
@@ -1141,10 +1139,10 @@ public class SapEvent {
         return getPaymentsFor(transactionId).findAny().isPresent();
     }
 
-    public boolean hasPayment(final AccountingTransaction transaction, SapRequest sapRequest) {
-        return getPaymentsFor(transaction.getTransactionDetail().getExternalId()).filter(sr -> transaction == sr.getPayment())
-                .anyMatch(sr -> sr != sapRequest);
-    }
+//    public boolean hasPayment(final AccountingTransaction transaction, SapRequest sapRequest) {
+//        return getPaymentsFor(transaction.getTransactionDetail().getExternalId()).filter(sr -> transaction == sr.getPayment())
+//                .anyMatch(sr -> sr != sapRequest);
+//    }
 
     private Stream<SapRequest> getPaymentsFor(final String transactionDetailId) {
         return getFilteredSapRequestStream()
