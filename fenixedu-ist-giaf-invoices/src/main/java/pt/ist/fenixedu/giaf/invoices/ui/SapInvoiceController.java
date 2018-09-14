@@ -50,7 +50,7 @@ import pt.ist.fenixedu.giaf.invoices.EventLogger;
 import pt.ist.fenixedu.giaf.invoices.EventProcessor;
 import pt.ist.fenixedu.giaf.invoices.SapEvent;
 
-@SpringFunctionality(app = InvoiceController.class, title = "title.sap.invoice.viewer")
+@SpringFunctionality(app = InvoiceDownlaodController.class, title = "title.sap.invoice.viewer")
 @RequestMapping("/sap-invoice-viewer")
 public class SapInvoiceController {
 
@@ -67,8 +67,8 @@ public class SapInvoiceController {
     @RequestMapping(method = RequestMethod.GET)
     public String home(@RequestParam(required = false) String username, final Model model,
             @RequestParam(required = false) String exception, @RequestParam(required = false) String errors) {
-        final User user = InvoiceController.getUser(username);
-        if (InvoiceController.isAllowedToAccess(user)) {
+        final User user = InvoiceDownlaodController.getUser(username);
+        if (InvoiceDownlaodController.isAllowedToAccess(user)) {
             final Person person = user.getPerson();
             final DateTime now = new DateTime();
             final JsonArray events = person.getEventsSet().stream()

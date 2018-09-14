@@ -32,12 +32,6 @@ public class TaskUtils {
 
     static final String EMAIL_ADDRESSES_TO_SEND_DATA_FILENAME  = "/afs/ist.utl.pt/ciist/fenix/fenix015/ist/giaf_sync_errors_to.txt";
     static final String EMAIL_ADDRESSES_BCC_SEND_DATA_FILENAME = "/afs/ist.utl.pt/ciist/fenix/fenix015/ist/giaf_sync_errors_bcc.txt";
-    static final String LOCK_VARIABLE = "GIAF_INVOICE_SYNC_VAR";
-
-    static void sendReport(final String filename, final byte[] byteArray, final String subject, final String body)
-            throws MessagingException {
-        send(filename, byteArray, subject, body, EMAIL_ADDRESSES_TO_SEND_DATA_FILENAME, EMAIL_ADDRESSES_BCC_SEND_DATA_FILENAME);
-    }
 
     static void sendSapReport(final String filename, final byte[] byteArray, final String subject, final String body)
             throws AddressException, MessagingException {
@@ -87,47 +81,4 @@ public class TaskUtils {
         }
     }
 
-    public static class LockManager implements AutoCloseable {
-
-        Connection connection = ConnectionManager.getCurrentSQLConnection();
-
-        private LockManager() {
-            try {
-                final PreparedStatement statement = connection.prepareStatement(
-                        "select GET_LOCK('" + LOCK_VARIABLE + "', 5);");
-                final ResultSet resultSet = statement.executeQuery();
-                if (resultSet.next() && resultSet.getInt(1) == 1) {
-                    System.out.println("Lock obtained for " + LOCK_VARIABLE + ". Running...");
-                } else {
-                    releaseLock();
-                    throw new Error("Unable to obtain lock for " + LOCK_VARIABLE);
-                }
-            } catch (final SQLException e) {
-                throw new Error(e);
-            }
-        }
-
-        private void releaseLock() {
-            try {
-                final PreparedStatement statement = connection.prepareStatement(
-                        "select RELEASE_LOCK('" + LOCK_VARIABLE + "');");
-                statement.executeQuery();
-                System.out.println("Released lock for " + LOCK_VARIABLE);
-            } catch(final Throwable t) {
-                System.out.println("Unable to released lock for" + LOCK_VARIABLE);
-            }
-        }
-
-        @Override
-        public void close() {
-            releaseLock();
-            connection = null;
-        }
-        
-    }
-
-    static LockManager getLockManager() {
-        return new LockManager();
-    }
-    
 }

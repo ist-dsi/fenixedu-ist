@@ -32,6 +32,7 @@ import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.EventState;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.security.Authenticate;
+import org.fenixedu.bennu.spring.portal.SpringApplication;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.springframework.http.HttpStatus;
 import org.springframework.ui.Model;
@@ -49,14 +50,19 @@ import pt.ist.fenixedu.domain.SapDocumentFile;
 import pt.ist.fenixedu.domain.SapRequest;
 import pt.ist.fenixedu.giaf.invoices.GiafEvent;
 
-@SpringFunctionality(app = InvoiceController.class, title = "title.giaf.invoice.viewer")
+@SpringApplication(group = "logged", path = "giaf-invoice-viewer", title = "title.giaf.invoice.viewer", hint = "giaf-invoice-viewer")
+@SpringFunctionality(app = InvoiceDownlaodController.class, title = "title.giaf.invoice.viewer")
 @RequestMapping("/invoice-downloader")
 public class InvoiceDownlaodController {
 
+    static User getUser(final String username) {
+        return username == null || username.isEmpty() ? Authenticate.getUser() : User.findByUsername(username);
+    }
+
     @RequestMapping(method = RequestMethod.GET)
     public String list(@RequestParam(required = false) String username, final Model model) {
-        final User user = InvoiceController.getUser(username);
-        if (InvoiceController.isAllowedToAccess(user)) {
+        final User user = getUser(username);
+        if (isAllowedToAccess(user)) {
             final Person person = user.getPerson();
             final JsonArray sapRequests = person.getEventsSet().stream()
                     .flatMap(e -> e.getSapRequestSet().stream())
@@ -164,7 +170,12 @@ public class InvoiceDownlaodController {
         return user != null && user == person.getUser();
     }
 
-    private boolean isAcademicServiceStaff(final User user) {
+    static boolean isAllowedToAccess(final User user) {
+        final User currentUser = Authenticate.getUser();
+        return currentUser != null && (currentUser == user || isAcademicServiceStaff(currentUser));
+    }
+
+    static boolean isAcademicServiceStaff(final User user) {
         return AcademicAuthorizationGroup.get(AcademicOperationType.MANAGE_STUDENT_PAYMENTS).isMember(user)
                 || AcademicAuthorizationGroup.get(AcademicOperationType.MANAGE_STUDENT_PAYMENTS_ADV).isMember(user);
     }

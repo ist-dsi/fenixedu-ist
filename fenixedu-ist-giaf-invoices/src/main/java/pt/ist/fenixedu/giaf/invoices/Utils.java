@@ -245,11 +245,6 @@ public class Utils {
             .findFirst().orElse(null);
     }
 
-    public static String hackAreaCode(final String areaCode, final Country countryOfResidence, final Person person) {
-        return countryOfResidence != null && !"PT".equals(countryOfResidence.getCode()) ? "0" : hackAreaCodePT(areaCode,
-                countryOfResidence);
-    }
-
     private static String hackAreaCodePT(final String areaCode, final Country countryOfResidence) {
         if (countryOfResidence != null && "PT".equals(countryOfResidence.getCode())) {
             if (areaCode == null || areaCode.isEmpty()) {
@@ -310,13 +305,6 @@ public class Utils {
         return cycleType == null ? Utils.cycleTypeFor(e, ExecutionYear.readCurrentExecutionYear().getPreviousExecutionYear()) : cycleType;
     }
 
-    public static String getDisplayName(final Person person) {
-        final User user = person.getUser();
-        final UserProfile profile = user == null ? null : user.getProfile();
-        final String displayName = profile == null ? null : profile.getDisplayName();
-        return displayName == null ? person.getName() : displayName;
-    }
-
     private static boolean isValidPostCode(final String postalCode) {
         if (postalCode != null) {
             final String v = postalCode.trim();
@@ -329,12 +317,6 @@ public class Utils {
     public static ExecutionYear executionYearOf(final Event event) {
         return event instanceof AnnualEvent ? ((AnnualEvent) event).getExecutionYear() : ExecutionYear.readByDateTime(event
                 .getWhenOccured());
-    }
-
-    public static String getDegreeAcronym(final Event event) {
-        return event instanceof GratuityEvent ? ((GratuityEvent) event).getDegree()
-                .getSigla() : event instanceof PhdGratuityEvent ? ((PhdGratuityEvent) event).getPhdIndividualProgramProcess()
-                        .getPhdProgram().getAcronym() : "";
     }
 
     private static DebtCycleType getCycleType(Collection<CycleType> cycleTypes) {
@@ -399,86 +381,6 @@ public class Utils {
             }
         }
         return null;
-    }
-
-    public static String mapToArticleCode(final Event event, final String eventDescription) {
-        if (event.isGratuity() && !(event instanceof PhdGratuityEvent)) {
-            final GratuityEvent gratuityEvent = (GratuityEvent) event;
-            final StudentCurricularPlan scp = gratuityEvent.getStudentCurricularPlan();
-            final Degree degree = scp.getDegree();
-            if (scp.getRegistration().getRegistrationProtocol().isAlien()) {
-                return "FEINTERN";// PROPINAS INTERNACIONAL
-            }
-            if (degree.isFirstCycle() && degree.isSecondCycle()) {
-                return "FEMESTIN";// 724114 PROPINAS MESTRADO INTEGRADO
-            }
-            if (degree.isFirstCycle()) {
-                return "FE1CICLO";// 724111 PROPINAS 1 CICLO
-            }
-            if (degree.isSecondCycle()) {
-                return "FE2CICLO";// 724112 PROPINAS 2 CICLO
-            }
-            if (degree.isThirdCycle()) {
-                return "FE3CICLO";// 724113 PROPINAS 3 CICLO
-            }
-            return "FEOUTPRO";// 724116 PROPINAS - OUTROS
-        }
-        if (event instanceof PhdGratuityEvent) {
-            return "FE3CICLO";// 724113 PROPINAS 3 CICLO
-        }
-        if (event.isResidenceEvent()) {
-            return null;
-        }
-        if (event.isFctScholarshipPhdGratuityContribuitionEvent()) {
-            return null;
-        }
-        if (event.isAcademicServiceRequestEvent()) {
-            if (eventDescription.indexOf(" Reingresso") >= 0) {
-                return "FETAXAOUT";// 72419 OUTRAS TAXAS
-            }
-            return "FEEMOL";// 7246 EMOLUMENTOS
-        }
-        if (event.isDfaRegistrationEvent()) {
-            return "FETAXAMAT";// 72412 TAXAS DE MATRICULA
-        }
-        if (event.isIndividualCandidacyEvent()) {
-            return "FETAXAMAT";// 72412 TAXAS DE MATRICULA
-        }
-        if (event.isEnrolmentOutOfPeriod()) {
-            return "FETAXAOUT";// 72419 OUTRAS TAXAS
-        }
-        if (event instanceof AdministrativeOfficeFeeAndInsuranceEvent) {
-            return "FETAXAMAT";// 72412 TAXAS DE MATRICULA
-        }
-        if (event instanceof InsuranceEvent) {
-            return "FESEGESC";// 72415 SEGURO ESCOLAR
-        }
-        if (event.isSpecializationDegreeRegistrationEvent()) {
-            return "FETAXAMAT";// 72412 TAXAS DE MATRICULA
-        }
-        if (event instanceof ImprovementOfApprovedEnrolmentEvent) {
-            return "FETAXAMN";// 72414 TAXAS DE MELHORIAS DE NOTAS
-        }
-        if (event instanceof DFACandidacyEvent) {
-            return "FETAXAMAT";// 72412 TAXAS DE MATRICULA"
-        }
-        if (event instanceof SpecialSeasonEnrolmentEvent) {
-            return "FETAXAEX";// 72413 TAXAS  DE EXAMES
-        }
-        if (event.isPhdEvent()) {
-            if (eventDescription.indexOf("Taxa de Inscri") >= 0) {
-                return "FETAXAMAT";// 72412 TAXAS DE MATRICULA
-            }
-            if (eventDescription.indexOf("Requerimento de provas") >= 0) {
-                return "FETAXAEX";// 72413 TAXAS  DE EXAMES
-            }
-            return "FETAXAMAT";// 72412 TAXAS DE MATRICULA
-        }
-        throw new Error("not.supported: " + event.getExternalId());
-    }
-
-    public static String toPaymentDocumentNumber(final AccountingTransactionDetail detail) {
-        return detail instanceof SibsTransactionDetail ? ((SibsTransactionDetail) detail).getSibsCode() : "";
     }
 
     public static String limitFormat(final int maxSize, String in) {
