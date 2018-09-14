@@ -250,7 +250,7 @@ public class SapInvoiceController {
         result.addProperty("totalPaidAmount", calculator.getTotalPaidAmount());
 
         final JsonArray sapRequests = event.getSapRequestSet().stream()
-            .sorted(SapRequest.COMPARATOR_BY_DATE)
+            .sorted(SapRequest.COMPARATOR_BY_EVENT_AND_ORDER)
             .map(sr -> toJsonObject(sr))
             .collect(toJsonArray());
         result.add("sapRequests", sapRequests);
