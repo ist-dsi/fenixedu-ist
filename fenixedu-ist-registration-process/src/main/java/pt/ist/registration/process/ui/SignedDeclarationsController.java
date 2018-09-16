@@ -1,6 +1,5 @@
 package pt.ist.registration.process.ui;
 
-import java.io.IOException;
 import java.util.Optional;
 
 import org.fenixedu.academic.domain.student.Registration;
@@ -18,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import io.jsonwebtoken.Jwts;
 import pt.ist.registration.process.domain.RegistrationDeclarationFile;
+import pt.ist.registration.process.domain.RegistrationDeclarationFileState;
 import pt.ist.registration.process.ui.exception.UnauthorizedException;
 import pt.ist.registration.process.ui.service.SignCertAndStoreService;
 
@@ -43,11 +43,23 @@ public class SignedDeclarationsController {
                 .parseClaimsJws(nounce).getBody().getSubject();
         Optional<RegistrationDeclarationFile> registrationDeclarationFile =
                 RegistrationDeclarationFile.getRegistrationDeclarationFile(registration, uniqueIdentifier);
+
         return registrationDeclarationFile.map(declarationFile -> {
             logger.debug("Registration Declaration {} of student {} was signed.",uniqueIdentifier, registration.getNumber());
             logger.debug("Registration Declaration {} of student {} sent to be certified", uniqueIdentifier, registration.getNumber());
-            signCertAndStoreService.sendDocumentToBeCertified(registration.getExternalId(), declarationFile.getFilename(), file,
-                    uniqueIdentifier, true);
+
+            RegistrationDeclarationFileState state = declarationFile.getState();
+
+            if (state == RegistrationDeclarationFileState.STORED) {
+                return "ok";
+            }
+
+            if (state != RegistrationDeclarationFileState.CERTIFIED) {
+                declarationFile.updateState(RegistrationDeclarationFileState.SIGNED);
+            }
+
+            signCertAndStoreService.sendDocumentToBeCertifiedWithJob(registration, declarationFile, file, uniqueIdentifier);
+
             return "ok";
         }).orElseThrow(UnauthorizedException::new);
     }
@@ -60,15 +72,21 @@ public class SignedDeclarationsController {
                 .parseClaimsJws(nounce).getBody().getSubject();
         Optional<RegistrationDeclarationFile> registrationDeclarationFile =
                 RegistrationDeclarationFile.getRegistrationDeclarationFile(registration, uniqueIdentifier);
+
         return registrationDeclarationFile.map(declarationFile -> {
-            try {
-                logger.debug("Registration Declaration {} of student {} was certified.", uniqueIdentifier, registration.getNumber());
-                logger.debug("Registration Declaration {} of student {} sent out to be stored.", uniqueIdentifier, registration.getNumber());
-                signCertAndStoreService.sendDocumentToBeStored(registration.getPerson().getUsername(), registration.getPerson().getEmailForSendingEmails(), declarationFile, file);
+            logger.debug("Registration Declaration {} of student {} was certified.", uniqueIdentifier, registration.getNumber());
+            logger.debug("Registration Declaration {} of student {} sent out to be stored.", uniqueIdentifier,
+                    registration.getNumber());
+
+            if (declarationFile.getState() == RegistrationDeclarationFileState.STORED) {
                 return "ok";
-            } catch (IOException e) {
-                throw new Error(e);
             }
+
+            declarationFile.updateState(RegistrationDeclarationFileState.CERTIFIED);
+            signCertAndStoreService.sendDocumentToBeStoredWithJob(registration, declarationFile, file);
+
+            return "ok";
+
         }).orElseThrow(UnauthorizedException::new);
     }
 
