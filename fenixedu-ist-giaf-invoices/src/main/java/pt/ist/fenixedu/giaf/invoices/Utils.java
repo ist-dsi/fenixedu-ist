@@ -174,7 +174,7 @@ public class Utils {
 //            return false;
             } else if ("PT".equals(countryOfAddress.getCode()) /* || "PT".equals(country.getCode()) */) {
                 if (!isValidPostCode(hackAreaCodePT(address.getAreaCode(), countryOfAddress))) {
-                    logError(consumer, "No Valid Post Code For Address For", event, getUserIdentifier(party), "", country, party,
+                    logError(consumer, "No Valid Post Code For Address", event, getUserIdentifier(party), "", country, party,
                             address, countryOfAddress, event);
                     return false;
                 }
@@ -288,7 +288,7 @@ public class Utils {
                 vat,
                 address == null ? "" : address.getAddress(),
                 "",
-                address == null ? "" : address.getPostalCode(),
+                address == null ? "" : address.getAreaCode(),
                 countryOfAddress == null ? "" : countryOfAddress.getCode(),
                 "",
                 "",
