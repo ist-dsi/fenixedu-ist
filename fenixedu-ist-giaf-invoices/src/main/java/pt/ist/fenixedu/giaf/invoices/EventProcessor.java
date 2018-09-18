@@ -62,6 +62,9 @@ public class EventProcessor {
     }
 
     private static void processSap(final ErrorLogConsumer errorLog, final EventLogger elogger, final Event event) {
+        if (!EventWrapper.shouldProcess(errorLog, event)) {
+            return;
+        }
         try {
             if (EventWrapper.needsProcessingSap(event)) {
                 final SapEvent sapEvent = new SapEvent(event);

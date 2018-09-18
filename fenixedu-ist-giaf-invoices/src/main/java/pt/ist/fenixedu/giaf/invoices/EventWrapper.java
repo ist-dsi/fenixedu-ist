@@ -1,14 +1,9 @@
 package pt.ist.fenixedu.giaf.invoices;
 
 import java.time.Year;
-import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.ExecutionYear;
-import org.fenixedu.academic.domain.accounting.AccountingTransaction;
-import org.fenixedu.academic.domain.accounting.AccountingTransactionDetail;
-import org.fenixedu.academic.domain.accounting.CreditNoteEntry;
 import org.fenixedu.academic.domain.accounting.CreditNoteState;
-import org.fenixedu.academic.domain.accounting.Entry;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.util.Money;
 import org.joda.time.DateTime;
@@ -26,18 +21,12 @@ public class EventWrapper {
         return !executionYear.isBefore(SAP_THRESHOLD);
     }
 
-    public static Stream<Event> eventsToProcessSap(final ErrorLogConsumer consumer, final Stream<Event> eventStream,
-            final Stream<AccountingTransactionDetail> txStream) {
-        final Stream<Event> currentEvents =
-                eventStream.filter(EventWrapper::needsProcessingSap).filter(e -> Utils.validate(consumer, e));
-
+    public static boolean shouldProcess(final ErrorLogConsumer consumer, final Event event) {
         final int currentYear = Year.now().getValue();
-        final Stream<Event> pastEvents = txStream.filter(d -> d.getWhenRegistered().getYear() == currentYear)
-                .map(d -> d.getEvent()).filter(e -> !needsProcessingSap(e)).filter(e -> Utils.validate(consumer, e));
-
-        return Stream.concat(currentEvents, pastEvents).distinct();
+        return (needsProcessingSap(event)
+                || event.getAccountingTransactionsSet().stream().anyMatch(tx -> tx.getWhenRegistered().getYear() == currentYear))
+                && Utils.validate(consumer, event);
     }
-
 
     public final Event event;
     public final Money debt;

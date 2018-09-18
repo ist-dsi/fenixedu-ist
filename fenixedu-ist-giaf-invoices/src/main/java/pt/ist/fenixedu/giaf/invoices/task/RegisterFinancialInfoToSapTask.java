@@ -3,12 +3,10 @@ package pt.ist.fenixedu.giaf.invoices.task;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.stream.Stream;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 
-import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.bennu.GiafInvoiceConfiguration;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.scheduler.CronTask;
@@ -20,7 +18,6 @@ import org.joda.time.DateTime;
 import pt.ist.fenixedu.giaf.invoices.ErrorLogConsumer;
 import pt.ist.fenixedu.giaf.invoices.EventLogger;
 import pt.ist.fenixedu.giaf.invoices.EventProcessor;
-import pt.ist.fenixedu.giaf.invoices.EventWrapper;
 import pt.ist.fenixedu.giaf.invoices.Utils;
 import pt.ist.fenixframework.Atomic.TxMode;
 
@@ -74,7 +71,7 @@ public class RegisterFinancialInfoToSapTask extends CronTask {
         final EventLogger elogger = (msg, args) -> taskLog(msg, args);
 
         touch("Processing events...");
-        getEventStream(errorLogConsumer)
+        Bennu.getInstance().getAccountingEventsSet().stream().parallel()
                 .forEach(e -> EventProcessor.registerEventSapRequests(errorLogConsumer, elogger, e));
 
         touch("Dumping error messages.");
@@ -107,10 +104,4 @@ public class RegisterFinancialInfoToSapTask extends CronTask {
     private void touch(final String prefix) {
         taskLog("%s: %s%n", prefix, new DateTime().toString("yyyy-MM-dd HH:mm:ss"));
     }
-
-    private Stream<Event> getEventStream(final ErrorLogConsumer consumer) {
-        return EventWrapper.eventsToProcessSap(consumer, Bennu.getInstance().getAccountingEventsSet().stream(),
-                Bennu.getInstance().getAccountingTransactionDetailsSet().stream());
-    }
-
 }
