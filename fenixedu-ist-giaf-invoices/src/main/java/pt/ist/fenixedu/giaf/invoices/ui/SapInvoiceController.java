@@ -138,7 +138,7 @@ public class SapInvoiceController {
 
     @RequestMapping(value = "/{sapRequest}/transfer", method = RequestMethod.POST)
     public String transfer(final @PathVariable SapRequest sapRequest, final Model model,
-            @RequestParam final String uvat, @RequestParam final String valueToTransfer,
+            @RequestParam final ExternalClient client, @RequestParam final String valueToTransfer,
             @RequestParam final String pledgeNumber) {
         if (Group.dynamic("managers").isMember(Authenticate.getUser())) {
             try {
@@ -151,14 +151,13 @@ public class SapInvoiceController {
                     model.addAttribute("error", "error.value.to.transfer.cannot.exceed.invouce.value");
                     return prepareTransfer(sapRequest, model);                
                 }
-                final ExternalClient externalClient = ExternalClient.find(uvat);
-                if (externalClient == null) {
+                if (client == null) {
                     model.addAttribute("error", "error.destination.client.not.found");
                     return prepareTransfer(sapRequest, model);                
                 }
                 final SapEvent sapEvent = new SapEvent(sapRequest.getEvent());
                 try {
-                    sapEvent.transferInvoice(sapRequest, externalClient, value, pledgeNumber);
+                    sapEvent.transferInvoice(sapRequest, client, value, pledgeNumber);
                 } catch (final Exception | Error e) {
                     model.addAttribute("exception", e.getMessage());
                     return prepareTransfer(sapRequest, model);
