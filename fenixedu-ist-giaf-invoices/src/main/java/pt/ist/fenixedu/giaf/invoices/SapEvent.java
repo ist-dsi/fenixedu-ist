@@ -781,7 +781,9 @@ public class SapEvent {
         JsonObject json = toJson(event, clientData, documentDate, isDebtRegistration, true, isInterest);
         JsonObject workDocument =
                 toJsonWorkDocument(documentDate, entryDate, debtFenix, "ND", true, new DateTime(Utils.getDueDate(event)));
-        workDocument.addProperty("compromiseMetadata", pledgeNumber);
+        if (Strings.isNullOrEmpty(pledgeNumber)) {
+            workDocument.addProperty("compromiseMetadata", "{\"COMPROMISSO\":\"" + pledgeNumber + "\"}");
+        }
 
         json.add("workingDocument", workDocument);
         return json;
