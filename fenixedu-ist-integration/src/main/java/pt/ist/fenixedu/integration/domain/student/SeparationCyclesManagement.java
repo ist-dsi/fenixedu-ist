@@ -18,6 +18,9 @@
  */
 package pt.ist.fenixedu.integration.domain.student;
 
+import java.text.MessageFormat;
+import java.util.function.Predicate;
+
 import org.fenixedu.academic.domain.Attends;
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.Degree;
@@ -75,9 +78,6 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.YearMonthDay;
 
-import java.text.MessageFormat;
-import java.util.function.Predicate;
-
 public class SeparationCyclesManagement {
 
     private static final Predicate<DegreeType> ACCEPTED_DEGREE_TYPES = DegreeType.oneOf(DegreeType::isBolonhaDegree,
@@ -127,7 +127,8 @@ public class SeparationCyclesManagement {
 
     private boolean studentAlreadyHasNewRegistration(final StudentCurricularPlan studentCurricularPlan) {
         final Student student = studentCurricularPlan.getRegistration().getStudent();
-        return student.hasRegistrationFor(studentCurricularPlan.getSecondCycle().getDegreeCurricularPlanOfDegreeModule());
+        return student.getActiveRegistrationFor(studentCurricularPlan.getSecondCycle().getDegreeCurricularPlanOfDegreeModule())
+                != null;
     }
 
     protected Registration createNewSecondCycle(final StudentCurricularPlan oldStudentCurricularPlan) {
@@ -147,8 +148,11 @@ public class SeparationCyclesManagement {
         //TODO : cannot simply move events information between events
         //moveGratuityEventsInformation(oldStudentCurricularPlan, newStudentCurricularPlan);
         createAdministrativeOfficeFeeAndInsurance(newStudentCurricularPlan);
-
-        markOldRegistrationWithConcludedState(oldStudentCurricularPlan);
+        if (oldStudentCurricularPlan.getDegreeCurricularPlan().getDegreeType().isIntegratedMasterDegree()) {
+            markOldRegistrationWithState(oldStudentCurricularPlan, RegistrationStateType.EXTERNAL_ABANDON);
+        } else {
+            markOldRegistrationWithState(oldStudentCurricularPlan, RegistrationStateType.CONCLUDED);
+        }
 
         return newRegistration;
     }
@@ -214,7 +218,7 @@ public class SeparationCyclesManagement {
     private YearMonthDay getBeginDate(final StudentCurricularPlan sourceStudentCurricularPlan,
             final ExecutionSemester executionSemester) {
 
-        if (!sourceStudentCurricularPlan.getRegistration().hasConcluded()) {
+        if (!sourceStudentCurricularPlan.getFirstCycle().isConcluded()) {
             throw new DomainException("error.SeparationCyclesManagement.source.studentCurricularPlan.is.not.concluded");
         }
 
@@ -534,8 +538,9 @@ public class SeparationCyclesManagement {
         return true;
     }
 
-    private void markOldRegistrationWithConcludedState(final StudentCurricularPlan oldStudentCurricularPlan) {
-        if (oldStudentCurricularPlan.getRegistration().hasState(RegistrationStateType.CONCLUDED)) {
+    private void markOldRegistrationWithState(final StudentCurricularPlan oldStudentCurricularPlan, RegistrationStateType
+            stateType) {
+        if (oldStudentCurricularPlan.getRegistration().hasState(stateType)) {
             return;
         }
 
@@ -546,7 +551,7 @@ public class SeparationCyclesManagement {
 
         final RegistrationState state =
                 RegistrationState.createRegistrationState(oldStudentCurricularPlan.getRegistration(), null,
-                        stateDate.toDateTimeAtStartOfDay(), RegistrationStateType.CONCLUDED);
+                        stateDate.toDateTimeAtStartOfDay(), stateType);
         state.setResponsiblePerson(null);
     }
 
