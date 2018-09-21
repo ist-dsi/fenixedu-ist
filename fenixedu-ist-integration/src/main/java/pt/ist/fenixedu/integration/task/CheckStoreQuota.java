@@ -19,6 +19,7 @@
 package pt.ist.fenixedu.integration.task;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -35,7 +36,6 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import com.google.common.base.MoreObjects;
 import org.fenixedu.academic.FenixEduAcademicConfiguration;
 import org.fenixedu.bennu.io.domain.FileStorage;
 import org.fenixedu.bennu.io.domain.FileSupport;
@@ -43,11 +43,11 @@ import org.fenixedu.bennu.io.domain.LocalFileSystemStorage;
 import org.fenixedu.bennu.portal.domain.PortalConfiguration;
 import org.fenixedu.bennu.scheduler.CronTask;
 import org.fenixedu.bennu.scheduler.annotation.Task;
-
 import org.fenixedu.messaging.core.domain.MessagingSystem;
-import pt.ist.fenixedu.integration.FenixEduIstIntegrationConfiguration;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.io.ByteStreams;
+import pt.ist.fenixedu.integration.FenixEduIstIntegrationConfiguration;
 
 @Task(englishTitle = "Checks the AFS store's quota", readOnly = true)
 public class CheckStoreQuota extends CronTask {
@@ -70,7 +70,8 @@ public class CheckStoreQuota extends CronTask {
             long total = Integer.parseInt(fragments.get(1));
             long current = Integer.parseInt(fragments.get(2));
             BigDecimal occupation =
-                    BigDecimal.valueOf(current).divide(BigDecimal.valueOf(total)).multiply(BigDecimal.valueOf(100));
+                    BigDecimal.valueOf(current).divide(BigDecimal.valueOf(total), 2, RoundingMode.HALF_EVEN).multiply
+                            (BigDecimal.valueOf(100));
             taskLog("\tTotal: %s Current: %s, Occupied: %s\n", total, current, occupation);
             if (occupation.longValue() > 90 && hasConfigurations(store)) {
                 messages.add("- " + store.getName() + ". Total: " + total + ", Current: " + current + ". Occupation: "
