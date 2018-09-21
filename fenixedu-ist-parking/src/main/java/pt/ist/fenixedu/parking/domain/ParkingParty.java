@@ -29,14 +29,14 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.Teacher;
+import org.fenixedu.academic.domain.TeacherAuthorization;
+import org.fenixedu.academic.domain.accessControl.ActiveTeachersGroup;
 import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.exceptions.DomainException;
-import org.fenixedu.academic.domain.organizationalStructure.AccountabilityTypeEnum;
 import org.fenixedu.academic.domain.organizationalStructure.Party;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.person.RoleType;
@@ -52,22 +52,19 @@ import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+
 import pt.ist.fenixedu.contracts.domain.Employee;
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveEmployees;
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveGrantOwner;
+import pt.ist.fenixedu.contracts.domain.accessControl.ActiveResearchers;
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.Invitation;
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonContractSituation;
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalData;
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalCategory;
-import pt.ist.fenixedu.contracts.domain.util.CategoryType;
 import pt.ist.fenixedu.parking.domain.ParkingRequest.ParkingRequestFactoryCreator;
 import pt.ist.fenixedu.parking.dto.ParkingPartyBean;
 import pt.ist.fenixedu.parking.dto.VehicleBean;
 import pt.ist.fenixframework.dml.runtime.RelationAdapter;
-
-import com.google.common.base.Joiner;
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 
 public class ParkingParty extends ParkingParty_Base {
 
@@ -112,11 +109,11 @@ public class ParkingParty extends ParkingParty_Base {
     }
 
     public boolean getHasAllNecessaryPersonalInfo() {
-        return ((getParty().getDefaultPhone() != null && !Strings.isNullOrEmpty(getParty().getDefaultPhone().getNumber())) || (getParty()
-                .getDefaultMobilePhone() != null && !Strings.isNullOrEmpty(getParty().getDefaultMobilePhone().getNumber())))
-                && (isEmployee() || (getParty().getDefaultEmailAddress() != null
-                        && getParty().getDefaultEmailAddress().hasValue() && !Strings.isNullOrEmpty(getParty()
-                        .getDefaultEmailAddress().getValue())));
+        return ((getParty().getDefaultPhone() != null && !Strings.isNullOrEmpty(getParty().getDefaultPhone().getNumber()))
+                || (getParty().getDefaultMobilePhone() != null
+                        && !Strings.isNullOrEmpty(getParty().getDefaultMobilePhone().getNumber())))
+                && (isEmployee() || (getParty().getDefaultEmailAddress() != null && getParty().getDefaultEmailAddress().hasValue()
+                        && !Strings.isNullOrEmpty(getParty().getDefaultEmailAddress().getValue())));
     }
 
     private boolean isEmployee() {
@@ -227,14 +224,12 @@ public class ParkingParty extends ParkingParty_Base {
         if (getParty().isPerson()) {
             Person person = (Person) getParty();
             Teacher teacher = person.getTeacher();
-            if (teacher != null && RoleType.TEACHER.isMember(person.getUser())
-                    && !ProfessionalCategory.isMonitor(teacher, ExecutionSemester.readActualExecutionSemester())) {
+            if (teacher != null && RoleType.TEACHER.isMember(person.getUser())) {
                 roles.add(BundleUtil.getString(Bundle.ENUMERATION, RoleType.TEACHER.name()));
             }
             Employee employee = person.getEmployee();
             if (employee != null && !RoleType.TEACHER.isMember(person.getUser())
-                    && new ActiveEmployees().isMember(person.getUser())
-                    && employee.getCurrentContractByContractType(AccountabilityTypeEnum.WORKING_CONTRACT) != null) {
+                    && (new ActiveEmployees().isMember(person.getUser()) || new ActiveResearchers().isMember(person.getUser()))) {
                 roles.add(BundleUtil.getString(Bundle.ENUMERATION, "EMPLOYEE"));
             }
             Student student = person.getStudent();
@@ -256,13 +251,8 @@ public class ParkingParty extends ParkingParty_Base {
                     }
                 }
             }
-            if (person.getEmployee() != null) {
-                PersonContractSituation currentGrantOwnerContractSituation =
-                        person.getPersonProfessionalData() != null ? person.getPersonProfessionalData()
-                                .getCurrentPersonContractSituationByCategoryType(CategoryType.GRANT_OWNER) : null;
-                if (currentGrantOwnerContractSituation != null) {
-                    roles.add(BundleUtil.getString(Bundle.ENUMERATION, "GRANT_OWNER"));
-                }
+            if (person.getEmployee() != null && new ActiveGrantOwner().isMember(person.getUser())) {
+                roles.add(BundleUtil.getString(Bundle.ENUMERATION, "GRANT_OWNER"));
             }
             if (!Invitation.getActiveInvitations(person).isEmpty()) {
                 roles.add(BundleUtil.getString("resources.ParkingResources", "label.invited"));
@@ -283,69 +273,29 @@ public class ParkingParty extends ParkingParty_Base {
             Person person = (Person) getParty();
             Teacher teacher = person.getTeacher();
             if (teacher != null) {
-                ExecutionSemester currentExecutionSemester = ExecutionSemester.readActualExecutionSemester();
-                String currentWorkingDepartmentName = teacher.getDepartment() != null ? teacher.getDepartment().getName() : null;
-                PersonContractSituation currentOrLastTeacherContractSituation =
-                        PersonContractSituation.getCurrentOrLastTeacherContractSituation(teacher);
-                if (currentOrLastTeacherContractSituation != null) {
-                    String employeeType = RoleType.TEACHER.getLocalizedName();
-                    if (ProfessionalCategory.isMonitor(teacher, currentExecutionSemester)) {
-                        employeeType = "Monitor";
-                    }
-                    occupations.add(getOccupation(employeeType, teacher.getPerson().getEmployee().getEmployeeNumber().toString(),
-                            currentWorkingDepartmentName, currentOrLastTeacherContractSituation.getBeginDate(),
-                            currentOrLastTeacherContractSituation.getEndDate()));
-                }
+                TeacherAuthorization teacherAuthorization = teacher.getTeacherAuthorization().orElse(null);
+                if (teacherAuthorization != null) {
+                    String employeeType = teacherAuthorization.isContracted() ? "Docente" : "Docente Autorizado";
+                    occupations.add(
+                            getOccupation(employeeType, teacher.getTeacherId(), teacherAuthorization.getDepartment().getName(),
+                                    teacherAuthorization.getExecutionSemester().getBeginDateYearMonthDay().toLocalDate(),
+                                    teacherAuthorization.getExecutionSemester().getEndDateYearMonthDay().toLocalDate()));
 
-                String employeeType = "Docente Autorizado";
-                if (teacher.hasTeacherAuthorization()) {
-                    occupations.add(getOccupation(employeeType, teacher.getTeacherId(), currentWorkingDepartmentName,
-                            currentExecutionSemester.getBeginDateYearMonthDay().toLocalDate(), currentExecutionSemester
-                                    .getEndDateYearMonthDay().toLocalDate()));
                 }
             }
-            PersonContractSituation currentEmployeeContractSituation =
-                    person.getEmployee() != null ? person.getEmployee().getCurrentEmployeeContractSituation() : null;
-            if (currentEmployeeContractSituation != null) {
-                Unit currentUnit = person.getEmployee().getCurrentWorkingPlace();
-                String thisOccupation =
-                        getOccupation(BundleUtil.getString(Bundle.ENUMERATION, "EMPLOYEE"), person.getEmployee()
-                                .getEmployeeNumber().toString(), currentUnit == null ? null : currentUnit.getName(),
-                                currentEmployeeContractSituation.getBeginDate(), currentEmployeeContractSituation.getEndDate());
-                occupations.add(thisOccupation);
-            }
-            if (person.getEmployee() != null) {
-                PersonContractSituation currentGrantOwnerContractSituation =
-                        person.getPersonProfessionalData() != null ? person.getPersonProfessionalData()
-                                .getCurrentPersonContractSituationByCategoryType(CategoryType.GRANT_OWNER) : null;
-                if (currentGrantOwnerContractSituation != null) {
-                    Unit currentUnit = person.getEmployee().getCurrentWorkingPlace();
-                    String thisOccupation =
-                            getOccupation(BundleUtil.getString(Bundle.ENUMERATION, "GRANT_OWNER"), person.getEmployee()
-                                    .getEmployeeNumber().toString(), currentUnit == null ? null : currentUnit.getName(),
-                                    currentGrantOwnerContractSituation.getBeginDate(),
-                                    currentGrantOwnerContractSituation.getEndDate());
-                    occupations.add(thisOccupation);
-                }
 
-                PersonContractSituation currentResearcherContractSituation =
-                        person.getPersonProfessionalData() != null ? person.getPersonProfessionalData()
-                                .getCurrentPersonContractSituationByCategoryType(CategoryType.RESEARCHER) : null;
-                if (currentResearcherContractSituation != null) {
-                    StringBuilder stringBuilder =
-                            new StringBuilder(BundleUtil.getString("resources.ParkingResources", "message.person.identification",
-                                    RoleType.RESEARCHER.getLocalizedName(), PartyClassification.getMostSignificantNumber(person).toString()));
-                    Unit currentUnit = person.getEmployee() != null ? person.getEmployee().getCurrentWorkingPlace() : null;
-                    if (currentUnit != null) {
-                        stringBuilder.append(currentUnit.getName()).append("<br/>");
-                    }
-                    DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy/MM/dd");
-                    stringBuilder.append("(Data inicio: ").append(fmt.print(currentResearcherContractSituation.getBeginDate()));
-                    if (currentResearcherContractSituation.getEndDate() != null) {
-                        stringBuilder.append(" - Data fim: ").append(fmt.print(currentResearcherContractSituation.getEndDate()));
-                    }
-                    occupations.add(stringBuilder.append(")<br/>").toString());
-                }
+            Unit currentUnit = person.getEmployee() != null ? person.getEmployee().getCurrentWorkingPlace() : null;
+            if (new ActiveEmployees().isMember(person.getUser())) {
+                occupations.add(getOccupation(BundleUtil.getString(Bundle.ENUMERATION, "EMPLOYEE"), person.getUsername(),
+                        currentUnit == null ? null : currentUnit.getName()));
+            }
+            if (new ActiveGrantOwner().isMember(person.getUser())) {
+                occupations.add(getOccupation(BundleUtil.getString(Bundle.ENUMERATION, "GRANT_OWNER"), person.getUsername(),
+                        currentUnit == null ? null : currentUnit.getName()));
+            }
+            if (new ActiveResearchers().isMember(person.getUser())) {
+                occupations.add(getOccupation(BundleUtil.getString(Bundle.ENUMERATION, "RESEARCHER"), person.getUsername(),
+                        currentUnit == null ? null : currentUnit.getName()));
             }
 
             Student student = person.getStudent();
@@ -356,9 +306,8 @@ public class ParkingParty extends ParkingParty_Base {
                     StudentCurricularPlan scp = registration.getLastStudentCurricularPlan();
                     if (scp != null) {
                         if (stringBuilder == null) {
-                            stringBuilder =
-                                    new StringBuilder(BundleUtil.getString("resources.ParkingResources",
-                                            "message.person.identification",
+                            stringBuilder = new StringBuilder(
+                                    BundleUtil.getString("resources.ParkingResources", "message.person.identification",
                                             RoleType.STUDENT.getLocalizedName(), student.getNumber().toString()));
 
                         }
@@ -380,9 +329,8 @@ public class ParkingParty extends ParkingParty_Base {
 
                 for (PhdIndividualProgramProcess phdIndividualProgramProcess : person.getPhdIndividualProgramProcessesSet()) {
                     if (phdIndividualProgramProcess.getActiveState().isPhdActive()) {
-                        String thisOccupation =
-                                getOccupation(RoleType.STUDENT.getLocalizedName(), student.getNumber().toString(),
-                                        "\nPrograma Doutoral: " + phdIndividualProgramProcess.getPhdProgram().getName());
+                        String thisOccupation = getOccupation(RoleType.STUDENT.getLocalizedName(), student.getNumber().toString(),
+                                "\nPrograma Doutoral: " + phdIndividualProgramProcess.getPhdProgram().getName());
                         occupations.add(thisOccupation);
 
                     }
@@ -393,9 +341,8 @@ public class ParkingParty extends ParkingParty_Base {
             List<Invitation> invitations = Invitation.getActiveInvitations(person);
             if (!invitations.isEmpty()) {
                 for (Invitation invitation : invitations) {
-                    String thisOccupation =
-                            getOccupation("Convidado", "-", invitation.getUnit().getName(), invitation.getBeginDate()
-                                    .toLocalDate(), invitation.getEndDate().toLocalDate());
+                    String thisOccupation = getOccupation("Convidado", "-", invitation.getUnit().getName(),
+                            invitation.getBeginDate().toLocalDate(), invitation.getEndDate().toLocalDate());
                     occupations.add(thisOccupation);
                 }
             }
@@ -404,16 +351,16 @@ public class ParkingParty extends ParkingParty_Base {
     }
 
     private String getOccupation(String type, String identification, String workingPlace) {
-        StringBuilder stringBuilder =
-                new StringBuilder(BundleUtil.getString("resources.ParkingResources", "message.person.identification",
-                        type, identification));
+        StringBuilder stringBuilder = new StringBuilder(
+                BundleUtil.getString("resources.ParkingResources", "message.person.identification", type, identification));
         if (!Strings.isNullOrEmpty(workingPlace)) {
             stringBuilder.append(workingPlace).append("<br/>");
         }
         return stringBuilder.toString();
     }
 
-    private String getOccupation(String type, String identification, String workingPlace, LocalDate beginDate, LocalDate endDate) {
+    private String getOccupation(String type, String identification, String workingPlace, LocalDate beginDate,
+            LocalDate endDate) {
         StringBuilder stringBuilder = new StringBuilder(getOccupation(type, identification, workingPlace));
         if (beginDate != null) {
             DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy/MM/dd");
@@ -498,10 +445,9 @@ public class ParkingParty extends ParkingParty_Base {
         if (getParty().isPerson()) {
             final Person person = (Person) getParty();
             final Employee employee = person.getEmployee();
-            if (employee != null
-                    && (RoleType.TEACHER.isMember(person.getUser()) || new ActiveEmployees().isMember(person.getUser())
-                            || RoleType.RESEARCHER.isMember(person.getUser()) || new ActiveGrantOwner()
-                                .isMember(person.getUser()))) {
+            if (employee != null && new ActiveTeachersGroup().isMember(person.getUser())
+                    || new ActiveEmployees().isMember(person.getUser()) || new ActiveResearchers().isMember(person.getUser())
+                    || new ActiveGrantOwner().isMember(person.getUser())) {
                 result.add(employee.getEmployeeNumber().toString());
             }
             final Student student = person.getStudent();
@@ -515,20 +461,12 @@ public class ParkingParty extends ParkingParty_Base {
     public Integer getMostSignificantNumber() {
         if (getParty().isPerson()) {
             final Person person = (Person) getParty();
-            final Teacher teacher = person.getTeacher();
-            ExecutionSemester actualExecutionSemester = ExecutionSemester.readActualExecutionSemester();
-            final boolean isTeacher =
-                    teacher != null && !PersonProfessionalData.isTeacherInactive(teacher, actualExecutionSemester);
-            final boolean isMonitor = isTeacher && ProfessionalCategory.isMonitor(teacher, actualExecutionSemester);
             final Employee employee = person.getEmployee();
 
-            if (employee != null && employee.getCurrentWorkingContract() != null) {
-                if (!RoleType.TEACHER.isMember(person.getUser()) || (teacher != null && isTeacher && !isMonitor)) {
+            if (employee != null && new ActiveTeachersGroup().isMember(person.getUser())
+                    || new ActiveEmployees().isMember(person.getUser()) || new ActiveResearchers().isMember(person.getUser())
+                    || new ActiveGrantOwner().isMember(person.getUser())) {
                     return employee.getEmployeeNumber();
-                }
-            }
-            if (employee != null && getPartyClassification().equals(PartyClassification.RESEARCHER)) {
-                return employee.getEmployeeNumber();
             }
 
             final Student student = person.getStudent();
@@ -548,9 +486,6 @@ public class ParkingParty extends ParkingParty_Base {
                 }
             }
 
-            if (employee != null && isTeacher && isMonitor) {
-                return employee.getEmployeeNumber();
-            }
             if (getPhdNumber() != null) {
                 return getPhdNumber();
             }
@@ -573,8 +508,8 @@ public class ParkingParty extends ParkingParty_Base {
                         || changedDates(getCardEndDate(), parkingPartyBean.getCardEndDate(),
                                 parkingPartyBean.getCardAlwaysValid())
                         || changedObject(getCardNumber(), parkingPartyBean.getCardNumber())
-                        || changedObject(getParkingGroup(), parkingPartyBean.getParkingGroup()) || changedObject(getPhdNumber(),
-                            parkingPartyBean.getPhdNumber()))) {
+                        || changedObject(getParkingGroup(), parkingPartyBean.getParkingGroup())
+                        || changedObject(getPhdNumber(), parkingPartyBean.getPhdNumber()))) {
             new ParkingPartyHistory(this, false);
         }
         setCardNumber(parkingPartyBean.getCardNumber());
@@ -603,7 +538,8 @@ public class ParkingParty extends ParkingParty_Base {
     }
 
     private boolean changedObject(Object oldObject, Object newObject) {
-        return (oldObject != null || newObject != null) && (oldObject == null || newObject == null || (!oldObject.equals(newObject)));
+        return (oldObject != null || newObject != null)
+                && (oldObject == null || newObject == null || (!oldObject.equals(newObject)));
     }
 
     public void edit(ParkingRequest parkingRequest) {
@@ -638,10 +574,10 @@ public class ParkingParty extends ParkingParty_Base {
         if (getParty().isPerson()) {
             Person person = (Person) getParty();
             if (getParkingGroup().getGroupName().equalsIgnoreCase("Docentes")) {
-                return person.getTeacher() != null && person.getTeacher().getDepartment() != null;
+                return new ActiveTeachersGroup().isMember(person.getUser());
             }
             if (getParkingGroup().getGroupName().equalsIgnoreCase("Não Docentes")) {
-                return person.getEmployee() != null && person.getEmployee().getCurrentWorkingPlace() != null;
+                return new ActiveEmployees().isMember(person.getUser()) || new ActiveResearchers().isMember(person.getUser());
             }
             PartyClassification classification = PartyClassification.getPartyClassification(person);
             if (getParkingGroup().getGroupName().equalsIgnoreCase("Especiais")) {
@@ -655,13 +591,7 @@ public class ParkingParty extends ParkingParty_Base {
                 }
             }
             if (getParkingGroup().getGroupName().equalsIgnoreCase("Bolseiros")) {
-                if (person.getEmployee() != null) {
-                    PersonContractSituation currentGrantOwnerContractSituation =
-                            person.getPersonProfessionalData() != null ? person.getPersonProfessionalData()
-                                    .getCurrentPersonContractSituationByCategoryType(CategoryType.GRANT_OWNER) : null;
-                    return currentGrantOwnerContractSituation != null;
-                }
-                return false;
+                return new ActiveGrantOwner().isMember(person.getUser());
             }
             if (getParkingGroup().getGroupName().equalsIgnoreCase("3º ciclo")) {
                 if (person.getStudent() != null) {
