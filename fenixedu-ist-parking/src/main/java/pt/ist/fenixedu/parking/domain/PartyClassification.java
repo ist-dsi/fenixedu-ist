@@ -20,26 +20,26 @@ package pt.ist.fenixedu.parking.domain;
 
 import java.util.function.Predicate;
 
-import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Teacher;
+import org.fenixedu.academic.domain.accessControl.ActiveTeachersGroup;
 import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.organizationalStructure.Party;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 
+import pt.ist.fenixedu.contracts.domain.accessControl.ActiveEmployees;
+import pt.ist.fenixedu.contracts.domain.accessControl.ActiveGrantOwner;
+import pt.ist.fenixedu.contracts.domain.accessControl.ActiveResearchers;
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.Invitation;
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonContractSituation;
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalData;
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalCategory;
-import pt.ist.fenixedu.contracts.domain.util.CategoryType;
 
 public enum PartyClassification {
-    TEACHER, EMPLOYEE, RESEARCHER, GRANT_OWNER, MASTER_DEGREE(DegreeType::isPreBolonhaMasterDegree), DEGREE(
-            DegreeType::isPreBolonhaDegree), BOLONHA_SPECIALIZATION_DEGREE(DegreeType::isSpecializationDegree),
-    BOLONHA_ADVANCED_FORMATION_DIPLOMA(DegreeType::isAdvancedFormationDiploma), BOLONHA_MASTER_DEGREE(
-            DegreeType::isBolonhaMasterDegree), BOLONHA_INTEGRATED_MASTER_DEGREE(DegreeType::isIntegratedMasterDegree),
-    BOLONHA_ADVANCED_SPECIALIZATION_DIPLOMA(DegreeType::isAdvancedSpecializationDiploma), BOLONHA_DEGREE(
-            DegreeType::isBolonhaDegree), INVITATION, PERSON, UNIT;
+    TEACHER, EMPLOYEE, RESEARCHER, GRANT_OWNER, MASTER_DEGREE(DegreeType::isPreBolonhaMasterDegree),
+    DEGREE(DegreeType::isPreBolonhaDegree), BOLONHA_SPECIALIZATION_DEGREE(DegreeType::isSpecializationDegree),
+    BOLONHA_ADVANCED_FORMATION_DIPLOMA(DegreeType::isAdvancedFormationDiploma),
+    BOLONHA_MASTER_DEGREE(DegreeType::isBolonhaMasterDegree),
+    BOLONHA_INTEGRATED_MASTER_DEGREE(DegreeType::isIntegratedMasterDegree),
+    BOLONHA_ADVANCED_SPECIALIZATION_DIPLOMA(DegreeType::isAdvancedSpecializationDiploma),
+    BOLONHA_DEGREE(DegreeType::isBolonhaDegree), INVITATION, PERSON, UNIT;
 
     private final Predicate<DegreeType> mapping;
 
@@ -72,28 +72,18 @@ public enum PartyClassification {
             Person person = (Person) party;
             final Teacher teacher = person.getTeacher();
             if (teacher != null) {
-                final ExecutionSemester actualExecutionSemester = ExecutionSemester.readActualExecutionSemester();
-                if (!PersonProfessionalData.isTeacherInactive(teacher, actualExecutionSemester)
-                        && !ProfessionalCategory.isMonitor(teacher, actualExecutionSemester)) {
+                if (new ActiveTeachersGroup().isMember(person.getUser())) {
                     return PartyClassification.TEACHER;
                 }
             }
-            if (person.getEmployee() != null && person.getEmployee().isActive()) {
+            if (new ActiveEmployees().isMember(person.getUser())) {
                 return PartyClassification.EMPLOYEE;
             }
-            if (person.getEmployee() != null) {
-                PersonContractSituation currentResearcherContractSituation =
-                        person.getPersonProfessionalData() != null ? person.getPersonProfessionalData()
-                                .getCurrentPersonContractSituationByCategoryType(CategoryType.RESEARCHER) : null;
-                if (currentResearcherContractSituation != null) {
-                    return PartyClassification.RESEARCHER;
-                }
-                final PersonContractSituation currentGrantOwnerContractSituation =
-                        person.getPersonProfessionalData() != null ? person.getPersonProfessionalData()
-                                .getCurrentPersonContractSituationByCategoryType(CategoryType.GRANT_OWNER) : null;
-                if (currentGrantOwnerContractSituation != null) {
-                    return PartyClassification.GRANT_OWNER;
-                }
+            if (new ActiveResearchers().isMember(person.getUser())) {
+                return PartyClassification.RESEARCHER;
+            }
+            if (new ActiveGrantOwner().isMember(person.getUser())) {
+                return PartyClassification.GRANT_OWNER;
             }
             if (person.getStudent() != null) {
                 final DegreeType degreeType = ParkingParty.mostSignificantDegreeType(person.getStudent());

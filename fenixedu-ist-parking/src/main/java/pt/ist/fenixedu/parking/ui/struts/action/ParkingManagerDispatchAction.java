@@ -47,6 +47,7 @@ import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Photograph;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
+import org.fenixedu.academic.domain.accessControl.ActiveTeachersGroup;
 import org.fenixedu.academic.domain.contacts.EmailAddress;
 import org.fenixedu.academic.domain.organizationalStructure.Party;
 import org.fenixedu.academic.domain.person.RoleType;
@@ -70,11 +71,13 @@ import org.fenixedu.messaging.core.domain.Message;
 import org.joda.time.DateTime;
 
 import com.google.common.base.Strings;
+
 import pt.ist.fenixWebFramework.renderers.components.state.IViewState;
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonContractSituation;
+import pt.ist.fenixedu.contracts.domain.accessControl.ActiveEmployees;
+import pt.ist.fenixedu.contracts.domain.accessControl.ActiveGrantOwner;
+import pt.ist.fenixedu.contracts.domain.accessControl.ActiveResearchers;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalCategory;
-import pt.ist.fenixedu.contracts.domain.util.CategoryType;
 import pt.ist.fenixedu.parking.domain.ParkingGroup;
 import pt.ist.fenixedu.parking.domain.ParkingParty;
 import pt.ist.fenixedu.parking.domain.ParkingPartyHistory;
@@ -327,12 +330,10 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
                 request.setAttribute("externalId", parkingRequestID);
                 return showRequest(mapping, actionForm, request, response);
             }
-            Integer mostSignificantNumber =
-                    getMostSignificantNumber((Person) parkingRequest.getParkingParty().getParty(),
-                            FenixFramework.getDomainObject(group));
-            updateParkingParty(parkingRequest, ParkingRequestState.ACCEPTED, cardNumber,
-                    FenixFramework.getDomainObject(group), note, parkingPartyBean.getCardStartDate(),
-                    parkingPartyBean.getCardEndDate(), mostSignificantNumber);
+            Integer mostSignificantNumber = getMostSignificantNumber((Person) parkingRequest.getParkingParty().getParty(),
+                    FenixFramework.getDomainObject(group));
+            updateParkingParty(parkingRequest, ParkingRequestState.ACCEPTED, cardNumber, FenixFramework.getDomainObject(group),
+                    note, parkingPartyBean.getCardStartDate(), parkingPartyBean.getCardEndDate(), mostSignificantNumber);
         } else if (request.getParameter("reject") != null) {
             updateParkingParty(parkingRequest, ParkingRequestState.REJECTED, null, null, note, null, null, null);
         } else {
@@ -398,8 +399,8 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
         Integer number = getMostSignificantNumber(person, parkingGroup);
         if (number != null) {
             if ((person.getTeacher() != null && person.getTeacher().getDepartment() != null)
-                    || (person.getEmployee() != null && person.getEmployee().getCurrentWorkingContract() != null && !RoleType.TEACHER
-                            .isMember(person.getUser()))) {
+                    || (person.getEmployee() != null && person.getEmployee().getCurrentWorkingContract() != null
+                            && !RoleType.TEACHER.isMember(person.getUser()))) {
                 return "Nº Mec: " + number;
             } else {
                 return "Nº" + number;
@@ -412,14 +413,11 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
         if (person.getParkingParty().getPhdNumber() != null) {
             return person.getParkingParty().getPhdNumber();
         }
-        if (person.getTeacher() != null && person.getTeacher().getDepartment() != null
-                && !ProfessionalCategory.isMonitor(person.getTeacher(), ExecutionSemester.readActualExecutionSemester())
-                && person.getEmployee() != null) {
-            return person.getEmployee().getEmployeeNumber();
-        }
-        if (person.getEmployee() != null && person.getEmployee().getCurrentWorkingContract() != null
-                && !RoleType.TEACHER.isMember(person.getUser())) {
-            return person.getEmployee().getEmployeeNumber();
+        if (person.getEmployee() != null) {
+            if (new ActiveResearchers().isMember(person.getUser()) || new ActiveGrantOwner().isMember(person.getUser())
+                    || new ActiveTeachersGroup().isMember(person.getUser()) || new ActiveEmployees().isMember(person.getUser())) {
+                return person.getEmployee().getEmployeeNumber();
+            }
         }
         if (person.getStudent() != null && !parkingGroup.getGroupName().equalsIgnoreCase("Bolseiros")) {
             Collection<Registration> registrations = ParkingParty.bestRegistrationsFor(person.getStudent());
@@ -429,25 +427,6 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
                     return person.getStudent().getNumber();
                 }
             }
-        }
-        if (person.getEmployee() != null) {
-            PersonContractSituation currentResearcherContractSituation =
-                    person.getPersonProfessionalData() != null ? person.getPersonProfessionalData()
-                            .getCurrentPersonContractSituationByCategoryType(CategoryType.RESEARCHER) : null;
-            if (currentResearcherContractSituation != null) {
-                return person.getEmployee().getEmployeeNumber();
-            }
-            PersonContractSituation currentGrantOwnerContractSituation =
-                    person.getPersonProfessionalData() != null ? person.getPersonProfessionalData()
-                            .getCurrentPersonContractSituationByCategoryType(CategoryType.GRANT_OWNER) : null;
-            if (currentGrantOwnerContractSituation != null) {
-                return person.getEmployee().getEmployeeNumber();
-            }
-        }
-        if (person.getTeacher() != null && person.getTeacher().getDepartment() != null
-                && ProfessionalCategory.isMonitor(person.getTeacher(), ExecutionSemester.readActualExecutionSemester())
-                && person.getEmployee() != null) {
-            return person.getEmployee().getEmployeeNumber();
         }
         return null;
     }
@@ -489,9 +468,8 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
         if (SearchParkingPartyBean != null) {
             SearchParkingPartyBean.setParty(null);
 
-            List<Party> partyList =
-                    searchPartyCarPlate(SearchParkingPartyBean.getPartyName(), SearchParkingPartyBean.getCarPlateNumber(),
-                            SearchParkingPartyBean.getParkingCardNumber());
+            List<Party> partyList = searchPartyCarPlate(SearchParkingPartyBean.getPartyName(),
+                    SearchParkingPartyBean.getCarPlateNumber(), SearchParkingPartyBean.getParkingCardNumber());
             request.setAttribute("searchPartyBean", SearchParkingPartyBean);
             request.setAttribute("partyList", partyList);
 
@@ -643,8 +621,8 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
                 spreadsheet.newRow();
                 int firstRow = spreadsheet.getRow().getRowNum();
                 PartyClassification partyClassification =
-                        parkingRequestSearch.getPartyClassification() != null ? parkingRequestSearch.getPartyClassification() : PartyClassification
-                                .getPartyClassification(person);
+                        parkingRequestSearch.getPartyClassification() != null ? parkingRequestSearch
+                                .getPartyClassification() : PartyClassification.getPartyClassification(person);
                 spreadsheet.addCell(enumerationBundle.getString(partyClassification.name()));
                 spreadsheet.addCell(parkingRequest.getRequestedAs());
                 spreadsheet.addCell(parkingRequest.getParkingParty().getMostSignificantNumber());
@@ -664,7 +642,8 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
                     int lastRow = firstRow + parkingRequest.getParkingParty().getDegreesInformation().size() - 1;
                     if (firstRow != lastRow) {
                         for (int iter = 0; iter < 7; iter++) {
-                            spreadsheet.getSheet().addMergedRegion(new CellRangeAddress(firstRow, (short) iter, lastRow, (short) iter));
+                            spreadsheet.getSheet()
+                                    .addMergedRegion(new CellRangeAddress(firstRow, (short) iter, lastRow, (short) iter));
                         }
                     }
                 }
@@ -723,11 +702,10 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
         ParkingParty parkingParty = parkingRequest.getParkingParty();
 
         if (parkingRequestState == ParkingRequestState.ACCEPTED) {
-            if (parkingParty.getCardNumber() != null
-                    && (changedObject(parkingParty.getCardStartDate(), cardStartDate)
-                            || changedObject(parkingParty.getCardEndDate(), cardEndDate)
-                            || changedObject(parkingParty.getCardNumber(), cardCode) || changedObject(
-                                parkingParty.getParkingGroup(), parkingGroup))) {
+            if (parkingParty.getCardNumber() != null && (changedObject(parkingParty.getCardStartDate(), cardStartDate)
+                    || changedObject(parkingParty.getCardEndDate(), cardEndDate)
+                    || changedObject(parkingParty.getCardNumber(), cardCode)
+                    || changedObject(parkingParty.getParkingGroup(), parkingGroup))) {
                 new ParkingPartyHistory(parkingParty, true);
             }
             parkingParty.setCardStartDate(cardStartDate);
@@ -750,17 +728,14 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
 
         if (note != null && note.trim().length() != 0 && email != null) {
             ResourceBundle bundle = ResourceBundle.getBundle("resources.ParkingResources", I18N.getLocale());
-            Message.fromSystem()
-                    .replyTo(bundle.getString("label.fromAddress"))
-                    .singleBcc(email)
-                    .subject(bundle.getString("label.subject"))
-                    .textBody(note)
-                    .send();
+            Message.fromSystem().replyTo(bundle.getString("label.fromAddress")).singleBcc(email)
+                    .subject(bundle.getString("label.subject")).textBody(note).send();
         }
     }
 
     private boolean changedObject(Object oldObject, Object newObject) {
-        return (oldObject != null || newObject != null) && (oldObject == null || newObject == null || (!oldObject.equals(newObject)));
+        return (oldObject != null || newObject != null)
+                && (oldObject == null || newObject == null || (!oldObject.equals(newObject)));
     }
 
     @Atomic
@@ -789,8 +764,8 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
     }
 
     private boolean satisfiedParkingCardNumber(ParkingParty parkingParty, Long parkingCardNumber) {
-        return parkingCardNumber == null || parkingParty.getCardNumber() != null && parkingParty.getCardNumber().toString()
-                .contains(parkingCardNumber.toString());
+        return parkingCardNumber == null || parkingParty.getCardNumber() != null
+                && parkingParty.getCardNumber().toString().contains(parkingCardNumber.toString());
     }
 
     private boolean satisfiedPlateNumber(ParkingParty parkingParty, String carPlateNumber) {
