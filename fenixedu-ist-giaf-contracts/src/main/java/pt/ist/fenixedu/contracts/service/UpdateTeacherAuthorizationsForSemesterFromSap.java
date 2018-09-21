@@ -37,12 +37,10 @@ import pt.ist.sap.client.SapStaff;
 import pt.ist.sap.client.SapStructure;
 import pt.ist.sap.group.integration.domain.Colaborator;
 import pt.ist.sap.group.integration.domain.ColaboratorSituation;
-import pt.ist.sap.group.integration.domain.Situation;
 
 public class UpdateTeacherAuthorizationsForSemesterFromSap {
 
 	private static final int minimumDaysForActivity = 90;
-	private Set<Situation> situations = new HashSet<Situation>();
 	private Map<String, TeacherCategory> categoryMap = new HashMap<String, TeacherCategory>();
 
 	public String updateTeacherAuthorization(ExecutionSemester executionSemester) {
@@ -59,10 +57,6 @@ public class UpdateTeacherAuthorizationsForSemesterFromSap {
 		Map<User, Set<ColaboratorSituation>> colaboratorSituationsMap = new HashMap<User, Set<ColaboratorSituation>>();
 			final JsonObject params = new JsonObject();
 		params.addProperty("institution", SapSdkConfiguration.getConfiguration().sapServiceInstitutionCode());
-
-			sapStaff.listProfessionalSituation(params).forEach(e -> {
-				situations.add(new Situation(e.getAsJsonObject()));
-			});
 
 			sapStaff.listPersonProfessionalInformation(params).forEach(e -> {
 				final ColaboratorSituation colaboratorSituation = new ColaboratorSituation(e.getAsJsonObject());
@@ -176,8 +170,7 @@ public class UpdateTeacherAuthorizationsForSemesterFromSap {
 					}
 				});
 		validPersonContractSituations.addAll(situationsMap.get(user).stream().filter(cs -> {
-			Situation situation = getSituation(cs);
-			return situation.inExercise() && !situation.endSituation() && isValidAndOverlaps(cs, semesterInterval)
+			return cs.inExercise() && !cs.endSituation() && isValidAndOverlaps(cs, semesterInterval)
 					&& isValidCategoryAndCategoryType(cs.categoryName(), cs.categoryTypeName());
 		}).filter(Objects::nonNull).collect(Collectors.toSet()));
 		return validPersonContractSituations;
@@ -348,9 +341,8 @@ public class UpdateTeacherAuthorizationsForSemesterFromSap {
 
 	public Double getWeeklyLessonHours(ColaboratorSituation colaboratorSituation, Interval interval,
 			TeacherCategory teacherCategory) {
-		Situation situation = getSituation(colaboratorSituation);
-		if (situation.endSituation() || (situation.serviceExemption())// && !hasMandatoryCredits())
-				|| !situation.inExercise()) {
+		if (colaboratorSituation.endSituation() || (colaboratorSituation.serviceExemption())// && !hasMandatoryCredits())
+				|| !colaboratorSituation.inExercise()) {
 			return Double.valueOf(0);
 		}
 
@@ -382,15 +374,6 @@ public class UpdateTeacherAuthorizationsForSemesterFromSap {
 			}
 		}
 		return Double.valueOf(12);
-	}
-
-	private Situation getSituation(ColaboratorSituation colaboratorSituation) {
-		return situations.stream()
-				.filter(situation -> situation.measure().equals(colaboratorSituation.measure())
-						&& situation.measurename().equals(colaboratorSituation.measurename())
-						&& situation.code().equals(colaboratorSituation.situationCode())
-						&& situation.name().equals(colaboratorSituation.situationName()))
-				.findFirst().orElse(null);
 	}
 
 	protected boolean isTeacherCategoryType(ColaboratorSituation colaboratorSituation) {
