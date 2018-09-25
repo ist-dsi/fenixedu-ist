@@ -54,6 +54,7 @@ public class SapRequest extends SapRequest_Base {
         Optional<SapRequest> maxRequest = event.getSapRequestSet().stream().filter(sr -> sr != this).max(COMPARATOR_BY_ORDER);
         Integer order = maxRequest.isPresent() ? maxRequest.get().getOrder() : 0;
 
+        setSapRoot(SapRoot.getInstance());
         setEvent(event);
         setClientId(clientId);
         setValue(amount);
@@ -94,6 +95,7 @@ public class SapRequest extends SapRequest_Base {
         if (documentFile != null) {
             documentFile.delete();
         }
+        setSapRoot(null);
         deleteDomainObject();
     }
 
