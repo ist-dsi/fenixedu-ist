@@ -105,3 +105,12 @@ relation SapRootEventToSkipEnrolmentBlockCheck {
         multiplicity *;
     }
 }
+
+relation SapRootSapRequest {
+    SapRoot playsRole sapRoot {
+        multiplicity 1..1;
+    }
+    SapRequest playsRole sapRequest {
+        multiplicity *;
+    }
+}
