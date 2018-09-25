@@ -21,10 +21,14 @@ public class EventWrapper {
         return !executionYear.isBefore(SAP_THRESHOLD);
     }
 
-    public static boolean shouldProcess(final ErrorLogConsumer consumer, final Event event) {
+    public static boolean needsToProcessPayments(Event event) {
         final int currentYear = Year.now().getValue();
-        return (needsProcessingSap(event)
-                || event.getAccountingTransactionsSet().stream().anyMatch(tx -> tx.getWhenRegistered().getYear() == currentYear))
+        return event.getAccountingTransactionsSet().stream().anyMatch(tx -> tx.getWhenRegistered().getYear() == currentYear);
+    }
+
+    public static boolean shouldProcess(final ErrorLogConsumer consumer, final Event event) {
+        return event.getSapRequestSet().stream().allMatch(r -> r.getIntegrated())
+                && (needsProcessingSap(event) || needsToProcessPayments(event))
                 && Utils.validate(consumer, event);
     }
 
