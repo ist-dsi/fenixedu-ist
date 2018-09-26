@@ -150,7 +150,7 @@ public class SapInvoiceController {
     public String transfer(final @PathVariable SapRequest sapRequest, final Model model,
             @RequestParam final ExternalClient client, @RequestParam final String valueToTransfer,
             @RequestParam final String pledgeNumber) {
-        if (Group.dynamic("managers").isMember(Authenticate.getUser())) {
+        if (Group.dynamic("managers").isMember(Authenticate.getUser()) || isAdvancedPaymentManager()) {
             try {
                 final Money value = toMoney(valueToTransfer);
                 if (value.isZero() || value.isNegative()) {
