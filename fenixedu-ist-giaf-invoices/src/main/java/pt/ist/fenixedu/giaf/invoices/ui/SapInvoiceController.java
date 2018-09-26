@@ -19,10 +19,14 @@
  */
 package pt.ist.fenixedu.giaf.invoices.ui;
 
+import java.util.Collections;
+import java.util.Optional;
 import java.util.stream.Collector;
 import java.util.stream.Collector.Characteristics;
 
 import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.accessControl.AcademicAuthorizationGroup;
+import org.fenixedu.academic.domain.accessControl.academicAdministration.AcademicOperationType;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.EventState;
 import org.fenixedu.academic.domain.accounting.calculator.DebtInterestCalculator;
@@ -58,6 +62,12 @@ public class SapInvoiceController {
 
     public static interface EventProcessorInterface {
         public void process(final ErrorLogConsumer consumer, final EventLogger logger, final Event event);
+    }
+
+    public static boolean isAdvancedPaymentManager() {
+        return Optional.ofNullable(Authenticate.getUser())
+                .map(AcademicAuthorizationGroup.get(AcademicOperationType.MANAGE_STUDENT_PAYMENTS_ADV, Collections.emptySet(), Collections.emptySet(), null)::isMember)
+                .orElse(false);
     }
 
     private String homeRedirect(final String username) {
