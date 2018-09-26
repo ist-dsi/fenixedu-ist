@@ -18,6 +18,9 @@
     along with FenixEdu IST GIAF Invoices.  If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@page import="pt.ist.fenixedu.giaf.invoices.ui.SapInvoiceController"%>
+<%@page import="org.fenixedu.bennu.core.domain.User"%>
+<%@page import="org.fenixedu.academic.ui.spring.service.AccountingManagementAccessControlService"%>
 <%@page import="org.fenixedu.bennu.core.security.Authenticate"%>
 <%@page import="org.fenixedu.bennu.core.groups.Group"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
@@ -224,7 +227,7 @@
     }
 
     function transfer(sapRequest) {
-        <% if (Group.dynamic("managers").isMember(Authenticate.getUser())) { %>
+        <% if (Group.dynamic("managers").isMember(Authenticate.getUser()) || SapInvoiceController.isAdvancedPaymentManager()) { %>
         if (!sapRequest.referenced && !sapRequest.ignore && sapRequest.requestType == 'INVOICE') {
             return '<form method="get" action="' + contextPath + '/sap-invoice-viewer/' + sapRequest.id + '/transfer">'
                + '${csrf.field()}'
