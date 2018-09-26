@@ -15,6 +15,7 @@ import org.fenixedu.commons.spreadsheet.Spreadsheet;
 import org.fenixedu.commons.spreadsheet.Spreadsheet.Row;
 import org.joda.time.DateTime;
 
+import pt.ist.fenixedu.domain.SapRoot;
 import pt.ist.fenixedu.giaf.invoices.ErrorLogConsumer;
 import pt.ist.fenixedu.giaf.invoices.EventLogger;
 import pt.ist.fenixedu.giaf.invoices.EventProcessor;
@@ -71,8 +72,10 @@ public class SyncFinancialInfoToSapTask extends CronTask {
         final EventLogger elogger = (msg, args) -> taskLog(msg, args);
 
         touch("Processing events...");
-        Bennu.getInstance().getAccountingEventsSet().stream()
-            .filter(e -> e.getSapRequestSet().stream().anyMatch(r -> !r.getIntegrated()))
+        SapRoot.getInstance().getSapRequestSet().stream()
+            .filter(sr -> !sr.getIntegrated())
+            .map(sr -> sr.getEvent())
+            .distinct()
             .forEach(e -> EventProcessor.syncEventWithSap(errorLogConsumer, elogger, e));
 
         touch("Dumping error messages.");
