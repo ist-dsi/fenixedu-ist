@@ -13,6 +13,7 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
 import org.fenixedu.academic.domain.organizationalStructure.Party;
 import org.fenixedu.bennu.GiafInvoiceConfiguration;
+import org.fenixedu.TINValidator;
 
 import com.google.common.base.Strings;
 import com.google.gson.JsonObject;
@@ -48,7 +49,7 @@ public class ClientMap {
                     && Character.isUpperCase(tin.charAt(1))) {
                 final String countryCode = tin.substring(0, 2);
                 final String code = tin.substring(2);
-                if (TINValid.checkTIN(countryCode, code) == 0) {
+                if (TINValidator.isValid(countryCode, code)) {
                     // all is ok
                     return tin;
                 }
@@ -71,7 +72,7 @@ public class ClientMap {
     private static Country getValidCountry(final String tin, final Country... countries) {
         for (int i = 0; i < countries.length; i++) {
             final Country country = countries[i];
-            if (country != null && TINValid.checkTIN(country.getCode().toUpperCase(), tin) == 0) {
+            if (country != null && TINValidator.isValid(country.getCode().toUpperCase(), tin) == 0) {
                 return country;
             }
         }
