@@ -46,7 +46,7 @@ public class ExternalClient extends ExternalClient_Base {
             final String country, final String street, final String city, final String region, final String postalCode, final String nationality) {
         final ExternalClient client = SapRoot.getInstance().getExternalClientSet().stream()
                 .filter(c -> c.getClientId().equals(clientId))
-                .findAny().orElseGet(() -> new ExternalClient(clientId, clientId));
+                .findAny().orElseGet(() -> new ExternalClient("ADHOC", clientId));
         client.edit(companyName, country, street, city, region, postalCode, vatNumber, fiscalCountry, nationality, Integer.valueOf(0));
     }
 

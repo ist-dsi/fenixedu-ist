@@ -19,7 +19,10 @@
  */
 package pt.ist.fenixedu.giaf.invoices.ui;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.fenixedu.PostalCodeValidator;
 import org.fenixedu.academic.domain.Country;
@@ -27,6 +30,8 @@ import org.fenixedu.bennu.core.security.SkipCSRF;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.fenixedu.commons.StringNormalizer;
 import org.fenixedu.commons.i18n.I18N;
+import org.fenixedu.commons.spreadsheet.Spreadsheet;
+import org.fenixedu.commons.spreadsheet.Spreadsheet.Row;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.ui.Model;
@@ -109,7 +114,9 @@ public class ClientController {
     @SkipCSRF
     @RequestMapping(value = "/search", method = RequestMethod.GET)
     public String search(final Model model, final @RequestParam ExternalClient client) {
-        model.addAttribute("client", client.toJson().toString());
+        if (client != null) {
+            model.addAttribute("client", client.toJson().toString());
+        }
         return "client-management/home";
     }
 
@@ -132,13 +139,52 @@ public class ClientController {
         return result.toString();
     }
 
+    @RequestMapping(value = "/download", method = RequestMethod.GET, produces = "application/xlsx")
+    public void download(final HttpServletResponse response) {
+        final String name = "ExternalClients";
+        final Spreadsheet sheet = new Spreadsheet(name);
+        SapRoot.getInstance().getExternalClientSet().stream()
+            .forEach(c -> {
+                final Row row = sheet.addRow();
+                row.setCell("AccountId", c.getAccountId());
+                row.setCell("BillingIndicator", c.getBillingIndicator());
+                row.setCell("City", c.getCity());
+                row.setCell("ClientId", c.getClientId());
+                row.setCell("CompanyName", c.getCompanyName());
+                row.setCell("Country", c.getCountry());
+                row.setCell("FiscalCountry", c.getFiscalCountry());
+                row.setCell("Nationality", c.getNationality());
+                row.setCell("PostalCode", c.getPostalCode());
+                row.setCell("Region", c.getRegion());
+                row.setCell("Street", c.getStreet());
+                row.setCell("VatNumber", c.getVatNumber());
+            });
+        final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        try {
+            sheet.exportToXLSSheet(stream);
+            response.setHeader("Content-Disposition", "attachment; filename=" + name + ".xlsx");
+            response.getOutputStream().write(stream.toByteArray());
+            response.flushBuffer();
+        } catch (final IOException e) {
+            throw new Error(e);
+        }
+    }
+    
     private boolean matchesClient(final ExternalClient c, final String[] input) {
+        if (input.length == 0) {
+            return false;
+        }
+        int matchCount = 0;
+        final String accountId = StringNormalizer.normalize(c.getAccountId());
+        final String clientId = StringNormalizer.normalize(c.getClientId());
+        final String vatNumber = StringNormalizer.normalize(c.getVatNumber());
+        final String companyName = StringNormalizer.normalize(c.getCompanyName());
         for (final String s : input) {
-            if (c.getAccountId().equals(s) || c.getClientId().equals(s) || c.getVatNumber().equals(s) || c.getCompanyName().contains(s)) {
-                return true;
+            if (accountId.indexOf(s) >= 0 || clientId.indexOf(s) >= 0 || vatNumber.indexOf(s) >= 0 || companyName.indexOf(s) >= 0) {
+                matchCount++;
             }
         }
-        return false;
+        return matchCount == input.length;
     }
 
     private void error(final RedirectAttributes model, final String key, final Object... args) {

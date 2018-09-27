@@ -26,8 +26,12 @@
         <button id="submitRequest" class="btn btn-primary">
             <spring:message code="label.search" text="Search" />
         </button>
+        <a href="<%= contextPath %>/client-management/download" class="btn btn-default">
+            <spring:message code="label.download" text="Download" />
+        </a>
     </div>
 </form>
+
 
 <br/>
 <br/>
