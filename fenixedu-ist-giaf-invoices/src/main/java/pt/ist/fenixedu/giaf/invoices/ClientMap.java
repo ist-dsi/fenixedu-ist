@@ -72,7 +72,7 @@ public class ClientMap {
     private static Country getValidCountry(final String tin, final Country... countries) {
         for (int i = 0; i < countries.length; i++) {
             final Country country = countries[i];
-            if (country != null && TINValidator.isValid(country.getCode().toUpperCase(), tin) == 0) {
+            if (country != null && TINValidator.isValid(country.getCode().toUpperCase(), tin)) {
                 return country;
             }
         }
