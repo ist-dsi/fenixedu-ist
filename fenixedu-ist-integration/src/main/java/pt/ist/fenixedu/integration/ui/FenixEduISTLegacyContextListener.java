@@ -94,6 +94,7 @@ import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
 import pt.ist.fenixframework.FenixFramework;
 import pt.ist.fenixframework.dml.runtime.RelationAdapter;
+import org.fenixedu.TINValidator;
 
 @WebListener
 public class FenixEduISTLegacyContextListener implements ServletContextListener {
@@ -208,7 +209,7 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
                         tin.substring(0, 2) : null;
                 if (tin == null || tin.isEmpty()) {
                     warnings.add(BundleUtil.getString("resources.FenixeduIstIntegrationResources", "label.person.details.vatNumber.none"));
-                } else if ("PT999999990".equals(tin) || tinCountryCode == null || TINValid.checkTIN(tinCountryCode, tin.substring(2)) != 0) {
+                } else if ("PT999999990".equals(tin) || tinCountryCode == null || !TINValidator.isValid(tinCountryCode, tin.substring(2))) {
                     warnings.add(BundleUtil.getString("resources.FenixeduIstIntegrationResources", "label.person.details.vatNumber.invalid"));
                 }
 

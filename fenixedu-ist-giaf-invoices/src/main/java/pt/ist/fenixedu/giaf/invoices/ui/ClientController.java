@@ -25,6 +25,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.fenixedu.PostalCodeValidator;
+import org.fenixedu.TINValidator;
 import org.fenixedu.academic.domain.Country;
 import org.fenixedu.bennu.core.security.SkipCSRF;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
@@ -93,7 +94,7 @@ public class ClientController {
 
                         if (fiscalCountry.length() != 2 || Country.readByTwoLetterCode(fiscalCountry) == null) {
                             error(redirectAttributes, "label.error.file.upload.invalid.country.at.line", i+1, fiscalCountry);
-                        } else if (TINValid.checkTIN(fiscalCountry, vatNumber) != 0) {
+                        } else if (!TINValidator.isValid(fiscalCountry, vatNumber)) {
                                 error(redirectAttributes, "label.error.file.upload.invalid.tinNumber.at.line", i+1, fiscalCountry, vatNumber);
                         } else if (!PostalCodeValidator.isValidAreaCode(fiscalCountry, postalCode)) {
                             error(redirectAttributes, "label.error.file.upload.invalid.postCode.at.line", i+1, fiscalCountry, postalCode);
