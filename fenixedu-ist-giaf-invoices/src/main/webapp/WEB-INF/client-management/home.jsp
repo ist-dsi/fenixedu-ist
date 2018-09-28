@@ -123,6 +123,17 @@
             </td>
         </tr>
     </table>
+    <form class="form-horizontal" method="POST" enctype="multipart/form-data" action="<%= contextPath %>/client-management/delete">
+        ${csrf.field()}
+        <input id="clientToDelete" name="clientToDelete" class="form-control" value="" type="hidden"/>
+        <div class="form-group">
+            <div class="col-sm-10 col-sm-offset-2">
+                <button id="submitRequest" class="btn btn-danger">
+                    <spring:message code="label.delete" text="Delete" />
+                </button>
+            </div>
+        </div>
+    </form>
 </div>
 
 <h2>
@@ -154,7 +165,7 @@
             </button>
         </div>
     </div>
- </form>
+</form>
 
 <script type="text/javascript">
     var contextPath = '<%= contextPath %>';
@@ -182,7 +193,7 @@
             
             select: function( event, ui ) {
                 $( "#searchTerm" ).val( ui.item.label );
-                $( "#client" ).val( ui.item.value );               
+                $( "#client" ).val( ui.item.value );
                 return false;
             }
         });
@@ -203,6 +214,7 @@
 %>
             var client = JSON.parse('<%= client %>');
         	document.getElementById("clientInfo").style.display = 'block';
+            document.getElementById("clientToDelete").value = client.id;
         	$('#accountId').html(client.accountId);
             $('#clientId').html(client.clientId);
             $('#companyName').html(client.companyName);

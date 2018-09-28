@@ -52,6 +52,7 @@ public class ExternalClient extends ExternalClient_Base {
 
     public JsonObject toJson() {
         final JsonObject result = new JsonObject();
+        result.addProperty("id", getExternalId());
         result.addProperty("accountId", getAccountId());
         result.addProperty("clientId", getClientId());
         result.addProperty("companyName", getCompanyName());
@@ -87,4 +88,9 @@ public class ExternalClient extends ExternalClient_Base {
         return b.toString();
     }
 
+    @Atomic
+    public void delete() {
+        setSapRoot(null);
+        deleteDomainObject();
+    }
 }
