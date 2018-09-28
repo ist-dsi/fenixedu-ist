@@ -24,7 +24,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -47,14 +58,48 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
 
-import org.fenixedu.academic.domain.*;
+import org.fenixedu.academic.domain.AdHocEvaluation;
+import org.fenixedu.academic.domain.Attends;
+import org.fenixedu.academic.domain.CompetenceCourse;
+import org.fenixedu.academic.domain.Coordinator;
+import org.fenixedu.academic.domain.CurricularCourse;
+import org.fenixedu.academic.domain.Degree;
+import org.fenixedu.academic.domain.DegreeCurricularPlan;
+import org.fenixedu.academic.domain.DegreeInfo;
+import org.fenixedu.academic.domain.Department;
+import org.fenixedu.academic.domain.Enrolment;
+import org.fenixedu.academic.domain.Evaluation;
+import org.fenixedu.academic.domain.Exam;
+import org.fenixedu.academic.domain.ExecutionCourse;
+import org.fenixedu.academic.domain.ExecutionDegree;
+import org.fenixedu.academic.domain.ExecutionInterval;
+import org.fenixedu.academic.domain.ExecutionSemester;
+import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.Grouping;
+import org.fenixedu.academic.domain.Lesson;
+import org.fenixedu.academic.domain.LessonInstance;
+import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.Photograph;
+import org.fenixedu.academic.domain.Professorship;
+import org.fenixedu.academic.domain.Project;
+import org.fenixedu.academic.domain.Shift;
+import org.fenixedu.academic.domain.ShiftType;
+import org.fenixedu.academic.domain.StudentCurricularPlan;
+import org.fenixedu.academic.domain.Summary;
+import org.fenixedu.academic.domain.Teacher;
+import org.fenixedu.academic.domain.TeacherAuthorization;
+import org.fenixedu.academic.domain.TeacherCategory;
+import org.fenixedu.academic.domain.WrittenEvaluation;
+import org.fenixedu.academic.domain.WrittenEvaluationEnrolment;
 import org.fenixedu.academic.domain.accessControl.ActiveStudentsGroup;
 import org.fenixedu.academic.domain.accessControl.ActiveTeachersGroup;
 import org.fenixedu.academic.domain.accessControl.AllAlumniGroup;
 import org.fenixedu.academic.domain.accounting.Entry;
 import org.fenixedu.academic.domain.accounting.Event;
-import org.fenixedu.academic.domain.accounting.PaymentCode;
-import org.fenixedu.academic.domain.accounting.paymentCodes.AccountingEventPaymentCode;
+import org.fenixedu.academic.domain.accounting.calculator.BigDecimalUtil;
+import org.fenixedu.academic.domain.accounting.calculator.Debt;
+import org.fenixedu.academic.domain.accounting.calculator.DebtInterestCalculator;
+import org.fenixedu.academic.domain.accounting.paymentCodes.EventPaymentCodeEntry;
 import org.fenixedu.academic.domain.contacts.EmailAddress;
 import org.fenixedu.academic.domain.contacts.WebAddress;
 import org.fenixedu.academic.domain.degreeStructure.BibliographicReferences.BibliographicReference;
@@ -97,8 +142,6 @@ import org.fenixedu.academic.util.ContentType;
 import org.fenixedu.academic.util.EvaluationType;
 import org.fenixedu.academic.util.HourMinuteSecond;
 import org.fenixedu.bennu.core.domain.Avatar;
-import org.fenixedu.cms.domain.Category;
-import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
@@ -110,7 +153,13 @@ import org.fenixedu.commons.stream.StreamUtils;
 import org.fenixedu.spaces.domain.BlueprintFile;
 import org.fenixedu.spaces.domain.Space;
 import org.fenixedu.spaces.services.SpaceBlueprintsDWGProcessor;
-import org.joda.time.*;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeFieldType;
+import org.joda.time.Duration;
+import org.joda.time.LocalDate;
+import org.joda.time.Partial;
+import org.joda.time.TimeOfDay;
+import org.joda.time.YearMonthDay;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
@@ -130,7 +179,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-
 import net.fortuna.ical4j.model.Calendar;
 import pt.ist.fenixedu.contracts.domain.Employee;
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveEmployees;
@@ -155,11 +203,24 @@ import pt.ist.fenixedu.integration.api.beans.FenixPerson.FenixPhoto;
 import pt.ist.fenixedu.integration.api.beans.FenixPerson.FenixRole;
 import pt.ist.fenixedu.integration.api.beans.FenixPersonCourses;
 import pt.ist.fenixedu.integration.api.beans.FenixPersonCourses.FenixEnrolment;
-import pt.ist.fenixedu.integration.api.beans.publico.*;
+import pt.ist.fenixedu.integration.api.beans.publico.FenixAbout;
+import pt.ist.fenixedu.integration.api.beans.publico.FenixCourseEvaluation;
+import pt.ist.fenixedu.integration.api.beans.publico.FenixCourseExtended;
 import pt.ist.fenixedu.integration.api.beans.publico.FenixCourseExtended.FenixCompetence;
 import pt.ist.fenixedu.integration.api.beans.publico.FenixCourseExtended.FenixCompetence.BiblioRef;
+import pt.ist.fenixedu.integration.api.beans.publico.FenixCourseGroup;
+import pt.ist.fenixedu.integration.api.beans.publico.FenixCourseStudents;
+import pt.ist.fenixedu.integration.api.beans.publico.FenixDegree;
+import pt.ist.fenixedu.integration.api.beans.publico.FenixDegreeExtended;
 import pt.ist.fenixedu.integration.api.beans.publico.FenixDegreeExtended.FenixDegreeInfo;
 import pt.ist.fenixedu.integration.api.beans.publico.FenixDegreeExtended.FenixTeacher;
+import pt.ist.fenixedu.integration.api.beans.publico.FenixDepartment;
+import pt.ist.fenixedu.integration.api.beans.publico.FenixDomainModel;
+import pt.ist.fenixedu.integration.api.beans.publico.FenixExecutionCourse;
+import pt.ist.fenixedu.integration.api.beans.publico.FenixPeriod;
+import pt.ist.fenixedu.integration.api.beans.publico.FenixRoomEvent;
+import pt.ist.fenixedu.integration.api.beans.publico.FenixSchedule;
+import pt.ist.fenixedu.integration.api.beans.publico.FenixSpace;
 import pt.ist.fenixedu.integration.api.infra.FenixAPIFromExternalServer;
 import pt.ist.fenixedu.integration.dto.PersonInformationBean;
 import pt.ist.fenixedu.integration.service.services.externalServices.CreatePreEnrolment;
@@ -672,17 +733,29 @@ public class FenixAPIv1 {
         List<Event> notPayedEvents = calculateNotPayedEvents(person);
         List<PendingEvent> notPayed = new ArrayList<>();
 
-        for (Event event : notPayedEvents) {
+        for (Event event: notPayedEvents) {
 
-            for (PaymentCode paymentCode : event.getNonProcessedPaymentCodes()) {
-                String id = paymentCode.getExternalId();
-                String description = paymentCode.getDescription();
-                String startDate = formatDay.print(paymentCode.getStartDate()) + " 00:00";
-                String endDate = formatDay.print(paymentCode.getEndDate()) + " 23:59";
-                String entity = paymentCode.getEntityCode();
-                String reference = paymentCode.getFormattedCode();
-                String amount = paymentCode.getMinAmount().getAmountAsString();
-                notPayed.add(new PendingEvent(id, description, new FenixPeriod(startDate, endDate), entity, reference, amount));
+            DebtInterestCalculator calculator = event.getDebtInterestCalculator(DateTime.now());
+            String description = event.getDescription().toString();
+
+            for (Debt debt : calculator.getDebtsOrderedByDueDate()) {
+                if (BigDecimalUtil.isPositive(debt.getTotalOpenAmount())){
+
+                    String id = debt.getId();
+                    LocalDate debtCreation = debt.getCreated().toLocalDate();
+                    LocalDate debtDueDate = debt.getDueDate();
+                    String amount = debt.getTotalOpenAmount().toPlainString();
+                    EventPaymentCodeEntry codeEntry = event.getAvailablePaymentCodeEntry().orElse(null);
+                    String reference = null;
+                    String entity = null;
+
+                    if (codeEntry != null) {
+                        reference = codeEntry.getPaymentCode().getFormattedCode();
+                        entity = codeEntry.getPaymentCode().getEntityCode();
+                    }
+
+                    notPayed.add(new PendingEvent(id, description, new FenixPeriod(debtCreation, debtDueDate), entity, reference, amount));
+                }
             }
         }
 

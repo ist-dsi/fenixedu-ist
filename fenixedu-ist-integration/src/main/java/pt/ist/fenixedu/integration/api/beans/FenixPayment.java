@@ -106,8 +106,8 @@ public class FenixPayment {
             this.id = id;
             this.description = description;
             this.paymentPeriod = paymentPeriod;
-            this.entity = entity;
-            this.reference = reference;
+            this.entity = entity == null ? "" : entity;
+            this.reference = reference == null ? "" : reference ;
             this.amount = amount;
         }
 
