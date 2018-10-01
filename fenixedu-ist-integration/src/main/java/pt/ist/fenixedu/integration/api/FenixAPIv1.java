@@ -53,6 +53,7 @@ import org.fenixedu.academic.domain.accessControl.ActiveTeachersGroup;
 import org.fenixedu.academic.domain.accessControl.AllAlumniGroup;
 import org.fenixedu.academic.domain.accounting.Entry;
 import org.fenixedu.academic.domain.accounting.Event;
+import org.fenixedu.academic.domain.accounting.PaymentCode;
 import org.fenixedu.academic.domain.accounting.paymentCodes.AccountingEventPaymentCode;
 import org.fenixedu.academic.domain.contacts.EmailAddress;
 import org.fenixedu.academic.domain.contacts.WebAddress;
@@ -673,14 +674,14 @@ public class FenixAPIv1 {
 
         for (Event event : notPayedEvents) {
 
-            for (AccountingEventPaymentCode accountingEventPaymentCode : event.getNonProcessedPaymentCodes()) {
-                String id = accountingEventPaymentCode.getExternalId();
-                String description = accountingEventPaymentCode.getDescription();
-                String startDate = formatDay.print(accountingEventPaymentCode.getStartDate()) + " 00:00";
-                String endDate = formatDay.print(accountingEventPaymentCode.getEndDate()) + " 23:59";
-                String entity = accountingEventPaymentCode.getEntityCode();
-                String reference = accountingEventPaymentCode.getFormattedCode();
-                String amount = accountingEventPaymentCode.getMinAmount().getAmountAsString();
+            for (PaymentCode paymentCode : event.getNonProcessedPaymentCodes()) {
+                String id = paymentCode.getExternalId();
+                String description = paymentCode.getDescription();
+                String startDate = formatDay.print(paymentCode.getStartDate()) + " 00:00";
+                String endDate = formatDay.print(paymentCode.getEndDate()) + " 23:59";
+                String entity = paymentCode.getEntityCode();
+                String reference = paymentCode.getFormattedCode();
+                String amount = paymentCode.getMinAmount().getAmountAsString();
                 notPayed.add(new PendingEvent(id, description, new FenixPeriod(startDate, endDate), entity, reference, amount));
             }
         }
