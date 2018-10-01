@@ -46,7 +46,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import eu.europa.ec.taxud.tin.algorithm.TINValid;
 import pt.ist.fenixedu.domain.ExternalClient;
 import pt.ist.fenixedu.domain.SapRoot;
 
@@ -119,6 +118,14 @@ public class ClientController {
             model.addAttribute("client", client.toJson().toString());
         }
         return "client-management/home";
+    }
+
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
+    public String delete(final Model model, final @RequestParam ExternalClient clientToDelete) {
+        if (clientToDelete != null) {
+            clientToDelete.delete();
+        }
+        return homeRedirect(model);
     }
 
     @SkipCSRF
