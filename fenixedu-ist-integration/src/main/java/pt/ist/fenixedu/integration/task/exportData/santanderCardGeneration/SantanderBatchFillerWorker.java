@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.Department;
@@ -42,24 +43,27 @@ import org.fenixedu.academic.domain.student.RegistrationProtocol;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.domain.student.registrationStates.RegistrationState;
 import org.fenixedu.bennu.core.domain.Bennu;
-import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.idcards.domain.SantanderBatch;
 import org.fenixedu.idcards.domain.SantanderEntry;
+import org.fenixedu.idcards.domain.SantanderPhotoEntry;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.DateTime;
 import org.joda.time.YearMonthDay;
 import org.slf4j.Logger;
 
+import com.google.common.base.CharMatcher;
+import com.google.common.base.Strings;
+
+import pt.ist.esw.advice.pt.ist.fenixframework.AtomicInstance;
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveEmployees;
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveGrantOwner;
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveResearchers;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonContractSituation;
 import pt.ist.fenixedu.contracts.domain.util.CategoryType;
 import pt.ist.fenixframework.Atomic;
+import pt.ist.fenixframework.Atomic.TxMode;
+import pt.ist.fenixframework.CallableWithoutException;
 import pt.ist.fenixframework.FenixFramework;
-
-import com.google.common.base.CharMatcher;
-import com.google.common.base.Strings;
 
 public class SantanderBatchFillerWorker {
     private static String recordEnd = "*";
@@ -87,12 +91,22 @@ public class SantanderBatchFillerWorker {
             if (batch.getGenerated() != null) {
                 continue;
             }
-            final Set<Object[]> lines = new HashSet<Object[]>();
-            for (User user : Bennu.getInstance().getUserSet()) {
-                if (user.getPerson() != null) {
-                    generateLine(lines, batch, user.getPerson());
-                }
-            }
+            final Set<Object[]> lines = Bennu.getInstance().getUserSet().stream().parallel()
+                .map(user -> {
+                    try {
+                        return FenixFramework.getTransactionManager().withTransaction(new CallableWithoutException<Object[]>() {
+                            @Override
+                            public Object[] call() {
+                                final Person person = user.getPerson();
+                                return person == null ? null : generateLine(batch, person);
+                            }
+                        }, new AtomicInstance(TxMode.READ, false));
+                    } catch (final Exception ex) {
+                        throw new Error(ex);
+                    }                    
+                })
+                .filter(o -> o != null)
+                .collect(Collectors.toSet());
             fillBatch(batch, lines);
         }
         logger.info("[" + (new DateTime()).toString("yyyy-MM-dd HH:mm") + "] Work finished. :)");
@@ -103,14 +117,20 @@ public class SantanderBatchFillerWorker {
         for (final Object[] o : lines) {
             final Person person = (Person) o[0];
             final String line = (String) o[1];
-            new SantanderEntry(batch, person, line);
+            final SantanderEntry entry = new SantanderEntry(batch, person, line);
+            if (person.getSantanderPhotoEntry() == null) {
+                final SantanderPhotoEntry photoEntry = SantanderPhotoEntry.getOrCreatePhotoEntryForPerson(person);
+                if (photoEntry != null) {
+                    photoEntry.setSantanderEntry(entry);
+                }
+            }
         }
         batch.setGenerated(new DateTime());
         logger.info("Processed batch #" + batch.getExternalId());
         logger.info("Total number of records: " + batch.getSantanderEntriesSet().size() + "\n");
     }
 
-    private void generateLine(final Set<Object[]> lines, SantanderBatch batch, Person person) {
+    private Object[] generateLine(final SantanderBatch batch, final Person person) {
         /*
          * 1. Teacher
          * 2. Researcher
@@ -129,13 +149,8 @@ public class SantanderBatchFillerWorker {
             line = createLine(batch, person, "EMPLOYEE");
         } else if (treatAsGrantOwner(person)) {
             line = createLine(batch, person, "GRANT_OWNER");
-        } else {
-            return;
         }
-        if (line != null) {
-            lines.add(new Object[] { person, line });
-            //new SantanderEntry(batch, person, line);
-        }
+        return line == null ? null : new Object[] { person, line };
     }
 
     private boolean treatAsTeacher(Person person) {
