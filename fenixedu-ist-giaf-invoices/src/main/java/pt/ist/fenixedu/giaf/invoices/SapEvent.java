@@ -20,8 +20,6 @@ import org.fenixedu.academic.domain.accounting.AccountingTransaction;
 import org.fenixedu.academic.domain.accounting.AccountingTransactionDetail;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.EventType;
-import org.fenixedu.academic.domain.accounting.PaymentMode;
-import org.fenixedu.academic.domain.accounting.accountingTransactions.detail.SibsTransactionDetail;
 import org.fenixedu.academic.domain.accounting.calculator.CreditEntry;
 import org.fenixedu.academic.domain.accounting.calculator.Payment;
 import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeAndInsuranceEvent;
@@ -48,7 +46,6 @@ import com.google.common.base.Strings;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
 import pt.ist.fenixedu.domain.ExternalClient;
 import pt.ist.fenixedu.domain.SapDocumentFile;
 import pt.ist.fenixedu.domain.SapRequest;
@@ -671,6 +668,8 @@ public class SapEvent {
         return data;
     }
 
+
+
     private JsonObject toJsonPaymentFromAdvancement(Event event, SapRequest sapInvoiceRequest, Money amount)
             throws Exception {
         JsonObject data = toJson(event, sapInvoiceRequest.getClientJson(), new DateTime(), false, false, false);
@@ -986,24 +985,11 @@ public class SapEvent {
     }
 
     private String getPaymentMethodReference(AccountingTransactionDetail transactionDetail) {
-        if (transactionDetail.getPaymentMode().equals(PaymentMode.ATM)) {
-            return ((SibsTransactionDetail) transactionDetail).getSibsCode();
-        }
-        return "";
+        return transactionDetail.getPaymentReference();
     }
 
     private String getPaymentMechanism(AccountingTransactionDetail transactionDetail) {
-//            "NU" - numerário
-//            "SI" - sibs
-//            "OU" - outros        
-        switch (transactionDetail.getPaymentMode()) {
-        case CASH:
-            return "NU";
-        case ATM:
-            return "SI";
-        default:
-            throw new Error();
-        }
+        return transactionDetail.getPaymentMethod().getCode();
     }
 
     /**

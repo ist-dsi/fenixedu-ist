@@ -662,7 +662,7 @@ public class FenixAPIv1 {
         for (Entry entry : person.getPayments()) {
             String id = entry.getExternalId();
             String amount = entry.getOriginalAmount().getAmountAsString();
-            String name = entry.getPaymentMode().getName();
+            String name = entry.getPaymentMethod().getLocalizedName();
             String description = entry.getDescription().toString();
             String shortDescription = getShortDescriptionForEntry(entry);
             String date = formatDay.print(entry.getWhenRegistered());
