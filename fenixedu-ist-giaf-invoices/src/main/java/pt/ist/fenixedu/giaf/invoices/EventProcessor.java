@@ -55,7 +55,7 @@ public class EventProcessor {
                     return null;
                 }
             }, new AtomicInstance(TxMode.SPECULATIVE_READ, false));
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logError(consumer, elogger, event, e);
             e.printStackTrace();
         }
@@ -65,7 +65,6 @@ public class EventProcessor {
         if (!EventWrapper.shouldProcess(errorLog, event)) {
             return;
         }
-        try {
             if (EventWrapper.needsProcessingSap(event)) {
                 final SapEvent sapEvent = new SapEvent(event);
                 if (sapEvent.hasPendingDocumentCancelations()) {
@@ -136,9 +135,7 @@ public class EventProcessor {
 //                    d -> elogger.log("Processing past payment %s : %s%n", eventWrapper.event.getExternalId(), d.getExternalId()))
 //                    .forEach(d -> sapEvent.registerInvoiceAndPayment(clientMap, d, errorLog, elogger));
             }
-        } catch (final Exception e) {
-            logError(errorLog, elogger, event, e);
-        }
+
     }
 
     static CreditEntry getCreditEntry(final Money creditAmount) {
@@ -171,7 +168,7 @@ public class EventProcessor {
     }
 
     private static void logError(final ErrorLogConsumer errorLog, final EventLogger elogger, final Event event,
-            final Exception e) {
+            final Throwable e) {
         final String errorMessage = e.getMessage();
 
         BigDecimal amount;

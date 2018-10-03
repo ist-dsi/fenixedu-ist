@@ -38,18 +38,13 @@ import org.fenixedu.academic.domain.accounting.AccountingTransaction;
 import org.fenixedu.academic.domain.accounting.AccountingTransactionDetail;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.ResidenceEvent;
-import org.fenixedu.academic.domain.accounting.accountingTransactions.detail.SibsTransactionDetail;
 import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeAndInsuranceEvent;
 import org.fenixedu.academic.domain.accounting.events.AnnualEvent;
-import org.fenixedu.academic.domain.accounting.events.ImprovementOfApprovedEnrolmentEvent;
 import org.fenixedu.academic.domain.accounting.events.PastAdministrativeOfficeFeeAndInsuranceEvent;
-import org.fenixedu.academic.domain.accounting.events.SpecialSeasonEnrolmentEvent;
 import org.fenixedu.academic.domain.accounting.events.candidacy.IndividualCandidacyEvent;
-import org.fenixedu.academic.domain.accounting.events.dfa.DFACandidacyEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.ExternalScholarshipGratuityContributionEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEventWithPaymentPlan;
-import org.fenixedu.academic.domain.accounting.events.insurance.InsuranceEvent;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
 import org.fenixedu.academic.domain.degreeStructure.CycleType;
 import org.fenixedu.academic.domain.exceptions.DomainException;
@@ -59,8 +54,6 @@ import org.fenixedu.academic.domain.phd.debts.PhdGratuityEvent;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.util.Money;
-import org.fenixedu.bennu.core.domain.User;
-import org.fenixedu.bennu.core.domain.UserProfile;
 import org.fenixedu.commons.StringNormalizer;
 import org.joda.time.DateTime;
 import org.joda.time.YearMonthDay;
@@ -84,7 +77,8 @@ public class Utils {
         try {
             transaction.getAmountWithAdjustment().getAmount();
         } catch (final DomainException ex) {
-            logError(consumer, "Unable to Determine Amount", event, null, "", null, null, null, null, event);
+            logError(consumer, "Unable to Determine Amount", event, getUserIdentifier(event.getParty()), "", null,
+                    event.getParty(), null, null, event);
             return false;
         }
 
@@ -146,6 +140,10 @@ public class Utils {
 
         final Party party = event.getParty();
         final Country country = party.getCountry();
+        if (country == null) {
+            logError(consumer, "Has no country", event, getUserIdentifier(party), "", null, party, null, null, event);
+            return false;
+        }
 
         final SimpleImmutableEntry<String, String> articleCode = SapEvent.mapToProduct(event, eventDescription, false, false);
         if (articleCode == null) {
