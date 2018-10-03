@@ -58,8 +58,19 @@
 
 	<!-- Operations -->
 	<ul>
-		<li><html:link action="<%="/payments.do?method=showEvents&amp;personId=" + personId %>">
+		<li><html:link href="<%=request.getContextPath() + "/accounting-management/" + personId + "/multiplePayments/select" %>">
 			<bean:message bundle="ACADEMIC_OFFICE_RESOURCES" key="label.payments.currentEvents" />
+		</html:link></li>
+		<li>
+			<html:link href="<%= request.getContextPath() + "/accounting-management/" + personId %>">
+				<bean:message bundle="ACADEMIC_OFFICE_RESOURCES" key="label.payments.show.events"/>
+			</html:link>
+		</li>
+		<li><html:link href="<%= request.getContextPath() + "/giaf-invoice-viewer" %>" paramId="username" paramName="person" paramProperty="username">
+			<bean:message bundle="GIAF_INVOICES_RESOURCES" key="title.giaf.invoice.viewer" />
+		</html:link></li>
+		<li><html:link href="<%= request.getContextPath() + "/sap-invoice-viewer" %>" paramId="username" paramName="person" paramProperty="username">
+			<bean:message bundle="GIAF_INVOICES_RESOURCES" key="title.sap.invoice.viewer" />
 		</html:link></li>
 	</ul>
 	<%--<ul>--%>
@@ -77,16 +88,6 @@
 			<%--<bean:message bundle="ACADEMIC_OFFICE_RESOURCES" key="label.payments.extract" />--%>
 		<%--</html:link></li>--%>
 	<%--</ul>--%>
-	<ul>
-		<li><html:link href="<%= request.getContextPath() + "/giaf-invoice-viewer" %>" paramId="username" paramName="person" paramProperty="username">
-			<bean:message bundle="GIAF_INVOICES_RESOURCES" key="title.giaf.invoice.viewer" />
-		</html:link></li>
-	</ul>
-    <ul>
-        <li><html:link href="<%= request.getContextPath() + "/sap-invoice-viewer" %>" paramId="username" paramName="person" paramProperty="username">
-            <bean:message bundle="GIAF_INVOICES_RESOURCES" key="title.sap.invoice.viewer" />
-        </html:link></li>
-    </ul>
 	
 	<br/>
 	<strong><bean:message bundle="ACADEMIC_OFFICE_RESOURCES" key="label.documents"/></strong>
