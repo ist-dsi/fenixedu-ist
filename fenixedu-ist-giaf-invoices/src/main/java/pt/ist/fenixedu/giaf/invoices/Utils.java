@@ -262,15 +262,13 @@ public class Utils {
             return;
         }
 
-        BigDecimal amount;
-        DebtCycleType cycleType;
+        BigDecimal amount = null;
+        DebtCycleType cycleType = null;
         
         try {
-            amount = e.getOriginalAmountToPay().getAmount();
             cycleType = cycleType(e);
+            amount = e.getOriginalAmountToPay().getAmount();
         } catch (Throwable t) {
-            amount = null;
-            cycleType = null;
         }
 
         consumer.accept(

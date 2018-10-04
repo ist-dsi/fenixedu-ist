@@ -187,7 +187,7 @@ public class EventProcessor {
                 "", "", "", "", "", "", "", "", "", "", "");
         elogger.log("%s: %s%n", event.getExternalId(), errorMessage);
         elogger.log(
-                "Unhandled SAP error for event " + event.getExternalId() + " : " + e.getClass().getName() + " - " + errorMessage);
+                "Unhandled error for event " + event.getExternalId() + " : " + e.getClass().getName() + " - " + errorMessage);
         e.printStackTrace();
     }
 
