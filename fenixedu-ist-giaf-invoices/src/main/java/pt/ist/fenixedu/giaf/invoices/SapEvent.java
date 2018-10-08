@@ -953,7 +953,7 @@ public class SapEvent {
         clientData.addProperty("city", externalClient.getCity());
         clientData.addProperty("region", externalClient.getRegion());
         clientData.addProperty("postalCode", externalClient.getPostalCode());
-        clientData.addProperty("vatNumber", externalClient.getVatNumber());
+        clientData.addProperty("vatNumber", externalClient.getFiscalCountry() + externalClient.getVatNumber());
         clientData.addProperty("fiscalCountry", externalClient.getFiscalCountry());
         clientData.addProperty("nationality", externalClient.getNationality());
         clientData.addProperty("billingIndicator", externalClient.getBillingIndicator());
