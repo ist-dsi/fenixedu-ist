@@ -16,6 +16,64 @@ import pt.ist.fenixframework.Atomic.TxMode;
 
 public class SapRequest extends SapRequest_Base {
 
+    public class ClientData {
+
+        private final JsonObject clientData = getRequestAsJson().get("clientData").getAsJsonObject();
+
+        public String getAccountId() {
+            return clientData.get("accountId").getAsString();
+        }
+        public String getCompanyName() {
+            return clientData.get("companyName").getAsString();
+        }
+        public String getClientId() {
+            return clientData.get("clientId").getAsString();
+        }
+        public String getCountry() {
+            return clientData.get("country").getAsString();
+        }
+        public String getStreet() {
+            return clientData.get("street").getAsString();
+        }
+        public String getCity() {
+            return clientData.get("city").getAsString();
+        }
+        public String getRegion() {
+            return clientData.get("region").getAsString();
+        }
+        public String getPostalCode() {
+            return clientData.get("postalCode").getAsString();
+        }
+        public String getVatNumber() {
+            return clientData.get("vatNumber").getAsString();
+        }
+        public String getFiscalCountry() {
+            return clientData.get("fiscalCountry").getAsString();
+        }
+        public String getNationality() {
+            return clientData.get("nationality").getAsString();
+        }
+        public String getBillingIndicator() {
+            return clientData.get("billingIndicator").getAsString();
+        }
+    }
+
+    public class DocumentData {
+
+        private final JsonObject json = getRequestAsJson();
+
+        public String getCurrencyCode() {
+            return json.get("currencyCode").getAsString();
+        }
+        public String getProductCode() {
+            return json.get("productCode").getAsString();
+        }
+        public String getProductDescription() {
+            return json.get("productDescription").getAsString();
+        }
+
+    }
+
     public static final Comparator<SapRequest> COMPARATOR_BY_DATE = new Comparator<SapRequest>() {
         @Override
         public int compare(SapRequest r1, SapRequest r2) {
@@ -130,8 +188,14 @@ public class SapRequest extends SapRequest_Base {
     }
 
     public JsonObject getClientJson() {
-        final JsonObject o = new JsonParser().parse(getRequest()).getAsJsonObject();
+        final JsonObject o = getRequestAsJson();
         return o.get("clientData").getAsJsonObject();
+    }
+
+    public String getUVat() {
+        final JsonObject o = getRequestAsJson();
+        final JsonObject clientData = o.get("clientData").getAsJsonObject();
+        return clientData == null || clientData.isJsonNull() ? null : clientData.get("vatNumber").getAsString();
     }
 
     public boolean getReferenced() {
@@ -143,6 +207,18 @@ public class SapRequest extends SapRequest_Base {
     public boolean isDebtDocument() {
         final SapRequestType requestType = getRequestType();
         return requestType == SapRequestType.DEBT || requestType == SapRequestType.DEBT_CREDIT;
+    }
+
+    private JsonObject getRequestAsJson() {
+        return new JsonParser().parse(getRequest()).getAsJsonObject();
+    }
+
+    public ClientData getClientData() {
+        return new ClientData();
+    }
+
+    public DocumentData getDocumentData() {
+        return new DocumentData();
     }
 
 }
