@@ -1,0 +1,33 @@
+{% set giafInvoicesResourcesBundle = "resources/GiafInvoicesResources" %}
+
+<div class="overall-description">
+<table class="table tdmiddle">
+    <thead>
+        <tr>
+            <th>{{i18n(giafInvoicesResourcesBundle, "label.invoice")}}</th>
+            <th>{{i18n(giafInvoicesResourcesBundle, "label.value")}}</th>
+            <th>{{i18n(giafInvoicesResourcesBundle, "label.uvat")}}</th>
+        </tr>
+    </thead>
+    <tbody id="eventList">
+        {% for sapRequest in event.getSapRequestSet %}
+            {% if sapRequest.requestType == 'INVOICE' %}
+            <tr>
+                <td>
+                    <a href="{{request.contextPath}}/invoice-downloader/sap/{{sapRequest.externalId}}/details">
+                        {{sapRequest.documentNumber}}
+                    </a>
+                </td>
+                <td>
+                    {{sapRequest.value}}
+                </td>
+                <td>
+                    {{sapRequest.uVat}}
+                </td>
+            </tr>
+            {% endif %}
+        {% else %}
+        {% endfor %}
+    </tbody>
+</table>
+</div>

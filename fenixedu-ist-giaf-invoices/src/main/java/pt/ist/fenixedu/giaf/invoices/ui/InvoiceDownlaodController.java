@@ -32,6 +32,8 @@ import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.EventState;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.security.Authenticate;
+import org.fenixedu.bennu.rendering.annotations.BennuIntersection;
+import org.fenixedu.bennu.rendering.annotations.BennuIntersections;
 import org.fenixedu.bennu.spring.portal.SpringApplication;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.springframework.http.HttpStatus;
@@ -50,6 +52,12 @@ import pt.ist.fenixedu.domain.SapDocumentFile;
 import pt.ist.fenixedu.domain.SapRequest;
 import pt.ist.fenixedu.giaf.invoices.GiafEvent;
 
+@BennuIntersections({
+    @BennuIntersection(location = "events.global.operations", position = "operations", file= "templates/sapDocumentsLink.html"),
+    @BennuIntersection(location = "event.details.extra.info", position = "info", file= "templates/sapInvoiceDetails.html"),
+    @BennuIntersection(location = "event.details.extra.info", position = "operations", file= "templates/sapEventDocumentsLink.html"),
+    @BennuIntersection(location = "event.payment.reference.extra.info", position = "info", file= "templates/sapPaymentReferenceInfo.html")
+})
 @SpringApplication(group = "logged", path = "giaf-invoice-viewer", title = "title.giaf.invoice.viewer", hint = "giaf-invoice-viewer")
 @SpringFunctionality(app = InvoiceDownlaodController.class, title = "title.giaf.invoice.viewer")
 @RequestMapping("/invoice-downloader")
@@ -154,6 +162,14 @@ public class InvoiceDownlaodController {
         } catch (final IOException e) {
             throw new Error(e);
         };
+    }
+
+    @RequestMapping(value = "/sap/{sapRequest}/details", method = RequestMethod.GET)
+    public String sapInvoiceDetails(final @PathVariable SapRequest sapRequest, final Model model) {
+        model.addAttribute("sapRequest", sapRequest);
+        model.addAttribute("clientData", sapRequest.getClientData());
+        model.addAttribute("documentData", sapRequest.getDocumentData());
+        return "sap-invoice-viewer/invoiceDetails";
     }
 
     private String fullFilename(final String filename) {
