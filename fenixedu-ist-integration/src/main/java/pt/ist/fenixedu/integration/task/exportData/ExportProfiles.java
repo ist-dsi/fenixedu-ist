@@ -18,11 +18,10 @@
  */
 package pt.ist.fenixedu.integration.task.exportData;
 
-import java.util.Optional;
-import pt.ist.fenixedu.contracts.domain.LegacyRoleUtils;
-import pt.ist.fenixframework.Atomic.TxMode;
+import static org.fenixedu.commons.stream.StreamUtils.toJsonArray;
 
 import java.io.FileOutputStream;
+import java.util.Optional;
 
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.bennu.core.domain.Bennu;
@@ -30,14 +29,17 @@ import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.UserProfile;
 import org.fenixedu.bennu.scheduler.CronTask;
 import org.fenixedu.bennu.scheduler.annotation.Task;
-import org.fenixedu.bennu.scheduler.custom.CustomTask;
 import org.joda.time.LocalDate;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import static org.fenixedu.commons.stream.StreamUtils.toJsonArray;
+import pt.ist.esw.advice.pt.ist.fenixframework.AtomicInstance;
+import pt.ist.fenixedu.contracts.domain.LegacyRoleUtils;
+import pt.ist.fenixframework.Atomic.TxMode;
+import pt.ist.fenixframework.CallableWithoutException;
+import pt.ist.fenixframework.FenixFramework;
 
 @Task(englishTitle = "Export user profiles to shared json file with other applications.")
 public class ExportProfiles extends CronTask {
@@ -49,9 +51,11 @@ public class ExportProfiles extends CronTask {
 
     @Override
     public void runTask() throws Exception {
-        final String profiles =
-                Bennu.getInstance().getUserSet().stream().filter(u -> u.getProfile() != null)
-                        .map(u -> toJsonObject(u.getProfile())).collect(toJsonArray()).toString();
+        final String profiles = Bennu.getInstance().getUserSet().stream()
+                .parallel()
+                .map(u -> toJsonObject(u))
+                .filter(j -> j != null)
+                .collect(toJsonArray()).toString();
         final byte[] bytes = profiles.getBytes();
         output("profiles.json", bytes);
         try (final FileOutputStream fos = new FileOutputStream("/afs/ist.utl.pt/ciist/fenix/fenix015/ist/profiles.json")) {
@@ -59,18 +63,32 @@ public class ExportProfiles extends CronTask {
         }
     }
 
-    private JsonObject toJsonObject(final UserProfile up) {
-        final JsonObject object = new JsonObject();
-        object.addProperty("username", up.getUser().getUsername());
-        object.addProperty("givenNames", up.getGivenNames());
-        object.addProperty("familyNames", up.getFamilyNames());
-        object.addProperty("displayName", up.getDisplayName());
-        object.addProperty("email", up.getEmail());
-        object.add("userAliases", aliasesFor(up));
-        Optional<LocalDate> expiration = up.getUser().getExpiration();
-        object.addProperty("expiration", expiration.map(Object::toString).orElse(null));
-        object.add("roles", LegacyRoleUtils.mainRoleKeys(up.getUser()).stream().map(JsonPrimitive::new).collect(toJsonArray()));
-        return object;
+    private JsonObject toJsonObject(final User user) {
+        try {
+            return FenixFramework.getTransactionManager().withTransaction(new CallableWithoutException<JsonObject>() {
+
+                @Override
+                public JsonObject call() {
+                    final UserProfile up = user.getProfile();
+                    if (up == null) {
+                        return null;
+                    }
+                    final JsonObject object = new JsonObject();
+                    object.addProperty("username", up.getUser().getUsername());
+                    object.addProperty("givenNames", up.getGivenNames());
+                    object.addProperty("familyNames", up.getFamilyNames());
+                    object.addProperty("displayName", up.getDisplayName());
+                    object.addProperty("email", up.getEmail());
+                    object.add("userAliases", aliasesFor(up));
+                    Optional<LocalDate> expiration = up.getUser().getExpiration();
+                    object.addProperty("expiration", expiration.map(Object::toString).orElse(null));
+                    object.add("roles", LegacyRoleUtils.mainRoleKeys(up.getUser()).stream().map(JsonPrimitive::new).collect(toJsonArray()));
+                    return object;
+                }
+            }, new AtomicInstance(TxMode.READ, false));
+        } catch (Exception e) {
+            throw new Error(e);
+        }
     }
 
     private JsonArray aliasesFor(final UserProfile up) {
