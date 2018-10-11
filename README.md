@@ -20,7 +20,7 @@ The modules are:
 - Tutorship - Tutorship program for IST
 - Vigilancies - Exam vigilancies for IST
 
-##Issue Tracking
+## Issue Tracking
 
 Issue Tracking for the FenixEdu IST project is done in the [FenixEdu JIRA](https://jira.fenixedu.org/browse/FIST).
 
