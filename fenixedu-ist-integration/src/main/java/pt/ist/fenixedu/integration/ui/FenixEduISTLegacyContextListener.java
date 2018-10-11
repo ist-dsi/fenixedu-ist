@@ -238,7 +238,7 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
 
                 try {
                     final Stream<Event> events = person.getEventsSet().stream();
-                    final String overDueEvents = events.filter(FenixEduISTLegacyContextListener::isOverDue)
+                    final String overDueEvents = events.filter(Utils::isOverDue)
                             .map(e -> e.getDescription().toString())
                             .collect(Collectors.joining(","));
                     if (!Strings.isNullOrEmpty(overDueEvents)) {
@@ -295,10 +295,6 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
             return null;
         };
 
-    }
-
-    private static boolean isOverDue(final Event event) {
-        return !event.isCancelled() && event.isInDebt() && Utils.getDueDate(event).before(new Date());
     }
 
     private static boolean isValidPostCode(final String postalCode) {

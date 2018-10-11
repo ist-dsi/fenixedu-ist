@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -38,25 +39,23 @@ import org.fenixedu.academic.domain.accounting.AccountingTransaction;
 import org.fenixedu.academic.domain.accounting.AccountingTransactionDetail;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.ResidenceEvent;
-import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeAndInsuranceEvent;
+import org.fenixedu.academic.domain.accounting.calculator.Debt;
+import org.fenixedu.academic.domain.accounting.calculator.DebtInterestCalculator;
 import org.fenixedu.academic.domain.accounting.events.AnnualEvent;
-import org.fenixedu.academic.domain.accounting.events.PastAdministrativeOfficeFeeAndInsuranceEvent;
 import org.fenixedu.academic.domain.accounting.events.candidacy.IndividualCandidacyEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.ExternalScholarshipGratuityContributionEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEvent;
-import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEventWithPaymentPlan;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
 import org.fenixedu.academic.domain.degreeStructure.CycleType;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.organizationalStructure.Party;
 import org.fenixedu.academic.domain.phd.debts.PhdEvent;
-import org.fenixedu.academic.domain.phd.debts.PhdGratuityEvent;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.util.Money;
 import org.fenixedu.commons.StringNormalizer;
 import org.joda.time.DateTime;
-import org.joda.time.YearMonthDay;
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -409,33 +408,25 @@ public class Utils {
         }
     }
 
-    public static Date getDueDate(final Event event) {
-        final DateTime dueDate;
-        if (event instanceof GratuityEventWithPaymentPlan) {
-            final GratuityEventWithPaymentPlan gratuityEventWithPaymentPlan = (GratuityEventWithPaymentPlan) event;
-            dueDate = findLastDueDate(gratuityEventWithPaymentPlan);
-        } else if (event instanceof PhdGratuityEvent) {
-            final PhdGratuityEvent phdGratuityEvent = (PhdGratuityEvent) event;
-            dueDate = phdGratuityEvent.getLimitDateToPay();
-        } else if (event instanceof PastAdministrativeOfficeFeeAndInsuranceEvent) {
-            dueDate = getDueDateByPaymentCodes(event);
-        } else if (event instanceof AdministrativeOfficeFeeAndInsuranceEvent) {
-            final AdministrativeOfficeFeeAndInsuranceEvent insuranceEvent = (AdministrativeOfficeFeeAndInsuranceEvent) event;
-            final YearMonthDay ymd = insuranceEvent.getAdministrativeOfficeFeePaymentLimitDate();
-            dueDate = ymd != null ? ymd.plusDays(1).toDateTimeAtMidnight() : getDueDateByPaymentCodes(event);
-        } else {
-            dueDate = getDueDateByPaymentCodes(event);
+    public static boolean isOverDue(final Event event) {
+        if (event.isCancelled()) {
+            return false;
         }
-        return dueDate.toDate();
+        final LocalDate today = new LocalDate();
+        final DebtInterestCalculator calculator = event.getDebtInterestCalculator(new DateTime());
+        for (final Debt debt : calculator.getDebtsOrderedByDueDate()) {
+            if ((debt.getDueDate().isBefore(today) && debt.getOpenAmount().signum() > 0)
+                    || debt.getOpenFineAmount().signum() > 0
+                    || debt.getOpenInterestAmount().signum() > 0){
+                return true;
+            }
+        }
+        return false;
     }
 
-    private static DateTime getDueDateByPaymentCodes(final Event event) {
-        final YearMonthDay ymd = event.getPaymentCodesSet().stream().map(pc -> pc.getEndDate()).max(YearMonthDay::compareTo).orElse(null);
-        return ymd != null ? ymd.plusDays(1).toDateTimeAtMidnight() : event.getWhenOccured();
-    }
-
-    private static DateTime findLastDueDate(final GratuityEventWithPaymentPlan event) {
-        return event.getInstallments().stream().map(i -> i.getEndDate().toDateTimeAtMidnight()).max(DateTime::compareTo).orElse(null);
+    public static Date getDueDate(final Event event) {
+        return event.getDueDateAmountMap(new DateTime()).keySet().stream()
+            .sorted(Comparator.reverseOrder()).findFirst().get().toDate();
     }
 
 }
