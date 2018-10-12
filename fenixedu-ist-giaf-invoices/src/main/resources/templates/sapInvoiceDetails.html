@@ -11,7 +11,7 @@
     </thead>
     <tbody id="eventList">
         {% for sapRequest in event.getSapRequestSet %}
-            {% if sapRequest.requestType == 'INVOICE' %}
+            {% if sapRequest.requestType == 'INVOICE' and sapRequest.documentNumber != 'ND0' %}
             <tr>
                 <td>
                     <a href="{{request.contextPath}}/invoice-downloader/sap/{{sapRequest.externalId}}/details">

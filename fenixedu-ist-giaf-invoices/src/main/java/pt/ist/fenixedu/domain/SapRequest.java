@@ -189,12 +189,12 @@ public class SapRequest extends SapRequest_Base {
 
     public JsonObject getClientJson() {
         final JsonObject o = getRequestAsJson();
-        return o.get("clientData").getAsJsonObject();
+        return o == null ? null : o.get("clientData").getAsJsonObject();
     }
 
     public String getUVat() {
         final JsonObject o = getRequestAsJson();
-        final JsonObject clientData = o.get("clientData").getAsJsonObject();
+        final JsonObject clientData = o == null ? null : o.get("clientData").getAsJsonObject();
         return clientData == null || clientData.isJsonNull() ? null : clientData.get("vatNumber").getAsString();
     }
 
@@ -210,7 +210,8 @@ public class SapRequest extends SapRequest_Base {
     }
 
     private JsonObject getRequestAsJson() {
-        return new JsonParser().parse(getRequest()).getAsJsonObject();
+        final String request = getRequest();
+        return request == null || request.isEmpty() ? null : new JsonParser().parse(getRequest()).getAsJsonObject();
     }
 
     public ClientData getClientData() {
