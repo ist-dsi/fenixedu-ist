@@ -82,7 +82,7 @@ public class SapEvent {
 
     public SapRequest registerInvoice(Money debtFenix, Event event, boolean isGratuity, boolean isNewDate) {
 
-        if (isToProcessDebt(event, isGratuity)) {
+        if (isToProcessDebt(isGratuity, isNewDate, getDocumentDate(event.getWhenOccured(), isNewDate))) {
             //if debt is greater than invoice, then there was a debt registered and the correspondent invoice failed, don't register the debt again
             if (!getDebtAmount().greaterThan(getInvoiceAmount())) {
                 registerDebt(debtFenix, event, isNewDate);
@@ -183,7 +183,8 @@ public class SapEvent {
             workDocument.addProperty("paymentStatus", "A");
             workDocument.addProperty("paymentDate", new DateTime().toString("yyyy-MM-dd HH:mm:ss"));
         }
-        if (requestType == SapRequestType.CREDIT && isToProcessDebt(sapRequest.getEvent(), sapRequest.getEvent().isGratuity())) {
+        if (requestType == SapRequestType.CREDIT
+                && getFilteredSapRequestStream().anyMatch(r -> r.getRequestType() == SapRequestType.DEBT)) {
             registerDebt(sapRequest.getValue(), event, true);
         }
             
@@ -328,7 +329,7 @@ public class SapEvent {
         // diminuir divida no sap (se for propina diminuir dívida) e credit note na última factura existente
         // se o valor pago nesta factura for superior à nova dívida, o que fazer? terá que existir nota crédito no fenix -> sim
 
-        if (isToProcessDebt(event, isGratuity)) {
+        if (isToProcessDebt(isGratuity, true, new DateTime())) {
             //if the debt credit amount is greater than the credit amount it means that a credit debt was registered but the correspondent invoice credit failed
             //we don't register the credit debt again
             if (!getDebtCreditAmount().greaterThan(getCreditAmount())) {
@@ -608,9 +609,14 @@ public class SapEvent {
         return documentDate;
     }
 
-    private boolean isToProcessDebt(Event event, boolean isGratuity) {
+    private boolean isToProcessDebt(boolean isGratuity, final boolean isNewDate, final DateTime documentDate) {
         return (isGratuity || (event instanceof ExternalScholarshipPhdGratuityContribuitionEvent))
-                && event.getWhenOccured().isAfter(EventWrapper.LIMIT);
+                && event.getWhenOccured().isAfter(EventWrapper.LIMIT)
+                && isNotPastDebtEndDate(isNewDate, documentDate);
+    }
+
+    private boolean isNotPastDebtEndDate(final boolean isNewDate, final DateTime documentDate) {
+        return getDebtInterval(documentDate, isNewDate) != null;
     }
 
     /**
@@ -792,23 +798,10 @@ public class SapEvent {
                 toJsonWorkDocument(documentDate, entryDate, debtFenix, docType, isToDebit, new DateTime(Utils.getDueDate(event)));
 
         if (originalMetadata == null) {
-            LocalDate startDate = isNewDate ? currentDate : documentDate.toLocalDate();
-            ExecutionYear executionYear = Utils.executionYearOf(event);
-            if (startDate.isBefore(executionYear.getBeginLocalDate())) {
-                startDate = executionYear.getBeginLocalDate();
-            }
-            LocalDate endDate = executionYear.getEndDateYearMonthDay().toLocalDate();
-
-            //If it is a Phd the dates are not regulated by the execution year
-            if (event instanceof PhdGratuityEvent) {
-                PhdGratuityEvent phdEvent = (PhdGratuityEvent) event;
-                startDate = phdEvent.getPhdGratuityDate().getYear() == phdEvent.getYear() ? phdEvent.getPhdGratuityDate()
-                        .toLocalDate() : phdEvent.getWhenOccured().toLocalDate();
-                endDate = startDate.plusYears(1);
-            }
-
+            final LocalDate[] debtInterval = getDebtInterval(documentDate, isNewDate);
+            final ExecutionYear executionYear = Utils.executionYearOf(event);
             String metadata = String.format("{\"ANO_LECTIVO\":\"%s\", \"START_DATE\":\"%s\", \"END_DATE\":\"%s\"}",
-                    executionYear.getName(), startDate.toString("yyyy-MM-dd"), endDate.toString("yyyy-MM-dd"));
+                    executionYear.getName(), debtInterval[0].toString("yyyy-MM-dd"), debtInterval[1].toString("yyyy-MM-dd"));
             workDocument.addProperty("debtMetadata", metadata);
         } else {
             workDocument.addProperty("debtMetadata", originalMetadata);
@@ -816,6 +809,24 @@ public class SapEvent {
 
         json.add("workingDocument", workDocument);
         return json;
+    }
+
+    private LocalDate[] getDebtInterval(final DateTime documentDate, final boolean isNewDate) {
+        LocalDate startDate = isNewDate ? currentDate : documentDate.toLocalDate();
+        final LocalDate endDate;
+        if (event instanceof PhdGratuityEvent) {
+            PhdGratuityEvent phdEvent = (PhdGratuityEvent) event;
+            final LocalDate localDate = phdEvent.getPhdGratuityDate().getYear() == phdEvent.getYear() ?
+                    phdEvent.getPhdGratuityDate().toLocalDate() : phdEvent.getWhenOccured().toLocalDate();
+            endDate = localDate.plusYears(1);
+        } else {
+            final ExecutionYear executionYear = Utils.executionYearOf(event);
+            if (startDate.isBefore(executionYear.getBeginLocalDate())) {
+                startDate = executionYear.getBeginLocalDate();
+            }
+            endDate = executionYear.getEndDateYearMonthDay().toLocalDate();
+        }
+        return startDate.isAfter(endDate) ? null : new LocalDate[] { startDate, endDate };
     }
 
     private JsonObject toJsonDebtCredit(Event event, Money debtFenix, String clientId, DateTime documentDate, DateTime entryDate,
