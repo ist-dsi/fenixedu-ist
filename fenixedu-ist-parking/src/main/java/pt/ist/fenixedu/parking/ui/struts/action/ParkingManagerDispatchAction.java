@@ -643,7 +643,7 @@ public class ParkingManagerDispatchAction extends FenixDispatchAction {
                     if (firstRow != lastRow) {
                         for (int iter = 0; iter < 7; iter++) {
                             spreadsheet.getSheet()
-                                    .addMergedRegion(new CellRangeAddress(firstRow, (short) iter, lastRow, (short) iter));
+                                    .addMergedRegion(new CellRangeAddress(firstRow, lastRow, (short) iter, (short) iter));
                         }
                     }
                 }
