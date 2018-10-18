@@ -122,17 +122,14 @@ public class SapEvent {
         if (amountToTransfer.isZero()) {
             throw new Error("label.error.value.to.transfer.must.be.posituve");
         }
-        event.getSapRequestSet().stream()
-            .filter(r -> r != sapRequest && r.refersToDocument(sapRequest.getDocumentNumber()))
-            .findAny().ifPresent(r -> {
-                throw new Error("label.error.invoice.already.used");
-            });
         final Money invoiceValue = sapRequest.getValue();
-        final Money remainder = invoiceValue.subtract(amountToTransfer);
+        final Money consumedAmount = sapRequest.consumedAmount();
+        final Money availableInvoiceValue = invoiceValue.subtract(consumedAmount);
+        final Money remainder = availableInvoiceValue.subtract(amountToTransfer);
         if (remainder.isNegative()) {
             throw new Error("label.error.amount.exceeds.invoice.value");
         } else {
-            final SapRequest creditRequest = registerCredit(event, EventProcessor.getCreditEntry(invoiceValue), invoiceValue, sapRequest);
+            final SapRequest creditRequest = registerCredit(event, EventProcessor.getCreditEntry(availableInvoiceValue), availableInvoiceValue, sapRequest);
             sapRequest.setIgnore(true);
             creditRequest.setIgnore(true);
 

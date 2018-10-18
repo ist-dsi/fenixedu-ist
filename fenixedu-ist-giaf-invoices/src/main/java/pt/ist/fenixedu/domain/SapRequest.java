@@ -222,4 +222,16 @@ public class SapRequest extends SapRequest_Base {
         return new DocumentData();
     }
 
+    public Money consumedAmount() {
+        final SapRequest sapRequest = this;
+        return getEvent().getSapRequestSet().stream()
+            .filter(r -> r != sapRequest && r.refersToDocument(sapRequest.getDocumentNumber()))
+            .map(r -> r.getValue())
+            .reduce(Money.ZERO, Money::add);
+    }
+
+    public boolean isAvailableForTransfer() {
+        return getValue().subtract(consumedAmount()).isPositive();
+    }
+
 }
