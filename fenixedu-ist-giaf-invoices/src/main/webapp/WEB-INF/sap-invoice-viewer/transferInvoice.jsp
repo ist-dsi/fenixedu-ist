@@ -51,7 +51,7 @@
             <spring:message code="label.invoice.transfer.value" text="Value to Transfer" />
         </label>
         <div class="col-sm-10">
-            <input name="valueToTransfer" type="text" class="form-control" id="valueToTransfer" required="required" value=""/>
+            <input name="valueToTransfer" class="form-control" id="valueToTransfer" type="text" min="0.01" pattern="[0-9]+([\.][0-9]{0,2})?" placeholder="ex: xxxx.yy" required><span> €</span>
         </div>
     </div>
     <div class="form-group">
