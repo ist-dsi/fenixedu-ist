@@ -56,7 +56,8 @@ import pt.ist.fenixedu.giaf.invoices.GiafEvent;
     @BennuIntersection(location = "events.global.operations", position = "operations", file= "templates/sapDocumentsLink.html"),
     @BennuIntersection(location = "event.details.extra.info", position = "info", file= "templates/sapInvoiceDetails.html"),
     @BennuIntersection(location = "event.details.extra.info", position = "operations", file= "templates/sapEventDocumentsLink.html"),
-    @BennuIntersection(location = "event.payment.reference.extra.info", position = "info", file= "templates/sapPaymentReferenceInfo.html")
+    @BennuIntersection(location = "event.payment.reference.extra.info", position = "info", file= "templates/sapPaymentReferenceInfo.html"),
+    @BennuIntersection(location = "event.payment.reference.extra.info", position = "paymentMethods", file= "templates/otherPaymentMethods.html")
 })
 @SpringApplication(group = "logged", path = "giaf-invoice-viewer", title = "title.giaf.invoice.viewer", hint = "giaf-invoice-viewer")
 @SpringFunctionality(app = InvoiceDownlaodController.class, title = "title.giaf.invoice.viewer")
