@@ -296,6 +296,7 @@ public class SapInvoiceController {
         result.addProperty("whenSent", sapRequest.getWhenSent() == null ? null : sapRequest.getWhenSent().toString(DATE_TIME_FORMAT));
         result.addProperty("ignore", sapRequest.getIgnore());
         result.addProperty("referenced", sapRequest.getReferenced());
+        result.addProperty("isAvailableForTransfer", sapRequest.isAvailableForTransfer());
         return result;
     }
 

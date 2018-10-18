@@ -228,7 +228,7 @@
 
     function transfer(sapRequest) {
         <% if (Group.dynamic("managers").isMember(Authenticate.getUser()) || SapInvoiceController.isAdvancedPaymentManager()) { %>
-        if (!sapRequest.referenced && !sapRequest.ignore && sapRequest.requestType == 'INVOICE') {
+        if (sapRequest.isAvailableForTransfer && !sapRequest.ignore && sapRequest.requestType == 'INVOICE') {
             return '<form method="get" action="' + contextPath + '/sap-invoice-viewer/' + sapRequest.id + '/transfer">'
                + '${csrf.field()}'
                + '<button type="submit" class="btn btn-info"><spring:message code="label.transfer" text="Transfer"/></button>'
