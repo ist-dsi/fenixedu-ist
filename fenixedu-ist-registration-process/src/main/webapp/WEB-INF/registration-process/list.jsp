@@ -203,7 +203,7 @@
 			<form:label path="executionYear" class="control-label col-sm-2"> <spring:message code="label.declaration.generate.file.choose.year" /> </form:label>
 			<div class="col-sm-10">
 				<form:select path="executionYear" class="form-control">
-	   				<form:options items="${registration.registrationDataByExecutionYear}" itemValue="executionYear.externalId" itemLabel="executionYear.name"/>
+	   				<form:options items="${enrolmentExecutionYears}" itemValue="externalId" itemLabel="name"/>
 				</form:select>
 			</div>
 		</div>

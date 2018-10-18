@@ -2,14 +2,11 @@ package pt.ist.registration.process.ui;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.student.Registration;
-import org.fenixedu.academic.domain.student.RegistrationDataByExecutionYear;
 import org.fenixedu.bennu.rendering.annotations.BennuIntersection;
 import org.fenixedu.bennu.rendering.annotations.BennuIntersections;
 import org.fenixedu.bennu.spring.portal.SpringApplication;
@@ -59,7 +56,7 @@ public class RegistrationProcessDeclarationController {
         logger.debug("Invoking RegistrationProcessDeclarationController.list => Registration: {}", registration.getExternalId());
         return listFiles(model, registration);
     }
-    
+
     @RequestMapping(value = "/registration/{registration}", method = RequestMethod.POST)
     public String generateRegistrationDeclaration(@PathVariable Registration registration,
             @ModelAttribute DeclarationTemplateInputFormBean bean, Model model) {
@@ -77,8 +74,6 @@ public class RegistrationProcessDeclarationController {
                 registration.getExternalId(), template == null ? "null" : template.getExternalId(),
                 executionYear == null ? "null" : executionYear.getExternalId());
 
-        final Set<ExecutionYear> registrationExecutionYears = registration.getRegistrationDataByExecutionYearSet().stream()
-                .map(RegistrationDataByExecutionYear::getExecutionYear).collect(Collectors.toSet());
 
         if (registrationProcessDeclarationsService.getSub23DeclarationTemplates().contains(template)) {
             final YearMonthDay ymd = person.getDateOfBirthYearMonthDay();
@@ -87,7 +82,10 @@ public class RegistrationProcessDeclarationController {
             if (ymd == null || ymd.plusYears(24).isBefore(today)) {
                 errors.add("label.declaration.generate.file.error.sub23.not.applicable");
             }
-        }        
+        }
+
+        final List<ExecutionYear> registrationExecutionYears =
+                registrationProcessDeclarationsService.getEnrolmentExecutionYears(registration);
 
         if (!registrationExecutionYears.contains(executionYear)) {
             errors.add("label.declaration.generate.file.error.invalid.execution.year");
@@ -184,6 +182,8 @@ public class RegistrationProcessDeclarationController {
     }
 
     public String listFiles(Model model, Registration registration, List<String> errors) {
+        model.addAttribute("enrolmentExecutionYears", registrationProcessDeclarationsService.getEnrolmentExecutionYears
+                (registration));
         model.addAttribute("registration", registration);
         model.addAttribute("declarationRegistrationFiles",
                 registrationProcessDeclarationsService.getRegistrationDeclarationFileOrderedByDate(registration));
