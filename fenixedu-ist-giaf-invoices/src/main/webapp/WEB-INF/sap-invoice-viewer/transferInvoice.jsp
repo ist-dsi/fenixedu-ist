@@ -19,6 +19,7 @@
             <spring:message code="label.event.description" text="Event" />
         </label>
         <div class="col-sm-10" id="eventDescription">
+            <input name="description" value="${event.description}" disabled="disabled" class="form-control"/>
         </div>
     </div>
     <div class="form-group">
@@ -26,6 +27,7 @@
             <spring:message code="label.sapRequest.documentNumber" text="Document Number" />
         </label>
         <div class="col-sm-10" id="documentNumber">
+            <input name="documentNumber" value="${sapRequest.documentNumber}" disabled="disabled" class="form-control"/>
         </div>
     </div>
     <div class="form-group">
@@ -33,6 +35,15 @@
             <spring:message code="label.sapRequest.value" text="Value" />
         </label>
         <div class="col-sm-10" id="value">
+            <input name="totalInvoiceValue" value="${sapRequest.value}" disabled="disabled" class="form-control"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-sm-2" for="type">
+            <spring:message code="label.sapRequest.valueAvailableForTransfer" text="Value Available For Transfer" />
+        </label>
+        <div class="col-sm-10" id="valuevalueAvailableForTransfer">
+            <input name="valueAvailableForTransfer" value="${sapRequest.valueAvailableForTransfer}" disabled="disabled" class="form-control"/>
         </div>
     </div>
     <div class="form-group">
@@ -49,9 +60,10 @@
     <div class="form-group">
         <label class="control-label col-sm-2" for="type">
             <spring:message code="label.invoice.transfer.value" text="Value to Transfer" />
+            <spring:message code="label.euro" text="EUR" />
         </label>
         <div class="col-sm-10">
-            <input name="valueToTransfer" type="text" class="form-control" id="valueToTransfer" required="required" value=""/>
+            <input name="valueToTransfer" type="text" min="0.01" pattern="[0-9]+([\.][0-9]{0,2})?" placeholder="ex: xxxx.yy" required class="form-control" value="${sapRequest.valueAvailableForTransfer}">
         </div>
     </div>
     <div class="form-group">
@@ -70,10 +82,8 @@
         </div>
     </div>
  </form>
- 
- <script type="text/javascript">
-    var event = ${event};
-    var sapRequest = ${sapRequest};
+
+  <script type="text/javascript">
     var contextPath = '<%= contextPath %>';
 
     $(function() {
@@ -106,17 +116,14 @@
     });
 
     $(document).ready(function() {
-    	$('#eventDescription').html(event.eventDescription);
-    	$('#documentNumber').html(sapRequest.documentNumber);
-    	$('#value').html(sapRequest.value);
-
-    	if (${not empty error}) {
-    		document.getElementById("errors").style.display = 'block';
-    		$('#errors').html('<spring:message code="${error}" text="Error"/>');
-    	}
-    	if (${not empty exception}) {
-    		document.getElementById("errors").style.display = 'block';
-    		$('#errors').html('<spring:message code="${exception}" text="Error"/>');
+        if (${not empty error}) {
+            document.getElementById("errors").style.display = 'block';
+            $('#errors').html('<spring:message code="${error}" text="Error"/>');
+        }
+        if (${not empty exception}) {
+            document.getElementById("errors").style.display = 'block';
+            $('#errors').html('<spring:message code="${exception}" text="Error"/>');
         }
     });
  </script>
+ 

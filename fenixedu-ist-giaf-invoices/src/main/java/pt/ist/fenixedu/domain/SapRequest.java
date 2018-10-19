@@ -230,8 +230,12 @@ public class SapRequest extends SapRequest_Base {
             .reduce(Money.ZERO, Money::add);
     }
 
+    public Money getValueAvailableForTransfer() {
+        return getValue().subtract(consumedAmount());
+    }
+
     public boolean isAvailableForTransfer() {
-        return getValue().subtract(consumedAmount()).isPositive();
+        return getValueAvailableForTransfer().isPositive();
     }
 
 }

@@ -74,6 +74,10 @@ public class SapInvoiceController {
         return "redirect:/sap-invoice-viewer?username=" + username;
     }
 
+    private String eventRedirect(final Event event) {
+        return "redirect:/accounting-management/" + event.getExternalId() + "/details";
+    }
+
     @RequestMapping(method = RequestMethod.GET)
     public String home(@RequestParam(required = false) String username, final Model model,
             @RequestParam(required = false) String exception, @RequestParam(required = false) String errors) {
@@ -140,9 +144,14 @@ public class SapInvoiceController {
 
     @RequestMapping(value = "/{sapRequest}/transfer", method = RequestMethod.GET)
     public String prepareTransfer(final @PathVariable SapRequest sapRequest, final Model model) {
-        model.addAttribute("sapRequest", toJsonObject(sapRequest));
-        final DateTime now = new DateTime();
-        model.addAttribute("event", toJsonObject(sapRequest.getEvent(), now));
+        model.addAttribute("sapRequest", sapRequest);
+
+        final Event event = sapRequest.getEvent();
+        model.addAttribute("event", event);
+
+        final DebtInterestCalculator calculator = event.getDebtInterestCalculator(new DateTime());
+        model.addAttribute("calculator", calculator);
+
         return "sap-invoice-viewer/transferInvoice";
     }
 
@@ -177,7 +186,7 @@ public class SapInvoiceController {
                 return prepareTransfer(sapRequest, model);                
             }
         }
-        return homeRedirect(sapRequest.getEvent().getPerson().getUsername());
+        return eventRedirect(sapRequest.getEvent());
     }
 
     static Money toMoney(final String s) {
@@ -297,6 +306,7 @@ public class SapInvoiceController {
         result.addProperty("ignore", sapRequest.getIgnore());
         result.addProperty("referenced", sapRequest.getReferenced());
         result.addProperty("isAvailableForTransfer", sapRequest.isAvailableForTransfer());
+        result.addProperty("valuevalueAvailableForTransfer", sapRequest.getValue() == null ? null : sapRequest.getValue().subtract(sapRequest.consumedAmount()).toPlainString());
         return result;
     }
 
