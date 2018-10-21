@@ -76,7 +76,7 @@ public class RegistrationDeclarationDataProvider {
         payload.addProperty("nationality", nationality);
         payload.add("curricularYear", curricularYear);
         payload.addProperty("degreeName", degreeName);
-        payload.addProperty("numberOfEnrollments", registration.getEnrolments(executionYear).size());
+        payload.addProperty("numberOfEnrollments", registration.getNumberOfTotalEnrolments(executionYear));
 
         if (registration.getCampus(executionYear).equals(SpaceUtils.getDefaultCampus())) {
             setAlamedaAddress(payload);

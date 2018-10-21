@@ -1,11 +1,16 @@
 package pt.ist.registration.process.ui.service;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.academic.domain.studentCurriculum.CurriculumLine;
+import org.fenixedu.academic.domain.studentCurriculum.ExternalEnrolment;
 import org.fenixedu.bennu.RegistrationProcessConfiguration;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.springframework.stereotype.Service;
@@ -52,5 +57,15 @@ public class RegistrationProcessDeclarationsService {
         }
 
         return null;
+    }
+
+    public List<ExecutionYear> getEnrolmentExecutionYears(Registration registration) {
+        return registration.getStudentCurricularPlansSet()
+                .stream()
+                .flatMap(scp -> Stream.concat(scp.getEnrolmentStream().map(CurriculumLine::getExecutionYear),
+                        registration.getExternalEnrolmentsSet().stream().map(ExternalEnrolment::getExecutionYear)))
+                .distinct()
+                .sorted(Comparator.reverseOrder())
+                .collect(Collectors.toList());
     }
 }
