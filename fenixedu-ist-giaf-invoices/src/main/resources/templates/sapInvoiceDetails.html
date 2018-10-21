@@ -7,11 +7,12 @@
             <th>{{i18n(giafInvoicesResourcesBundle, "label.invoice")}}</th>
             <th>{{i18n(giafInvoicesResourcesBundle, "label.value")}}</th>
             <th>{{i18n(giafInvoicesResourcesBundle, "label.uvat")}}</th>
+            <th></th>
         </tr>
     </thead>
     <tbody id="eventList">
         {% for sapRequest in event.getSapRequestSet %}
-            {% if sapRequest.requestType == 'INVOICE' and sapRequest.documentNumber != 'ND0' %}
+            {% if sapRequest.requestType == 'INVOICE' and sapRequest.documentNumber != 'ND0' and not sapRequest.ignore %}
             <tr>
                 <td>
                     <a href="{{request.contextPath}}/invoice-downloader/sap/{{sapRequest.externalId}}/details">
@@ -23,6 +24,13 @@
                 </td>
                 <td>
                     {{sapRequest.uVat}}
+                </td>
+                <td>
+                    {% if sapRequest.isAvailableForTransfer %}
+                        <a href="{{request.contextPath}}/sap-invoice-viewer/{{sapRequest.externalId}}/transfer" class="btn btn-default">
+                            {{i18n(giafInvoicesResourcesBundle, "label.transfer")}}
+                        </a>
+                    {% endif %}
                 </td>
             </tr>
             {% endif %}
