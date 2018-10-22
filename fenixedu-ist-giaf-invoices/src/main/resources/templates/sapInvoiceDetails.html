@@ -26,7 +26,7 @@
                     {{sapRequest.uVat}}
                 </td>
                 <td>
-                    {% if sapRequest.isAvailableForTransfer %}
+                    {% if sapRequest.isAvailableForTransfer and isPaymentManager %}
                         <a href="{{request.contextPath}}/sap-invoice-viewer/{{sapRequest.externalId}}/transfer" class="btn btn-default">
                             {{i18n(giafInvoicesResourcesBundle, "label.transfer")}}
                         </a>
