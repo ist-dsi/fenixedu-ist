@@ -91,13 +91,13 @@
                     <spring:message code="label.download" text="Download"/>
                 </a>
             </c:if>
+            <c:if test="${sapRequest.isAvailableForTransfer}">
+                <c:if test="${isPaymentManager}">
+                    <a class="btn btn-default btn-block" href="<%= contextPath %>/sap-invoice-viewer/${sapRequest.externalId}/transfer">
+                        <spring:message code="label.transfer" text="Transfer"/>
+                    </a>
+                </c:if>
+            </c:if>
         </div>
     </div>
 </div>
-
-<script type="text/javascript">
-    var contextPath = '<%= contextPath %>';
-
-    $(document).ready(function() {
-    });
-</script>

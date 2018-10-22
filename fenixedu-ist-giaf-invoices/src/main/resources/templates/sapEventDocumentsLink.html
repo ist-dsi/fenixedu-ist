@@ -1,3 +1,6 @@
 {% set giafInvoicesResourcesBundle = "resources/GiafInvoicesResources" %}
 
 <a class="btn btn-default btn-block" href="{{request.contextPath}}/invoice-downloader?username={{event.person.username}}">{{i18n(giafInvoicesResourcesBundle, "title.documents")}}</a>
+{% if isPaymentManager %}
+    <a class="btn btn-default btn-block" href="{{request.contextPath}}/sap-invoice-viewer/{{event.externalId}}">{{i18n(giafInvoicesResourcesBundle, "title.sap.invoice.viewer")}}</a>
+{% endif %}

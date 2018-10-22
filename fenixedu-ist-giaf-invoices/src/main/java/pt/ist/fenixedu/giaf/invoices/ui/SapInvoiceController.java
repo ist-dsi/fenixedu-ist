@@ -21,6 +21,8 @@ package pt.ist.fenixedu.giaf.invoices.ui;
 
 import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collector;
 import java.util.stream.Collector.Characteristics;
 
@@ -78,6 +80,10 @@ public class SapInvoiceController {
         return "redirect:/accounting-management/" + event.getExternalId() + "/details";
     }
 
+    private String sapDocumentsRedirect(final Event event) {
+        return "redirect:/sap-invoice-viewer/" + event.getExternalId();
+    }
+
     @RequestMapping(method = RequestMethod.GET)
     public String home(@RequestParam(required = false) String username, final Model model,
             @RequestParam(required = false) String exception, @RequestParam(required = false) String errors) {
@@ -98,6 +104,24 @@ public class SapInvoiceController {
             model.addAttribute("errors", errors);
         }
         return "sap-invoice-viewer/home";
+    }
+
+    @RequestMapping(value = "/{event}", method = RequestMethod.GET)
+    public String eventDetails(final @PathVariable Event event, final Model model,
+            @RequestParam(required = false) String exception, @RequestParam(required = false) String errors) {
+        model.addAttribute("event", event);
+        final Set<SapRequest> sapRequests = new TreeSet<>(SapRequest.COMPARATOR_BY_EVENT_AND_ORDER);
+        sapRequests.addAll(event.getSapRequestSet());
+        model.addAttribute("sapRequests", sapRequests);
+        if (!Strings.isNullOrEmpty(exception)) {
+            model.addAttribute("exception", exception);
+        }
+        if (!Strings.isNullOrEmpty(errors)) {
+            model.addAttribute("errors", errors);
+        }
+        model.addAttribute("isSapIntegrator", Group.dynamic("sapIntegrationManager").isMember(Authenticate.getUser()));
+        model.addAttribute("isPaymentManager", SapInvoiceController.isAdvancedPaymentManager());
+        return "sap-invoice-viewer/eventDetails";
     }
 
     @RequestMapping(value = "/{event}/calculateRequests", method = RequestMethod.POST)
@@ -139,7 +163,7 @@ public class SapInvoiceController {
 
         model.addAttribute("errors", errors.toString());
 
-        return homeRedirect(event.getPerson().getUsername());
+        return sapDocumentsRedirect(event);
     }
 
     @RequestMapping(value = "/{sapRequest}/transfer", method = RequestMethod.GET)
@@ -203,7 +227,7 @@ public class SapInvoiceController {
         if (Group.dynamic("managers").isMember(Authenticate.getUser())) {
             sapRequest.delete();
         }
-        return homeRedirect(event.getPerson().getUsername());
+        return sapDocumentsRedirect(event);
     }
 
     @RequestMapping(value = "/{sapRequest}/cancel", method = RequestMethod.POST)
@@ -217,7 +241,7 @@ public class SapInvoiceController {
                 model.addAttribute("exception", e.getMessage());
             }
         }
-        return homeRedirect(event.getPerson().getUsername());
+        return sapDocumentsRedirect(event);
     }
 
     @RequestMapping(value = "/{event}/cancelDebt", method = RequestMethod.POST)
@@ -230,7 +254,7 @@ public class SapInvoiceController {
                 model.addAttribute("exception", e.getMessage());
             }
         }
-        return homeRedirect(event.getPerson().getUsername());
+        return sapDocumentsRedirect(event);
     }
 
     private JsonObject toJsonObject(final Event event, final DateTime when) {
