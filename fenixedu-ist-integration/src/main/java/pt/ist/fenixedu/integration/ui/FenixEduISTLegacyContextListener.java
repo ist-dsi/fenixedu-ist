@@ -244,10 +244,10 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
                     if (!Strings.isNullOrEmpty(overDueEvents)) {
                         warnings.add(BundleUtil.getString("resources.FenixeduIstIntegrationResources", "label.event.overdue", overDueEvents));
                     }
-                } catch (final NullPointerException npe) {
+                } catch (final Throwable thrw) {
                     final ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     final PrintStream printStream = new PrintStream(stream);
-                    npe.printStackTrace(printStream);
+                    thrw.printStackTrace(printStream);
                     warnings.add(BundleUtil.getString("resources.FenixeduIstIntegrationResources", "label.event.not.consistent", new String(stream.toByteArray())));
                 }
 
