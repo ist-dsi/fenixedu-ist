@@ -246,4 +246,9 @@ public class SapRequest extends SapRequest_Base {
                 && getRequestType() != SapRequestType.DEBT && getRequestType() != SapRequestType.DEBT_CREDIT;
     }
 
+    public boolean getCanBeClosed() {
+        return getIntegrated() && !getIgnore() && getRequest().length() > 2 && getAnulledRequest() == null
+                && getRequestType() == SapRequestType.DEBT;
+    }
+
 }

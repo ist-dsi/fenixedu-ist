@@ -51,7 +51,7 @@
                 <c:forEach var="sapRequest" items="${sapRequests}">
                     <tr
                         <c:if test="${sapRequest.ignore}">class="strikeLine"</c:if>
-                        <c:if test="${sapRequest.anulledRequest}">class="anulledRequest"</c:if>
+                        <c:if test="${not empty sapRequest.anulledRequest}">class="anulledRequest"</c:if>
                        >
                         <td>
                             <joda:format value="${sapRequest.whenCreated}" pattern="yyyy-MM-dd HH:mm:ss"/>
@@ -130,6 +130,13 @@
                                             onsubmit="return confirm('<spring:message code="label.cancel.confirm" text="Are you sure?"/>');">
                                             ${csrf.field()}
                                             <button type="submit" class="btn btn-warning"><spring:message code="label.cancel" text="Cancel Request"/></button>
+                                        </form>
+                                    </c:if>
+                                    <c:if test="${sapRequest.canBeClosed}">
+                                        <form method="post" action="<%= contextPath %>/sap-invoice-viewer/${sapRequest.externalId}/close" style="display: inline;"
+                                            onsubmit="return confirm('<spring:message code="label.debt.close.confirm" text="Are you sure?"/>');">
+                                            ${csrf.field()}
+                                            <button type="submit" class="btn btn-warning"><spring:message code="label.debt.close" text="Close Debt"/></button>
                                         </form>
                                     </c:if>
                                 </c:if>

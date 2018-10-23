@@ -183,7 +183,7 @@ public class SapInvoiceController {
     public String transfer(final @PathVariable SapRequest sapRequest, final Model model,
             @RequestParam final ExternalClient client, @RequestParam final String valueToTransfer,
             @RequestParam final String pledgeNumber) {
-        if (Group.dynamic("managers").isMember(Authenticate.getUser()) || isAdvancedPaymentManager()) {
+        if (Group.dynamic("managers").isMember(Authenticate.getUser()) || isAdvancedPaymentManager() || Group.dynamic("sapIntegrationManager").isMember(Authenticate.getUser())) {
             try {
                 final Money value = toMoney(valueToTransfer);
                 if (value.isZero() || value.isNegative()) {
@@ -224,8 +224,22 @@ public class SapInvoiceController {
     @RequestMapping(value = "/{sapRequest}/delete", method = RequestMethod.POST)
     public String delete(final @PathVariable SapRequest sapRequest, final Model model) {
         final Event event = sapRequest.getEvent();
-        if (Group.dynamic("managers").isMember(Authenticate.getUser())) {
+        if (Group.dynamic("managers").isMember(Authenticate.getUser()) || Group.dynamic("sapIntegrationManager").isMember(Authenticate.getUser())) {
             sapRequest.delete();
+        }
+        return sapDocumentsRedirect(event);
+    }
+
+    @RequestMapping(value = "/{sapRequest}/close", method = RequestMethod.POST)
+    public String close(final @PathVariable SapRequest sapRequest, final Model model) {
+        final Event event = sapRequest.getEvent();
+        if (Group.dynamic("managers").isMember(Authenticate.getUser()) || Group.dynamic("sapIntegrationManager").isMember(Authenticate.getUser())) {
+            final SapEvent sapEvent = new SapEvent(event);
+            try {
+                sapEvent.closeDocument(sapRequest);
+            } catch (final Exception | Error e) {
+                model.addAttribute("exception", e.getMessage());
+            }
         }
         return sapDocumentsRedirect(event);
     }
@@ -233,7 +247,7 @@ public class SapInvoiceController {
     @RequestMapping(value = "/{sapRequest}/cancel", method = RequestMethod.POST)
     public String cancel(final @PathVariable SapRequest sapRequest, final Model model) {
         final Event event = sapRequest.getEvent();
-        if (Group.dynamic("managers").isMember(Authenticate.getUser())) {
+        if (Group.dynamic("managers").isMember(Authenticate.getUser()) || Group.dynamic("sapIntegrationManager").isMember(Authenticate.getUser())) {
             final SapEvent sapEvent = new SapEvent(event);
             try {
                 sapEvent.cancelDocument(sapRequest);
@@ -246,7 +260,7 @@ public class SapInvoiceController {
 
     @RequestMapping(value = "/{event}/cancelDebt", method = RequestMethod.POST)
     public String cancelDebt(final @PathVariable Event event, final Model model) {
-        if (Group.dynamic("managers").isMember(Authenticate.getUser())) {
+        if (Group.dynamic("managers").isMember(Authenticate.getUser()) || Group.dynamic("sapIntegrationManager").isMember(Authenticate.getUser())) {
             final SapEvent sapEvent = new SapEvent(event);
             try {
                 sapEvent.cancelDebt();
