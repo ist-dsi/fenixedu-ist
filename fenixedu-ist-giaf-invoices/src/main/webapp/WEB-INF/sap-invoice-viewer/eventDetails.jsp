@@ -15,6 +15,9 @@
 </div>
 
 <div class="page-body">
+    <c:set var="person" scope="request" value="${event.person}"/>
+    <jsp:include page="../fenixedu-academic/accounting/heading-person.jsp"/>
+
     <h2>
         <a href="<%= contextPath %>/accounting-management/${event.externalId}/details">
             ${event.description}
@@ -133,11 +136,20 @@
                                         </form>
                                     </c:if>
                                     <c:if test="${sapRequest.canBeClosed}">
-                                        <form method="post" action="<%= contextPath %>/sap-invoice-viewer/${sapRequest.externalId}/close" style="display: inline;"
-                                            onsubmit="return confirm('<spring:message code="label.debt.close.confirm" text="Are you sure?"/>');">
-                                            ${csrf.field()}
-                                            <button type="submit" class="btn btn-warning"><spring:message code="label.debt.close" text="Close Debt"/></button>
-                                        </form>
+                                        <c:if test="${sapRequest.requestType == 'DEBT'}">
+                                            <form method="post" action="<%= contextPath %>/sap-invoice-viewer/${sapRequest.externalId}/close" style="display: inline;"
+                                                onsubmit="return confirm('<spring:message code="label.debt.close.confirm" text="Are you sure?"/>');">
+                                                ${csrf.field()}
+                                                <button type="submit" class="btn btn-warning"><spring:message code="label.debt.close" text="Close Debt"/></button>
+                                            </form>
+                                        </c:if>
+                                        <c:if test="${sapRequest.requestType == 'INVOICE'}">
+                                            <form method="post" action="<%= contextPath %>/sap-invoice-viewer/${sapRequest.externalId}/close" style="display: inline;"
+                                                onsubmit="return confirm('<spring:message code="label.invoice.close.confirm" text="Are you sure?"/>');">
+                                                ${csrf.field()}
+                                                <button type="submit" class="btn btn-warning"><spring:message code="label.invoice.close" text="Close Invoice"/></button>
+                                            </form>
+                                        </c:if>
                                     </c:if>
                                 </c:if>
                                 </h3>
@@ -161,8 +173,10 @@
 <c:forEach var="sapRequest" items="${sapRequests}">
     <script type="text/javascript">
         $(document).ready(function() {
-            integrationPart('srdm${sapRequest.externalId}', '${sapRequest.integrationMessage}');
-            integrationPart('srdr${sapRequest.externalId}', '${sapRequest.request}');
+        	var integrationMessageAsJson = ${sapRequest.integrationMessageAsJson};
+        	var requestAsJson = ${sapRequest.requestAsJson};
+            integrationPart('srdm${sapRequest.externalId}', integrationMessageAsJson);
+            integrationPart('srdr${sapRequest.externalId}', requestAsJson);
         });
     </script>
 </c:forEach>
@@ -176,6 +190,12 @@
 .anulledRequest {
     background-color: #ffcaba;
 }
+
+.json {
+    width: 1000px;
+    overflow: scroll;
+}
+
 </style>
 
 <script type="text/javascript">
@@ -191,8 +211,12 @@
 
     function integrationPart(id, json) {
         var jv = new JSONViewer();
-        jv.showJSON(JSON.parse(json), -1, -1);
-        document.getElementById(id).appendChild(jv.getContainer());
+        try {
+            jv.showJSON(json, -1, -1);
+            document.getElementById(id).appendChild(jv.getContainer());
+        } catch(e) {
+        	document.getElementById(id).innerHTML = e + '<br/>' + '<pre class="json">' + json + '</pre>';
+        }
     }
 
     JSONViewer = (function() {

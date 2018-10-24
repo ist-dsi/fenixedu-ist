@@ -152,12 +152,9 @@ public class SapEvent {
                 && requestType != SapRequestType.DEBT) {
             throw new Error("label.document.type.cannot.be.closed");
         }
-        event.getSapRequestSet().stream()
-                .filter(r -> !r.getIgnore())
-                .filter(r -> r != sapRequest && r.refersToDocument(sapRequest.getDocumentNumber()))
-                .findAny().ifPresent(r -> {
-                    throw new Error("label.error.invoice.already.used");
-                });
+        if (sapRequest.isReferencedByOtherRequest()) {
+            throw new Error("label.error.invoice.already.used");
+        }
 
         final Money documentValue = sapRequest.getValue();
         final CreditEntry creditEntry = EventProcessor.getCreditEntry(documentValue);
@@ -182,12 +179,9 @@ public class SapEvent {
                 && requestType != SapRequestType.ADVANCEMENT) {
             throw new Error("label.document.type.cannot.be.canceled");
         }
-        event.getSapRequestSet().stream()
-                .filter(r -> !r.getIgnore())
-                .filter(r -> r != sapRequest && r.refersToDocument(sapRequest.getDocumentNumber()))
-                .findAny().ifPresent(r -> {
-                    throw new Error("label.error.invoice.already.used");
-                });
+        if (sapRequest.isReferencedByOtherRequest()) {
+            throw new Error("label.error.invoice.already.used");
+        }
 
         JsonObject jsonAnnulled = new JsonParser().parse(sapRequest.getRequest()).getAsJsonObject();
         if (requestType == SapRequestType.INVOICE
@@ -244,7 +238,7 @@ public class SapEvent {
         if (requestType != SapRequestType.INVOICE) {
             return;
         }
-        if (event.getSapRequestSet().stream().anyMatch(r -> r != sapRequest && r.refersToDocument(sapRequest.getDocumentNumber()))) {
+        if (sapRequest.isReferencedByOtherRequest()) {
             return;
         }
         final String clientId = ClientMap.uVATNumberFor(event.getParty());
