@@ -22,7 +22,6 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Teacher;
@@ -107,6 +106,12 @@ public class AnnualCreditsState extends AnnualCreditsState_Base {
             setIsFinalCreditsCalculated(false);
             super.setFinalCalculationDate(finalCalculationDate);
         }
+    }
+
+    public static ExecutionYear getExecutionYearForValidReductionServiceApprovalPeriod() {
+        return Bennu.getInstance().getAnnualCreditsStatesSet().stream()
+                .filter(acs -> acs.getReductionServiceApproval() != null && acs.getReductionServiceApproval().containsNow())
+                .map(acs -> acs.getExecutionYear()).findFirst().orElse(null);
     }
 
     public static boolean isInValidReductionServiceApprovalPeriod(ExecutionYear executionYear) {

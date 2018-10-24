@@ -42,7 +42,7 @@
 <logic:present name="reductionServiceBean">
 	<logic:empty name="reductionServiceBean" property="teacher">
 		<fr:edit id="reductionServiceBean" name="reductionServiceBean" action="/creditsReductions.do?method=aproveReductionService">
-			<fr:schema bundle="TEACHER_CREDITS_SHEET_RESOURCES" type="org.fenixedu.academic.domain.credits.util.ReductionServiceBean">
+			<fr:schema bundle="TEACHER_CREDITS_SHEET_RESOURCES" type="pt.ist.fenixedu.teacher.evaluation.domain.credits.util.ReductionServiceBean">
 				<fr:slot name="teacher" layout="autoComplete">
 					<fr:property name="size" value="80"/>
 					<fr:property name="format" value="${person.name} (${person.username})"/>
