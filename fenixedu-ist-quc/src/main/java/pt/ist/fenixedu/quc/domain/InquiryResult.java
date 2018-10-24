@@ -171,6 +171,7 @@ public class InquiryResult extends InquiryResult_Base {
                 if (inquiryResult != null) {
                     inquiryResult.setValue(inquiryResultBean.getValue());
                     inquiryResult.setResultClassification(inquiryResultBean.getResultClassification());
+                    inquiryResult.setLastModifiedDate(new DateTime());
                 } else {
                     throw new DomainException("result not found: " + getPrintableColumns(columns));
                 }
