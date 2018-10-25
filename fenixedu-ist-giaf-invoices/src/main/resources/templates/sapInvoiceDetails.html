@@ -7,7 +7,6 @@
             <th>{{i18n(giafInvoicesResourcesBundle, "label.invoice")}}</th>
             <th>{{i18n(giafInvoicesResourcesBundle, "label.value")}}</th>
             <th>{{i18n(giafInvoicesResourcesBundle, "label.uvat")}}</th>
-            <th></th>
         </tr>
     </thead>
     <tbody id="eventList">
@@ -24,13 +23,6 @@
                 </td>
                 <td>
                     {{sapRequest.uVat}}
-                </td>
-                <td>
-                    {% if sapRequest.isAvailableForTransfer %}
-                        <a href="{{request.contextPath}}/sap-invoice-viewer/{{sapRequest.externalId}}/transfer" class="btn btn-default">
-                            {{i18n(giafInvoicesResourcesBundle, "label.transfer")}}
-                        </a>
-                    {% endif %}
                 </td>
             </tr>
             {% endif %}

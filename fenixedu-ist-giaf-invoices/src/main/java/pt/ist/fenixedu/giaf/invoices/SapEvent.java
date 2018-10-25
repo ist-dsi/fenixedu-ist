@@ -146,6 +146,29 @@ public class SapEvent {
     }
 
     @Atomic
+    public void closeDocument(final SapRequest sapRequest) {
+        final SapRequestType requestType = sapRequest.getRequestType();
+        if (requestType != SapRequestType.INVOICE
+                && requestType != SapRequestType.DEBT) {
+            throw new Error("label.document.type.cannot.be.closed");
+        }
+        if (sapRequest.isReferencedByOtherRequest()) {
+            throw new Error("label.error.invoice.already.used");
+        }
+
+        final Money documentValue = sapRequest.getValue();
+        final CreditEntry creditEntry = EventProcessor.getCreditEntry(documentValue);
+        if (requestType == SapRequestType.INVOICE) {
+            final SapRequest creditRequest = registerCredit(event, creditEntry, documentValue, sapRequest);
+            creditRequest.setIgnore(true);
+        } else if (requestType == SapRequestType.DEBT) {
+            final SapRequest debtCreditRequest = registerDebtCredit(sapRequest.getClientId(), event, documentValue, creditEntry, sapRequest, true);
+            debtCreditRequest.setIgnore(true);
+        }
+        sapRequest.setIgnore(true);
+    }
+
+    @Atomic
     public void cancelDocument(final SapRequest sapRequest) {
         final SapRequestType requestType = sapRequest.getRequestType();
         if (requestType != SapRequestType.INVOICE
@@ -156,12 +179,9 @@ public class SapEvent {
                 && requestType != SapRequestType.ADVANCEMENT) {
             throw new Error("label.document.type.cannot.be.canceled");
         }
-        event.getSapRequestSet().stream()
-                .filter(r -> !r.getIgnore())
-                .filter(r -> r != sapRequest && r.refersToDocument(sapRequest.getDocumentNumber()))
-                .findAny().ifPresent(r -> {
-                    throw new Error("label.error.invoice.already.used");
-                });
+        if (sapRequest.isReferencedByOtherRequest()) {
+            throw new Error("label.error.invoice.already.used");
+        }
 
         JsonObject jsonAnnulled = new JsonParser().parse(sapRequest.getRequest()).getAsJsonObject();
         if (requestType == SapRequestType.INVOICE
@@ -218,7 +238,7 @@ public class SapEvent {
         if (requestType != SapRequestType.INVOICE) {
             return;
         }
-        if (event.getSapRequestSet().stream().anyMatch(r -> r != sapRequest && r.refersToDocument(sapRequest.getDocumentNumber()))) {
+        if (sapRequest.isReferencedByOtherRequest()) {
             return;
         }
         final String clientId = ClientMap.uVATNumberFor(event.getParty());
@@ -309,7 +329,7 @@ public class SapEvent {
         }
     }
 
-    private void registerDebtCredit(String clientId, Event event, Money amountToRegister, CreditEntry creditEntry,
+    private SapRequest registerDebtCredit(String clientId, Event event, Money amountToRegister, CreditEntry creditEntry,
             SapRequest debtRequest, boolean isNewDate) {
         checkValidDocumentNumber(debtRequest.getDocumentNumber(), event);
 
@@ -319,6 +339,7 @@ public class SapEvent {
         SapRequest sapRequest =
                 new SapRequest(event, clientId, amountToRegister, documentNumber, SapRequestType.DEBT_CREDIT, Money.ZERO, data);
         sapRequest.setCreditId(creditEntry.getId());
+        return sapRequest;
     }
 
     public void registerCredit(Event event, CreditEntry creditEntry, boolean isGratuity, ErrorLogConsumer errorLog,

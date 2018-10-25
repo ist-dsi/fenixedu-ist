@@ -170,6 +170,7 @@ public class InvoiceDownlaodController {
         model.addAttribute("sapRequest", sapRequest);
         model.addAttribute("clientData", sapRequest.getClientData());
         model.addAttribute("documentData", sapRequest.getDocumentData());
+        model.addAttribute("isPaymentManager", SapInvoiceController.isAdvancedPaymentManager());
         return "sap-invoice-viewer/invoiceDetails";
     }
 

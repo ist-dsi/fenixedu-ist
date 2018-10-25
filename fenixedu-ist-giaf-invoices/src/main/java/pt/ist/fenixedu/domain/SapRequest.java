@@ -111,7 +111,6 @@ public class SapRequest extends SapRequest_Base {
             JsonObject request) {
         Optional<SapRequest> maxRequest = event.getSapRequestSet().stream().filter(sr -> sr != this).max(COMPARATOR_BY_ORDER);
         Integer order = maxRequest.isPresent() ? maxRequest.get().getOrder() : 0;
-
         setSapRoot(SapRoot.getInstance());
         setEvent(event);
         setClientId(clientId);
@@ -155,6 +154,12 @@ public class SapRequest extends SapRequest_Base {
         }
         setSapRoot(null);
         deleteDomainObject();
+    }
+
+    public boolean isReferencedByOtherRequest() {
+        return getEvent().getSapRequestSet().stream()
+                .filter(r -> !r.getIgnore())
+                .anyMatch(r -> r != this && r.refersToDocument(getDocumentNumber()));
     }
 
     public boolean refersToDocument(final String documentNumber) {
@@ -209,7 +214,7 @@ public class SapRequest extends SapRequest_Base {
         return requestType == SapRequestType.DEBT || requestType == SapRequestType.DEBT_CREDIT;
     }
 
-    private JsonObject getRequestAsJson() {
+    public JsonObject getRequestAsJson() {
         final String request = getRequest();
         return request == null || request.isEmpty() ? null : new JsonParser().parse(getRequest()).getAsJsonObject();
     }
@@ -236,6 +241,22 @@ public class SapRequest extends SapRequest_Base {
 
     public boolean isAvailableForTransfer() {
         return getValueAvailableForTransfer().isPositive();
+    }
+
+    public boolean getIsAvailableForTransfer() {
+        return isAvailableForTransfer();
+    }
+
+    public boolean getCanBeCanceled() {
+        return getIntegrated() && !getIgnore() && getRequest().length() > 2 && getAnulledRequest() == null
+                && getRequestType() != SapRequestType.DEBT && getRequestType() != SapRequestType.DEBT_CREDIT
+                && !isReferencedByOtherRequest();
+    }
+
+    public boolean getCanBeClosed() {
+        return getIntegrated() && !getIgnore() && getRequest().length() > 2 && getAnulledRequest() == null
+                && (getRequestType() == SapRequestType.DEBT || getRequestType() == SapRequestType.INVOICE)
+                && !isReferencedByOtherRequest();
     }
 
 }
