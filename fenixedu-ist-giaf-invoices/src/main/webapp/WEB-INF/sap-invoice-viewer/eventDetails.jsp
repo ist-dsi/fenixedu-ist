@@ -17,11 +17,8 @@
 <div class="page-body">
     <c:set var="person" scope="request" value="${event.person}"/>
     <jsp:include page="../fenixedu-academic/accounting/heading-person.jsp"/>
+    <jsp:include page="../fenixedu-academic/accounting/heading-event.jsp"/>
 
-    <h2>
-        <a href="<%= contextPath %>/accounting-management/${event.externalId}/details">
-            ${event.description}
-        </a>
         <c:if test="${isSapIntegrator}">
             <form method="post" action="<%= contextPath %>/sap-invoice-viewer/${event.externalId}/calculateRequests" style="display: inline;">
                 ${csrf.field()}
@@ -32,7 +29,6 @@
                 <button type="submit" class="btn btn-info"><spring:message code="label.repeat.request" text="Sync"/></button>
             </form>
         </c:if>
-    </h2>
 
     <div>
         <table class="table tdmiddle">
@@ -63,7 +59,14 @@
                             <spring:message code="label.document.type.${sapRequest.requestType}"/>
                         </td>
                         <td>
-                            ${sapRequest.documentNumber}
+                            <c:if test="${sapRequest.requestType == 'INVOICE'}">
+                                <a href="<%= contextPath %>/invoice-downloader/sap/${sapRequest.externalId}/details">
+                                    ${sapRequest.documentNumber}
+                                </a>
+                            </c:if>
+                            <c:if test="${sapRequest.requestType != 'INVOICE'}">
+                                ${sapRequest.documentNumber}
+                            </c:if>
                         </td>
                         <td>
                             ${sapRequest.value}
@@ -201,7 +204,6 @@
 <script type="text/javascript">
 
     function displayDetails(id) {
-    	
     	if (getComputedStyle(document.getElementById(id), null).display === 'table-row') {
     		document.getElementById(id).style.display = 'none';
     	} else {

@@ -169,14 +169,10 @@ public class SapInvoiceController {
     @RequestMapping(value = "/{sapRequest}/transfer", method = RequestMethod.GET)
     public String prepareTransfer(final @PathVariable SapRequest sapRequest, final Model model) {
         model.addAttribute("sapRequest", sapRequest);
-
-        final Event event = sapRequest.getEvent();
-        model.addAttribute("event", event);
-
-        final DebtInterestCalculator calculator = event.getDebtInterestCalculator(new DateTime());
-        model.addAttribute("calculator", calculator);
-
-        return "sap-invoice-viewer/transferInvoice";
+        model.addAttribute("clientData", sapRequest.getClientData());
+        model.addAttribute("documentData", sapRequest.getDocumentData());
+        model.addAttribute("isPaymentManager", SapInvoiceController.isAdvancedPaymentManager());
+        return "sap-invoice-viewer/invoiceDetails";
     }
 
     @RequestMapping(value = "/{sapRequest}/transfer", method = RequestMethod.POST)

@@ -6,8 +6,18 @@
 <link rel="stylesheet" type="text/css" media="screen" href="<%= request.getContextPath() %>/CSS/accounting.css"/>
 
 <div class="page-header">
-    <p><a id="backUrl" href="#" class="btn btn-default"><spring:message code="label.back" text="Back"/></a></p>
     <h1>
+        <a href="<%= request.getContextPath() %>/accounting-management/${sapRequest.event.externalId}/details">
+            ${sapRequest.event.description}
+        </a>
+    </h1>
+</div>
+
+<div class="page-body">
+    <c:set var="event" scope="request" value="${sapRequest.event}"/>
+    <c:set var="person" scope="request" value="${event.person}"/>
+    <jsp:include page="../fenixedu-academic/accounting/heading-person.jsp"/>
+    <h2>
         <span style="color: gray;"><spring:message code="label.document" text="Document"/></span>
         ${sapRequest.documentNumber}
         <c:if test="${sapRequest.requestType == 'ADVANCEMENT'}">
@@ -37,10 +47,12 @@
         <c:if test="${sapRequest.requestType == 'REIMBURSEMENT'}">
             <spring:message code="label.refund" text="Refund"/>
         </c:if>
-    </h1>
-</div>
-
-<div class="page-body">
+        <c:if test="${sapRequest.ignore}">
+            <small>
+            <span class="text-danger">(<spring:message code="label.ignored" text="Ignored"/>)</span>
+            </small>
+        </c:if>
+    </h2>
 
     <div class="row">
         <div class="col-md-4">
@@ -85,6 +97,7 @@
                 </dl>
             </div>
         </div>
+
         <div class="col-md-2 col-md-push-1">
             <c:if test="${sapRequest.integrated}">
                 <a class="btn btn-primary btn-block" href="<%= contextPath %>/invoice-downloader/sap/${sapRequest.externalId}/${sapRequest.documentNumber}.pdf">
@@ -93,11 +106,29 @@
             </c:if>
             <c:if test="${sapRequest.isAvailableForTransfer}">
                 <c:if test="${isPaymentManager}">
-                    <a class="btn btn-default btn-block" href="<%= contextPath %>/sap-invoice-viewer/${sapRequest.externalId}/transfer">
-                        <spring:message code="label.transfer" text="Transfer"/>
+                    <a class="btn btn-default btn-block" href="#" onclick="toggleBlock('transferInvoiceForm'); return false;">
+                       <spring:message code="label.transfer" text="Transfer"/>
                     </a>
                 </c:if>
             </c:if>
         </div>
     </div>
+
+    <div class="row" id="transferInvoiceForm" style="display: none;">
+        <div class="col-md-12">
+            <jsp:include page="transferInvoice.jsp"/>
+        </div>
+    </div>
+
 </div>
+
+<script type="text/javascript">
+
+    function toggleBlock(id) {
+        if (getComputedStyle(document.getElementById(id), null).display === 'block') {
+            document.getElementById(id).style.display = 'none';
+        } else {
+            document.getElementById(id).style.display = 'block';
+        }
+    }
+</script>
