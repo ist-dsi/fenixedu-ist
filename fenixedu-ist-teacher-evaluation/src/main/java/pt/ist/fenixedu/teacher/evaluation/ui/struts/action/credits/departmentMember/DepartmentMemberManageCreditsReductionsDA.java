@@ -55,30 +55,28 @@ import pt.ist.fenixframework.FenixFramework;
 @StrutsFunctionality(app = DepartmentMemberPresidentApp.class, path = "credits-reductions",
         titleKey = "label.credits.creditsReduction", bundle = "TeacherCreditsSheetResources")
 @Mapping(module = "departmentMember", path = "/creditsReductions")
-@Forwards(
-        value = {
-                @Forward(name = "editReductionService",
-                        path = "/teacher/evaluation/credits/degreeTeachingService/editCreditsReduction.jsp"),
-                @Forward(name = "viewAnnualTeachingCredits",
-                        path = "/departmentMember/credits.do?method=viewAnnualTeachingCredits"),
-                @Forward(name = "showReductionServices",
-                        path = "/teacher/evaluation/credits/reductionService/showReductionServices.jsp"),
-                @Forward(name = "showReductionService",
-                        path = "/teacher/evaluation/credits/reductionService/showReductionService.jsp") })
+@Forwards(value = {
+        @Forward(name = "editReductionService",
+                path = "/teacher/evaluation/credits/degreeTeachingService/editCreditsReduction.jsp"),
+        @Forward(name = "viewAnnualTeachingCredits", path = "/departmentMember/credits.do?method=viewAnnualTeachingCredits"),
+        @Forward(name = "showReductionServices", path = "/teacher/evaluation/credits/reductionService/showReductionServices.jsp"),
+        @Forward(name = "showReductionService", path = "/teacher/evaluation/credits/reductionService/showReductionService.jsp") })
 public class DepartmentMemberManageCreditsReductionsDA extends ManageCreditsReductionsDispatchAction {
 
     @EntryPoint
     public ActionForward showReductionServices(ActionMapping mapping, ActionForm form, HttpServletRequest request,
             HttpServletResponse response) throws NumberFormatException, FenixServiceException {
-        ExecutionYear executionYear = ExecutionYear.readCurrentExecutionYear();
+        ExecutionYear executionYear = AnnualCreditsState.getExecutionYearForValidReductionServiceApprovalPeriod();
+        if (executionYear == null) {
+            executionYear = ExecutionYear.readCurrentExecutionYear();
+        }
         User userView = Authenticate.getUser();
         Department department = userView.getPerson().getTeacher().getDepartment();
         SortedSet<ReductionService> creditsReductions = new TreeSet<ReductionService>(new Comparator<ReductionService>() {
             @Override
             public int compare(ReductionService reductionService1, ReductionService reductionService2) {
-                final int teacherIdCompare =
-                        reductionService1.getTeacherService().getTeacher().getPerson().getUsername()
-                                .compareTo(reductionService2.getTeacherService().getTeacher().getPerson().getUsername());
+                final int teacherIdCompare = reductionService1.getTeacherService().getTeacher().getPerson().getUsername()
+                        .compareTo(reductionService2.getTeacherService().getTeacher().getPerson().getUsername());
                 return teacherIdCompare == 0 ? reductionService1.getTeacherService().getExecutionPeriod()
                         .compareExecutionInterval(reductionService2.getTeacherService().getExecutionPeriod()) : teacherIdCompare;
             }
@@ -96,17 +94,17 @@ public class DepartmentMemberManageCreditsReductionsDA extends ManageCreditsRedu
 
                 for (Teacher teacher : allTeachers) {
                     TeacherService teacherService = TeacherService.getTeacherServiceByExecutionPeriod(teacher, executionSemester);
-                    if (teacherService != null
-                            && teacherService.getReductionService() != null
-                            && ((teacherService.getReductionService().getRequestCreditsReduction() != null && teacherService
-                                    .getReductionService().getRequestCreditsReduction()) || teacherService.getReductionService()
-                                    .getCreditsReductionAttributed() != null)
+                    if (teacherService != null && teacherService.getReductionService() != null
+                            && ((teacherService.getReductionService().getRequestCreditsReduction() != null
+                                    && teacherService.getReductionService().getRequestCreditsReduction())
+                                    || teacherService.getReductionService().getCreditsReductionAttributed() != null)
                             && (teacherService.getTeacherServiceLock() != null || !inValidTeacherCreditsPeriod)) {
                         creditsReductions.add(teacherService.getReductionService());
                     }
                 }
             }
         }
+        request.setAttribute("executionYear", executionYear);
         request.setAttribute("creditsReductions", creditsReductions);
         return mapping.findForward("showReductionServices");
     }
@@ -122,9 +120,8 @@ public class DepartmentMemberManageCreditsReductionsDA extends ManageCreditsRedu
             reductionServiceBean = getRenderedObject("reductionServiceBean");
             if (reductionServiceBean != null && reductionServiceBean.getTeacher() != null) {
                 if (reductionServiceBean.getReductionService() == null) {
-                    TeacherService teacherService =
-                            TeacherService.getTeacherServiceByExecutionPeriod(reductionServiceBean.getTeacher(),
-                                    ExecutionSemester.readActualExecutionSemester());
+                    TeacherService teacherService = TeacherService.getTeacherServiceByExecutionPeriod(
+                            reductionServiceBean.getTeacher(), reductionServiceBean.getExecutionSemester());
                     if (teacherService != null) {
                         reductionServiceBean.setReductionService(teacherService.getReductionService());
                     }

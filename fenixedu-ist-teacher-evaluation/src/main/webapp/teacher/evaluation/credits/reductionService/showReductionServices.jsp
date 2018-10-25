@@ -32,12 +32,12 @@
 
 <em><bean:message key="label.teacherService.credits"/></em>
 <h3><bean:message key="label.credits.creditsReduction.definition" bundle="TEACHER_CREDITS_SHEET_RESOURCES"/></h3>
+<bean:define id="executionYear" name="executionYear" type="org.fenixedu.academic.domain.ExecutionYear"/>
 <%
-org.fenixedu.academic.domain.ExecutionYear executionYear = org.fenixedu.academic.domain.ExecutionYear.readCurrentExecutionYear(); 
 Boolean canAproveReductionServiceCredits = pt.ist.fenixedu.teacher.evaluation.domain.credits.AnnualCreditsState.isInValidReductionServiceApprovalPeriod(executionYear);
 Boolean canInsertReductionServiceCredits = Boolean.FALSE;
 %>
-<bean:define id="executionYearName" value="<%= executionYear.getQualifiedName()%>"/>
+<bean:define id="executionYearName" name="executionYear" property="qualifiedName"/>
 <bean:define id="canAproveReductionService" value="<%= canAproveReductionServiceCredits.toString()%>"/>
 <bean:define id="canInsertReductionService" value="<%= canInsertReductionServiceCredits.toString()%>"/>
 <h3><bean:write name="executionYearName"/></h3>
