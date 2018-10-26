@@ -63,11 +63,16 @@ public class CreateAdministrativeOfficeFeeEvent extends CronTask {
 
     @Atomic(mode = TxMode.WRITE)
     private void createAdministrativeOfficeFeeEventAtomic(ExecutionYear executionYear, StudentCurricularPlan scp) {
-        final AccountingEventsManager manager = new AccountingEventsManager();
-        final InvocationResult result;
         if (!acceptedDegreeTypesForAdministrativeOfficeFeeAndInsuranceEvent.test(scp.getDegreeType())) {
             return;
         }
+
+        if(scp.getPerson().hasInsuranceEventOrAdministrativeOfficeFeeInsuranceEventFor(executionYear)){
+            return;
+        }
+
+        final AccountingEventsManager manager = new AccountingEventsManager();
+        final InvocationResult result;
         result = manager.createAdministrativeOfficeFeeAndInsuranceEvent(scp, executionYear);
         if (result.isSuccess()) {
             AdministrativeOfficeFee_TOTAL_CREATED++;
@@ -88,6 +93,10 @@ public class CreateAdministrativeOfficeFeeEvent extends CronTask {
 
     @Atomic(mode = TxMode.WRITE)
     private void createInsuranceEventAtomic(ExecutionYear executionYear, Person person) {
+        if (person.hasInsuranceEventOrAdministrativeOfficeFeeInsuranceEventFor(executionYear)) {
+            return;
+        }
+
         final AccountingEventsManager manager = new AccountingEventsManager();
         final InvocationResult result = manager.createInsuranceEvent(person, executionYear);
         if (result.isSuccess()) {
