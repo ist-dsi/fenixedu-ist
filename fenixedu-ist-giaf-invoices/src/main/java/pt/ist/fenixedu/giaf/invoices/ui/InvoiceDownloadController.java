@@ -30,51 +30,68 @@ import org.fenixedu.academic.domain.accessControl.AcademicAuthorizationGroup;
 import org.fenixedu.academic.domain.accessControl.academicAdministration.AcademicOperationType;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.EventState;
+import org.fenixedu.academic.ui.spring.controller.AccountingEventForOwnerController;
+import org.fenixedu.academic.ui.spring.controller.AccountingEventsPaymentManagerController;
+import org.fenixedu.academic.ui.spring.service.AccountingManagementAccessControlService;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.rendering.annotations.BennuIntersection;
 import org.fenixedu.bennu.rendering.annotations.BennuIntersections;
 import org.fenixedu.bennu.spring.portal.SpringApplication;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.google.common.io.ByteStreams;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 import pt.ist.fenixedu.domain.SapDocumentFile;
 import pt.ist.fenixedu.domain.SapRequest;
 import pt.ist.fenixedu.giaf.invoices.GiafEvent;
 
 @BennuIntersections({
-    @BennuIntersection(location = "events.global.operations", position = "operations", file= "templates/sapDocumentsLink.html"),
     @BennuIntersection(location = "event.details.extra.info", position = "info", file= "templates/sapInvoiceDetails.html"),
     @BennuIntersection(location = "event.details.extra.info", position = "operations", file= "templates/sapEventDocumentsLink.html"),
     @BennuIntersection(location = "event.payment.reference.extra.info", position = "info", file= "templates/sapPaymentReferenceInfo.html"),
     @BennuIntersection(location = "event.payment.reference.extra.info", position = "paymentMethods", file= "templates/otherPaymentMethods.html")
 })
 @SpringApplication(group = "logged", path = "giaf-invoice-viewer", title = "title.giaf.invoice.viewer", hint = "giaf-invoice-viewer")
-@SpringFunctionality(app = InvoiceDownlaodController.class, title = "title.giaf.invoice.viewer")
+@SpringFunctionality(app = InvoiceDownloadController.class, title = "title.giaf.invoice.viewer")
 @RequestMapping("/invoice-downloader")
-public class InvoiceDownlaodController {
+public class InvoiceDownloadController {
+
+    private final AccountingManagementAccessControlService accessControlService;
+
+    @Autowired
+    public InvoiceDownloadController(final AccountingManagementAccessControlService accessControlService) {
+        this.accessControlService = accessControlService;
+    }
 
     static User getUser(final String username) {
         return username == null || username.isEmpty() ? Authenticate.getUser() : User.findByUsername(username);
     }
 
-    @RequestMapping(method = RequestMethod.GET)
-    public String list(@RequestParam(required = false) String username, final Model model) {
-        final User user = getUser(username);
-        if (isAllowedToAccess(user)) {
-            final Person person = user.getPerson();
-            final JsonArray sapRequests = person.getEventsSet().stream()
-                    .flatMap(e -> e.getSapRequestSet().stream())
+    private String eventDetails(final Event event) {
+        return AccountingEventsPaymentManagerController.REQUEST_MAPPING + "/" + event.getExternalId() + "/details";
+    }
+
+    private String ownerEventDetails(final Event event) {
+        return AccountingEventForOwnerController.REQUEST_MAPPING + "/" + event.getExternalId() + "/details";
+    }
+
+    @RequestMapping(value = "/{event}/documents", method = RequestMethod.GET)
+    public String listForEvent(@PathVariable Event event, final Model model) {
+        if (sAllowedToAccess(event)) {
+            model.addAttribute("event", event);
+            model.addAttribute("eventDetailsUrl", accessControlService.isEventOwner(event, Authenticate.getUser()) ?
+                    ownerEventDetails(event): eventDetails(event));
+
+            final JsonArray sapRequests = event.getSapRequestSet().stream()
                     .filter(r -> r.getRequest().length() > 2)
                     .sorted(SapRequest.COMPARATOR_BY_EVENT_AND_ORDER)
                     .map(r -> toJsonObject(r))
@@ -82,16 +99,14 @@ public class InvoiceDownlaodController {
             model.addAttribute("sapRequests", sapRequests);
 
             final JsonArray giafDocuments = new JsonArray();
-            for (final Event event : person.getEventsSet()) {
-                final JsonArray jsonEvent = GiafEvent.readEventFile(event);
-                for (final JsonElement je : jsonEvent) {
-                    final JsonObject jo = je.getAsJsonObject();
-                    jo.addProperty("eventId", event.getExternalId());
-                    final JsonElement receiptId = jo.get("receiptId");
-                    if (receiptId != null && !receiptId.isJsonNull()) {
-                        giafDocuments.add(jo);
-                        jo.addProperty("description", event.getDescription().toString());
-                    }
+            final JsonArray jsonEvent = GiafEvent.readEventFile(event);
+            for (final JsonElement je : jsonEvent) {
+                final JsonObject jo = je.getAsJsonObject();
+                jo.addProperty("eventId", event.getExternalId());
+                final JsonElement receiptId = jo.get("receiptId");
+                if (receiptId != null && !receiptId.isJsonNull()) {
+                    giafDocuments.add(jo);
+                    jo.addProperty("description", event.getDescription().toString());
                 }
             }
             model.addAttribute("giafDocuments", giafDocuments);

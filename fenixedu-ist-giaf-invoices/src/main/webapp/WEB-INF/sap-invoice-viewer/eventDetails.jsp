@@ -10,14 +10,16 @@
 
 <div class="page-header">
     <h1>
-        <span style="color: gray;"><spring:message code="title.sap.invoice.viewer" text="SAP Documents"/></span>
+        <jsp:include page="../fenixedu-academic/accounting/heading-event.jsp"/>
     </h1>
 </div>
 
 <div class="page-body">
     <c:set var="person" scope="request" value="${event.person}"/>
     <jsp:include page="../fenixedu-academic/accounting/heading-person.jsp"/>
-    <jsp:include page="../fenixedu-academic/accounting/heading-event.jsp"/>
+    <h2>
+        <span style="color: gray;"><spring:message code="title.sap.invoice.viewer" text="SAP Documents"/></span>
+    </h2>
 
         <c:if test="${isSapIntegrator}">
             <form method="post" action="<%= contextPath %>/sap-invoice-viewer/${event.externalId}/calculateRequests" style="display: inline;">

@@ -19,6 +19,7 @@
 
 --%>
 <%@page import="pt.ist.fenixedu.domain.SapRequestType"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <% final String contextPath = request.getContextPath(); %>
 
@@ -32,9 +33,18 @@
 
 <div class="page-header">
 	<h1>
-		<spring:message code="title.invoice.viewer" text="Invoices"/>
+        <jsp:include page="../fenixedu-academic/accounting/heading-event.jsp"/>
 	</h1>
 </div>
+
+<div class="page-body">
+
+    <c:set var="person" scope="request" value="${event.person}"/>
+    <jsp:include page="../fenixedu-academic/accounting/heading-person.jsp"/>
+
+    <h2>
+		<spring:message code="title.documents" text="Invoices"/>
+    </h2>
 
 <table id="invoiceTable" class="table tdmiddle">
 	<thead>
@@ -51,6 +61,7 @@
 	<tbody id="invoiceList">
 	</tbody>
 </table>
+</div>
 
 <script type="text/javascript">
 	var sapRequests = ${sapRequests};
