@@ -7,14 +7,12 @@
 
 <div class="page-header">
     <h1>
-        <a href="<%= request.getContextPath() %>/accounting-management/${sapRequest.event.externalId}/details">
-            ${sapRequest.event.description}
-        </a>
+        <c:set var="event" scope="request" value="${sapRequest.event}"/>
+        <jsp:include page="../fenixedu-academic/accounting/heading-event.jsp"/>
     </h1>
 </div>
 
 <div class="page-body">
-    <c:set var="event" scope="request" value="${sapRequest.event}"/>
     <c:set var="person" scope="request" value="${event.person}"/>
     <jsp:include page="../fenixedu-academic/accounting/heading-person.jsp"/>
     <h2>
