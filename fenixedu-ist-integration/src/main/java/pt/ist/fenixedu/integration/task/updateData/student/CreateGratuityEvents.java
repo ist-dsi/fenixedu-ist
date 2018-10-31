@@ -27,6 +27,9 @@ import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.accounting.events.AccountingEventsManager;
+import org.fenixedu.academic.domain.accounting.events.gratuity.DfaGratuityEvent;
+import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEventWithPaymentPlan;
+import org.fenixedu.academic.domain.accounting.events.gratuity.SpecializationDegreeGratuityEvent;
 import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.util.InvocationResult;
 import org.fenixedu.bennu.scheduler.CronTask;
@@ -63,7 +66,22 @@ public class CreateGratuityEvents extends CronTask {
         if (!acceptedDegreeTypesForGratuityEvent.test(studentCurricularPlan.getDegreeType())) {
             return;
         }
-        generateGratuityEvent(studentCurricularPlan, executionYear);
+
+        if (studentCurricularPlan.getDegreeType().isAdvancedFormationDiploma()) {
+            if (studentCurricularPlan.getRegistration().hasGratuityEvent(executionYear, DfaGratuityEvent.class)) {
+                return;
+            }
+        } else if (studentCurricularPlan.getDegreeType().isSpecializationDegree()) {
+            if (studentCurricularPlan.getRegistration().hasGratuityEvent(executionYear, SpecializationDegreeGratuityEvent.class)) {
+                return;
+            }
+        } else if(!studentCurricularPlan.getDegreeType().isEmpty()) {
+            if (studentCurricularPlan.getRegistration().hasGratuityEvent(executionYear, GratuityEventWithPaymentPlan.class)) {
+                return;
+            }
+        }
+
+        generateGratuityEvent(studentCurricularPlan,executionYear);
     }
 
     private void generateGratuityEvent(StudentCurricularPlan studentCurricularPlan, ExecutionYear executionYear) {
