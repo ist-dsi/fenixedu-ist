@@ -28,7 +28,7 @@ import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.accounting.events.AccountingEventsManager;
 import org.fenixedu.academic.domain.accounting.events.gratuity.DfaGratuityEvent;
-import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEventWithPaymentPlan;
+import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.SpecializationDegreeGratuityEvent;
 import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.util.InvocationResult;
@@ -76,7 +76,7 @@ public class CreateGratuityEvents extends CronTask {
                 return;
             }
         } else if(!studentCurricularPlan.getDegreeType().isEmpty()) {
-            if (studentCurricularPlan.getRegistration().hasGratuityEvent(executionYear, GratuityEventWithPaymentPlan.class)) {
+            if (studentCurricularPlan.getRegistration().hasGratuityEvent(executionYear, GratuityEvent.class)) {
                 return;
             }
         }
