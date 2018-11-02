@@ -303,8 +303,8 @@ public class Utils {
     private static boolean isValidPostCode(final String postalCode) {
         if (postalCode != null) {
             final String v = postalCode.trim();
-            return v.length() == 8 && v.charAt(4) == '-' && CharMatcher.DIGIT.matchesAllOf(v.substring(0, 4))
-                    && CharMatcher.DIGIT.matchesAllOf(v.substring(5));
+            return v.length() == 8 && v.charAt(4) == '-' && CharMatcher.digit().matchesAllOf(v.substring(0, 4))
+                    && CharMatcher.digit().matchesAllOf(v.substring(5));
         }
         return false;
     }
