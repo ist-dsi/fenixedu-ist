@@ -190,7 +190,7 @@ public class FacultyEvaluationProcess extends FacultyEvaluationProcess_Base impl
             if (user != null) {
                 return user.getPerson();
             }
-            if (!string.isEmpty() && CharMatcher.DIGIT.matchesAllOf(string)) {
+            if (!string.isEmpty() && CharMatcher.digit().matchesAllOf(string)) {
                 final int number = Integer.parseInt(string);
                 if (number > 0) {
                     Employee employee = Employee.readByNumber(new Integer(number));

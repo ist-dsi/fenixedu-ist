@@ -247,7 +247,7 @@ public class SantanderBatchFillerWorker {
     }
 
     private String purgeString(final String name) {
-        if (!CharMatcher.JAVA_LETTER.or(CharMatcher.WHITESPACE).matchesAllOf(name)) {
+        if (!CharMatcher.javaLetter().or(CharMatcher.whitespace()).matchesAllOf(name)) {
             final char[] ca = new char[name.length()];
             int j = 0;
             for (int i = 0; i < name.length(); i++) {
