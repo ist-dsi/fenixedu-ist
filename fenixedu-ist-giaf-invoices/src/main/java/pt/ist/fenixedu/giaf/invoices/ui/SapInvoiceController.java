@@ -162,7 +162,8 @@ public class SapInvoiceController {
             }
             errors.append(String.format(msg.replace("%n", ""), args));
         };
-        if (Group.dynamic("managers").isMember(Authenticate.getUser())) {
+        if (Group.dynamic("managers").isMember(Authenticate.getUser())
+                || Group.dynamic("sapIntegrationManager").isMember(Authenticate.getUser())) {
             processor.process(errorLogConsumer, elogger, event);
         }
 
