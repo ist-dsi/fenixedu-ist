@@ -1,10 +1,23 @@
 package pt.ist.fenixedu.domain;
 
+import org.fenixedu.academic.domain.accounting.Event;
+import org.fenixedu.academic.domain.accounting.Refund;
+
 import com.google.gson.JsonObject;
 
 import pt.ist.fenixframework.Atomic;
+import pt.ist.fenixframework.dml.runtime.RelationAdapter;
 
 public class ExternalClient extends ExternalClient_Base {
+
+    static {
+        Refund.getRelationEventRefund().addListener(new RelationAdapter<Refund, Event>() {
+            @Override
+            public void afterRemove(final Refund refund, Event event) {
+                refund.setExternalClient(null);
+            }
+        });
+    }
 
     public ExternalClient(final String accountId, final String clientId) {
         super();

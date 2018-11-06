@@ -114,3 +114,12 @@ relation SapRootSapRequest {
         multiplicity *;
     }
 }
+
+relation RefundExternalClient {
+    .org.fenixedu.academic.domain.accounting.Refund playsRole refund {
+        multiplicity *;
+    }
+    ExternalClient playsRole externalClient {
+        multiplicity 0..1;
+    }
+}
