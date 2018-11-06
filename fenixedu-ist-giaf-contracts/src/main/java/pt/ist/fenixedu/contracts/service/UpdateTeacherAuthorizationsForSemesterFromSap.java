@@ -213,6 +213,8 @@ public class UpdateTeacherAuthorizationsForSemesterFromSap {
 
 			categoryMap.put("Investigadores" + "Investig Coordenador",
 					TeacherCategory.findByCode("investigador-coordenador").orElse(null));
+            categoryMap.put("Investigadores" + "Invest Coord Convid",
+                    TeacherCategory.findByCode("investigador-coordenador-convidado").orElse(null));
 			categoryMap.put("Investigadores" + "Investigador Princip",
 					TeacherCategory.findByCode("investigador-principal").orElse(null));
 			categoryMap.put("Investigadores" + "Investig Auxiliar",
