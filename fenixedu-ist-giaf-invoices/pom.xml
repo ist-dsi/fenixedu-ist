@@ -4,7 +4,7 @@
     <parent>
         <groupId>pt.ist</groupId>
         <artifactId>fenixedu-ist</artifactId>
-        <version>16.15.0-SNAPSHOT</version>
+        <version>16.16.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>fenixedu-ist-giaf-invoices</artifactId>
@@ -13,7 +13,7 @@
 
     <properties>
         <version.pt.ist.giaf-client-financial-documents>1.2.0</version.pt.ist.giaf-client-financial-documents>
-        <version.pt.ist.sap-sdk-java>4.1.0</version.pt.ist.sap-sdk-java>
+        <version.pt.ist.sap-sdk-java>4.1.1</version.pt.ist.sap-sdk-java>
         <version.org.fenixedu.postCodeTools>1.0.0</version.org.fenixedu.postCodeTools>
     </properties>
 

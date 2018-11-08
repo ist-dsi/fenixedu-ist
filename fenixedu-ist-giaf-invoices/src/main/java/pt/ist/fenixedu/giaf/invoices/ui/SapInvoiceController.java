@@ -32,6 +32,7 @@ import org.fenixedu.academic.domain.accessControl.academicAdministration.Academi
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.EventState;
 import org.fenixedu.academic.domain.accounting.calculator.DebtInterestCalculator;
+import org.fenixedu.academic.ui.spring.controller.AccountingEventsPaymentManagerController;
 import org.fenixedu.academic.util.Money;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.groups.Group;
@@ -48,7 +49,6 @@ import com.google.common.base.Strings;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 import pt.ist.fenixedu.domain.ExternalClient;
 import pt.ist.fenixedu.domain.SapRequest;
 import pt.ist.fenixedu.giaf.invoices.ErrorLogConsumer;
@@ -56,7 +56,7 @@ import pt.ist.fenixedu.giaf.invoices.EventLogger;
 import pt.ist.fenixedu.giaf.invoices.EventProcessor;
 import pt.ist.fenixedu.giaf.invoices.SapEvent;
 
-@SpringFunctionality(app = InvoiceDownlaodController.class, title = "title.sap.invoice.viewer")
+@SpringFunctionality(app = InvoiceDownloadController.class, title = "title.sap.invoice.viewer")
 @RequestMapping("/sap-invoice-viewer")
 public class SapInvoiceController {
 
@@ -77,9 +77,13 @@ public class SapInvoiceController {
     }
 
     private String eventRedirect(final Event event) {
-        return "redirect:/accounting-management/" + event.getExternalId() + "/details";
+        return "redirect:" + eventDetails(event);
     }
 
+    private String eventDetails(final Event event) {
+        return AccountingEventsPaymentManagerController.REQUEST_MAPPING + "/" + event.getExternalId() + "/details";
+    }
+    
     private String sapDocumentsRedirect(final Event event) {
         return "redirect:/sap-invoice-viewer/" + event.getExternalId();
     }
@@ -87,8 +91,8 @@ public class SapInvoiceController {
     @RequestMapping(method = RequestMethod.GET)
     public String home(@RequestParam(required = false) String username, final Model model,
             @RequestParam(required = false) String exception, @RequestParam(required = false) String errors) {
-        final User user = InvoiceDownlaodController.getUser(username);
-        if (InvoiceDownlaodController.isAllowedToAccess(user)) {
+        final User user = InvoiceDownloadController.getUser(username);
+        if (InvoiceDownloadController.isAllowedToAccess(user)) {
             final Person person = user.getPerson();
             final DateTime now = new DateTime();
             final JsonArray events = person.getEventsSet().stream()
@@ -109,6 +113,7 @@ public class SapInvoiceController {
     @RequestMapping(value = "/{event}", method = RequestMethod.GET)
     public String eventDetails(final @PathVariable Event event, final Model model,
             @RequestParam(required = false) String exception, @RequestParam(required = false) String errors) {
+        model.addAttribute("eventDetailsUrl", eventDetails(event));
         model.addAttribute("event", event);
         final Set<SapRequest> sapRequests = new TreeSet<>(SapRequest.COMPARATOR_BY_EVENT_AND_ORDER);
         sapRequests.addAll(event.getSapRequestSet());
@@ -157,7 +162,8 @@ public class SapInvoiceController {
             }
             errors.append(String.format(msg.replace("%n", ""), args));
         };
-        if (Group.dynamic("managers").isMember(Authenticate.getUser())) {
+        if (Group.dynamic("managers").isMember(Authenticate.getUser())
+                || Group.dynamic("sapIntegrationManager").isMember(Authenticate.getUser())) {
             processor.process(errorLogConsumer, elogger, event);
         }
 

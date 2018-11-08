@@ -49,7 +49,7 @@ import com.google.gson.JsonObject;
 import pt.ist.fenixedu.domain.ExternalClient;
 import pt.ist.fenixedu.domain.SapRoot;
 
-@SpringFunctionality(app = InvoiceDownlaodController.class, title = "title.client.management")
+@SpringFunctionality(app = InvoiceDownloadController.class, title = "title.client.management")
 @RequestMapping("/client-management")
 public class ClientController {
 

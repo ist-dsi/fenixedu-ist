@@ -75,7 +75,7 @@ public class QuestionScale implements Serializable {
             int length = 0;
             int collonPosition = string.indexOf(':', iter + 3);
 
-            if (CharMatcher.DIGIT.matchesAllOf(string.substring(iter + 3, collonPosition))) {
+            if (CharMatcher.digit().matchesAllOf(string.substring(iter + 3, collonPosition))) {
                 length = Integer.parseInt(string.substring(iter + 3, collonPosition));
                 String scalePortion = string.substring(collonPosition + 1, collonPosition + 1 + length);
                 int index = scalePortion.indexOf(SCALE_VALUE_SEPARATOR);

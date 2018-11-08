@@ -364,7 +364,7 @@ public class InquiryGroupResultsResumeRenderer extends InputRenderer {
             int endAt = getPercentageScaleSize(questionResultsSummaryBean, questionHeader);
             for (int iter = 0, startAt = 1; iter < questionHeader.getScaleHeaders().getScaleValues().length; iter++) {
                 String value = questionHeader.getScaleHeaders().getScaleValues()[iter];
-                if (CharMatcher.DIGIT.matchesAllOf(value) && Integer.valueOf(value) > 0) {
+                if (CharMatcher.digit().matchesAllOf(value) && Integer.valueOf(value) > 0) {
                     StringBuilder builder = new StringBuilder("<span class=\"legend-bar\">");
                     builder.append(questionHeader.getScaleHeaders().getScale()[iter].getContent());
                     builder.append("&nbsp;<span class=\"legend-bar-1");
