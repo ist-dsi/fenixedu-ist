@@ -94,7 +94,8 @@ public class ImportEmployeeUnitsFromSap extends CronTask {
         });
 
         for (Accountability accountability : Bennu.getInstance().getAccountabilitysSet()) {
-            if (accountability.getAccountabilityType().getType() == AccountabilityTypeEnum.WORKING_CONTRACT
+            if (EmployeeContract.class.isAssignableFrom(accountability.getClass())
+                    && accountability.getAccountabilityType().getType() == AccountabilityTypeEnum.WORKING_CONTRACT
                     && accountability.isActive() && !activeWorkingContracts.contains(accountability)) {
                 closeCurrentContract(AccountabilityTypeEnum.WORKING_CONTRACT, (Contract) accountability, today.minusDays(1));
             }
