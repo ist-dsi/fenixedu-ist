@@ -14,7 +14,7 @@
     <properties>
         <jasper.threads>3</jasper.threads>
 
-        <version.net.sf.jasperreports.jasperreports>3.6.0</version.net.sf.jasperreports.jasperreports>
+        <version.net.sf.jasperreports.jasperreports>3.7.6</version.net.sf.jasperreports.jasperreports>
     </properties>
 
     <build>
