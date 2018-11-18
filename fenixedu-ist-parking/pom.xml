@@ -12,7 +12,7 @@
     <name>FenixEdu IST Parking</name>
 
     <properties>
-        <version.com.healthmarketscience.jackcess.jackcess>1.2.8</version.com.healthmarketscience.jackcess.jackcess>
+        <version.com.healthmarketscience.jackcess.jackcess>1.2.14.3</version.com.healthmarketscience.jackcess.jackcess>
     </properties>
 
     <dependencies>
