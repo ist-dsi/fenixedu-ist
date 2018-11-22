@@ -49,7 +49,7 @@ public class DelegateMessagingController {
 
     @RequestMapping
     public String home(Model model) {
-        return messaging(Authenticate.getUser().getDelegatesSet().iterator().next(), true, false, model);
+        return messaging(Authenticate.getUser().getDelegatesSet().stream().filter(Delegate::isActive).iterator().next(), true, false, model);
     }
 
     @RequestMapping(value = "/messaging/{delegate}", method = RequestMethod.GET)
