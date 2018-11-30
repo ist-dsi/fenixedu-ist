@@ -49,6 +49,7 @@ import com.google.common.base.Strings;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
 import pt.ist.fenixedu.domain.ExternalClient;
 import pt.ist.fenixedu.domain.SapRequest;
 import pt.ist.fenixedu.giaf.invoices.ErrorLogConsumer;
@@ -268,6 +269,38 @@ public class SapInvoiceController {
                 sapEvent.cancelDebt();
             } catch (final Exception | Error e) {
                 model.addAttribute("exception", e.getMessage());
+            }
+        }
+        return sapDocumentsRedirect(event);
+    }
+
+    @RequestMapping(value = "/{event}/createNewInvoice", method = RequestMethod.GET)
+    public String prepareCreateNewInvoice(final @PathVariable Event event, final Model model) {
+        model.addAttribute("event", event);
+        return "sap-invoice-viewer/createNewInvoice";
+    }
+
+    @RequestMapping(value = "/{event}/createNewInvoice", method = RequestMethod.POST)
+    public String createNewInvoice(final @PathVariable Event event, final Model model,
+            @RequestParam final ExternalClient client, @RequestParam final String valueToTransfer,
+            @RequestParam final String pledgeNumber) {
+        if (Group.dynamic("managers").isMember(Authenticate.getUser()) || isAdvancedPaymentManager() || Group.dynamic("sapIntegrationManager").isMember(Authenticate.getUser())) {
+            try {
+                final Money value = toMoney(valueToTransfer);
+                if (value.isZero() || value.isNegative()) {
+                    model.addAttribute("error", "error.value.to.transfer.must.be.positive");
+                    return prepareCreateNewInvoice(event, model);
+                }
+                final SapEvent sapEvent = new SapEvent(event);
+                try {
+                    sapEvent.registerInvoice(value, event.isGratuity(), true, client, pledgeNumber);
+                } catch (final Exception | Error e) {
+                    model.addAttribute("exception", e.getMessage());
+                    return prepareCreateNewInvoice(event, model);
+                }
+            } catch (final NumberFormatException ex) {
+                model.addAttribute("error", "error.value.to.transfer.must.be.positive");
+                return prepareCreateNewInvoice(event, model);
             }
         }
         return sapDocumentsRedirect(event);
