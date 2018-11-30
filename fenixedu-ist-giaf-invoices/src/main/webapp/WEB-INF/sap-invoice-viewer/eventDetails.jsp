@@ -22,6 +22,9 @@
     </h2>
 
         <c:if test="${isSapIntegrator}">
+            <a href="<%= contextPath %>/sap-invoice-viewer/${event.externalId}/createNewInvoice" class="btn btn-default">
+                <spring:message code="label.sapRequest.create.new.invoice" text="Create New Invoice"/>
+            </a>
             <form method="post" action="<%= contextPath %>/sap-invoice-viewer/${event.externalId}/calculateRequests" style="display: inline;">
                 ${csrf.field()}
                 <button type="submit" class="btn btn-default"><spring:message code="label.calculate.request" text="Calculate Request"/></button>

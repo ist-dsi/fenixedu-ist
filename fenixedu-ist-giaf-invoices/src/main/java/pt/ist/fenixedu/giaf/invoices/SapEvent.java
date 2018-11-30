@@ -113,6 +113,21 @@ public class SapEvent {
     }
 
     @Atomic
+    public void registerInvoice(final Money value, final boolean gratuity, final boolean isNewDate, final ExternalClient externalClient, final String pledgeNumber) {
+        final String clientId;
+        final JsonObject data;
+        if (externalClient == null) {
+            clientId = ClientMap.uVATNumberFor(event.getParty());
+            data = toJsonInvoice(event, value, getDocumentDate(event.getWhenOccured(), isNewDate), new DateTime(), clientId, false, false);
+        } else {
+            clientId = externalClient.getClientId();
+            data = toJsonInvoice(externalClient, value, getDocumentDate(event.getWhenOccured(), true), new DateTime(), false, false, pledgeNumber);
+        }
+        final String documentNumber = getDocumentNumber(data, false);
+        new SapRequest(event, clientId, value, documentNumber, SapRequestType.INVOICE, Money.ZERO, data);
+    }
+
+    @Atomic
     public void transferInvoice(final SapRequest sapRequest, final ExternalClient externalClient, final Money amountToTransfer,
             final String pledgeNumber) {
         final SapRequestType requestType = sapRequest.getRequestType();
@@ -133,8 +148,7 @@ public class SapEvent {
             sapRequest.setIgnore(true);
             creditRequest.setIgnore(true);
 
-            final JsonObject data = toJsonInvoice(sapRequest, externalClient, amountToTransfer,
-                    getDocumentDate(event.getWhenOccured(), true), new DateTime(), false, false, pledgeNumber);
+            final JsonObject data = toJsonInvoice(externalClient, amountToTransfer, getDocumentDate(event.getWhenOccured(), true), new DateTime(), false, false, pledgeNumber);
             final String documentNumber = getDocumentNumber(data, false);
             new SapRequest(event, externalClient.getClientId(), amountToTransfer, documentNumber, SapRequestType.INVOICE, Money.ZERO, data);
         }
@@ -793,7 +807,7 @@ public class SapEvent {
         return json;
     }
 
-    private JsonObject toJsonInvoice(final SapRequest sapRequest, final ExternalClient externalClient, final Money debtFenix,
+    private JsonObject toJsonInvoice(final ExternalClient externalClient, final Money debtFenix,
             final DateTime documentDate, final DateTime entryDate, final boolean isDebtRegistration,
             final boolean isInterest, final String pledgeNumber) {
         final JsonObject clientData = toJsonClient(externalClient);

@@ -65,11 +65,12 @@ public class EventProcessor {
         if (!EventWrapper.shouldProcess(errorLog, event)) {
             return;
         }
+
+        final SapEvent sapEvent = new SapEvent(event);
+        if (sapEvent.hasPendingDocumentCancelations()) {
+            return;
+        }
             if (EventWrapper.needsProcessingSap(event)) {
-                final SapEvent sapEvent = new SapEvent(event);
-                if (sapEvent.hasPendingDocumentCancelations()) {
-                    return;
-                }
 
                 final EventWrapper eventWrapper = new EventWrapper(event, errorLog, true);
 
@@ -131,9 +132,26 @@ public class EventProcessor {
                 }
             } else {
                 //processing payments of past events
-//                eventWrapper.paymentsSap().filter(d -> !sapEvent.hasPayment(d)).peek(
-//                    d -> elogger.log("Processing past payment %s : %s%n", eventWrapper.event.getExternalId(), d.getExternalId()))
-//                    .forEach(d -> sapEvent.registerInvoiceAndPayment(clientMap, d, errorLog, elogger));
+                final EventWrapper eventWrapper = new EventWrapper(event, errorLog, true);
+
+                final DebtInterestCalculator calculator = event.getDebtInterestCalculator(new DateTime());
+
+                for (final CreditEntry creditEntry : calculator.getCreditEntries()) {
+                    if (creditEntry.getAmount().compareTo(BigDecimal.ZERO) > 0
+                            && creditEntry.getCreated().isAfter(EventWrapper.SAP_TRANSACTIONS_THRESHOLD)) {
+                        if (creditEntry.getClass().equals(Payment.class)) {
+                            final Payment payment = (Payment) creditEntry;
+                            if (payment.isForDebt() && !sapEvent.hasPayment(payment.getId())) {
+                                sapEvent.registerPayment(payment, errorLog, elogger);
+                            }
+                        } else if (creditEntry instanceof DebtExemption) {
+                            final DebtExemption debtExemption = (DebtExemption) creditEntry;
+                            if (!sapEvent.hasCredit(debtExemption.getId())) {
+                                sapEvent.registerCredit(event, debtExemption, eventWrapper.isGratuity(), errorLog, elogger);
+                            }
+                        }
+                    }
+                }
             }
 
     }
