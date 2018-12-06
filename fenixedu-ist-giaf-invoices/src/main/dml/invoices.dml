@@ -114,3 +114,12 @@ relation SapRootSapRequest {
         multiplicity *;
     }
 }
+
+relation PaymentMethodDefaultInternal {
+    .org.fenixedu.bennu.core.domain.Bennu playsRole internalBennu {
+        multiplicity 0..1;
+    }
+    .org.fenixedu.academic.domain.accounting.PaymentMethod playsRole internalPaymentMethod {
+        multiplicity 0..1;
+    }
+}

@@ -4,3 +4,7 @@
 {% if isPaymentManager %}
     <a class="btn btn-default btn-block" href="{{request.contextPath}}/sap-invoice-viewer/{{event.externalId}}">{{i18n(giafInvoicesResourcesBundle, "title.sap.invoice.viewer")}}</a>
 {% endif %}
+    <a class="btn btn-default btn-block" href="{{request.contextPath}}/sap-invoice-viewer/{{event.externalId}}/registerInternalPayment">{{i18n(giafInvoicesResourcesBundle, "title.register.internal.payment")}}</a>
+{% if pt.ist.fenixedu.giaf.invoices.ui.SapInvoiceController.sapIntegrationManager() %}
+    <a class="btn btn-default btn-block" href="{{request.contextPath}}/sap-invoice-viewer/{{event.externalId}}/registerInternalPayment">{{i18n(giafInvoicesResourcesBundle, "title.register.internal.payment")}}</a>
+{% endif %}

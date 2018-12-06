@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.fenixedu.PostalCodeValidator;
 import org.fenixedu.TINValidator;
 import org.fenixedu.academic.domain.Country;
+import org.fenixedu.bennu.SapSdkConfiguration;
 import org.fenixedu.bennu.core.security.SkipCSRF;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.fenixedu.commons.StringNormalizer;
@@ -44,10 +45,12 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import pt.ist.fenixedu.domain.ExternalClient;
 import pt.ist.fenixedu.domain.SapRoot;
+import pt.ist.sap.client.SapStructure;
 
 @SpringFunctionality(app = InvoiceDownloadController.class, title = "title.client.management")
 @RequestMapping("/client-management")
@@ -130,7 +133,7 @@ public class ClientController {
 
     @SkipCSRF
     @RequestMapping(value = "/availableClients", method = RequestMethod.POST, produces = "application/json; charset=UTF-8")
-    public @ResponseBody String availableUnits(final @RequestParam(required = false, value = "term") String term, final Model model) {
+    public @ResponseBody String availableClients(final @RequestParam(required = false, value = "term") String term, final Model model) {
         final JsonArray result = new JsonArray();
         final String trimmedValue = term.trim();
         final String[] input = StringNormalizer.normalize(trimmedValue).split(" ");
@@ -145,6 +148,35 @@ public class ClientController {
             });
 
         return result.toString();
+    }
+
+    @SkipCSRF
+    @RequestMapping(value = "/availableInternalUnits", method = RequestMethod.POST, produces = "application/json; charset=UTF-8")
+    public @ResponseBody String availableInternalUnits(final @RequestParam(required = false, value = "term") String term, final Model model) {
+        final JsonArray result = new JsonArray();
+        final String trimmedValue = term.trim();
+        final String[] input = StringNormalizer.normalize(trimmedValue).split(" ");
+
+        final SapStructure sapStructure = new SapStructure();
+        final JsonObject sapInput = new JsonObject();
+        sapInput.addProperty("institution", SapSdkConfiguration.getConfiguration().sapServiceInstitutionCode());
+
+        for (final JsonElement pepElement : sapStructure.listSanitizedProjects(sapInput)) {
+            final JsonObject pepObject = pepElement.getAsJsonObject();
+            final String pepUnitSapId = getString(pepObject, "unitSapId");
+
+            final JsonObject o = new JsonObject();
+            o.addProperty("id", pepUnitSapId);
+            o.addProperty("name", pepUnitSapId);
+            result.add(o);
+        }
+
+        return result.toString();
+    }
+
+    private static String getString(final JsonObject jo, final String key) {
+        final JsonElement e = jo.get(key);
+        return e == null || e.isJsonNull() ? null : e.getAsString();
     }
 
     @RequestMapping(value = "/download", method = RequestMethod.GET, produces = "application/xlsx")

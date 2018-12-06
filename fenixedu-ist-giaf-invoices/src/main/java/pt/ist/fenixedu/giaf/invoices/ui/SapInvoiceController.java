@@ -32,8 +32,11 @@ import org.fenixedu.academic.domain.accessControl.academicAdministration.Academi
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.EventState;
 import org.fenixedu.academic.domain.accounting.calculator.DebtInterestCalculator;
+import org.fenixedu.academic.dto.accounting.DepositAmountBean;
 import org.fenixedu.academic.ui.spring.controller.AccountingEventsPaymentManagerController;
+import org.fenixedu.academic.ui.spring.service.AccountingManagementService;
 import org.fenixedu.academic.util.Money;
+import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.security.Authenticate;
@@ -71,6 +74,10 @@ public class SapInvoiceController {
         return Optional.ofNullable(Authenticate.getUser())
                 .map(AcademicAuthorizationGroup.get(AcademicOperationType.MANAGE_STUDENT_PAYMENTS_ADV, Collections.emptySet(), Collections.emptySet(), null)::isMember)
                 .orElse(false);
+    }
+
+    public static boolean isSapIntegrationManager() {
+        return Group.dynamic("sapIntegrationManager").isMember(Authenticate.getUser());
     }
 
     private String homeRedirect(final String username) {
@@ -277,6 +284,7 @@ public class SapInvoiceController {
     @RequestMapping(value = "/{event}/createNewInvoice", method = RequestMethod.GET)
     public String prepareCreateNewInvoice(final @PathVariable Event event, final Model model) {
         model.addAttribute("event", event);
+        model.addAttribute("eventDetailsUrl", eventDetails(event));
         return "sap-invoice-viewer/createNewInvoice";
     }
 
@@ -284,7 +292,7 @@ public class SapInvoiceController {
     public String createNewInvoice(final @PathVariable Event event, final Model model,
             @RequestParam final ExternalClient client, @RequestParam final String valueToTransfer,
             @RequestParam final String pledgeNumber) {
-        if (Group.dynamic("managers").isMember(Authenticate.getUser()) || isAdvancedPaymentManager() || Group.dynamic("sapIntegrationManager").isMember(Authenticate.getUser())) {
+        if (Group.dynamic("managers").isMember(Authenticate.getUser()) || Group.dynamic("sapIntegrationManager").isMember(Authenticate.getUser())) {
             try {
                 final Money value = toMoney(valueToTransfer);
                 if (value.isZero() || value.isNegative()) {
@@ -305,6 +313,54 @@ public class SapInvoiceController {
         }
         return sapDocumentsRedirect(event);
     }
+
+    @RequestMapping(value = "/{event}/registerInternalPayment", method = RequestMethod.GET)
+    public String prepareRegisterInternalPayment(final @PathVariable Event event, final Model model) {
+        model.addAttribute("event", event);
+        model.addAttribute("eventDetailsUrl", eventDetails(event));
+        return "sap-invoice-viewer/registerInternalPayment";
+    }
+
+    @RequestMapping(value = "/{event}/registerInternalPayment", method = RequestMethod.POST)
+    public String registerInternalPayment(final @PathVariable Event event, final Model model,
+            @RequestParam final String unit, @RequestParam final String valueToTransfer,
+            @RequestParam final DateTime whenRegistered, @RequestParam final String reason) {
+        final User user = Authenticate.getUser();
+        if (Group.dynamic("managers").isMember(user) || Group.dynamic("sapIntegrationManager").isMember(user)) {
+            try {
+                final Money value = toMoney(valueToTransfer);
+                if (value.isZero() || value.isNegative()) {
+                    model.addAttribute("error", "error.value.to.transfer.must.be.positive");
+                    return prepareRegisterInternalPayment(event, model);
+                }
+                final DebtInterestCalculator calculatorNow = event.getDebtInterestCalculator(new DateTime());
+                final Money dueAmount = new Money(calculatorNow.getDueAmount());
+                if (value.greaterThan(dueAmount)) {
+                    model.addAttribute("error", "error.value.exeeds.due.amount");
+                    return prepareRegisterInternalPayment(event, model);                    
+                }
+                final DebtInterestCalculator calculatorWhen = event.getDebtInterestCalculator(whenRegistered);
+                final Money dueInterestOrFine = new Money(calculatorWhen.getDueFineAmount().add(calculatorWhen.getDueInterestAmount()));
+                if (dueInterestOrFine.isPositive()) {
+                    model.addAttribute("error", "error.cannot.register.internal.payment.with.pending.interes.or.fines");
+                    return prepareRegisterInternalPayment(event, model);                    
+                }
+
+                final DepositAmountBean bean = new DepositAmountBean();
+                bean.setAmount(value);
+                bean.setEntryType(event.getEntryType());
+                bean.setPaymentMethod(Bennu.getInstance().getInternalPaymentMethod());
+                bean.setPaymentReference(unit);
+                bean.setReason(reason);
+                bean.setWhenRegistered(whenRegistered);
+                new AccountingManagementService().depositAmount(event, user, bean);
+            } catch (final NumberFormatException ex) {
+                model.addAttribute("error", "error.value.to.transfer.must.be.positive");
+                return prepareRegisterInternalPayment(event, model);
+            }
+        }
+        return eventRedirect(event);
+    }    
 
     private JsonObject toJsonObject(final Event event, final DateTime when) {
         final JsonObject result = new JsonObject();
