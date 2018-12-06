@@ -22,12 +22,21 @@ package pt.ist.fenixedu.giaf.invoices.ui;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.fenixedu.PostalCodeValidator;
 import org.fenixedu.TINValidator;
 import org.fenixedu.academic.domain.Country;
+import org.fenixedu.academic.domain.accounting.AccountingTransactionDetail;
+import org.fenixedu.academic.domain.accounting.PaymentMethod;
+import org.fenixedu.academic.domain.exceptions.DomainException;
+import org.fenixedu.academic.ui.spring.controller.manager.PaymentMethodService;
 import org.fenixedu.bennu.SapSdkConfiguration;
+import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.bennu.core.groups.Group;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.core.security.SkipCSRF;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.fenixedu.commons.StringNormalizer;
@@ -50,11 +59,27 @@ import com.google.gson.JsonObject;
 
 import pt.ist.fenixedu.domain.ExternalClient;
 import pt.ist.fenixedu.domain.SapRoot;
+import pt.ist.fenixframework.FenixFramework;
+import pt.ist.fenixframework.dml.runtime.RelationAdapter;
 import pt.ist.sap.client.SapStructure;
 
 @SpringFunctionality(app = InvoiceDownloadController.class, title = "title.client.management")
 @RequestMapping("/client-management")
 public class ClientController {
+
+    static {
+        PaymentMethod.getRelationAccountingTransactionDetailPaymentMethod().addListener(new RelationAdapter<AccountingTransactionDetail, PaymentMethod>() {
+
+            @Override
+            public void beforeAdd(final AccountingTransactionDetail txd, final PaymentMethod pm) {
+                if (txd != null && pm != null && pm == Bennu.getInstance().getInternalPaymentMethod() && !Group.dynamic("sapIntegrationManager").isMember(Authenticate.getUser())) {
+                    throw new DomainException(BundleUtil.getLocalizedString("resources.GiafInvoicesResources", "error.only.sapIntegrationManager.can.use.this.payment.method").getContent());
+                }
+            }
+
+        });
+    }
+
 
     @Autowired
     private MessageSource messageSource;
@@ -209,7 +234,21 @@ public class ClientController {
             throw new Error(e);
         }
     }
-    
+
+    @RequestMapping(value = "/manageDefaultPaymentMethods", method = RequestMethod.POST)
+    public String manageDefaults(Model model, @RequestParam PaymentMethod defaultCashPaymentMethod,
+            @RequestParam PaymentMethod defaultSibsPaymentMethod, @RequestParam PaymentMethod defaultInternalPaymentMethod, final HttpServletRequest request) {
+        try {
+            new PaymentMethodService().setDefaultPaymentMethods(defaultCashPaymentMethod, defaultSibsPaymentMethod);
+            FenixFramework.atomic(() -> {
+                defaultInternalPaymentMethod.setInternalBennu(Bennu.getInstance());
+            });
+            return "redirect:/payment-methods-management";
+        } catch (DomainException de) {
+            return "redirect:/payment-methods-management/manageDefaults";
+        }
+    }
+
     private boolean matchesClient(final ExternalClient c, final String[] input) {
         if (input.length == 0) {
             return false;
