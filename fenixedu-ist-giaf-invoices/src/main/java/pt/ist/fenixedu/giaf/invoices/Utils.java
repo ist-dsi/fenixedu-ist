@@ -425,7 +425,7 @@ public class Utils {
     }
 
     public static Date getDueDate(final Event event) {
-        return event.getDueDateAmountMap(new DateTime()).keySet().stream()
+        return event.getDueDateAmountMap().keySet().stream()
             .sorted(Comparator.reverseOrder()).findFirst().get().toDate();
     }
 
