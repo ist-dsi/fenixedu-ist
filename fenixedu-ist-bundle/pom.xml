@@ -79,6 +79,11 @@
             <artifactId>fenixedu-ist-registration-process</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>pt.ist</groupId>
+            <artifactId>fenixedu-ist-bullet</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <repositories>

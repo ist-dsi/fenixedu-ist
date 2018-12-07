@@ -280,5 +280,6 @@
         <module>fenixedu-ist-tutorship</module>
         <module>fenixedu-ist-vigilancies</module>
         <module>fenixedu-ist-registration-process</module>
+        <module>fenixedu-ist-bullet</module>
     </modules>
 </project>
