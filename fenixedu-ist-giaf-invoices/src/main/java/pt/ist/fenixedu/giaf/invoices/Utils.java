@@ -425,8 +425,10 @@ public class Utils {
     }
 
     public static Date getDueDate(final Event event) {
-        return event.getDueDateAmountMap(new DateTime()).keySet().stream()
-            .sorted(Comparator.reverseOrder()).findFirst().get().toDate();
+        return event.getDueDateAmountMap().keySet()
+                .stream()
+                .max(Comparator.naturalOrder())
+                .map(LocalDate::toDate)
+                .orElseThrow(() -> new DomainException("key.return.argument", "No due date found for event " + event.getExternalId());
     }
-
 }
