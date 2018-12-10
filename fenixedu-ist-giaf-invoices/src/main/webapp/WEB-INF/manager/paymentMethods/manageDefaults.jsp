@@ -76,6 +76,16 @@
                     </div>
                 </div>
                 <div class="form-group">
+                    <label for="defaultRefundPaymentMethod" class="col-sm-1 control-label"><spring:message code="label.paymentMethods.defaultRefund" /></label>
+                    <div class="col-sm-1">
+                        <select name="defaultRefundPaymentMethod" id="defaultRefundPaymentMethod">
+                            <c:forEach var="paymentMethod" items="${paymentMethods}">
+                                <option value="${paymentMethod.externalId}" <c:if test="${paymentMethod.refund}">selected="selected"</c:if> >${paymentMethod.code} - ${paymentMethod.localizedName}</option>
+                            </c:forEach>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
                     <label for="defaulttInternalPaymentMethod" class="col-sm-1 control-label"><spring:message code="label.paymentMethods.defaulttInternal" /></label>
                     <div class="col-sm-1">
                         <select name="defaultInternalPaymentMethod" id="defaulttInternalPaymentMethod">
