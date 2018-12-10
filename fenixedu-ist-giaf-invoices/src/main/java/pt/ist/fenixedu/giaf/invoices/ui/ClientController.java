@@ -19,6 +19,8 @@
  */
 package pt.ist.fenixedu.giaf.invoices.ui;
 
+import static org.fenixedu.academic.domain.PaymentMethodLog.createLog;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
@@ -32,6 +34,7 @@ import org.fenixedu.academic.domain.accounting.AccountingTransactionDetail;
 import org.fenixedu.academic.domain.accounting.PaymentMethod;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.ui.spring.controller.manager.PaymentMethodService;
+import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.SapSdkConfiguration;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.groups.Group;
@@ -239,9 +242,10 @@ public class ClientController {
 
     @RequestMapping(value = "/manageDefaultPaymentMethods", method = RequestMethod.POST)
     public String manageDefaults(Model model, @RequestParam PaymentMethod defaultCashPaymentMethod,
-            @RequestParam PaymentMethod defaultSibsPaymentMethod, @RequestParam PaymentMethod defaultInternalPaymentMethod, final HttpServletRequest request) {
+            @RequestParam PaymentMethod defaultSibsPaymentMethod, @RequestParam PaymentMethod defaultRefundPaymentMethod,
+            @RequestParam PaymentMethod defaultInternalPaymentMethod, final HttpServletRequest request) {
         try {
-            new PaymentMethodService().setDefaultPaymentMethods(defaultCashPaymentMethod, defaultSibsPaymentMethod);
+            new PaymentMethodService().setDefaultPaymentMethods(defaultCashPaymentMethod, defaultSibsPaymentMethod, defaultRefundPaymentMethod);
             FenixFramework.atomic(() -> {
                 defaultInternalPaymentMethod.setInternalBennu(Bennu.getInstance());
             });
