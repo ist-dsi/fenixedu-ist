@@ -429,6 +429,6 @@ public class Utils {
                 .stream()
                 .max(Comparator.naturalOrder())
                 .map(LocalDate::toDate)
-                .orElseThrow(() -> new DomainException("key.return.argument", "No due date found for event " + event.getExternalId());
+                .orElseThrow(() -> new DomainException("key.return.argument", "No due date found for event " + event.getExternalId()));
     }
 }
