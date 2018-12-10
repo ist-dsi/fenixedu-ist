@@ -1143,7 +1143,7 @@ public class FenixAPIv1 {
         String acronym = department.getAcronym();
 
         List<Employee> employees = Employee.getAllWorkingEmployees(department, interval.getBeginYearMonthDayWithoutChronology(), interval.getEndYearMonthDayWithoutChronology());
-        Set<Person> employeePeople = employees.stream().map(Employee::getPerson).collect(Collectors.toSet());
+        Set<Person> employeePeople = employees.stream().filter(Objects::nonNull).map(Employee::getPerson).collect(Collectors.toSet());
         //XXX Teachers are obtained separately through their TeacherAuthorizations so external teachers are taken into account
         //XXX Internal teachers with missing authorizations are present in the employee stream and are displayed in the same way as others
         List<Teacher> teachers = department.getAllTeachers(interval);

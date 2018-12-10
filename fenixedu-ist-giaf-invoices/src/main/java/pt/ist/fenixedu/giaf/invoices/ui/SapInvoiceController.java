@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Collector.Characteristics;
 
@@ -31,9 +32,13 @@ import org.fenixedu.academic.domain.accessControl.AcademicAuthorizationGroup;
 import org.fenixedu.academic.domain.accessControl.academicAdministration.AcademicOperationType;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.EventState;
+import org.fenixedu.academic.domain.accounting.Refund;
 import org.fenixedu.academic.domain.accounting.calculator.DebtInterestCalculator;
 import org.fenixedu.academic.dto.accounting.DepositAmountBean;
+import org.fenixedu.academic.domain.accounting.events.EventExemptionJustificationType;
+import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.ui.spring.controller.AccountingEventsPaymentManagerController;
+import org.fenixedu.academic.ui.spring.service.AccountingManagementAccessControlService;
 import org.fenixedu.academic.ui.spring.service.AccountingManagementService;
 import org.fenixedu.academic.util.Money;
 import org.fenixedu.bennu.core.domain.Bennu;
@@ -59,6 +64,7 @@ import pt.ist.fenixedu.giaf.invoices.ErrorLogConsumer;
 import pt.ist.fenixedu.giaf.invoices.EventLogger;
 import pt.ist.fenixedu.giaf.invoices.EventProcessor;
 import pt.ist.fenixedu.giaf.invoices.SapEvent;
+import pt.ist.fenixframework.Atomic;
 
 @SpringFunctionality(app = InvoiceDownloadController.class, title = "title.sap.invoice.viewer")
 @RequestMapping("/sap-invoice-viewer")
@@ -145,6 +151,44 @@ public class SapInvoiceController {
     @RequestMapping(value = "/{event}/sync", method = RequestMethod.POST)
     public String syncEvent(final @PathVariable Event event, final Model model) {
         return processEvent(model, event, (c, l, e) -> EventProcessor.syncEventWithSap(c, l, e));
+    }
+
+    @RequestMapping(value = "{event}/refundEvent", method = RequestMethod.POST)
+    public String refundEvent(final @PathVariable Event event, final User user, final Model model, @RequestParam(required = false) final ExternalClient client,
+            final @RequestParam EventExemptionJustificationType justificationType, final @RequestParam String reason) {
+        return doRefund(event, user, model, () -> doRefundToExternalClient(event, user, client, justificationType, reason));
+    }
+
+    @Atomic
+    private Refund doRefundToExternalClient(final Event event, final User user, final ExternalClient client,
+            final EventExemptionJustificationType justificationType, final String reason) {
+        final Refund refund = new AccountingManagementService().refundEvent(event, user, justificationType, reason);
+        refund.setExternalClient(client);
+        return refund;
+    }
+
+    @RequestMapping(value = "{event}/refundExcessPayment", method = RequestMethod.POST)
+    public String refundExcessPayment(final @PathVariable Event event, final User user, final Model model, @RequestParam(required = false) final ExternalClient client){
+        return doRefund(event, user, model, () -> doRefundExcessToExternalClient(event, user, client));
+    }
+
+    @Atomic
+    private Refund doRefundExcessToExternalClient(final Event event, final User user, final ExternalClient client) {
+        final Refund refund = new AccountingManagementService().refundExcessPayment(event, user, null);
+        refund.setExternalClient(client);
+        return refund;
+    }
+
+    private String doRefund(final @PathVariable Event event, final User user, final Model model, Supplier<?> supplier) {
+        new AccountingManagementAccessControlService().checkAdvancedPaymentManager(event, user);
+        try {
+            supplier.get();
+        } catch (final DomainException e) {
+            model.addAttribute("error", e.getLocalizedMessage());
+            model.addAttribute("eventDetailsUrl", eventDetails(event));
+            return "redirect:/accounting-management/" + event.getExternalId() + "/refund";
+        }
+        return eventRedirect(event);        
     }
 
     private String processEvent(final Model model, final Event event, final EventProcessorInterface processor) {
