@@ -190,10 +190,12 @@ public class ClientController {
             final JsonObject pepObject = pepElement.getAsJsonObject();
             final String pepUnitSapId = getString(pepObject, "unitSapId");
 
-            final JsonObject o = new JsonObject();
-            o.addProperty("id", pepUnitSapId);
-            o.addProperty("name", pepUnitSapId);
-            result.add(o);
+            if (matches(input, pepUnitSapId)) {
+                final JsonObject o = new JsonObject();
+                o.addProperty("id", pepUnitSapId);
+                o.addProperty("name", pepUnitSapId);
+                result.add(o);
+            }
         }
 
         return result.toString();
@@ -264,6 +266,18 @@ public class ClientController {
             }
         }
         return matchCount == input.length;
+    }
+
+    private boolean matches(final String[] input, final String string) {
+        if (string == null || string.isEmpty() || input.length == 0) {
+            return false;
+        }
+        for (final String s : input) {
+            if (string.indexOf(s) < 0 ) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void error(final RedirectAttributes model, final String key, final Object... args) {
