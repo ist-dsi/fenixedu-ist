@@ -1,24 +1,16 @@
 package pt.ist.fenixedu.giaf.invoices;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Locale;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.fenixedu.TINValidator;
 import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.contacts.PhysicalAddress;
 import org.fenixedu.academic.domain.organizationalStructure.Party;
 import org.fenixedu.bennu.GiafInvoiceConfiguration;
-import org.fenixedu.TINValidator;
-
-import com.google.common.base.Strings;
-import com.google.gson.JsonObject;
-
-import eu.europa.ec.taxud.tin.algorithm.TINValid;
 
 public class ClientMap {
 
@@ -72,7 +64,7 @@ public class ClientMap {
     private static Country getValidCountry(final String tin, final Country... countries) {
         for (int i = 0; i < countries.length; i++) {
             final Country country = countries[i];
-            if (country != null && TINValidator.isValid(country.getCode().toUpperCase(), tin)) {
+            if (country != null && TINValidator.isValid(country.getCode().toUpperCase(), tin, false)) {
                 return country;
             }
         }

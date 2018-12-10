@@ -421,16 +421,46 @@ public class SapEvent {
         return sapRequest;
     }
 
-    public SapRequest registerReimbursement(Event event, Money amount, ErrorLogConsumer errorLog, EventLogger elogger) {
+    @Atomic
+    public Set<SapRequest> registerReimbursement() {
+        return getFilteredSapRequestStream()
+            .filter(sr -> sr.getRequestType() == SapRequestType.INVOICE)
+            .sorted(SapRequest.COMPARATOR_BY_EVENT_AND_ORDER)
+            .map(sr -> registerReimbursement(sr))
+            .collect(Collectors.toSet());
+    }
 
-        SapRequest sapInvoiceRequest = getLastInvoiceNumber();
+    private SapRequest registerReimbursement(final SapRequest sapInvoiceRequest) {
         checkValidDocumentNumber(sapInvoiceRequest.getDocumentNumber(), event);
+        
+        final String clientId = ClientMap.uVATNumberFor(event.getParty());
+        final Money payedAmount = calculateAmountPayedForInvoice(sapInvoiceRequest);
+        final Money openInvoiceValue = invoiceValue(sapInvoiceRequest);
+        if (payedAmount.isZero()) {
+            final JsonObject jsonCredit = toJsonCredit(event, new DateTime(), openInvoiceValue, sapInvoiceRequest, false, true);
+            final String documentNumber = getDocumentNumber(jsonCredit, true);
+            return new SapRequest(event, clientId, openInvoiceValue, documentNumber, SapRequestType.CREDIT, Money.ZERO, jsonCredit);
+        } else {
+            final JsonObject data = toJsonReimbursement(event, payedAmount, openInvoiceValue, sapInvoiceRequest, false, true);
+            final String documentNumber = getDocumentNumber(data, true);
+            return new SapRequest(event, clientId, payedAmount, documentNumber, SapRequestType.REIMBURSEMENT, Money.ZERO, data);
+        }
+    }
 
-        String clientId = ClientMap.uVATNumberFor(event.getParty());
-        JsonObject data = toJsonReimbursement(event, amount, sapInvoiceRequest, false, true);
+    private Money invoiceValue(final SapRequest sapInvoiceRequest) {
+        final Money value = sapInvoiceRequest.getValue();
+        final Money credits = getFilteredSapRequestStream()
+                .filter(sr -> sr.getRequestType() == SapRequestType.CREDIT && sr.refersToDocument(sapInvoiceRequest.getDocumentNumber()))
+                .map(SapRequest::getValue)
+                .reduce(Money.ZERO, Money::add);
+        return value.subtract(credits);
+    }
 
-        String documentNumber = getDocumentNumber(data, true);
-        return new SapRequest(event, clientId, amount, documentNumber, SapRequestType.REIMBURSEMENT, Money.ZERO, data);
+    private Money calculateAmountPayedForInvoice(final SapRequest sapInvoiceRequest) {
+        return getFilteredSapRequestStream()
+            .filter(sr -> sr.getRequestType() == SapRequestType.PAYMENT && sr.refersToDocument(sapInvoiceRequest.getDocumentNumber()))
+            .map(sr -> sr.getValue())
+            .reduce(Money.ZERO, Money::add);
     }
 
     private void registerInterest(final Money payedInterest, final String clientId,
@@ -755,19 +785,19 @@ public class SapEvent {
         return json;
     }
 
-    private JsonObject toJsonReimbursement(Event event, Money amount, SapRequest sapInvoiceRequest,
+    private JsonObject toJsonReimbursement(Event event, Money amountToRefund, final Money amountToCredit, SapRequest sapInvoiceRequest,
             boolean isDebtRegistration, boolean isNewDate) {
         JsonObject json = toJson(event, sapInvoiceRequest.getClientJson(), new DateTime(), isDebtRegistration, isNewDate, false);
-        JsonObject workDocument = toJsonWorkDocument(new DateTime(), new DateTime(), amount, "NA", false, new DateTime());
+        JsonObject workDocument = toJsonWorkDocument(new DateTime(), new DateTime(), amountToCredit, "NA", false, new DateTime());
         workDocument.addProperty("workOriginDocNumber", sapInvoiceRequest.getDocumentNumber());
         json.add("workingDocument", workDocument);
 
         String workingDocumentNumber = workDocument.get("workingDocumentNumber").getAsString();
-        JsonObject paymentDocument = toJsonPaymentDocument(amount, "NR", workingDocumentNumber, new DateTime(), "OU", "",
+        JsonObject paymentDocument = toJsonPaymentDocument(amountToRefund, "NR", workingDocumentNumber, new DateTime(), "OU", "",
                 SAFTPTSettlementType.NR.toString(), false);
         paymentDocument.addProperty("isReimbursment", true);
         paymentDocument.addProperty("reimbursementStatus", "PENDING");
-        paymentDocument.addProperty("excessPayment", amount.negate().toPlainString());//the payment amount must be zero
+        paymentDocument.addProperty("excessPayment", amountToRefund.negate().toPlainString());//the payment amount must be zero
         json.add("paymentDocument", paymentDocument);
 
         return json;
