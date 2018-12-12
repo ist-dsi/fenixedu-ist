@@ -259,4 +259,8 @@ public class SapRequest extends SapRequest_Base {
                 && !isReferencedByOtherRequest();
     }
 
+    public boolean getCanBeRefunded() {
+        return getIntegrated() && !getIgnore() && getRequest().length() > 2 && getRequestType() == SapRequestType.PAYMENT;
+    }
+
 }

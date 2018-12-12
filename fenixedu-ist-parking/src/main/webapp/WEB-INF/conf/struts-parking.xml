@@ -66,11 +66,11 @@
       <!-- ========== Controller Configuration ================================ -->
       <controller processorClass="org.fenixedu.bennu.struts.SimpleRenderersRequestProcessor"></controller>
       <!-- ========== Message Resources Definitions ============================ -->
-      <message-resources null="false" parameter="resources.ParkingResources"></message-resources>
-      <message-resources null="false" key="PARKING_RESOURCES" parameter="resources.ParkingResources"></message-resources>
-      <message-resources null="false" key="APPLICATION_RESOURCES" parameter="resources.ApplicationResources"></message-resources>
-      <message-resources null="false" key="ENUMERATION_RESOURCES" parameter="resources.EnumerationResources"></message-resources>
-      <message-resources null="false" key="MANAGER_RESOURCES" parameter="resources.ManagerResources"></message-resources>
+      <message-resources factory="org.fenixedu.bennu.struts.extension.UTF8PropertyMessageResourcesFactory"  null="false" parameter="resources.ParkingResources"></message-resources>
+      <message-resources factory="org.fenixedu.bennu.struts.extension.UTF8PropertyMessageResourcesFactory"  null="false" key="PARKING_RESOURCES" parameter="resources.ParkingResources"></message-resources>
+      <message-resources factory="org.fenixedu.bennu.struts.extension.UTF8PropertyMessageResourcesFactory"  null="false" key="APPLICATION_RESOURCES" parameter="resources.ApplicationResources"></message-resources>
+      <message-resources factory="org.fenixedu.bennu.struts.extension.UTF8PropertyMessageResourcesFactory"  null="false" key="ENUMERATION_RESOURCES" parameter="resources.EnumerationResources"></message-resources>
+      <message-resources factory="org.fenixedu.bennu.struts.extension.UTF8PropertyMessageResourcesFactory"  null="false" key="MANAGER_RESOURCES" parameter="resources.ManagerResources"></message-resources>
       <!-- ========== Plug Ins Configuration ================================= -->
       <plug-in className="org.apache.struts.validator.ValidatorPlugIn">
             <set-property value="/WEB-INF/validator-rules.xml" property="pathnames"></set-property>

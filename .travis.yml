@@ -3,5 +3,9 @@ jdk:
   - oraclejdk8
 sudo: false
 
-script: mvn test -Dorg.apache.jasper.compiler.Parser.STRICT_QUOTE_ESCAPING=false jspc:compile -B
-
+cache:
+  directories:
+  - $HOME/.m2
+  
+# TODO: Remove the Strict Quote Escaping Flag once ACDM-472 is resolved
+script: mvn clean test -Dorg.apache.jasper.compiler.Parser.STRICT_QUOTE_ESCAPING=false jspc:compile -B

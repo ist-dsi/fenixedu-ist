@@ -18,6 +18,8 @@
  */
 package pt.ist.fenixedu.integration.task.exportData.santanderCardGeneration;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -43,6 +45,7 @@ import org.fenixedu.academic.domain.student.RegistrationProtocol;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.domain.student.registrationStates.RegistrationState;
 import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.idcards.domain.SantanderBatch;
 import org.fenixedu.idcards.domain.SantanderEntry;
 import org.fenixedu.idcards.domain.SantanderPhotoEntry;
@@ -53,17 +56,19 @@ import org.slf4j.Logger;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Strings;
+import com.google.gson.JsonObject;
 
 import pt.ist.esw.advice.pt.ist.fenixframework.AtomicInstance;
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveEmployees;
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveGrantOwner;
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveResearchers;
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonContractSituation;
-import pt.ist.fenixedu.contracts.domain.util.CategoryType;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
 import pt.ist.fenixframework.CallableWithoutException;
 import pt.ist.fenixframework.FenixFramework;
+import pt.ist.sap.client.SapStaff;
+import pt.ist.sap.group.integration.domain.ColaboratorSituation;
+import pt.ist.sap.group.integration.domain.SapWrapper;
 
 public class SantanderBatchFillerWorker {
     private static String recordEnd = "*";
@@ -81,32 +86,32 @@ public class SantanderBatchFillerWorker {
 
     protected final Logger logger;
 
+    private static Map<User, Map<String, String>> userRoleCampus = new HashMap<User, Map<String, String>>();
+
     public SantanderBatchFillerWorker(final Logger logger) {
         this.logger = logger;
     }
 
     public void run() {
         logger.info("[" + (new DateTime()).toString("yyyy-MM-dd HH:mm") + "] Looking for open batches to populate...\n");
+        fillUserRoleCampusMap();
         for (SantanderBatch batch : Bennu.getInstance().getSantanderBatchesSet()) {
             if (batch.getGenerated() != null) {
                 continue;
             }
-            final Set<Object[]> lines = Bennu.getInstance().getUserSet().stream().parallel()
-                .map(user -> {
-                    try {
-                        return FenixFramework.getTransactionManager().withTransaction(new CallableWithoutException<Object[]>() {
-                            @Override
-                            public Object[] call() {
-                                final Person person = user.getPerson();
-                                return person == null ? null : generateLine(batch, person);
-                            }
-                        }, new AtomicInstance(TxMode.READ, false));
-                    } catch (final Exception ex) {
-                        throw new Error(ex);
-                    }                    
-                })
-                .filter(o -> o != null)
-                .collect(Collectors.toSet());
+            final Set<Object[]> lines = Bennu.getInstance().getUserSet().stream().parallel().map(user -> {
+                try {
+                    return FenixFramework.getTransactionManager().withTransaction(new CallableWithoutException<Object[]>() {
+                        @Override
+                        public Object[] call() {
+                            final Person person = user.getPerson();
+                            return person == null ? null : generateLine(batch, person);
+                        }
+                    }, new AtomicInstance(TxMode.READ, false));
+                } catch (final Exception ex) {
+                    throw new Error(ex);
+                }
+            }).filter(o -> o != null).collect(Collectors.toSet());
             fillBatch(batch, lines);
         }
         logger.info("[" + (new DateTime()).toString("yyyy-MM-dd HH:mm") + "] Work finished. :)");
@@ -161,23 +166,15 @@ public class SantanderBatchFillerWorker {
     }
 
     private boolean treatAsResearcher(Person person) {
-        if (person.getEmployee() != null) {
-            return new ActiveResearchers().isMember(person.getUser());
-        }
-        return false;
+        return new ActiveResearchers().isMember(person.getUser());
     }
 
     private boolean treatAsEmployee(Person person) {
-        if (person.getEmployee() != null) {
-            return person.getEmployee().isActive();
-        }
-        return false;
+        return new ActiveEmployees().isMember(person.getUser());
     }
 
     private boolean treatAsGrantOwner(Person person) {
-        return (isGrantOwner(person))
-                || (new ActiveGrantOwner().isMember(person.getUser()) && person.getEmployee() != null
-                        && !new ActiveEmployees().isMember(person.getUser()) && person.getPersonProfessionalData() != null);
+        return new ActiveGrantOwner().isMember(person.getUser());
     }
 
     private boolean treatAsStudent(Person person, ExecutionYear executionYear) {
@@ -192,20 +189,6 @@ public class SantanderBatchFillerWorker {
             final PhdIndividualProgramProcess phdIndividualProgramProcess =
                     event != null && event.isClosed() ? find(person.getPhdIndividualProgramProcessesSet()) : null;
             return (phdIndividualProgramProcess != null);
-        }
-        return false;
-    }
-
-    private boolean isGrantOwner(final Person person) {
-        if (new ActiveGrantOwner().isMember(person.getUser())) {
-            final PersonContractSituation currentGrantOwnerContractSituation =
-                    person.getPersonProfessionalData() != null ? person.getPersonProfessionalData()
-                            .getCurrentPersonContractSituationByCategoryType(CategoryType.GRANT_OWNER) : null;
-            if (currentGrantOwnerContractSituation != null
-                    && currentGrantOwnerContractSituation.getProfessionalCategory() != null && person.getEmployee() != null
-                    && person.getEmployee().getCurrentWorkingPlace() != null) {
-                return true;
-            }
         }
         return false;
     }
@@ -383,39 +366,13 @@ public class SantanderBatchFillerWorker {
             }
             break;
         case "EMPLOYEE":
-            try {
-                campus = person.getEmployee().getCurrentCampus();
-            } catch (NullPointerException npe) {
-                return null;
-            }
-            break;
+            return campi.get(getUserRoleCampus(person.getUser(), "EMPLOYEE"));
         case "TEACHER":
-            try {
-                campus =
-                        person.getPersonProfessionalData().getGiafProfessionalDataByCategoryType(CategoryType.TEACHER)
-                                .getCampus();
-            } catch (NullPointerException npe) {
-                return null;
-            }
-            break;
+            return campi.get(getUserRoleCampus(person.getUser(), "TEACHER"));
         case "RESEARCHER":
-            try {
-                campus =
-                        person.getPersonProfessionalData().getGiafProfessionalDataByCategoryType(CategoryType.RESEARCHER)
-                                .getCampus();
-            } catch (NullPointerException npe) {
-                return null;
-            }
-            break;
+            return campi.get(getUserRoleCampus(person.getUser(), "RESEARCHER"));
         case "GRANT_OWNER":
-            try {
-                campus =
-                        person.getPersonProfessionalData().getGiafProfessionalDataByCategoryType(CategoryType.GRANT_OWNER)
-                                .getCampus();
-            } catch (NullPointerException npe) {
-                return null;
-            }
-            break;
+            return campi.get(getUserRoleCampus(person.getUser(), "GRANT_OWNER"));
         default:
             break;
         }
@@ -583,15 +540,15 @@ public class SantanderBatchFillerWorker {
         case STUDENT:
             roleCode = "1";
             break;
-
+        
         case TEACHER:
             roleCode = "2";
             break;
-
+        
         case EMPLOYEE:
             roleCode = "3";
             break;
-
+        
         default:
             roleCode = "7";
             break;
@@ -706,5 +663,76 @@ public class SantanderBatchFillerWorker {
         exports.put("tagus", new CampusAddress(tagusAddr, tagusZip, tagusTown));
         exports.put("itn", new CampusAddress(itnAddr, itnZip, itnTown));
         return exports;
+    }
+
+    private String getCampus(String campus) {
+        if (!Strings.isNullOrEmpty(campus)) {
+            if (campus.equals("Alameda")) {
+                return "alameda";
+            } else if (campus.equals("Tagus Park")) {
+                return "tagus";
+            } else if (campus.equals("CTN")) {
+                return "itn";
+            }
+        }
+        return null;
+    }
+
+    private static String getRole(String categoryTypeName) {
+        switch (categoryTypeName) {
+        case "Docentes":
+            return "TEACHER";
+        case "Não Docente":
+        case "Dirigentes":
+        case "Técnicos e Administ.":
+            return "EMPLOYEE";
+        case "Investigadores":
+            return "REARCHERS";
+        case "Bolseiros":
+        case "Bols. Investigação":
+            return "GRANT_OWNER";
+        default:
+            return null;
+        }
+    }
+
+    private void fillUserRoleCampusMap() {
+        final SapStaff sapStaff = new SapStaff();
+        for (final String institution : SapWrapper.institutions) {
+
+            final JsonObject params = new JsonObject();
+            params.addProperty("institution", institution);
+
+            sapStaff.listPersonProfessionalInformation(params).forEach(e -> {
+                final ColaboratorSituation colaboratorSituation = new ColaboratorSituation(e.getAsJsonObject());
+
+                final User colaboratorUser = User.findByUsername(colaboratorSituation.username().toLowerCase());
+                if (colaboratorUser != null) {
+                    if ((!colaboratorSituation.endSituation())
+                            && isValidToday(colaboratorSituation.beginDate(), colaboratorSituation.endDate())) {
+                        Map<String, String> roleCampus = userRoleCampus.get(colaboratorUser);
+                        if (roleCampus == null) {
+                            roleCampus = new HashMap<String, String>();
+                        }
+                        roleCampus.put(getRole(colaboratorSituation.categoryTypeName()),
+                                getCampus(colaboratorSituation.campus()));
+                        userRoleCampus.put(colaboratorUser, roleCampus);
+                    }
+                }
+            });
+        }
+    }
+
+    private boolean isValidToday(final String beginDate, final String endDate) {
+        final LocalDate begin =
+                beginDate == null || beginDate.isEmpty() ? null : LocalDate.parse(beginDate, DateTimeFormatter.ISO_DATE);
+        final LocalDate end = endDate == null || endDate.isEmpty() ? null : LocalDate.parse(endDate, DateTimeFormatter.ISO_DATE);
+        LocalDate now = LocalDate.now();
+        return (begin == null || begin.isBefore(now)) && (end == null || end.isAfter(now));
+    }
+
+    private String getUserRoleCampus(User user, String role) {
+        Map<String, String> roleCampusMap = userRoleCampus.get(user);
+        return roleCampusMap == null ? null : roleCampusMap.get(role);
     }
 }

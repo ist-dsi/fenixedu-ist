@@ -50,6 +50,7 @@ import com.google.common.io.ByteStreams;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
 import pt.ist.fenixedu.domain.SapDocumentFile;
 import pt.ist.fenixedu.domain.SapRequest;
 import pt.ist.fenixedu.giaf.invoices.GiafEvent;
@@ -182,6 +183,10 @@ public class InvoiceDownloadController {
 
     @RequestMapping(value = "/sap/{sapRequest}/details", method = RequestMethod.GET)
     public String sapInvoiceDetails(final @PathVariable SapRequest sapRequest, final Model model) {
+        final Event event = sapRequest.getEvent();
+        model.addAttribute("eventDetailsUrl", accessControlService.isEventOwner(event, Authenticate.getUser()) ?
+                ownerEventDetails(event): eventDetails(event));
+
         model.addAttribute("sapRequest", sapRequest);
         model.addAttribute("clientData", sapRequest.getClientData());
         model.addAttribute("documentData", sapRequest.getDocumentData());

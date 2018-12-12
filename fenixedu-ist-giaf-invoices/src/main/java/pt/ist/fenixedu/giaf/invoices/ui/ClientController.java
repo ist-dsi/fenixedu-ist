@@ -19,14 +19,27 @@
  */
 package pt.ist.fenixedu.giaf.invoices.ui;
 
+import static org.fenixedu.academic.domain.PaymentMethodLog.createLog;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.fenixedu.PostalCodeValidator;
 import org.fenixedu.TINValidator;
 import org.fenixedu.academic.domain.Country;
+import org.fenixedu.academic.domain.accounting.AccountingTransactionDetail;
+import org.fenixedu.academic.domain.accounting.PaymentMethod;
+import org.fenixedu.academic.domain.exceptions.DomainException;
+import org.fenixedu.academic.ui.spring.controller.manager.PaymentMethodService;
+import org.fenixedu.academic.util.Bundle;
+import org.fenixedu.bennu.SapSdkConfiguration;
+import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.bennu.core.groups.Group;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.core.security.SkipCSRF;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.fenixedu.commons.StringNormalizer;
@@ -44,14 +57,32 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import pt.ist.fenixedu.domain.ExternalClient;
 import pt.ist.fenixedu.domain.SapRoot;
+import pt.ist.fenixframework.FenixFramework;
+import pt.ist.fenixframework.dml.runtime.RelationAdapter;
+import pt.ist.sap.client.SapStructure;
 
 @SpringFunctionality(app = InvoiceDownloadController.class, title = "title.client.management")
 @RequestMapping("/client-management")
 public class ClientController {
+
+    static {
+        PaymentMethod.getRelationAccountingTransactionDetailPaymentMethod().addListener(new RelationAdapter<AccountingTransactionDetail, PaymentMethod>() {
+
+            @Override
+            public void beforeAdd(final AccountingTransactionDetail txd, final PaymentMethod pm) {
+                if (txd != null && pm != null && pm == Bennu.getInstance().getInternalPaymentMethod() && !Group.dynamic("sapIntegrationManager").isMember(Authenticate.getUser())) {
+                    throw new DomainException(BundleUtil.getLocalizedString("resources.GiafInvoicesResources", "error.only.sapIntegrationManager.can.use.this.payment.method").getContent());
+                }
+            }
+
+        });
+    }
+
 
     @Autowired
     private MessageSource messageSource;
@@ -130,7 +161,7 @@ public class ClientController {
 
     @SkipCSRF
     @RequestMapping(value = "/availableClients", method = RequestMethod.POST, produces = "application/json; charset=UTF-8")
-    public @ResponseBody String availableUnits(final @RequestParam(required = false, value = "term") String term, final Model model) {
+    public @ResponseBody String availableClients(final @RequestParam(required = false, value = "term") String term, final Model model) {
         final JsonArray result = new JsonArray();
         final String trimmedValue = term.trim();
         final String[] input = StringNormalizer.normalize(trimmedValue).split(" ");
@@ -145,6 +176,37 @@ public class ClientController {
             });
 
         return result.toString();
+    }
+
+    @SkipCSRF
+    @RequestMapping(value = "/availableInternalUnits", method = RequestMethod.POST, produces = "application/json; charset=UTF-8")
+    public @ResponseBody String availableInternalUnits(final @RequestParam(required = false, value = "term") String term, final Model model) {
+        final JsonArray result = new JsonArray();
+        final String trimmedValue = term.trim();
+        final String[] input = StringNormalizer.normalize(trimmedValue).split(" ");
+
+        final SapStructure sapStructure = new SapStructure();
+        final JsonObject sapInput = new JsonObject();
+        sapInput.addProperty("institution", SapSdkConfiguration.getConfiguration().sapServiceInstitutionCode());
+
+        for (final JsonElement pepElement : sapStructure.listSanitizedProjects(sapInput)) {
+            final JsonObject pepObject = pepElement.getAsJsonObject();
+            final String pepUnitSapId = getString(pepObject, "unitSapId");
+
+            if (matches(input, pepUnitSapId)) {
+                final JsonObject o = new JsonObject();
+                o.addProperty("id", pepUnitSapId);
+                o.addProperty("name", pepUnitSapId);
+                result.add(o);
+            }
+        }
+
+        return result.toString();
+    }
+
+    private static String getString(final JsonObject jo, final String key) {
+        final JsonElement e = jo.get(key);
+        return e == null || e.isJsonNull() ? null : e.getAsString();
     }
 
     @RequestMapping(value = "/download", method = RequestMethod.GET, produces = "application/xlsx")
@@ -177,7 +239,22 @@ public class ClientController {
             throw new Error(e);
         }
     }
-    
+
+    @RequestMapping(value = "/manageDefaultPaymentMethods", method = RequestMethod.POST)
+    public String manageDefaults(Model model, @RequestParam PaymentMethod defaultCashPaymentMethod,
+            @RequestParam PaymentMethod defaultSibsPaymentMethod, @RequestParam PaymentMethod defaultRefundPaymentMethod,
+            @RequestParam PaymentMethod defaultInternalPaymentMethod, final HttpServletRequest request) {
+        try {
+            new PaymentMethodService().setDefaultPaymentMethods(defaultCashPaymentMethod, defaultSibsPaymentMethod, defaultRefundPaymentMethod);
+            FenixFramework.atomic(() -> {
+                defaultInternalPaymentMethod.setInternalBennu(Bennu.getInstance());
+            });
+            return "redirect:/payment-methods-management";
+        } catch (DomainException de) {
+            return "redirect:/payment-methods-management/manageDefaults";
+        }
+    }
+
     private boolean matchesClient(final ExternalClient c, final String[] input) {
         if (input.length == 0) {
             return false;
@@ -193,6 +270,18 @@ public class ClientController {
             }
         }
         return matchCount == input.length;
+    }
+
+    private boolean matches(final String[] input, final String string) {
+        if (string == null || string.isEmpty() || input.length == 0) {
+            return false;
+        }
+        for (final String s : input) {
+            if (string.indexOf(s) < 0 ) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void error(final RedirectAttributes model, final String key, final Object... args) {
