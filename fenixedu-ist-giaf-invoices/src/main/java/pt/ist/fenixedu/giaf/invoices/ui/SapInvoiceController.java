@@ -60,6 +60,7 @@ import com.google.gson.JsonObject;
 
 import pt.ist.fenixedu.domain.ExternalClient;
 import pt.ist.fenixedu.domain.SapRequest;
+import pt.ist.fenixedu.domain.SapRequestType;
 import pt.ist.fenixedu.giaf.invoices.ErrorLogConsumer;
 import pt.ist.fenixedu.giaf.invoices.EventLogger;
 import pt.ist.fenixedu.giaf.invoices.EventProcessor;
@@ -290,7 +291,11 @@ public class SapInvoiceController {
         if (Group.dynamic("managers").isMember(Authenticate.getUser()) || Group.dynamic("sapIntegrationManager").isMember(Authenticate.getUser())) {
             final SapEvent sapEvent = new SapEvent(event);
             try {
-                sapEvent.closeDocument(sapRequest);
+                if (sapRequest.getRequestType() == SapRequestType.CREDIT) {
+                    sapEvent.cancelCredit(sapRequest);
+                } else {
+                    sapEvent.closeDocument(sapRequest);
+                }
             } catch (final Exception | Error e) {
                 model.addAttribute("exception", e.getMessage());
             }

@@ -158,6 +158,13 @@
                                                 <button type="submit" class="btn btn-warning"><spring:message code="label.invoice.close" text="Close Invoice"/></button>
                                             </form>
                                         </c:if>
+                                        <c:if test="${sapRequest.requestType == 'CREDIT'}">
+                                            <form method="post" action="<%= contextPath %>/sap-invoice-viewer/${sapRequest.externalId}/close" style="display: inline;"
+                                                onsubmit="return confirm('<spring:message code="label.credit.close.confirm" text="Are you sure?"/>');">
+                                                ${csrf.field()}
+                                                <button type="submit" class="btn btn-warning"><spring:message code="label.credit.close" text="Close Credit"/></button>
+                                            </form>
+                                        </c:if>
                                     </c:if>
                                 </c:if>
                                 </h3>
