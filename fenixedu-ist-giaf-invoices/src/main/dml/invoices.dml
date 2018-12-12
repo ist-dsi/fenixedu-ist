@@ -132,3 +132,21 @@ relation RefundExternalClient {
         multiplicity 0..1;
     }
 }
+
+relation SapRequestReimbursementAdvancement {
+	SapRequest playsRole reimbursementRequest {
+	    multiplicity 0..1;
+    }
+    SapRequest playsRole advancementRequest {
+	    multiplicity 0..1;
+    }
+}
+
+relation SapRequestRefund {
+	SapRequest playsRole sapRequest {
+	    multiplicity *;
+    }
+    .org.fenixedu.academic.domain.accounting.Refund playsRole refund {
+    	multiplicity 0..1;
+    }
+}
