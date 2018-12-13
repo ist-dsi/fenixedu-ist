@@ -330,41 +330,17 @@ public class SapEvent {
 
         String clientId = ClientMap.uVATNumberFor(event.getParty());
 
-        SimpleImmutableEntry<List<SapRequest>, Money> openInvoicesAndRemainingValue = getOpenInvoicesAndRemainingValue();
-        List<SapRequest> openInvoices = openInvoicesAndRemainingValue.getKey();
-        Money remainingAmount = openInvoicesAndRemainingValue.getValue();
-        if (creditEntry.getAmount().compareTo(remainingAmount.getAmount()) == 1) {
-            if (openInvoices.size() > 1) {
-                // dividir o valor da isenção pelas várias facturas....
-                registerCreditList(event, openInvoices, creditEntry, new Money(creditEntry.getAmount()), remainingAmount, clientId);
-            } else {
-                // o valor da isenção é superior ao valor em dívida
-                SapRequest invoice = null;
-                if (openInvoices.size() == 1) { // mas só existe uma factura abertura
-                    invoice = openInvoices.get(0);
-                } else { // não existe nenhuma factura aberta, ir buscar a última
-                    invoice = getLastInvoice();
-                }
-                registerCredit(event, creditEntry, new Money(creditEntry.getAmount()), invoice);
-            }
-        } else {
-            //tudo normal
-            registerCredit(event, creditEntry, new Money(creditEntry.getAmount()), openInvoices.get(0));
-        }
-    }
+        final SortedMap<SapRequest, Money> openInvoices = getOpenInvoicesAndRemainingValue();
+        Money amountToCredit = new Money(creditEntry.getAmount());
+        for (final Entry<SapRequest, Money> entry : openInvoices.entrySet()) {
+            if (amountToCredit.isPositive()) {
+                final SapRequest invoice = entry.getKey();
+                final Money openInvoiceAmount = entry.getValue();
 
-    private void registerCreditList(Event event, List<SapRequest> openInvoices, CreditEntry creditEntry, Money amountToRegister,
-                                    Money remainingAmount, String clientId) {
-        if (amountToRegister.greaterThan(remainingAmount)) {
-            if (openInvoices.size() > 1) {
-                registerCredit(event, creditEntry, remainingAmount, openInvoices.get(0));
-                registerCreditList(event, openInvoices.subList(1, openInvoices.size()), creditEntry,
-                        amountToRegister.subtract(remainingAmount), openInvoices.get(1).getValue(), clientId);
-            } else {
-                registerCredit(event, creditEntry, amountToRegister, openInvoices.get(0));
+                final Money amountForInvoice = Money.min(openInvoiceAmount, amountToCredit);
+                registerCredit(event, creditEntry, new Money(creditEntry.getAmount()), invoice);
+                amountToCredit = amountToCredit.subtract(amountForInvoice);
             }
-        } else {
-            registerCredit(event, creditEntry, amountToRegister, openInvoices.get(0));
         }
     }
 
