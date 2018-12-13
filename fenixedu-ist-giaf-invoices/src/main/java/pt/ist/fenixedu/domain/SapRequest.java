@@ -303,4 +303,8 @@ public class SapRequest extends SapRequest_Base {
         return getIntegrated() && !getIgnore() && getRequest().length() > 2 && getRequestType() == SapRequestType.PAYMENT;
     }
 
+    public Money openInvoiceValue() {
+        return getRequest().length() == 2 ? Money.ZERO : getValue().subtract(consumedAmount());
+    }
+
 }

@@ -1,13 +1,16 @@
 package pt.ist.fenixedu.giaf.invoices;
 
 import java.math.BigDecimal;
-
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -487,18 +490,11 @@ public class SapEvent {
         registerSinglePayment(transactionDetail, payedInterest, sapInvoiceRequest, true, SapRequestType.PAYMENT_INTEREST);
     }
 
-    public void registerPayment(CreditEntry payment) {
+    public void registerPayment(final CreditEntry payment) {
 
-        AccountingTransactionDetail transactionDetail =
+        final AccountingTransactionDetail transactionDetail =
                 ((AccountingTransaction) FenixFramework.getDomainObject(payment.getId())).getTransactionDetail();
-        String clientId = ClientMap.uVATNumberFor(event.getParty());
-
-        // ir buscar a ultima factura aberta e verificar se o pagamento ultrapassa o valor da factura
-        // e associar o restante à(s) factura(s) seguinte(s)
-        SimpleImmutableEntry<List<SapRequest>, Money> openInvoicesAndRemainingAmount = getOpenInvoicesAndRemainingValue();
-
-        Money firstRemainingAmount = openInvoicesAndRemainingAmount.getValue();
-        List<SapRequest> openInvoices = openInvoicesAndRemainingAmount.getKey();
+        final String clientId = ClientMap.uVATNumberFor(event.getParty());
 
         final Money payedInterest = new Money(payment.getUsedAmountInInterests().add(payment.getUsedAmountInFines()));
         if (payedInterest.isPositive()) {
@@ -511,27 +507,29 @@ public class SapEvent {
             return;
         }
 
-        if (firstRemainingAmount.isZero()) {
-            // não há facturas abertas, fazer adiantamento, sobre a última factura!!
-            registerAdvancementOnly(getLastInvoice(), transactionDetail, payedAmount);
-            return;
-        }
+        final SortedMap<SapRequest, Money> openInvoices = getOpenInvoicesAndRemainingValue();
+        registerPayment(transactionDetail, payedAmount, (Entry<SapRequest, Money>[]) openInvoices.entrySet().toArray());
+    }
 
-        if (firstRemainingAmount.lessThan(payedAmount)) {
-            // quer dizer que ou há outra factura aberta ou é um pagamento em excesso
-            // dividir o valor pago pela facturas e registar n pagamentos ou registar um pagamento adiamento
-
-            if (openInvoices.size() == 1) {
-                // só há uma factura aberta -> fazer adiantamento
-                registerAdvancement(firstRemainingAmount, payedAmount.subtract(firstRemainingAmount), openInvoices.get(0),
-                        transactionDetail);
+    private void registerPayment(final AccountingTransactionDetail transactionDetail, final Money payedAmount, final Entry<SapRequest, Money>[] openInvoices) {
+        if (payedAmount.isPositive()) {
+            if (openInvoices.length == 0) {
+                registerAdvancementOnly(getLastInvoice(), transactionDetail, payedAmount);
             } else {
-                // vai distribuir o pagamento pelas restantes facturas abertas
-                registerPaymentList(openInvoices, payedAmount, firstRemainingAmount, transactionDetail);
+                final Entry<SapRequest, Money> entry = openInvoices[0];
+                final SapRequest openInvoice = entry.getKey();
+                final Money openInvoiceValue = entry.getValue();
+
+                if (openInvoiceValue.greaterOrEqualThan(payedAmount)) {
+                    registerPayment(transactionDetail, payedAmount, openInvoice, openInvoiceValue);
+                } else if (openInvoices.length > 1) {
+                    registerPayment(transactionDetail, openInvoiceValue, openInvoice, openInvoiceValue);
+                    registerPayment(transactionDetail, payedAmount.subtract(openInvoiceValue), Arrays.copyOfRange(openInvoices, 1, openInvoices.length));
+                } else {
+                    final Money amountForInvoice = Money.min(openInvoiceValue, payedAmount);
+                    registerAdvancement(amountForInvoice, payedAmount.subtract(amountForInvoice), openInvoice, transactionDetail);
+                }
             }
-        } else {
-            // tudo ok, é só registar o pagamento
-            registerPayment(transactionDetail, payedAmount, openInvoices.get(0), firstRemainingAmount);
         }
     }
 
@@ -565,26 +563,6 @@ public class SapEvent {
         data.add("paymentDocument", paymentDocument);
 
         return data;
-    }
-
-    private void registerPaymentList(List<SapRequest> openInvoices, Money amountToRegister, Money remainingAmount,
-                                     AccountingTransactionDetail transactionDetail) {
-        if (amountToRegister.greaterThan(remainingAmount)) {
-            if (openInvoices.size() > 1) {
-                registerPayment(transactionDetail, remainingAmount, openInvoices.get(0), remainingAmount);
-                registerPaymentList(openInvoices.subList(1, openInvoices.size()), amountToRegister.subtract(remainingAmount),
-                        openInvoices.get(1).getValue(), transactionDetail);
-            } else {
-                // neste ponto sabemos sempre que existe pelo menos uma factura em aberto e que o remaining amout nunca é zero
-                // portanto se não entrou no if de cima quer dizer que só existe uma factura aberta
-                // registar adiantamento
-                registerAdvancement(remainingAmount, amountToRegister.subtract(remainingAmount), openInvoices.get(0),
-                        transactionDetail);
-            }
-        } else {
-            final SapRequest invoice = openInvoices.get(0);
-            registerPayment(transactionDetail, amountToRegister, invoice, invoice.getValue());
-        }
     }
 
     private void registerPayment(AccountingTransactionDetail transactionDetail, Money payedAmount, SapRequest sapInvoiceRequest, Money remainingInvoiceAmount) {
@@ -1129,23 +1107,11 @@ public class SapEvent {
      *
      * @return
      */
-    private SimpleImmutableEntry<List<SapRequest>, Money> getOpenInvoicesAndRemainingValue() {
-        List<SapRequest> invoiceEntries =
-                getInvoiceEntries().sorted(SapRequest.COMPARATOR_BY_ORDER).collect(Collectors.toList());
-        Money invoiceAmount = Money.ZERO;
-        Money firstRemainingValue = Money.ZERO;
-        Money totalAmount = getPayedAmount().add(getCreditAmount());
-        List<SapRequest> openInvoiceEntries = new ArrayList<SapRequest>();
-        for (SapRequest invoiceEntry : invoiceEntries) {
-            invoiceAmount = invoiceAmount.add(invoiceEntry.getValue());
-            if (invoiceAmount.greaterOrEqualThan(totalAmount)) {
-                if (firstRemainingValue.isZero()) {
-                    firstRemainingValue = invoiceAmount.subtract(totalAmount);
-                }
-                openInvoiceEntries.add(invoiceEntry);
-            }
-        }
-        return new SimpleImmutableEntry<>(openInvoiceEntries, firstRemainingValue);
+    private SortedMap<SapRequest, Money> getOpenInvoicesAndRemainingValue() {
+        final SortedMap<SapRequest, Money> openInvoiceMap = new TreeMap<>(SapRequest.COMPARATOR_BY_EVENT_AND_ORDER);
+        return getInvoiceEntries().sorted(SapRequest.COMPARATOR_BY_ORDER)
+                .filter(sr -> sr.openInvoiceValue().isPositive())
+                .collect(Collectors.toMap(sr -> sr, sr -> sr.openInvoiceValue(), (sr1, sr2) -> sr1, () -> openInvoiceMap));
     }
 
     private Stream<SapRequest> getInvoiceEntries() {
