@@ -1,17 +1,12 @@
 package pt.ist.fenixedu.giaf.invoices;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.calculator.AccountingEntry;
 import org.fenixedu.academic.domain.accounting.calculator.CreditEntry;
 import org.fenixedu.academic.domain.accounting.calculator.DebtExemption;
 import org.fenixedu.academic.domain.accounting.calculator.DebtInterestCalculator;
-import org.fenixedu.academic.domain.accounting.calculator.ExcessRefund;
-import org.fenixedu.academic.domain.accounting.calculator.PartialPayment;
 import org.fenixedu.academic.domain.accounting.calculator.Payment;
 import org.fenixedu.academic.domain.accounting.calculator.Refund;
 import org.fenixedu.academic.util.Money;
@@ -19,6 +14,7 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
 import pt.ist.esw.advice.pt.ist.fenixframework.AtomicInstance;
+import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
 import pt.ist.fenixframework.CallableWithoutException;
 import pt.ist.fenixframework.FenixFramework;
@@ -147,6 +143,7 @@ public class EventProcessor {
         };
     }
 
+    @Atomic(mode = TxMode.READ)
     private static void logError(final ErrorLogConsumer errorLog, final EventLogger elogger, final Event event,
                                  final Throwable e) {
         final String errorMessage = e.getMessage();
@@ -171,6 +168,7 @@ public class EventProcessor {
         e.printStackTrace();
     }
 
+    @Atomic(mode = TxMode.READ)
     private static void logError(Event event, ErrorLogConsumer errorLog, EventLogger elogger, String errorMessage) {
         BigDecimal amount;
         DebtCycleType cycleType;
