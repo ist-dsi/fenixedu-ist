@@ -270,9 +270,14 @@ public class SapRequest extends SapRequest_Base {
     public Money consumedAmount() {
         final SapRequest sapRequest = this;
         return getEvent().getSapRequestSet().stream()
-            .filter(r -> r != sapRequest && r.refersToDocument(sapRequest.getDocumentNumber()))
+            .filter(r -> r != sapRequest && r.refersToDocument(sapRequest.getDocumentNumber()) && r.isConsumer())
             .map(r -> r.getValue())
             .reduce(Money.ZERO, Money::add);
+    }
+
+    private boolean isConsumer() {
+        final SapRequestType type = getRequestType();
+        return type == SapRequestType.PAYMENT || type == SapRequestType.ADVANCEMENT || type == SapRequestType.CREDIT;
     }
 
     public Money getValueAvailableForTransfer() {

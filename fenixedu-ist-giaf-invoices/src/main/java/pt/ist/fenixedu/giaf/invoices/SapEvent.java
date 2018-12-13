@@ -482,27 +482,26 @@ public class SapEvent {
         }
 
         final SortedMap<SapRequest, Money> openInvoices = getOpenInvoicesAndRemainingValue();
-        registerPayment(transactionDetail, payedAmount, (Entry<SapRequest, Money>[]) openInvoices.entrySet().toArray());
+        if (openInvoices.size() == 0) {
+            registerAdvancementOnly(getLastInvoice(), transactionDetail, payedAmount);
+        } else {
+            registerPayment(transactionDetail, payedAmount, (Entry<SapRequest, Money>[]) openInvoices.entrySet().toArray(new Entry[0]));
+        }
     }
 
     private void registerPayment(final AccountingTransactionDetail transactionDetail, final Money payedAmount, final Entry<SapRequest, Money>[] openInvoices) {
         if (payedAmount.isPositive()) {
-            if (openInvoices.length == 0) {
-                registerAdvancementOnly(getLastInvoice(), transactionDetail, payedAmount);
-            } else {
-                final Entry<SapRequest, Money> entry = openInvoices[0];
-                final SapRequest openInvoice = entry.getKey();
-                final Money openInvoiceValue = entry.getValue();
+            final Entry<SapRequest, Money> entry = openInvoices[0];
+            final SapRequest openInvoice = entry.getKey();
+            final Money openInvoiceValue = entry.getValue();
 
-                if (openInvoiceValue.greaterOrEqualThan(payedAmount)) {
-                    registerPayment(transactionDetail, payedAmount, openInvoice, openInvoiceValue);
-                } else if (openInvoices.length > 1) {
-                    registerPayment(transactionDetail, openInvoiceValue, openInvoice, openInvoiceValue);
-                    registerPayment(transactionDetail, payedAmount.subtract(openInvoiceValue), Arrays.copyOfRange(openInvoices, 1, openInvoices.length));
-                } else {
-                    final Money amountForInvoice = Money.min(openInvoiceValue, payedAmount);
-                    registerAdvancement(amountForInvoice, payedAmount.subtract(amountForInvoice), openInvoice, transactionDetail);
-                }
+            if (openInvoiceValue.greaterOrEqualThan(payedAmount)) {
+                registerPayment(transactionDetail, payedAmount, openInvoice, openInvoiceValue);
+            } else if (openInvoices.length > 1) {
+                registerPayment(transactionDetail, openInvoiceValue, openInvoice, openInvoiceValue);
+                registerPayment(transactionDetail, payedAmount.subtract(openInvoiceValue), Arrays.copyOfRange(openInvoices, 1, openInvoices.length));
+            } else {
+                registerAdvancement(openInvoiceValue, payedAmount.subtract(openInvoiceValue), openInvoice, transactionDetail);
             }
         }
     }
