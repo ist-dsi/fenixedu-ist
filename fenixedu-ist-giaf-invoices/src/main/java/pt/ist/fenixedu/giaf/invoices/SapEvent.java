@@ -328,8 +328,6 @@ public class SapEvent {
             registerDebtCredit(creditEntry, event, true);
         }
 
-        String clientId = ClientMap.uVATNumberFor(event.getParty());
-
         final SortedMap<SapRequest, Money> openInvoices = getOpenInvoicesAndRemainingValue();
         Money amountToCredit = new Money(creditEntry.getAmount());
         for (final Entry<SapRequest, Money> entry : openInvoices.entrySet()) {
