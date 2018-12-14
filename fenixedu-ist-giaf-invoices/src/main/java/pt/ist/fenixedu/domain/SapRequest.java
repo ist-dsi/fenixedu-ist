@@ -305,7 +305,7 @@ public class SapRequest extends SapRequest_Base {
     }
 
     public boolean getCanBeRefunded() {
-        return getIntegrated() && !getIgnore() && getRequest().length() > 2 && getRequestType() == SapRequestType.PAYMENT;
+        return getIntegrated() && !getIgnore() && getRequest().length() > 2 && (getRequestType() == SapRequestType.PAYMENT || getRequestType() == SapRequestType.ADVANCEMENT);
     }
 
     public Money openInvoiceValue() {
