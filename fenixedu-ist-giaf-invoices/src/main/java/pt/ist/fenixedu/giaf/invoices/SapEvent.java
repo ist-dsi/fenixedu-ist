@@ -483,7 +483,7 @@ public class SapEvent {
 
         final SortedMap<SapRequest, Money> openInvoices = getOpenInvoicesAndRemainingValue();
         if (openInvoices.size() == 0) {
-            registerAdvancementOnly(getLastInvoice(), transactionDetail, payedAmount);
+            registerAdvancementOnly(clientId, transactionDetail, payedAmount);
         } else {
             registerPayment(transactionDetail, payedAmount, (Entry<SapRequest, Money>[]) openInvoices.entrySet().toArray(new Entry[0]));
         }
@@ -506,17 +506,17 @@ public class SapEvent {
         }
     }
 
-    private void registerAdvancementOnly(final SapRequest invoice, final AccountingTransactionDetail transactionDetail, final Money payedAmount) {
-        final JsonObject data = toJsonAdvancementOnly(invoice, transactionDetail, payedAmount);
+    private void registerAdvancementOnly(final String clientId, final AccountingTransactionDetail transactionDetail, final Money payedAmount) {
+        final JsonObject data = toJsonAdvancementOnly(clientId, transactionDetail, payedAmount);
         String documentNumber = getDocumentNumber(data, true);
-        SapRequest sapRequest = new SapRequest(event, invoice.getClientId(), Money.ZERO, documentNumber,
+        SapRequest sapRequest = new SapRequest(event, clientId, Money.ZERO, documentNumber,
                 SapRequestType.ADVANCEMENT, payedAmount, data);
         sapRequest.setPayment(transactionDetail.getTransaction());
     }
 
-    private JsonObject toJsonAdvancementOnly(final SapRequest sapInvoiceRequest, final AccountingTransactionDetail transactionDetail, final Money amount) {
-        JsonObject data =
-                toJson(event, sapInvoiceRequest.getClientJson(), transactionDetail.getWhenRegistered(), false, false, false, true);
+    private JsonObject toJsonAdvancementOnly(final String clientId, final AccountingTransactionDetail transactionDetail, final Money amount) {
+        final JsonObject clientData = toJsonClient(event.getParty(), clientId);
+        JsonObject data = toJson(event, clientData, transactionDetail.getWhenRegistered(), false, false, false, true);
         JsonObject paymentDocument = toJsonPaymentDocument(Money.ZERO, "NP", "", transactionDetail.getWhenRegistered(),
                 getPaymentMechanism(transactionDetail), getPaymentMethodReference(transactionDetail),
                 SAFTPTSettlementType.NL.toString(), true);
