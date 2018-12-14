@@ -597,11 +597,16 @@ public class SapEvent {
     private void registerAdvancement(Money amount, Money advancement, SapRequest sapInvoiceRequest, AccountingTransactionDetail transactionDetail) {
         checkValidDocumentNumber(sapInvoiceRequest.getDocumentNumber(), event);
 
-        JsonObject data = toJsonAdvancement(amount, advancement, sapInvoiceRequest, transactionDetail);
-        String documentNumber = getDocumentNumber(data, true);
-        SapRequest sapRequest = new SapRequest(event, sapInvoiceRequest.getClientId(), amount, documentNumber,
-                SapRequestType.ADVANCEMENT, advancement, data);
-        sapRequest.setPayment(transactionDetail.getTransaction());
+        if (amount.equals(sapInvoiceRequest.getValue())) {
+            JsonObject data = toJsonAdvancement(amount, advancement, sapInvoiceRequest, transactionDetail);
+            String documentNumber = getDocumentNumber(data, true);
+            SapRequest sapRequest = new SapRequest(event, sapInvoiceRequest.getClientId(), amount, documentNumber,
+                    SapRequestType.ADVANCEMENT, advancement, data);
+            sapRequest.setPayment(transactionDetail.getTransaction());
+        } else {
+            registerFinalPayment(transactionDetail, amount, sapInvoiceRequest, false, SapRequestType.PAYMENT, getPaymentsFor(sapInvoiceRequest));
+            registerAdvancementOnly(ClientMap.uVATNumberFor(transactionDetail.getEvent().getParty()), transactionDetail, advancement);
+        }
     }
 
     public boolean processPendingRequests(Event event, ErrorLogConsumer errorLog, EventLogger elogger) {

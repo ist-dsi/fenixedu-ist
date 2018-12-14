@@ -2,6 +2,7 @@ package pt.ist.fenixedu.giaf.invoices;
 
 import java.math.BigDecimal;
 
+import com.google.common.base.Strings;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.calculator.AccountingEntry;
 import org.fenixedu.academic.domain.accounting.calculator.CreditEntry;
@@ -91,6 +92,7 @@ public class EventProcessor {
             DebtInterestCalculator calculator = event.getDebtInterestCalculator(new DateTime());
             for (AccountingEntry accountingEntry : calculator.getAccountingEntries()) {
                 if (accountingEntry instanceof Payment && accountingEntry.getAmount().compareTo(BigDecimal.ZERO) > 0
+                        && Strings.isNullOrEmpty(((Payment) accountingEntry).getRefundId())
                         && !sapEvent.hasPayment(accountingEntry.getId())
                         && accountingEntry.getCreated().isAfter(EventWrapper.SAP_TRANSACTIONS_THRESHOLD)) {
                     sapEvent.registerPayment((CreditEntry) accountingEntry);
