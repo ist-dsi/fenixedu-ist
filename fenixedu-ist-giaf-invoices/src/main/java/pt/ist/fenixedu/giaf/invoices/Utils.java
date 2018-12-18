@@ -144,7 +144,7 @@ public class Utils {
             return false;
         }
 
-        final SimpleImmutableEntry<String, String> articleCode = SapEvent.mapToProduct(event, eventDescription, false, false);
+        final SimpleImmutableEntry<String, String> articleCode = SapEvent.mapToProduct(event, eventDescription, false, false, false);
         if (articleCode == null) {
             if (eventDescription.indexOf("Pagamento da resid") >= 0) {
                 logError(consumer, "No Article Code - Residence", event, null, "", null, null, null, null, event);
