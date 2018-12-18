@@ -25,6 +25,8 @@ import org.fenixedu.academic.domain.accounting.AccountingTransactionDetail;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.EventType;
 import org.fenixedu.academic.domain.accounting.calculator.CreditEntry;
+import org.fenixedu.academic.domain.accounting.calculator.ExcessRefund;
+import org.fenixedu.academic.domain.accounting.calculator.PartialPayment;
 import org.fenixedu.academic.domain.accounting.calculator.Refund;
 import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeAndInsuranceEvent;
 import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeEvent;
@@ -325,7 +327,7 @@ public class SapEvent {
     public void registerCredit(Event event, CreditEntry creditEntry, boolean isGratuity) {
         // diminuir divida no sap (se for propina diminuir dívida) e credit note na última factura existente
         if (isToProcessDebt(isGratuity, true, new DateTime())) {
-            registerDebtCredit(creditEntry, event, true);
+            registerDebtCredit(creditEntry, event, false);
         }
 
         final SortedMap<SapRequest, Money> openInvoices = getOpenInvoicesAndRemainingValue();
@@ -354,39 +356,39 @@ public class SapEvent {
     }
 
     @Atomic
-    public Set<SapRequest> registerReimbursement(Refund refund) {
-        return getFilteredSapRequestStream()
-            .filter(sr -> sr.getRequestType() == SapRequestType.INVOICE)
+    public void registerReimbursement(Refund refund) {
+        Money paymentsInSap = getFilteredSapRequestStream()
+            .filter(sr -> sr.getRequestType() == SapRequestType.INVOICE && sr.getRequest().length() > 2)
             .sorted(SapRequest.COMPARATOR_BY_EVENT_AND_ORDER)
             .map(sr -> registerReimbursement(sr, refund))
-            .collect(Collectors.toSet());
+            .reduce(Money.ZERO, Money::add);;
+
+        if(!refund.getAmount().equals(paymentsInSap.getAmount())){
+            throw new Error("The value given for refund (" + refund.getId() + ") does not match the value of payments in SAP."
+                    + "Refund amount: " + refund.getAmount() + " - payments in SAP: " + paymentsInSap.getAmountAsString());
+        }
     }
 
-    private SapRequest registerReimbursement(final SapRequest sapInvoiceRequest, final Refund refund) {
-        //TODO receber o objecto refund
-
+    private Money registerReimbursement(final SapRequest sapInvoiceRequest, final Refund refund) {
         checkValidDocumentNumber(sapInvoiceRequest.getDocumentNumber(), event);
         
         final String clientId = ClientMap.uVATNumberFor(event.getParty());
         final Money payedAmount = calculateAmountPayedForInvoice(sapInvoiceRequest);
         final Money openInvoiceValue = invoiceValueWithoutCredits(sapInvoiceRequest);
 
-        //TODO se a factura tiver originado dívida tem que se abater a dívida
-//        if (isToProcessDebt(event.isGratuity(), true, new DateTime())) {
-//            //if the debt credit amount is greater than the credit amount it means that a credit debt was registered but the correspondent invoice credit failed
-//            //we don't register the credit debt again
-//            if (!getDebtCreditAmount().greaterThan(getCreditAmount())) {
-//                registerDebtCredit(EventProcessor.getCreditEntry(sapInvoiceRequest.getValue()), event, true);
-//            } else {
-//                //TODO mandar erro se o valor abater for maior que o valor de NA algo não está bem
-//                //throw Error("");
-//            }
-//        }
+        //if the invoice generated debt we have to send a debt credit
+        if (isToProcessDebt(event.isGratuity(), true, new DateTime())) {
+            registerDebtCredit(EventProcessor.getCreditEntry(openInvoiceValue), event, true);
+        }
 
+        org.fenixedu.academic.domain.accounting.Refund domainRefund = FenixFramework.getDomainObject(refund.getId());
         if (payedAmount.isZero()) {
+            //when a reimbursement is done it's of the total value of the event and event is closed, so we have to close all invoices
+            //if for an invoice no payment was done we just have to send a credit note to close it, no real reimbursement needed
             final JsonObject jsonCredit = toJsonCredit(event, new DateTime(), openInvoiceValue, sapInvoiceRequest, false, true);
             final String documentNumber = getDocumentNumber(jsonCredit, true);
-            return new SapRequest(event, clientId, openInvoiceValue, documentNumber, SapRequestType.CREDIT, Money.ZERO, jsonCredit);
+            final SapRequest sapRequestNA = new SapRequest(event, clientId, openInvoiceValue, documentNumber, SapRequestType.CREDIT, Money.ZERO, jsonCredit);
+            sapRequestNA.setRefund(domainRefund);
         } else {
             final JsonObject data = toJsonReimbursement(event, payedAmount, openInvoiceValue, sapInvoiceRequest, false, true);
             final String documentNumber = getDocumentNumber(data, true);
@@ -395,9 +397,12 @@ public class SapEvent {
             SapRequest creditNoteRequest = new SapRequest(event, clientId, openInvoiceValue, documentNumber, SapRequestType.CREDIT, Money.ZERO, data);
             creditNoteRequest.setSent(true);
             creditNoteRequest.setIntegrated(true);
+            creditNoteRequest.setRefund(domainRefund);
 
-            return new SapRequest(event, clientId, payedAmount, documentNumber, SapRequestType.REIMBURSEMENT, Money.ZERO, data);
+            SapRequest reimbursement = new SapRequest(event, clientId, payedAmount, documentNumber, SapRequestType.REIMBURSEMENT, Money.ZERO, data);
+            reimbursement.setRefund(domainRefund);
         }
+        return payedAmount;
     }
 
     private Money invoiceValueWithoutCredits(final SapRequest sapInvoiceRequest) {
@@ -411,22 +416,32 @@ public class SapEvent {
 
     private Money calculateAmountPayedForInvoice(final SapRequest sapInvoiceRequest) {
         return getFilteredSapRequestStream()
-            .filter(sr -> sr.getRequestType() == SapRequestType.PAYMENT && sr.refersToDocument(sapInvoiceRequest.getDocumentNumber()))
+            .filter(sr -> (sr.getRequestType() == SapRequestType.PAYMENT || sr.getRequestType() == SapRequestType.ADVANCEMENT)
+                            && sr.refersToDocument(sapInvoiceRequest.getDocumentNumber()))
             .map(sr -> sr.getValue())
             .reduce(Money.ZERO, Money::add);
     }
 
-    public void registerReimbursementAdvancements() {
-        getUnusedAdvancementPayments().forEach(sr -> registerReimbursementAdvancement(sr));
+    public void registerReimbursementAdvancement(ExcessRefund excessRefund) {
+        excessRefund.getPartialPayments().forEach(p -> registerReimbursementAdvancement(p));
+        //getUnusedAdvancementPayments().forEach(sr -> registerReimbursementAdvancement(sr));
     }
 
-    private SapRequest registerReimbursementAdvancement(SapRequest advancement) {
+    private SapRequest registerReimbursementAdvancement(PartialPayment partialPayment) {
+        final Stream<SapRequest> paymentsFor = getAdvancementPaymentsFor(partialPayment.getCreditEntry().getId());
+        if (paymentsFor.count() > 1) {
+            throw new Error("More than one advancement payment was done with ID " +
+                    partialPayment.getCreditEntry().getId() + " - can not make reimbursement");
+        }
+
+        //TODO qual é o valor que eu tenho que devolver deste adiantamento?
+        //TODO o pagamento de onde veio o reembolso é o valor a usar todo?
         String clientId = ClientMap.uVATNumberFor(event.getParty());
-        JsonObject data = toJsonReimbursementAdvancement(advancement, false, true);
+        JsonObject data = toJsonReimbursementAdvancement(paymentsFor.findAny().get(), false, true);
 
         String documentNumber = getDocumentNumber(data, true);
-        SapRequest reimbursementRequest = new SapRequest(event, clientId, advancement.getAdvancement(), documentNumber, SapRequestType.REIMBURSEMENT, Money.ZERO, data);
-        reimbursementRequest.setAdvancementRequest(advancement);
+        SapRequest reimbursementRequest = new SapRequest(event, clientId, null/*advancement.getAdvancement()*/, documentNumber, SapRequestType.REIMBURSEMENT, Money.ZERO, data);
+        //reimbursementRequest.setAdvancementRequest(advancement);
         return reimbursementRequest;
     }
 
@@ -672,9 +687,6 @@ public class SapEvent {
     private DateTime getDocumentDate(DateTime documentDate, boolean isNewDate) {
         if (isNewDate) {
             return new DateTime();
-        }
-        if (documentDate.getYear() < currentDate.getYear()) {
-            return documentDatePreviousYear.apply(currentDate);
         }
         return documentDate;
     }
@@ -1201,6 +1213,12 @@ public class SapEvent {
         return getFilteredSapRequestStream()
                 .filter(sr -> sr.getRequestType() == SapRequestType.PAYMENT || sr.getRequestType() == SapRequestType.ADVANCEMENT)
                 .filter(sr -> sr.getPayment() != null).filter(sr -> transactionDetailId.equals(sr.getPayment().getExternalId()));
+    }
+
+    private Stream<SapRequest> getAdvancementPaymentsFor(final String transactionDetailId) {
+        return getFilteredSapRequestStream()
+                .filter(sr -> sr.getRequestType() == SapRequestType.ADVANCEMENT)
+                .filter(sr -> sr.getPayment() != null && transactionDetailId.equals(sr.getPayment().getExternalId()));
     }
 
     public boolean hasInterestPayment(final AccountingTransaction transaction) {
