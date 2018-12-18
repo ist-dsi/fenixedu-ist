@@ -779,7 +779,7 @@ public class SapEvent {
         final JsonArray documents = new JsonArray();
         JsonObject line = new JsonObject();
         line.addProperty("amount", creditAmount.getAmountAsString());
-        line.addProperty("isToDebit", false);
+        line.addProperty("isToDebit", true);
         line.addProperty("originDocNumber", sapInvoiceRequest.getDocumentNumber());
         documents.add(line);
         paymentDocument.add("documents", documents);
