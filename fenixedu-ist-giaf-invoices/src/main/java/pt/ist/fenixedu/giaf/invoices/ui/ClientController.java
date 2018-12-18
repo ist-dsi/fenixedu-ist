@@ -19,8 +19,6 @@
  */
 package pt.ist.fenixedu.giaf.invoices.ui;
 
-import static org.fenixedu.academic.domain.PaymentMethodLog.createLog;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
@@ -34,7 +32,6 @@ import org.fenixedu.academic.domain.accounting.AccountingTransactionDetail;
 import org.fenixedu.academic.domain.accounting.PaymentMethod;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.ui.spring.controller.manager.PaymentMethodService;
-import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.SapSdkConfiguration;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.groups.Group;
@@ -189,15 +186,29 @@ public class ClientController {
         final JsonObject sapInput = new JsonObject();
         sapInput.addProperty("institution", SapSdkConfiguration.getConfiguration().sapServiceInstitutionCode());
 
+        final JsonArray projects = sapStructure.listSanitizedProjects(sapInput);
         for (final JsonElement pepElement : sapStructure.listSanitizedProjects(sapInput)) {
             final JsonObject pepObject = pepElement.getAsJsonObject();
             final String pepUnitSapId = getString(pepObject, "unitSapId");
 
-            if (matches(input, pepUnitSapId)) {
-                final JsonObject o = new JsonObject();
-                o.addProperty("id", pepUnitSapId);
-                o.addProperty("name", pepUnitSapId);
-                result.add(o);
+            for (final JsonElement aggregationElement : pepObject.get("elements").getAsJsonArray()) {
+                final JsonObject aggregationObject = aggregationElement.getAsJsonObject();
+
+                for (final JsonElement actionElement : aggregationObject.get("elements").getAsJsonArray()) {
+                    final JsonObject actionObject = actionElement.getAsJsonObject();
+                    final String actionDescription = getString(actionObject, "description");
+                    final String actionElementSapId = getString(actionObject, "elementSapId");
+                    final String aggregationDescription = getString(aggregationObject, "description");
+                    final String subProjectName = aggregationDescription + " - " + actionDescription;
+
+                    if (matches(input, actionElementSapId) || matches(input, subProjectName)) {
+
+                        final JsonObject o = new JsonObject();
+                        o.addProperty("id", actionElementSapId);
+                        o.addProperty("name", actionElementSapId);
+                        result.add(o);
+                    }
+                }
             }
         }
 
