@@ -1,6 +1,8 @@
 package pt.ist.fenixedu.giaf.invoices;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.google.common.base.Strings;
 import org.fenixedu.academic.domain.accounting.Event;
@@ -8,6 +10,7 @@ import org.fenixedu.academic.domain.accounting.calculator.AccountingEntry;
 import org.fenixedu.academic.domain.accounting.calculator.CreditEntry;
 import org.fenixedu.academic.domain.accounting.calculator.DebtExemption;
 import org.fenixedu.academic.domain.accounting.calculator.DebtInterestCalculator;
+import org.fenixedu.academic.domain.accounting.calculator.ExcessRefund;
 import org.fenixedu.academic.domain.accounting.calculator.Payment;
 import org.fenixedu.academic.domain.accounting.calculator.Refund;
 import org.fenixedu.academic.util.Money;
@@ -92,10 +95,14 @@ public class EventProcessor {
             DebtInterestCalculator calculator = event.getDebtInterestCalculator(new DateTime());
             for (AccountingEntry accountingEntry : calculator.getAccountingEntries()) {
                 if (accountingEntry instanceof Payment && accountingEntry.getAmount().compareTo(BigDecimal.ZERO) > 0
-                        && Strings.isNullOrEmpty(((Payment) accountingEntry).getRefundId())
                         && !sapEvent.hasPayment(accountingEntry.getId())
                         && accountingEntry.getCreated().isAfter(EventWrapper.SAP_TRANSACTIONS_THRESHOLD)) {
-                    sapEvent.registerPayment((CreditEntry) accountingEntry);
+                    if(Strings.isNullOrEmpty(((Payment) accountingEntry).getRefundId())) {
+                        sapEvent.registerPayment((CreditEntry) accountingEntry);
+                    } else {
+                        //TODO process
+                        return;
+                    }
                 }  else if (accountingEntry instanceof DebtExemption) {
                     if (accountingEntry.getAmount().compareTo(BigDecimal.ZERO) > 0 && !sapEvent.hasCredit(accountingEntry.getId())
                             && accountingEntry.getCreated().isAfter(EventWrapper.SAP_TRANSACTIONS_THRESHOLD)) {
@@ -103,8 +110,18 @@ public class EventProcessor {
                     }
                 } else if (accountingEntry instanceof Refund && !sapEvent.hasRefund(accountingEntry.getId())) {
                     //Reimbursements
-                    Refund refund = (Refund) accountingEntry;
-                    sapEvent.registerReimbursement(refund);
+                    //TODO
+                    return;
+//                    Refund refund = (Refund) accountingEntry;
+//                    sapEvent.registerReimbursement(refund);
+                } else if (accountingEntry instanceof ExcessRefund && !sapEvent.hasRefund(accountingEntry.getId())) {
+                    //Reimbursements
+                    ExcessRefund excessRefund = (ExcessRefund) accountingEntry;
+                    //TODO
+                    return;
+//                    if (!Strings.isNullOrEmpty(excessRefund.getTargetPaymentId())) {
+//                        sapEvent.registerReimbursementAdvancement(excessRefund);
+//                    }
                 }
         }
 
