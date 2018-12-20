@@ -13,7 +13,6 @@
 	<parameter name="studentName" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="thesisTitle" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="thesisSubtitle" class="java.lang.String" isForPrompting="false"/>
-	<parameter name="thesisLanguage" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="juryPresidentName" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="juryPresidentCategory" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="juryPresidentAffiliation" class="java.lang.String" isForPrompting="false"/>
@@ -263,19 +262,6 @@
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA["Data de provas: " + $P{discussion}]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="false">
-				<reportElement key="textField-5" positionType="Float" x="231" y="134" width="194" height="13"/>
-				<box>
-					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-					<bottomPen lineWidth="0.0" lineColor="#000000"/>
-					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement verticalAlignment="Top" rotation="None" lineSpacing="Single">
-					<font size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="true"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA["Idioma: " + $P{thesisLanguage}]]></textFieldExpression>
-			</textField>
 			<line>
 				<reportElement key="line-1" positionType="Float" x="31" y="123" width="394" height="1"/>
 				<graphicElement>
@@ -284,12 +270,6 @@
 			</line>
 			<line>
 				<reportElement key="line-3" positionType="Float" x="73" y="145" width="127" height="1"/>
-				<graphicElement>
-					<pen lineWidth="0.25" lineStyle="Solid"/>
-				</graphicElement>
-			</line>
-			<line>
-				<reportElement key="line-4" positionType="Float" x="266" y="145" width="159" height="1"/>
 				<graphicElement>
 					<pen lineWidth="0.25" lineStyle="Solid"/>
 				</graphicElement>
