@@ -411,6 +411,15 @@ public class SapInvoiceController {
         return eventRedirect(event);
     }    
 
+    @RequestMapping(value = "/{sapRequest}/toggleIgnore", method = RequestMethod.POST)
+    public String toggleIgnore(final @PathVariable SapRequest sapRequest, final Model model) {
+        final Event event = sapRequest.getEvent();
+        if (Group.dynamic("managers").isMember(Authenticate.getUser()) || Group.dynamic("sapIntegrationManager").isMember(Authenticate.getUser())) {
+            sapRequest.toggleIgnore();
+        }
+        return sapDocumentsRedirect(event);
+    }
+
     private JsonObject toJsonObject(final Event event, final DateTime when) {
         final JsonObject result = new JsonObject();
 

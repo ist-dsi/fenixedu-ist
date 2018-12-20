@@ -166,6 +166,11 @@
                                             </form>
                                         </c:if>
                                     </c:if>
+                                    <form method="post" action="<%= contextPath %>/sap-invoice-viewer/${sapRequest.externalId}/toggleIgnore" style="display: inline;"
+                                            onsubmit="return confirm('<spring:message code="label.delete.confirm" text="Are you sure?"/>');">
+                                            ${csrf.field()}
+                                        <button type="submit" class="btn btn-warning"><spring:message code="label.toggleIgnore" text="Toggle Ignore"/></button>
+                                    </form>
                                 </c:if>
                                 </h3>
                                 <h4>

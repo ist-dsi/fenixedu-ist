@@ -312,4 +312,9 @@ public class SapRequest extends SapRequest_Base {
         return getRequest().length() == 2 ? Money.ZERO : getValue().subtract(consumedAmount());
     }
 
+    @Atomic
+    public void toggleIgnore() {
+        setIgnore(!getIgnore());
+    }
+
 }
