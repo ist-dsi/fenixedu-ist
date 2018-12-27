@@ -23,10 +23,10 @@ import static org.apache.commons.lang.BooleanUtils.isTrue;
 import java.time.Year;
 
 import org.fenixedu.academic.util.Bundle;
-import org.fenixedu.bennu.BennuSpringContextHelper;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.security.Authenticate;
+import org.fenixedu.bennu.spring.BennuSpringContextHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
