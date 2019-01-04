@@ -1,6 +1,7 @@
 package pt.ist.fenixedu.sap.servlet;
 
 import java.util.Collection;
+import java.util.Optional;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -17,23 +18,29 @@ import org.fenixedu.academic.domain.accounting.EventState.ChangeStateEvent;
 import org.fenixedu.academic.domain.accounting.Exemption;
 import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeAndInsuranceEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEvent;
+import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.bennu.GiafInvoiceConfiguration;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.signals.DomainObjectEvent;
 import org.fenixedu.bennu.core.signals.Signal;
 
+import pt.ist.fenixedu.domain.SapRequest;
 import pt.ist.fenixedu.giaf.invoices.SapEvent;
 import pt.ist.fenixframework.FenixFramework;
 
 @WebListener
 public class FenixEduSapInvoiceContextListener implements ServletContextListener {
 
+
+    private static final String BUNDLE = "resources.GiafInvoiceResources";
+
     public static boolean allowCloseToOpen = false;
 
     @Override
     public void contextInitialized(final ServletContextEvent sce) {
-        Event.canBeRefunded = (event) -> event.getSapRequestSet().stream().anyMatch(sr -> sr.getCanBeRefunded());
+        Event.canBeRefunded = (event) -> event.getSapRequestSet().stream().anyMatch(SapRequest::getCanBeRefunded);
 
         if (GiafInvoiceConfiguration.getConfiguration().sapSyncActive()) {
             Signal.register(AccountingTransaction.SIGNAL_ANNUL, this::handlerAccountingTransactionAnnulment);
@@ -96,7 +103,7 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
         final AccountingTransaction transaction = domainEvent.getInstance();
         final Event event = transaction.getEvent();
         if (new SapEvent(event).hasPayment(transaction.getExternalId())) {
-            throw new Error("This transaction must be first canceled / undone in SAP");
+            throw new DomainException(Optional.of(BUNDLE), "error.first.undo.transaction.in.sap");
         }
     }
 
@@ -123,29 +130,27 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
             // Ack, normal SAP integration will be fine.
         } else if (oldtState == EventState.OPEN && newState == EventState.CANCELLED) {
             if (new SapEvent(event).canCancel()) {
-                throw new Error("Event state change must first be canceled in SAP");
+                throw new DomainException(Optional.of(BUNDLE), "error.event.state.change.first.in.sap");
             }
         } else if (allowCloseToOpen && oldtState == EventState.CLOSED && newState == EventState.OPEN) {
-            // Ack. Fuck it...
+            // Ack. 
         } else {
-            throw new Error("New event state change that must be handled: "
-                    + (oldtState == null ? "" : oldtState.name()) + " -> "
-                    + (newState == null ? "null" : newState.name())
-                    + " on event: " + event.getExternalId());
+            throw new DomainException(Optional.of(BUNDLE), "error.new.event.state.change.must.be.handled", (oldtState == null ?
+                    "null" : oldtState.name()), (newState == null ? "null" : newState.name()), event.getExternalId());
         }
     }
 
     private void blockExemption(final Exemption exemption, final Collection<String> blockers) {
         final Event event = exemption.getEvent();
         if (new SapEvent(event).hasCredit(exemption.getExternalId())) {
-            blockers.add("Exemption must be first undone in SAP");
+            blockers.add(BundleUtil.getString(BUNDLE, "error.first.undo.exemption.in.sap"));
         }
     }
 
     private void blockDiscount(final Discount discount, final Collection<String> blockers) {
         final Event event = discount.getEvent();
         if (new SapEvent(event).hasCredit(discount.getExternalId())) {
-            blockers.add("Discount must first be removed from SAP");
+            blockers.add(BundleUtil.getString(BUNDLE, "error.first.undo.discount.in.sap"));
         }
     }
 
