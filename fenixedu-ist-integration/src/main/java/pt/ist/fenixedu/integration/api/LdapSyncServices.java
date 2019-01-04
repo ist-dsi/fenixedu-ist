@@ -42,21 +42,21 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.candidacy.CandidacySummaryFile;
 import org.fenixedu.academic.domain.candidacy.FirstTimeCandidacyStage;
 import org.fenixedu.academic.domain.candidacy.StudentCandidacy;
+import org.fenixedu.academic.domain.contacts.EmailAddress;
 import org.fenixedu.academic.domain.person.IDDocumentType;
 import org.fenixedu.academic.service.services.candidacy.LogFirstTimeCandidacyTimestamp;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.rest.BennuRestResource;
 
+import com.google.common.base.Strings;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import pt.ist.fenixedu.integration.FenixEduIstIntegrationConfiguration;
 import pt.ist.fenixedu.integration.dto.PersonInformationDTO;
 import pt.ist.fenixedu.integration.dto.PersonInformationFromUniqueCardDTO;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
-
-import com.google.common.base.Strings;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 
 @Path("/fenix-ist/ldapSync")
 public class LdapSyncServices extends BennuRestResource {
@@ -173,10 +173,25 @@ public class LdapSyncServices extends BennuRestResource {
     @Atomic
     public Status setEmail(String username, String email) {
         final User foundUser = User.findByUsername(username);
-        if (Strings.isNullOrEmpty(email) || foundUser == null || foundUser.getPerson() == null) {
+
+        if (foundUser == null) {
             return Status.NOT_FOUND;
         }
-        foundUser.getPerson().setInstitutionalEmailAddressValue(email);
+
+        Person person = foundUser.getPerson();
+
+        if (person == null) {
+            return Status.NOT_FOUND;
+        }
+
+        final EmailAddress institutionalEmailAddress = person.getInstitutionalEmailAddress();
+        if (institutionalEmailAddress != null && Strings.isNullOrEmpty(email)) {
+            institutionalEmailAddress.setActive(false);
+        } else {
+            person.setInstitutionalEmailAddressValue(email);
+            person.getInstitutionalEmailAddress().setActive(true);
+        }
+
         return Status.OK;
     }
 }
