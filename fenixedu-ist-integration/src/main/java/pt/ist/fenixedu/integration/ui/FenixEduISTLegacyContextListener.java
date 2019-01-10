@@ -226,12 +226,13 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
                 }
 
                 if (tinCountryCode != null) {
+                    final Country countryForTin = Country.readByTwoLetterCode(tinCountryCode);
                     final PhysicalAddress addressForTin = Utils.toAddress(person, tinCountryCode);
                     if (addressForTin == null) {
                         warnings.add(BundleUtil.getString("resources.FenixeduIstIntegrationResources", "label.person.details.no.address.for.tin"));
                     } else if (addressForTin.getCountryOfResidence() == null) {
                         warnings.add(BundleUtil.getString("resources.FenixeduIstIntegrationResources", "label.person.details.address.for.tin.has.no.country"));
-                    } else if (addressForTin.getAreaCode() == null || countryOfAddress == null || !PostalCodeValidator.isValidAreaCode(tinCountryCode, addressForTin.getAreaCode())) {
+                    } else if (addressForTin.getAreaCode() == null || countryOfAddress == null || countryForTin == null || !PostalCodeValidator.isValidAreaCode(tinCountryCode, addressForTin.getAreaCode())) {
                         warnings.add(BundleUtil.getString("resources.FenixeduIstIntegrationResources", "label.person.details.no.valid.post.code.for.tin"));
                     }
                 }
