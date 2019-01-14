@@ -119,25 +119,25 @@ public class Utils {
                 return false;
             }
         }
+        final Party party = event.getParty();
         final String eventDescription;
         try {
             eventDescription = event.getDescription().toString();
         } catch (final NullPointerException ex) {
-            logError(consumer, "No Description Available", event, null, "", null, null, null, null, event);
+            logError(consumer, "No Description Available", event, getUserIdentifier(party), "", null, party, null, null, event);
             return false;
         }
         final Money originalAmountToPay;
         try {
             originalAmountToPay = event.getOriginalAmountToPay();
         } catch (final DomainException ex) {
-            logError(consumer, "Unable to Determine Amount: " + ex.getMessage(), event, null, "", null, null, null, null, event);
+            logError(consumer, "Unable to Determine Amount: " + ex.getMessage(), event, getUserIdentifier(party), "", null, party, null, null, event);
             return false;
         } catch (final NullPointerException ex) {
-            logError(consumer, "Unable to Determine Amount: " + ex.getMessage(), event, null, "", null, null, null, null, event);
+            logError(consumer, "Unable to Determine Amount: " + ex.getMessage(), event, getUserIdentifier(party), "", null, party, null, null, event);
             return false;
         }
 
-        final Party party = event.getParty();
         final Country country = party.getCountry();
         if (country == null) {
             logError(consumer, "Has no country", event, getUserIdentifier(party), "", null, party, null, null, event);
