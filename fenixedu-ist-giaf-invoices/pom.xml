@@ -14,7 +14,7 @@
     <properties>
         <version.pt.ist.giaf-client-financial-documents>1.2.0</version.pt.ist.giaf-client-financial-documents>
         <version.pt.ist.sap-sdk-java>4.2.0</version.pt.ist.sap-sdk-java>
-        <version.org.fenixedu.postCodeTools>1.2.2</version.org.fenixedu.postCodeTools>
+        <version.org.fenixedu.postCodeTools>1.2.3</version.org.fenixedu.postCodeTools>
     </properties>
 
     <dependencies>
