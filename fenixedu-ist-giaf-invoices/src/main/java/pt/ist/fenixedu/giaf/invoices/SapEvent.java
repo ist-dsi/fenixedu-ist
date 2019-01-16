@@ -148,7 +148,8 @@ public class SapEvent {
     public void closeDocument(final SapRequest sapRequest) {
         final SapRequestType requestType = sapRequest.getRequestType();
         if (requestType != SapRequestType.INVOICE
-                && requestType != SapRequestType.DEBT) {
+                && requestType != SapRequestType.DEBT
+                && requestType != SapRequestType.INVOICE_INTEREST) {
             throw new Error("label.document.type.cannot.be.closed");
         }
         if (sapRequest.isReferencedByOtherRequest()) {
@@ -157,7 +158,7 @@ public class SapEvent {
 
         final Money documentValue = sapRequest.getValue();
         final CreditEntry creditEntry = EventProcessor.getCreditEntry(documentValue);
-        if (requestType == SapRequestType.INVOICE) {
+        if (requestType == SapRequestType.INVOICE || requestType == SapRequestType.INVOICE_INTEREST) {
             final SapRequest creditRequest = registerCredit(event, creditEntry, documentValue, sapRequest);
             creditRequest.setIgnore(true);
         } else if (requestType == SapRequestType.DEBT) {
