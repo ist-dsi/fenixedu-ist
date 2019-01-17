@@ -41,8 +41,7 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
 
     @Override
     public void contextInitialized(final ServletContextEvent sce) {
-        Event.canBeRefunded = (event) -> false;
-                //(event) -> event.getSapRequestSet().stream().anyMatch(SapRequest::getCanBeRefunded);
+        Event.canBeRefunded = (event) -> event.getSapRequestSet().stream().anyMatch(SapRequest::getCanBeRefunded);
 
         if (GiafInvoiceConfiguration.getConfiguration().sapSyncActive()) {
             Signal.register(AccountingTransaction.SIGNAL_ANNUL, this::handlerAccountingTransactionAnnulment);

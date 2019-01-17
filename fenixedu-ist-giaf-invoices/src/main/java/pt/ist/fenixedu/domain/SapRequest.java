@@ -147,6 +147,7 @@ public class SapRequest extends SapRequest_Base {
         setEvent(null);
         setOriginalRequest(null);
         setPayment(null);
+        setRefund(null);
         final SapDocumentFile documentFile = getSapDocumentFile();
         if (documentFile != null) {
             documentFile.delete();

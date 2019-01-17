@@ -12,7 +12,6 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -25,8 +24,12 @@ import org.fenixedu.academic.domain.accounting.AccountingTransactionDetail;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.EventType;
 import org.fenixedu.academic.domain.accounting.calculator.CreditEntry;
+import org.fenixedu.academic.domain.accounting.calculator.DebtInterestCalculator;
 import org.fenixedu.academic.domain.accounting.calculator.ExcessRefund;
+import org.fenixedu.academic.domain.accounting.calculator.Fine;
+import org.fenixedu.academic.domain.accounting.calculator.Interest;
 import org.fenixedu.academic.domain.accounting.calculator.PartialPayment;
+import org.fenixedu.academic.domain.accounting.calculator.Payment;
 import org.fenixedu.academic.domain.accounting.calculator.Refund;
 import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeAndInsuranceEvent;
 import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeEvent;
@@ -41,6 +44,7 @@ import org.fenixedu.academic.domain.organizationalStructure.Party;
 import org.fenixedu.academic.domain.phd.debts.ExternalScholarshipPhdGratuityContribuitionEvent;
 import org.fenixedu.academic.domain.phd.debts.PhdGratuityEvent;
 import org.fenixedu.academic.util.Money;
+import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.generated.sources.saft.sap.SAFTPTPaymentType;
 import org.fenixedu.generated.sources.saft.sap.SAFTPTSettlementType;
 import org.fenixedu.generated.sources.saft.sap.SAFTPTSourceBilling;
@@ -72,8 +76,6 @@ public class SapEvent {
     private static final int MAX_SIZE_REGION = 50;
     private static final int MAX_SIZE_POSTAL_CODE = 20;
     private static final int MAX_SIZE_VAT_NUMBER = 20;
-    public static Function<LocalDate, DateTime> documentDatePreviousYear =
-            (currentDate) -> new DateTime(currentDate.getYear() - 1, 12, 31, 23, 59);
     public LocalDate currentDate = new LocalDate();
     public Event event = null;
 
@@ -356,13 +358,12 @@ public class SapEvent {
         return sapRequest;
     }
 
-    @Atomic
     public void registerReimbursement(Refund refund) {
         Money paymentsInSap = getFilteredSapRequestStream()
             .filter(sr -> sr.getRequestType() == SapRequestType.INVOICE && sr.getRequest().length() > 2)
             .sorted(SapRequest.COMPARATOR_BY_EVENT_AND_ORDER)
             .map(sr -> registerReimbursement(sr, refund))
-            .reduce(Money.ZERO, Money::add);;
+            .reduce(Money.ZERO, Money::add);
 
         if(!refund.getAmount().equals(paymentsInSap.getAmount())){
             throw new Error("The value given for refund (" + refund.getId() + ") does not match the value of payments in SAP."
@@ -372,7 +373,7 @@ public class SapEvent {
 
     private Money registerReimbursement(final SapRequest sapInvoiceRequest, final Refund refund) {
         checkValidDocumentNumber(sapInvoiceRequest.getDocumentNumber(), event);
-        
+
         final String clientId = ClientMap.uVATNumberFor(event.getParty());
         final Money payedAmount = calculateAmountPayedForInvoice(sapInvoiceRequest);
         final Money openInvoiceValue = invoiceValueWithoutCredits(sapInvoiceRequest);
@@ -393,15 +394,14 @@ public class SapEvent {
         } else {
             final JsonObject data = toJsonReimbursement(event, payedAmount, openInvoiceValue, sapInvoiceRequest, false, true);
             final String documentNumber = getDocumentNumber(data, true);
+            SapRequest reimbursement = new SapRequest(event, clientId, payedAmount, documentNumber, SapRequestType.REIMBURSEMENT, Money.ZERO, data);
+            reimbursement.setRefund(domainRefund);
 
             //we must create a fictious credit note request so that we know that the invoice is closed
             SapRequest creditNoteRequest = new SapRequest(event, clientId, openInvoiceValue, documentNumber, SapRequestType.CREDIT, Money.ZERO, data);
             creditNoteRequest.setSent(true);
             creditNoteRequest.setIntegrated(true);
             creditNoteRequest.setRefund(domainRefund);
-
-            SapRequest reimbursement = new SapRequest(event, clientId, payedAmount, documentNumber, SapRequestType.REIMBURSEMENT, Money.ZERO, data);
-            reimbursement.setRefund(domainRefund);
         }
         return payedAmount;
     }
@@ -424,30 +424,28 @@ public class SapEvent {
     }
 
     public void registerReimbursementAdvancement(ExcessRefund excessRefund) {
-        excessRefund.getPartialPayments().forEach(p -> registerReimbursementAdvancement(p));
-        //getUnusedAdvancementPayments().forEach(sr -> registerReimbursementAdvancement(sr));
+        excessRefund.getPartialPayments().stream().forEach(p -> registerReimbursementAdvancement(p));
     }
 
     private SapRequest registerReimbursementAdvancement(PartialPayment partialPayment) {
-        final Stream<SapRequest> paymentsFor = getAdvancementPaymentsFor(partialPayment.getCreditEntry().getId());
-        if (paymentsFor.count() > 1) {
+        final List<SapRequest> paymentsFor = getAdvancementPaymentsFor(partialPayment.getCreditEntry().getId()).collect(Collectors.toList());
+        if (paymentsFor.size() > 1) {
             throw new Error("More than one advancement payment was done with ID " +
                     partialPayment.getCreditEntry().getId() + " - can not make reimbursement");
         }
+        SapRequest advPayment = paymentsFor.iterator().next();
+        if(advPayment.getAdvancement().lessThan(new Money(partialPayment.getAmount()))) {
+            throw new Error("Trying to reimburse more value than what was sent in request for payment: " +
+                    partialPayment.getCreditEntry().getId() + " - can not make reimbursement");
+        }
 
-        //TODO qual é o valor que eu tenho que devolver deste adiantamento?
-        //TODO o pagamento de onde veio o reembolso é o valor a usar todo?
         String clientId = ClientMap.uVATNumberFor(event.getParty());
-        JsonObject data = toJsonReimbursementAdvancement(paymentsFor.findAny().get(), false, true);
+        JsonObject data = toJsonReimbursementAdvancement(advPayment, false, true);
 
         String documentNumber = getDocumentNumber(data, true);
-        SapRequest reimbursementRequest = new SapRequest(event, clientId, null/*advancement.getAdvancement()*/, documentNumber, SapRequestType.REIMBURSEMENT, Money.ZERO, data);
-        //reimbursementRequest.setAdvancementRequest(advancement);
+        SapRequest reimbursementRequest = new SapRequest(event, clientId, new Money(partialPayment.getAmount()), documentNumber, SapRequestType.REIMBURSEMENT, Money.ZERO, data);
+        reimbursementRequest.setAdvancementRequest(advPayment);
         return reimbursementRequest;
-    }
-
-    private Stream<SapRequest> getUnusedAdvancementPayments() {
-        return getFilteredSapRequestStream().filter(sr -> sr.getRequestType() == SapRequestType.ADVANCEMENT && sr.getReimbursementRequest() == null);
     }
 
     private void registerInterest(final Money payedInterest, final String clientId, final AccountingTransactionDetail transactionDetail) {
@@ -484,6 +482,13 @@ public class SapEvent {
 
         final AccountingTransactionDetail transactionDetail =
                 ((AccountingTransaction) FenixFramework.getDomainObject(payment.getId())).getTransactionDetail();
+
+        // if it is an internal imputation gets a different treatment
+        if(Bennu.getInstance().getInternalPaymentMethod().equals(getPaymentMethodReference(transactionDetail))) {
+            registerCredit(event, payment, false);
+            return;
+        }
+
         final String clientId = ClientMap.uVATNumberFor(event.getParty());
 
         final Money payedInterest = new Money(payment.getUsedAmountInInterests().add(payment.getUsedAmountInFines()));
@@ -625,6 +630,78 @@ public class SapEvent {
         }
     }
 
+    public void registerAdvancementInPayment(final Payment payment) {
+        AccountingTransactionDetail paymentDetail = ((AccountingTransaction) FenixFramework.getDomainObject(payment.getId())).getTransactionDetail();
+        Event originEvent = paymentDetail.getTransaction().getRefund().getEvent();
+        DebtInterestCalculator calculator = originEvent.getDebtInterestCalculator(new DateTime());
+        ExcessRefund excessRefund = calculator.getExcessRefundStream().filter(er -> er.getId().equals(payment.getRefundId())).findAny().get();
+
+        excessRefund.getPartialPayments().stream().forEach(
+                pp -> registerAdvancementInPayment(excessRefund, pp, new Money(pp.getAmount()), paymentDetail, originEvent,
+                            getOpenInvoicesAndRemainingValue().entrySet().toArray(new Entry[0])));
+    }
+
+    private void registerAdvancementInPayment(final ExcessRefund excessRefund, final PartialPayment partialPayment, final Money amountUsed, final AccountingTransactionDetail payment,
+                                              final Event originEvent, final Entry<SapRequest, Money>[] openInvoices) {
+
+        if (partialPayment.getDebtEntry() instanceof Fine || partialPayment.getDebtEntry() instanceof Interest) {
+            final String clientId = ClientMap.uVATNumberFor(event.getParty());
+            SapRequest interestInvoice = registerInterestInvoice(new Money(partialPayment.getAmount()), clientId, payment, payment.getWhenRegistered());
+            registerAdvancementInPayment(excessRefund, partialPayment, payment, originEvent, amountUsed, interestInvoice, SapRequestType.PAYMENT_INTEREST);
+        } else {
+            if (amountUsed.isPositive()) {
+                final Entry<SapRequest, Money> entry = openInvoices[0];
+                final SapRequest openInvoice = entry.getKey();
+                final Money openInvoiceValue = entry.getValue();
+
+                if (openInvoiceValue.greaterOrEqualThan(amountUsed)) {
+                    registerAdvancementInPayment(excessRefund, partialPayment, payment, originEvent, amountUsed, openInvoice, SapRequestType.PAYMENT);
+                } else if (openInvoices.length > 1) {
+                    registerAdvancementInPayment(excessRefund, partialPayment, payment, originEvent, openInvoiceValue, openInvoice, SapRequestType.PAYMENT);
+                    registerAdvancementInPayment(excessRefund, partialPayment, amountUsed.subtract(openInvoiceValue), payment, originEvent, Arrays.copyOfRange(openInvoices, 1, openInvoices.length));
+                } else {
+                    throw new Error("There is no open invoice to register payment: " + payment.getExternalId() + " - that resulted from an advance");
+                }
+            }
+        }
+    }
+
+    private void registerAdvancementInPayment(final ExcessRefund excessRefund, final PartialPayment partialPayment, final AccountingTransactionDetail payment,
+                                              final Event originEvent, final Money amountUsed, final SapRequest openInvoice, final SapRequestType requestType) {
+        SapEvent sapOriginEvent = new SapEvent(originEvent);
+        SapRequest originalPayment = sapOriginEvent.getAdvancementPaymentsFor(partialPayment.getCreditEntry().getId()).findAny()
+                .orElseThrow(() -> new Error("There is no advancement registered for paymentId: " + partialPayment.getCreditEntry().getId()));
+        JsonObject advInPayment = toJsonUseAdvancementInPayment(payment, originalPayment, amountUsed, openInvoice.getDocumentNumber());
+        final SapRequest sapRequest = new SapRequest(event, originalPayment.getClientId(), amountUsed, getDocumentNumber(advInPayment, true),
+                requestType, Money.ZERO, advInPayment);
+        sapRequest.setPayment(payment.getTransaction());
+        sapRequest.setRefund(FenixFramework.getDomainObject(excessRefund.getId()));
+        sapRequest.setAdvancementRequest(originalPayment);
+    }
+
+
+    private JsonObject toJsonUseAdvancementInPayment(final AccountingTransactionDetail payment, final SapRequest originalPayment, final Money amountToUse, final String invoiceNumber) {
+        JsonObject data =
+                toJson(event, originalPayment.getClientJson(), payment.getWhenRegistered(), false, false, false, false);
+
+        JsonObject paymentDocument = toJsonPaymentDocument(amountToUse, "NP", invoiceNumber, payment.getWhenRegistered(),
+                "OU", getPaymentMethodReference(payment), SAFTPTSettlementType.NN.toString(), true);
+        paymentDocument.addProperty("excessPayment", amountToUse.negate().toPlainString());//the payment amount must be zero
+        paymentDocument.addProperty("isToCreditTotal", true);
+
+        final JsonArray documents = new JsonArray();
+        JsonObject line = new JsonObject();
+        line.addProperty("amount", amountToUse.getAmountAsString());
+        line.addProperty("isToDebit", false);
+        line.addProperty("originDocNumber", originalPayment.getDocumentNumberForType("NA"));
+        documents.add(line);
+        paymentDocument.add("documents", documents);
+
+        data.add("paymentDocument", paymentDocument);
+
+        return data;
+    }
+
     public boolean processPendingRequests(Event event, ErrorLogConsumer errorLog, EventLogger elogger) {
         Set<SapRequest> requests = new TreeSet<>(SapRequest.COMPARATOR_BY_ORDER);
         requests.addAll(event.getSapRequestSet());
@@ -693,7 +770,7 @@ public class SapEvent {
     }
 
     private boolean isToProcessDebt(boolean isGratuity, final boolean isNewDate, final DateTime documentDate) {
-        return (isGratuity || (event instanceof ExternalScholarshipPhdGratuityContribuitionEvent))
+        return (isGratuity || event instanceof ExternalScholarshipPhdGratuityContribuitionEvent)
                 && event.getWhenOccured().isAfter(EventWrapper.LIMIT)
                 && isNotPastDebtEndDate(isNewDate, documentDate);
     }
