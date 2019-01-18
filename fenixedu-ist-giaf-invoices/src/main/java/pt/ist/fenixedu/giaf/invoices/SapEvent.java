@@ -456,7 +456,7 @@ public class SapEvent {
 
         // registering the invoice
         SapRequest interestInvoiceRequest = registerInterestInvoice(payedInterest, clientId, transactionDetail,
-                    getDocumentDate(transactionDetail.getWhenProcessed(), false));
+                    transactionDetail.getWhenRegistered());
         // registering the payment
         registerInterestPayment(payedInterest, interestInvoiceRequest, transactionDetail);
     }
