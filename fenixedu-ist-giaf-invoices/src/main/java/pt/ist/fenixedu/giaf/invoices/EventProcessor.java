@@ -125,9 +125,9 @@ public class EventProcessor {
 
         } else {
             //processing payments of past events
-//                eventWrapper.paymentsSap().filter(d -> !sapEvent.hasPayment(d)).peek(
-//                    d -> elogger.log("Processing past payment %s : %s%n", eventWrapper.event.getExternalId(), d.getExternalId()))
-//                    .forEach(d -> sapEvent.registerInvoiceAndPayment(clientMap, d, errorLog, elogger));
+            DebtInterestCalculator calculator = event.getDebtInterestCalculator(new DateTime());
+            calculator.getPayments().filter(p -> !sapEvent.hasPayment(p.getId()) && p.getCreated().isAfter(EventWrapper.SAP_TRANSACTIONS_THRESHOLD))
+                    .forEach(p -> sapEvent.registerPastPayment(p));
         }
     }
 
