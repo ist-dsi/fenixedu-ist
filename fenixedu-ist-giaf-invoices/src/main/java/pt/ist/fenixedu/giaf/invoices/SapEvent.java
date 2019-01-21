@@ -341,7 +341,7 @@ public class SapEvent {
                 final Money openInvoiceAmount = entry.getValue();
 
                 final Money amountForInvoice = Money.min(openInvoiceAmount, amountToCredit);
-                registerCredit(event, creditEntry, new Money(creditEntry.getAmount()), invoice);
+                registerCredit(event, creditEntry, amountForInvoice, invoice);
                 amountToCredit = amountToCredit.subtract(amountForInvoice);
             }
         }
