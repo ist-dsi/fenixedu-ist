@@ -6,7 +6,6 @@ import java.util.Optional;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
-import javax.ws.rs.HEAD;
 
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
@@ -17,6 +16,7 @@ import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.EventState;
 import org.fenixedu.academic.domain.accounting.EventState.ChangeStateEvent;
 import org.fenixedu.academic.domain.accounting.Exemption;
+import org.fenixedu.academic.domain.accounting.calculator.DebtInterestCalculator;
 import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeAndInsuranceEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEvent;
 import org.fenixedu.academic.domain.exceptions.DomainException;
@@ -26,8 +26,8 @@ import org.fenixedu.bennu.GiafInvoiceConfiguration;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.signals.DomainObjectEvent;
 import org.fenixedu.bennu.core.signals.Signal;
+import org.joda.time.DateTime;
 
-import pt.ist.fenixedu.domain.SapRequest;
 import pt.ist.fenixedu.giaf.invoices.SapEvent;
 import pt.ist.fenixframework.FenixFramework;
 
@@ -41,7 +41,12 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
 
     @Override
     public void contextInitialized(final ServletContextEvent sce) {
-        Event.canBeRefunded = (event) -> event.getSapRequestSet().stream().anyMatch(SapRequest::getCanBeRefunded);
+        Event.canBeRefunded = (event) -> {
+            final DebtInterestCalculator calculator = event.getDebtInterestCalculator(new DateTime());
+            return calculator.getPayments().count() > 0 && calculator.getPayments()
+                .map(p -> (AccountingTransaction) FenixFramework.getDomainObject(p.getId()))
+                .allMatch(t -> event.getSapRequestSet().stream().anyMatch(sr -> sr.getPayment() == t && sr.getCanBeRefunded()));
+        };
 
         if (GiafInvoiceConfiguration.getConfiguration().sapSyncActive()) {
             Signal.register(AccountingTransaction.SIGNAL_ANNUL, this::handlerAccountingTransactionAnnulment);
