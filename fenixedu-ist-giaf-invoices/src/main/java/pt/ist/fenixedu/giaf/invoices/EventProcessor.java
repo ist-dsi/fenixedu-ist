@@ -157,6 +157,11 @@ public class EventProcessor {
             public boolean isForDebt() {
                 return false;
             }
+
+            @Override
+            public BigDecimal getUsedAmountInDebts() {
+                return getAmount();
+            }
         };
     }
 

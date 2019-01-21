@@ -278,10 +278,11 @@ public class SapEvent {
         SimpleImmutableEntry<List<SapRequest>, Money> openDebtsAndRemainingValue = getOpenDebtsAndRemainingValue();
         List<SapRequest> openDebts = openDebtsAndRemainingValue.getKey();
         Money remainingAmount = openDebtsAndRemainingValue.getValue();
+        final Money amountToRegister = new Money(creditEntry.getUsedAmountInDebts());
         if (creditEntry.getAmount().compareTo(remainingAmount.getAmount()) == 1) {
             if (openDebts.size() > 1) {
                 // dividir o valor da isenção pelas várias dívidas
-                registerDebtCreditList(event, openDebts, new Money(creditEntry.getAmount()), creditEntry, remainingAmount,
+                registerDebtCreditList(event, openDebts, amountToRegister, creditEntry, remainingAmount,
                         clientId, isNewDate);
             } else {
                 // o valor da isenção é superior ao valor em dívida
@@ -291,11 +292,11 @@ public class SapEvent {
                 } else { // não existe nenhuma dívida aberta, ir buscar a última
                     debt = getLastDebt();
                 }
-                registerDebtCredit(clientId, event, new Money(creditEntry.getAmount()), creditEntry, debt, isNewDate);
+                registerDebtCredit(clientId, event, amountToRegister, creditEntry, debt, isNewDate);
             }
         } else {
             //tudo normal
-            registerDebtCredit(clientId, event, new Money(creditEntry.getAmount()), creditEntry, openDebts.get(0), isNewDate);
+            registerDebtCredit(clientId, event, amountToRegister, creditEntry, openDebts.get(0), isNewDate);
         }
     }
 
@@ -334,7 +335,7 @@ public class SapEvent {
         }
 
         final SortedMap<SapRequest, Money> openInvoices = getOpenInvoicesAndRemainingValue();
-        Money amountToCredit = new Money(creditEntry.getAmount());
+        Money amountToCredit = new Money(creditEntry.getUsedAmountInDebts());
         for (final Entry<SapRequest, Money> entry : openInvoices.entrySet()) {
             if (amountToCredit.isPositive()) {
                 final SapRequest invoice = entry.getKey();
