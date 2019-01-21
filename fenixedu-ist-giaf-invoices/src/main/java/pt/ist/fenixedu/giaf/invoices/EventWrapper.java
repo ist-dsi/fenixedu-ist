@@ -22,7 +22,8 @@ public class EventWrapper {
 
     public static boolean needsToProcessPayments(Event event) {
         final int currentYear = Year.now().getValue();
-        return event.getAccountingTransactionsSet().stream().anyMatch(tx -> tx.getWhenRegistered().getYear() == currentYear);
+        return event.getAccountingTransactionsSet().stream().anyMatch(tx -> tx.getWhenRegistered().getYear() == currentYear
+                || tx.getWhenRegistered().getYear() == currentYear -1);
     }
 
     public static boolean shouldProcess(final ErrorLogConsumer consumer, final Event event) {
