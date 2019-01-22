@@ -271,7 +271,7 @@ public class SapRequest extends SapRequest_Base {
     public Money consumedAmount() {
         final SapRequest sapRequest = this;
         return getEvent().getSapRequestSet().stream()
-            .filter(r -> r != sapRequest && r.refersToDocument(sapRequest.getDocumentNumber()) && r.isConsumer())
+            .filter(r -> r != sapRequest && !r.getIgnore() && r.refersToDocument(sapRequest.getDocumentNumber()) && r.isConsumer())
             .map(r -> r.getValue())
             .reduce(Money.ZERO, Money::add);
     }
