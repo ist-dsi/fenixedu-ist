@@ -177,7 +177,8 @@ public class SapEvent {
                 && requestType != SapRequestType.INVOICE_INTEREST
                 && requestType != SapRequestType.PAYMENT
                 && requestType != SapRequestType.PAYMENT_INTEREST
-                && requestType != SapRequestType.ADVANCEMENT) {
+                && requestType != SapRequestType.ADVANCEMENT
+                && requestType != SapRequestType.CREDIT) {
             throw new Error("label.document.type.cannot.be.canceled");
         }
         if (sapRequest.isReferencedByOtherRequest()) {
@@ -187,17 +188,24 @@ public class SapEvent {
         JsonObject jsonAnnulled = new JsonParser().parse(sapRequest.getRequest()).getAsJsonObject();
         if (requestType == SapRequestType.INVOICE
                 || requestType == SapRequestType.INVOICE_INTEREST
-                || requestType == SapRequestType.ADVANCEMENT) {
+                || requestType == SapRequestType.ADVANCEMENT
+                || requestType == SapRequestType.CREDIT) {
             final JsonObject workDocument = jsonAnnulled.get("workingDocument").getAsJsonObject();
             workDocument.addProperty("workStatus", "A");
             workDocument.addProperty("documentDate", new DateTime().toString("yyyy-MM-dd HH:mm:ss"));
         }
+        if (requestType == SapRequestType.CREDIT){
+            final JsonObject paymentDocument = jsonAnnulled.get("paymentDocument").getAsJsonObject();
+            final JsonObject workDocument = jsonAnnulled.get("workingDocument").getAsJsonObject();
+            workDocument.addProperty("workOriginDocNumber", paymentDocument.get("paymentDocumentNumber").getAsString());
+        }
         if (requestType == SapRequestType.PAYMENT
                 || requestType == SapRequestType.PAYMENT_INTEREST
-                || requestType == SapRequestType.ADVANCEMENT) {
-            final JsonObject workDocument = jsonAnnulled.get("paymentDocument").getAsJsonObject();
-            workDocument.addProperty("paymentStatus", "A");
-            workDocument.addProperty("paymentDate", new DateTime().toString("yyyy-MM-dd HH:mm:ss"));
+                || requestType == SapRequestType.ADVANCEMENT
+                || requestType == SapRequestType.CREDIT) {
+            final JsonObject paymentDocument = jsonAnnulled.get("paymentDocument").getAsJsonObject();
+            paymentDocument.addProperty("paymentStatus", "A");
+            paymentDocument.addProperty("paymentDate", new DateTime().toString("yyyy-MM-dd HH:mm:ss"));
         }
 
         final SapRequest sapRequestAnnulled = new SapRequest(sapRequest.getEvent(), sapRequest.getClientId(), sapRequest.getValue(),
