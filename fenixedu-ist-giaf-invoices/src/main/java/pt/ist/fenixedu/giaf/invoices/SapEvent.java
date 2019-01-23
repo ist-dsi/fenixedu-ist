@@ -522,7 +522,7 @@ public class SapEvent {
                 ((AccountingTransaction) FenixFramework.getDomainObject(payment.getId())).getTransactionDetail();
 
         // if it is an internal imputation gets a different treatment
-        if(Bennu.getInstance().getInternalPaymentMethod().equals(getPaymentMethodReference(transactionDetail))) {
+        if(Bennu.getInstance().getInternalPaymentMethod() == transactionDetail.getPaymentMethod()) {
             registerCredit(event, payment, false);
             return;
         }
