@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
@@ -674,32 +675,51 @@ public class SapEvent {
         DebtInterestCalculator calculator = originEvent.getDebtInterestCalculator(new DateTime());
         ExcessRefund excessRefund = calculator.getExcessRefundStream().filter(er -> er.getId().equals(payment.getRefundId())).findAny().get();
 
-        excessRefund.getPartialPayments().stream().forEach(
-                pp -> registerAdvancementInPayment(excessRefund, pp, new Money(pp.getAmount()), paymentDetail, originEvent,
-                            getOpenInvoicesAndRemainingValue().entrySet().toArray(new Entry[0])));
+        final Map<PartialPayment, Money> paymentMoneyMap = excessRefund.getPartialPayments().stream().collect(Collectors.toMap(p -> p, p -> new Money(p.getAmount())));
+
+        Money interests = new Money(payment.getUsedAmountInFines().add(payment.getUsedAmountInInterests()));
+        if (interests.isPositive()) {
+            registerAdvancementInPaymentInterest(excessRefund, interests, paymentDetail, originEvent, paymentMoneyMap);
+        }
+
+        paymentMoneyMap.forEach((partialPayment, pAmount) -> {
+            registerAdvancementInPayment(excessRefund, partialPayment, pAmount, paymentDetail, originEvent, getOpenInvoicesAndRemainingValue().entrySet().toArray(new Entry[0]));
+        });
+
+    }
+
+    private void registerAdvancementInPaymentInterest(final ExcessRefund excessRefund, final Money interest, final AccountingTransactionDetail payment,
+                                              final Event originEvent, final Map<PartialPayment, Money> partialPayments) {
+        Money interestAmount = new Money(interest.getAmount());
+        for(Entry<PartialPayment, Money> entry : partialPayments.entrySet()) {
+            if (interestAmount.isPositive()) {
+                Money pAmount = entry.getValue();
+                PartialPayment partialPayment = entry.getKey();
+                Money interestToProcess = Money.min(pAmount, interestAmount);
+
+                final String clientId = ClientMap.uVATNumberFor(event.getParty());
+                SapRequest interestInvoice = registerInterestInvoice(interestToProcess, clientId, payment, payment.getWhenRegistered());
+                registerAdvancementInPayment(excessRefund, partialPayment, payment, originEvent, interestToProcess, interestInvoice, SapRequestType.PAYMENT_INTEREST);
+                partialPayments.put(partialPayment, Money.max(Money.ZERO, pAmount.subtract(interestAmount)));
+                interestAmount = interestAmount.subtract(pAmount);
+            }
+        }
     }
 
     private void registerAdvancementInPayment(final ExcessRefund excessRefund, final PartialPayment partialPayment, final Money amountUsed, final AccountingTransactionDetail payment,
                                               final Event originEvent, final Entry<SapRequest, Money>[] openInvoices) {
+        if (amountUsed.isPositive()) {
+            final Entry<SapRequest, Money> entry = openInvoices[0];
+            final SapRequest openInvoice = entry.getKey();
+            final Money openInvoiceValue = entry.getValue();
 
-        if (partialPayment.getDebtEntry() instanceof Fine || partialPayment.getDebtEntry() instanceof Interest) {
-            final String clientId = ClientMap.uVATNumberFor(event.getParty());
-            SapRequest interestInvoice = registerInterestInvoice(new Money(partialPayment.getAmount()), clientId, payment, payment.getWhenRegistered());
-            registerAdvancementInPayment(excessRefund, partialPayment, payment, originEvent, amountUsed, interestInvoice, SapRequestType.PAYMENT_INTEREST);
-        } else {
-            if (amountUsed.isPositive()) {
-                final Entry<SapRequest, Money> entry = openInvoices[0];
-                final SapRequest openInvoice = entry.getKey();
-                final Money openInvoiceValue = entry.getValue();
-
-                if (openInvoiceValue.greaterOrEqualThan(amountUsed)) {
-                    registerAdvancementInPayment(excessRefund, partialPayment, payment, originEvent, amountUsed, openInvoice, SapRequestType.PAYMENT);
-                } else if (openInvoices.length > 1) {
-                    registerAdvancementInPayment(excessRefund, partialPayment, payment, originEvent, openInvoiceValue, openInvoice, SapRequestType.PAYMENT);
-                    registerAdvancementInPayment(excessRefund, partialPayment, amountUsed.subtract(openInvoiceValue), payment, originEvent, Arrays.copyOfRange(openInvoices, 1, openInvoices.length));
-                } else {
-                    throw new Error("There is no open invoice to register payment: " + payment.getExternalId() + " - that resulted from an advance");
-                }
+            if (openInvoiceValue.greaterOrEqualThan(amountUsed)) {
+                registerAdvancementInPayment(excessRefund, partialPayment, payment, originEvent, amountUsed, openInvoice, SapRequestType.PAYMENT);
+            } else if (openInvoices.length > 1) {
+                registerAdvancementInPayment(excessRefund, partialPayment, payment, originEvent, openInvoiceValue, openInvoice, SapRequestType.PAYMENT);
+                registerAdvancementInPayment(excessRefund, partialPayment, amountUsed.subtract(openInvoiceValue), payment, originEvent, Arrays.copyOfRange(openInvoices, 1, openInvoices.length));
+            } else {
+                throw new Error("There is no open invoice to register payment: " + payment.getExternalId() + " - that resulted from an advance");
             }
         }
     }
