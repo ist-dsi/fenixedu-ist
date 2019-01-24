@@ -1,11 +1,8 @@
 <%@page import="org.joda.time.DateTime"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <% final String contextPath = request.getContextPath(); %>
 <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-<link rel="stylesheet" type="text/css" media="screen" href="<%= request.getContextPath() %>/CSS/accounting.css"/>
 <script src="${pageContext.request.contextPath}/javaScript/jquery/jquery-ui.js"></script>
 
 ${portal.toolkit()}
@@ -26,7 +23,7 @@ ${portal.toolkit()}
         <spring:message code="title.register.internal.payment" text="Internal Payment"/>
     </h3>
 
-    <form class="form-horizontal" method="POST" action="<%= contextPath %>/sap-invoice-viewer/${event.externalId}/createNewInvoice">
+    <form class="form-horizontal" method="POST" action="<%= contextPath %>/sap-invoice-viewer/${event.externalId}/registerInternalPayment">
         ${csrf.field()}
 
         <div class="form-group">

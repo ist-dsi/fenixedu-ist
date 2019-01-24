@@ -34,9 +34,9 @@ import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.EventState;
 import org.fenixedu.academic.domain.accounting.Refund;
 import org.fenixedu.academic.domain.accounting.calculator.DebtInterestCalculator;
-import org.fenixedu.academic.dto.accounting.DepositAmountBean;
 import org.fenixedu.academic.domain.accounting.events.EventExemptionJustificationType;
 import org.fenixedu.academic.domain.exceptions.DomainException;
+import org.fenixedu.academic.dto.accounting.DepositAmountBean;
 import org.fenixedu.academic.ui.spring.controller.AccountingEventsPaymentManagerController;
 import org.fenixedu.academic.ui.spring.service.AccountingManagementAccessControlService;
 import org.fenixedu.academic.ui.spring.service.AccountingManagementService;
@@ -47,6 +47,7 @@ import org.fenixedu.bennu.core.groups.Group;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.joda.time.DateTime;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -373,7 +374,7 @@ public class SapInvoiceController {
     @RequestMapping(value = "/{event}/registerInternalPayment", method = RequestMethod.POST)
     public String registerInternalPayment(final @PathVariable Event event, final Model model,
             @RequestParam final String unit, @RequestParam final String valueToTransfer,
-            @RequestParam final DateTime whenRegistered, @RequestParam final String reason) {
+            @RequestParam final @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ") DateTime whenRegistered, @RequestParam final String reason) {
         final User user = Authenticate.getUser();
         if (Group.dynamic("managers").isMember(user) || Group.dynamic("sapIntegrationManager").isMember(user)) {
             try {
