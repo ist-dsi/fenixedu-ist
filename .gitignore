@@ -19,3 +19,8 @@ output/
 # Maven #
 target/
 bin/
+
+# VSCode #
+.vscode
+.settings
+.factorypath

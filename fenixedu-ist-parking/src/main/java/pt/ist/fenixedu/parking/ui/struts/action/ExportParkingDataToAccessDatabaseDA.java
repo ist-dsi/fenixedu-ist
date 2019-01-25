@@ -50,7 +50,6 @@ import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
 import org.fenixedu.commons.spreadsheet.ExcelStyle;
 import org.fenixedu.commons.spreadsheet.Spreadsheet;
 import org.fenixedu.commons.spreadsheet.Spreadsheet.Row;
-import org.fenixedu.idcards.ui.OpenFileBean;
 import org.joda.time.DateTime;
 import org.joda.time.YearMonthDay;
 

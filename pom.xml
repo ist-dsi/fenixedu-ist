@@ -40,7 +40,7 @@
         <version.org.fenixedu.messaging>4.0.1</version.org.fenixedu.messaging>
         <version.org.glassfish.jersey>2.27</version.org.glassfish.jersey>
         <version.pt.ist.drive-sdk>2.1.0</version.pt.ist.drive-sdk>
-        <version.pt.ist.fenixedu-id-cards>4.0.0</version.pt.ist.fenixedu-id-cards>
+        <version.pt.ist.fenixedu-id-cards>5.0.0</version.pt.ist.fenixedu-id-cards>
         <version.pt.ist.fenixedu-ulisboa-cgdIntegration>3.0.0</version.pt.ist.fenixedu-ulisboa-cgdIntegration>
         <version.json.simple>1.1</version.json.simple>
     </properties>
@@ -62,7 +62,7 @@
         <connection>scm:git:git@github.com:ist-dsi/fenixedu-ist.git</connection>
         <developerConnection>scm:git:git@github.com:ist-dsi/fenixedu-ist.git</developerConnection>
         <url>http://fenixedu.org</url>
-        <tag>v17.3.0-SNAPSHOT</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <dependencyManagement>

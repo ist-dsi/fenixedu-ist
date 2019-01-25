@@ -47,7 +47,6 @@ import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.scheduler.CronTask;
 import org.fenixedu.bennu.scheduler.annotation.Task;
 import org.fenixedu.commons.StringNormalizer;
-import org.fenixedu.idcards.domain.SantanderCardInformation;
 import org.fenixedu.messaging.core.domain.MessagingSystem;
 import org.joda.time.DateTime;
 
@@ -56,8 +55,11 @@ import pt.ist.fenixedu.parking.domain.ParkingParty;
 
 @Task(englishTitle = "Send car park users to remote car park")
 public class ExportCarParkUsers extends CronTask {
+    @Override
+    public void runTask() throws Exception {
+    }
 
-    private static final String EMAIL_ADDRESSES_TO_SEND_DATA =
+    /*private static final String EMAIL_ADDRESSES_TO_SEND_DATA =
             "arcodocego@empark.pt, mamede@empark.pt, aneves@empark.es, alameda@empark.pt";
 
     private static final String EMAIL_ADDRESSES_BCC_SEND_DATA =
@@ -92,7 +94,7 @@ public class ExportCarParkUsers extends CronTask {
         printStream.print("\r\n");
     }
 
-    private void appendUserInfo(final PrintStream printStream, final User user) {
+    *//*private void appendUserInfo(final PrintStream printStream, final User user) {
         final String rfid = getUserRFID(user);
         if (rfid != null) {
             printStream.print(toHex(rfid.trim()));
@@ -102,7 +104,7 @@ public class ExportCarParkUsers extends CronTask {
             printStream.print(date(getEndDate(user)));
             printStream.print("\r\n");
         }
-    }
+    }*//*
 
     private String toHex(final String rfid) {
         return invert(makeStringLeftBlock(Long.toHexString(Long.parseLong(rfid)), 8));
@@ -145,12 +147,12 @@ public class ExportCarParkUsers extends CronTask {
         return blockBuilder.toString();
     }
 
-    private String getUserRFID(final User user) {
+    *//*private String getUserRFID(final User user) {
         final Person person = user.getPerson();
         final ParkingParty parkingParty = person.getParkingParty();
         final Long cn = parkingParty.getCardNumber();
         return cn == null ? getLastMifareSerialNumber(person) : cn.toString();
-    }
+    }*//*
 
     private String invert(final String rfid) {
         final StringBuilder builder = new StringBuilder();
@@ -180,11 +182,11 @@ public class ExportCarParkUsers extends CronTask {
         return isActive(parkingParty, allowedGroups);
     }
 
-    private static String getLastMifareSerialNumber(final Person person) {
+    *//*private static String getLastMifareSerialNumber(final Person person) {
         final Stream<SantanderCardInformation> infos = person.getSantanderCardsInformationSet().stream();
         final String line = infos.map(i -> i.getDchpRegisteLine()).max(ExportCarParkUsers::compareDHCPLines).orElse(null);
         return line == null ? null : getMifareSerialNumber(line);
-    }
+    }*//*
 
     private static String getMifareSerialNumber(String line) {
         final int offset = line.length() - 550 - 1;
@@ -268,6 +270,6 @@ public class ExportCarParkUsers extends CronTask {
         message.setContent(multipart);
 
         Transport.send(message);
-    }
+    }*/
 
 }
