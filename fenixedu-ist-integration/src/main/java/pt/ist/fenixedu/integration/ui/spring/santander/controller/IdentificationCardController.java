@@ -5,15 +5,11 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.bennu.spring.portal.SpringApplication;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
-import org.fenixedu.idcards.service.SantanderRequestCardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import pt.ist.fenixedu.integration.domain.santander.RequestCardUtils;
 import pt.ist.fenixedu.integration.ui.spring.santander.service.IdentificationCardService;
-
-import java.util.List;
 
 @SpringApplication(group = "logged", path = "identification-card", title = "label.identification.card")
 @SpringFunctionality(app = IdentificationCardController.class, title = "label.identification.card")
