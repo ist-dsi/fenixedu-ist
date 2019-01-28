@@ -34,13 +34,11 @@ import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.RegistrationProtocol;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.domain.student.registrationStates.RegistrationState;
-import org.fenixedu.idcards.IdCardsConfiguration;
 import org.fenixedu.idcards.domain.SantanderPhotoEntry;
+import org.fenixedu.idcards.utils.SantanderEntryUtils;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.DateTime;
 import org.joda.time.YearMonthDay;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Strings;
@@ -51,17 +49,9 @@ import pt.ist.fenixedu.contracts.domain.accessControl.ActiveResearchers;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonContractSituation;
 import pt.ist.fenixedu.contracts.domain.util.CategoryType;
 import pt.ist.fenixframework.FenixFramework;
-import pt.sibscartoes.portal.wcf.IRegistersInfo;
-import pt.sibscartoes.portal.wcf.dto.FormData;
-import pt.sibscartoes.portal.wcf.dto.RegisterData;
-import pt.sibscartoes.portal.wcf.tui.ITUIDetailService;
-import pt.sibscartoes.portal.wcf.tui.dto.TUIResponseData;
 import pt.sibscartoes.portal.wcf.tui.dto.TuiPhotoRegisterData;
-import pt.sibscartoes.portal.wcf.tui.dto.TuiSignatureRegisterData;
 
 public class RequestCardUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(RequestCardUtils.class);
 
     private static String alamedaAddr = "Avenida Rovisco Pais, 1";
     private static String alamedaZip = "1049-001";
@@ -76,113 +66,7 @@ public class RequestCardUtils {
 
     private static Map<String, CampusAddress> campi = getCampi();
 
-    public static String getRegister(Person person) {
-
-        JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
-
-        factory.setServiceClass(IRegistersInfo.class);
-        factory.setAddress("https://portal.sibscartoes.pt/wcf/RegistersInfo.svc");
-        factory.setBindingId("http://schemas.xmlsoap.org/wsdl/soap12/");
-        factory.getFeatures().add(new WSAddressingFeature());
-
-        //Add loggers to request
-        factory.getInInterceptors().add(new LoggingInInterceptor());
-        factory.getOutInterceptors().add(new LoggingOutInterceptor());
-
-        IRegistersInfo port = (IRegistersInfo) factory.create();
-
-        /*define WSDL policy*/
-        Client client = ClientProxy.getClient(port);
-        HTTPConduit http = (HTTPConduit) client.getConduit();
-
-        //Add username and password properties
-        http.getAuthorization().setUserName(IdCardsConfiguration.getConfiguration().sibsWebServiceUsername());
-        http.getAuthorization().setPassword(IdCardsConfiguration.getConfiguration().sibsWebServicePassword());
-
-        final String userName = Strings.padEnd(person.getUsername(), 10, 'x');
-
-        RegisterData statusInformation = port.getRegister(userName);
-
-        String result = userName + " : " + statusInformation.getStatusDate().getValue().replaceAll("-", "/") + " : "
-                + statusInformation.getStatus().getValue() + " - " + statusInformation.getStatusDesc().getValue();
-
-        FormData formData = port.getFormStatus(userName);
-
-        String template = "%s | Entity: %s | IdentRegNum: %s | NDoc: %s | Status: %s | Date: %s";
-        result = String.format(template, userName, formData.getEntityCode().getValue(), formData.getIdentRegNum().getValue(),
-                formData.getNDoc().getValue(), formData.getStatus().getValue(), formData.getIdentRegNum().getValue());
-
-        return result;
-    }
-
-    public static List<String> createRegister(String tuiEntry, TuiPhotoRegisterData photo) {
-        JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
-
-        factory.setServiceClass(ITUIDetailService.class);
-        factory.setAddress("https://portal.sibscartoes.pt/tstwcfv2/services/TUIDetailService.svc");
-        factory.setBindingId("http://schemas.xmlsoap.org/wsdl/soap12/");
-        factory.getFeatures().add(new WSAddressingFeature());
-
-        //Add loggers to request
-        factory.getInInterceptors().add(new LoggingInInterceptor());
-        factory.getOutInterceptors().add(new LoggingOutInterceptor());
-
-        ITUIDetailService port = (ITUIDetailService) factory.create();
-
-        /*define WSDL policy*/
-        Client client = ClientProxy.getClient(port);
-        HTTPConduit http = (HTTPConduit) client.getConduit();
-        //Add username and password properties
-        http.getAuthorization().setUserName(IdCardsConfiguration.getConfiguration().sibsWebServiceUsername());
-        http.getAuthorization().setPassword(IdCardsConfiguration.getConfiguration().sibsWebServicePassword());
-
-        ExecutionYear executionYear = ExecutionYear.readCurrentExecutionYear();
-
-        TuiSignatureRegisterData signature = new TuiSignatureRegisterData();
-
-        logger.debug("line: %s %d%n", tuiEntry, tuiEntry.length());
-
-        TUIResponseData tuiResponse = port.saveRegister(tuiEntry, photo, signature);
-        
-        List<String> result = new ArrayList<>();
-
-        result.add(tuiResponse.getStatus().getValue());
-        result.add(tuiResponse.getStatusDescription().getValue());
-        result.add(tuiResponse.getTuiResponseLine().getValue());
-
-        logger.debug("Response Status: " + result.get(0) + " -- Description: " + result.get(1));
-        logger.debug("Response Line: " + result.get(2));
-
-        return result;
-
-    }
-
-    public static TuiPhotoRegisterData getOrCreateSantanderPhoto(Person person) {
-        final QName FILE_NAME =
-                new QName("http://schemas.datacontract.org/2004/07/SibsCards.Wcf.Services.DataContracts", "FileName");
-        final QName FILE_EXTENSION =
-                new QName("http://schemas.datacontract.org/2004/07/SibsCards.Wcf.Services.DataContracts", "Extension");
-        final QName FILE_CONTENTS =
-                new QName("http://schemas.datacontract.org/2004/07/SibsCards.Wcf.Services.DataContracts", "FileContents");
-        final QName FILE_SIZE = new QName("http://schemas.datacontract.org/2004/07/SibsCards.Wcf.Services.DataContracts", "Size");
-
-        final String EXTENSION = ".jpeg";
-
-        TuiPhotoRegisterData photo = new TuiPhotoRegisterData();
-
-        SantanderPhotoEntry photoEntry = SantanderPhotoEntry.getOrCreatePhotoEntryForPerson(person);
-        byte[] photo_contents = photoEntry.getPhotoAsByteArray();
-
-        photo.setFileContents(new JAXBElement<byte[]>(FILE_CONTENTS, byte[].class, photo_contents));
-        photo.setSize(new JAXBElement<String>(FILE_SIZE, String.class, new Integer(photo_contents.length).toString()));
-        photo.setExtension(new JAXBElement<String>(FILE_EXTENSION, String.class, new String(".jpeg")));
-        photo.setFileName(new JAXBElement<String>(FILE_NAME, String.class, "foto")); //TODO
-
-        return photo;
-
-    }
-
-    public static List<String> generateLine(Person person, ExecutionYear executionYear, String action) {
+    public static String generateLine(Person person, ExecutionYear executionYear, String action) {
         /*
          * 1. Teacher
          * 2. Researcher
@@ -190,7 +74,7 @@ public class RequestCardUtils {
          * 4. GrantOwner
          * 5. Student
          */
-        List<String> line = new ArrayList<>();
+        String line = null;
         if (treatAsStudent(person, executionYear)) {
             line = createLine(person, "STUDENT", executionYear, action);
         } else if (treatAsTeacher(person)) {
@@ -273,20 +157,20 @@ public class RequestCardUtils {
         return result;
     }
 
-    private static List<String> createLine(Person person, String role, ExecutionYear executionYear, String action) {
+    private static String createLine(Person person, String role, ExecutionYear executionYear, String action) {
 
-        List<String> line = new ArrayList<>();
+        List<String> values = new ArrayList<>();
 
         String recordType = "2";
 
-        String idNumber = makeStringBlock(person.getUsername(), 10);
+        String idNumber = person.getUsername();
 
         String[] names = harvestNames(person.getName());
-        String name = makeStringBlock(names[0], 15);
-        String surname = makeStringBlock(names[1], 15);
-        String middleNames = makeStringBlock(names[2], 40);
+        String name = names[0];
+        String surname = names[1];
+        String middleNames = names[2];
 
-        String degreeCode = makeStringBlock(getDegreeDescription(person, role, executionYear), 16);
+        String degreeCode = getDegreeDescription(person, role, executionYear);
         if (role.equals("STUDENT") && degreeCode.startsWith(" ")) {
             return null;
         }
@@ -295,15 +179,15 @@ public class RequestCardUtils {
         if (campusAddr == null) {
             return null;
         }
-        String address1 = makeStringBlock(campusAddr.getAddress(), 50);
-        String address2 = makeStringBlock((IST_FULL_NAME + (degreeCode == null ? "" : " " + degreeCode)).trim(), 50);
+        String address1 = campusAddr.getAddress();
+        String address2 = (IST_FULL_NAME + (degreeCode == null ? "" : " " + degreeCode)).trim();
 
         String zipCode = campusAddr.getZip();
-        String town = makeStringBlock(campusAddr.getTown(), 30);
+        String town = campusAddr.getTown();
 
-        String homeCountry = makeStringBlock("", 10);
+        String homeCountry = "";
 
-        String residenceCountry = makeStringBlock(person.getUsername(), 10); // As stipulated this field will carry the istId instead.
+        String residenceCountry = person.getUsername(); // As stipulated this field will carry the istId instead.
 
         String expireDate = getExpireDate(executionYear);
 
@@ -312,152 +196,108 @@ public class RequestCardUtils {
         String curricularYear = "00";
         String executionYear_field = "00000000";
 
-        String unit = makeStringBlock("", 30); //Size changed from 11 to 30
+        String unit = ""; //Size changed from 11 to 30
         if (role.equals("TEACHER")) {
-            unit = makeStringBlock(person.getTeacher().getDepartment().getAcronym(), 30);
+            unit = person.getTeacher().getDepartment().getAcronym();
         }
 
-        String accessContrl = makeStringBlock("", 10);
+        String accessContrl = "";
 
         String expireData_AAMM = expireDate.substring(7) + "08"; //TODO
 
-        String templateCode = makeStringBlock("", 10); //TODO
+        String templateCode = ""; //TODO
 
-        String actionCode = makeStringBlock(action, 4); //TODO
+        String actionCode = action; //TODO
 
         String roleCode = getRoleCode(role);
 
-        String roleDesc = makeStringBlock(getRoleDescripriton(role), 20);
+        String roleDesc = getRoleDescripriton(role);
 
-        String idDocumentType = makeStringBlock("0", 1); // TODO
+        String idDocumentType = "0"; // TODO
 
-        String checkDigit = makeStringBlock("", 1); // TODO
+        String checkDigit = ""; // TODO
 
-        String cardType = makeStringBlock("00", 2); // TODO
+        String cardType = "00"; // TODO
 
-        String expedictionCode = makeStringBlock("00", 2); // TODO
+        String expedictionCode = "00"; // TODO
 
-        String detourAdress1 = makeStringBlock("", 50); // TODO
+        String detourAdress1 = ""; // TODO
 
-        String detourAdress2 = makeStringBlock("", 50); // TODO
+        String detourAdress2 = ""; // TODO
 
-        String detourAdress3 = makeStringBlock("", 50); // TODO
+        String detourAdress3 = ""; // TODO
 
-        String detourZipCode = makeStringBlock("", 8); // TODO
+        String detourZipCode = ""; // TODO
 
-        String detourTown = makeStringBlock("", 30); // TODO
+        String detourTown = ""; // TODO
 
-        String aditionalData = makeStringBlock("1", 1); // TODO
+        String aditionalData = "1"; // TODO
 
-        String cardName = makeStringBlock(names[0].toUpperCase() + " " + names[1].toUpperCase(), 40); // TODO
+        String cardName = names[0].toUpperCase() + " " + names[1].toUpperCase(); // TODO
 
-        String email = makeStringBlock("", 100); // TODO
+        String email = ""; // TODO
 
-        String phone = makeStringBlock("", 20); // TODO
+        String phone = ""; // TODO
 
-        String photoFlag = makeStringBlock("0", 1); // TODO
+        String photoFlag = "0"; // TODO
 
-        String photoRef = makeStringBlock("", 32); // TODO
+        String photoRef = ""; // TODO
 
-        String signatureFlag = makeStringBlock("0", 1); // TODO
+        String signatureFlag = "0"; // TODO
 
-        String signatureRef = makeStringBlock("", 32); // TODO
+        String signatureRef = ""; // TODO
 
-        String digCertificateFlag = makeStringBlock("0", 1); // TODO
+        String digCertificateFlag = "0"; // TODO
 
-        String digCertificateRef = makeStringBlock("", 32); // TODO
+        String digCertificateRef = ""; // TODO
 
-        String filler = makeStringBlock("", 682);
+        String filler = "";
 
-        line.add(recordType); //0
-        line.add(idNumber); //1
-        line.add(name); //2
-        line.add(surname); //3
-        line.add(middleNames); //4
-        line.add(address1); //5
-        line.add(address2); //6
-        line.add(zipCode); //7
-        line.add(town); //8
-        line.add(homeCountry); //9
-        line.add(residenceCountry); //10
-        line.add(expireDate); //11
-        line.add(degreeCode); //12
-        line.add(backNumber); //13
-        line.add(curricularYear); //14
-        line.add(executionYear_field); //15
-        line.add(unit); //16
-        line.add(accessContrl); //17
-        line.add(expireData_AAMM); //18
-        line.add(templateCode); //19
-        line.add(actionCode); //20
-        line.add(roleCode); //21
-        line.add(roleDesc); //22
-        line.add(idDocumentType); //23
-        line.add(checkDigit); //24
-        line.add(cardType); //25
-        line.add(expedictionCode); //26
-        line.add(detourAdress1); //27
-        line.add(detourAdress2); //28
-        line.add(detourAdress3); //29
-        line.add(detourZipCode); //30
-        line.add(detourTown); //31
-        line.add(aditionalData); //32
-        line.add(cardName); //33
-        line.add(email); //34
-        line.add(phone); //35
-        line.add(photoFlag); //36
-        line.add(photoRef); //37
-        line.add(signatureFlag); //38
-        line.add(signatureRef); //39
-        line.add(digCertificateFlag); //40
-        line.add(digCertificateRef); //41
-        line.add(filler); //42
+        values.add(recordType); //0
+        values.add(idNumber); //1
+        values.add(name); //2
+        values.add(surname); //3
+        values.add(middleNames); //4
+        values.add(address1); //5
+        values.add(address2); //6
+        values.add(zipCode); //7
+        values.add(town); //8
+        values.add(homeCountry); //9
+        values.add(residenceCountry); //10
+        values.add(expireDate); //11
+        values.add(degreeCode); //12
+        values.add(backNumber); //13
+        values.add(curricularYear); //14
+        values.add(executionYear_field); //15
+        values.add(unit); //16
+        values.add(accessContrl); //17
+        values.add(expireData_AAMM); //18
+        values.add(templateCode); //19
+        values.add(actionCode); //20
+        values.add(roleCode); //21
+        values.add(roleDesc); //22
+        values.add(idDocumentType); //23
+        values.add(checkDigit); //24
+        values.add(cardType); //25
+        values.add(expedictionCode); //26
+        values.add(detourAdress1); //27
+        values.add(detourAdress2); //28
+        values.add(detourAdress3); //29
+        values.add(detourZipCode); //30
+        values.add(detourTown); //31
+        values.add(aditionalData); //32
+        values.add(cardName); //33
+        values.add(email); //34
+        values.add(phone); //35
+        values.add(photoFlag); //36
+        values.add(photoRef); //37
+        values.add(signatureFlag); //38
+        values.add(signatureRef); //39
+        values.add(digCertificateFlag); //40
+        values.add(digCertificateRef); //41
+        values.add(filler); //42
 
-        logger.debug("recordType: " + recordType + " -- size: " + recordType.length());
-        logger.debug("idNumber: " + idNumber + " -- size: " + idNumber.length());
-        logger.debug("name: " + name + " -- size: " + name.length());
-        logger.debug("surname: " + surname + " -- size: " + surname.length());
-        logger.debug("middleNames: " + middleNames + " -- size: " + middleNames.length());
-        logger.debug("address1: " + address1 + " -- size: " + address1.length());
-        logger.debug("address2: " + address2 + " -- size: " + address2.length());
-        logger.debug("zipCode: " + zipCode + " -- size: " + zipCode.length());
-        logger.debug("town: " + town + " -- size: " + town.length());
-        logger.debug("homeCountry: " + homeCountry + " -- size: " + homeCountry.length());
-        logger.debug("residenceCountry: " + residenceCountry + " -- size: " + residenceCountry.length());
-        logger.debug("expireDate: " + expireDate + " -- size: " + expireDate.length());
-        logger.debug("degreeCode: " + degreeCode + " -- size: " + degreeCode.length());
-        logger.debug("backNumber: " + backNumber + " -- size: " + backNumber.length());
-        logger.debug("curricularYear: " + curricularYear + " -- size: " + curricularYear.length());
-        logger.debug("executionYear_field: " + executionYear_field + " -- size: " + executionYear_field.length());
-        logger.debug("unit: " + unit + " -- size: " + unit.length());
-        logger.debug("accessContrl: " + accessContrl + " -- size: " + accessContrl.length());
-        logger.debug("expireData_AAMM: " + expireData_AAMM + " -- size: " + expireData_AAMM.length());
-        logger.debug("templateCode: " + templateCode + " -- size: " + templateCode.length());
-        logger.debug("actionCode: " + actionCode + " -- size: " + actionCode.length());
-        logger.debug("roleCode: " + roleCode + " -- size: " + roleCode.length());
-        logger.debug("roleDesc: " + roleDesc + " -- size: " + roleDesc.length());
-        logger.debug("idDocumentType: " + idDocumentType + " -- size: " + idDocumentType.length());
-        logger.debug("checkDigit: " + checkDigit + " -- size: " + checkDigit.length());
-        logger.debug("cardType: " + cardType + " -- size: " + cardType.length());
-        logger.debug("expedictionCode: " + expedictionCode + " -- size: " + expedictionCode.length());
-        logger.debug("detourAdress1: " + detourAdress1 + " -- size: " + detourAdress1.length());
-        logger.debug("detourAdress2: " + detourAdress2 + " -- size: " + detourAdress2.length());
-        logger.debug("detourAdress3: " + detourAdress3 + " -- size: " + detourAdress3.length());
-        logger.debug("detourZipCode: " + detourZipCode + " -- size: " + detourZipCode.length());
-        logger.debug("detourTown: " + detourTown + " -- size: " + detourTown.length());
-        logger.debug("aditionalData: " + aditionalData + " -- size: " + aditionalData.length());
-        logger.debug("cardName: " + cardName + " -- size: " + cardName.length());
-        logger.debug("email: " + email + " -- size: " + email.length());
-        logger.debug("phone: " + phone + " -- size: " + phone.length());
-        logger.debug("photoFlag: " + photoFlag + " -- size: " + photoFlag.length());
-        logger.debug("photoRef: " + photoRef + " -- size: " + photoRef.length());
-        logger.debug("signatureFlag: " + signatureFlag + " -- size: " + signatureFlag.length());
-        logger.debug("signatureRef: " + signatureRef + " -- size: " + signatureRef.length());
-        logger.debug("digCertificateFlag: " + digCertificateFlag + " -- size: " + digCertificateFlag.length());
-        logger.debug("digCertificateRef: " + digCertificateRef + " -- size: " + digCertificateRef.length());
-        logger.debug("filler: " + filler + " -- size: " + filler.length());
-
-        return line;
+        return SantanderEntryUtils.generateLine(values);
     }
 
     private static String getRoleCode(String role) {
@@ -514,7 +354,6 @@ public class RequestCardUtils {
         if (roleType.equals("STUDENT") || roleType.equals("GRANT_OWNER")) {
             final PhdIndividualProgramProcess process = getPhdProcess(person);
             if (process != null) {
-                logger.debug("phdProcess: " + process.getExternalId());
                 return process.getPhdProgram().getAcronym();
             }
             final Degree degree = getDegree(person, executionYear);
@@ -706,21 +545,6 @@ public class RequestCardUtils {
         }
         String format = "%0" + size + "d";
         return String.format(format, number);
-    }
-
-    private static String makeStringBlock(String content, int size) {
-        int fillerLength = size - content.length();
-        if (fillerLength < 0) {
-            throw new DomainException("Content is bigger than string block.");
-        }
-        StringBuilder blockBuilder = new StringBuilder(size);
-        blockBuilder.append(content);
-
-        for (int i = 0; i < fillerLength; i++) {
-            blockBuilder.append(" ");
-        }
-
-        return blockBuilder.toString();
     }
 
     private static Map<String, CampusAddress> getCampi() {

@@ -22,7 +22,7 @@ import org.fenixedu.bennu.spring.BennuSpringModule;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 @EnableAsync
-@BennuSpringModule(basePackages = { "pt.ist.fenixedu.integration.ui.spring" }, bundles = "FenixEduIstIntegrationResources")
+@BennuSpringModule(basePackages = { "pt.ist.fenixedu.integration.ui.spring" }, bundles = {"FenixEduIstIntegrationResources", "APPLICATION_RESOURCES"})
 public class FenixEduIstIntegrationSpringConfiguration {
 
 }
