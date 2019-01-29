@@ -434,10 +434,10 @@ public class SapEvent {
     }
 
     public void registerReimbursementAdvancement(ExcessRefund excessRefund) {
-        excessRefund.getPartialPayments().stream().forEach(p -> registerReimbursementAdvancement(p));
+        excessRefund.getPartialPayments().stream().forEach(p -> registerReimbursementAdvancement(p, excessRefund));
     }
 
-    private SapRequest registerReimbursementAdvancement(PartialPayment partialPayment) {
+    private SapRequest registerReimbursementAdvancement(PartialPayment partialPayment, ExcessRefund excessRefund) {
         final List<SapRequest> paymentsFor = getAdvancementPaymentsFor(partialPayment.getCreditEntry().getId()).collect(Collectors.toList());
         if (paymentsFor.size() > 1) {
             throw new Error("More than one advancement payment was done with ID " +
@@ -455,6 +455,7 @@ public class SapEvent {
         String documentNumber = getDocumentNumber(data, true);
         SapRequest reimbursementRequest = new SapRequest(event, clientId, new Money(partialPayment.getAmount()), documentNumber, SapRequestType.REIMBURSEMENT, Money.ZERO, data);
         reimbursementRequest.setAdvancementRequest(advPayment);
+        reimbursementRequest.setRefund(FenixFramework.getDomainObject(excessRefund.getId()));
         return reimbursementRequest;
     }
 
