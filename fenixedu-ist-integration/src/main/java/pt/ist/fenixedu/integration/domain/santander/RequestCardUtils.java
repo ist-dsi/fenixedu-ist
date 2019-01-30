@@ -253,6 +253,8 @@ public class RequestCardUtils {
 
         String filler = "";
 
+        String endFlag = "1";
+
         values.add(recordType); //0
         values.add(idNumber); //1
         values.add(name); //2
@@ -296,6 +298,7 @@ public class RequestCardUtils {
         values.add(digCertificateFlag); //40
         values.add(digCertificateRef); //41
         values.add(filler); //42
+        values.add(endFlag);
 
         return SantanderEntryUtils.generateLine(values);
     }
