@@ -318,4 +318,14 @@ public class SapRequest extends SapRequest_Base {
         setIgnore(!getIgnore());
     }
 
+    @Atomic
+    public void consolidate() {
+        setSapRootFromConsolidated(SapRoot.getInstance());
+    }
+
+    @Atomic
+    public void revertConsolidation() {
+        setSapRootFromConsolidated(null);
+    }
+
 }

@@ -65,13 +65,18 @@ ${portal.toolkit()}
                                 <spring:message code="label.comment" text="Comment"/>
                             </th>
                             <th>
-                                <spring:message code="label.consolidated" text="Consolidated"/>
                             </th>
                         </tr>
                     </thead>
                     <tbody>
                         <c:forEach var="info" items="${internalPayments}">
-                            <tr>
+                            <c:if test="${ not empty info.sapRequest.sapRootFromConsolidated }">
+                                <c:set var="consolidated">consolidated</c:set>
+                            </c:if>
+                            <c:if test="${ empty info.sapRequest.sapRootFromConsolidated }">
+                                <c:set var="consolidated"></c:set>
+                            </c:if>
+                            <tr class="${consolidated}">
                                 <td>
                                     ${info.sapRequest.whenSent.toString('yyyy-MM-dd HH:mm:ss')}
                                 </td>
@@ -95,6 +100,22 @@ ${portal.toolkit()}
                                     ${info.accountingTransaction.transactionDetail.comments}
                                 </td>
                                 <td>
+                                    <c:if test="${ empty info.sapRequest.sapRootFromConsolidated }">
+                                        <form method="post" action="<%= request.getContextPath() %>/accounting-internalPayment/${info.sapRequest.externalId}/consolidate" class="form-horizontal">
+                                            ${csrf.field()}
+                                            <button class="btn btn-primary" type="submit">
+                                                <spring:message code="label.consolidate" text="Consolidate"/>
+                                            </button>
+                                        </form>                                        
+                                    </c:if>
+                                    <c:if test="${ not empty info.sapRequest.sapRootFromConsolidated }">
+                                        <form method="post" action="<%= request.getContextPath() %>/accounting-internalPayment/${info.sapRequest.externalId}/revertConsolidation" class="form-horizontal">
+                                            ${csrf.field()}
+                                            <button class="btn btn-danger" type="submit">
+                                                <spring:message code="label.consolidate.revert" text="Revert Consolidation"/>
+                                            </button>
+                                        </form>                                        
+                                    </c:if>
                                 </td>
                             </tr>
                         </c:forEach>                        
@@ -104,3 +125,11 @@ ${portal.toolkit()}
         </div>
     </div>
 </body>
+
+<style>
+<!--
+.consolidated {
+    background-color: #bfffbf;
+}
+-->
+</style>

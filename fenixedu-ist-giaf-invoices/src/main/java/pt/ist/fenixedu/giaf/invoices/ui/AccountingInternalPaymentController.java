@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -110,6 +111,20 @@ public class AccountingInternalPaymentController {
 
     private String toString(final DateTime dateTime) {
         return dateTime.toString(ISODateTimeFormat.dateTime());
+    }
+
+    @RequestMapping(value="/{sapRequest}/consolidate", method = RequestMethod.POST)
+    public String consolidate(final @PathVariable SapRequest sapRequest, final Model model) {
+        final DateTime whenSent = sapRequest.getWhenSent();
+        sapRequest.consolidate();
+        return "redirect:" + REQUEST_MAPPING + "/search?start=" + toString(whenSent.minusDays(2)) + "&end=" + toString(whenSent.plusDays(1));
+    }
+
+    @RequestMapping(value="/{sapRequest}/revertConsolidation", method = RequestMethod.POST)
+    public String revertConsolidation(final @PathVariable SapRequest sapRequest, final Model model) {
+        final DateTime whenSent = sapRequest.getWhenSent();
+        sapRequest.revertConsolidation();
+        return "redirect:" + REQUEST_MAPPING + "/search?start=" + toString(whenSent.minusDays(2)) + "&end=" + toString(whenSent.plusDays(1));
     }
 
 }
