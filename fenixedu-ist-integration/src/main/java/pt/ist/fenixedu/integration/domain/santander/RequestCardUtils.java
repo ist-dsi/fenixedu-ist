@@ -9,16 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
-
-import org.apache.cxf.endpoint.Client;
-import org.apache.cxf.frontend.ClientProxy;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
-import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
-import org.apache.cxf.transport.http.HTTPConduit;
-import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.ExecutionYear;
@@ -34,11 +24,12 @@ import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.RegistrationProtocol;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.domain.student.registrationStates.RegistrationState;
-import org.fenixedu.idcards.domain.SantanderPhotoEntry;
 import org.fenixedu.idcards.utils.SantanderEntryUtils;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.DateTime;
 import org.joda.time.YearMonthDay;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Strings;
@@ -49,9 +40,10 @@ import pt.ist.fenixedu.contracts.domain.accessControl.ActiveResearchers;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonContractSituation;
 import pt.ist.fenixedu.contracts.domain.util.CategoryType;
 import pt.ist.fenixframework.FenixFramework;
-import pt.sibscartoes.portal.wcf.tui.dto.TuiPhotoRegisterData;
 
 public class RequestCardUtils {
+
+    private static Logger logger = LoggerFactory.getLogger(RequestCardUtils.class);
 
     private static String alamedaAddr = "Avenida Rovisco Pais, 1";
     private static String alamedaZip = "1049-001";
@@ -298,7 +290,52 @@ public class RequestCardUtils {
         values.add(digCertificateFlag); //40
         values.add(digCertificateRef); //41
         values.add(filler); //42
-        values.add(endFlag);
+        values.add(endFlag); //43
+
+        logger.debug("recordType: " + recordType + "| size: " + recordType.length());
+        logger.debug("idNumber: " + idNumber + "| size: " + idNumber.length());
+        logger.debug("name: " + name + "| size: " + name.length());
+        logger.debug("surname: " + surname + "| size: " + surname.length());
+        logger.debug("middleNames: " + middleNames + "| size: " + middleNames.length());
+        logger.debug("address1: " + address1 + "| size: " + address1.length());
+        logger.debug("address2: " + address2 + "| size: " + address2.length());
+        logger.debug("zipCode: " + zipCode + "| size: " + zipCode.length());
+        logger.debug("town: " + town + "| size: " + town.length());
+        logger.debug("homeCountry: " + homeCountry + "| size: " + homeCountry.length());
+        logger.debug("residenceCountry: " + residenceCountry + "| size: " + residenceCountry.length());
+        logger.debug("expireDate: " + expireDate + "| size: " + expireDate.length());
+        logger.debug("degreeCode: " + degreeCode + "| size: " + degreeCode.length());
+        logger.debug("backNumber: " + backNumber + "| size: " + backNumber.length());
+        logger.debug("curricularYear: " + curricularYear + "| size: " + curricularYear.length());
+        logger.debug("executionYear_field: " + executionYear_field + "| size: " + executionYear_field.length());
+        logger.debug("unit: " + unit + "| size: " + unit.length());
+        logger.debug("accessContrl: " + accessControl + "| size: " + accessControl.length());
+        logger.debug("expireData_AAMM: " + expireData_AAMM + "| size: " + expireData_AAMM.length());
+        logger.debug("templateCode: " + templateCode + "| size: " + templateCode.length());
+        logger.debug("actionCode: " + actionCode + "| size: " + actionCode.length());
+        logger.debug("roleCode: " + roleCode + "| size: " + roleCode.length());
+        logger.debug("roleDesc: " + roleDesc + "| size: " + roleDesc.length());
+        logger.debug("idDocumentType: " + idDocumentType + "| size: " + idDocumentType.length());
+        logger.debug("checkDigit: " + checkDigit + "| size: " + checkDigit.length());
+        logger.debug("cardType: " + cardType + "| size: " + cardType.length());
+        logger.debug("expedictionCode: " + expedictionCode + "| size: " + expedictionCode.length());
+        logger.debug("detourAdress1: " + detourAdress1 + "| size: " + detourAdress1.length());
+        logger.debug("detourAdress2: " + detourAdress2 + "| size: " + detourAdress2.length());
+        logger.debug("detourAdress3: " + detourAdress3 + "| size: " + detourAdress3.length());
+        logger.debug("detourZipCode: " + detourZipCode + "| size: " + detourZipCode.length());
+        logger.debug("detourTown: " + detourTown + "| size: " + detourTown.length());
+        logger.debug("aditionalData: " + aditionalData + "| size: " + aditionalData.length());
+        logger.debug("cardName: " + cardName + "| size: " + cardName.length());
+        logger.debug("email: " + email + "| size: " + email.length());
+        logger.debug("phone: " + phone + "| size: " + phone.length());
+        logger.debug("photoFlag: " + photoFlag + "| size: " + photoFlag.length());
+        logger.debug("photoRef: " + photoRef + "| size: " + photoRef.length());
+        logger.debug("signatureFlag: " + signatureFlag + "| size: " + signatureFlag.length());
+        logger.debug("signatureRef: " + signatureRef + "| size: " + signatureRef.length());
+        logger.debug("digCertificateFlag: " + digCertificateFlag + "| size: " + digCertificateFlag.length());
+        logger.debug("digCertificateRef: " + digCertificateRef + "| size: " + digCertificateRef.length());
+        logger.debug("filler: " + filler + "| size: " + filler.length());
+        logger.debug("end_flag: " + endFlag + "| size: " + endFlag.length());
 
         return SantanderEntryUtils.generateLine(values);
     }

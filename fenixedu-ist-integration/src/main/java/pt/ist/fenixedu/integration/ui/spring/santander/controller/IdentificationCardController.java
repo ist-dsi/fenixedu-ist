@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
 import pt.ist.fenixedu.integration.ui.spring.santander.service.IdentificationCardService;
 
 @SpringApplication(group = "logged", path = "identification-card", title = "label.identification.card")
@@ -42,6 +43,6 @@ public class IdentificationCardController {
 
         identificationCardService.createRegister(person, ExecutionYear.readCurrentExecutionYear(), ACTION_NEW);
 
-        return "fenixedu-ist-integration/identificationCards/showCardInformation";
+        return "redirect:/identification-card";
     }
 }
