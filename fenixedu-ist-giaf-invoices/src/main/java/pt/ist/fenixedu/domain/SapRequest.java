@@ -294,23 +294,23 @@ public class SapRequest extends SapRequest_Base {
     }
 
     public boolean getCanBeCanceled() {
-        return getIntegrated() && !getIgnore() && getRequest().length() > 2 && getAnulledRequest() == null
+        return getIntegrated() && !getIgnore() && !isInitialization() && getAnulledRequest() == null
                 && getRequestType() != SapRequestType.DEBT && getRequestType() != SapRequestType.DEBT_CREDIT
                 && getRequestType() != SapRequestType.CREDIT && !isReferencedByOtherRequest();
     }
 
     public boolean getCanBeClosed() {
-        return getIntegrated() && !getIgnore() && getRequest().length() > 2 && getAnulledRequest() == null
+        return getIntegrated() && !getIgnore() && !isInitialization() && getAnulledRequest() == null
                 && (getRequestType() == SapRequestType.DEBT || getRequestType() == SapRequestType.INVOICE
                     || getRequestType() == SapRequestType.CREDIT) && !isReferencedByOtherRequest();
     }
 
     public boolean getCanBeRefunded() {
-        return getIntegrated() && !getIgnore() && getRequest().length() > 2 && (getRequestType() == SapRequestType.PAYMENT || getRequestType() == SapRequestType.ADVANCEMENT);
+        return getIntegrated() && !getIgnore() && !isInitialization() && (getRequestType() == SapRequestType.PAYMENT || getRequestType() == SapRequestType.ADVANCEMENT);
     }
 
     public Money openInvoiceValue() {
-        return getRequest().length() == 2 ? Money.ZERO : getValue().subtract(consumedAmount());
+        return isInitialization() ? Money.ZERO : getValue().subtract(consumedAmount());
     }
 
     @Atomic
@@ -318,4 +318,7 @@ public class SapRequest extends SapRequest_Base {
         setIgnore(!getIgnore());
     }
 
+    public boolean isInitialization() {
+        return getRequest().equals("{}");
+    }
 }
