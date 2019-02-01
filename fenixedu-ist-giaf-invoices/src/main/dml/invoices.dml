@@ -152,3 +152,12 @@ relation SapRequestRefund {
     	multiplicity 0..1;
     }
 }
+
+relation SapRootConsolidatedSapRequest {
+    SapRoot playsRole sapRootFromConsolidated {
+        multiplicity 0..1;
+    }
+    SapRequest playsRole consolidatedSapRequest {
+        multiplicity *;
+    }
+}

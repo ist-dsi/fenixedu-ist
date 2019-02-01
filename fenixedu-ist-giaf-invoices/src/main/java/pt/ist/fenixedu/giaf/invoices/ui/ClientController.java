@@ -108,16 +108,16 @@ public class ClientController {
                     if (line.length != 10) {
                         error(redirectAttributes, "label.error.file.upload.invalid.format.at.line", i+1, lines[i]);
                     } else {
-                        final String clientId = line[0];
-                        final String vatNumber = line[1];
-                        final String fiscalCountry = line[2];
-                        final String companyName = line[3];
-                        final String country = line[4];
-                        final String street = line[5];
-                        final String city = line[6];
-                        final String region = line[7];
-                        final String postalCode = line[8];
-                        final String nationality = line[9];
+                        final String clientId = line[0].trim();
+                        final String vatNumber = line[1].trim();
+                        final String fiscalCountry = line[2].trim();
+                        final String companyName = line[3].trim();
+                        final String country = line[4].trim();
+                        final String street = line[5].trim();
+                        final String city = line[6].trim();
+                        final String region = line[7].trim();
+                        final String postalCode = line[8].trim();
+                        final String nationality = line[9].trim();
 
                         if (fiscalCountry.length() != 2 || Country.readByTwoLetterCode(fiscalCountry) == null) {
                             error(redirectAttributes, "label.error.file.upload.invalid.country.at.line", i+1, fiscalCountry);
