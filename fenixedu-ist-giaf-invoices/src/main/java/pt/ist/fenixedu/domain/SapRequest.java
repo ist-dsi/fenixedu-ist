@@ -71,7 +71,21 @@ public class SapRequest extends SapRequest_Base {
         public String getProductDescription() {
             return json.get("productDescription").getAsString();
         }
-
+        public String getWorkingDocumentNumber() {
+            final JsonElement result;
+            final JsonElement workingDocument = json.get("workingDocument");
+            if (workingDocument != null && !workingDocument.isJsonNull()) {
+                result = workingDocument;
+            } else {
+                final JsonElement paymentDocument = json.get("paymentDocument");
+                if (paymentDocument != null && !paymentDocument.isJsonNull()) {
+                    result = paymentDocument;
+                } else {
+                    return null;
+                }
+            }
+            return result.getAsJsonObject().get("workingDocumentNumber").getAsString();
+        }
     }
 
     public static final Comparator<SapRequest> COMPARATOR_BY_DATE = new Comparator<SapRequest>() {
