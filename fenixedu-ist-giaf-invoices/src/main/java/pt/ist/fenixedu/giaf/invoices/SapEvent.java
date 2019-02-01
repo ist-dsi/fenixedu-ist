@@ -27,8 +27,6 @@ import org.fenixedu.academic.domain.accounting.EventType;
 import org.fenixedu.academic.domain.accounting.calculator.CreditEntry;
 import org.fenixedu.academic.domain.accounting.calculator.DebtInterestCalculator;
 import org.fenixedu.academic.domain.accounting.calculator.ExcessRefund;
-import org.fenixedu.academic.domain.accounting.calculator.Fine;
-import org.fenixedu.academic.domain.accounting.calculator.Interest;
 import org.fenixedu.academic.domain.accounting.calculator.PartialPayment;
 import org.fenixedu.academic.domain.accounting.calculator.Payment;
 import org.fenixedu.academic.domain.accounting.calculator.Refund;
@@ -77,6 +75,8 @@ public class SapEvent {
     private static final int MAX_SIZE_REGION = 50;
     private static final int MAX_SIZE_POSTAL_CODE = 20;
     private static final int MAX_SIZE_VAT_NUMBER = 20;
+    public static final String PROCESS_ID = "006";
+    public static final String IST_VAT_NUMBER = "501507930";
     public LocalDate currentDate = new LocalDate();
     public Event event = null;
 
@@ -240,7 +240,7 @@ public class SapEvent {
     }
 
     public void updateInvoiceWithNewClientData() {
-        for (final SapRequest sapRequest : getFilteredSapRequestStream().filter(r -> r.getRequest().length() > 2).collect(Collectors.toSet())) {
+        for (final SapRequest sapRequest : getFilteredSapRequestStream().filter(r -> !r.isInitialization()).collect(Collectors.toSet())) {
             updateInvoiceWithNewClientData(sapRequest);
         }
     }
@@ -370,7 +370,7 @@ public class SapEvent {
 
     public void registerReimbursement(Refund refund) {
         Money paymentsInSap = getFilteredSapRequestStream()
-            .filter(sr -> sr.getRequestType() == SapRequestType.INVOICE && sr.getRequest().length() > 2)
+            .filter(sr -> sr.getRequestType() == SapRequestType.INVOICE && !sr.isInitialization())
             .sorted(SapRequest.COMPARATOR_BY_EVENT_AND_ORDER)
             .map(sr -> registerReimbursement(sr, refund))
             .reduce(Money.ZERO, Money::add);
@@ -1119,7 +1119,7 @@ public class SapEvent {
         json.addProperty("taxCountry", "PT");
         json.addProperty("taxPercentage", "0");
         json.addProperty("auditFileVersion", "1.0.3");
-        json.addProperty("processId", "006");
+        json.addProperty("processId", PROCESS_ID);
         json.addProperty("businessName", "Técnico Lisboa");
         json.addProperty("companyName", "Instituto Superior Técnico");
         json.addProperty("companyId", "256241256");
@@ -1138,7 +1138,7 @@ public class SapEvent {
         json.addProperty("softwareCertificateNumber", 0);
         json.addProperty("taxAccountingBasis", "P");
         json.addProperty("taxEntity", "Global");
-        json.addProperty("taxRegistrationNumber", "501507930");
+        json.addProperty("taxRegistrationNumber", IST_VAT_NUMBER);
         return json;
     }
 

@@ -1,6 +1,6 @@
 package pt.ist.fenixedu.domain;
 
-enum pt.ist.fenixedu.domain.SapRequestType	as SapRequestType;
+enum pt.ist.fenixedu.domain.SapRequestType  as  SapRequestType;
 
 class SapRoot {
 	Long sapDocumentNumber;
@@ -22,6 +22,8 @@ class SapRequest {
 	String request;
 	Integer order;
 	boolean ignore;
+	RefundState refundState;
+	LocalDate refundStateDate;
 }
 
 class SapDocumentFile extends .org.fenixedu.bennu.io.domain.GenericFile {
