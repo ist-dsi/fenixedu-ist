@@ -196,12 +196,12 @@ public class RequestCardUtils {
         String curricularYear = "00";
         String executionYear_field = "00000000";
 
-        String unit = ""; //Size changed from 11 to 30
+        String unit = "";
         if (role.equals("TEACHER")) {
             unit = person.getTeacher().getDepartment().getAcronym();
         }
 
-        String accessContrl = "";
+        String accessControl = "";
 
         String expireData_AAMM = expireDate.substring(7) + "08"; //TODO
 
@@ -272,7 +272,7 @@ public class RequestCardUtils {
         values.add(curricularYear); //14
         values.add(executionYear_field); //15
         values.add(unit); //16
-        values.add(accessContrl); //17
+        values.add(accessControl); //17
         values.add(expireData_AAMM); //18
         values.add(templateCode); //19
         values.add(actionCode); //20
@@ -305,17 +305,17 @@ public class RequestCardUtils {
 
     private static String getRoleCode(String role) {
         switch (role) {
-        case "STUDENT":
-            return "01";
+            case "STUDENT":
+                return "01";
 
-        case "TEACHER":
-            return "02";
+            case "TEACHER":
+                return "02";
 
-        case "EMPLOYEE":
-            return "03";
+            case "EMPLOYEE":
+                return "03";
 
-        default:
-            return "99";
+            default:
+                return "99";
         }
     }
 
