@@ -12,15 +12,28 @@
 	<c:out value="${currentState}" />
 </c:if>
 
+<br />
+<br />
+
+<p><strong>Available actions</strong></p>
+
 <form action="${baseUrl}/request-card" method="post">
 	${csrf.field()}
-	<button id="bpi-form-submit-button" class="btn btn-primary" type="submit">
+    <label for="action">Acção</label>
+    <select name="action" id="action">
+        <c:forEach var="action" items="${availableActions}">
+            <option value="${action}">${action}</option>
+        </c:forEach>
+    </select>
+	<button class="btn btn-primary" type="submit">
 		<spring:message code="authorize.personal.data.access.submit"/>
 	</button>
 </form>
 
 <br />
 <br />
+
+<p><strong>Test actions</strong></p>
 
 <form action="${baseUrl}/request-card-test" method="post">
     ${csrf.field()}

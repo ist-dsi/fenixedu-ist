@@ -34,13 +34,20 @@ public class IdentificationCardController {
         Person person = AccessControl.getPerson();
 
         model.addAttribute("currentState", SantanderRequestCardService.getRegister(person));
+        model.addAttribute("availableActions", SantanderRequestCardService.getPersonAvailableActions(person));
 
         return "fenixedu-ist-integration/identificationCards/showCardInformation";
     }
 
     @RequestMapping(value = "/request-card", method = RequestMethod.POST)
-    public String requestCard() {
+    public String requestCard(Model model, String action) {
         Person person = AccessControl.getPerson();
+
+        if (!SantanderRequestCardService.getPersonAvailableActions(person).contains(action)) {
+            // TODO: Return with error? check?
+            model.addAttribute("error", String.format("Action %s not available", action));
+            return "redirect:/identification-card";
+        }
 
         identificationCardService.createRegister(person, ExecutionYear.readCurrentExecutionYear(), ACTION_NEW);
 
@@ -48,7 +55,7 @@ public class IdentificationCardController {
     }
 
     @RequestMapping(value = "/request-card-test", method = RequestMethod.POST)
-    public String requestCard(String action) {
+    public String requestCardTest(String action) {
         Person person = AccessControl.getPerson();
 
         identificationCardService.createRegister(person, ExecutionYear.readCurrentExecutionYear(), action);
