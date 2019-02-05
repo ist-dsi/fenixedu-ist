@@ -1306,13 +1306,18 @@ public class SapEvent {
                                          EventLogger elogger, String action) {
         JsonArray jsonArray = result.getAsJsonArray("documents");
         boolean checkStatus = true;
+        JsonArray errorMessages = new JsonArray();
         for (int iter = 0; iter < jsonArray.size(); iter++) {
             JsonObject json = jsonArray.get(iter).getAsJsonObject();
             if (!"S".equals(json.get("status").getAsString())) {
                 checkStatus = false;
                 String errorMessage = json.get("errorDescription").getAsString();
-                logError(event, errorLog, elogger, errorMessage, json.get("documentNumber").getAsString(), action, sapRequest);
+                JsonObject error = logError(event, errorLog, elogger, errorMessage, json.get("documentNumber").getAsString(), action, sapRequest);
+                errorMessages.add(error);
             }
+        }
+        if (errorMessages.size() != 0) {
+            sapRequest.addIntegrationMessage("Documento", errorMessages);
         }
         return checkStatus;
     }
@@ -1525,7 +1530,7 @@ public class SapEvent {
         sr.addIntegrationMessage("Cliente", errorMessage);
     }
 
-    private void logError(Event event, ErrorLogConsumer errorLog, EventLogger elogger, String errorMessage, String documentNumber,
+    private JsonObject logError(Event event, ErrorLogConsumer errorLog, EventLogger elogger, String errorMessage, String documentNumber,
                           String action, SapRequest sr) {
         BigDecimal amount = null;
         DebtCycleType cycleType = Utils.cycleType(event);
@@ -1546,7 +1551,7 @@ public class SapEvent {
         returnMessage.addProperty("Nº Documento", documentNumber);
         returnMessage.addProperty("Tipo Documento", action);
 
-        sr.addIntegrationMessage("Documento", returnMessage);
+        return returnMessage;
     }
 
     public boolean hasPendingDocumentCancelations() {
