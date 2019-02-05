@@ -6,13 +6,11 @@ import org.fenixedu.idcards.service.SantanderRequestCardService;
 import org.springframework.stereotype.Service;
 import pt.ist.fenixedu.integration.domain.santander.RequestCardUtils;
 
-import java.util.List;
-
 @Service
 public class IdentificationCardService {
 
-    public List<String> createRegister(Person person, ExecutionYear executionYear, String action) {
+    public void createRegister(Person person, ExecutionYear executionYear, String action) {
         String tuiEntry = RequestCardUtils.generateLine(person, executionYear, action);
-        return SantanderRequestCardService.createRegister(tuiEntry, person);
+        SantanderRequestCardService.createRegister(tuiEntry, person);
     }
 }
