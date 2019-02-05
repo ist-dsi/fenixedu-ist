@@ -1,17 +1,21 @@
 package pt.ist.fenixedu.integration.ui.spring.santander.controller;
 
-import org.fenixedu.academic.domain.Person;
+import java.util.List;
+
+import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.spring.portal.SpringApplication;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
+import org.fenixedu.idcards.domain.SantanderEntryNew;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import pt.ist.fenixedu.integration.ui.spring.santander.bean.UsernameBean;
+import pt.ist.fenixedu.integration.ui.spring.santander.bean.SantanderEntrySearchBean;
+import pt.ist.fenixedu.integration.ui.spring.santander.service.IdentificationCardService;
 
 @SpringApplication(group = "logged", path = "identification-card-log", title = "label.identification.card.log")
 @SpringFunctionality(app = IdentificationCardLogController.class, title = "label.identification.card.log")
@@ -19,32 +23,35 @@ import pt.ist.fenixedu.integration.ui.spring.santander.bean.UsernameBean;
 @RequestMapping("/identification-card-log")
 public class IdentificationCardLogController {
 
+    private IdentificationCardService identificationCardService;
+
+    @Autowired
+    public IdentificationCardLogController(IdentificationCardService identificationCardService) {
+        this.identificationCardService = identificationCardService;
+    }
+
     @RequestMapping(value = "", method = RequestMethod.GET)
     public String showRequests(Model model) {
 
-        model.addAttribute("usernameBean", new UsernameBean());
+        model.addAttribute("santanderEntrySearchBean", new SantanderEntrySearchBean());
+        model.addAttribute("executionYears", identificationCardService.getExecutionYears());
 
         return "fenixedu-ist-integration/identificationCards/searchUser";
     }
 
-    @RequestMapping(value = "/search-person", method = RequestMethod.POST)
-    public String searchUser(@ModelAttribute UsernameBean bean, Model model) {
-
+    @RequestMapping(value = "/search-entries", method = RequestMethod.POST)
+    public String searchUser(@ModelAttribute SantanderEntrySearchBean bean, Model model) {
         User user = User.findByUsername(bean.getUsername());
+        ExecutionYear executionYear = bean.getExecutionYear();
 
-        if (user == null) {
+        if (user == null && executionYear == null) {
             return "redirect:/identification-card-log";
         }
 
-        return "redirect:/identification-card-log/person/" + user.getPerson().getExternalId();
+        List<SantanderEntryNew> requests = bean.search();
+        
+        model.addAttribute("requests", requests);
+
+        return "fenixedu-ist-integration/identificationCards/showCardLog";
     }
-
-    @RequestMapping(value = "/person/{person}", method = RequestMethod.GET)
-    public String searchUser(@PathVariable Person person, Model model) {
-
-        //TODO
-
-        return "fenixedu-ist-integration/identificationCards/showCardInformation";
-    }
-
 }
