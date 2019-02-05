@@ -12,20 +12,27 @@
 	<c:out value="${currentState}" />
 </c:if>
 
-<c:if test="${not empty requests}">
-	<p><strong>Log</strong></p>
-
-	<div class="alert well" >
-		<c:forEach var="request" items="${requests}">
-			<c:set var="format" value="dd-MM-yyyy HH:mm" />
-			<c:out value="${request.createdAt.toString(format)}" />
-		</c:forEach>
-	</div>
-</c:if>
-
 <form action="${baseUrl}/request-card" method="post">
 	${csrf.field()}
 	<button id="bpi-form-submit-button" class="btn btn-primary" type="submit">
 		<spring:message code="authorize.personal.data.access.submit"/>
 	</button>
+</form>
+
+<br />
+<br />
+
+<form action="${baseUrl}/request-card-test" method="post">
+    ${csrf.field()}
+    <label for="action">Acção</label>
+    <select name="action" id="action">
+        <option value="NOVO">NOVO</option>
+        <option value="REMI">REMI</option>
+        <option value="RENU">RENU</option>
+        <option value="ATUA">ATUA</option>
+        <option value="CANC">CANC</option>
+    </select>
+    <button class="btn btn-primary" type="submit">
+        <spring:message code="authorize.personal.data.access.submit"/>
+    </button>
 </form>

@@ -5,7 +5,6 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.bennu.spring.portal.SpringApplication;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
-import org.fenixedu.idcards.domain.SantanderEntryNew;
 import org.fenixedu.idcards.service.SantanderRequestCardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -34,7 +33,6 @@ public class IdentificationCardController {
     public String showRequests(Model model) {
         Person person = AccessControl.getPerson();
 
-        model.addAttribute("requests", SantanderEntryNew.getSantanderEntryHistory(person));
         model.addAttribute("currentState", SantanderRequestCardService.getRegister(person));
 
         return "fenixedu-ist-integration/identificationCards/showCardInformation";
@@ -45,6 +43,15 @@ public class IdentificationCardController {
         Person person = AccessControl.getPerson();
 
         identificationCardService.createRegister(person, ExecutionYear.readCurrentExecutionYear(), ACTION_NEW);
+
+        return "redirect:/identification-card";
+    }
+
+    @RequestMapping(value = "/request-card-test", method = RequestMethod.POST)
+    public String requestCard(String action) {
+        Person person = AccessControl.getPerson();
+
+        identificationCardService.createRegister(person, ExecutionYear.readCurrentExecutionYear(), action);
 
         return "redirect:/identification-card";
     }
