@@ -121,8 +121,6 @@ public class ClientController {
 
                         if (fiscalCountry.length() != 2 || Country.readByTwoLetterCode(fiscalCountry) == null) {
                             error(redirectAttributes, "label.error.file.upload.invalid.country.at.line", i+1, fiscalCountry);
-                        } else if (!TINValidator.isValid(fiscalCountry, vatNumber)) {
-                                error(redirectAttributes, "label.error.file.upload.invalid.tinNumber.at.line", i+1, fiscalCountry, vatNumber);
                         } else if (!PostalCodeValidator.isValidAreaCode(fiscalCountry, postalCode)) {
                             error(redirectAttributes, "label.error.file.upload.invalid.postCode.at.line", i+1, fiscalCountry, postalCode);
                         } else {
