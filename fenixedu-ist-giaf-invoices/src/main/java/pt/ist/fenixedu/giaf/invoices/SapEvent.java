@@ -288,20 +288,13 @@ public class SapEvent {
         List<SapRequest> openDebts = openDebtsAndRemainingValue.getKey();
         Money remainingAmount = openDebtsAndRemainingValue.getValue();
         final Money amountToRegister = new Money(creditEntry.getUsedAmountInDebts());
-        if (creditEntry.getAmount().compareTo(remainingAmount.getAmount()) == 1) {
+        if (amountToRegister.greaterThan(remainingAmount)) {
             if (openDebts.size() > 1) {
                 // dividir o valor da isenção pelas várias dívidas
                 registerDebtCreditList(event, openDebts, amountToRegister, creditEntry, remainingAmount,
                         clientId, isNewDate);
             } else {
-                // o valor da isenção é superior ao valor em dívida
-                SapRequest debt;
-                if (openDebts.size() == 1) { // mas só existe uma dívida abertura
-                    debt = openDebts.get(0);
-                } else { // não existe nenhuma dívida aberta, ir buscar a última
-                    debt = getLastDebt();
-                }
-                registerDebtCredit(clientId, event, amountToRegister, creditEntry, debt, isNewDate);
+                throw new Error("There is no open debt to credit exemption: " + creditEntry.getId() + " for event: " + event.getExternalId());
             }
         } else {
             //tudo normal
@@ -317,7 +310,7 @@ public class SapEvent {
                 registerDebtCreditList(event, openDebts.subList(1, openDebts.size()), amountToRegister.subtract(remainingAmount),
                         creditEntry, openDebts.get(1).getValue(), clientId, isNewDate);
             } else {
-                registerDebtCredit(clientId, event, amountToRegister, creditEntry, openDebts.get(0), isNewDate);
+                throw new Error("There is no open debt to credit exemption: " + creditEntry.getId() + " for event: " + event.getExternalId());
             }
         } else {
             registerDebtCredit(clientId, event, amountToRegister, creditEntry, openDebts.get(0), isNewDate);
@@ -338,13 +331,20 @@ public class SapEvent {
     }
 
     public void registerCredit(Event event, CreditEntry creditEntry, boolean isGratuity) {
+        Money amountToCredit = new Money(creditEntry.getUsedAmountInDebts());
+        if (!amountToCredit.isPositive()) {
+            throw new Error("There is no debt value for the debt exemption: " + creditEntry.getId() + " for event: " + event.getExternalId());
+        }
+
         // diminuir divida no sap (se for propina diminuir dívida) e credit note na última factura existente
         if (isToProcessDebt(isGratuity, true, new DateTime())) {
             registerDebtCredit(creditEntry, event, false);
         }
 
         final SortedMap<SapRequest, Money> openInvoices = getOpenInvoicesAndRemainingValue();
-        Money amountToCredit = new Money(creditEntry.getUsedAmountInDebts());
+        if (openInvoices.isEmpty()) {
+            throw new Error("There is no open invoice to credit exemption: " + creditEntry.getId() + " for event: " + event.getExternalId());
+        }
         for (final Entry<SapRequest, Money> entry : openInvoices.entrySet()) {
             if (amountToCredit.isPositive()) {
                 final SapRequest invoice = entry.getKey();
@@ -354,6 +354,10 @@ public class SapEvent {
                 registerCredit(event, creditEntry, amountForInvoice, invoice);
                 amountToCredit = amountToCredit.subtract(amountForInvoice);
             }
+        }
+        if (amountToCredit.isPositive()) {
+            throw new Error("Trying to credit more value than existing open invoices for exemption: " + creditEntry.getId()
+                    + " for event: " + event.getExternalId());
         }
     }
 
