@@ -3,6 +3,7 @@ package pt.ist.fenixedu.domain;
 import java.util.Comparator;
 import java.util.Optional;
 
+import com.google.gson.JsonArray;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.util.Money;
 import org.joda.time.DateTime;
@@ -143,7 +144,7 @@ public class SapRequest extends SapRequest_Base {
         return message == null || message.isEmpty() ? new JsonObject() : new JsonParser().parse(message).getAsJsonObject();
     }
 
-    public void addIntegrationMessage(final String key, final JsonObject message) {
+    public void addIntegrationMessage(final String key, final JsonElement message) {
         final JsonObject messages = getIntegrationMessageAsJson();
         messages.add(key, message);
         setIntegrationMessage(messages.toString());
