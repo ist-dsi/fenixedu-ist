@@ -163,10 +163,8 @@ public class SapRequest extends SapRequest_Base {
         setOriginalRequest(null);
         setPayment(null);
         setRefund(null);
-        final SapDocumentFile documentFile = getSapDocumentFile();
-        if (documentFile != null) {
-            documentFile.delete();
-        }
+        setAdvancementRequest(null);
+        setReimbursementRequest(null);
         setSapRoot(null);
         deleteDomainObject();
     }
