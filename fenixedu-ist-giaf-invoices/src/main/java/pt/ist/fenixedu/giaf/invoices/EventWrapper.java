@@ -1,11 +1,11 @@
 package pt.ist.fenixedu.giaf.invoices;
 
+import java.time.Year;
+
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.util.Money;
 import org.joda.time.DateTime;
-
-import java.time.Year;
 
 public class EventWrapper {
 
@@ -28,6 +28,7 @@ public class EventWrapper {
 
     public static boolean shouldProcess(final ErrorLogConsumer consumer, final Event event) {
         return event.getSapRequestSet().stream().allMatch(r -> r.getIntegrated())
+                && allAdvancementFromRefundSapIntegration(event)
                 && (needsProcessingSap(event) || needsToProcessPayments(event))
                 && Utils.validate(consumer, event);
     }
@@ -58,4 +59,13 @@ public class EventWrapper {
     public boolean isGratuity() {
         return this.event.isGratuity();
     }
+
+    private static boolean allAdvancementFromRefundSapIntegration(final Event event) {
+        final boolean pendingIntegration = event.getAccountingTransactionsSet().stream()
+            .map(tx -> tx.getRefund())
+            .filter(r -> r != null)
+            .anyMatch(r -> r.getSapRequestSet().isEmpty() || r.getSapRequestSet().stream().anyMatch(sr -> !sr.getIntegrated()));
+        return !pendingIntegration;
+    }
+
 }
