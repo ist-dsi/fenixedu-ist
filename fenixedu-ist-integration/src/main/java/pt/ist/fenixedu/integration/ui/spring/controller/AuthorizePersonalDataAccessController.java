@@ -154,7 +154,7 @@ public class AuthorizePersonalDataAccessController {
     @RequestMapping(value = "santander-card", method = RequestMethod.GET)
     public String santanderCardAuthorization(HttpServletRequest request, Model model) {
         if (checkCardDataAuthorizationWorkflowComplete()) {
-            return "redirect://authorize-personal-data-access/review";
+            return "redirect:/authorize-personal-data-access/review";
         }
 
         return checkAuthorizationDetails(model, dataService.getSantanderCardTitle(), dataService.getSantanderCardMessage());
@@ -170,7 +170,7 @@ public class AuthorizePersonalDataAccessController {
     @RequestMapping(value = "/cgd-card", method = RequestMethod.GET)
     public String cgdCardAuthorization(Model model) {
         if (checkCardDataAuthorizationWorkflowComplete()) {
-            return "redirect://authorize-personal-data-access/review";
+            return "redirect:/authorize-personal-data-access/review";
         }
 
         return checkAuthorizationDetails(model, dataService.getCgdCardTitle(), dataService.getCgdCardMessage());
@@ -186,7 +186,7 @@ public class AuthorizePersonalDataAccessController {
     @RequestMapping(value = "/bpi-card", method = RequestMethod.GET)
     public String bpiCardAuthorization(Model model) {
         if (checkCardDataAuthorizationWorkflowComplete()) {
-            return "redirect://authorize-personal-data-access/review";
+            return "redirect:/authorize-personal-data-access/review";
         }
 
         return "redirect:/authorize-personal-data-access/santander-bank";
@@ -203,7 +203,7 @@ public class AuthorizePersonalDataAccessController {
     public String santanderBankAuthorization(Model model, RedirectAttributes redirectAttributes, @RequestParam(defaultValue =
             "") String candidacy) {
         if (checkCardDataAuthorizationWorkflowComplete()) {
-            return "redirect://authorize-personal-data-access/review";
+            return "redirect:/authorize-personal-data-access/review";
         }
         model.addAttribute("candidacy", candidacy);
         return chooseAuthorizationDetails(model, dataService.getSantanderBankTitle(), dataService.getSantanderBankMessage());
@@ -223,7 +223,7 @@ public class AuthorizePersonalDataAccessController {
     @RequestMapping(value = "/cgd-bank", method = RequestMethod.GET)
     public String cgdBankAuthorization(Model model, @ModelAttribute("candidacy") String candidacy) {
         if (checkCardDataAuthorizationWorkflowComplete()) {
-            return "redirect://authorize-personal-data-access/review";
+            return "redirect:/authorize-personal-data-access/review";
         }
         
         model.addAttribute("candidacy", candidacy);
@@ -242,7 +242,7 @@ public class AuthorizePersonalDataAccessController {
     @RequestMapping(value = "/bpi-bank", method = RequestMethod.GET)
     public String bpiBankAuthorization(Model model, @ModelAttribute("candidacy") String candidacy) {
         if (checkCardDataAuthorizationWorkflowComplete()) {
-            return "redirect://authorize-personal-data-access/review";
+            return "redirect:/authorize-personal-data-access/review";
         }
         model.addAttribute("candidacy", candidacy);
         return chooseAuthorizationDetails(model, dataService.getBpiBankTitle(), dataService.getBpiBankMessage());
