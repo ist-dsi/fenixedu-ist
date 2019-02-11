@@ -33,6 +33,7 @@ public class ReportNotConfirmedMarksheets extends CronTask {
     @Override
     public void runTask() throws Exception {
         final Spreadsheet spreadsheet = new Spreadsheet("PautasPorConfirmar");
+        spreadsheet.setHeader("Periodo\t");
         spreadsheet.setHeader("Plano Curricular\t");
         spreadsheet.setHeader("Unidade Curricular\t");
         spreadsheet.setHeader("IstID Responsável\t");
@@ -41,6 +42,7 @@ public class ReportNotConfirmedMarksheets extends CronTask {
         for (final MarkSheet markSheet : Bennu.getInstance().getMarkSheetsSet()) {
             if (markSheet.isNotConfirmed()) {
                 final Row row = spreadsheet.addRow();
+                row.setCell(markSheet.getExecutionPeriod().getQualifiedName());
                 row.setCell(markSheet.getCurricularCourse().getDegreeCurricularPlan().getName());
                 row.setCell(markSheet.getCurricularCourse().getName());
                 row.setCell(markSheet.getResponsibleTeacher().getPerson().getUsername());

@@ -42,6 +42,7 @@ public class ReportCoursesWithoutMarksheet extends CronTask {
     @Override
     public void runTask() throws Exception {
         final Spreadsheet spreadsheet = new Spreadsheet("DisciplinasSemPauta");
+        spreadsheet.setHeader("Periodo\t");
         spreadsheet.setHeader("Plano Curricular\t");
         spreadsheet.setHeader("Unidade Curricular\t");
         spreadsheet.setHeader("IstID Responsável\t");
@@ -56,6 +57,7 @@ public class ReportCoursesWithoutMarksheet extends CronTask {
                         curricularCourses.add(curricularCourse);
                         final Person responsible = findResponsible(enrolment);
                         final Row row = spreadsheet.addRow();
+                        row.setCell(executionSemester.getQualifiedName());
                         row.setCell(curricularCourse.getDegreeCurricularPlan().getName());
                         row.setCell(curricularCourse.getName());
                         row.setCell(responsible == null ? "" : responsible.getUsername());
