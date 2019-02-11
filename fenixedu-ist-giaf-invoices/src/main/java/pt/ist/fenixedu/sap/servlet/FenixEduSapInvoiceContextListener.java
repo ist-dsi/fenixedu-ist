@@ -44,8 +44,9 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
         Event.canBeRefunded = (event) -> {
             final DebtInterestCalculator calculator = event.getDebtInterestCalculator(new DateTime());
             return calculator.getPayments().count() > 0 && calculator.getPayments()
-                .map(p -> (AccountingTransaction) FenixFramework.getDomainObject(p.getId()))
-                .allMatch(t -> event.getSapRequestSet().stream().anyMatch(sr -> sr.getPayment() == t && sr.getCanBeRefunded()));
+                    .allMatch(p -> p.getDate().getYear() >= 2018);
+//                .map(p -> (AccountingTransaction) FenixFramework.getDomainObject(p.getId()))
+//                .allMatch(t -> event.getSapRequestSet().stream().anyMatch(sr -> sr.getPayment() == t && sr.getCanBeRefunded()));
         };
 
         if (GiafInvoiceConfiguration.getConfiguration().sapSyncActive()) {
