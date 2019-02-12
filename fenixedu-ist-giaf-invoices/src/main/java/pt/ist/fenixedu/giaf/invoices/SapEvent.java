@@ -25,6 +25,7 @@ import org.fenixedu.academic.domain.accounting.AccountingTransactionDetail;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.EventType;
 import org.fenixedu.academic.domain.accounting.calculator.CreditEntry;
+import org.fenixedu.academic.domain.accounting.calculator.DebtExemption;
 import org.fenixedu.academic.domain.accounting.calculator.DebtInterestCalculator;
 import org.fenixedu.academic.domain.accounting.calculator.ExcessRefund;
 import org.fenixedu.academic.domain.accounting.calculator.PartialPayment;
@@ -372,11 +373,11 @@ public class SapEvent {
         return sapRequest;
     }
 
-    public void registerReimbursement(Refund refund) {
-        Money paymentsInSap = getFilteredSapRequestStream()
+    public void registerReimbursement(final Refund refund, final DebtExemption debtExemption) {
+        final Money paymentsInSap = getFilteredSapRequestStream()
             .filter(sr -> sr.getRequestType() == SapRequestType.INVOICE && !sr.isInitialization())
             .sorted(SapRequest.COMPARATOR_BY_EVENT_AND_ORDER)
-            .map(sr -> registerReimbursement(sr, refund))
+            .map(sr -> registerReimbursement(sr, refund, debtExemption))
             .reduce(Money.ZERO, Money::add);
 
         if(!refund.getAmount().equals(paymentsInSap.getAmount())){
@@ -385,7 +386,7 @@ public class SapEvent {
         }
     }
 
-    private Money registerReimbursement(final SapRequest sapInvoiceRequest, final Refund refund) {
+    private Money registerReimbursement(final SapRequest sapInvoiceRequest, final Refund refund, final DebtExemption debtExemption) {
         checkValidDocumentNumber(sapInvoiceRequest.getDocumentNumber(), event);
 
         final String clientId = ClientMap.uVATNumberFor(event.getParty());
@@ -405,6 +406,7 @@ public class SapEvent {
             final String documentNumber = getDocumentNumber(jsonCredit, true);
             final SapRequest sapRequestNA = new SapRequest(event, clientId, openInvoiceValue, documentNumber, SapRequestType.CREDIT, Money.ZERO, jsonCredit);
             sapRequestNA.setRefund(domainRefund);
+            sapRequestNA.setCreditId(debtExemption.getId());
         } else {
             final JsonObject data = toJsonReimbursement(event, payedAmount, openInvoiceValue, sapInvoiceRequest, false, true);
             final String documentNumber = getDocumentNumber(data, true);
@@ -416,6 +418,7 @@ public class SapEvent {
             creditNoteRequest.setSent(true);
             creditNoteRequest.setIntegrated(true);
             creditNoteRequest.setRefund(domainRefund);
+            creditNoteRequest.setCreditId(debtExemption.getId());
         }
         return payedAmount;
     }

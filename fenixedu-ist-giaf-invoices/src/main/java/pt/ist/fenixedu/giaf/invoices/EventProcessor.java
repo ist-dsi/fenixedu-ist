@@ -1,23 +1,20 @@
 package pt.ist.fenixedu.giaf.invoices;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
 
-import com.google.common.base.Strings;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.calculator.AccountingEntry;
 import org.fenixedu.academic.domain.accounting.calculator.CreditEntry;
 import org.fenixedu.academic.domain.accounting.calculator.DebtExemption;
 import org.fenixedu.academic.domain.accounting.calculator.DebtInterestCalculator;
 import org.fenixedu.academic.domain.accounting.calculator.ExcessRefund;
-import org.fenixedu.academic.domain.accounting.calculator.PartialPayment;
 import org.fenixedu.academic.domain.accounting.calculator.Payment;
 import org.fenixedu.academic.domain.accounting.calculator.Refund;
 import org.fenixedu.academic.util.Money;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
+
+import com.google.common.base.Strings;
 
 import pt.ist.esw.advice.pt.ist.fenixframework.AtomicInstance;
 import pt.ist.fenixframework.Atomic;
@@ -94,41 +91,52 @@ public class EventProcessor {
                 }
             }
 
-            DebtInterestCalculator calculator = event.getDebtInterestCalculator(new DateTime());
-            for (AccountingEntry accountingEntry : calculator.getAccountingEntries()) {
+            final DebtInterestCalculator calculator = event.getDebtInterestCalculator(new DateTime());
+            for (final AccountingEntry accountingEntry : calculator.getAccountingEntries()) {
                 if (accountingEntry instanceof Payment && accountingEntry.getAmount().compareTo(BigDecimal.ZERO) > 0
                         && !sapEvent.hasPayment(accountingEntry.getId())
                         && accountingEntry.getCreated().isAfter(EventWrapper.SAP_TRANSACTIONS_THRESHOLD)) {
-                    Payment payment = (Payment) accountingEntry;
+                    final Payment payment = (Payment) accountingEntry;
                     if(Strings.isNullOrEmpty(payment.getRefundId())) {
                         sapEvent.registerPayment((CreditEntry) accountingEntry);
                     } else {
                         sapEvent.registerAdvancementInPayment(payment);
                     }
-                }  else if (accountingEntry instanceof DebtExemption) {
+                } else if (accountingEntry instanceof DebtExemption) {
                     if (accountingEntry.getAmount().compareTo(BigDecimal.ZERO) > 0 && !sapEvent.hasCredit(accountingEntry.getId())
                             && accountingEntry.getCreated().isAfter(EventWrapper.SAP_TRANSACTIONS_THRESHOLD)) {
                         sapEvent.registerCredit(event, (CreditEntry) accountingEntry, eventWrapper.isGratuity());
                     }
                 } else if (accountingEntry instanceof Refund && !sapEvent.hasRefund(accountingEntry.getId())) {
                     //Reimbursements
-                    Refund refund = (Refund) accountingEntry;
-                    sapEvent.registerReimbursement(refund);
+                    final Refund refund = (Refund) accountingEntry;
+                    final DebtExemption debtExemption = findDebtExemptionfor(calculator, refund);
+                    sapEvent.registerReimbursement(refund, debtExemption);
                 } else if (accountingEntry instanceof ExcessRefund && !sapEvent.hasRefund(accountingEntry.getId())) {
                     //Reimbursements
-                    ExcessRefund excessRefund = (ExcessRefund) accountingEntry;
+                    final ExcessRefund excessRefund = (ExcessRefund) accountingEntry;
                     if (Strings.isNullOrEmpty(excessRefund.getTargetPaymentId())) {
                         sapEvent.registerReimbursementAdvancement(excessRefund);
                     }
                 }
-        }
-
+            }
         } else {
             //processing payments of past events
             DebtInterestCalculator calculator = event.getDebtInterestCalculator(new DateTime());
             calculator.getPayments().filter(p -> !sapEvent.hasPayment(p.getId()) && p.getCreated().isAfter(EventWrapper.SAP_TRANSACTIONS_THRESHOLD))
                     .forEach(p -> sapEvent.registerPastPayment(p));
         }
+    }
+
+    private static DebtExemption findDebtExemptionfor(final DebtInterestCalculator calculator, final Refund refund) {
+        AccountingEntry previousAccountingEntry = null;
+        for (final AccountingEntry accountingEntry : calculator.getAccountingEntries()) {
+            if (accountingEntry instanceof DebtExemption && previousAccountingEntry == refund) {
+                return (DebtExemption) accountingEntry;
+            }
+            previousAccountingEntry = accountingEntry;
+        }
+        return null;
     }
 
     static CreditEntry getCreditEntry(final Money creditAmount) {
