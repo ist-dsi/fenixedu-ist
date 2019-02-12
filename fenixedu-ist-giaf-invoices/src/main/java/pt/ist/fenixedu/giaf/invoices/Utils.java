@@ -119,6 +119,10 @@ public class Utils {
                 return false;
             }
         }
+        if (isEventAlreadyProcessed(event)) {
+            return true;
+        }
+
         final Party party = event.getParty();
         final String eventDescription;
         try {
@@ -195,6 +199,27 @@ public class Utils {
     private static boolean isToIgnoreNIF(Party party) {
         return FCT_NIF.equalsIgnoreCase(party.getSocialSecurityNumber())
                 || ("PT" + FCT_NIF).equals(party.getSocialSecurityNumber());
+    }
+
+    private static boolean isEventAlreadyProcessed(Event event) {
+        if (event.getSapRequestSet().isEmpty()) {
+            return false;
+        }
+        SapEvent sapEvent = new SapEvent(event);
+        final boolean paymentsProcessed = event.getAdjustedTransactions().stream().allMatch(tx -> sapEvent.hasPayment(tx.getExternalId()));
+        if (!paymentsProcessed) {
+            return false;
+        }
+        final boolean exemptionsProcessed = event.getExemptionsSet().stream().filter(e -> !e.isPenaltyExemption())
+                .allMatch(ex -> sapEvent.hasCredit(ex.getExternalId()));
+        if (!exemptionsProcessed) {
+            return false;
+        }
+        final boolean refundsProcessed = event.getRefundSet().stream().allMatch(r -> sapEvent.hasRefund(r.getExternalId()));
+        if (!refundsProcessed) {
+            return false;
+        }
+        return true;
     }
 
     public static String getUserIdentifier(Party party) {
