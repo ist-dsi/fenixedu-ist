@@ -1,6 +1,7 @@
 package pt.ist.fenixedu.integration.ui.spring.santander.bean;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,13 +50,13 @@ public class SantanderEntrySearchBean {
         if (user != null) {
             List<SantanderEntryNew> entries = SantanderEntryNew.getSantanderEntryHistory(user.getPerson());
             santanderEntryNews.addAll(entries);
+            Collections.reverse(santanderEntryNews);
         } else if (executionYear != null) {
             List<SantanderEntryNew> entries = Bennu.getInstance().getSantanderEntriesNewSet().stream()
                     .filter(sen -> sen.getExecutionYear().equals(executionYear))
-                    .sorted(SantanderEntryNew.COMPARATOR_BY_CREATED_DATE).collect(Collectors.toList());
+                    .sorted(SantanderEntryNew.REVERSE_COMPARATOR_BY_CREATED_DATE).collect(Collectors.toList());
             santanderEntryNews.addAll(entries);
         }
-
         return santanderEntryNews;
     }
 

@@ -1,6 +1,5 @@
 package pt.ist.fenixedu.integration.ui.spring.santander.service;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,6 +21,6 @@ public class IdentificationCardService {
 
     public List<ExecutionYear> getExecutionYears() {
         return Bennu.getInstance().getSantanderEntriesNewSet().stream().map(sen -> sen.getExecutionYear()).distinct()
-                .sorted(Comparator.reverseOrder()).collect(Collectors.toList());
+                .sorted(ExecutionYear.REVERSE_COMPARATOR_BY_YEAR).collect(Collectors.toList());
     }
 }

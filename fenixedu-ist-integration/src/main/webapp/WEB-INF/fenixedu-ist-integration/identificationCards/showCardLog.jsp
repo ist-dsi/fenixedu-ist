@@ -4,7 +4,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="joda" uri="http://www.joda.org/joda/time/tags" %>
 
-<h2 class="santanderTitle"><spring:message code="subtitle.santander.cards"/></h2>
+<h2 class="santanderTitle"><spring:message code="subtitle.santander.cards" text="Santander Cards"/></h2>
 
 <br>
 <br>
@@ -13,11 +13,11 @@
 	<table class="table tdmiddle">
 		<thead>
 			<tr>
-				<th><spring:message code="Identification"/></th><!-- TODO -->
-				<th><spring:message code="Name"/></th><!-- TODO -->
-				<th><spring:message code="Request Date"/></th><!-- TODO -->
-				<th><spring:message code="Request Successful"/></th><!-- TODO -->
-				<th><spring:message code="Error Message"/></th><!-- TODO -->
+				<th><spring:message code="label.santander.entry.new.request.person.identification" text="Identification"/></th>
+				<th><spring:message code="label.santander.entry.new.request.person.name" text="Name"/></th>
+				<th><spring:message code="label.santander.entry.new.request.creation.date" text="Request Date"/></th>
+				<th><spring:message code="label.santander.entry.new.request.error.flag" text="Request Successful"/></th>
+				<th><spring:message code="label.santander.entry.new.request.error.message" text="Error Message"/></th>
 				<th></th>
 			</tr>
 		</thead>
