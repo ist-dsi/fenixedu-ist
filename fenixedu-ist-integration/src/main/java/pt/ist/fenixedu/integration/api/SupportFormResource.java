@@ -272,6 +272,9 @@ public class SupportFormResource extends BennuRestResource {
         }
 
         public String getSupportEmail() {
+            if (!Strings.isNullOrEmpty(exceptionInfo)) {
+                return CoreConfiguration.getConfiguration().defaultSupportEmailAddress();
+            }
             if (Strings.isNullOrEmpty(support)) {
                 return getFunctionality().getSupport() != null ? getFunctionality().getSupport()
                         .getEmailAddress() : CoreConfiguration.getConfiguration().defaultSupportEmailAddress();
