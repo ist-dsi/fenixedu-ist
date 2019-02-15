@@ -1,5 +1,7 @@
 package pt.ist.fenixedu.integration.ui.spring.santander.controller;
 
+import java.util.List;
+
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.predicate.AccessControl;
@@ -33,7 +35,11 @@ public class IdentificationCardController {
     public String showRequests(Model model) {
         Person person = AccessControl.getPerson();
 
-        model.addAttribute("currentState", SantanderRequestCardService.getRegister(person));
+        List<String> status = SantanderRequestCardService.getRegister(person);
+
+        String formatedStatus = status.get(1) + " : " + status.get(0) + " - " + status.get(2);
+
+        model.addAttribute("currentState", formatedStatus);
         model.addAttribute("availableActions", SantanderRequestCardService.getPersonAvailableActions(person));
 
         return "fenixedu-ist-integration/identificationCards/showCardInformation";
@@ -43,6 +49,7 @@ public class IdentificationCardController {
     public String requestCard(Model model, String action) {
         Person person = AccessControl.getPerson();
 
+        System.out.println(action);
         if (!SantanderRequestCardService.getPersonAvailableActions(person).contains(action)) {
             // TODO: Return with error? check?
             model.addAttribute("error", String.format("Action %s not available", action));

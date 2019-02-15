@@ -162,17 +162,14 @@ public class RequestCardUtils {
         String surname = names[1];
         String middleNames = names[2];
 
-        String degreeCode = getDegreeDescription(person, role, executionYear);
-        if (role.equals("STUDENT") && degreeCode.startsWith(" ")) {
-            return null;
-        }
+        String degreeCode = "";
 
         CampusAddress campusAddr = getCampusAddress(person, role);
         if (campusAddr == null) {
             return null;
         }
         String address1 = campusAddr.getAddress();
-        String address2 = (IST_FULL_NAME + (degreeCode == null ? "" : " " + degreeCode)).trim();
+        String address2 = IST_FULL_NAME;
 
         String zipCode = campusAddr.getZip();
         String town = campusAddr.getTown();
@@ -181,12 +178,14 @@ public class RequestCardUtils {
 
         String residenceCountry = person.getUsername(); // As stipulated this field will carry the istId instead.
 
-        String expireDate = getExpireDate(executionYear);
+        DateTime now = DateTime.now();
+
+        String expireDate = now.toString("yyyy") + "/" + now.plusYears(3).toString("yyyy");
 
         String backNumber = makeZeroPaddedNumber(Integer.parseInt(person.getUsername().substring(3)), 10);
 
-        String curricularYear = "00";
-        String executionYear_field = "00000000";
+        String curricularYear = "";
+        String executionYear_field = "";
 
         String unit = "";
         if (role.equals("TEACHER")) {
@@ -195,7 +194,7 @@ public class RequestCardUtils {
 
         String accessControl = "";
 
-        String expireData_AAMM = expireDate.substring(7) + "08"; //TODO
+        String expireData_AAMM = expireDate.substring(7) + now.toString("MM"); //TODO
 
         String templateCode = ""; //TODO
 
