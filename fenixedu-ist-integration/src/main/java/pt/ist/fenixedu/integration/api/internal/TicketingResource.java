@@ -18,6 +18,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
+import javax.ws.rs.core.Configuration;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
@@ -30,11 +31,16 @@ public class TicketingResource {
     public static final String TICKETS_SCOPE = "TICKETS";
 
     private static final Client HTTP_CLIENT = ClientBuilder.newBuilder().register(JsonBodyReaderWriter.class).build();
+    
+    static {
+    	HTTP_CLIENT.property("javax.xml.ws.client.connectionTimeout", 5000);
+    	HTTP_CLIENT.property("javax.xml.ws.client.receiveTimeout", 5000);
+    }
 
     private static final String TICKET_SERVER_URL = FenixEduIstIntegrationConfiguration.getConfiguration().getTicketingUrl();
     private static final String JWT_SIGNING_KEY = FenixEduIstIntegrationConfiguration.getConfiguration().getTicketingJwtSecret();
     private static final String HEADER = "Authorization";
-    private static final String AUTHORIZATION_TYPE = "Token";
+    private static final String AUTHORIZATION_TYPE = "Bearer";
     private static final int JWT_EXPIRATION_PERIOD = 6;
 
     @GET
@@ -50,19 +56,6 @@ public class TicketingResource {
         }
     }
 
-    @GET
-    @Path("services/{id}/queues")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response getQueues(@PathParam("id") String serviceId) {
-        try {
-            return getRootWebTarget().path("services").path(serviceId).path("queues")
-                    .request(MediaType.APPLICATION_JSON)
-                    .get();
-        } catch (WebApplicationException wae) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
     @POST
     @Path("services/{id}/queues/{queueId}/tickets")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -72,10 +65,10 @@ public class TicketingResource {
         String accessToken = getUserToken(user);
 
         try {
-            return getRootWebTarget().path("services").path(serviceId).path("queues").path(queueId).path("tickets/")
+            return getRootWebTarget().path("services").path(serviceId).path("queues").path(queueId).path("tickets")
                     .request(MediaType.APPLICATION_JSON)
                     .header(HEADER, String.format("%s %s", AUTHORIZATION_TYPE, accessToken))
-                    .post(Entity.json(""));
+                    .post(Entity.json(null));
         } catch (WebApplicationException wae) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
@@ -90,7 +83,7 @@ public class TicketingResource {
         String accessToken = getUserToken(user);
 
         try {
-            return getRootWebTarget().path("user").path("tickets")
+            return getRootWebTarget().path("users").path(user.getUsername()).path("tickets")
                     .request(MediaType.APPLICATION_JSON)
                     .header(HEADER, String.format("%s %s", AUTHORIZATION_TYPE, accessToken))
                     .get();
@@ -112,7 +105,6 @@ public class TicketingResource {
                 .setIssuedAt(DateTime.now().toDate())
                 .setExpiration(DateTime.now().plusHours(JWT_EXPIRATION_PERIOD).toDate())
                 .setSubject(user.getUsername())
-                .claim("name", user.getDisplayName())
                 .signWith(signatureAlgorithm, signingKey);
 
         return builder.compact();

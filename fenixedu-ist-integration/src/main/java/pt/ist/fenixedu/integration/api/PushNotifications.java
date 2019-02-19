@@ -27,10 +27,14 @@ import pt.ist.fenixedu.integration.FenixEduIstIntegrationConfiguration;
 public class PushNotifications {
 
     private static final Client HTTP_CLIENT = ClientBuilder.newBuilder().register(JsonBodyReaderWriter.class).build();
+    
+    static {
+    	HTTP_CLIENT.property("javax.xml.ws.client.connectionTimeout", 5000);
+    	HTTP_CLIENT.property("javax.xml.ws.client.receiveTimeout", 5000);
+    }
 
     private final static String pushNotificationServerUrl =
             FenixEduIstIntegrationConfiguration.getConfiguration().getPushNotificationsServer();
-    private final static String header = FenixEduIstIntegrationConfiguration.getConfiguration().getPushNotificationsHeader();
     private final static String token = FenixEduIstIntegrationConfiguration.getConfiguration().getPushNotificationsToken();
 
     @POST
@@ -43,14 +47,14 @@ public class PushNotifications {
 
         JsonObject pushRequest = new JsonObject();
         pushRequest.addProperty("username", Authenticate.getUser().getUsername());
-        pushRequest.addProperty("device_id", request.get("device_id").getAsString());
-        pushRequest.addProperty("registration_id", request.get("registration_id").getAsString());
+        pushRequest.addProperty("deviceID", request.get("device_id").getAsString());
+        pushRequest.addProperty("registrationID", request.get("registration_id").getAsString());
         pushRequest.addProperty("lang", request.get("lang").getAsString());
-        pushRequest.addProperty("device_type", request.get("device_type").getAsString());
+        pushRequest.addProperty("deviceType", request.get("device_type").getAsString());
 
         try {
-            return HTTP_CLIENT.target(pushNotificationServerUrl).path("api").path("v1").path("device/").request()
-                    .header(header, token).post(Entity.entity(pushRequest, MediaType.APPLICATION_JSON_TYPE));
+            return HTTP_CLIENT.target(pushNotificationServerUrl).path("api").path("v1").path("devices").request()
+                    .header("Authorization", "Bearer "+token).post(Entity.entity(pushRequest, MediaType.APPLICATION_JSON_TYPE));
         } catch (WebApplicationException wae) {
             return Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
@@ -58,11 +62,11 @@ public class PushNotifications {
 
     @DELETE
     @Path("/unregister/{device_id}")
-    public Response unregister(@PathParam("device_id") String deviceId, @QueryParam("registration_id") String registrationId) {
+    public Response unregister(@PathParam("device_id") String deviceId, @QueryParam("registrationId") String registrationId) {
 
         try {
-            return HTTP_CLIENT.target(pushNotificationServerUrl).path("api").path("v1").path("device").path(deviceId + "/")
-                    .queryParam("registration_id", registrationId).request().header(header, token).delete();
+            return HTTP_CLIENT.target(pushNotificationServerUrl).path("api").path("v1").path("devices").path(deviceId)
+                    .queryParam("registrationID", registrationId).request().header("Authorization", "Bearer "+token).delete();
         } catch (WebApplicationException wae) {
             return Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
