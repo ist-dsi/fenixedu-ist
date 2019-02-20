@@ -16,6 +16,7 @@ import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.EventState;
 import org.fenixedu.academic.domain.accounting.EventState.ChangeStateEvent;
 import org.fenixedu.academic.domain.accounting.Exemption;
+import org.fenixedu.academic.domain.accounting.Refund;
 import org.fenixedu.academic.domain.accounting.calculator.DebtInterestCalculator;
 import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeAndInsuranceEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEvent;
@@ -35,7 +36,7 @@ import pt.ist.fenixframework.FenixFramework;
 public class FenixEduSapInvoiceContextListener implements ServletContextListener {
 
 
-    private static final String BUNDLE = "resources.GiafInvoiceResources";
+    private static final String BUNDLE = "resources.GiafInvoicesResources";
 
     public static boolean allowCloseToOpen = false;
 
@@ -55,6 +56,7 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
 
             FenixFramework.getDomainModel().registerDeletionBlockerListener(Exemption.class, this::blockExemption);
             FenixFramework.getDomainModel().registerDeletionBlockerListener(Discount.class, this::blockDiscount);
+            FenixFramework.getDomainModel().registerDeletionBlockerListener(Refund.class, this::blockRefund);
         }
 
         EnrolmentBlocker.enrolmentBlocker = new EnrolmentBlocker() {
@@ -158,6 +160,13 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
         final Event event = discount.getEvent();
         if (new SapEvent(event).hasCredit(discount.getExternalId())) {
             blockers.add(BundleUtil.getString(BUNDLE, "error.first.undo.discount.in.sap"));
+        }
+    }
+
+    private void blockRefund(final Refund refund, final Collection<String> blockers) {
+        final Event event = refund.getEvent();
+        if (new SapEvent(event).hasRefund(refund.getExternalId())) {
+            blockers.add(BundleUtil.getString(BUNDLE, "error.first.undo.refund.in.sap"));
         }
     }
 

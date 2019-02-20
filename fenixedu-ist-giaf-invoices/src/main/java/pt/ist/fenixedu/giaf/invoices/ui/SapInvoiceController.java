@@ -121,7 +121,7 @@ public class SapInvoiceController {
             model.addAttribute("exception", exception);
         }
         if (!Strings.isNullOrEmpty(errors)) {
-            model.addAttribute("errors", errors);
+            model.addAttribute("error", errors);
         }
         return "sap-invoice-viewer/home";
     }
@@ -138,7 +138,7 @@ public class SapInvoiceController {
             model.addAttribute("exception", exception);
         }
         if (!Strings.isNullOrEmpty(errors)) {
-            model.addAttribute("errors", errors);
+            model.addAttribute("error", errors);
         }
         model.addAttribute("isSapIntegrator", Group.dynamic("sapIntegrationManager").isMember(Authenticate.getUser()));
         model.addAttribute("isPaymentManager", SapInvoiceController.isAdvancedPaymentManager());
@@ -210,12 +210,7 @@ public class SapInvoiceController {
                 errors.append(error);
             }
         };
-        final EventLogger elogger = (msg, args) -> {
-            if (errors.length() > 0) {
-                errors.append("<br/>");
-            }
-            errors.append(String.format(msg.replace("%n", ""), args));
-        };
+        final EventLogger elogger = (msg, args) -> {};
         if (Group.dynamic("managers").isMember(Authenticate.getUser())
                 || Group.dynamic("sapIntegrationManager").isMember(Authenticate.getUser())) {
             processor.process(errorLogConsumer, elogger, event);
