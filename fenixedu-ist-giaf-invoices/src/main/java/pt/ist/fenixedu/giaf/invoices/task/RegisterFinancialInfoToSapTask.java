@@ -72,7 +72,7 @@ public class RegisterFinancialInfoToSapTask extends CronTask {
 
         touch("Processing events...");
         Bennu.getInstance().getAccountingEventsSet().stream().parallel()
-                .forEach(e -> EventProcessor.registerEventSapRequests(errorLogConsumer, elogger, e));
+                .forEach(e -> EventProcessor.registerEventSapRequests(errorLogConsumer, elogger, e, true));
 
         touch("Dumping error messages.");
         final ByteArrayOutputStream stream = new ByteArrayOutputStream();
