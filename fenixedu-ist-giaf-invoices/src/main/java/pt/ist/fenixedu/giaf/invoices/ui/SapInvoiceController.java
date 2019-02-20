@@ -147,7 +147,7 @@ public class SapInvoiceController {
 
     @RequestMapping(value = "/{event}/calculateRequests", method = RequestMethod.POST)
     public String calculateRequests(final @PathVariable Event event, final Model model) {
-        return processEvent(model, event, (c, l, e) -> EventProcessor.registerEventSapRequests(c, l, e));
+        return processEvent(model, event, (c, l, e) -> EventProcessor.registerEventSapRequests(c, l, e, false));
     }
 
     @RequestMapping(value = "/{event}/sync", method = RequestMethod.POST)

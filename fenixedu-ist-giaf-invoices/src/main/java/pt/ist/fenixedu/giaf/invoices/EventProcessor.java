@@ -49,13 +49,13 @@ public class EventProcessor {
         }
     }
 
-    public static void registerEventSapRequests(final ErrorLogConsumer consumer, final EventLogger elogger, final Event event) {
+    public static void registerEventSapRequests(final ErrorLogConsumer consumer, final EventLogger elogger, final Event event, final boolean offsetPayments) {
         try {
             FenixFramework.getTransactionManager().withTransaction(new CallableWithoutException<Void>() {
 
                 @Override
                 public Void call() {
-                    processSap(consumer, elogger, event);
+                    processSap(consumer, elogger, event, offsetPayments);
                     return null;
                 }
             }, new AtomicInstance(TxMode.SPECULATIVE_READ, false));
@@ -65,7 +65,7 @@ public class EventProcessor {
         }
     }
 
-    private static void processSap(final ErrorLogConsumer errorLog, final EventLogger elogger, final Event event) {
+    private static void processSap(final ErrorLogConsumer errorLog, final EventLogger elogger, final Event event, final boolean offsetPayments) {
         if (!EventWrapper.shouldProcess(errorLog, event)) {
             return;
         }
@@ -97,6 +97,11 @@ public class EventProcessor {
                         && !sapEvent.hasPayment(accountingEntry.getId())
                         && accountingEntry.getCreated().isAfter(EventWrapper.SAP_TRANSACTIONS_THRESHOLD)) {
                     final Payment payment = (Payment) accountingEntry;
+
+                    if (offsetPayments && payment.getCreated().plusDays(15).isAfterNow()) {
+                        return;
+                    }
+
                     if(Strings.isNullOrEmpty(payment.getRefundId())) {
                         sapEvent.registerPayment((CreditEntry) accountingEntry);
                     } else {
@@ -124,6 +129,7 @@ public class EventProcessor {
             //processing payments of past events
             DebtInterestCalculator calculator = event.getDebtInterestCalculator(new DateTime());
             calculator.getPayments().filter(p -> !sapEvent.hasPayment(p.getId()) && p.getCreated().isAfter(EventWrapper.SAP_TRANSACTIONS_THRESHOLD))
+                    .filter(p -> !offsetPayments || p.getCreated().plusDays(15).isBeforeNow())
                     .forEach(p -> sapEvent.registerPastPayment(p));
         }
     }
