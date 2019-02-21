@@ -22,7 +22,7 @@
     <label for="action">Acção</label>
     <select name="action" id="action">
         <c:forEach var="action" items="${availableActions}">
-            <option value="${action.action}">${action.label}</option>
+            <option value="${action.name}">${action.localizedName}</option>
         </c:forEach>
     </select>
 	<button class="btn btn-primary" type="submit">

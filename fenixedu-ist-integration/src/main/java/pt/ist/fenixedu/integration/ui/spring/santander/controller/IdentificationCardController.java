@@ -7,6 +7,7 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.bennu.spring.portal.SpringApplication;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
+import org.fenixedu.idcards.domain.RegisterAction;
 import org.fenixedu.idcards.service.SantanderCardMissingDataException;
 import org.fenixedu.idcards.service.SantanderRequestCardService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +51,7 @@ public class IdentificationCardController {
     public String requestCard(Model model, String action) {
         Person person = AccessControl.getPerson();
 
-        if (!SantanderRequestCardService.getPersonAvailableActions(person).contains(action)) {
+        if (!SantanderRequestCardService.getPersonAvailableActions(person).contains(RegisterAction.valueOf(action))) {
             // TODO: Return with error? check?
             model.addAttribute("error", String.format("Action %s not available", action));
             return "redirect:/identification-card";
