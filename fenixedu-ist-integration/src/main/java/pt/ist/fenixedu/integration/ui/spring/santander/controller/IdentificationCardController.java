@@ -7,6 +7,7 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.bennu.spring.portal.SpringApplication;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
+import org.fenixedu.idcards.service.SantanderCardMissingDataException;
 import org.fenixedu.idcards.service.SantanderRequestCardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -49,14 +50,17 @@ public class IdentificationCardController {
     public String requestCard(Model model, String action) {
         Person person = AccessControl.getPerson();
 
-        System.out.println(action);
         if (!SantanderRequestCardService.getPersonAvailableActions(person).contains(action)) {
             // TODO: Return with error? check?
             model.addAttribute("error", String.format("Action %s not available", action));
             return "redirect:/identification-card";
         }
 
-        identificationCardService.createRegister(person, ExecutionYear.readCurrentExecutionYear(), ACTION_NEW);
+        try {
+            identificationCardService.createRegister(person, ExecutionYear.readCurrentExecutionYear(), action);
+        } catch (SantanderCardMissingDataException e) {
+            //TODO Missing photo / name error
+        }
 
         return "redirect:/identification-card";
     }
@@ -65,7 +69,11 @@ public class IdentificationCardController {
     public String requestCardTest(String action) {
         Person person = AccessControl.getPerson();
 
-        identificationCardService.createRegister(person, ExecutionYear.readCurrentExecutionYear(), action);
+        try {
+            identificationCardService.createRegister(person, ExecutionYear.readCurrentExecutionYear(), action);
+        } catch (SantanderCardMissingDataException e) {
+            //TODO Missing photo / name error
+        }
 
         return "redirect:/identification-card";
     }
