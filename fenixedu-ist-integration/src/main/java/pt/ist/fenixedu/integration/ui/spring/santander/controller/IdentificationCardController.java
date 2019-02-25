@@ -1,5 +1,6 @@
 package pt.ist.fenixedu.integration.ui.spring.santander.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.fenixedu.academic.domain.ExecutionYear;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import pt.ist.fenixedu.integration.ui.spring.santander.service.IdentificationCardService;
+import pt.sibscartoes.portal.wcf.register.info.dto.RegisterData;
 
 @SpringApplication(group = "logged", path = "identification-card", title = "label.identification.card")
 @SpringFunctionality(app = IdentificationCardController.class, title = "label.identification.card")
@@ -37,11 +39,15 @@ public class IdentificationCardController {
     public String showRequests(Model model) {
         Person person = AccessControl.getPerson();
 
-        List<String> status = SantanderRequestCardService.getRegister(person);
+        /*List<String> status = new ArrayList<>();
+        RegisterData registerData = SantanderRequestCardService.getRegister(person);
+        status.add(registerData.getStatus().getValue());
+        status.add(registerData.getStatusDate().getValue());
+        status.add(registerData.getStatusDescription().getValue());
 
-        String formatedStatus = status.get(1) + " : " + status.get(0) + " - " + status.get(2);
+        String formatedStatus = status.get(1) + " : " + status.get(0) + " - " + status.get(2);*/
 
-        model.addAttribute("currentState", formatedStatus);
+       /* model.addAttribute("currentState", formatedStatus);*/
         model.addAttribute("availableActions", SantanderRequestCardService.getPersonAvailableActions(person));
 
         return "fenixedu-ist-integration/identificationCards/showCardInformation";

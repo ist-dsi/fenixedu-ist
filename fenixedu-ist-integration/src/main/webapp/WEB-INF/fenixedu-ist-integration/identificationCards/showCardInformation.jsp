@@ -6,11 +6,11 @@
 
 <h2><bean:message key="title.person.welcome"/> - <bean:message key="label.identification.card"  bundle="APPLICATION_RESOURCES"/></h2>
 
-<c:if test="${not empty currentState}">
+<%--<c:if test="${not empty currentState}">
 	<p><strong>Estado atual</strong></p>
 
 	<c:out value="${currentState}" />
-</c:if>
+</c:if>--%>
 
 <br />
 <br />
