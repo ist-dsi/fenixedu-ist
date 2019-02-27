@@ -105,9 +105,6 @@ public class Utils {
     }
 
     public static boolean validate(final ErrorLogConsumer consumer, final Event event) {
-        if (event.isCancelled()) {
-            return false;
-        }
         if (event instanceof ExternalScholarshipGratuityContributionEvent) {
             return false;
         }
