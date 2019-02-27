@@ -50,166 +50,170 @@ import org.fenixedu.bennu.struts.annotations.Forwards;
 import org.fenixedu.bennu.struts.annotations.Mapping;
 import org.fenixedu.bennu.struts.portal.EntryPoint;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
-import org.fenixedu.commons.spreadsheet.StyledExcelSpreadsheet;
+import org.fenixedu.commons.spreadsheet.Spreadsheet;
+import org.fenixedu.commons.spreadsheet.Spreadsheet.Row;
 import org.joda.time.Duration;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
+import com.google.common.collect.Sets;
+
 import pt.ist.fenixedu.teacher.evaluation.domain.credits.util.DepartmentCreditsBean;
 import pt.ist.fenixedu.teacher.evaluation.domain.teacher.TeacherService;
 import pt.ist.fenixedu.teacher.evaluation.ui.struts.action.DepartmentCreditsManagerApp;
-
-import com.google.common.collect.Sets;
 
 @StrutsFunctionality(app = DepartmentCreditsManagerApp.class, path = "department-teacher-service",
         titleKey = "link.teacherService", bundle = "DepartmentAdmOfficeResources")
 @Mapping(path = "/departmentTeacherService")
 @Forwards(@Forward(name = "viewDepartmentTeacherService", path = "/teacher/evaluation/credits/viewDepartmentTeacherService.jsp"))
 public class ViewDepartmentTeacherServiceDA extends FenixDispatchAction {
+@EntryPoint
+public ActionForward prepareViewDepartmentTeacherService(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+        HttpServletResponse response) throws FenixServiceException {
+    DepartmentCreditsBean departmentCreditsBean = new DepartmentCreditsBean();
+    request.setAttribute("departmentCreditsBean", departmentCreditsBean);
+    return mapping.findForward("viewDepartmentTeacherService");
+}
 
-    @EntryPoint
-    public ActionForward prepareViewDepartmentTeacherService(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-            HttpServletResponse response) throws FenixServiceException {
-        DepartmentCreditsBean departmentCreditsBean = new DepartmentCreditsBean();
-        request.setAttribute("departmentCreditsBean", departmentCreditsBean);
-        return mapping.findForward("viewDepartmentTeacherService");
+public ActionForward exportDepartmentTeacherService(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+        HttpServletResponse response) throws FenixServiceException, IOException {
+    DepartmentCreditsBean departmentCreditsBean = getRenderedObject();
+    List<Department> departments = new ArrayList<Department>();
+    if (departmentCreditsBean.getDepartment() != null) {
+        departments.add(departmentCreditsBean.getDepartment());
+    } else {
+        departments.addAll(departmentCreditsBean.getAvailableDepartments());
     }
-
-    public ActionForward exportDepartmentTeacherService(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-            HttpServletResponse response) throws FenixServiceException, IOException {
-        DepartmentCreditsBean departmentCreditsBean = getRenderedObject();
-        List<Department> departments = new ArrayList<Department>();
-        if (departmentCreditsBean.getDepartment() != null) {
-            departments.add(departmentCreditsBean.getDepartment());
-        } else {
-            departments.addAll(departmentCreditsBean.getAvailableDepartments());
+        Spreadsheet firstSpreadsheet = null, spreadsheet = null;
+    PeriodFormatter periodFormatter =
+            new PeriodFormatterBuilder().printZeroAlways().minimumPrintedDigits(2).appendHours().appendSuffix(":")
+                    .appendMinutes().toFormatter();
+    for (Department department : departments) {
+        if(spreadsheet==null) {
+            firstSpreadsheet = spreadsheet = new Spreadsheet(department.getAcronym());
+        }else {
+            spreadsheet = spreadsheet.addSpreadsheet(department.getAcronym());
         }
-        StyledExcelSpreadsheet spreadsheet = new StyledExcelSpreadsheet();
-        PeriodFormatter periodFormatter =
-                new PeriodFormatterBuilder().printZeroAlways().minimumPrintedDigits(2).appendHours().appendSuffix(":")
-                        .appendMinutes().toFormatter();
-        for (Department department : departments) {
-            spreadsheet.getSheet(department.getAcronym());
-            spreadsheet.newHeaderRow();
-            spreadsheet.addHeader(BundleUtil.getString(Bundle.DEPARTMENT_MEMBER, "label.teacherService.course.name"), 10000);
-            spreadsheet.addHeader(BundleUtil.getString(Bundle.DEPARTMENT_MEMBER, "label.teacherService.course.degrees"));
-            spreadsheet.addHeader(BundleUtil.getString(Bundle.DEPARTMENT_MEMBER, "label.teacherService.course.semester"));
+        
+        spreadsheet.setHeader(BundleUtil.getString(Bundle.DEPARTMENT_MEMBER, "label.teacherService.course.name"));
+        spreadsheet.setHeader(BundleUtil.getString(Bundle.DEPARTMENT_MEMBER, "label.teacherService.course.degrees"));
+        spreadsheet.setHeader(BundleUtil.getString(Bundle.DEPARTMENT_MEMBER, "label.teacherService.course.semester"));
 
-            spreadsheet.addHeader(BundleUtil.getString(Bundle.DEPARTMENT_MEMBER,
-                    "label.teacherService.course.firstTimeEnrolledStudentsNumber"));
-            spreadsheet.addHeader(BundleUtil.getString(Bundle.DEPARTMENT_MEMBER,
-                    "label.teacherService.course.secondTimeEnrolledStudentsNumber"));
+        spreadsheet.setHeader(BundleUtil.getString(Bundle.DEPARTMENT_MEMBER,
+                "label.teacherService.course.firstTimeEnrolledStudentsNumber"));
+        spreadsheet.setHeader(BundleUtil.getString(Bundle.DEPARTMENT_MEMBER,
+                "label.teacherService.course.secondTimeEnrolledStudentsNumber"));
 
-            spreadsheet.addHeader(BundleUtil.getString(Bundle.DEPARTMENT_MEMBER,
-                    "label.teacherService.course.totalStudentsNumber"));
+        spreadsheet.setHeader(BundleUtil.getString(Bundle.DEPARTMENT_MEMBER,
+                "label.teacherService.course.totalStudentsNumber"));
 
-            org.fenixedu.academic.domain.ShiftType[] values = org.fenixedu.academic.domain.ShiftType.values();
-            for (ShiftType shiftType : values) {
-                spreadsheet.addHeader(BundleUtil.getString(Bundle.DEPARTMENT_MEMBER, "label.teacherServiceDistribution.hours")
-                        + " " + shiftType.getFullNameTipoAula());
-                //    spreadsheet.addHeader("# Alunos / # Turnos " + shiftType.getFullNameTipoAula());
-            }
-
-            spreadsheet.addHeader(BundleUtil.getString(Bundle.DEPARTMENT_MEMBER, "label.teacherService.course.totalHours"));
-            spreadsheet.addHeader(BundleUtil.getString(Bundle.DEPARTMENT_MEMBER, "label.teacherService.course.availability"));
-
-            for (ExecutionSemester executionSemester : departmentCreditsBean.getExecutionYear().getExecutionPeriodsSet()) {
-                for (ExecutionCourse executionCourse : departmentCreditsBean.getDepartment().getDepartmentUnit()
-                        .getAllExecutionCoursesByExecutionPeriod(executionSemester)) {
-
-                    spreadsheet.newRow();
-                    spreadsheet.addCell(executionCourse.getNome());
-                    spreadsheet.addCell(getDegreeSiglas(executionCourse));
-                    spreadsheet.addCell(executionCourse.getExecutionPeriod().getSemester());
-
-                    int executionCourseFirstTimeEnrollementStudentNumber = executionCourse.getFirstTimeEnrolmentStudentNumber();
-                    int totalStudentsNumber = executionCourse.getTotalEnrolmentStudentNumber();
-                    int executionCourseSecondTimeEnrollementStudentNumber =
-                            totalStudentsNumber - executionCourseFirstTimeEnrollementStudentNumber;
-                    spreadsheet.addCell(executionCourseFirstTimeEnrollementStudentNumber);
-                    spreadsheet.addCell(executionCourseSecondTimeEnrollementStudentNumber);
-                    spreadsheet.addCell(totalStudentsNumber);
-
-                    Double totalHours = 0.0;
-                    for (ShiftType shiftType : values) {
-                        Double shiftHours = executionCourse.getAllShiftUnitHours(shiftType).doubleValue();
-                        totalHours += shiftHours;
-                        spreadsheet.addCell(shiftHours);
-                    }
-
-                    Duration totalShiftsDuration = new Duration(new Double(executionCourse.getAssociatedShifts().stream()
-                            .mapToDouble(s -> s.getCourseLoadWeeklyAverage().doubleValue()).sum() * 3600000).longValue());
-                    spreadsheet.addCell(periodFormatter.print(totalShiftsDuration.toPeriod()));
-                    int colNum = spreadsheet.getNextWritableCell();
-                    spreadsheet.addCell("");
-
-                    Duration totalLecturedDuration = Duration.ZERO;
-                    for (Professorship professorship : executionCourse.getProfessorshipsSet()) {
-                        Teacher teacher = professorship.getTeacher();
-                        if (teacher != null) {
-                            Duration teacherLecturedTime =
-                                    TeacherService.getLecturedDurationOnExecutionCourse(teacher, executionCourse);
-                            totalLecturedDuration = totalLecturedDuration.plus(teacherLecturedTime);
-                            spreadsheet.addCell(teacher.getPerson().getUsername());
-                            spreadsheet.addCell(teacher.getPerson().getName());
-                            spreadsheet.addCell(periodFormatter.print(teacherLecturedTime.toPeriod()));
-                        }
-
-                    }
-
-                    spreadsheet.addCell(periodFormatter.print(totalShiftsDuration.minus(totalLecturedDuration).toPeriod()),
-                            colNum);
-                }
-            }
-            spreadsheet.getSheet(department.getAcronym() + "_docentes");
-            spreadsheet.newHeaderRow();
-            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.teacher.id"));
-            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.teacher.name"), 10000);
-            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.category"));
-            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.course"), 10000);
-            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.degrees"));
-            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.execution-period"));
-            spreadsheet.addHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.hours"));
-
-            Set<Teacher> allTeachers = Sets.newHashSet(department.getAllTeachers(departmentCreditsBean.getExecutionYear()));
-            for (Teacher teacher : allTeachers) {
-                spreadsheet.newRow();
-                spreadsheet.addCell(teacher.getPerson().getUsername());
-                spreadsheet.addCell(teacher.getPerson().getProfile().getDisplayName());
-                TeacherAuthorization teacherAuthorization =
-                        teacher.getTeacherAuthorization(departmentCreditsBean.getExecutionYear().getAcademicInterval()).orElse(
-                                null);
-                if (teacherAuthorization != null) {
-                    spreadsheet.addCell(teacherAuthorization.getTeacherCategory().getName().getContent());
-                }
-                for (Professorship professorship : teacher.getProfessorships(departmentCreditsBean.getExecutionYear())) {
-                    spreadsheet.newRow();
-                    spreadsheet.addCell(professorship.getExecutionCourse().getNome(), 3);
-                    spreadsheet.addCell(getDegreeSiglas(professorship.getExecutionCourse()));
-                    spreadsheet.addCell(professorship.getExecutionCourse().getExecutionPeriod().getSemester());
-                    Duration teacherLecturedTime =
-                            TeacherService.getLecturedDurationOnExecutionCourse(professorship.getTeacher(),
-                                    professorship.getExecutionCourse());
-                    spreadsheet.addCell(periodFormatter.print(teacherLecturedTime.toPeriod()));
-                }
-            }
+        org.fenixedu.academic.domain.ShiftType[] values = org.fenixedu.academic.domain.ShiftType.values();
+        for (ShiftType shiftType : values) {
+            spreadsheet.setHeader(BundleUtil.getString(Bundle.DEPARTMENT_MEMBER, "label.teacherServiceDistribution.hours")
+                    + " " + shiftType.getFullNameTipoAula());
+            //    spreadsheet.addHeader("# Alunos / # Turnos " + shiftType.getFullNameTipoAula());
         }
 
-        response.setContentType("text/plain");
-        StringBuilder filename = new StringBuilder("servicoDocencia");
-        filename.append((departments.size() == 1 ? departments.iterator().next().getAcronym() : "Departamentos"));
-        filename.append("_").append(departmentCreditsBean.getExecutionYear().getQualifiedName().replaceAll("/", "_"))
-                .append(".xls");
-        response.setHeader("Content-disposition", "attachment; filename=" + filename.toString());
-        final ServletOutputStream writer = response.getOutputStream();
-        spreadsheet.getWorkbook().write(writer);
-        writer.flush();
-        response.flushBuffer();
-        return null;
+        spreadsheet.setHeader(BundleUtil.getString(Bundle.DEPARTMENT_MEMBER, "label.teacherService.course.totalHours"));
+        spreadsheet.setHeader(BundleUtil.getString(Bundle.DEPARTMENT_MEMBER, "label.teacherService.course.availability"));
+
+        for (ExecutionSemester executionSemester : departmentCreditsBean.getExecutionYear().getExecutionPeriodsSet()) {
+            for (ExecutionCourse executionCourse : department.getDepartmentUnit()
+                    .getAllExecutionCoursesByExecutionPeriod(executionSemester)) {
+
+                Row row = spreadsheet.addRow();
+                row.setCell(executionCourse.getNome());
+                row.setCell(getDegreeSiglas(executionCourse));
+                row.setCell(executionCourse.getExecutionPeriod().getSemester());
+
+                int executionCourseFirstTimeEnrollementStudentNumber = executionCourse.getFirstTimeEnrolmentStudentNumber();
+                int totalStudentsNumber = executionCourse.getTotalEnrolmentStudentNumber();
+                int executionCourseSecondTimeEnrollementStudentNumber =
+                        totalStudentsNumber - executionCourseFirstTimeEnrollementStudentNumber;
+                row.setCell(executionCourseFirstTimeEnrollementStudentNumber);
+                row.setCell(executionCourseSecondTimeEnrollementStudentNumber);
+                row.setCell(totalStudentsNumber);
+
+                Double totalHours = 0.0;
+                for (ShiftType shiftType : values) {
+                    Double shiftHours = executionCourse.getAllShiftUnitHours(shiftType).doubleValue();
+                    totalHours += shiftHours;
+                    row.setCell(shiftHours);
+                }
+
+                Duration totalShiftsDuration = new Duration(new Double(executionCourse.getAssociatedShifts().stream()
+                        .mapToDouble(s -> s.getCourseLoadWeeklyAverage().doubleValue()).sum() * 3600000).longValue());
+                row.setCell(periodFormatter.print(totalShiftsDuration.toPeriod()));
+                int colNum = row.getCells().size();
+                row.setCell("");
+
+                Duration totalLecturedDuration = Duration.ZERO;
+                for (Professorship professorship : executionCourse.getProfessorshipsSet()) {
+                    Teacher teacher = professorship.getTeacher();
+                    if (teacher != null) {
+                        Duration teacherLecturedTime =
+                                TeacherService.getLecturedDurationOnExecutionCourse(teacher, executionCourse);
+                        totalLecturedDuration = totalLecturedDuration.plus(teacherLecturedTime);
+                        row.setCell(teacher.getPerson().getUsername());
+                        row.setCell(teacher.getPerson().getName());
+                        row.setCell(periodFormatter.print(teacherLecturedTime.toPeriod()));
+                    }
+
+                }
+
+                row.setCell(periodFormatter.print(totalShiftsDuration.minus(totalLecturedDuration).toPeriod()),
+                        colNum);
+            }
+        }
+        spreadsheet = spreadsheet.addSpreadsheet(department.getAcronym() + "_docentes");
+        spreadsheet.setHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.teacher.id"));
+        spreadsheet.setHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.teacher.name"));
+        spreadsheet.setHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.category"));
+        spreadsheet.setHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.course"));
+        spreadsheet.setHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.degrees"));
+        spreadsheet.setHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.execution-period"));
+        spreadsheet.setHeader(BundleUtil.getString("resources.TeacherCreditsSheetResources", "label.hours"));
+
+        Set<Teacher> allTeachers = Sets.newHashSet(department.getAllTeachers(departmentCreditsBean.getExecutionYear()));
+        for (Teacher teacher : allTeachers) {
+            Row row = spreadsheet.addRow();
+            row.setCell(teacher.getPerson().getUsername());
+            row.setCell(teacher.getPerson().getProfile().getDisplayName());
+            TeacherAuthorization teacherAuthorization =
+                    teacher.getTeacherAuthorization(departmentCreditsBean.getExecutionYear().getAcademicInterval()).orElse(
+                            null);
+            if (teacherAuthorization != null) {
+                row.setCell(teacherAuthorization.getTeacherCategory().getName().getContent());
+            }
+            for (Professorship professorship : teacher.getProfessorships(departmentCreditsBean.getExecutionYear())) {
+                row = spreadsheet.addRow();
+                row.setCell(3, professorship.getExecutionCourse().getNome());
+                row.setCell(getDegreeSiglas(professorship.getExecutionCourse()));
+                row.setCell(professorship.getExecutionCourse().getExecutionPeriod().getSemester());
+                Duration teacherLecturedTime =
+                        TeacherService.getLecturedDurationOnExecutionCourse(professorship.getTeacher(),
+                                professorship.getExecutionCourse());
+                row.setCell(periodFormatter.print(teacherLecturedTime.toPeriod()));
+            }
+        }
     }
 
-    public String getDegreeSiglas(ExecutionCourse executionCourse) {
-        return executionCourse.getAssociatedCurricularCoursesSet().stream().map(CurricularCourse::getDegreeCurricularPlan)
-                .map(DegreeCurricularPlan::getDegree).map(Degree::getSigla).collect(Collectors.joining(", "));
-    }
+    response.setContentType("text/plain");
+    StringBuilder filename = new StringBuilder("servicoDocencia");
+    filename.append((departments.size() == 1 ? departments.iterator().next().getAcronym() : "Departamentos"));
+    filename.append("_").append(departmentCreditsBean.getExecutionYear().getQualifiedName().replaceAll("/", "_"))
+            .append(".xls");
+    response.setHeader("Content-disposition", "attachment; filename=" + filename.toString());
+    final ServletOutputStream writer = response.getOutputStream();
+    firstSpreadsheet.exportToXLSSheet(writer);
+    writer.flush();
+    response.flushBuffer();
+    return null;
+}
+
+public String getDegreeSiglas(ExecutionCourse executionCourse) {
+    return executionCourse.getAssociatedCurricularCoursesSet().stream().map(CurricularCourse::getDegreeCurricularPlan)
+            .map(DegreeCurricularPlan::getDegree).map(Degree::getSigla).collect(Collectors.joining(", "));
+}
+
 }
