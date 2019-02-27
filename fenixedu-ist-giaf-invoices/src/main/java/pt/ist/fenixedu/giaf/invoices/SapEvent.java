@@ -1360,7 +1360,7 @@ public class SapEvent {
 
     private Stream<SapRequest> getPaymentsFor(final String transactionDetailId) {
         return getFilteredSapRequestStream()
-                .filter(sr -> sr.getRequestType() == SapRequestType.PAYMENT || sr.getRequestType() == SapRequestType.ADVANCEMENT)
+                .filter(sr -> sr.getRequestType() == SapRequestType.PAYMENT || sr.getRequestType() == SapRequestType.PAYMENT_INTEREST || sr.getRequestType() == SapRequestType.ADVANCEMENT)
                 .filter(sr -> sr.getPayment() != null).filter(sr -> transactionDetailId.equals(sr.getPayment().getExternalId()));
     }
 
