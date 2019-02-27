@@ -4,7 +4,7 @@
     <parent>
         <groupId>pt.ist</groupId>
         <artifactId>fenixedu-ist</artifactId>
-        <version>17.7.0</version>
+        <version>17.8.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>fenixedu-ist-teacher-evaluation</artifactId>
