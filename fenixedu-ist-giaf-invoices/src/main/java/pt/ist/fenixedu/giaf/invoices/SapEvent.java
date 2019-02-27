@@ -5,6 +5,7 @@ import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -532,7 +533,7 @@ public class SapEvent {
 
         // if it is an internal imputation gets a different treatment
         if(Bennu.getInstance().getInternalPaymentMethod() == transactionDetail.getPaymentMethod()) {
-            registerCredit(event, payment, false);
+            processInternalPayment(payment);
             return;
         }
 
@@ -554,6 +555,17 @@ public class SapEvent {
             registerAdvancementOnly(clientId, transactionDetail, payedAmount);
         } else {
             registerPayment(transactionDetail, payedAmount, (Entry<SapRequest, Money>[]) openInvoices.entrySet().toArray(new Entry[0]));
+        }
+    }
+
+    private void processInternalPayment(final CreditEntry payment) {
+        if (!hasCredit(payment.getId())) {
+            Set<SapRequest> before = new HashSet<>(event.getSapRequestSet());
+            registerCredit(event, payment, false);
+            Set<SapRequest> after = new HashSet<>(event.getSapRequestSet());
+            after.removeAll(before);
+            //associate all requests originated from registerCredit to the payment
+            after.forEach(sr -> sr.setPayment(FenixFramework.getDomainObject(payment.getId())));
         }
     }
 
