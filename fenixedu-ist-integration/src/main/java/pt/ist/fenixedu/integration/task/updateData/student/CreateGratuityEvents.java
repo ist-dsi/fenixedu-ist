@@ -23,6 +23,8 @@ import java.io.StringWriter;
 import java.util.Locale;
 import java.util.function.Predicate;
 
+import org.fenixedu.academic.domain.DegreeCurricularPlan;
+import org.fenixedu.academic.domain.EnrolmentPeriod;
 import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
@@ -50,11 +52,29 @@ public class CreateGratuityEvents extends CronTask {
 
     private void generateGratuityEventsForAllStudents(final ExecutionYear executionYear) {
         for (final ExecutionDegree executionDegree : executionYear.getExecutionDegreesSet()) {
-            for (final StudentCurricularPlan studentCurricularPlan : executionDegree.getDegreeCurricularPlan()
-                    .getStudentCurricularPlansSet()) {
-                generateGratuityEvents(executionYear, studentCurricularPlan);
+            final boolean isInEnrolmentPeriod = isInEnrolmentPerior(executionDegree);
+            for (final StudentCurricularPlan studentCurricularPlan : executionDegree.getDegreeCurricularPlan().getStudentCurricularPlansSet()) {
+                if (!isInEnrolmentPeriod || isFirstTimeStudent(studentCurricularPlan, executionYear)) {
+                    generateGratuityEvents(executionYear, studentCurricularPlan);
+                }
             }
         }
+    }
+
+    private boolean isFirstTimeStudent(final StudentCurricularPlan studentCurricularPlan, final ExecutionYear executionYear) {
+        return studentCurricularPlan.getRegistration().getStudent().getFirstRegistrationExecutionYear() == executionYear;
+    }
+
+    private boolean isInEnrolmentPerior(final ExecutionDegree executionDegree) {
+        final DegreeCurricularPlan degreeCurricularPlan = executionDegree.getDegreeCurricularPlan();
+        final ExecutionYear executionYear = executionDegree.getExecutionYear();
+        return degreeCurricularPlan.getEnrolmentPeriodsSet().stream()
+            .anyMatch(p -> isInEnrolmentPerior(p, executionYear));
+    }
+
+    private boolean isInEnrolmentPerior(final EnrolmentPeriod enrolmentPeriod, final ExecutionYear executionYear) {
+        return enrolmentPeriod.isForCurricularCourses() && enrolmentPeriod.isValid()
+                && enrolmentPeriod.getExecutionPeriod().getExecutionYear() == executionYear;
     }
 
     private void generateGratuityEvents(final ExecutionYear executionYear, final StudentCurricularPlan studentCurricularPlan) {
