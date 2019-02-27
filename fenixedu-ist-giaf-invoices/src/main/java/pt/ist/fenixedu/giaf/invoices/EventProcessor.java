@@ -140,7 +140,9 @@ public class EventProcessor {
             if (accountingEntry instanceof DebtExemption && previousAccountingEntry == refund) {
                 return (DebtExemption) accountingEntry;
             }
-            previousAccountingEntry = accountingEntry;
+            if (accountingEntry instanceof Refund) {
+                previousAccountingEntry = accountingEntry;
+            }
         }
         return null;
     }

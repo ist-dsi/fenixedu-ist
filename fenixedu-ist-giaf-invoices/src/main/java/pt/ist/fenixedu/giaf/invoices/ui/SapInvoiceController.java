@@ -19,6 +19,7 @@
  */
 package pt.ist.fenixedu.giaf.invoices.ui;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
@@ -157,14 +158,14 @@ public class SapInvoiceController {
 
     @RequestMapping(value = "{event}/refundEvent", method = RequestMethod.POST)
     public String refundEvent(final @PathVariable Event event, final User user, final Model model, @RequestParam(required = false) final ExternalClient client,
-            final @RequestParam EventExemptionJustificationType justificationType, final @RequestParam String reason) {
-        return doRefund(event, user, model, () -> doRefundToExternalClient(event, user, client, justificationType, reason));
+            final @RequestParam EventExemptionJustificationType justificationType, final @RequestParam String reason, @RequestParam BigDecimal amount) {
+        return doRefund(event, user, model, () -> doRefundToExternalClient(event, user, client, justificationType, reason, amount));
     }
 
     @Atomic
     private Refund doRefundToExternalClient(final Event event, final User user, final ExternalClient client,
-            final EventExemptionJustificationType justificationType, final String reason) {
-        final Refund refund = new AccountingManagementService().refundEvent(event, user, justificationType, reason);
+            final EventExemptionJustificationType justificationType, final String reason, final BigDecimal amount) {
+        final Refund refund = new AccountingManagementService().refundEvent(event, user, justificationType, reason, amount);
         refund.setExternalClient(client);
         return refund;
     }
