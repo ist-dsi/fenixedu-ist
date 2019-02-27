@@ -17,18 +17,21 @@ import org.fenixedu.academic.domain.accounting.EventState;
 import org.fenixedu.academic.domain.accounting.EventState.ChangeStateEvent;
 import org.fenixedu.academic.domain.accounting.Exemption;
 import org.fenixedu.academic.domain.accounting.Refund;
+import org.fenixedu.academic.domain.accounting.calculator.DebtExemption;
 import org.fenixedu.academic.domain.accounting.calculator.DebtInterestCalculator;
 import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeAndInsuranceEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEvent;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
+import org.fenixedu.academic.util.Money;
 import org.fenixedu.bennu.GiafInvoiceConfiguration;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.signals.DomainObjectEvent;
 import org.fenixedu.bennu.core.signals.Signal;
 import org.joda.time.DateTime;
 
+import pt.ist.fenixedu.domain.SapRequestType;
 import pt.ist.fenixedu.giaf.invoices.SapEvent;
 import pt.ist.fenixframework.FenixFramework;
 
@@ -53,6 +56,7 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
         if (GiafInvoiceConfiguration.getConfiguration().sapSyncActive()) {
             Signal.register(AccountingTransaction.SIGNAL_ANNUL, this::handlerAccountingTransactionAnnulment);
             Signal.register(EventState.EVENT_STATE_CHANGED, this::handlerEventStateChange);
+            Signal.register(EventState.EVENT_STATE_CHANGED, this::calculateSapRequestsForCanceledEvent);
 
             FenixFramework.getDomainModel().registerDeletionBlockerListener(Exemption.class, this::blockExemption);
             FenixFramework.getDomainModel().registerDeletionBlockerListener(Discount.class, this::blockDiscount);
@@ -167,6 +171,30 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
         final Event event = refund.getEvent();
         if (new SapEvent(event).hasRefund(refund.getExternalId())) {
             blockers.add(BundleUtil.getString(BUNDLE, "error.first.undo.refund.in.sap"));
+        }
+    }
+
+    private void calculateSapRequestsForCanceledEvent(final ChangeStateEvent eventStateChange) {
+        final Event event = eventStateChange.getEvent();
+        final EventState oldtState = event.getEventState();
+        final EventState newState = eventStateChange.getNewState();
+
+        if (newState == EventState.CANCELLED && oldtState != newState && event.getSapRequestSet().isEmpty()) {
+            final DebtInterestCalculator calculator = event.getDebtInterestCalculator(new DateTime());
+            final Money debtAmount = new Money(calculator.getDebtAmount());
+            if (debtAmount.isPositive()) {
+                final DebtExemption debtExemption = calculator.getAccountingEntries().stream()
+                        .filter(e -> e instanceof DebtExemption)
+                        .map(e -> (DebtExemption) e)
+                        .filter(e -> new Money(e.getAmount()).equals(debtAmount))
+                        .findAny().orElse(null);
+                if (debtExemption == null) {
+                    throw new Error("inconsistent data, event is canceled but the the exempt value does not match the orginal debt value");
+                }
+                final SapEvent sapEvent = new SapEvent(event);
+                sapEvent.fakeSapRequest(SapRequestType.INVOICE, "ND0", debtAmount, null);
+                sapEvent.fakeSapRequest(SapRequestType.CREDIT, "NA0", debtAmount, debtExemption.getId());
+            }
         }
     }
 

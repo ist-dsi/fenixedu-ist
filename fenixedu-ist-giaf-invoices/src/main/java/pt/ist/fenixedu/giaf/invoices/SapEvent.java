@@ -1573,4 +1573,15 @@ public class SapEvent {
     public Money calculateDebtValue() {
         return getDebtAmount().subtract(getDebtCreditAmount());
     }
+
+    public SapRequest fakeSapRequest(final SapRequestType requestType, final String documentNumber, final Money amount, final String creditId) {
+        final String clientId = ClientMap.uVATNumberFor(event.getParty());
+        final SapRequest sapRequest = new SapRequest(event, clientId, amount, documentNumber, requestType, Money.ZERO, new JsonObject());
+        sapRequest.setCreditId(creditId);
+        sapRequest.setSent(true);
+        sapRequest.setWhenSent(new DateTime());
+        sapRequest.setIntegrated(true);
+        return sapRequest;
+    }
+
 }
