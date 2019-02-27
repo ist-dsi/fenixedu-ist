@@ -26,7 +26,7 @@
 				<tr>
 					<td><c:out value="${request.identificationNumber}"/></td>                    
 					<td><c:out value="${request.name}"/></td>
-					<td><joda:format value="${request.createdAt}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
+					<td><joda:format value="${request.lastUpdate}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
 					<td>
 						<c:if test="${request.registerSuccessful}">
 							<span class="glyphicon glyphicon glyphicon-ok" aria-hidden="true" style="color: green;"></span>
