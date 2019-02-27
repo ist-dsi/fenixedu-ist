@@ -34,9 +34,14 @@ public class PushNotificationsInitializer implements ServletContextListener {
 
     private static final Client HTTP_CLIENT = ClientBuilder.newBuilder().register(JsonBodyReaderWriter.class).build();
 
+    
+    static {
+    	HTTP_CLIENT.property("javax.xml.ws.client.connectionTimeout", 5000);
+    	HTTP_CLIENT.property("javax.xml.ws.client.receiveTimeout", 5000);
+    }
+    
     private final static String pushNotificationServerUrl =
             FenixEduIstIntegrationConfiguration.getConfiguration().getPushNotificationsServer();
-    private final static String header = FenixEduIstIntegrationConfiguration.getConfiguration().getPushNotificationsHeader();
     private final static String token = FenixEduIstIntegrationConfiguration.getConfiguration().getPushNotificationsToken();
 
     @Override
@@ -67,20 +72,22 @@ public class PushNotificationsInitializer implements ServletContextListener {
                     .filter(u -> !postAuthor.equals(u)).distinct().map(JsonPrimitive::new).collect(StreamUtils.toJsonArray());
 
             usernames.addAll(teacherUsernames);
-
-            JsonObject message = new JsonObject();
+            JsonObject title = new JsonObject();
             for (Locale locale : post.getName().getLocales()) {
                 JsonObject localizedMessage = new JsonObject();
-                localizedMessage.addProperty("title", post.getName().getContent(locale));
-                message.add(locale.toLanguageTag(), localizedMessage);
-
+                title.addProperty(locale.toLanguageTag(), "Técnico Lisboa");
+            }
+            JsonObject body = new JsonObject();
+            for (Locale locale : post.getName().getLocales()) {
+                JsonObject localizedMessage = new JsonObject();
+                body.addProperty(locale.toLanguageTag(), post.getSite().getExecutionCourse().getSigla() + ":" + post.getName().getContent(locale));
             }
             JsonObject returnObj = new JsonObject();
             returnObj.add("usernames", usernames);
-            returnObj.add("message", message);
-            returnObj.addProperty("channel", post.getSite().getExecutionCourse().getSigla());
+            returnObj.add("title", title);
+            returnObj.add("body", body);
             try {
-                HTTP_CLIENT.target(pushNotificationServerUrl).path("api/v1/message/").request().header(header, token)
+                HTTP_CLIENT.target(pushNotificationServerUrl).path("api/v1/messages").request().header("Authorization", "Bearer "+token)
                         .post(Entity.entity(returnObj, "application/json; charset=utf8"));
             } catch (Throwable wae) {
                 logger.warn("error when creating post sending message", wae);
