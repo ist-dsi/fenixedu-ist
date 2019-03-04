@@ -147,7 +147,10 @@ public class DelegateStudentSelectBean {
                 selectedStudentCourses.stream().map(TeacherResponsibleOfExecutionCourseGroup::get).forEach(toRet::add);
             }
             else {
-                selectedStudentCourses.stream().map(StudentGroup::get).forEach(toRet::add);
+                selectedStudentCourses.stream()
+                        .map(executionCourse -> StudentGroup.get(null, selectedPosition.getDegree(),
+                                null, null, executionCourse, null, null))
+                        .forEach(toRet::add);
             }
         }
         if (selectedYearStudents && selectedPosition instanceof YearDelegate) {
