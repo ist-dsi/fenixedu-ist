@@ -2,6 +2,8 @@ package pt.ist.fenixedu.domain;
 
 import java.util.Comparator;
 import java.util.Optional;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import com.google.gson.JsonArray;
 import org.fenixedu.academic.domain.accounting.Event;
@@ -156,6 +158,26 @@ public class SapRequest extends SapRequest_Base {
         setIntegrationMessage(messages.toString());
     }
   
+    public SortedSet<String> getErrorMessages() {
+        final SortedSet<String> errors = new TreeSet<>();
+        final JsonObject integrationMessage = getIntegrationMessageAsJson();
+        final JsonElement client = integrationMessage.get("Cliente");
+        if (client != null && !client.isJsonNull()) {
+            errors.add(client.getAsJsonObject().get("Mensagem").getAsString());
+        }
+        final JsonElement document = integrationMessage.get("Documento");
+        if (document != null && !document.isJsonNull()) {
+            if (document.isJsonObject()) {
+                errors.add(document.getAsJsonObject().get("Mensagem").getAsString());
+            } else {
+                for (JsonElement element : document.getAsJsonArray()) {
+                    errors.add(element.getAsJsonObject().get("Mensagem").getAsString());
+                }
+            }
+        }
+        return errors;
+    }
+
     @Atomic(mode = TxMode.WRITE)
     public void delete() {
         setAnulledRequest(null);
