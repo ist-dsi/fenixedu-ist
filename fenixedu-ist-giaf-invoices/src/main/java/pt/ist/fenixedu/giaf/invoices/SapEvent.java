@@ -375,53 +375,73 @@ public class SapEvent {
     }
 
     public void registerReimbursement(final Refund refund, final DebtExemption debtExemption) {
-        final Money paymentsInSap = getFilteredSapRequestStream()
-            .filter(sr -> sr.getRequestType() == SapRequestType.INVOICE && !sr.isInitialization())
-            .sorted(SapRequest.COMPARATOR_BY_EVENT_AND_ORDER)
-            .map(sr -> registerReimbursement(sr, refund, debtExemption))
-            .reduce(Money.ZERO, Money::add);
+        org.fenixedu.academic.domain.accounting.Refund domainRefund = FenixFramework.getDomainObject(refund.getId());
+        if(getPayedAmount().equals(refund.getAmount())) {
+            final Money paymentsInSap = getFilteredSapRequestStream()
+                    .filter(sr -> sr.getRequestType() == SapRequestType.INVOICE && !sr.isInitialization())
+                    .sorted(SapRequest.COMPARATOR_BY_EVENT_AND_ORDER)
+                    .map(sr -> registerReimbursement(sr, domainRefund, null, debtExemption, true))
+                    .reduce(Money.ZERO, Money::add);
 
-        if(!refund.getAmount().equals(paymentsInSap.getAmount())){
-            throw new Error("The value given for refund (" + refund.getId() + ") does not match the value of payments in SAP."
-                    + "Refund amount: " + refund.getAmount() + " - payments in SAP: " + paymentsInSap.getAmountAsString());
+            if (!refund.getAmount().equals(paymentsInSap.getAmount())) {
+                throw new Error("The value given for refund (" + refund.getId() + ") does not match the value of payments in SAP."
+                        + "Refund amount: " + refund.getAmount() + " - payments in SAP: " + paymentsInSap.getAmountAsString());
+            }
+        } else if (!getOpenInvoicesAndRemainingValue().isEmpty()) {
+            throw new Error("It's not possible to reimburse a partial value from an event that is not closed. For refund: "
+                    + refund.getId() + " - amount: " + refund.getAmount());
+        } else {
+            final List<SapRequest> sapRequests = getFilteredSapRequestStream()
+                    .filter(sr -> sr.getRequestType() == SapRequestType.INVOICE && !sr.isInitialization())
+                    .sorted(SapRequest.COMPARATOR_BY_EVENT_AND_ORDER.reversed()).collect(Collectors.toList());
+            Money refundValue = domainRefund.getAmount();
+            for (SapRequest sr : sapRequests) {
+                final Money payedAmountInInvoice = calculateAmountPayedForInvoice(sr);
+                registerReimbursement(sr, domainRefund, Money.min(refundValue, payedAmountInInvoice), debtExemption, false);
+                refundValue = refundValue.subtract(payedAmountInInvoice);
+                if (!refundValue.isPositive()) {
+                    return;
+                }
+            }
         }
     }
 
-    private Money registerReimbursement(final SapRequest sapInvoiceRequest, final Refund refund, final DebtExemption debtExemption) {
+    private Money registerReimbursement(final SapRequest sapInvoiceRequest, final org.fenixedu.academic.domain.accounting.Refund refund,
+                                        final Money refundValue, final DebtExemption debtExemption, final boolean refundTotal) {
         checkValidDocumentNumber(sapInvoiceRequest.getDocumentNumber(), event);
 
-        final String clientId = ClientMap.uVATNumberFor(event.getParty());
-        final Money payedAmount = calculateAmountPayedForInvoice(sapInvoiceRequest);
-        final Money openInvoiceValue = invoiceValueWithoutCredits(sapInvoiceRequest);
+        final String clientId = sapInvoiceRequest.getClientId();
+
+        final Money valueToExempt = refundTotal ? invoiceValueWithoutCredits(sapInvoiceRequest) : refundValue;
+        final Money valueToRefund = refundTotal ? calculateAmountPayedForInvoice(sapInvoiceRequest) : refundValue;
 
         //if the invoice generated debt we have to send a debt credit
         if (isToProcessDebt(event.isGratuity(), true, new DateTime())) {
-            registerDebtCredit(EventProcessor.getCreditEntry(openInvoiceValue), event, true);
+            registerDebtCredit(EventProcessor.getCreditEntry(valueToExempt), event, true);
         }
 
-        org.fenixedu.academic.domain.accounting.Refund domainRefund = FenixFramework.getDomainObject(refund.getId());
-        if (payedAmount.isZero()) {
-            //when a reimbursement is done it's of the total value of the event and event is closed, so we have to close all invoices
+        if (refundTotal && valueToRefund.isZero()) {
+            //when a reimbursement of total payed is done the event is closed, so we have to close all invoices
             //if for an invoice no payment was done we just have to send a credit note to close it, no real reimbursement needed
-            final JsonObject jsonCredit = toJsonCredit(event, new DateTime(), openInvoiceValue, sapInvoiceRequest, false, true);
+            final JsonObject jsonCredit = toJsonCredit(event, new DateTime(), valueToExempt, sapInvoiceRequest, false, true);
             final String documentNumber = getDocumentNumber(jsonCredit, true);
-            final SapRequest sapRequestNA = new SapRequest(event, clientId, openInvoiceValue, documentNumber, SapRequestType.CREDIT, Money.ZERO, jsonCredit);
-            sapRequestNA.setRefund(domainRefund);
+            final SapRequest sapRequestNA = new SapRequest(event, clientId, valueToExempt, documentNumber, SapRequestType.CREDIT, Money.ZERO, jsonCredit);
+            sapRequestNA.setRefund(refund);
             sapRequestNA.setCreditId(debtExemption.getId());
         } else {
-            final JsonObject data = toJsonReimbursement(event, payedAmount, openInvoiceValue, sapInvoiceRequest, false, true);
+            final JsonObject data = toJsonReimbursement(event, valueToRefund, valueToExempt, sapInvoiceRequest, false, true);
             final String documentNumber = getDocumentNumber(data, true);
-            SapRequest reimbursement = new SapRequest(event, clientId, payedAmount, documentNumber, SapRequestType.REIMBURSEMENT, Money.ZERO, data);
-            reimbursement.setRefund(domainRefund);
+            SapRequest reimbursement = new SapRequest(event, clientId, valueToRefund, documentNumber, SapRequestType.REIMBURSEMENT, Money.ZERO, data);
+            reimbursement.setRefund(refund);
 
             //we must create a fictious credit note request so that we know that the invoice is closed
-            SapRequest creditNoteRequest = new SapRequest(event, clientId, openInvoiceValue, documentNumber, SapRequestType.CREDIT, Money.ZERO, data);
+            SapRequest creditNoteRequest = new SapRequest(event, clientId, valueToExempt, documentNumber, SapRequestType.CREDIT, Money.ZERO, data);
             creditNoteRequest.setSent(true);
             creditNoteRequest.setIntegrated(true);
-            creditNoteRequest.setRefund(domainRefund);
+            creditNoteRequest.setRefund(refund);
             creditNoteRequest.setCreditId(debtExemption.getId());
         }
-        return payedAmount;
+        return valueToRefund;
     }
 
     private Money invoiceValueWithoutCredits(final SapRequest sapInvoiceRequest) {

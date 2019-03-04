@@ -3,8 +3,8 @@ package pt.ist.fenixedu.domain;
 import java.util.Comparator;
 import java.util.Optional;
 
-import com.google.gson.JsonArray;
 import org.fenixedu.academic.domain.accounting.Event;
+import org.fenixedu.academic.domain.accounting.Refund;
 import org.fenixedu.academic.util.Money;
 import org.joda.time.DateTime;
 
@@ -162,7 +162,13 @@ public class SapRequest extends SapRequest_Base {
         setEvent(null);
         setOriginalRequest(null);
         setPayment(null);
-        setRefund(null);
+        final Refund refund = getRefund();
+        if (refund != null) {
+            setRefund(null);
+            refund.getSapRequestSet().stream().
+                filter(sr -> sr.getRequestType() == SapRequestType.CREDIT)
+                .forEach(sr -> sr.delete());
+        }
         setAdvancementRequest(null);
         setReimbursementRequest(null);
         setSapRoot(null);

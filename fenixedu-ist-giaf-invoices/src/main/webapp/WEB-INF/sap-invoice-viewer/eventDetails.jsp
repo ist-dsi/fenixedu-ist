@@ -16,6 +16,7 @@
 
 <div class="page-body">
     <c:set var="person" scope="request" value="${event.person}"/>
+    <c:set var="error" scope="page" value="${error}"/>
     <jsp:include page="../fenixedu-academic/accounting/heading-person.jsp"/>
     <h2>
         <span style="color: gray;"><spring:message code="title.sap.invoice.viewer" text="SAP Documents"/></span>
