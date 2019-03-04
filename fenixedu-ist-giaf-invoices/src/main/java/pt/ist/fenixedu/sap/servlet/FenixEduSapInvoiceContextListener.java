@@ -122,7 +122,7 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
 
     private void handlerEventStateChange(final ChangeStateEvent eventStateChange) {
         final Event event = eventStateChange.getEvent();
-        final EventState oldtState = event.getEventState();
+        final EventState oldState = eventStateChange.getOldState();
         final EventState newState = eventStateChange.getNewState();
 
         /*
@@ -135,21 +135,21 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
          *  CANCELED   |   Ex   |  Ex  |   Ex   |   OK
          */
 
-        if (oldtState == newState) {
+        if (oldState == newState) {
             // Not really a state change... nothing to be done.
-        } else if (oldtState == null && newState == EventState.OPEN) {
+        } else if (oldState == null && newState == EventState.OPEN) {
             // Ack, normal SAP integration will be fine.
-        } else if (oldtState == EventState.OPEN && newState == EventState.CLOSED) {
+        } else if (oldState == EventState.OPEN && newState == EventState.CLOSED) {
             // Ack, normal SAP integration will be fine.
-        } else if (oldtState == EventState.OPEN && newState == EventState.CANCELLED) {
+        } else if (oldState == EventState.OPEN && newState == EventState.CANCELLED) {
             if (new SapEvent(event).canCancel()) {
                 throw new DomainException(Optional.of(BUNDLE), "error.event.state.change.first.in.sap");
             }
-        } else if (allowCloseToOpen && oldtState == EventState.CLOSED && newState == EventState.OPEN) {
+        } else if (allowCloseToOpen && oldState == EventState.CLOSED && newState == EventState.OPEN) {
             // Ack. 
         } else {
-            throw new DomainException(Optional.of(BUNDLE), "error.new.event.state.change.must.be.handled", (oldtState == null ?
-                    "null" : oldtState.name()), (newState == null ? "null" : newState.name()), event.getExternalId());
+            throw new DomainException(Optional.of(BUNDLE), "error.new.event.state.change.must.be.handled", (oldState == null ?
+                    "null" : oldState.name()), (newState == null ? "null" : newState.name()), event.getExternalId());
         }
     }
 
@@ -176,10 +176,10 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
 
     private void calculateSapRequestsForCanceledEvent(final ChangeStateEvent eventStateChange) {
         final Event event = eventStateChange.getEvent();
-        final EventState oldtState = event.getEventState();
+        final EventState oldState = eventStateChange.getOldState();
         final EventState newState = eventStateChange.getNewState();
 
-        if (newState == EventState.CANCELLED && oldtState != newState && event.getSapRequestSet().isEmpty()) {
+        if (newState == EventState.CANCELLED && oldState != newState && event.getSapRequestSet().isEmpty()) {
             final DebtInterestCalculator calculator = event.getDebtInterestCalculator(new DateTime());
             final Money debtAmount = new Money(calculator.getDebtAmount());
             if (debtAmount.isPositive()) {
