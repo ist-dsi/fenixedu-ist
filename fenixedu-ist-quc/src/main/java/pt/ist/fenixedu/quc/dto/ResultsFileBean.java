@@ -18,17 +18,13 @@
  */
 package pt.ist.fenixedu.quc.dto;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 
 import org.joda.time.DateTime;
 
-import com.google.common.io.ByteStreams;
-
 import pt.ist.fenixedu.quc.domain.ResultsImportationFile;
 import pt.ist.fenixedu.quc.domain.ResultsImportationProcess;
-import pt.ist.fenixedu.quc.domain.exceptions.FenixEduQucDomainException;
 import pt.ist.fenixframework.Atomic;
 
 public class ResultsFileBean implements Serializable {
@@ -62,14 +58,9 @@ public class ResultsFileBean implements Serializable {
         return newResults;
     }
 
-    @Atomic
-    public void createImportationProcess() {
-        try {
-            ResultsImportationFile resultsImportationFile =
-                    new ResultsImportationFile("filename", ByteStreams.toByteArray(getInputStream()));
-            new ResultsImportationProcess(getResultsDate(), resultsImportationFile, getNewResults());
-        } catch (IOException e) {
-            throw FenixEduQucDomainException.importationResultFileError(e);
-        }
+    @Atomic(mode = Atomic.TxMode.WRITE)
+    public void createImportationProcess(byte[] content) {
+        ResultsImportationFile resultsImportationFile = new ResultsImportationFile("filename", content);
+        new ResultsImportationProcess(getResultsDate(), resultsImportationFile, getNewResults());
     }
 }

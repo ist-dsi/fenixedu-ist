@@ -21,6 +21,7 @@
  */
 package pt.ist.fenixedu.quc.ui.struts.action.gep.inquiries;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,8 +40,10 @@ import org.fenixedu.bennu.struts.annotations.Mapping;
 import org.fenixedu.bennu.struts.portal.EntryPoint;
 import org.fenixedu.bennu.struts.portal.StrutsFunctionality;
 
+import com.google.common.io.ByteStreams;
 import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
 import pt.ist.fenixedu.quc.domain.ResultsImportationProcess;
+import pt.ist.fenixedu.quc.domain.exceptions.FenixEduQucDomainException;
 import pt.ist.fenixedu.quc.dto.ResultsFileBean;
 
 /**
@@ -73,9 +76,13 @@ public class UploadInquiriesResultsDA extends FenixDispatchAction {
             HttpServletResponse response) {
         ResultsFileBean resultsBean = getRenderedObject("uploadFileBean");
         RenderUtils.invalidateViewState("uploadFileBean");
-
-        resultsBean.createImportationProcess();
-        request.setAttribute("success", "true");
+        try {
+            byte[] content = ByteStreams.toByteArray(resultsBean.getInputStream());
+            resultsBean.createImportationProcess(content);
+            request.setAttribute("success", "true");
+        } catch (IOException e) {
+            addErrorMessage(request, e);
+        }
         return prepare(mapping, actionForm, request, response);
     }
 }
