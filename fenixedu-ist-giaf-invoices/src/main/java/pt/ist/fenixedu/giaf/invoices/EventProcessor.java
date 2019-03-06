@@ -47,7 +47,7 @@ public class EventProcessor {
                 }
             }, new AtomicInstance(TxMode.SPECULATIVE_READ, false));
         } catch (Exception e) {
-            logError(errorLog, elogger, event, e);
+            logError(errorLog, elogger, supplier, e);
             e.printStackTrace();
         }
     }
@@ -57,7 +57,7 @@ public class EventProcessor {
             SapEvent sapEvent = new SapEvent(event);
             sapEvent.processPendingRequests(event, errorLog, elogger);
         } catch (final Exception e) {
-            logError(errorLog, elogger, event, e);
+            logError(errorLog, elogger, () -> event, e);
         }
     }
 
