@@ -141,6 +141,7 @@ import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.academic.util.ContentType;
 import org.fenixedu.academic.util.EvaluationType;
 import org.fenixedu.academic.util.HourMinuteSecond;
+import org.fenixedu.academic.util.Money;
 import org.fenixedu.bennu.core.domain.Avatar;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
@@ -738,22 +739,30 @@ public class FenixAPIv1 {
             DebtInterestCalculator calculator = event.getDebtInterestCalculator(DateTime.now());
             String description = event.getDescription().toString();
 
+            Money dueInterestOrFines = new Money(calculator.getDueInterestAmount().add(calculator.getDueFineAmount()));
+
+            EventPaymentCodeEntry codeEntry;
+
+            if (dueInterestOrFines.isPositive()) {
+                codeEntry = event.getAvailablePaymentCodeEntry().orElse(null);
+            } else {
+                codeEntry = event.getReusablePaymentCodeEntry().orElse(null);
+            }
+
+            String reference = null;
+            String entity = null;
+
+            if (codeEntry != null) {
+                reference = codeEntry.getPaymentCode().getFormattedCode();
+                entity = codeEntry.getPaymentCode().getEntityCode();
+            }
+
             for (Debt debt : calculator.getDebtsOrderedByDueDate()) {
                 if (BigDecimalUtil.isPositive(debt.getTotalOpenAmount())){
-
                     String id = debt.getId();
                     LocalDate debtCreation = debt.getCreated().toLocalDate();
                     LocalDate debtDueDate = debt.getDueDate();
                     String amount = debt.getTotalOpenAmount().toPlainString();
-                    EventPaymentCodeEntry codeEntry = event.getAvailablePaymentCodeEntry().orElse(null);
-                    String reference = null;
-                    String entity = null;
-
-                    if (codeEntry != null) {
-                        reference = codeEntry.getPaymentCode().getFormattedCode();
-                        entity = codeEntry.getPaymentCode().getEntityCode();
-                    }
-
                     notPayed.add(new PendingEvent(id, description, new FenixPeriod(debtCreation, debtDueDate), entity, reference, amount));
                 }
             }
