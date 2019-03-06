@@ -32,6 +32,7 @@ import org.fenixedu.bennu.core.signals.Signal;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixedu.domain.SapRequestType;
+import pt.ist.fenixedu.giaf.invoices.EventProcessor;
 import pt.ist.fenixedu.giaf.invoices.SapEvent;
 import pt.ist.fenixframework.FenixFramework;
 
@@ -57,6 +58,7 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
             Signal.register(AccountingTransaction.SIGNAL_ANNUL, this::handlerAccountingTransactionAnnulment);
             Signal.register(EventState.EVENT_STATE_CHANGED, this::handlerEventStateChange);
             Signal.register(EventState.EVENT_STATE_CHANGED, this::calculateSapRequestsForCanceledEvent);
+            Signal.registerWithoutTransaction(EventState.EVENT_STATE_CHANGED, this::processEvent);
 
             FenixFramework.getDomainModel().registerDeletionBlockerListener(Exemption.class, this::blockExemption);
             FenixFramework.getDomainModel().registerDeletionBlockerListener(Discount.class, this::blockDiscount);
@@ -200,4 +202,9 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
         }
     }
 
+    private void processEvent(final ChangeStateEvent eventStateChange) {
+        EventProcessor.calculate(() -> eventStateChange.getEvent());
+        EventProcessor.sync(() -> eventStateChange.getEvent());
+    }
+    
 }
