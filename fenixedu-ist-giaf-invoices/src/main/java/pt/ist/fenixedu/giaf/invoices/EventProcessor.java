@@ -1,6 +1,7 @@
 package pt.ist.fenixedu.giaf.invoices;
 
 import java.math.BigDecimal;
+import java.util.function.Supplier;
 
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.calculator.AccountingEntry;
@@ -24,13 +25,24 @@ import pt.ist.fenixframework.FenixFramework;
 
 public class EventProcessor {
 
+    public static void calculate(final Supplier<Event> supplier) {
+        final ErrorLogConsumer errorLog = (oid, user, name, amount, cycleType, error, args, type, countryOfVatNumber, 
+                vatNumber, address, locality, postCode, countryOfAddress, paymentMethod, documentNumber, actionType) -> {};
+        final EventLogger elogger = (msg, args) -> {};
+        syncEventWithSap(errorLog, elogger, supplier.get());
+    }
+
     public static void syncEventWithSap(final ErrorLogConsumer errorLog, final EventLogger elogger, final Event event) {
+        syncEventWithSap(errorLog, elogger, () -> event);
+    }
+
+    public static void syncEventWithSap(final ErrorLogConsumer errorLog, final EventLogger elogger, final Supplier<Event> supplier) {
         try {
             FenixFramework.getTransactionManager().withTransaction(new CallableWithoutException<Void>() {
 
                 @Override
                 public Void call() {
-                    syncToSap(errorLog, elogger, event);
+                    syncToSap(errorLog, elogger, supplier.get());
                     return null;
                 }
             }, new AtomicInstance(TxMode.SPECULATIVE_READ, false));
@@ -49,13 +61,24 @@ public class EventProcessor {
         }
     }
 
+    public static void sync(final Supplier<Event> supplier) {
+        final ErrorLogConsumer errorLog = (oid, user, name, amount, cycleType, error, args, type, countryOfVatNumber, 
+                vatNumber, address, locality, postCode, countryOfAddress, paymentMethod, documentNumber, actionType) -> {};
+        final EventLogger elogger = (msg, args) -> {};
+        registerEventSapRequests(errorLog, elogger, supplier.get(), true);
+    }
+
     public static void registerEventSapRequests(final ErrorLogConsumer consumer, final EventLogger elogger, final Event event, final boolean offsetPayments) {
+        registerEventSapRequests(consumer, elogger, () -> event, offsetPayments);
+    }
+
+    public static void registerEventSapRequests(final ErrorLogConsumer consumer, final EventLogger elogger, final Supplier<Event> event, final boolean offsetPayments) {
         try {
             FenixFramework.getTransactionManager().withTransaction(new CallableWithoutException<Void>() {
 
                 @Override
                 public Void call() {
-                    processSap(consumer, elogger, event, offsetPayments);
+                    processSap(consumer, elogger, event.get(), offsetPayments);
                     return null;
                 }
             }, new AtomicInstance(TxMode.SPECULATIVE_READ, false));
@@ -182,8 +205,9 @@ public class EventProcessor {
     }
 
     @Atomic(mode = TxMode.READ)
-    private static void logError(final ErrorLogConsumer errorLog, final EventLogger elogger, final Event event,
+    private static void logError(final ErrorLogConsumer errorLog, final EventLogger elogger, final Supplier<Event> supplier,
                                  final Throwable e) {
+        final Event event = supplier.get();
         final String errorMessage = e.getMessage();
 
         BigDecimal amount;
@@ -223,4 +247,5 @@ public class EventProcessor {
                 "", "", "", "", "", "", "", "", "", "", "");
         elogger.log("%s: %s %s %s %n", event.getExternalId(), errorMessage, "", "");
     }
+
 }
