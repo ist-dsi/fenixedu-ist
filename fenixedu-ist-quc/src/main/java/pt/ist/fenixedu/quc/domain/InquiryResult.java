@@ -37,13 +37,20 @@ import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.reports.GepReportFile;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
+import pt.ist.fenixframework.FenixFramework;
 
 public class InquiryResult extends InquiryResult_Base {
+    private static final int PARTITION_SIZE = 2500;
+    private static final Logger LOGGER = LoggerFactory.getLogger(InquiryResult.class);
 
     public final static Comparator<InquiryResult> INQUIRY_RESULT_SCALE_VALUES_COMPARATOR = new Comparator<InquiryResult>() {
 
@@ -77,69 +84,55 @@ public class InquiryResult extends InquiryResult_Base {
     }
 
     public static void importResults(String stringResults, DateTime resultDate) {
-        String[] allRows = stringResults.split("\r\n");
-        String[] rows = new String[199];
-        for (int iter = 0, cycleCount = 0; iter < allRows.length; iter++, cycleCount++) {
-            if (iter == 0) {
-                continue;
-            }
-            rows[cycleCount] = allRows[iter];
-            if (cycleCount == 199 - 1) {
+        List<String> results = Splitter.on("\r\n").splitToList(stringResults);
+        List<List<String>> partition = new ArrayList<>(Lists.partition(results, PARTITION_SIZE));
 
-                WriteRows writeRows = new WriteRows(rows, resultDate);
-                writeRows.start();
-                try {
-                    writeRows.join();
-                } catch (InterruptedException e) {
-                    if (writeRows.domainException != null) {
-                        throw writeRows.domainException;
-                    }
-                    throw new Error(e);
+        int index = 1;
+        for (final List<String> resultPartition : partition) {
+            LOGGER.info("Importing {} of {} results", index * PARTITION_SIZE, results.size());
+            Importer importer = new Importer(resultPartition.toArray(new String[0]), resultDate);
+            Thread thread = new Thread(importer);
+            try {
+                thread.start();
+                thread.join();
+            } catch (InterruptedException e) {
+                if (importer.exception != null) {
+                    throw new Error(importer.exception);
                 }
-                //importRows(rows, resultDate);
-                cycleCount = 0;
-                rows = new String[199];
+                throw new Error(e);
             }
+            index++;
         }
-        WriteRows writeRows = new WriteRows(rows, resultDate);
-        writeRows.start();
-        try {
-            writeRows.join();
-        } catch (InterruptedException e) {
-            if (writeRows.domainException != null) {
-                throw writeRows.domainException;
-            }
-            throw new Error(e);
-        }
-        //	importRows(rows, resultDate);
     }
 
-    public static class WriteRows extends Thread {
-        String[] rows;
-        DateTime resultDate;
-        DomainException domainException;
+    private static class Importer implements Runnable {
 
-        public WriteRows(String[] rows, DateTime resultDate) {
+        private final String[] rows;
+        private final DateTime resultDate;
+        private Throwable exception;
+
+        public Importer(final String[] rows, final DateTime resultDate) {
             this.rows = rows;
             this.resultDate = resultDate;
         }
 
         @Override
-        @Atomic(mode = TxMode.READ)
         public void run() {
             try {
-                importRows(rows, resultDate);
-            } catch (DomainException e) {
-                domainException = e;
-                throw e;
+                FenixFramework.atomic(() -> {
+                    importRows(rows, resultDate);
+                });
+            }catch (Throwable t) {
+                LOGGER.error("Error while importing rows", t);
+                exception = t;
+                throw t;
             }
         }
     }
 
-    @Atomic
     private static void importRows(String[] rows, DateTime resultDate) {
         for (String row : rows) {
-            if (row != null) {
+            if (!Strings.isNullOrEmpty(row)) {
                 String[] columns = row.split("\t");
                 //TODO rever indices das colunas
                 //columns[columns.length - 1] = columns[columns.length - 1].split("\r")[0];
@@ -159,22 +152,27 @@ public class InquiryResult extends InquiryResult_Base {
         }
     }
 
-    @Atomic
     public static void updateRows(String rows, DateTime resultDate) {
-        String[] allRows = rows.split("\r\n");// \r\n
-        for (int iter = 1; iter < allRows.length; iter++) {
-            String row = allRows[iter];
-            if (row != null) {
-                String[] columns = row.split("\t");
-                InquiryResultBean inquiryResultBean = new InquiryResultBean(columns);
-                InquiryResult inquiryResult = getInquiryResult(inquiryResultBean);
-                if (inquiryResult != null) {
-                    inquiryResult.setValue(inquiryResultBean.getValue());
-                    inquiryResult.setResultClassification(inquiryResultBean.getResultClassification());
-                    inquiryResult.setLastModifiedDate(new DateTime());
-                } else {
-                    throw new DomainException("result not found: " + getPrintableColumns(columns));
-                }
+        List<String> results = Splitter.on("\r\n").splitToList(rows);
+        List<List<String>> partitions = Lists.partition(results, PARTITION_SIZE);
+        for (final List<String> partition : partitions) {
+            FenixFramework.atomic(() -> {
+                partition.forEach(InquiryResult::updateRow);
+            });
+        }
+    }
+
+    private static void updateRow(final String row) {
+        if (!Strings.isNullOrEmpty(row)) {
+            String[] columns = row.split("\t");
+            InquiryResultBean inquiryResultBean = new InquiryResultBean(columns);
+            InquiryResult inquiryResult = getInquiryResult(inquiryResultBean);
+            if (inquiryResult != null) {
+                inquiryResult.setValue(inquiryResultBean.getValue());
+                inquiryResult.setResultClassification(inquiryResultBean.getResultClassification());
+                inquiryResult.setLastModifiedDate(new DateTime());
+            } else {
+                throw new DomainException("result not found: " + getPrintableColumns(columns));
             }
         }
     }
