@@ -20,9 +20,7 @@ public class IdentificationCardService {
             throws SantanderCardMissingDataException {
         String tuiEntry = RequestCardUtils.generateLine(person, executionYear, action.getName());
 
-        if (action == RegisterAction.ATUA) {
-            SantanderRequestCardService.updateRegister(tuiEntry, person);
-        } else if (action == RegisterAction.CANC) {
+        if (action == RegisterAction.CANC) {
             SantanderRequestCardService.cancelRegister(tuiEntry, person);
         } else {
             SantanderRequestCardService.createRegister(tuiEntry, person);
