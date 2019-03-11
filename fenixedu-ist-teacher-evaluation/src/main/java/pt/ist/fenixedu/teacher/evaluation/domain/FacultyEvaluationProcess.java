@@ -64,7 +64,7 @@ public class FacultyEvaluationProcess extends FacultyEvaluationProcess_Base impl
     public FacultyEvaluationProcess(final LocalizedString title, final Interval autoEvaluationInterval,
             final Interval evaluationInterval) {
         this();
-        if (title == null || !title.isEmpty()) {
+        if (title == null || title.isEmpty()) {
             throw new DomainException("error.title.cannot.be.null");
         }
         setTitle(title);
