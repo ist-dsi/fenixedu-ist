@@ -106,7 +106,7 @@ public class TeacherEvaluationInformationBean implements Serializable {
                                 Joiner.on(", ").join(
                                         BundleUtil.getString("resources.TeacherEvaluationResources", participant.getClass()
                                                 .getName() + "." + ThesisParticipationType.PRESIDENT.name()),
-                                        participant.getThesis().getTitle(),
+                                        participant.getThesis().getTitle().getContent(),
                                         participant.getThesis().getStudent().getPerson().getName(),
                                         participant.getThesis().getStudent().getNumber(),
                                         thesis.getDiscussed().toLocalDate().toString());
@@ -278,7 +278,7 @@ public class TeacherEvaluationInformationBean implements Serializable {
             this.description =
                     Joiner.on(", ").join(
                             BundleUtil.getString(Bundle.ENUMERATION, participant.getType().name()) + " ("
-                                    + participant.getPercentageDistribution() + "%)", participant.getThesis().getTitle(),
+                                    + participant.getPercentageDistribution() + "%)", participant.getThesis().getTitle().getContent(),
                             participant.getThesis().getStudent().getPerson().getName(),
                             participant.getThesis().getStudent().getNumber(), date.toString());
         }
