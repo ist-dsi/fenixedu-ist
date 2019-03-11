@@ -44,10 +44,10 @@ public class SotisPublications {
 
     private static final String BASE_URL = "https://sotis.tecnico.ulisboa.pt/";
 
-    private static final String RECORD_PATH = "api/sotis-core/record/list";
+    private static final String RECORD_PATH = "api/v1/researchers/participations";
 
-    private static final String RECORD_URL_PREFIX = BASE_URL + "sotis-ui/?#record/";
-
+    private static final String RECORD_URL_PREFIX = BASE_URL + "record/";
+        
     public List<String> get(User user) {
         SortedSet<Publication> publications = getPublications(user);
         return publications.stream().map(p -> p.getPublicationString()).collect(Collectors.toList());
@@ -67,8 +67,7 @@ public class SotisPublications {
     private SortedSet<Publication> getPublications(User user) {
         SortedSet<Publication> publications = new TreeSet<Publication>();
         Client HTTP_CLIENT = ClientBuilder.newClient();
-        WebTarget resource = HTTP_CLIENT.target(BASE_URL).path(RECORD_PATH);
-        resource = resource.queryParam("researchers", user.getUsername());
+        WebTarget resource = HTTP_CLIENT.target(BASE_URL).path(RECORD_PATH).path(user.getUsername());
         try {
             String allPublications = resource.request().get(String.class);
             JsonParser parser = new JsonParser();
@@ -117,7 +116,10 @@ public class SotisPublications {
 
             List<String> otherData = new ArrayList<>();
             if (publication.has("journal")) {
-                otherData.add(publication.get("journal").getAsJsonObject().get("name").getAsString());
+                JsonElement journalName = publication.get("journal").getAsJsonObject().get("name");
+                if (!journalName.isJsonNull()) {
+                    otherData.add(journalName.getAsString());
+                }
                 if (publication.has("volume") && publication.has("number")) {
                     otherData.add(publication.get("volume").getAsString() + " (" + publication.get("number").getAsString() + ")");
                 }
@@ -129,7 +131,11 @@ public class SotisPublications {
                 otherData.add(publication.get("pages").getAsString());
             }
             if (publication.has("publisher")) {
-                otherData.add(publication.get("publisher").getAsJsonObject().get("name").getAsString());
+                if (publication.get("publisher").isJsonObject()) {
+                    otherData.add(publication.get("publisher").getAsJsonObject().get("name").getAsString());
+                } else {
+                    otherData.add(publication.get("publisher").getAsString());
+                }
             }
             parts.add(Joiner.on(", ").join(otherData));
             publicationString = Joiner.on(". ").join(parts);
