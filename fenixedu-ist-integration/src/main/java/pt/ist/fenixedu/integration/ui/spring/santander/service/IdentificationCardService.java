@@ -19,13 +19,10 @@ public class IdentificationCardService {
     public void createRegister(Person person, ExecutionYear executionYear, RegisterAction action)
             throws SantanderCardMissingDataException {
         String tuiEntry = RequestCardUtils.generateLine(person, executionYear, action.getName());
-
-        if (action == RegisterAction.CANC) {
-            SantanderRequestCardService.cancelRegister(tuiEntry, person);
-        } else {
-            SantanderRequestCardService.createRegister(tuiEntry, person);
-        }
+        SantanderRequestCardService.createRegister(tuiEntry, person);
     }
+
+    //TODO encapsulate all needed SantanderCardService functions
 
     public List<ExecutionYear> getExecutionYears() {
         return Bennu.getInstance().getSantanderEntriesNewSet().stream().map(sen -> sen.getExecutionYear()).distinct()

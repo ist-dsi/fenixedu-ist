@@ -23,8 +23,6 @@ import pt.ist.fenixedu.integration.ui.spring.santander.service.IdentificationCar
 @RequestMapping("/identification-card")
 public class IdentificationCardController {
 
-    private static final String ACTION_NEW = "NOVO";
-
     private IdentificationCardService identificationCardService;
 
     @Autowired
@@ -58,12 +56,16 @@ public class IdentificationCardController {
             }
 
             identificationCardService.createRegister(person, ExecutionYear.readCurrentExecutionYear(), registerAction);
+            //TODO ADD error for invalid person (if person no longer as a valid satus)
         } catch (IllegalArgumentException e) {
-            //TODO Invalid action error
+            System.out.println("Wrong action");
+            e.printStackTrace();
         } catch (SantanderCardMissingDataException e) {
-            //TODO Missing photo / name error
+            System.out.println("Missing photo");
+            e.printStackTrace();
         } catch (Throwable t) {
-            //TODO Generic error
+            System.out.println("Generic error");
+            t.printStackTrace();
         }
 
         return "redirect:/identification-card";
