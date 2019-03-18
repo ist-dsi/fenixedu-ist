@@ -53,13 +53,9 @@ public class NumberObfuscationAdaptor implements IMemberIDAdapter {
         }
         final User user = person.getUser();
         if (user != null) {
-            final int year = Year.now().getValue();
-            for (final CgdCard card : user.getCgdCardSet()) {
-                if (BooleanUtils.isTrue(card.getAllowSendBankDetails()) &&
-                        (card.getCgdCardCounter().getYear() == year || card.getCgdCardCounter().getYear() == (year - 1))) {
-                    return true;
-                }
-            }
+            final int year = Year.now().getValue() - 3;
+            return user.getCgdCardSet().stream().anyMatch(card -> BooleanUtils.isTrue(card.getAllowSendCardDetails()) &&
+                    card.getCgdCardCounter().getYear() >= year);
         }
         return false;
     }
