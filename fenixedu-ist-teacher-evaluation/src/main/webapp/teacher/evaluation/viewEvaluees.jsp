@@ -37,7 +37,7 @@
 <table class="tstyle1 thlight thleft mtop15">
 	<tr><th>Docente</th>
 	<logic:iterate id="evaluationProcess" name="processes">
-			<th><bean:write name="evaluationProcess" property="title"/></th>
+			<th><bean:write name="evaluationProcess" property="title.content"/></th>
 	</logic:iterate>
 	</tr>
 
