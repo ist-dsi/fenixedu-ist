@@ -37,8 +37,8 @@ public class IdentificationCardController {
         SantanderEntryNew entryNew = SantanderRequestCardService.updateState(person);
         String currentStatus = entryNew == null ? "No Request" : entryNew.getState().getName();
 
-        model.addAttribute("currentState", currentStatus);
         model.addAttribute("availableActions", SantanderRequestCardService.getPersonAvailableActions(person));
+        model.addAttribute("cardHistory", SantanderEntryNew.getSantanderCardHistory(person));
 
         return "fenixedu-ist-integration/identificationCards/showCardInformation";
     }
@@ -56,7 +56,7 @@ public class IdentificationCardController {
             }
 
             identificationCardService.createRegister(person, ExecutionYear.readCurrentExecutionYear(), registerAction);
-            //TODO ADD error for invalid person (if person no longer as a valid satus)
+            //TODO ADD error for invalid person (if person no longer as a valid status)
         } catch (IllegalArgumentException e) {
             System.out.println("Wrong action");
             e.printStackTrace();

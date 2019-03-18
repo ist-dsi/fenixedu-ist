@@ -28,18 +28,18 @@
 					<td><c:out value="${request.name}"/></td>
 					<td><joda:format value="${request.lastUpdate}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
 					<td>
-						<c:if test="${request.registerSuccessful}">
+						<c:if test="${request.wasRegisterSuccessful()}">
 							<span class="glyphicon glyphicon glyphicon-ok" aria-hidden="true" style="color: green;"></span>
 						</c:if>
-						<c:if test="${not request.registerSuccessful}">
+						<c:if test="${not request.wasRegisterSuccessful()}">
 							<span class="glyphicon glyphicon glyphicon-remove" aria-hidden="true" style="color: red;"></span>
 						</c:if>
 					</td>
 					<td>
-                    	<c:if test="${request.registerSuccessful}">
+                    	<c:if test="${request.wasRegisterSuccessful()}">
 							<span class="glyphicon glyphicon glyphicon-ok" aria-hidden="true" style="color: green;"></span>
 						</c:if>
-						<c:if test="${not request.registerSuccessful}">
+						<c:if test="${not request.wasRegisterSuccessful()}">
 							<c:out value="${request.errorDescriptionMessage}"/>
 						</c:if>
 					</td>
