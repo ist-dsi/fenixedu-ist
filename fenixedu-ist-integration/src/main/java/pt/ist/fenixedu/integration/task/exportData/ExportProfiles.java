@@ -57,7 +57,6 @@ public class ExportProfiles extends CronTask {
                 .filter(j -> j != null)
                 .collect(toJsonArray()).toString();
         final byte[] bytes = profiles.getBytes();
-        output("profiles.json", bytes);
         try (final FileOutputStream fos = new FileOutputStream("/afs/ist.utl.pt/ciist/fenix/fenix015/ist/profiles.json")) {
             fos.write(bytes);
         }
