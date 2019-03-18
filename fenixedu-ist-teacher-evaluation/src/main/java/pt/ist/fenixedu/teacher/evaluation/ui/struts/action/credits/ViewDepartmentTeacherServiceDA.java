@@ -161,8 +161,7 @@ public ActionForward exportDepartmentTeacherService(ActionMapping mapping, Actio
 
                 }
 
-                row.setCell(periodFormatter.print(totalShiftsDuration.minus(totalLecturedDuration).toPeriod()),
-                        colNum);
+                row.setCell(colNum, periodFormatter.print(totalShiftsDuration.minus(totalLecturedDuration).toPeriod()));
             }
         }
         spreadsheet = spreadsheet.addSpreadsheet(department.getAcronym() + "_docentes");
