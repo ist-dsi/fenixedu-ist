@@ -47,6 +47,8 @@ public class SotisPublications {
     private static final String RECORD_PATH = "api/v1/researchers/participations";
 
     private static final String RECORD_URL_PREFIX = BASE_URL + "record/";
+
+    private static int  MAX_PUBLICATIONS = 1500;
         
     public List<String> get(User user) {
         SortedSet<Publication> publications = getPublications(user);
@@ -67,7 +69,8 @@ public class SotisPublications {
     private SortedSet<Publication> getPublications(User user) {
         SortedSet<Publication> publications = new TreeSet<Publication>();
         Client HTTP_CLIENT = ClientBuilder.newClient();
-        WebTarget resource = HTTP_CLIENT.target(BASE_URL).path(RECORD_PATH).path(user.getUsername());
+        WebTarget resource =
+                HTTP_CLIENT.target(BASE_URL).path(RECORD_PATH).path(user.getUsername()).queryParam("size", MAX_PUBLICATIONS);
         try {
             String allPublications = resource.request().get(String.class);
             JsonParser parser = new JsonParser();
@@ -140,7 +143,7 @@ public class SotisPublications {
             parts.add(Joiner.on(", ").join(otherData));
             publicationString = Joiner.on(". ").join(parts);
 
-            if (publication.has("url")) {
+            if (publication.has("url") && !publication.get("url").isJsonNull()) {
                 url = publication.get("url").getAsString();
             } else {
                 url = RECORD_URL_PREFIX + publication.get("id").getAsString();
