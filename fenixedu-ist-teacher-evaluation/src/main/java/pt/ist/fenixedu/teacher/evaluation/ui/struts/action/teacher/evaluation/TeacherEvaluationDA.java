@@ -238,7 +238,8 @@ public class TeacherEvaluationDA extends FenixDispatchAction {
             }
             evaluees.get(process.getEvaluee()).processes.put(process.getFacultyEvaluationProcess(), process);
         }
-        request.setAttribute("processes", Bennu.getInstance().getFacultyEvaluationProcessSet());
+        final SortedSet<FacultyEvaluationProcess> processes = new TreeSet<>(Bennu.getInstance().getFacultyEvaluationProcessSet());
+        request.setAttribute("processes", processes);
         request.setAttribute("evaluees", evaluees.values());
         return mapping.findForward("viewEvaluees");
     }
