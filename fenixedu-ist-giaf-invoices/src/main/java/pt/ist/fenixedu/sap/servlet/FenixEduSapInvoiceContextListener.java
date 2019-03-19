@@ -133,7 +133,7 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
          *     V       |  
          *    null     |   OK   |  OK  |   Ex   |   Ex
          *    OPEN     |   Ex   |  OK  |   OK   |   SAP
-         *   CLOSED    |   Ex   |  Ex  |   OK   |   OK
+         *   CLOSED    |   Ex   |  Ok  |   OK   |   OK
          *  CANCELED   |   Ex   |  Ex  |   Ex   |   OK
          */
 
@@ -142,6 +142,8 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
         } else if (oldState == null && newState == EventState.OPEN) {
             // Ack, normal SAP integration will be fine.
         } else if (oldState == EventState.OPEN && newState == EventState.CLOSED) {
+            // Ack, normal SAP integration will be fine.
+        } else if (oldState == EventState.CLOSED && newState == EventState.OPEN) {
             // Ack, normal SAP integration will be fine.
         } else if (oldState == EventState.CLOSED && newState == EventState.CANCELLED) {
             // Ack, normal SAP integration will be fine.
