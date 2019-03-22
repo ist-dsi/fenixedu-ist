@@ -132,10 +132,10 @@ public class Utils {
         try {
             originalAmountToPay = event.getOriginalAmountToPay();
         } catch (final DomainException ex) {
-            logError(consumer, "Unable to Determine Amount: " + ex.getMessage(), event, getUserIdentifier(party), "", null, party, null, null, event);
+            logError(consumer, "Unable to Determine Amount: " + ex.getLocalizedMessage(), event, getUserIdentifier(party), "", null, party, null, null, event);
             return false;
         } catch (final NullPointerException ex) {
-            logError(consumer, "Unable to Determine Amount: " + ex.getMessage(), event, getUserIdentifier(party), "", null, party, null, null, event);
+            logError(consumer, "Unable to Determine Amount: " + ex.getLocalizedMessage(), event, getUserIdentifier(party), "", null, party, null, null, event);
             return false;
         }
 

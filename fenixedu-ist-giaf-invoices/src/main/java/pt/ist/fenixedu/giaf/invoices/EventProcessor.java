@@ -208,7 +208,7 @@ public class EventProcessor {
     private static void logError(final ErrorLogConsumer errorLog, final EventLogger elogger, final Supplier<Event> supplier,
                                  final Throwable e) {
         final Event event = supplier.get();
-        final String errorMessage = e.getMessage();
+        final String errorMessage = e.getLocalizedMessage();
 
         BigDecimal amount;
         DebtCycleType cycleType;
