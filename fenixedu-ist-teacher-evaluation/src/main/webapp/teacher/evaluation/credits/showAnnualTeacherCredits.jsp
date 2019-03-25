@@ -221,7 +221,7 @@ if(RoleType.SCIENTIFIC_COUNCIL.actualGroup().isMember(user)){
 						<logic:iterate id="degreeTeachingService" name="degreeTeachingServicesOrderedByShift" indexId="indexShifts">
 							<bean:size id="numberOfLessons" name="degreeTeachingService" property="shift.lessonsOrderedByWeekDayAndStartTime"/>
 							<logic:equal name="numberOfLessons" value="0">
-								<td><bean:write name="degreeTeachingService" property="shift.nome"/></td>
+								<tr><td><bean:write name="degreeTeachingService" property="shift.nome"/></td>
 								<td><bean:write name="degreeTeachingService" property="shift.shiftTypesPrettyPrint"/></td>
 								<td colspan="6"/>
 								<td style="text-align: right;">
