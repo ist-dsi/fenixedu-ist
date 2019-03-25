@@ -119,9 +119,10 @@ public class SotisPublications {
 
             List<String> otherData = new ArrayList<>();
             if (publication.has("journal")) {
-                JsonElement journalName = publication.get("journal").getAsJsonObject().get("name");
-                if (!journalName.isJsonNull()) {
-                    otherData.add(journalName.getAsString());
+                if (publication.get("journal").isJsonObject()) {
+                    otherData.add(publication.get("journal").getAsJsonObject().get("name").getAsString());
+                }else {
+                    otherData.add(publication.get("journal").getAsString());
                 }
                 if (publication.has("volume") && publication.has("number")) {
                     otherData.add(publication.get("volume").getAsString() + " (" + publication.get("number").getAsString() + ")");
