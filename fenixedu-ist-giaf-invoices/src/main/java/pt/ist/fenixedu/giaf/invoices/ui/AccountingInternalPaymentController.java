@@ -83,7 +83,7 @@ public class AccountingInternalPaymentController {
 
         final List<InternalPaymentInfo> internalPayments = SapRoot.getInstance().getSapRequestSet().stream()
             .filter(sr -> !sr.getIgnore() && sr.getIntegrated() && sr.getRequestType() == SapRequestType.CREDIT && sr.getRequest().length() > 2)
-            .filter(sr -> !sr.getWhenSent().isBefore(start) && !sr.getWhenSent().isAfter(end))
+            .filter(sr -> sr.getWhenSent() != null && !sr.getWhenSent().isBefore(start) && !sr.getWhenSent().isAfter(end))
             .map(sr -> toInternalPaymentInfo(sr))
             .filter(ipi -> ipi != null)
             .sorted(ENTRY_COMPARATOR.reversed())

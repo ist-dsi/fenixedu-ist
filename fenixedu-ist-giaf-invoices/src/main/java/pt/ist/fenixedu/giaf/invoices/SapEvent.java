@@ -437,6 +437,7 @@ public class SapEvent {
             //we must create a fictious credit note request so that we know that the invoice is closed
             SapRequest creditNoteRequest = new SapRequest(event, clientId, valueToExempt, documentNumber, SapRequestType.CREDIT, Money.ZERO, data);
             creditNoteRequest.setSent(true);
+            creditNoteRequest.setWhenSent(new DateTime());
             creditNoteRequest.setIntegrated(true);
             creditNoteRequest.setRefund(refund);
             creditNoteRequest.setCreditId(debtExemption.getId());
