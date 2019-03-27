@@ -34,9 +34,6 @@ public class IdentificationCardController {
     public String showRequests(Model model) {
         Person person = AccessControl.getPerson();
 
-        SantanderEntryNew entryNew = SantanderRequestCardService.updateState(person);
-        String currentStatus = entryNew == null ? "No Request" : entryNew.getState().getName();
-
         model.addAttribute("availableActions", SantanderRequestCardService.getPersonAvailableActions(person));
         model.addAttribute("cardHistory", SantanderEntryNew.getSantanderCardHistory(person));
 
