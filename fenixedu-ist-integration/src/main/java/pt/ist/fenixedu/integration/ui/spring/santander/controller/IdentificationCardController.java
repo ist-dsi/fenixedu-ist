@@ -24,17 +24,19 @@ import pt.ist.fenixedu.integration.ui.spring.santander.service.IdentificationCar
 public class IdentificationCardController {
 
     private IdentificationCardService identificationCardService;
+    private SantanderRequestCardService santanderRequestCardService;
 
     @Autowired
-    public IdentificationCardController(IdentificationCardService identificationCardService) {
+    public IdentificationCardController(IdentificationCardService identificationCardService, SantanderRequestCardService santanderRequestCardService) {
         this.identificationCardService = identificationCardService;
+        this.santanderRequestCardService = santanderRequestCardService;
     }
 
     @RequestMapping(value = "", method = RequestMethod.GET)
     public String showRequests(Model model) {
         Person person = AccessControl.getPerson();
 
-        model.addAttribute("availableActions", SantanderRequestCardService.getPersonAvailableActions(person));
+        model.addAttribute("availableActions", santanderRequestCardService.getPersonAvailableActions(person));
         model.addAttribute("cardHistory", SantanderEntryNew.getSantanderCardHistory(person));
 
         return "fenixedu-ist-integration/identificationCards/showCardInformation";
@@ -46,7 +48,7 @@ public class IdentificationCardController {
         try {
 
             RegisterAction registerAction = RegisterAction.valueOf(action);
-            if (!SantanderRequestCardService.getPersonAvailableActions(person).contains(registerAction)) {
+            if (!santanderRequestCardService.getPersonAvailableActions(person).contains(registerAction)) {
                 // TODO: Return with error? check?
                 model.addAttribute("error", String.format("Action %s not available", action));
                 return "redirect:/identification-card";
