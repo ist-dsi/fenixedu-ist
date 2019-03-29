@@ -90,6 +90,13 @@
 			
 		</p>
 	</logic:equal>
+	<logic:equal name="process" property="inAutoEvaluation" value="false">
+		<logic:equal name="process" property="inEvaluationInterval" value="true">
+	 		<html:link action="/teacherEvaluation.do?method=viewEvalueeInformation" paramId="process" paramName="process" paramProperty="externalId">
+				<bean:message bundle="TEACHER_EVALUATION_RESOURCES" key="label.teacher.evaluation.showTeacherInformation" />
+			</html:link>
+		</logic:equal>
+	</logic:equal>
 
 	<div id="<%="warning" + processId%>" class="dnone">
 		<div class="warning1">
