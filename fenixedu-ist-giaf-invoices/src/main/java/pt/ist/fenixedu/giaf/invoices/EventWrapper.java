@@ -1,21 +1,11 @@
 package pt.ist.fenixedu.giaf.invoices;
 
 import java.time.Year;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.accounting.Event;
-import org.fenixedu.academic.domain.accounting.Refund;
-import org.fenixedu.academic.domain.accounting.calculator.DebtInterestCalculator;
-import org.fenixedu.academic.domain.accounting.calculator.ExcessRefund;
-import org.fenixedu.academic.domain.accounting.calculator.PartialPayment;
 import org.fenixedu.academic.util.Money;
 import org.joda.time.DateTime;
-
-import pt.ist.fenixedu.domain.SapRequest;
-import pt.ist.fenixedu.domain.SapRequestType;
 
 public class EventWrapper {
 
@@ -71,28 +61,12 @@ public class EventWrapper {
     }
 
     private static boolean allAdvancementFromRefundSapIntegration(final Event event) {
-        final boolean pendingIntegration = event.getAccountingTransactionsSet().stream()
-            .map(tx -> tx.getRefund())
-            .filter(r -> r != null)
-            .anyMatch(r -> notIntegrated(r));
-        return !pendingIntegration;
-    }
-
-    private static boolean notIntegrated(final Refund refund) {
-        final Event event = refund.getEvent();
-        final DebtInterestCalculator calculator = event.getDebtInterestCalculator(new DateTime());
-        final ExcessRefund excessRefund = calculator.getExcessRefundStream().filter(r -> r.getId().equals(refund.getExternalId())).findAny().orElse(null);
-        final List<PartialPayment> partialPayments = excessRefund.getPartialPayments();
-        return excessRefund == null || partialPayments.isEmpty() || !partialPayments.stream().allMatch(pp -> isIntegrated(event, pp));
-    }
-
-    private static boolean isIntegrated(final Event event, final PartialPayment partialPayment) {
-        final Set<SapRequest> request = event.getSapRequestSet().stream()
-            .filter(sr -> sr.getRequestType() == SapRequestType.ADVANCEMENT)
-            .filter(sr -> !sr.getIgnore() && !sr.isInitialization() && sr.getIntegrated())
-            .filter(sr -> sr.getPayment().getExternalId().equals(partialPayment.getDebtEntry().getId()))
-            .collect(Collectors.toSet());
-        return !request.isEmpty();
+        return event.getAccountingTransactionsSet().stream()
+                .map(tx -> tx.getRefund())
+                .filter(r -> r != null)
+                .map(r -> r.getEvent())
+                .flatMap(e -> e.getNonAdjustingTransactionStream())
+                .allMatch(tx -> tx.getSapRequestSet().stream().allMatch(sr -> sr.getIntegrated()));
     }
 
 }
