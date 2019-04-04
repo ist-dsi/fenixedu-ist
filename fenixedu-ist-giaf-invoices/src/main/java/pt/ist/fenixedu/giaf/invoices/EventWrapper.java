@@ -66,7 +66,7 @@ public class EventWrapper {
                 .filter(r -> r != null)
                 .map(r -> r.getEvent())
                 .flatMap(e -> e.getNonAdjustingTransactionStream())
-                .allMatch(tx -> tx.getSapRequestSet().stream().allMatch(sr -> sr.getIntegrated()));
+                .allMatch(tx -> !tx.getSapRequestSet().isEmpty() && tx.getSapRequestSet().stream().allMatch(sr -> sr.getIntegrated()));
     }
 
 }
