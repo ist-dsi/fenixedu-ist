@@ -29,7 +29,7 @@ public class EventProcessor {
         final ErrorLogConsumer errorLog = (oid, user, name, amount, cycleType, error, args, type, countryOfVatNumber, 
                 vatNumber, address, locality, postCode, countryOfAddress, paymentMethod, documentNumber, actionType) -> {};
         final EventLogger elogger = (msg, args) -> {};
-        syncEventWithSap(errorLog, elogger, supplier.get());
+        registerEventSapRequests(errorLog, elogger, supplier.get(), true);
     }
 
     public static void syncEventWithSap(final ErrorLogConsumer errorLog, final EventLogger elogger, final Event event) {
@@ -65,7 +65,7 @@ public class EventProcessor {
         final ErrorLogConsumer errorLog = (oid, user, name, amount, cycleType, error, args, type, countryOfVatNumber, 
                 vatNumber, address, locality, postCode, countryOfAddress, paymentMethod, documentNumber, actionType) -> {};
         final EventLogger elogger = (msg, args) -> {};
-        registerEventSapRequests(errorLog, elogger, supplier.get(), true);
+        syncEventWithSap(errorLog, elogger, supplier.get());
     }
 
     public static void registerEventSapRequests(final ErrorLogConsumer consumer, final EventLogger elogger, final Event event, final boolean offsetPayments) {
