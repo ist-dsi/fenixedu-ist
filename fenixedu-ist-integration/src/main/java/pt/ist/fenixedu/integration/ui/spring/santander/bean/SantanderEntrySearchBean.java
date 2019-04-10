@@ -44,7 +44,7 @@ public class SantanderEntrySearchBean {
         User user = User.findByUsername(username);
 
         if (user != null) {
-            return SantanderEntryNew.getSantanderEntryHistory(user.getPerson());
+            return SantanderEntryNew.getSantanderEntryHistory(user);
         } else if (executionYear != null) {
             return SantanderEntryNew.getSantanderEntryHistory(executionYear);
         }

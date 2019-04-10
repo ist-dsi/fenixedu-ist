@@ -5,10 +5,10 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.bennu.spring.portal.SpringApplication;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
-import org.fenixedu.idcards.domain.RegisterAction;
 import org.fenixedu.idcards.domain.SantanderEntryNew;
 import org.fenixedu.idcards.service.SantanderCardMissingDataException;
 import org.fenixedu.idcards.service.SantanderRequestCardService;
+import org.fenixedu.santandersdk.dto.RegisterAction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -36,8 +36,8 @@ public class IdentificationCardController {
     public String showRequests(Model model) {
         Person person = AccessControl.getPerson();
 
-        model.addAttribute("availableActions", santanderRequestCardService.getPersonAvailableActions(person));
-        model.addAttribute("cardHistory", SantanderEntryNew.getSantanderCardHistory(person));
+        model.addAttribute("availableActions", santanderRequestCardService.getPersonAvailableActions(person.getUser()));
+        model.addAttribute("cardHistory", SantanderEntryNew.getSantanderCardHistory(person.getUser()));
 
         return "fenixedu-ist-integration/identificationCards/showCardInformation";
     }
@@ -48,19 +48,16 @@ public class IdentificationCardController {
         try {
 
             RegisterAction registerAction = RegisterAction.valueOf(action);
-            if (!santanderRequestCardService.getPersonAvailableActions(person).contains(registerAction)) {
+            if (!santanderRequestCardService.getPersonAvailableActions(person.getUser()).contains(registerAction)) {
                 // TODO: Return with error? check?
                 model.addAttribute("error", String.format("Action %s not available", action));
                 return "redirect:/identification-card";
             }
 
-            identificationCardService.createRegister(person, ExecutionYear.readCurrentExecutionYear(), registerAction);
+            identificationCardService.createRegister(person, registerAction);
             //TODO ADD error for invalid person (if person no longer as a valid status)
         } catch (IllegalArgumentException e) {
             System.out.println("Wrong action");
-            e.printStackTrace();
-        } catch (SantanderCardMissingDataException e) {
-            System.out.println("Missing photo");
             e.printStackTrace();
         } catch (Throwable t) {
             System.out.println("Generic error");
@@ -74,13 +71,8 @@ public class IdentificationCardController {
     public String requestCardTest(String action) {
         Person person = AccessControl.getPerson();
 
-        try {
-            RegisterAction registerAction = RegisterAction.valueOf(action);
-            identificationCardService.createRegister(person, ExecutionYear.readCurrentExecutionYear(), registerAction);
-        } catch (SantanderCardMissingDataException e) {
-            //TODO Missing photo / name error
-        }
-
+        RegisterAction registerAction = RegisterAction.valueOf(action);
+        identificationCardService.createRegister(person, registerAction);
         return "redirect:/identification-card";
     }
 }

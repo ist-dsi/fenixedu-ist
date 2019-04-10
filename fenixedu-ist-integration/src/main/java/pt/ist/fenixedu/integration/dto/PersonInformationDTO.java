@@ -221,7 +221,7 @@ public class PersonInformationDTO {
 
         this.eIdentifier = person.getEidentifier();
 
-        this.istCardMifareSerialNumber = getLastMifareSerialNumber(person);
+        /*this.istCardMifareSerialNumber = getLastMifareSerialNumber(person);*/
     }
 
     private static int compareDHCPLines(final String l1, String l2) {

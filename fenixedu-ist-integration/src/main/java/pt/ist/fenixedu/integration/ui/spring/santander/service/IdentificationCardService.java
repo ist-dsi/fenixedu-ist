@@ -6,13 +6,11 @@ import java.util.stream.Collectors;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.bennu.core.domain.Bennu;
-import org.fenixedu.idcards.domain.RegisterAction;
-import org.fenixedu.idcards.service.SantanderCardMissingDataException;
 import org.fenixedu.idcards.service.SantanderRequestCardService;
+import org.fenixedu.santandersdk.dto.RegisterAction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import pt.ist.fenixedu.integration.domain.santander.RequestCardUtils;
 
 @Service
 public class IdentificationCardService {
@@ -24,10 +22,8 @@ public class IdentificationCardService {
         this.santanderRequestCardService = santanderRequestCardService;
     }
 
-    public void createRegister(Person person, ExecutionYear executionYear, RegisterAction action)
-            throws SantanderCardMissingDataException {
-        String tuiEntry = RequestCardUtils.generateLine(person, executionYear, action.getName());
-        santanderRequestCardService.createRegister(tuiEntry, person);
+    public void createRegister(Person person, RegisterAction action) {
+        santanderRequestCardService.createRegister(person.getUser(), action);
     }
 
     //TODO encapsulate all needed SantanderCardService functions
