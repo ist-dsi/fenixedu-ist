@@ -17,8 +17,9 @@ public class UserInformationService implements IUserInfoService {
     }
 
     @Override
-    public byte[] getUserPhoto(User user) {
-        return user.getPerson().getPersonalPhoto().getOriginal().getPictureData();
+    public String getUserPhoto(User user) {
+        PersonInformationDTO personInformationDTO = new PersonInformationDTO(user.getPerson());
+        return personInformationDTO.getPhoto();
     }
 
     @Override
