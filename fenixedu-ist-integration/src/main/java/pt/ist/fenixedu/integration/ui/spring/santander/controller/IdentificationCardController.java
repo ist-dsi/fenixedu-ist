@@ -1,12 +1,10 @@
 package pt.ist.fenixedu.integration.ui.spring.santander.controller;
 
-import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.bennu.spring.portal.SpringApplication;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.fenixedu.idcards.domain.SantanderEntryNew;
-import org.fenixedu.idcards.service.SantanderCardMissingDataException;
 import org.fenixedu.idcards.service.SantanderRequestCardService;
 import org.fenixedu.santandersdk.dto.RegisterAction;
 import org.springframework.beans.factory.annotation.Autowired;

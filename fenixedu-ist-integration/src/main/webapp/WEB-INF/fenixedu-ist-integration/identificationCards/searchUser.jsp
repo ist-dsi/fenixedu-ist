@@ -17,15 +17,6 @@
 			<div class="col-sm-10"> <form:input class="form-control" path="username" /> </div>
 		</div>
 
-    	<div class="form-group">   
-			<form:label path="executionYear" class="control-label col-sm-2"> <spring:message code="Ano Lectivo" /> </form:label>			
-			<div class="col-sm-10">
-				<form:select path="executionYear" class="form-control">
-					<form:option value="Escolha um ano" />
-					<form:options items="${executionYears}" itemValue="externalId" itemLabel="name"/>
-				</form:select>
-			</div>
-		</div>
 	</div>
 
 	<p class="form-group">

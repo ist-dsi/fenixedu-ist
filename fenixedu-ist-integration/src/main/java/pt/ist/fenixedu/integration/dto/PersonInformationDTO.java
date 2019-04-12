@@ -21,7 +21,6 @@ package pt.ist.fenixedu.integration.dto;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Photograph;
@@ -37,7 +36,6 @@ import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.bennu.core.domain.UserProfile;
-import org.fenixedu.idcards.domain.SantanderCardInformation;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.YearMonthDay;
 
@@ -228,11 +226,11 @@ public class PersonInformationDTO {
         return l1.substring(1, 9).compareTo(l2.substring(1, 9));
     }
 
-    private static String getLastMifareSerialNumber(final Person person) {
+    /*private static String getLastMifareSerialNumber(final Person person) {
         final Stream<SantanderCardInformation> infos = person.getSantanderCardsInformationSet().stream();
         final String line = infos.map(i -> i.getDchpRegisteLine()).max(PersonInformationDTO::compareDHCPLines).orElse(null);
         return line == null ? null : getMifareSerialNumber(line);
-    }
+    }*/
 
     private static String getMifareSerialNumber(String line) {
         final int offset = line.length() - 550 - 1;

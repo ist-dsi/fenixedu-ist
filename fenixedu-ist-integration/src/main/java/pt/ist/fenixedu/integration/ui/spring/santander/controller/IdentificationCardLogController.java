@@ -2,7 +2,6 @@ package pt.ist.fenixedu.integration.ui.spring.santander.controller;
 
 import java.util.List;
 
-import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.spring.portal.SpringApplication;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
@@ -34,7 +33,6 @@ public class IdentificationCardLogController {
     public String showRequests(Model model) {
 
         model.addAttribute("santanderEntrySearchBean", new SantanderEntrySearchBean());
-        model.addAttribute("executionYears", identificationCardService.getExecutionYears());
 
         return "fenixedu-ist-integration/identificationCards/searchUser";
     }
@@ -42,9 +40,8 @@ public class IdentificationCardLogController {
     @RequestMapping(value = "/search-entries", method = RequestMethod.POST)
     public String searchUser(@ModelAttribute SantanderEntrySearchBean bean, Model model) {
         User user = User.findByUsername(bean.getUsername());
-        ExecutionYear executionYear = bean.getExecutionYear();
 
-        if (user == null && executionYear == null) {
+        if (user == null) {
             return "redirect:/identification-card-log";
         }
 

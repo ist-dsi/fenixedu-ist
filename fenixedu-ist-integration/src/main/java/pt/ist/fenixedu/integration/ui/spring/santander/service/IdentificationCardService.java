@@ -27,9 +27,4 @@ public class IdentificationCardService {
     }
 
     //TODO encapsulate all needed SantanderCardService functions
-
-    public List<ExecutionYear> getExecutionYears() {
-        return Bennu.getInstance().getSantanderEntriesNewSet().stream().map(sen -> sen.getExecutionYear()).distinct()
-                .sorted(ExecutionYear.REVERSE_COMPARATOR_BY_YEAR).collect(Collectors.toList());
-    }
 }
