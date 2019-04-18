@@ -127,21 +127,11 @@ public class ViewQUCInquiryAnswers extends FenixDispatchAction {
     public ActionForward showDelegateInquiry(ActionMapping actionMapping, ActionForm actionForm, HttpServletRequest request,
             HttpServletResponse response) throws Exception {
 
-        ExecutionCourse executionCourse =
-                FenixFramework.getDomainObject(getFromRequest(request, "executionCourseOID").toString());
-        ExecutionDegree executionDegree =
-                FenixFramework.getDomainObject(getFromRequest(request, "executionDegreeOID").toString());
+        InquiryDelegateAnswer inquiryDelegateAnswer = FenixFramework.getDomainObject(getFromRequest(request, "inquiryDelegateAnswerOID").toString());
+        ExecutionCourse executionCourse = inquiryDelegateAnswer.getExecutionCourse();
 
         DelegateInquiryTemplate delegateInquiryTemplate =
                 DelegateInquiryTemplate.getTemplateByExecutionPeriod(executionCourse.getExecutionPeriod());
-        InquiryDelegateAnswer inquiryDelegateAnswer = null;
-        for (InquiryDelegateAnswer delegateAnswer : executionCourse.getInquiryDelegatesAnswersSet()) {
-            if (delegateAnswer.getExecutionDegree() == executionDegree) {
-                inquiryDelegateAnswer = delegateAnswer;
-                break;
-            }
-        }
-
         Set<InquiryBlockDTO> delegateInquiryBlocks = new TreeSet<InquiryBlockDTO>();
         for (InquiryBlock inquiryBlock : delegateInquiryTemplate.getInquiryBlocksSet()) {
             delegateInquiryBlocks.add(new InquiryBlockDTO(inquiryDelegateAnswer, inquiryBlock));
@@ -151,7 +141,7 @@ public class ViewQUCInquiryAnswers extends FenixDispatchAction {
         request.setAttribute("year", year);
         request.setAttribute("executionPeriod", executionCourse.getExecutionPeriod());
         request.setAttribute("executionCourse", executionCourse);
-        request.setAttribute("executionDegree", executionDegree);
+        request.setAttribute("executionDegree", inquiryDelegateAnswer.getExecutionDegree());
         request.setAttribute("delegateInquiryBlocks", delegateInquiryBlocks);
 
         return new ActionForward(null, "/inquiries/showDelegateInquiry.jsp", false, "/delegate");

@@ -182,7 +182,7 @@ public class InquiryCoordinatorResumeRenderer extends InquiryBlocksResumeRendere
                 calculatedUrl = delegateLink.calculateUrl();
 
                 HtmlMenuOption optionDelegate = reportsGroup.createOption();
-                optionDelegate.setText(RenderUtils.getResourceString("INQUIRIES_RESOURCES", "label.inquiry.delegate"));
+                optionDelegate.setText(inquiryDelegateAnswer.getDelegate().getTitle());
                 optionDelegate.setValue(calculatedUrl + "&_request_checksum_="
                         + GenericChecksumRewriter.calculateChecksum(calculatedUrl, getSession()));
             }
@@ -227,8 +227,7 @@ public class InquiryCoordinatorResumeRenderer extends InquiryBlocksResumeRendere
 
     private String buildParametersForDelegateInquiry(InquiryDelegateAnswer inquiryDelegateAnswer) {
         StringBuilder builder = new StringBuilder("method=showDelegateInquiry");
-        builder.append("&executionCourseOID=").append(inquiryDelegateAnswer.getExecutionCourse().getExternalId());
-        builder.append("&executionDegreeOID=").append(inquiryDelegateAnswer.getExecutionDegree().getExternalId());
+        builder.append("&inquiryDelegateAnswerOID=").append(inquiryDelegateAnswer.getExternalId());
         return builder.toString();
     }
 
