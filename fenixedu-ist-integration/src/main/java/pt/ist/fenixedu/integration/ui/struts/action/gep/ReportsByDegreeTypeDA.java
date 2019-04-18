@@ -90,7 +90,7 @@ import pt.ist.fenixframework.FenixFramework;
         @Forward(name = "viewReports", path = "/gep/viewReports.jsp") })
 public class ReportsByDegreeTypeDA extends FenixDispatchAction {
 
-    private static final int MAX_AUTHORIZED_REPORT_FILES = 20;
+    private static final int MAX_AUTHORIZED_REPORT_FILES = 40;
 
     public static class ReportBean implements Serializable {
         private DegreeType degreeType;
@@ -182,16 +182,12 @@ public class ReportsByDegreeTypeDA extends FenixDispatchAction {
     private int getCountReportsForParameters(DegreeType degreeType, ExecutionYear executionYear, Class reportClass) {
         FindSelectedGepReports predicate = new FindSelectedGepReports(executionYear, degreeType, reportClass);
 
-        return getValidCounterForReports((int) Bennu.getInstance().getQueueJobSet().stream().filter(j -> predicate.evaluate(j))
+        return getValidCounterForReports((int) Bennu.getInstance().getQueueJobSet().stream().filter(predicate::evaluate)
                 .count());
     }
 
     private int getValidCounterForReports(int totalCounter) {
-        if (totalCounter > MAX_AUTHORIZED_REPORT_FILES) {
-            return MAX_AUTHORIZED_REPORT_FILES;
-        } else {
-            return totalCounter;
-        }
+        return Math.min(totalCounter, MAX_AUTHORIZED_REPORT_FILES);
     }
 
     public ActionForward cancelQueuedJob(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
@@ -857,20 +853,14 @@ public class ReportsByDegreeTypeDA extends FenixDispatchAction {
             try {
                 GepReportFile gepReportFile = (GepReportFile) queueJob;
                 if (gepReportFile.getClass() == this.reportClass) {
-                    if (this.executionYear == gepReportFile.getExecutionYear()
-                            && this.degreeType == gepReportFile.getDegreeType() && elements < MAX_AUTHORIZED_REPORT_FILES) {
-                        elements++;
-                        return true;
-                    } else {
-                        return false;
-                    }
+                    return this.executionYear == gepReportFile.getExecutionYear() && this.degreeType == gepReportFile
+                            .getDegreeType();
                 } else {
                     return false;
                 }
             } catch (ClassCastException E) {
                 return false;
             }
-
         }
     }
 
@@ -884,8 +874,11 @@ public class ReportsByDegreeTypeDA extends FenixDispatchAction {
         FindSelectedGepReports predicate = new FindSelectedGepReports(executionYear, degreeType, reportClass);
 
         List<GepReportFile> selectedJobs =
-                Bennu.getInstance().getQueueJobSet().stream().filter(j -> predicate.evaluate(j)).map(r -> (GepReportFile) r)
+                Bennu.getInstance().getQueueJobSet().stream().filter(predicate::evaluate).map(r -> (GepReportFile) r)
+                        .sorted(QueueJob.COMPARATORY_BY_REQUEST_DATE)
+                        .limit(MAX_AUTHORIZED_REPORT_FILES)
                         .collect(Collectors.toList());
+
         String reportName = "";
         if (selectedJobs.size() > 0) {
             reportName = selectedJobs.iterator().next().getJobName();
