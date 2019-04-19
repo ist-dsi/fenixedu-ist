@@ -62,11 +62,11 @@ public class PushNotifications {
 
     @DELETE
     @Path("/unregister/{device_id}")
-    public Response unregister(@PathParam("device_id") String deviceId, @QueryParam("registrationId") String registrationId) {
+    public Response unregister(@PathParam("device_id") String deviceId) {
 
         try {
-            return HTTP_CLIENT.target(pushNotificationServerUrl).path("api").path("v1").path("devices").path(deviceId)
-                    .queryParam("registrationID", registrationId).request().header("Authorization", "Bearer "+token).delete();
+            return HTTP_CLIENT.target(pushNotificationServerUrl).path("api").path("v1").path("devices").path(deviceId).request()
+                    .header("Authorization", "Bearer "+token).delete();
         } catch (WebApplicationException wae) {
             return Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }

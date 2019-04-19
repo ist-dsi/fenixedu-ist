@@ -75,17 +75,18 @@ public class PushNotificationsInitializer implements ServletContextListener {
             JsonObject title = new JsonObject();
             for (Locale locale : post.getName().getLocales()) {
                 JsonObject localizedMessage = new JsonObject();
-                title.addProperty(locale.toLanguageTag(), "Técnico Lisboa");
+                title.addProperty(locale.toLanguageTag(), post.getSite().getExecutionCourse().getName());
             }
             JsonObject body = new JsonObject();
             for (Locale locale : post.getName().getLocales()) {
                 JsonObject localizedMessage = new JsonObject();
-                body.addProperty(locale.toLanguageTag(), post.getSite().getExecutionCourse().getSigla() + ":" + post.getName().getContent(locale));
+                body.addProperty(locale.toLanguageTag(), post.getName().getContent(locale));
             }
             JsonObject returnObj = new JsonObject();
             returnObj.add("usernames", usernames);
             returnObj.add("title", title);
             returnObj.add("body", body);
+            returnObj.addProperty("channel", "tecnicoApp");
             try {
                 HTTP_CLIENT.target(pushNotificationServerUrl).path("api/v1/messages").request().header("Authorization", "Bearer "+token)
                         .post(Entity.entity(returnObj, "application/json; charset=utf8"));
