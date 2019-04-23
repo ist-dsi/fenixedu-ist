@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.fenixedu.academic.domain.CompetenceCourse;
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
@@ -107,6 +108,11 @@ public ActionForward exportDepartmentTeacherService(ActionMapping mapping, Actio
         spreadsheet.setHeader(BundleUtil.getString(Bundle.DEPARTMENT_MEMBER,
                 "label.teacherService.course.totalStudentsNumber"));
 
+        spreadsheet.setHeader(BundleUtil.getString(Bundle.DEPARTMENT_MEMBER,
+                "label.teacherService.course.firstTimeCompetenceEnrolledStudentsNumber"));
+        spreadsheet.setHeader(BundleUtil.getString(Bundle.DEPARTMENT_MEMBER,
+                "label.teacherService.course.secondTimeCompetenceEnrolledStudentsNumber"));
+
         org.fenixedu.academic.domain.ShiftType[] values = org.fenixedu.academic.domain.ShiftType.values();
         for (ShiftType shiftType : values) {
             spreadsheet.setHeader(BundleUtil.getString(Bundle.DEPARTMENT_MEMBER, "label.teacherServiceDistribution.hours")
@@ -127,12 +133,21 @@ public ActionForward exportDepartmentTeacherService(ActionMapping mapping, Actio
                 row.setCell(executionCourse.getExecutionPeriod().getSemester());
 
                 int executionCourseFirstTimeEnrollementStudentNumber = executionCourse.getFirstTimeEnrolmentStudentNumber();
+                int executionCourseSecondTimeEnrollementStudentNumber = executionCourse.getSecondTimeEnrolmentStudentNumber();
                 int totalStudentsNumber = executionCourse.getTotalEnrolmentStudentNumber();
-                int executionCourseSecondTimeEnrollementStudentNumber =
-                        totalStudentsNumber - executionCourseFirstTimeEnrollementStudentNumber;
+
                 row.setCell(executionCourseFirstTimeEnrollementStudentNumber);
                 row.setCell(executionCourseSecondTimeEnrollementStudentNumber);
                 row.setCell(totalStudentsNumber);
+
+
+                CompetenceCourse competenceCourse = executionCourse.getCompetenceCourses().stream()
+                        .filter(cc -> cc.getDepartmentUnit(executionSemester) == department.getDepartmentUnit()).findAny().get();
+                int competenceCourseFirstTimeEnrollementStudentNumber = competenceCourse.countAssociatedStudentsByEnrolmentNumber(1, executionSemester);
+                int competenceCourseSecondTimeEnrollementStudentNumber = competenceCourse.countAssociatedStudentsByEnrolmentNumber(2, executionSemester);
+
+                row.setCell(competenceCourseFirstTimeEnrollementStudentNumber);
+                row.setCell(competenceCourseSecondTimeEnrollementStudentNumber);
 
                 Double totalHours = 0.0;
                 for (ShiftType shiftType : values) {
