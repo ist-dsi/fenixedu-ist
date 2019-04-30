@@ -13,7 +13,7 @@
 
     <properties>
         <version.pt.ist.giaf-client-financial-documents>1.2.0</version.pt.ist.giaf-client-financial-documents>
-        <version.pt.ist.sap-sdk-java>4.3.0</version.pt.ist.sap-sdk-java>
+        <version.pt.ist.sap-sdk-java>4.4.0</version.pt.ist.sap-sdk-java>
         <version.org.fenixedu.postCodeTools>1.2.3</version.org.fenixedu.postCodeTools>
         <version.joda-time.joda-time-jsptags>1.1.1</version.joda-time.joda-time-jsptags>
     </properties>
