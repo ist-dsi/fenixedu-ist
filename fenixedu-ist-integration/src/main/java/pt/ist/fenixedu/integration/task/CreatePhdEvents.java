@@ -42,7 +42,7 @@ public class CreatePhdEvents extends CronTask {
     @Override
     public void runTask() throws Exception {
         final LocalDate today = new LocalDate();
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < 30; i++) {
             final LocalDate day = today.minusDays(i);
             Bennu.getInstance().getPartysSet().stream()
                 .parallel()
