@@ -26,6 +26,7 @@ import pt.ist.fenixWebFramework.renderers.components.HtmlLink;
 import pt.ist.fenixWebFramework.renderers.components.HtmlTableCell;
 import pt.ist.fenixWebFramework.renderers.components.HtmlTableRow;
 import pt.ist.fenixWebFramework.renderers.components.HtmlText;
+import pt.ist.fenixedu.quc.domain.InquiryDelegateAnswer;
 import pt.ist.fenixedu.quc.dto.BlockResumeResult;
 import pt.ist.fenixedu.quc.dto.CurricularCourseResumeResult;
 
@@ -49,19 +50,32 @@ public class InquiryCourseDegreesResumeRenderer extends InquiryBlocksResumeRende
         resultsLink.setTarget("_blank");
         resultsLink.setText("Resultados");
 
-        String delegateParameters = buildParametersForDelegate(blockResumeResult);
-        HtmlLink delegateLink = new HtmlLink();
-        delegateLink.setModule("/publico");
-        delegateLink.setUrl("/viewQUCInquiryAnswers.do?method=showDelegateInquiry" + delegateParameters);
-        delegateLink.setTarget("_blank");
-        delegateLink.setText("Relatório do Delegado");
-
         container.addChild(resultsLink);
-        container.addChild(new HtmlText("&nbsp;|&nbsp;", false));
-        container.addChild(delegateLink);
+
+        CurricularCourseResumeResult courseResume = (CurricularCourseResumeResult) blockResumeResult;
+        for (InquiryDelegateAnswer inquiryDelegateAnswer : courseResume.getExecutionCourse()
+                .getInquiryDelegatesAnswersSet()) {
+            if (inquiryDelegateAnswer.getExecutionDegree() == courseResume.getExecutionDegree()) {
+                String delegateInquiryParameters = buildParametersForDelegateInquiry(inquiryDelegateAnswer);
+
+                HtmlLink delegateLink = new HtmlLink();
+                delegateLink.setModule("/publico");
+                delegateLink.setUrl("/viewQUCInquiryAnswers.do?method=showDelegateInquiry" + delegateInquiryParameters);
+                delegateLink.setTarget("_blank");
+                delegateLink.setText("Relatório " + inquiryDelegateAnswer.getDelegate().getTitle());
+                container.addChild(new HtmlText("&nbsp;|&nbsp;", false));
+                container.addChild(delegateLink);
+            }
+        }
 
         linksCell.setBody(container);
         linksCell.setClasses("col-actions");
+    }
+
+    private String buildParametersForDelegateInquiry(final InquiryDelegateAnswer inquiryDelegateAnswer) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("&inquiryDelegateAnswerOID=").append(inquiryDelegateAnswer.getExternalId());
+        return builder.toString();
     }
 
     private String buildParametersForResults(BlockResumeResult blocksResumeResult) {
@@ -72,13 +86,4 @@ public class InquiryCourseDegreesResumeRenderer extends InquiryBlocksResumeRende
         builder.append("&executionCourseOID=").append(courseResume.getExecutionCourse().getExternalId());
         return builder.toString();
     }
-
-    private String buildParametersForDelegate(BlockResumeResult blocksResumeResult) {
-        CurricularCourseResumeResult courseResume = (CurricularCourseResumeResult) blocksResumeResult;
-        StringBuilder builder = new StringBuilder();
-        builder.append("&executionCourseOID=").append(courseResume.getExecutionCourse().getExternalId());
-        builder.append("&executionDegreeOID=").append(courseResume.getExecutionDegree().getExternalId());
-        return builder.toString();
-    }
-
 }
