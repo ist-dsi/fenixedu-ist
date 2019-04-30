@@ -19,6 +19,9 @@
  */
 package pt.ist.fenixedu.giaf.invoices.ui;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Optional;
@@ -28,6 +31,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Collector.Characteristics;
 
+import com.google.common.io.ByteStreams;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.accessControl.AcademicAuthorizationGroup;
 import org.fenixedu.academic.domain.accessControl.academicAdministration.AcademicOperationType;
@@ -49,6 +53,7 @@ import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.joda.time.DateTime;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -68,6 +73,9 @@ import pt.ist.fenixedu.giaf.invoices.EventLogger;
 import pt.ist.fenixedu.giaf.invoices.EventProcessor;
 import pt.ist.fenixedu.giaf.invoices.SapEvent;
 import pt.ist.fenixframework.Atomic;
+import pt.ist.sap.client.SapFinantialClient;
+
+import javax.servlet.http.HttpServletResponse;
 
 @SpringFunctionality(app = InvoiceDownloadController.class, title = "title.sap.invoice.viewer")
 @RequestMapping("/sap-invoice-viewer")
@@ -415,6 +423,25 @@ public class SapInvoiceController {
             sapRequest.toggleIgnore();
         }
         return sapDocumentsRedirect(event);
+    }
+
+    @RequestMapping(value = "/{sapRequest}/downloadXml", method = RequestMethod.POST, produces = "application/xml")
+    public void downloadXml(final @PathVariable SapRequest sapRequest, final Model model, final HttpServletResponse response) {
+        final Event event = sapRequest.getEvent();
+        if (Group.dynamic("managers").isMember(Authenticate.getUser()) || Group.dynamic("sapIntegrationManager").isMember(Authenticate.getUser())) {
+            String xml = SapFinantialClient.generateSapFile(sapRequest.getRequestAsJson());
+            try {
+                InputStream inputStream = new ByteArrayInputStream(xml.getBytes());
+                response.setHeader("Content-Disposition", "attachment; filename=" + sapRequest.getDocumentNumber() + ".xml");
+                ByteStreams.copy(inputStream, response.getOutputStream());
+                response.flushBuffer();
+            } catch (final IOException e) {
+                throw new Error(e);
+            }
+        } else {
+            response.setStatus(HttpStatus.FORBIDDEN.value());
+            response.getClass();
+        }
     }
 
     private JsonObject toJsonObject(final Event event, final DateTime when) {
