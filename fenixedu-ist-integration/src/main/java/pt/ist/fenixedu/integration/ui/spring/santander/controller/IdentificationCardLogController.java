@@ -5,7 +5,7 @@ import java.util.List;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.spring.portal.SpringApplication;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
-import org.fenixedu.idcards.domain.SantanderEntryNew;
+import org.fenixedu.idcards.domain.SantanderEntry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -45,7 +45,7 @@ public class IdentificationCardLogController {
             return "redirect:/identification-card-log";
         }
 
-        List<SantanderEntryNew> requests = bean.search();
+        List<SantanderEntry> requests = bean.search();
         
         model.addAttribute("requests", requests);
 

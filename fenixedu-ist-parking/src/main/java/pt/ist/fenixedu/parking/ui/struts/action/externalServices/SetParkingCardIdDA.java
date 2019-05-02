@@ -75,7 +75,7 @@ public class SetParkingCardIdDA extends FenixDispatchAction {
     private static String runSantander(final String password, final String categoryCode, final String identificationCardCode,
             final Long parkingCardID) throws FenixServiceException {
         if (isAllowed(password)) {
-            SantanderEntryNew entry = SantanderEntryNew.readByUsernameAndCategory(identificationCardCode, categoryCode);
+            SantanderEntry entry = SantanderEntry.readByUsernameAndCategory(identificationCardCode, categoryCode);
             if (entry == null) {
                 throw new UserDoesNotExistException();
             }

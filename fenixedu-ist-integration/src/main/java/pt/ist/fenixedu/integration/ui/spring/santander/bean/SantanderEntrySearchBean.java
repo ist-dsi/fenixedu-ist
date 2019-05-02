@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.fenixedu.bennu.core.domain.User;
-import org.fenixedu.idcards.domain.SantanderEntryNew;
+import org.fenixedu.idcards.domain.SantanderEntry;
 
 public class SantanderEntrySearchBean {
 
@@ -21,11 +21,11 @@ public class SantanderEntrySearchBean {
         this.username = username;
     }
 
-    public List<SantanderEntryNew> search() {
+    public List<SantanderEntry> search() {
         User user = User.findByUsername(username);
 
         if (user != null) {
-            return SantanderEntryNew.getSantanderEntryHistory(user);
+            return SantanderEntry.getSantanderEntryHistory(user);
         }
         return new ArrayList<>();
     }
