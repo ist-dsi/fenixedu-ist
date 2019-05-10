@@ -141,10 +141,14 @@ public ActionForward exportDepartmentTeacherService(ActionMapping mapping, Actio
                 row.setCell(totalStudentsNumber);
 
 
+                Set<DegreeCurricularPlan> degreeCurricularPlans = executionCourse.getAssociatedCurricularCoursesSet()
+                        .stream().map(CurricularCourse::getDegreeCurricularPlan).collect(Collectors.toSet());
                 CompetenceCourse competenceCourse = executionCourse.getCompetenceCourses().stream()
                         .filter(cc -> cc.getDepartmentUnit(executionSemester) == department.getDepartmentUnit()).findAny().get();
-                int competenceCourseFirstTimeEnrollementStudentNumber = competenceCourse.countAssociatedStudentsByEnrolmentNumber(1, executionSemester);
-                int competenceCourseSecondTimeEnrollementStudentNumber = competenceCourse.countAssociatedStudentsByEnrolmentNumber(2, executionSemester);
+                int competenceCourseFirstTimeEnrollementStudentNumber =
+                        competenceCourse.countAssociatedStudentsByEnrolmentNumberAndDegrees(1, executionSemester, degreeCurricularPlans);
+                int competenceCourseSecondTimeEnrollementStudentNumber =
+                        competenceCourse.countAssociatedStudentsByEnrolmentNumberAndDegrees(2, executionSemester, degreeCurricularPlans);
 
                 row.setCell(competenceCourseFirstTimeEnrollementStudentNumber);
                 row.setCell(competenceCourseSecondTimeEnrollementStudentNumber);
