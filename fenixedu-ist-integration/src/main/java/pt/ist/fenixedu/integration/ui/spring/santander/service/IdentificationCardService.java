@@ -1,12 +1,7 @@
 package pt.ist.fenixedu.integration.ui.spring.santander.service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.bennu.core.domain.Bennu;
-import org.fenixedu.idcards.service.SantanderRequestCardService;
+import org.fenixedu.idcards.service.SantanderIdCardsService;
 import org.fenixedu.santandersdk.dto.RegisterAction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,10 +10,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class IdentificationCardService {
 
-    private SantanderRequestCardService santanderRequestCardService;
+    private SantanderIdCardsService santanderRequestCardService;
 
     @Autowired
-    public IdentificationCardService(SantanderRequestCardService santanderRequestCardService) {
+    public IdentificationCardService(SantanderIdCardsService santanderRequestCardService) {
         this.santanderRequestCardService = santanderRequestCardService;
     }
 

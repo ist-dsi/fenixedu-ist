@@ -5,7 +5,7 @@ import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.bennu.spring.portal.SpringApplication;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.fenixedu.idcards.domain.SantanderEntry;
-import org.fenixedu.idcards.service.SantanderRequestCardService;
+import org.fenixedu.idcards.service.SantanderIdCardsService;
 import org.fenixedu.santandersdk.dto.RegisterAction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -22,10 +22,10 @@ import pt.ist.fenixedu.integration.ui.spring.santander.service.IdentificationCar
 public class IdentificationCardController {
 
     private IdentificationCardService identificationCardService;
-    private SantanderRequestCardService santanderRequestCardService;
+    private SantanderIdCardsService santanderRequestCardService;
 
     @Autowired
-    public IdentificationCardController(IdentificationCardService identificationCardService, SantanderRequestCardService santanderRequestCardService) {
+    public IdentificationCardController(IdentificationCardService identificationCardService, SantanderIdCardsService santanderRequestCardService) {
         this.identificationCardService = identificationCardService;
         this.santanderRequestCardService = santanderRequestCardService;
     }
@@ -35,7 +35,6 @@ public class IdentificationCardController {
         Person person = AccessControl.getPerson();
 
         model.addAttribute("availableActions", santanderRequestCardService.getPersonAvailableActions(person.getUser()));
-        model.addAttribute("cardHistory", SantanderEntry.getSantanderCardHistory(person.getUser()));
 
         return "fenixedu-ist-integration/identificationCards/showCardInformation";
     }
