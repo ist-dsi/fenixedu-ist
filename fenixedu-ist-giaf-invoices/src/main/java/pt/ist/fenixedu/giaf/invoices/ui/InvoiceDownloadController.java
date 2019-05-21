@@ -87,7 +87,7 @@ public class InvoiceDownloadController {
 
     @RequestMapping(value = "/{event}/documents", method = RequestMethod.GET)
     public String listForEvent(@PathVariable Event event, final Model model) {
-        if (sAllowedToAccess(event)) {
+        if (isAllowedToAccess(event)) {
             model.addAttribute("event", event);
             model.addAttribute("eventDetailsUrl", accessControlService.isEventOwner(event, Authenticate.getUser()) ?
                     ownerEventDetails(event): eventDetails(event));
@@ -140,7 +140,7 @@ public class InvoiceDownloadController {
 
     @RequestMapping(value = "/giaf/{event}/{filename}", method = RequestMethod.GET, produces = "application/pdf")
     public void giafInvoice(@PathVariable Event event, @PathVariable String filename, final HttpServletResponse response) {
-        if (sAllowedToAccess(event)) {
+        if (isAllowedToAccess(event)) {
             final File file =  GiafEvent.receiptFile(event, filename);
             if (file != null && file.exists()) {
                 try (final FileInputStream inputStream = new FileInputStream(file)) {
@@ -159,7 +159,7 @@ public class InvoiceDownloadController {
 
     @RequestMapping(value = "/sap/{sapRequest}/{filename}", method = RequestMethod.GET, produces = "application/pdf")
     public void sapInvoice(@PathVariable SapRequest sapRequest, @PathVariable String filename, final HttpServletResponse response) {
-        if (sAllowedToAccess(sapRequest.getEvent())) {
+        if (isAllowedToAccess(sapRequest.getEvent())) {
             final SapDocumentFile sapDocumentFile = sapRequest.getSapDocumentFile();
             if (sapDocumentFile == null) {
                 response.setStatus(HttpStatus.NOT_FOUND.value());
@@ -182,23 +182,28 @@ public class InvoiceDownloadController {
     }
 
     @RequestMapping(value = "/sap/{sapRequest}/details", method = RequestMethod.GET)
-    public String sapInvoiceDetails(final @PathVariable SapRequest sapRequest, final Model model) {
+    public String sapInvoiceDetails(final @PathVariable SapRequest sapRequest, final Model model, final HttpServletResponse response) {
         final Event event = sapRequest.getEvent();
-        model.addAttribute("eventDetailsUrl", accessControlService.isEventOwner(event, Authenticate.getUser()) ?
-                ownerEventDetails(event): eventDetails(event));
+        if (isAllowedToAccess(event)) {
+            model.addAttribute("eventDetailsUrl", accessControlService.isEventOwner(event, Authenticate.getUser()) ?
+                    ownerEventDetails(event): eventDetails(event));
 
-        model.addAttribute("sapRequest", sapRequest);
-        model.addAttribute("clientData", sapRequest.getClientData());
-        model.addAttribute("documentData", sapRequest.getDocumentData());
-        model.addAttribute("isPaymentManager", SapInvoiceController.isAdvancedPaymentManager());
-        return "sap-invoice-viewer/invoiceDetails";
+            model.addAttribute("sapRequest", sapRequest);
+            model.addAttribute("clientData", sapRequest.getClientData());
+            model.addAttribute("documentData", sapRequest.getDocumentData());
+            model.addAttribute("isPaymentManager", SapInvoiceController.isAdvancedPaymentManager());
+            return "sap-invoice-viewer/invoiceDetails";
+        } else {
+            response.setStatus(HttpStatus.FORBIDDEN.value());
+            return "/";
+        }
     }
 
     private String fullFilename(final String filename) {
         return filename.endsWith(".pdf") ? filename : filename + ".pdf";
     }
 
-    private boolean sAllowedToAccess(final Event event) {
+    private boolean isAllowedToAccess(final Event event) {
         final User user = Authenticate.getUser();
         return isOwner(event, user) || isAcademicServiceStaff(user);
     }
