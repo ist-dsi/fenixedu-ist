@@ -86,7 +86,7 @@ public class InvoiceDownloadController {
     }
 
     @RequestMapping(value = "/{event}/documents", method = RequestMethod.GET)
-    public String listForEvent(@PathVariable Event event, final Model model) {
+    public String listForEvent(@PathVariable Event event, final Model model, final HttpServletResponse response) {
         if (isAllowedToAccess(event)) {
             model.addAttribute("event", event);
             model.addAttribute("eventDetailsUrl", accessControlService.isEventOwner(event, Authenticate.getUser()) ?
@@ -111,8 +111,11 @@ public class InvoiceDownloadController {
                 }
             }
             model.addAttribute("giafDocuments", giafDocuments);
+            return "invoice-viewer/home";
+        } else {
+            response.setStatus(HttpStatus.FORBIDDEN.value());
+            return "/";
         }
-        return "invoice-viewer/home";
     }
 
     private JsonObject toJsonObject(final SapRequest sapRequest) {
@@ -153,7 +156,6 @@ public class InvoiceDownloadController {
             }
         } else {
             response.setStatus(HttpStatus.FORBIDDEN.value());
-            response.getClass();
         }
     }
 
