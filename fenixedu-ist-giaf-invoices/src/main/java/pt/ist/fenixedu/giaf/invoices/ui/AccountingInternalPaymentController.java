@@ -1,6 +1,9 @@
 package pt.ist.fenixedu.giaf.invoices.ui;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -70,7 +73,7 @@ public class AccountingInternalPaymentController {
     };
 
     @RequestMapping(method = RequestMethod.GET)
-    public String home() {
+    public String home() throws UnsupportedEncodingException {
         final DateTime now = new DateTime();
         return "redirect:" + REQUEST_MAPPING + "/search?start=" + toString(now.minusDays(3)) + "&end=" + toString(now);
     }
@@ -109,19 +112,19 @@ public class AccountingInternalPaymentController {
         return "fenixedu-academic/accounting/internalPayment/" + view;
     }
 
-    private String toString(final DateTime dateTime) {
-        return dateTime.toString(ISODateTimeFormat.dateTime());
+    private String toString(final DateTime dateTime) throws UnsupportedEncodingException {
+        return URLEncoder.encode(dateTime.toString(ISODateTimeFormat.dateTime()), StandardCharsets.UTF_8.toString());
     }
 
     @RequestMapping(value="/{sapRequest}/consolidate", method = RequestMethod.POST)
-    public String consolidate(final @PathVariable SapRequest sapRequest, final Model model) {
+    public String consolidate(final @PathVariable SapRequest sapRequest, final Model model) throws UnsupportedEncodingException {
         final DateTime whenSent = sapRequest.getWhenSent();
         sapRequest.consolidate();
         return "redirect:" + REQUEST_MAPPING + "/search?start=" + toString(whenSent.minusDays(2)) + "&end=" + toString(whenSent.plusDays(1));
     }
 
     @RequestMapping(value="/{sapRequest}/revertConsolidation", method = RequestMethod.POST)
-    public String revertConsolidation(final @PathVariable SapRequest sapRequest, final Model model) {
+    public String revertConsolidation(final @PathVariable SapRequest sapRequest, final Model model) throws UnsupportedEncodingException {
         final DateTime whenSent = sapRequest.getWhenSent();
         sapRequest.revertConsolidation();
         return "redirect:" + REQUEST_MAPPING + "/search?start=" + toString(whenSent.minusDays(2)) + "&end=" + toString(whenSent.plusDays(1));
