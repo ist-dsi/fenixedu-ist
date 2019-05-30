@@ -4,14 +4,11 @@ import static org.fenixedu.bennu.core.signals.Signal.registerWithoutTransaction;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.ws.rs.POST;
 
 import org.fenixedu.bennu.core.signals.HandlerRegistration;
-import org.fenixedu.bennu.core.signals.Signal;
 import org.fenixedu.bennu.spring.BennuSpringModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.context.WebApplicationContext;
@@ -35,7 +32,7 @@ public class RegistrationProcessSpringConfiguration {
 
     @Bean
     PapyrusSettings papyrusSettings() {
-        return PapyrusSettings.newBuilder().landscape(true).size("A4").pdfA(true).build();
+        return PapyrusSettings.newBuilder().landscape(false).format("A4").pdfA(true).build();
     }
 
     @PostConstruct
