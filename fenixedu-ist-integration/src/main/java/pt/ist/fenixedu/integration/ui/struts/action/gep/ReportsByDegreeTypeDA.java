@@ -53,6 +53,7 @@ import org.fenixedu.academic.domain.reports.StatusAndApprovalReportFile;
 import org.fenixedu.academic.domain.reports.SummaryOccupancyReportFile;
 import org.fenixedu.academic.domain.reports.WrittenEvaluationReportFile;
 import org.fenixedu.academic.predicate.AccessControl;
+import org.fenixedu.academic.thesis.domain.reports.ThesisProposalsReportFile;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
 import org.fenixedu.academic.ui.struts.action.gep.GepApplication.GepPortalApp;
 import org.fenixedu.bennu.core.domain.Bennu;
@@ -741,6 +742,18 @@ public class ReportsByDegreeTypeDA extends FenixDispatchAction {
         return selectDegreeType(mapping, actionForm, request, response);
     }
 
+    public ActionForward downloadThesisProposalsReportFile(ActionMapping mapping, ActionForm actionForm,
+                                                                 HttpServletRequest request, HttpServletResponse response) throws IOException {
+        if (isRepeatedJob(AccessControl.getPerson(), request, getClassForParameter(request.getParameter("type")))) {
+            return selectDegreeType(mapping, actionForm, request, response);
+        }
+        final ExecutionYear executionYear = getExecutionYear(request);
+
+        prepareNewJobResponse(request, ReportFileFactory.createThesisProposalsReportFile(getFormat(request), executionYear));
+
+        return selectDegreeType(mapping, actionForm, request, response);
+    }
+
     private void prepareNewJobResponse(HttpServletRequest request, GepReportFile job) {
 
         ReportBean reportBean = getRenderedObject();
@@ -827,6 +840,8 @@ public class ReportsByDegreeTypeDA extends FenixDispatchAction {
             return FirstTimeCycleAnswersReportFile.class;
         case 34:
             return StudentMeritReportFile.class;
+        case 35:
+            return ThesisProposalsReportFile.class;
         default:
             return null;
         }

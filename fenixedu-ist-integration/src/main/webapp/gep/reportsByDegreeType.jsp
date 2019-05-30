@@ -504,6 +504,7 @@
 <bean:define id="urlWrittenEvaluations" type="java.lang.String">/reportsByDegreeType.do?method=downloadWrittenEvaluations&amp;<bean:write name="args" filter="false"/></bean:define>
 <bean:define id="urlDissertations" type="java.lang.String">/reportsByDegreeType.do?method=downloadDissertationsWithExternalAffiliations&amp;<bean:write name="args" filter="false"/></bean:define>
 <bean:define id="urlDissertationsProposals" type="java.lang.String">/reportsByDegreeType.do?method=downloadDissertationsProposals&amp;<bean:write name="args" filter="false"/></bean:define>
+<bean:define id="urlThesisProposals" type="java.lang.String">/reportsByDegreeType.do?method=downloadThesisProposalsReportFile&amp;<bean:write name="args" filter="false"/></bean:define>
 <bean:define id="urlTeachersFromAplica" type="java.lang.String">/reportsByDegreeType.do?method=downloadTeachersListFromAplica&amp;<bean:write name="args" filter="false"/></bean:define>
 <bean:define id="urlTeacherCreditsReportFile" type="java.lang.String">/reportsByDegreeType.do?method=downloadTeacherCreditsReportFile&amp;<bean:write name="args" filter="false"/></bean:define>
 <bean:define id="urlEffectiveTeachingLoadReportFile" type="java.lang.String">/reportsByDegreeType.do?method=downloadEffectiveTeachingLoadReportFile&amp;<bean:write name="args" filter="false"/>
@@ -605,6 +606,27 @@
 		<td>
 			<html:link page="<%= viewReports + "&type=12" %>">
 				<bean:message key="label.view.requests.done" bundle="GEP_RESOURCES" /> (<bean:write name="numberOfReportsType12"/>)
+			</html:link>
+		</td>
+	</tr>
+	<tr>
+		<td style="width: 350px;">
+			${fr:message('resources.FenixEduThesisProposalsResources', 'label.report.thesis.proposals')}
+		</td>
+		<td>
+			<bean:define id="urlThesisCsv" type="java.lang.String"><bean:write name="urlThesisProposals" filter="false"/>&amp;format=csv&amp;type=35</bean:define>
+			<html:link page="<%= urlThesisCsv %>">
+				<bean:message key="label.request.csv" bundle="GEP_RESOURCES" />
+			</html:link>
+			|
+			<bean:define id="urlThesisXls" type="java.lang.String"><bean:write name="urlThesisProposals" filter="false"/>&amp;format=xls&amp;type=35</bean:define>
+			<html:link page="<%= urlThesisXls %>">
+				<bean:message key="label.request.xls" bundle="GEP_RESOURCES" />
+			</html:link>
+		</td>
+		<td>
+			<html:link page="<%= viewReports + "&type=35" %>">
+				<bean:message key="label.view.requests.done" bundle="GEP_RESOURCES" /> (<bean:write name="numberOfReportsType35"/>)
 			</html:link>
 		</td>
 	</tr>

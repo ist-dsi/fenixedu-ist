@@ -40,6 +40,7 @@ import org.fenixedu.academic.domain.reports.StatusAndApprovalReportFile;
 import org.fenixedu.academic.domain.reports.SummaryOccupancyReportFile;
 import org.fenixedu.academic.domain.reports.WrittenEvaluationReportFile;
 
+import org.fenixedu.academic.thesis.domain.reports.ThesisProposalsReportFile;
 import pt.ist.fenixedu.integration.domain.reports.StudentMeritReportFile;
 import pt.ist.fenixedu.quc.domain.reports.AvailableCoursesForQUCReportFile;
 import pt.ist.fenixedu.quc.domain.reports.CoordinatorsAnswersReportFile;
@@ -373,5 +374,13 @@ public class ReportFileFactory {
         studentMeritReportFile.setDegreeType(degreeType);
         studentMeritReportFile.setExecutionYear(executionYear);
         return studentMeritReportFile;
+    }
+
+    @Atomic
+    public static GepReportFile createThesisProposalsReportFile(String type, ExecutionYear executionYear) {
+        final ThesisProposalsReportFile thesisProposalsReportFile = new ThesisProposalsReportFile();
+        thesisProposalsReportFile.setType(type);
+        thesisProposalsReportFile.setExecutionYear(executionYear);
+        return thesisProposalsReportFile;
     }
 }
