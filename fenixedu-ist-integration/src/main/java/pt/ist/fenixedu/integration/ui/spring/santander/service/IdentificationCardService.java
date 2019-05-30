@@ -3,6 +3,7 @@ package pt.ist.fenixedu.integration.ui.spring.santander.service;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.idcards.service.SantanderIdCardsService;
 import org.fenixedu.santandersdk.dto.RegisterAction;
+import org.fenixedu.santandersdk.exception.SantanderValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +18,7 @@ public class IdentificationCardService {
         this.santanderRequestCardService = santanderRequestCardService;
     }
 
-    public void createRegister(Person person, RegisterAction action) {
+    public void createRegister(Person person, RegisterAction action) throws SantanderValidationException {
         santanderRequestCardService.createRegister(person.getUser(), action);
     }
 

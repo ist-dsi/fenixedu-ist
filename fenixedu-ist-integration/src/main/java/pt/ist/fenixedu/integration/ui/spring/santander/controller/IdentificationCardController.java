@@ -7,6 +7,7 @@ import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.fenixedu.idcards.domain.SantanderEntry;
 import org.fenixedu.idcards.service.SantanderIdCardsService;
 import org.fenixedu.santandersdk.dto.RegisterAction;
+import org.fenixedu.santandersdk.exception.SantanderValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -65,7 +66,7 @@ public class IdentificationCardController {
     }
 
     @RequestMapping(value = "/request-card-test", method = RequestMethod.POST)
-    public String requestCardTest(String action) {
+    public String requestCardTest(String action) throws SantanderValidationException {
         Person person = AccessControl.getPerson();
 
         RegisterAction registerAction = RegisterAction.valueOf(action);

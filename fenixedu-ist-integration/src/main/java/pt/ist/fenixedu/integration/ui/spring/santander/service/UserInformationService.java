@@ -25,6 +25,9 @@ public class UserInformationService implements IUserInfoService {
     public BufferedImage getUserPhoto(User user) {
         //Might not work if image is not in JPG format
         PersonInformationDTO personInformationDTO = new PersonInformationDTO(user.getPerson());
+        if (personInformationDTO.getPhoto() == null) {
+            return null;
+        }
         byte[] photo = BaseEncoding.base64().decode(personInformationDTO.getPhoto());
         return Picture.readImage(photo);
     }
