@@ -1,6 +1,9 @@
 package pt.ist.fenixedu.giaf.invoices.ui;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -90,7 +93,7 @@ public class AccountingRefundController {
     };
             
     @RequestMapping(method = RequestMethod.GET)
-    public String home() {
+    public String home() throws UnsupportedEncodingException {
         final DateTime now = new DateTime();
         return "redirect:" + REQUEST_MAPPING + "/search?start=" + toString(now.minusDays(3)) + "&end=" + toString(now);
     }
@@ -132,8 +135,8 @@ public class AccountingRefundController {
         return "fenixedu-academic/accounting/refund/" + view;
     }
 
-    private String toString(final DateTime dateTime) {
-        return dateTime.toString(ISODateTimeFormat.dateTime());
+    private String toString(final DateTime dateTime) throws UnsupportedEncodingException {
+        return URLEncoder.encode(dateTime.toString(ISODateTimeFormat.dateTime()), StandardCharsets.UTF_8.toString());
     }
 
 }
