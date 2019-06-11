@@ -44,6 +44,15 @@ class ExternalClient {
     Integer billingIndicator;
 }
 
+class documents.FinancialDocumentFile extends .org.fenixedu.bennu.io.domain.GenericFile {
+}
+
+class documents.FinancialDocument {
+    String documentType;
+    String documentNumber;
+    Money value;
+}
+
 
 relation SapRequestSapRequestAnnulled {
 	SapRequest playsRole originalRequest {
@@ -159,5 +168,23 @@ relation SapRootConsolidatedSapRequest {
     }
     SapRequest playsRole consolidatedSapRequest {
         multiplicity *;
+    }
+}
+
+relation EventFinancialDocument {
+    .org.fenixedu.academic.domain.accounting.Event playsRole event {
+        multiplicity 1..1;
+    }
+    documents.FinancialDocument playsRole financialDocument {
+        multiplicity *;
+    }
+}
+
+relation FinancialDocumentFinancialDocumentFile {
+    documents.FinancialDocumentFile playsRole financialDocumentFile {
+        multiplicity 1..1;
+    }
+    documents.FinancialDocument playsRole financialDocument {
+        multiplicity 1..1;
     }
 }
