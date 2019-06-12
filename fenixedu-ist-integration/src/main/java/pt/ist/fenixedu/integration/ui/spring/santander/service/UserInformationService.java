@@ -3,6 +3,7 @@ package pt.ist.fenixedu.integration.ui.spring.santander.service;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
+import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.photograph.Picture;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.idcards.service.IUserInfoService;
@@ -34,8 +35,11 @@ public class UserInformationService implements IUserInfoService {
 
     @Override
     public String getUserDepartmentAcronym(User user) {
-        PersonInformationDTO personInformationDTO = new PersonInformationDTO(user.getPerson());
-        return personInformationDTO.getTeacherDepartment();
+        Person person = user.getPerson();
+        if (person.getTeacher() != null && person.getTeacher().getDepartment() != null) {
+            return person.getTeacher().getDepartment().getAcronym();
+        }
+        return null;
     }
 
     @Override
