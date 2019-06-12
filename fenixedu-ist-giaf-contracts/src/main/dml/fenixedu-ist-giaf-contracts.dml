@@ -256,6 +256,7 @@ relation ResearchUnitSender {
 }
 
 class accessControl.PersistentCampusEmployeeGroup extends .org.fenixedu.bennu.core.domain.groups.PersistentGroup;
+class accessControl.PersistentCampusGrantOwnerGroup extends .org.fenixedu.bennu.core.domain.groups.PersistentGroup;
 
 relation GiafProfessionalDataRootDomainObject {
     .org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject;
@@ -645,6 +646,15 @@ relation PublicationCollaborators {
 
 relation PersistentCampusEmployeeGroupCampus {
     public accessControl.PersistentCampusEmployeeGroup playsRole campusEmployeeGroup {
+        multiplicity 0..1;
+    }
+    public .org.fenixedu.spaces.domain.Space playsRole campus {
+        multiplicity 1..1;
+    }
+}
+
+relation PersistentCampusGrantOwnerGroupCampus {
+    public accessControl.PersistentCampusGrantOwnerGroup playsRole campusGrantOwnerGroup {
         multiplicity 0..1;
     }
     public .org.fenixedu.spaces.domain.Space playsRole campus {

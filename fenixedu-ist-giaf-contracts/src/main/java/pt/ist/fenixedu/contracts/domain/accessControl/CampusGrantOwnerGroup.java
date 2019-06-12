@@ -9,21 +9,21 @@ import org.fenixedu.spaces.domain.Space;
  * Created by Sérgio Silva (hello@fenixedu.org).
  */
 
-@GroupOperator("campusEmployee")
-public class CampusEmployeeGroup extends CampusSapGroup {
+@GroupOperator("campusGrantOwner")
+public class CampusGrantOwnerGroup extends CampusSapGroup {
 
-    private static final String[] SAP_GROUPS = new String[] { " Não Docente", " Dirigentes", " Técnicos e Administ." };
+    private static final String[] SAP_GROUPS = new String[] { " Bolseiros", " Bols. Investigação" };
 
-    public CampusEmployeeGroup() {
+    public CampusGrantOwnerGroup() {
         super();
     }
-    
-    private CampusEmployeeGroup(Space campus) {
+
+    private CampusGrantOwnerGroup(Space campus) {
         super(campus);
     }
 
     public static Group get(final Space campus) {
-        return new CampusEmployeeGroup(campus);
+        return new CampusGrantOwnerGroup(campus);
     }
 
     @Override
@@ -33,6 +33,6 @@ public class CampusEmployeeGroup extends CampusSapGroup {
 
     @Override
     public PersistentGroup toPersistentGroup() {
-        return PersistentCampusEmployeeGroup.getInstance(campus);
+        return PersistentCampusGrantOwnerGroup.getInstance(campus);
     }
 }
