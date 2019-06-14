@@ -62,7 +62,7 @@
         <connection>scm:git:git@github.com:ist-dsi/fenixedu-ist.git</connection>
         <developerConnection>scm:git:git@github.com:ist-dsi/fenixedu-ist.git</developerConnection>
         <url>http://fenixedu.org</url>
-        <tag>v17.3.0-SNAPSHOT</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <dependencyManagement>
