@@ -7,7 +7,6 @@ import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.scheduler.CronTask;
 import org.fenixedu.bennu.scheduler.annotation.Task;
-import org.fenixedu.idcards.domain.SantanderCardInformation;
 
 import pt.ist.fenixedu.parking.domain.ParkingParty;
 
@@ -16,7 +15,7 @@ public class SetDefaultRFIDForCarParkUsers extends CronTask {
 
     @Override
     public void runTask() throws Exception {
-        for (final User user : Bennu.getInstance().getUserSet()) {
+     /*   for (final User user : Bennu.getInstance().getUserSet()) {
             final Person person = user.getPerson();
             if (person != null) {
                 final ParkingParty parkingParty = person.getParkingParty();
@@ -29,10 +28,10 @@ public class SetDefaultRFIDForCarParkUsers extends CronTask {
                     }
                 }
             }
-        }
+        }*/
     }
 
-    private boolean isOutDatedValue(final Person person, final Long cardNumber) {
+    /*private boolean isOutDatedValue(final Person person, final Long cardNumber) {
         final String rfid = getLastMifareSerialNumber(person);
         if (rfid ==  null) {
             return false;
@@ -57,6 +56,6 @@ public class SetDefaultRFIDForCarParkUsers extends CronTask {
 
     private static int compareDHCPLines(final String l1, String l2) {
         return l1.substring(1, 9).compareTo(l2.substring(1, 9));
-    }
+    }*/
 
 }

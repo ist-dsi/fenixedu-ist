@@ -18,29 +18,13 @@
  */
 package pt.ist.fenixedu.parking.ui.struts.action.externalServices;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
-import org.fenixedu.academic.domain.organizationalStructure.Party;
-import org.fenixedu.academic.service.services.exceptions.FenixServiceException;
 import org.fenixedu.academic.ui.struts.action.base.FenixDispatchAction;
 import org.fenixedu.bennu.struts.annotations.Mapping;
-import org.fenixedu.idcards.domain.SantanderEntry;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import pt.ist.fenixedu.parking.ParkingConfigurationManager;
-import pt.ist.fenixedu.parking.domain.ParkingParty;
-import pt.ist.fenixframework.Atomic;
 
 @Mapping(path = "/setParkingCardId", module = "external")
 public class SetParkingCardIdDA extends FenixDispatchAction {
 
-    private static final Logger logger = LoggerFactory.getLogger(SetParkingCardIdDA.class);
+    /*private static final Logger logger = LoggerFactory.getLogger(SetParkingCardIdDA.class);
 
     public ActionForward setSantanderId(ActionMapping mapping, ActionForm form, HttpServletRequest request,
             HttpServletResponse response) throws Exception {
@@ -108,6 +92,6 @@ public class SetParkingCardIdDA extends FenixDispatchAction {
     @Atomic
     private static ParkingParty createParkingParty(Party party) {
         return new ParkingParty(party);
-    }
+    }*/
 
 }
