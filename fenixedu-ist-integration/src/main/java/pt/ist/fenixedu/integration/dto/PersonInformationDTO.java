@@ -36,6 +36,7 @@ import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.bennu.core.domain.UserProfile;
+import org.fenixedu.idcards.domain.SantanderEntry;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.YearMonthDay;
 
@@ -219,24 +220,13 @@ public class PersonInformationDTO {
 
         this.eIdentifier = person.getEidentifier();
 
-        /*this.istCardMifareSerialNumber = getLastMifareSerialNumber(person);*/
+        this.istCardMifareSerialNumber = getLastMifareSerialNumber(person);
     }
 
-    private static int compareDHCPLines(final String l1, String l2) {
-        return l1.substring(1, 9).compareTo(l2.substring(1, 9));
+    private static String getLastMifareSerialNumber(final Person person) {
+        return SantanderEntry.getLastMifareNumber(person.getUser());
     }
-
-    /*private static String getLastMifareSerialNumber(final Person person) {
-        final Stream<SantanderCardInformation> infos = person.getSantanderCardsInformationSet().stream();
-        final String line = infos.map(i -> i.getDchpRegisteLine()).max(PersonInformationDTO::compareDHCPLines).orElse(null);
-        return line == null ? null : getMifareSerialNumber(line);
-    }*/
-
-    private static String getMifareSerialNumber(String line) {
-        final int offset = line.length() - 550 - 1;
-        return line.substring(offset - 10, offset);
-    }
-
+    
     private void fillPersonalAndWorkContacts(final List<? extends PartyContact> contacts, List<String> personalContacts,
             List<String> workContacts) {
         for (final PartyContact partyContact : contacts) {
