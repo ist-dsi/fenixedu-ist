@@ -62,6 +62,7 @@ import pt.ist.fenixWebFramework.renderers.utils.RenderUtils;
 import pt.ist.fenixedu.parking.domain.ParkingGroup;
 import pt.ist.fenixedu.parking.domain.ParkingParty;
 import pt.ist.fenixedu.parking.domain.Vehicle;
+import pt.ist.fenixedu.parking.dto.OpenFileBean;
 
 @StrutsFunctionality(app = ParkingManagerApp.class, path = "export-parking-data", titleKey = "link.mergeFiles")
 @Mapping(module = "parkingManager", path = "/exportParkingDB", input = "/exportParkingDB.do?method=prepareExportFile",
