@@ -59,12 +59,12 @@ public class DelegateService {
                 .sorted(ExecutionYear.REVERSE_COMPARATOR_BY_YEAR).collect(Collectors.toList()));
         delegateSearchBean.setDegreeTypes(executionYear.getExecutionDegreesSet().stream().map(d -> d.getDegree().getDegreeType())
                 .distinct().sorted().collect(Collectors.toList()));
-        if (degreeType == null && (degree == null || EmptyDegree.class.isInstance(degree))) {
+        if (degreeType == null && (degree == null || degree instanceof EmptyDegree)) {
             delegateSearchBean.setDegrees(executionYear.getExecutionDegreesSet().stream().map(ExecutionDegree::getDegree).distinct()
                     .sorted(Degree.COMPARATOR_BY_DEGREE_TYPE_DEGREE_NAME_AND_ID).collect(Collectors.toList()));
             return delegateSearchBean;
         }
-        if (degree == null || EmptyDegree.class.isInstance(degree)) {
+        if (degree == null || degree instanceof EmptyDegree) {
             delegateSearchBean.setDegrees(executionYear.getExecutionDegreesSet().stream()
                     .filter(d -> d.getDegree().getDegreeType().equals(degreeType)).map(ExecutionDegree::getDegree).distinct()
                     .sorted(Degree.COMPARATOR_BY_DEGREE_TYPE_DEGREE_NAME_AND_ID).collect(Collectors.toList()));

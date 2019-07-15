@@ -160,7 +160,8 @@ public class FenixDelegates {
 
     @Atomic
     private void serv(Degree degree, CurricularYear curricularYear, CycleType cycleType, User delegateUser) {
-        degree.getDelegateSet().stream().filter(d -> d.getInterval().containsNow())
+        degree.getDelegateSet().stream()
+                .filter(d -> d.getInterval().containsNow())
                 .filter(d -> Objects.equals(d.getCurricularYear(), curricularYear))
                 .filter(d -> Objects.equals(d.getCycleType(), cycleType)).forEach(d -> d.setEnd(new DateTime()));
         Delegate newDelegate = null;
