@@ -109,7 +109,7 @@ public class DelegateCrudController {
 
     @RequestMapping(value = "/attributePosition", method = RequestMethod.POST)
     public String attributePosition(@ModelAttribute DelegatePositionBean delegatePositionBean, BindingResult errors, Model model) {
-        if (delegateService.attributeDelegatePosition(delegatePositionBean) == true) {
+        if (delegateService.attributeDelegatePosition(delegatePositionBean)) {
             return toSearch(delegatePositionBean.getDegree(), model);
         } else {
             String cycleType =
