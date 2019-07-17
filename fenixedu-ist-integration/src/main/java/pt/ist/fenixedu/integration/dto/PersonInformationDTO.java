@@ -21,9 +21,12 @@ package pt.ist.fenixedu.integration.dto;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
+import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Photograph;
+import org.fenixedu.academic.domain.accessControl.ActivePhdProcessesGroup;
 import org.fenixedu.academic.domain.contacts.EmailAddress;
 import org.fenixedu.academic.domain.contacts.MobilePhone;
 import org.fenixedu.academic.domain.contacts.PartyContact;
@@ -34,6 +37,7 @@ import org.fenixedu.academic.domain.organizationalStructure.Accountability;
 import org.fenixedu.academic.domain.organizationalStructure.AccountabilityTypeEnum;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.person.RoleType;
+import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.bennu.core.domain.UserProfile;
 import org.fenixedu.idcards.domain.SantanderEntry;
@@ -48,7 +52,6 @@ import pt.ist.fenixedu.integration.util.contacts.ISTPhoneNumberHandler;
 
 /**
  * @author - Shezad Anavarali (shezad@ist.utl.pt)
- * 
  */
 public class PersonInformationDTO {
 
@@ -168,7 +171,7 @@ public class PersonInformationDTO {
             }
         }
 
-        this.studentDegrees = new ArrayList<String>();
+        this.studentDegrees = new ArrayList<>();
         if (person.getStudent() != null) {
             for (Registration registration : person.getStudent().getActiveRegistrations()) {
                 studentDegrees.add(registration.getDegree().getPresentationName());
@@ -177,6 +180,14 @@ public class PersonInformationDTO {
             final Registration lastActiveRegistration = person.getStudent().getLastActiveRegistration();
             if (lastActiveRegistration != null) {
                 this.campus = lastActiveRegistration.getCampus().getName();
+            } else if (new ActivePhdProcessesGroup().isMember(person.getUser())) {
+                Optional<PhdIndividualProgramProcess> individualProgramProcess =
+                        person.getPhdIndividualProgramProcessesSet().stream().filter(PhdIndividualProgramProcess::isProcessActive)
+                                .findFirst();
+
+                individualProgramProcess.ifPresent(phdIndividualProgramProcess -> this.campus =
+                        phdIndividualProgramProcess.getPhdProgram().getDegree().getLastActiveDegreeCurricularPlan()
+                                .getCampus(ExecutionYear.readCurrentExecutionYear()).getName());
             }
 
         }
@@ -226,7 +237,7 @@ public class PersonInformationDTO {
     private static String getLastMifareSerialNumber(final Person person) {
         return SantanderEntry.getLastMifareNumber(person.getUser());
     }
-    
+
     private void fillPersonalAndWorkContacts(final List<? extends PartyContact> contacts, List<String> personalContacts,
             List<String> workContacts) {
         for (final PartyContact partyContact : contacts) {
