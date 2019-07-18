@@ -8,6 +8,7 @@ import java.util.function.BiFunction;
 
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.accessControl.ActivePhdProcessesGroup;
 import org.fenixedu.academic.domain.accounting.events.insurance.InsuranceEvent;
 import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
 import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcessState;
@@ -88,24 +89,9 @@ public class UserInformationService implements IUserInfoService {
                 }
             }
             final InsuranceEvent event = person.getInsuranceEventFor(executionYear);
-            final PhdIndividualProgramProcess phdIndividualProgramProcess =
-                    event != null && event.isClosed() ? find(person.getPhdIndividualProgramProcessesSet()) : null;
-            return (phdIndividualProgramProcess != null);
+            return event != null && event.isClosed() && new ActivePhdProcessesGroup().isMember(person.getUser());
         }
         return false;
-    }
-
-    private PhdIndividualProgramProcess find(final Set<PhdIndividualProgramProcess> phdIndividualProgramProcesses) {
-        PhdIndividualProgramProcess result = null;
-        for (final PhdIndividualProgramProcess process : phdIndividualProgramProcesses) {
-            if (process.getActiveState() == PhdIndividualProgramProcessState.WORK_DEVELOPMENT) {
-                if (result != null) {
-                    return null;
-                }
-                result = process;
-            }
-        }
-        return result;
     }
 
     @Override
