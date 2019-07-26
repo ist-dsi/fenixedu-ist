@@ -111,6 +111,9 @@ public class SIBSOutgoingPaymentFile extends SIBSOutgoingPaymentFile_Base {
 
         try {
             Thread thread = new SetupPaymentCodePool();
+            thread.setUncaughtExceptionHandler((t, e) -> {
+                appendToErrors(errorsBuilder, "", e);
+            });
             thread.start();
             thread.join();
         } catch (InterruptedException e) {
@@ -119,6 +122,9 @@ public class SIBSOutgoingPaymentFile extends SIBSOutgoingPaymentFile_Base {
 
         try {
             Thread thread = new ExportPaymentCodesFromPool(sibsOutgoingPaymentFile);
+            thread.setUncaughtExceptionHandler((t, e) -> {
+                appendToErrors(errorsBuilder, "", e);
+            });
             thread.start();
             thread.join();
         } catch (InterruptedException e) {
