@@ -3,15 +3,12 @@ package pt.ist.fenixedu.integration.ui.spring.santander.service;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.function.BiFunction;
 
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.accessControl.ActivePhdProcessesGroup;
 import org.fenixedu.academic.domain.accounting.events.insurance.InsuranceEvent;
-import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
-import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcessState;
 import org.fenixedu.academic.domain.photograph.Picture;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.bennu.core.domain.User;
@@ -25,6 +22,8 @@ import pt.ist.fenixedu.contracts.domain.accessControl.ActiveGrantOwner;
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveResearchers;
 import pt.ist.fenixedu.contracts.domain.accessControl.CampusEmployeeGroup;
 import pt.ist.fenixedu.contracts.domain.accessControl.CampusGrantOwnerGroup;
+import pt.ist.fenixedu.contracts.domain.accessControl.CampusResearcherGroup;
+import pt.ist.fenixedu.contracts.domain.accessControl.SapBackedGroup;
 import pt.ist.fenixedu.integration.dto.PersonInformationDTO;
 
 @Service
@@ -34,7 +33,10 @@ public class UserInformationService implements IUserInfoService {
             (space, employeeUser) -> CampusEmployeeGroup.get(space).isMember(employeeUser);
 
     private final static BiFunction<Space, User, Boolean> grantOwnerGroupFunction =
-            (space, employeeUser) -> CampusGrantOwnerGroup.get(space).isMember(employeeUser);
+            (space, grantOwnerUser) -> CampusGrantOwnerGroup.get(space).isMember(grantOwnerUser);
+
+    private final static BiFunction<Space, User, Boolean> researcherGroupFunction =
+            (space, researcherUser) -> CampusResearcherGroup.get(space).isMember(researcherUser);
 
     @Override
     public List<String> getUserRoles(User user) {
@@ -68,15 +70,15 @@ public class UserInformationService implements IUserInfoService {
     }
 
     private boolean treatAsResearcher(User user) {
-        return new ActiveResearchers().isMember(user);
+        return new ActiveResearchers().isMember(user) && new ActiveResearchers().isFromInstitution(user, "IST");
     }
 
     private boolean treatAsEmployee(User user) {
-        return new ActiveEmployees().isMember(user);
+        return new ActiveEmployees().isMember(user) && new ActiveEmployees().isFromInstitution(user, "IST");
     }
 
     private boolean treatAsGrantOwner(User user) {
-        return new ActiveGrantOwner().isMember(user);
+        return new ActiveGrantOwner().isMember(user) && new ActiveGrantOwner().isFromInstitution(user, "IST");
     }
 
     private boolean treatAsStudent(User user, ExecutionYear executionYear) {
@@ -121,8 +123,9 @@ public class UserInformationService implements IUserInfoService {
 
         if (campus == null) {
             final BiFunction<Space, User, Boolean> groupFunction =
-                    new ActiveEmployees().isMember(user) ? employeeGroupFunction : (new ActiveGrantOwner()
-                            .isMember(user) ? grantOwnerGroupFunction : null);
+                    new ActiveEmployees().isMember(user) && new ActiveEmployees().isFromInstitution(user, "IST") ? employeeGroupFunction :
+                    new ActiveGrantOwner().isMember(user) && new ActiveGrantOwner().isFromInstitution(user, "IST") ? grantOwnerGroupFunction :
+                    new ActiveResearchers().isMember(user) && new ActiveResearchers().isFromInstitution(user, "IST") ? researcherGroupFunction : null;
 
             campus = groupFunction == null ? null : Space.getTopLevelSpaces().stream()
                     .filter(space -> groupFunction.apply(space, user)).findAny().map(Space::getName).orElse(null);

@@ -152,10 +152,8 @@ public class PersonInformationDTO {
         fillPersonalAndWorkContacts(person.getWebAddresses(), this.personalWebAdresses, this.workWebAdresses);
         fillPersonalAndWorkContacts(person.getEmailAddresses(), this.personalEmails, this.workEmails);
 
-        this.roles = new ArrayList<String>();
-        for (String role : LegacyRoleUtils.mainRoleKeys(person.getUser())) {
-            roles.add(role);
-        }
+        this.roles = new ArrayList<>();
+        roles.addAll(LegacyRoleUtils.mainRoleKeys(person.getUser()));
 
         for (final Accountability accountability : person.getParentsSet()) {
             if (accountability instanceof Invitation) {
@@ -179,35 +177,46 @@ public class PersonInformationDTO {
 
             final Registration lastActiveRegistration = person.getStudent().getLastActiveRegistration();
             if (lastActiveRegistration != null) {
-                this.campus = lastActiveRegistration.getCampus().getName();
+                setCampus(lastActiveRegistration.getCampus().getName());
             } else if (new ActivePhdProcessesGroup().isMember(person.getUser())) {
                 Optional<PhdIndividualProgramProcess> individualProgramProcess =
                         person.getPhdIndividualProgramProcessesSet().stream().filter(PhdIndividualProgramProcess::isProcessActive)
                                 .findFirst();
 
-                individualProgramProcess.ifPresent(phdIndividualProgramProcess -> this.campus =
-                        phdIndividualProgramProcess.getPhdProgram().getDegree().getLastActiveDegreeCurricularPlan()
-                                .getCampus(ExecutionYear.readCurrentExecutionYear()).getName());
+                individualProgramProcess.ifPresent(phdIndividualProgramProcess ->
+                        setCampus(phdIndividualProgramProcess.getPhdProgram().getDegree().getLastActiveDegreeCurricularPlan()
+                                .getCampus(ExecutionYear.readCurrentExecutionYear()).getName()));
             }
 
         }
 
         if (person.getTeacher() != null && person.getTeacher().getDepartment() != null) {
             this.teacherDepartment = person.getTeacher().getDepartment().getRealName();
+            person.getTeacher().getTeacherAuthorization().ifPresent(teacherAuthorization -> {
+                Space campus = teacherAuthorization.getCampus();
+
+                if (campus != null) {
+                    setCampus(campus.getName());
+                }
+            });
         }
 
         if (person.getEmployee() != null) {
             final Unit currentWorkingPlace = person.getEmployee().getCurrentWorkingPlace();
             if (currentWorkingPlace != null) {
+
+                if (this.campus == null) {
+                    Space campus = currentWorkingPlace.getCampus();
+
+                    if(campus != null) {
+                        setCampus(campus.getName());
+                    }
+                }
+
                 this.employeeUnit = currentWorkingPlace.getName();
                 if (currentWorkingPlace.getCostCenterCode() != null) {
                     workingCostCenters.add(currentWorkingPlace.getCostCenterCode().toString());
                 }
-            }
-
-            Space currentCampus = person.getEmployee().getCurrentCampus();
-            if (currentCampus != null) {
-                setCampus(currentCampus.getName());
             }
         }
 
