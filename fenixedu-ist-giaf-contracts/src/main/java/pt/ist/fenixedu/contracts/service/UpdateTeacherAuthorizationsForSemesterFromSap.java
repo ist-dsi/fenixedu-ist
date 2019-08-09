@@ -23,6 +23,7 @@ import org.fenixedu.academic.domain.organizationalStructure.DepartmentUnit;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.bennu.SapSdkConfiguration;
 import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.spaces.domain.Space;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
@@ -33,6 +34,7 @@ import com.google.common.base.Strings;
 import com.google.gson.JsonObject;
 
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.EmployeeContract;
+import pt.ist.fenixframework.FenixFramework;
 import pt.ist.sap.client.SapStaff;
 import pt.ist.sap.client.SapStructure;
 import pt.ist.sap.group.integration.domain.Colaborator;
@@ -129,8 +131,20 @@ public class UpdateTeacherAuthorizationsForSemesterFromSap {
 								countNew++;
 							}
 							if (teacherAuthorization == null) {
+								Space campus = null;
+								switch (colaboratorSituation.campus()) {
+									case "Alameda":
+										campus = FenixFramework.getDomainObject("2448131360897");
+										break;
+									case "Tagus Park":
+										campus = FenixFramework.getDomainObject("2448131360898");
+										break;
+									case "CTN":
+										campus = FenixFramework.getDomainObject("2448131392438");
+										break;
+								}
 								teacherAuthorization = TeacherAuthorization.createOrUpdate(teacher, department,
-										executionSemester, teacherCategory, true, lessonHours);
+										executionSemester, teacherCategory, true, lessonHours, campus);
 							}
 							processedAuthorizations.add(teacherAuthorization);
 						}

@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import com.google.common.base.Strings;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.groups.GroupStrategy;
@@ -67,6 +68,21 @@ public abstract class SapBackedGroup extends GroupStrategy {
 	@Override
 	public boolean isMember(final User user, final DateTime when) {
 	    throw new RuntimeException("information.not.available");
+	}
+
+	public boolean isFromInstitution(final User user, final String institutionCode) {
+		if (Strings.isNullOrEmpty(institutionCode)) {
+			return false;
+		}
+
+		final SapGroup sapGroup = new SapGroup();
+		for (String sapGroupName: sapGroups()) {
+			sapGroup.setGroup(institutionCode + sapGroupName);
+			if (sapGroup.isMember(user.getUsername())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
