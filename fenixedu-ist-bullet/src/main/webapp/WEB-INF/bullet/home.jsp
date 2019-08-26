@@ -21,6 +21,11 @@
                     JSON
                 </a>
             </th>
+            <th>
+                <a href="<%= request.getContextPath()%>/bullet/${semester.externalId}/exportXml">
+                    XML
+                </a>
+            </th>
             <c:forEach var="type" items="${types}">
                 <th>
                     <a href="<%= request.getContextPath()%>/bullet/${semester.externalId}/${type}/exportXls">

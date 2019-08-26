@@ -1,6 +1,7 @@
 package pt.ist.fenixedu.bullet.domain;
 
 import java.io.ByteArrayOutputStream;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,6 +9,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.solr.common.util.XML;
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.CurricularSemester;
 import org.fenixedu.academic.domain.Degree;
@@ -22,6 +24,20 @@ import org.joda.time.DateTime;
 import com.google.common.base.Throwables;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import org.w3c.dom.Node;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
 
 public class DumpContext {
 
@@ -98,4 +114,53 @@ public class DumpContext {
         return os.toByteArray();
     }
 
+    /*
+    public String toXMLString() {
+        try
+        {
+
+            System.out.println("oi\n" + this);
+            final JAXBContext jaxbContext = JAXBContext.newInstance(DumpContext.class);
+            final Marshaller marshaller = jaxbContext.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+            marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, "http://www.w3.org/2001/XMLSchema-instance");
+            final StringWriter sw = new StringWriter();
+
+            marshaller.marshal(this, sw);
+            String xmlString = sw.toString();
+
+            return xmlString;
+
+        } catch (final Exception e) {
+            throw Throwables.propagate(e);
+        }
+    }
+
+    public byte[] toXML() {
+        try
+        {
+            DocumentBuilderFactory docBFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder docBuilder = docBFactory.newDocumentBuilder();
+            Document XMLdoc = docBuilder.newDocument();
+            Element mainRootElement = XMLdoc.createElementNS("https://www.w3.org/2000/xmlns/","Schedule");
+            XMLdoc.appendChild(mainRootElement);
+            Element eventsRoot = XMLdoc.createElement("Events");
+            mainRootElement.appendChild(eventsRoot);
+
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            DOMSource source = new DOMSource(XMLdoc);
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            StreamResult result = new StreamResult(bos);
+            transformer.transform(source, result);
+            byte []array = bos.toByteArray();
+
+            return array;
+
+        } catch (final Exception e) {
+            throw Throwables.propagate(e);
+        }
+    }
+
+     */
 }

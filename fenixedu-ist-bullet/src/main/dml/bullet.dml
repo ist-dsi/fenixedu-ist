@@ -1,0 +1,49 @@
+package pt.ist.fenixedu.bullet.domain;
+
+class BttRoot {
+    int counter;
+}
+
+class BttType {
+    String name;
+}
+
+class BttObject {
+    int bttId;
+}
+
+relation BennuBttRoot {
+    .org.fenixedu.bennu.core.domain.Bennu playsRole bennu {
+        multiplicity 1..1;
+    }
+    BttRoot playsRole bttRoot {
+        multiplicity 0..1;
+    }
+}
+
+relation BttRootBttType {
+    BttRoot playsRole bttRoot {
+        multiplicity 1..1;
+    }
+    BttType playsRole bttType {
+        multiplicity *;
+    }
+}
+
+relation BttTypeBttObject {
+    BttType playsRole bttType {
+        multiplicity 1..1;
+    }
+    BttObject playsRole bttObject {
+        multiplicity *;
+    }
+}
+
+relation BttObjectLesson {
+    BttObject playsRole bttObject {
+        multiplicity 0..1;
+    }
+    .org.fenixedu.academic.domain.Lesson playsRole lesson {
+        multiplicity 0..1;
+    }
+}
