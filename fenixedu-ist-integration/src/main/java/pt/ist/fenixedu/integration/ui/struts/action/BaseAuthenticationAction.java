@@ -28,6 +28,7 @@ import org.apache.struts.action.ActionMapping;
 import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.OccupationPeriodType;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeEvent;
@@ -41,6 +42,7 @@ import org.fenixedu.bennu.core.domain.exceptions.AuthorizationException;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.struts.annotations.Mapping;
 
+import org.joda.time.YearMonthDay;
 import pt.ist.fenixWebFramework.renderers.components.HtmlLink;
 import pt.ist.fenixWebFramework.servlets.filters.contentRewrite.GenericChecksumRewriter;
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveEmployees;
@@ -114,9 +116,9 @@ public class BaseAuthenticationAction extends FenixAction {
     }
 
     private boolean isStudentAndHasFirstTimeCycleInquiryToRespond(User userView) {
-        if (RoleType.STUDENT.isMember(userView)) {
+        if (userView.getPerson() != null && userView.getPerson().getStudent() != null) {
             final Student student = userView.getPerson().getStudent();
-            return student != null && InquiryStudentCycleAnswer.hasFirstTimeCycleInquiryToRespond(student);
+            return hasActiveClassPeriod(student) && InquiryStudentCycleAnswer.hasFirstTimeCycleInquiryToRespond(student);
         }
         return false;
     }
@@ -163,7 +165,16 @@ public class BaseAuthenticationAction extends FenixAction {
 
     private boolean hasMissingRAIDESInformation(User userView) {
         return userView.getPerson() != null && userView.getPerson().getStudent() != null
+                && hasActiveClassPeriod(userView.getPerson().getStudent())
                 && userView.getPerson().getStudent().hasAnyMissingPersonalInformation();
+    }
+
+    private boolean hasActiveClassPeriod(final Student student) {
+        final ExecutionYear currentYear = ExecutionYear.readCurrentExecutionYear();
+        final YearMonthDay currentDay = new YearMonthDay();
+        return student.getActiveRegistrationStream()
+                .flatMap(r -> r.getDegree().getExecutionDegreesForExecutionYear(currentYear).stream())
+                .anyMatch(ed -> ed.getPeriods(OccupationPeriodType.LESSONS).anyMatch(op -> op.nestedOccupationPeriodsContainsDay(currentDay)));
     }
 
     private boolean hasPendingPartyContactValidationRequests(User userView) {
