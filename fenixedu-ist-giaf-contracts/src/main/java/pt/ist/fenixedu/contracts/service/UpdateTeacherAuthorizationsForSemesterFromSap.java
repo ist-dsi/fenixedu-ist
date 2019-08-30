@@ -43,7 +43,7 @@ import pt.ist.sap.group.integration.domain.ColaboratorSituation;
 public class UpdateTeacherAuthorizationsForSemesterFromSap {
 
 	private static final int minimumDaysForActivity = 90;
-	private Map<String, TeacherCategory> categoryMap = new HashMap<String, TeacherCategory>();
+	private Map<String, TeacherCategory> categoryMap = new HashMap<>();
 
 	public String updateTeacherAuthorization(ExecutionSemester executionSemester) {
 		StringBuilder output = new StringBuilder();
@@ -55,8 +55,8 @@ public class UpdateTeacherAuthorizationsForSemesterFromSap {
 		final SapStaff sapStaff = new SapStaff();
 		final SapStructure sapStructure = new SapStructure();
 
-		Map<User, Department> userDepartment = new HashMap<User, Department>();
-		Map<User, Set<ColaboratorSituation>> colaboratorSituationsMap = new HashMap<User, Set<ColaboratorSituation>>();
+		Map<User, Department> userDepartment = new HashMap<>();
+		Map<User, Set<ColaboratorSituation>> colaboratorSituationsMap = new HashMap<>();
 			final JsonObject params = new JsonObject();
 		params.addProperty("institution", SapSdkConfiguration.getConfiguration().sapServiceInstitutionCode());
 
@@ -69,7 +69,7 @@ public class UpdateTeacherAuthorizationsForSemesterFromSap {
 
 					Set<ColaboratorSituation> colaboratorSituations = colaboratorSituationsMap.get(user);
 					if (colaboratorSituations == null) {
-						colaboratorSituations = new HashSet<ColaboratorSituation>();
+						colaboratorSituations = new HashSet<>();
 					}
 					colaboratorSituations.add(colaboratorSituation);
 					colaboratorSituationsMap.put(user, colaboratorSituations);
@@ -92,7 +92,7 @@ public class UpdateTeacherAuthorizationsForSemesterFromSap {
 			}
 		});
 
-		Set<TeacherAuthorization> processedAuthorizations = new HashSet<TeacherAuthorization>();
+		Set<TeacherAuthorization> processedAuthorizations = new HashSet<>();
 
 		for (User user : colaboratorSituationsMap.keySet()) {
 			Person person = user.getPerson();
@@ -118,10 +118,26 @@ public class UpdateTeacherAuthorizationsForSemesterFromSap {
 									teacherCategory);
 							TeacherAuthorization existing = teacher
 									.getTeacherAuthorization(executionSemester.getAcademicInterval()).orElse(null);
+
+							Space campus = null;
+
+							switch (colaboratorSituation.campus()) {
+								case "Alameda":
+									campus = FenixFramework.getDomainObject("2448131360897");
+									break;
+								case "Tagus Park":
+									campus = FenixFramework.getDomainObject("2448131360898");
+									break;
+								case "CTN":
+									campus = FenixFramework.getDomainObject("2448131392438");
+									break;
+							}
+
 							if (existing != null) {
 								if (existing.getDepartment().equals(department) && existing.isContracted()
 										&& existing.getLessonHours().equals(lessonHours)
-										&& existing.getTeacherCategory().equals(teacherCategory)) {
+										&& existing.getTeacherCategory().equals(teacherCategory)
+										&& existing.getCampus().equals(campus)) {
 									teacherAuthorization = existing;
 								} else {
 									countEdited++;
@@ -131,18 +147,6 @@ public class UpdateTeacherAuthorizationsForSemesterFromSap {
 								countNew++;
 							}
 							if (teacherAuthorization == null) {
-								Space campus = null;
-								switch (colaboratorSituation.campus()) {
-									case "Alameda":
-										campus = FenixFramework.getDomainObject("2448131360897");
-										break;
-									case "Tagus Park":
-										campus = FenixFramework.getDomainObject("2448131360898");
-										break;
-									case "CTN":
-										campus = FenixFramework.getDomainObject("2448131392438");
-										break;
-								}
 								teacherAuthorization = TeacherAuthorization.createOrUpdate(teacher, department,
 										executionSemester, teacherCategory, true, lessonHours, campus);
 							}
@@ -175,14 +179,10 @@ public class UpdateTeacherAuthorizationsForSemesterFromSap {
 
 	private SortedSet<ColaboratorSituation> getValidPersonContractSituations(
 			Map<User, Set<ColaboratorSituation>> situationsMap, User user, Interval semesterInterval) {
-		SortedSet<ColaboratorSituation> validPersonContractSituations = new TreeSet<ColaboratorSituation>(
-				new Comparator<ColaboratorSituation>() {
-					@Override
-					public int compare(ColaboratorSituation c1, ColaboratorSituation c2) {
-						int compare = c1.beginDate().compareTo(c2.beginDate());
-						return compare == 0 ? (c1.equals(c2) ? 0 : 1) : compare;
-					}
-				});
+		SortedSet<ColaboratorSituation> validPersonContractSituations = new TreeSet<>((c1, c2) -> {
+            int compare = c1.beginDate().compareTo(c2.beginDate());
+            return compare == 0 ? (c1.equals(c2) ? 0 : 1) : compare;
+        });
 		validPersonContractSituations.addAll(situationsMap.get(user).stream().filter(cs -> {
 			return cs.inExercise() && !cs.endSituation() && isValidAndOverlaps(cs, semesterInterval)
 					&& isValidCategoryAndCategoryType(cs.categoryName(), cs.categoryTypeName());
