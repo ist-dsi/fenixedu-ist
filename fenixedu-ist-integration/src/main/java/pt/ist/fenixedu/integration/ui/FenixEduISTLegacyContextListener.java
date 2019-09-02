@@ -273,8 +273,16 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
         Signal.register(Registration.REGISTRATION_PROCESS_COMPLETE,
                 (Consumer<Registration>) registration -> registration.setBennuCompletedRegistration(Bennu.getInstance()));
 
-        Signal.registerWithoutTransaction(Registration.REGISTRATION_PROCESS_COMPLETE, (Consumer<Registration>) registration -> {
-            CgdCard.sendCard(registration.getPerson().getUser());
+        Signal.registerWithoutTransaction(Registration.REGISTRATION_PROCESS_COMPLETE, new Consumer<Registration>() {
+            @Override
+            public void accept(Registration registration) {
+                sendCgdCard(registration);
+            }
+
+            @Atomic
+            private void sendCgdCard(Registration registration) {
+                CgdCard.sendCard(registration.getPerson().getUser());
+            }
         });
 
         DegreeCandidacyManagementDispatchAction.finalStepRedirector = (request, response, candidacy) -> {
