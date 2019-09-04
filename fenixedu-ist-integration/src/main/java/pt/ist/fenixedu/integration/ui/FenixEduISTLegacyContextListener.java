@@ -24,7 +24,6 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -82,11 +81,9 @@ import org.fenixedu.cms.domain.Site;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
-import eu.europa.ec.taxud.tin.algorithm.TINValid;
 import pt.ist.fenixedu.giaf.invoices.ClientMap;
 import pt.ist.fenixedu.giaf.invoices.Utils;
 import pt.ist.fenixedu.integration.domain.cgd.CgdCard;
-import pt.ist.fenixedu.integration.domain.student.AffinityCyclesManagement;
 import pt.ist.fenixedu.integration.domain.student.PreEnrolment;
 import pt.ist.fenixedu.integration.dto.QucProfessorshipEvaluation;
 import pt.ist.fenixedu.teacher.evaluation.domain.ProfessorshipEvaluationBean;
@@ -157,12 +154,6 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
                         }
                     }
                 }));
-
-        Signal.register(Enrolment.SIGNAL_CREATED, ((DomainObjectEvent<Enrolment> e) -> {
-            Enrolment enrolment = e.getInstance();
-            new AffinityCyclesManagement(enrolment.getRegistration().getLastStudentCurricularPlan())
-                    .createCycleOrRepeateSeparate();
-        }));
 
         Consumer<DomainObjectEvent<Summary>> handler = (DomainObjectEvent<Summary> event) -> {
             ExecutionCourse executionCourse = event.getInstance().getExecutionCourse();
