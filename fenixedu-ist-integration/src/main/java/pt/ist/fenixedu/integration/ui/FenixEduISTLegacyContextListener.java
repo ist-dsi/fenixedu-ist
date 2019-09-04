@@ -280,7 +280,7 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
         DegreeCandidacyManagementDispatchAction.finalStepRedirector = (request, response, candidacy) -> {
             try {
                 response.sendRedirect(CoreConfiguration.getConfiguration().applicationUrl() +
-                        "/authorize-personal-data-access/santander-bank?candidacy=" + candidacy.getExternalId());
+                        "/tecnico-card/review?candidacy=" + candidacy.getExternalId());
             } catch (IOException e) {
                 throw new Error(e);
             }
