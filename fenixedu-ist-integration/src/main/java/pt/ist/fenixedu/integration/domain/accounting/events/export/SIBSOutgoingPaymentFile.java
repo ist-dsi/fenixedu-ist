@@ -78,6 +78,7 @@ public class SIBSOutgoingPaymentFile extends SIBSOutgoingPaymentFile_Base {
             final PaymentCodePool paymentCodePool = PaymentCodePool.getInstance();
             paymentCodePool.enforceMinSize(new LocalDate().withDayOfMonth(1));
             paymentCodePool.refreshPaymentCodes(new LocalDate().withDayOfMonth(1));
+            paymentCodePool.invalidatePaymentCodes(new LocalDate());
         }
 
         public SetupPaymentCodePool() {
@@ -97,7 +98,7 @@ public class SIBSOutgoingPaymentFile extends SIBSOutgoingPaymentFile_Base {
         @Override
         public void run() {
             PaymentCodePool.getInstance().getPaymentCodeSet().stream()
-                    .filter(EventPaymentCode::isNew)
+                    .filter(pc -> pc.isNew() || (pc.getEvent().isPresent() && pc.getEvent().get().isOpen()))
                     .forEach(eventPaymentCode -> {
                         sibsOutgoingPaymentFile.addLine(eventPaymentCode.getCode(), eventPaymentCode.getMinAmount(), eventPaymentCode.getMaxAmount(), eventPaymentCode.getStartDate(), eventPaymentCode.getEndDate());
                     });
