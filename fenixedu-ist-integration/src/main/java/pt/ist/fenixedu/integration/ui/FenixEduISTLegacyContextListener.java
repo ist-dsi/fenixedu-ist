@@ -74,6 +74,7 @@ import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.signals.DomainObjectEvent;
 import org.fenixedu.bennu.core.signals.Signal;
 import org.fenixedu.bennu.core.util.CoreConfiguration;
+import org.fenixedu.bennu.spring.BennuSpringContextHelper;
 import org.fenixedu.cms.domain.CMSFolder;
 import org.fenixedu.cms.domain.Category;
 import org.fenixedu.cms.domain.Site;
@@ -81,6 +82,14 @@ import org.fenixedu.cms.domain.Site;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
+import org.fenixedu.idcards.domain.SantanderEntry;
+import org.fenixedu.idcards.exception.SantanderCardNoPermissionException;
+import org.fenixedu.idcards.notifications.CardNotifications;
+import org.fenixedu.idcards.service.SantanderIdCardsService;
+import org.fenixedu.santandersdk.exception.SantanderMissingInformationException;
+import org.fenixedu.santandersdk.exception.SantanderValidationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pt.ist.fenixedu.giaf.invoices.ClientMap;
 import pt.ist.fenixedu.giaf.invoices.Utils;
 import pt.ist.fenixedu.integration.domain.cgd.CgdCard;
@@ -95,6 +104,8 @@ import org.fenixedu.TINValidator;
 
 @WebListener
 public class FenixEduISTLegacyContextListener implements ServletContextListener {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(FenixEduISTLegacyContextListener.class);
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
@@ -282,6 +293,39 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
             @Atomic
             private void sendCgdCard(Registration registration) {
                 CgdCard.sendCard(registration.getPerson().getUser());
+            }
+        }
+
+        Signal.registerWithoutTransaction(Registration.REGISTRATION_PROCESS_COMPLETE, new Consumer<Registration>() {
+            @Override
+            public void accept(Registration registration) {
+                emitSantanderCard(registration);
+            }
+
+            @Atomic
+            private void emitSantanderCard (Registration registration) {
+                final User user = registration.getPerson().getUser();
+                final String username = user.getUsername();
+
+                SantanderIdCardsService santanderIdCardsService = BennuSpringContextHelper.getBean(SantanderIdCardsService.class);
+
+                if (santanderIdCardsService.canRequestCard(user)) {
+                    try {
+                        SantanderEntry santanderEntry = santanderIdCardsService
+                                .createRegister(user, "First registration process card automatic request.");
+                        santanderIdCardsService.sendRegister(user, santanderEntry);
+                    } catch (SantanderCardNoPermissionException scnpe) {
+                        LOGGER.error("User with no permission to request card: {}", username);
+                    } catch (SantanderMissingInformationException smie) {
+                        final String missingInfo = santanderIdCardsService
+                                .getErrorMessage(user.getProfile().getPreferredLocale(), smie.getMessage());
+
+                        LOGGER.error("User >{}< has missing information: {}", username, missingInfo);
+                        CardNotifications.notifyMissingInformation(user, missingInfo);
+                    } catch (SantanderValidationException sve) {
+                        LOGGER.error("Error generating card for user: {}", username);
+                    }
+                }
             }
         });
 
