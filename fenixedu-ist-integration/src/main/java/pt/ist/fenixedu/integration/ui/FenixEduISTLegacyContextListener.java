@@ -294,7 +294,7 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
             private void sendCgdCard(Registration registration) {
                 CgdCard.sendCard(registration.getPerson().getUser());
             }
-        }
+        });
 
         Signal.registerWithoutTransaction(Registration.REGISTRATION_PROCESS_COMPLETE, new Consumer<Registration>() {
             @Override
