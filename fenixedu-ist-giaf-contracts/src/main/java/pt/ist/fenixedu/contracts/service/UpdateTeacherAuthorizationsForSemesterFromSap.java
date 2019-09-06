@@ -137,7 +137,7 @@ public class UpdateTeacherAuthorizationsForSemesterFromSap {
 								if (existing.getDepartment().equals(department) && existing.isContracted()
 										&& existing.getLessonHours().equals(lessonHours)
 										&& existing.getTeacherCategory().equals(teacherCategory)
-										&& existing.getCampus().equals(campus)) {
+										&& Objects.equals(existing.getCampus(), campus)) {
 									teacherAuthorization = existing;
 								} else {
 									countEdited++;
