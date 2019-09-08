@@ -217,8 +217,8 @@ public class SendFirstTimeStudentNotifications extends CronTask {
         taskLog("%s%n", message);
 
         try {
-            final String sid = PhoneValidationUtils.getInstance().sendTwilioSMS(number, "TECNICO", message);
-            taskLog("Sent SMS via twilio to %s : %s%n", number, sid);
+            final boolean result = PhoneValidationUtils.getInstance().sendSMS(number, message);
+            taskLog("Sent SMS via gateway to %s : %s%n", number, result);
         } catch (final Throwable t) {
             taskLog("Faild send sms with exception: %s to number %s%n", t.getMessage(), number);
             t.printStackTrace();
