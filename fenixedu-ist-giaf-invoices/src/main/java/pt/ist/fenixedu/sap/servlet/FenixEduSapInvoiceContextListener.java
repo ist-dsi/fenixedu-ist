@@ -34,6 +34,7 @@ import org.joda.time.DateTime;
 import pt.ist.fenixedu.domain.SapRequestType;
 import pt.ist.fenixedu.giaf.invoices.EventProcessor;
 import pt.ist.fenixedu.giaf.invoices.SapEvent;
+import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
 
 @WebListener
@@ -205,8 +206,24 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
     }
 
     private void processEvent(final ChangeStateEvent eventStateChange) {
-        EventProcessor.calculate(() -> eventStateChange.getEvent());
-        EventProcessor.sync(() -> eventStateChange.getEvent());
+        Thread thread = new FenixEduSapInvoiceContextListener.ProcessEvent(eventStateChange);
+        thread.start();
+    }
+
+    private static class ProcessEvent extends Thread {
+
+        private ChangeStateEvent eventStateChange;
+
+        public ProcessEvent(final ChangeStateEvent eventStateChange) {
+            setName(this.getClass().getSimpleName());
+            this.eventStateChange = eventStateChange;
+        }
+
+        @Override
+        public void run() {
+            EventProcessor.calculate(() -> eventStateChange.getEvent());
+            EventProcessor.sync(() -> eventStateChange.getEvent());
+        }
     }
     
 }
