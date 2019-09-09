@@ -18,7 +18,7 @@
     <inceptionYear>2013</inceptionYear>
 
     <properties>
-        <version.org.fenixedu.academic>22.3.3</version.org.fenixedu.academic>
+        <version.org.fenixedu.academic>22.3.4</version.org.fenixedu.academic>
         <version.com.google.code.gson.gson>2.8.5</version.com.google.code.gson.gson>
         <version.com.google.guava.guava>27.0.1-jre</version.com.google.guava.guava>
         <version.com.lowagie.itext>2.1.7</version.com.lowagie.itext>
@@ -40,7 +40,7 @@
         <version.org.fenixedu.messaging>4.0.1</version.org.fenixedu.messaging>
         <version.org.glassfish.jersey>2.27</version.org.glassfish.jersey>
         <version.pt.ist.drive-sdk>2.1.0</version.pt.ist.drive-sdk>
-        <version.pt.ist.fenixedu-id-cards>5.5.0</version.pt.ist.fenixedu-id-cards>
+        <version.pt.ist.fenixedu-id-cards>5.6.0</version.pt.ist.fenixedu-id-cards>
         <version.pt.ist.fenixedu-ulisboa-cgdIntegration>3.0.0</version.pt.ist.fenixedu-ulisboa-cgdIntegration>
         <version.json.simple>1.1</version.json.simple>
     </properties>
