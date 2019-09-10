@@ -74,7 +74,7 @@ public class PresentationComponent extends HomepageSiteComponent {
 
         if (site.getShowResearchUnitHomepage()) {
             if (site.getResearchUnitName() != null && !site.getResearchUnitName().isEmpty() && owner.getTeacher() != null
-                    && owner.getEmployee() != null && owner.getEmployee().getCurrentWorkingContract() != null) {
+                    && owner.getTeacher().isActiveContractedTeacher()) {
                 global.put("researchUnitName", site.getResearchUnitName());
                 global.put("researchUnitHomepage", site.getResearchUnitHomepage());
             } else {
@@ -107,8 +107,8 @@ public class PresentationComponent extends HomepageSiteComponent {
                 getSortedFilteredContacts(owner.getWebAddresses()).stream().map(WebAddress.class::cast)
                         .filter(addr -> !addr.getUrl().equals(page.getSite().getFullUrl())).collect(Collectors.toList()));
 
-        if (site.getShowCurrentExecutionCourses() && owner.getTeacher() != null && owner.getEmployee() != null
-                && owner.getEmployee().getCurrentWorkingContract() != null) {
+        if (site.getShowCurrentExecutionCourses() && owner.getTeacher() != null
+                && owner.getTeacher().isActiveContractedTeacher()) {
             global.put("teachingCourses", owner.getTeacher().getCurrentExecutionCourses());
         }
 
