@@ -29,4 +29,13 @@ public class BttRoot extends BttRoot_Base {
         setCounter(counter);
         return counter;
     }
+
+    @Atomic
+    void resetCounter() {
+        getBttTypeSet().stream()
+            .flatMap(t -> t.getBttObjectSet().stream())
+            .forEach(o -> o.delete());
+
+        setCounter(700000000);
+    }
 }

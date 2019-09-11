@@ -76,6 +76,11 @@ public class BulletController {
         download(response, "data.xlsx", context.toXlsx(type));
     }
 
+    @RequestMapping(path = "/resetEventCounter", method = RequestMethod.GET)
+    public void resetEventCounter(final HttpServletResponse response) {
+        BulletXmlConverter.resetEventCounter();
+    }
+
     private void download(final HttpServletResponse response, final String filename, final byte[] content) {
         try {
             response.setHeader("Content-Disposition", "attachment; filename=" + filename);

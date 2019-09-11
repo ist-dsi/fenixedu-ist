@@ -10,6 +10,12 @@
     </h1>
 </div>
 
+<div>
+    <a href="<%= request.getContextPath()%>/bullet/resetEventCounter" class="button">
+        Reset Event Counter (BTT Id)
+    </a>
+</div>
+
 <table class="table">
     <c:forEach var="semester" items="${semesters}">
         <tr>

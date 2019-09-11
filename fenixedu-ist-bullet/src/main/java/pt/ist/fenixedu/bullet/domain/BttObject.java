@@ -27,4 +27,10 @@ public class BttObject extends BttObject_Base {
                 .filter(o -> o.getBttId() == bttId)
                 .findAny().map(o -> o.getLesson()).orElse(null);
     }
+
+    void delete() {
+        setLesson(null);
+        setBttType(null);
+        deleteDomainObject();
+    }
 }
