@@ -15,6 +15,7 @@
         <spring:message code="reset.counter" text="Reset Event Counter (BTT Id)"/>
     </a>
 </div>
+<br>
 
 <table class="table">
     <c:forEach var="semester" items="${semesters}">
