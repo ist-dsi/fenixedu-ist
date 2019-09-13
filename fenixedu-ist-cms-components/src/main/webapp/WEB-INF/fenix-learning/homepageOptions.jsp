@@ -108,7 +108,7 @@ ${portal.toolkit()}
             </c:if>
 
             <!-- Teacher -->
-            <c:if test="${not empty person.teacher && not empty person.teacher.activeContractedTeacher}">
+            <c:if test="${not empty person.teacher && person.teacher.activeContractedTeacher}">
                 <div class="form-group">
                     <label class="col-sm-2 control-label">
                         <spring:message code="label.homepage.showCategory" />:
