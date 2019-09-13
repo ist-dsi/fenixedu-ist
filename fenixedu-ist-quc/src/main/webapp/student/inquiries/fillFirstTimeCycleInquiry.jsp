@@ -37,7 +37,11 @@
 	<html:messages id="message" message="true" bundle="INQUIRIES_RESOURCES">
 		<p><span class="error0"><!-- Error messages go here --><bean:write name="message" /></span></p>
 	</html:messages>
-	
+
+	<p class="mvert2 warning0">
+		<bean:message key="message.inquiries.firstTimeCycle.warning" bundle="INQUIRIES_RESOURCES"/>
+	</p>
+
 	<p class="mvert2">
 		<em><bean:message key="message.inquiries.requiredFieldsMarkedWithAsterisk" bundle="INQUIRIES_RESOURCES"/></em>
 	</p>
