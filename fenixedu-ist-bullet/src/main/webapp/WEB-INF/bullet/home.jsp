@@ -11,8 +11,8 @@
 </div>
 
 <div>
-    <a href="<%= request.getContextPath()%>/bullet/resetEventCounter" class="button">
-        Reset Event Counter (BTT Id)
+    <a href="#" class="btn btn-default" onclick="resetCounter()">
+        <spring:message code="reset.counter" text="Reset Event Counter (BTT Id)"/>
     </a>
 </div>
 
@@ -42,3 +42,17 @@
         </tr>
     </c:forEach>
 </table>
+
+<script>
+    function resetCounter() {
+        if (confirm('<spring:message code="please.confirm" text="Please confirm the counter reset"/>')) {
+            $.ajax({
+                type: "GET",
+                url: "bullet/resetEventCounter",
+                success: function() {
+                    location.reload();
+                }
+            });
+        }
+    }
+</script>
