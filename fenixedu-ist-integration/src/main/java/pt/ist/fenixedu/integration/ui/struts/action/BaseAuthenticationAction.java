@@ -34,6 +34,8 @@ import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeEvent;
 import org.fenixedu.academic.domain.alumni.CerimonyInquiryPerson;
 import org.fenixedu.academic.domain.person.RoleType;
+import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
+import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.ui.struts.action.HomeAction;
 import org.fenixedu.academic.ui.struts.action.base.FenixAction;
@@ -166,7 +168,23 @@ public class BaseAuthenticationAction extends FenixAction {
     private boolean hasMissingRAIDESInformation(User userView) {
         return userView.getPerson() != null && userView.getPerson().getStudent() != null
                 && hasActiveClassPeriod(userView.getPerson().getStudent())
-                && userView.getPerson().getStudent().hasAnyMissingPersonalInformation();
+                && hasFirstTimeCycleRAIDESToRespond(userView.getPerson().getStudent());
+    }
+
+    public static boolean hasFirstTimeCycleRAIDESToRespond(Student student) {
+        for (Registration registration : student.getActiveRegistrations()) {
+            if (!registration.getDegreeType().isEmpty() && registration.isFirstTime()
+                    && !registration.getStudent().hasAnyCompletedPersonalInformationSince(registration.getStartExecutionYear())) {
+                return true;
+            }
+        }
+        for (final PhdIndividualProgramProcess phdProcess : student.getPerson().getPhdIndividualProgramProcessesSet()) {
+            if (student.isValidAndActivePhdProcess(phdProcess)
+                    && !student.hasAnyCompletedPersonalInformationSince(ExecutionYear.readByDateTime(phdProcess.getWhenStartedStudies()))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean hasActiveClassPeriod(final Student student) {
