@@ -206,8 +206,20 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
     }
 
     private void processEvent(final ChangeStateEvent eventStateChange) {
-        Thread thread = new FenixEduSapInvoiceContextListener.ProcessEvent(eventStateChange);
-        thread.start();
+        if (!isScheduler()) {
+            Thread thread = new FenixEduSapInvoiceContextListener.ProcessEvent(eventStateChange);
+            thread.start();
+        }
+    }
+
+    private boolean isScheduler() {
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        for (int iter = 0; iter < stackTrace.length; iter++) {
+            if (stackTrace[iter].getClassName().contains("org.fenixedu.bennu.scheduler")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static class ProcessEvent extends Thread {
