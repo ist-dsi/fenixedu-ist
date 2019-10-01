@@ -376,7 +376,7 @@ public class SapEvent {
 
     public void registerReimbursement(final Refund refund, final DebtExemption debtExemption) {
         org.fenixedu.academic.domain.accounting.Refund domainRefund = FenixFramework.getDomainObject(refund.getId());
-        if(getPayedAmount().equals(refund.getAmount())) {
+        if (getPayedAmount().getAmount().compareTo(refund.getAmount()) == 0) {
             final Money paymentsInSap = getFilteredSapRequestStream()
                     .filter(sr -> sr.getRequestType() == SapRequestType.INVOICE && !sr.isInitialization())
                     .sorted(SapRequest.COMPARATOR_BY_EVENT_AND_ORDER)
