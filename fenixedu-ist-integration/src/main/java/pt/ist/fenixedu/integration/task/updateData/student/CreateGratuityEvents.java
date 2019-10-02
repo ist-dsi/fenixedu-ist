@@ -30,6 +30,7 @@ import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.accounting.events.AccountingEventsManager;
 import org.fenixedu.academic.domain.accounting.events.gratuity.DfaGratuityEvent;
+import org.fenixedu.academic.domain.accounting.events.gratuity.EnrolmentGratuityEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.SpecializationDegreeGratuityEvent;
 import org.fenixedu.academic.domain.degree.DegreeType;
@@ -56,9 +57,16 @@ public class CreateGratuityEvents extends CronTask {
             for (final StudentCurricularPlan studentCurricularPlan : executionDegree.getDegreeCurricularPlan().getStudentCurricularPlansSet()) {
                 if (!isInEnrolmentPeriod || isFirstTimeStudent(studentCurricularPlan, executionYear)) {
                     generateGratuityEvents(executionYear, studentCurricularPlan);
+                    generateEnrolmentGratuityEvents(executionYear, studentCurricularPlan);
                 }
             }
         }
+    }
+
+    private void generateEnrolmentGratuityEvents(final ExecutionYear executionYear, final StudentCurricularPlan scp) {
+        scp.getEnrolmentsByExecutionYear(executionYear).stream()
+                .filter(e -> !e.getGratuityEvent().isPresent())
+                .forEach(EnrolmentGratuityEvent::create);
     }
 
     private boolean isFirstTimeStudent(final StudentCurricularPlan studentCurricularPlan, final ExecutionYear executionYear) {
