@@ -20,7 +20,9 @@ import org.fenixedu.academic.domain.accounting.Refund;
 import org.fenixedu.academic.domain.accounting.calculator.DebtExemption;
 import org.fenixedu.academic.domain.accounting.calculator.DebtInterestCalculator;
 import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeAndInsuranceEvent;
+import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEvent;
+import org.fenixedu.academic.domain.accounting.events.insurance.InsuranceEvent;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
@@ -75,11 +77,16 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
 
             private boolean isAnyAdministrativeOfficeFeeAndInsuranceInDebtUntil(final StudentCurricularPlan scp, final ExecutionYear executionYear) {
                 for (final Event event : scp.getPerson().getEventsSet()) {
-                    if (event.getSapRoot() == null
-                            && event instanceof AdministrativeOfficeFeeAndInsuranceEvent
-                            && ((AdministrativeOfficeFeeAndInsuranceEvent) event).getExecutionYear().isBefore(executionYear)
-                            && event.isOpen()) {
-                        return true;
+                    if (event.getSapRoot() == null) {
+                        if (event instanceof InsuranceEvent && ((InsuranceEvent) event).getExecutionYear().isBefore(executionYear)
+                                && event.isOpen()) {
+                            return true;
+                        }
+                        if (event instanceof AdministrativeOfficeFeeEvent
+                                && ((AdministrativeOfficeFeeEvent) event).getExecutionYear().isBefore(executionYear)
+                                && event.isOpen()) {
+                            return true;
+                        }
                     }
                 }
 
