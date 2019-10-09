@@ -21,12 +21,18 @@
 <%@page import="pt.ist.fenixedu.domain.SapRequestType"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <% final String contextPath = request.getContextPath(); %>
 
 <style>
 <!--
 .strikeLine {
     text-decoration: line-through;
+}
+
+.buttonTable td {
+	padding: 5px;
 }
 -->
 </style>
@@ -46,7 +52,30 @@
 		<spring:message code="title.documents" text="Invoices"/>
     </h2>
 
-<table id="invoiceTable" class="table tdmiddle">
+	<c:if test="${isInDebt and isAcademicServiceStaff}">
+		<table class="buttonTable">
+			<tr>
+				<td>
+					<form method="post" action="${pageContext.request.contextPath}/invoice-downloader/${event.externalId}/createDebtLiquidationLetter">
+							${csrf.field()}
+						<button type="submit" class="btn btn-info">
+							<spring:message code="label.event.liquidation.letter.create" text="Create Liquidation Letter"/>
+						</button>
+					</form>
+				</td>
+				<td>
+					<form method="post" action="${pageContext.request.contextPath}/invoice-downloader/${event.externalId}/createDebtCertificate">
+							${csrf.field()}
+						<button type="submit" class="btn btn-info">
+							<spring:message code="label.event.debt.certificate.create" text="Create Debt Certificate"/>
+						</button>
+					</form>
+				</td>
+			</tr>
+		</table>
+	</c:if>
+
+	<table id="invoiceTable" class="table tdmiddle">
 	<thead>
 		<tr>
             <th><spring:message code="label.date" text="Date"/></th>
@@ -66,6 +95,7 @@
 <script type="text/javascript">
 	var sapRequests = ${sapRequests};
 	var giafDocuments = ${giafDocuments};
+	var financialDocuments = ${financialDocuments};
 	var contextPath = '<%= contextPath %>';
 
     function sapDocumentNumberPart(sapRequest) {
@@ -83,7 +113,11 @@
         return '<a href="' + link + '">' + giafDocument.receiptNumber + '</a>';
     }
 
-    function documentType(requestType) {
+	function downloadLink(filename, downloadUrl) {
+		return '<a href="' + downloadUrl + '">' + filename+ '</a>';
+	}
+
+	function documentType(requestType) {
     	if (requestType == 'ADVANCEMENT') {
     		return '<spring:message code="label.document.type.ADVANCEMENT"/>';
     	}
@@ -158,5 +192,16 @@
                 .append($('<td/>').html(sapDocumentNumberPart(sapRequest)))
                 ;
         });
+		$(financialDocuments).sort(sortSap).each(function(i, financialDocument) {
+			row = $('<tr/>').appendTo($('#invoiceTable'))
+					.append($('<td/>').text(financialDocument.created))
+					.append($('<td/>').text(financialDocument.id))
+					.append($('<td/>').text(financialDocument.eventDescription))
+					.append($('<td/>').text(financialDocument.value))
+					.append($('<td/>').text(financialDocument.documentType))
+					.append($('<td/>').text(financialDocument.documentNumber))
+					.append($('<td/>').html(downloadLink(financialDocument.displayName, financialDocument.url)))
+			;
+		});
 	});
 </script>

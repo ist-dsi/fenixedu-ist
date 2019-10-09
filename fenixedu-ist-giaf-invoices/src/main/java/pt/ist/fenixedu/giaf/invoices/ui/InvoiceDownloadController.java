@@ -35,6 +35,7 @@ import org.fenixedu.academic.ui.spring.controller.AccountingEventsPaymentManager
 import org.fenixedu.academic.ui.spring.service.AccountingManagementAccessControlService;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.security.Authenticate;
+import org.fenixedu.bennu.io.servlet.FileDownloadServlet;
 import org.fenixedu.bennu.rendering.annotations.BennuIntersection;
 import org.fenixedu.bennu.rendering.annotations.BennuIntersections;
 import org.fenixedu.bennu.spring.portal.SpringApplication;
@@ -53,6 +54,10 @@ import com.google.gson.JsonObject;
 
 import pt.ist.fenixedu.domain.SapDocumentFile;
 import pt.ist.fenixedu.domain.SapRequest;
+import pt.ist.fenixedu.domain.documents.DebtCertificate;
+import pt.ist.fenixedu.domain.documents.FinancialDocument;
+import pt.ist.fenixedu.domain.documents.FinancialDocumentFile;
+import pt.ist.fenixedu.domain.documents.LiquidationLetter;
 import pt.ist.fenixedu.giaf.invoices.GiafEvent;
 
 @BennuIntersections({
@@ -88,7 +93,10 @@ public class InvoiceDownloadController {
     @RequestMapping(value = "/{event}/documents", method = RequestMethod.GET)
     public String listForEvent(@PathVariable Event event, final Model model, final HttpServletResponse response) {
         if (isAllowedToAccess(event)) {
+            final User user = Authenticate.getUser();
+            model.addAttribute("isAcademicServiceStaff", Boolean.valueOf(isAcademicServiceStaff(user)));
             model.addAttribute("event", event);
+            model.addAttribute("isInDebt", Boolean.valueOf(event.isInDebt()));
             model.addAttribute("eventDetailsUrl", accessControlService.isEventOwner(event, Authenticate.getUser()) ?
                     ownerEventDetails(event): eventDetails(event));
 
@@ -111,11 +119,33 @@ public class InvoiceDownloadController {
                 }
             }
             model.addAttribute("giafDocuments", giafDocuments);
+
+            final JsonArray financialDocuments = event.getFinancialDocumentSet().stream()
+                    .map(doc -> toJson(doc))
+                    .collect(SapInvoiceController.toJsonArray());
+            model.addAttribute("financialDocuments", financialDocuments);
+
             return "invoice-viewer/home";
         } else {
             response.setStatus(HttpStatus.FORBIDDEN.value());
             return "/";
         }
+    }
+
+    private JsonObject toJson(final FinancialDocument financialDocument) {
+        final Event event = financialDocument.getEvent();
+        final FinancialDocumentFile financialDocumentFile = financialDocument.getFinancialDocumentFile();
+
+        final JsonObject result = new JsonObject();
+        result.addProperty("id", financialDocument.getExternalId());
+        result.addProperty("eventDescription", event.getDescription().toString());
+        result.addProperty("created", financialDocumentFile.getCreationDate().toString("yyyy-MM-dd HH:mm:ss"));
+        result.addProperty("value", financialDocument.getValue().toPlainString());
+        result.addProperty("documentType", financialDocument.getDocumentType());
+        result.addProperty("documentNumber", financialDocument.getDocumentNumber());
+        result.addProperty("displayName", financialDocumentFile.getDisplayName());
+        result.addProperty("url", FileDownloadServlet.getDownloadUrl(financialDocumentFile));
+        return result;
     }
 
     private JsonObject toJsonObject(final SapRequest sapRequest) {
@@ -223,6 +253,30 @@ public class InvoiceDownloadController {
     static boolean isAcademicServiceStaff(final User user) {
         return AcademicAuthorizationGroup.get(AcademicOperationType.MANAGE_STUDENT_PAYMENTS).isMember(user)
                 || AcademicAuthorizationGroup.get(AcademicOperationType.MANAGE_STUDENT_PAYMENTS_ADV).isMember(user);
+    }
+
+    @RequestMapping(value = "/{event}/createDebtLiquidationLetter", method = RequestMethod.POST)
+    public String createDebtLiquidationLetter(final @PathVariable Event event, final Model model, final HttpServletResponse response) {
+        final User user = Authenticate.getUser();
+        if (isAcademicServiceStaff(user)) {
+            LiquidationLetter.create(event);
+            return "redirect:/invoice-downloader/" + event.getExternalId() + "/documents";
+        } else {
+            response.setStatus(HttpStatus.FORBIDDEN.value());
+            return "/";
+        }
+    }
+
+    @RequestMapping(value = "/{event}/createDebtCertificate", method = RequestMethod.POST)
+    public String createDebtCertificate(final @PathVariable Event event, final Model model, final HttpServletResponse response) {
+        final User user = Authenticate.getUser();
+        if (isAcademicServiceStaff(user)) {
+            DebtCertificate.create(event);
+            return "redirect:/invoice-downloader/" + event.getExternalId() + "/documents";
+        } else {
+            response.setStatus(HttpStatus.FORBIDDEN.value());
+            return "/";
+        }
     }
 
 }
