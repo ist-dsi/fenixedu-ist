@@ -10,6 +10,13 @@
     </h1>
 </div>
 
+<div>
+    <a href="#" class="btn btn-default" onclick="resetCounter()">
+        <spring:message code="reset.counter" text="Reset Event Counter (BTT Id)"/>
+    </a>
+</div>
+<br>
+
 <table class="table">
     <c:forEach var="semester" items="${semesters}">
         <tr>
@@ -19,6 +26,11 @@
             <th>
                 <a href="<%= request.getContextPath()%>/bullet/${semester.externalId}/exportJson">
                     JSON
+                </a>
+            </th>
+            <th>
+                <a href="<%= request.getContextPath()%>/bullet/${semester.externalId}/exportXml">
+                    XML
                 </a>
             </th>
             <c:forEach var="type" items="${types}">
@@ -31,3 +43,17 @@
         </tr>
     </c:forEach>
 </table>
+
+<script>
+    function resetCounter() {
+        if (confirm('<spring:message code="please.confirm" text="Please confirm the counter reset"/>')) {
+            $.ajax({
+                type: "GET",
+                url: "bullet/resetEventCounter",
+                success: function() {
+                    location.reload();
+                }
+            });
+        }
+    }
+</script>

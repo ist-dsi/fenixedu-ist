@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.google.gson.GsonBuilder;
 
 import pt.ist.fenixedu.bullet.domain.BulletObjectType;
+import pt.ist.fenixedu.bullet.domain.BulletXmlConverter;
 import pt.ist.fenixedu.bullet.domain.DumpContext;
 
 @SpringApplication(group = "logged", path = "bullet", title = "title.bullet", hint = "title.bullet")
@@ -63,10 +64,21 @@ public class BulletController {
         download(response, "data.json", new GsonBuilder().setPrettyPrinting().create().toJson(context.toJson()).getBytes());
     }
 
+    @RequestMapping(path = "/{executionSemester}/exportXml", method = RequestMethod.GET, produces = "application/xml")
+    public void exportXml(@PathVariable final ExecutionSemester executionSemester, final Model model, final HttpServletResponse response) {
+        final BulletXmlConverter converter = new BulletXmlConverter(executionSemester);
+        download(response, "data.xml", converter.toXML());
+    }
+
     @RequestMapping(path = "/{executionSemester}/{type}/exportXls", method = RequestMethod.GET, produces = "application/xlsx")
     public void exportJson(@PathVariable final ExecutionSemester executionSemester, @PathVariable final BulletObjectType type, final Model model, final HttpServletResponse response) {
         final DumpContext context = new DumpContext(executionSemester);
         download(response, "data.xlsx", context.toXlsx(type));
+    }
+
+    @RequestMapping(path = "/resetEventCounter", method = RequestMethod.GET)
+    public void resetEventCounter(final HttpServletResponse response) {
+        BulletXmlConverter.resetEventCounter();
     }
 
     private void download(final HttpServletResponse response, final String filename, final byte[] content) {

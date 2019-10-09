@@ -11,7 +11,7 @@ import org.fenixedu.spaces.domain.Space;
 
 public class BulletRoom extends BulletSpace {
 
-    private BulletRoom(Space space) {
+    public BulletRoom(Space space) {
         super(space);
     }
 
@@ -36,7 +36,7 @@ public class BulletRoom extends BulletSpace {
         slots.put(BulletObjectTag.CHARACTERISTIC.unit(), BulletCharacteristic.getCharacteristics(space).collect(Collectors.joining(", ")));
     }
 
-    private String roomFullPath() {
+    public String roomFullPath() {
         return BulletZone.key(topLevelSpace(space))
                 + " > " + BulletBuilding.key(getBuilding())
                 + " > " + BulletLevel.key(getLevel())
