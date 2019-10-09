@@ -67,9 +67,9 @@ public class CreatePhdEvents extends CronTask {
         final LocalDate whenStartedStudies = phdIndividualProgramProcess.getWhenStartedStudies();
         if (whenStartedStudies != null) {
             final DateTime dt = today.toDateTimeAtStartOfDay().plusDays(1);
-            final LocalDate initialDateForEventCreation = initialDateForEventCreation(phdIndividualProgramProcess, dt);
+            final LocalDate initialDateForEventCreation = PhdGratuityEvent.initialDateForEventCreation(phdIndividualProgramProcess, dt);
             if (initialDateForEventCreation != null && initialDateForEventCreation.getDayOfMonth() == today.getDayOfMonth() && initialDateForEventCreation.getMonthOfYear() == today.getMonthOfYear()) {
-                PhdProgramProcessState stateForToday = findStateForDate(phdIndividualProgramProcess, dt);
+                PhdProgramProcessState stateForToday = PhdGratuityEvent.findStateForDate(phdIndividualProgramProcess, dt);
                 final PhdIndividualProgramProcessState type = stateForToday.getType();
                 if (type == PhdIndividualProgramProcessState.WORK_DEVELOPMENT || type == PhdIndividualProgramProcessState.SUSPENDED) {
                     final Person person = phdIndividualProgramProcess.getPerson();
@@ -102,24 +102,6 @@ public class CreatePhdEvents extends CronTask {
                 .map(e -> (PhdGratuityEvent) e)
                 .filter(e -> e.getYear().intValue() == today.getYear())
                 .findAny().orElse(null);
-    }
-
-    private PhdProgramProcessState findStateForDate(final PhdIndividualProgramProcess phdIndividualProgramProcess, final DateTime tomorrow) {
-        PhdProgramProcessState result = null;
-        for (final PhdProgramProcessState state : phdIndividualProgramProcess.getStatesSet().stream().sorted(STATE_COMPARATOR).collect(Collectors.toList())) {
-            if (!state.getStateDate().isAfter(tomorrow)) {
-                result = state;
-            }
-        }
-        return result;
-    }
-
-    private LocalDate initialDateForEventCreation(PhdIndividualProgramProcess phdIndividualProgramProcess, final DateTime today) {
-        return phdIndividualProgramProcess.getStatesSet().stream().sorted(STATE_COMPARATOR)
-                .filter(s -> s.getType() == PhdIndividualProgramProcessState.WORK_DEVELOPMENT || s.getType() == PhdIndividualProgramProcessState.SUSPENDED)
-                .filter(s -> !s.getStateDate().isAfter(today))
-                .map(s -> s.getStateDate().toLocalDate())
-                .max((d1, d2) -> d1.compareTo(d2)).orElse(null);
     }
 
     private void fixDueDate(final Event event) {
