@@ -2175,7 +2175,7 @@ public class FenixAPIv1 {
     @GET
     @Produces(JSON_UTF8)
     @Path("photo/{username}")
-    @OAuthEndpoint(PERSONAL_SCOPE, SCHEDULE_SCOPE, EVALUATIONS_SCOPE, CURRICULAR_SCOPE, PAYMENTS_SCOPE, DEGREE_CURRICULAR_MANAGEMENT)
+    @OAuthEndpoint( value = { PERSONAL_SCOPE, SCHEDULE_SCOPE, EVALUATIONS_SCOPE, CURRICULAR_SCOPE, PAYMENTS_SCOPE, DEGREE_CURRICULAR_MANAGEMENT } )
     public FenixPhoto person(@PathParam("username") String username) {
         final User user = User.findByUsername(username);
         final Person person = user == null ? null : user.getPerson();
