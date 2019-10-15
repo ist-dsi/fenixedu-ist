@@ -11,6 +11,7 @@ import org.fenixedu.academic.domain.accounting.calculator.DebtInterestCalculator
 import org.fenixedu.academic.domain.accounting.calculator.ExcessRefund;
 import org.fenixedu.academic.domain.accounting.calculator.Payment;
 import org.fenixedu.academic.domain.accounting.calculator.Refund;
+import org.fenixedu.academic.domain.accounting.events.EventExemptionJustificationType;
 import org.fenixedu.academic.util.Money;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -18,6 +19,7 @@ import org.joda.time.LocalDate;
 import com.google.common.base.Strings;
 
 import pt.ist.esw.advice.pt.ist.fenixframework.AtomicInstance;
+import pt.ist.fenixedu.domain.SapRequestType;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
 import pt.ist.fenixframework.CallableWithoutException;
@@ -133,7 +135,14 @@ public class EventProcessor {
                 } else if (accountingEntry instanceof DebtExemption) {
                     if (accountingEntry.getAmount().compareTo(BigDecimal.ZERO) > 0 && !sapEvent.hasCredit(accountingEntry.getId())
                             && accountingEntry.getCreated().isAfter(EventWrapper.SAP_TRANSACTIONS_THRESHOLD)) {
-                        sapEvent.registerCredit(event, (CreditEntry) accountingEntry, eventWrapper.isGratuity());
+                        final DebtExemption debtExemption = (DebtExemption) accountingEntry;
+                        if (EventExemptionJustificationType.CUSTOM_PAYMENT_PLAN.name().equals(debtExemption.getDescription())) {
+                            final Money value = new Money(debtExemption.getAmount());
+                            sapEvent.fakeSapRequest(SapRequestType.INVOICE, "ND0", value, null);
+                            sapEvent.fakeSapRequest(SapRequestType.CREDIT, "NA0", value, debtExemption.getId());
+                        } else {
+                            sapEvent.registerCredit(event, debtExemption, eventWrapper.isGratuity());
+                        }
                     }
                 } else if (accountingEntry instanceof Refund && !sapEvent.hasRefund(accountingEntry.getId())) {
                     //Reimbursements
