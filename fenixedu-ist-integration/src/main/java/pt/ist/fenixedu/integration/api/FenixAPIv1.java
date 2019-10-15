@@ -180,8 +180,8 @@ public class FenixAPIv1 {
 
     private FenixPhoto getPhoto(final Person person) {
         final String type = ContentType.PNG.getMimeType();
-        final byte[] avatar = person != null && person.isPhotoAvailableToCurrentUser() ?
-            person.getPersonalPhoto().getDefaultAvatar() : mysteryman();
+        final byte[] avatar = person != null && person.getPersonalPhoto() != null
+                && person.isPhotoAvailableToCurrentUser() ? person.getPersonalPhoto().getDefaultAvatar() : mysteryman();
         final String data = Base64.getEncoder().encodeToString(avatar);
         return new FenixPhoto(type, data);
     }
