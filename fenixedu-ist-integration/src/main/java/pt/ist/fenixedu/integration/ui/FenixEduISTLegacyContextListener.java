@@ -38,16 +38,7 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
 import org.fenixedu.PostalCodeValidator;
-import org.fenixedu.academic.domain.Country;
-import org.fenixedu.academic.domain.CurricularCourse;
-import org.fenixedu.academic.domain.Enrolment;
-import org.fenixedu.academic.domain.ExecutionCourse;
-import org.fenixedu.academic.domain.ExecutionYear;
-import org.fenixedu.academic.domain.OccupationPeriod;
-import org.fenixedu.academic.domain.OccupationPeriodType;
-import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.StudentCurricularPlan;
-import org.fenixedu.academic.domain.Summary;
+import org.fenixedu.academic.domain.*;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.VatNumberResolver;
 import org.fenixedu.academic.domain.accounting.events.AccountingEventsManager;
@@ -92,6 +83,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pt.ist.fenixedu.giaf.invoices.ClientMap;
 import pt.ist.fenixedu.giaf.invoices.Utils;
+import pt.ist.fenixedu.integration.domain.academic.DegreeStructureForIST;
 import pt.ist.fenixedu.integration.domain.cgd.CgdCard;
 import pt.ist.fenixedu.integration.domain.student.PreEnrolment;
 import pt.ist.fenixedu.integration.dto.QucProfessorshipEvaluation;
@@ -344,6 +336,9 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
             return null;
         };
 
+        DegreeCurricularPlan.RESET_DEGREE_CURRICULAR_PLAN_FUNCTION = (dcp) -> {
+            DegreeStructureForIST.resetDegreeCurricularPlan(dcp);
+        };
     }
 
     private static boolean isValidPostCode(final String postalCode) {
