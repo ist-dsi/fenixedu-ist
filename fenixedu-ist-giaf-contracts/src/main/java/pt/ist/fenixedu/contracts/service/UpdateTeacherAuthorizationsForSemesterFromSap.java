@@ -357,10 +357,10 @@ public class UpdateTeacherAuthorizationsForSemesterFromSap {
 
 	public Double getWeeklyLessonHours(ColaboratorSituation colaboratorSituation, Interval interval,
 			TeacherCategory teacherCategory) {
-		if (colaboratorSituation.endSituation() || (colaboratorSituation.serviceExemption())// && !hasMandatoryCredits())
-				|| !colaboratorSituation.inExercise()) {
-			return Double.valueOf(0);
-		}
+        if (colaboratorSituation.endSituation() //|| (colaboratorSituation.serviceExemption())// && !hasMandatoryCredits())
+                || !colaboratorSituation.inExercise()) {
+            return Double.valueOf(0);
+        }
 
 		if (teacherCategory != null) {
 			if (Strings.isNullOrEmpty(colaboratorSituation.fulltimeequivalent())) {
