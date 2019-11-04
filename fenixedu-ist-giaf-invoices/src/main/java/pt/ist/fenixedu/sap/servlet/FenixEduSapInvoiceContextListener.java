@@ -61,7 +61,7 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
             Signal.register(AccountingTransaction.SIGNAL_ANNUL, this::handlerAccountingTransactionAnnulment);
             Signal.register(EventState.EVENT_STATE_CHANGED, this::handlerEventStateChange);
             Signal.register(EventState.EVENT_STATE_CHANGED, this::calculateSapRequestsForCanceledEvent);
-            Signal.registerWithoutTransaction(EventState.EVENT_STATE_CHANGED, this::processEvent);
+//            Signal.registerWithoutTransaction(EventState.EVENT_STATE_CHANGED, this::processEvent);
 
             FenixFramework.getDomainModel().registerDeletionBlockerListener(Exemption.class, this::blockExemption);
             FenixFramework.getDomainModel().registerDeletionBlockerListener(Discount.class, this::blockDiscount);
