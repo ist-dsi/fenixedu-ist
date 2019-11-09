@@ -39,7 +39,7 @@ ${portal.toolkit()}
             <div class="form-group">
                 <label class="control-label col-sm-1"><spring:message code="label.org.fenixedu.academic.dto.accounting.DepositAmountBean.whenRegistered"/></label>
                 <div class="col-sm-4">
-                    <input id="whenRegistered" name="whenRegistered" value="<%= new DateTime().toString("MM/dd/yyyy HH:mm:ss") %>" bennu-datetime requires-past required>
+                    <input id="whenRegistered" name="whenRegistered" value="<%= new DateTime().toString("MM/dd/yyyy HH:mm:ss") %>" bennu-datetime required>
                 </div>
             </div>
 

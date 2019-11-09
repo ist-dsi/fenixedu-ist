@@ -20,7 +20,7 @@ ${portal.toolkit()}
                 <form method="get" action="<%= request.getContextPath() %>/accounting-refund/search" class="form-horizontal">
                     ${csrf.field()}
                     <div class="col-sm-3">
-                        <input id="start" name="start" value="${start}" bennu-datetime requires-past required class="form-inline">
+                        <input id="start" name="start" value="${start}" bennu-datetime required class="form-inline">
                     </div>
                     <div class="col-sm-3">
                         <span style="float: left; margin-right: 25px;">
