@@ -17,6 +17,10 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.google.common.base.Strings;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.fenixedu.PostalCodeValidator;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionYear;
@@ -25,18 +29,8 @@ import org.fenixedu.academic.domain.accounting.AccountingTransaction;
 import org.fenixedu.academic.domain.accounting.AccountingTransactionDetail;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.EventType;
-import org.fenixedu.academic.domain.accounting.calculator.CreditEntry;
-import org.fenixedu.academic.domain.accounting.calculator.DebtExemption;
-import org.fenixedu.academic.domain.accounting.calculator.DebtInterestCalculator;
-import org.fenixedu.academic.domain.accounting.calculator.ExcessRefund;
-import org.fenixedu.academic.domain.accounting.calculator.PartialPayment;
-import org.fenixedu.academic.domain.accounting.calculator.Payment;
-import org.fenixedu.academic.domain.accounting.calculator.Refund;
-import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeAndInsuranceEvent;
-import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeEvent;
-import org.fenixedu.academic.domain.accounting.events.EnrolmentEvaluationEvent;
-import org.fenixedu.academic.domain.accounting.events.ImprovementOfApprovedEnrolmentEvent;
-import org.fenixedu.academic.domain.accounting.events.SpecialSeasonEnrolmentEvent;
+import org.fenixedu.academic.domain.accounting.calculator.*;
+import org.fenixedu.academic.domain.accounting.events.*;
 import org.fenixedu.academic.domain.accounting.events.dfa.DFACandidacyEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEvent;
 import org.fenixedu.academic.domain.accounting.events.insurance.InsuranceEvent;
@@ -52,20 +46,17 @@ import org.fenixedu.generated.sources.saft.sap.SAFTPTSourceBilling;
 import org.fenixedu.generated.sources.saft.sap.SAFTPTSourcePayment;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
-
-import com.google.common.base.Strings;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
-import pt.ist.fenixedu.domain.ExternalClient;
-import pt.ist.fenixedu.domain.SapDocumentFile;
-import pt.ist.fenixedu.domain.SapRequest;
-import pt.ist.fenixedu.domain.SapRequestType;
-import pt.ist.fenixedu.domain.SapRoot;
+import pt.ist.fenixedu.domain.*;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
 import pt.ist.sap.client.SapFinantialClient;
+
+import java.math.BigDecimal;
+import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class SapEvent {
 
@@ -801,26 +792,32 @@ public class SapEvent {
         return data;
     }
 
-    public boolean processPendingRequests(Event event, ErrorLogConsumer errorLog, EventLogger elogger) {
-        Set<SapRequest> requests = new TreeSet<>(SapRequest.COMPARATOR_BY_ORDER);
+    public boolean processPendingRequests(final Event event, final ErrorLogConsumer errorLog, final EventLogger elogger) {
+        final Set<SapRequest> requests = new TreeSet<>(SapRequest.COMPARATOR_BY_ORDER);
         requests.addAll(event.getSapRequestSet());
-        for (SapRequest sr : requests) {
-            if (!sr.getIntegrated()) {
-                JsonParser jsonParser = new JsonParser();
-                JsonObject data = (JsonObject) jsonParser.parse(sr.getRequest());
+        for (final SapRequest sr : requests) {
+            if (!processPendingRequests(sr, errorLog, elogger)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
-                JsonObject result = sendDataToSap(sr, data);
+    public boolean processPendingRequests(final SapRequest sr, final ErrorLogConsumer errorLog, final EventLogger elogger) {
+        if (!sr.getIntegrated()) {
+            final JsonParser jsonParser = new JsonParser();
+            final JsonObject data = (JsonObject) jsonParser.parse(sr.getRequest());
 
-                boolean isIntegrated = checkAndRegisterIntegration(event, errorLog, elogger, data, sr.getDocumentNumber(), sr,
-                        result, sr.getRequestType().toString(), sr.getRequestType().isToGetDocument());
-                if (!isIntegrated) {
-                    return isIntegrated;
-                }
+            final JsonObject result = sendDataToSap(sr, data);
 
-                final SapRequest originalRequest = sr.getOriginalRequest();
-                if (originalRequest != null) {
-                    originalRequest.setIgnore(true);
-                }
+            if (!checkAndRegisterIntegration(event, errorLog, elogger, data, sr.getDocumentNumber(), sr,
+                    result, sr.getRequestType().toString(), sr.getRequestType().isToGetDocument())) {
+                return false;
+            }
+
+            final SapRequest originalRequest = sr.getOriginalRequest();
+            if (originalRequest != null) {
+                originalRequest.setIgnore(true);
             }
         }
         return true;
