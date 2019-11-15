@@ -35,6 +35,7 @@ public class DegreeStructureForIST {
     private static void delete(final CourseGroup courseGroup, final Set<DegreeModule> toDelete) {
         courseGroup.getChildContextsSet().stream().forEach(c -> delete(c, toDelete));
         courseGroup.delete();
+        courseGroup.setProgramConclusion(null);
     }
 
     private static void delete(final Context context, final Set<DegreeModule> toDelete) {
