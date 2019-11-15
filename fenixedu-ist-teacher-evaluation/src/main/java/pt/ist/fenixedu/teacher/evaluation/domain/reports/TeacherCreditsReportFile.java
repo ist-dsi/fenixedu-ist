@@ -36,12 +36,7 @@ import org.fenixedu.commons.spreadsheet.Spreadsheet;
 import org.fenixedu.commons.spreadsheet.Spreadsheet.Row;
 import org.joda.time.Interval;
 
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.GiafProfessionalData;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonContractSituation;
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalData;
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalCategory;
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalRegime;
-import pt.ist.fenixedu.contracts.domain.util.CategoryType;
 import pt.ist.fenixedu.teacher.evaluation.domain.TeacherCredits;
 import pt.ist.fenixedu.teacher.evaluation.domain.credits.util.AnnualTeachingCreditsBean;
 import pt.ist.fenixedu.teacher.evaluation.domain.teacher.OtherService;
@@ -75,9 +70,6 @@ public class TeacherCreditsReportFile extends TeacherCreditsReportFile_Base {
         spreadsheet.setHeader("Nome");
         spreadsheet.setHeader("Semestre");
         spreadsheet.setHeader("Categoria");
-        spreadsheet.setHeader("Situação");
-        spreadsheet.setHeader("Regime");
-        spreadsheet.setHeader("Docente de carreira");
         spreadsheet.setHeader("Departamento - último");
         spreadsheet.setHeader("Departamento - dominante");
         spreadsheet.setHeader("CLE");
@@ -116,24 +108,8 @@ public class TeacherCreditsReportFile extends TeacherCreditsReportFile_Base {
                     row.setCell(teacher.getPerson().getEmployee() != null ? teacher.getPerson().getEmployee().getEmployeeNumber() : null);
                     row.setCell(teacher.getPerson().getName());
                     row.setCell(executionSemester.getName());
-                    ProfessionalCategory category =
-                            teacher.getCategory(executionSemester.getAcademicInterval()).map(tc -> tc.getProfessionalCategory())
-                                    .orElse(null);
-                    PersonContractSituation situation = null;
-                    ProfessionalRegime regime = null;
-                    if (teacherAuthorization.isContracted()
-                            && PersonProfessionalData.isTeacherActiveForSemester(teacher, executionSemester)) {
-                        situation =
-                                PersonContractSituation.getCurrentOrLastTeacherContractSituation(teacher, executionSemester
-                                        .getBeginDateYearMonthDay().toLocalDate(), executionSemester.getEndDateYearMonthDay()
-                                        .toLocalDate());
-                        regime = getProfessionalRegime(situation, semesterInterval);
-                    }
-                    row.setCell(category == null ? null : category.getName().getContent());
-                    row.setCell(situation == null ? null : situation.getContractSituation().getName().getContent());
-
-                    row.setCell(regime == null ? null : regime.getName().getContent());
-                    row.setCell(category == null ? null : category.isTeacherProfessorCategory() ? "S" : "N");
+                    row.setCell(teacherAuthorization.getTeacherCategory().getName().getContent());
+                    
                     Department lastDepartment = teacher.getLastDepartment(executionSemester.getAcademicInterval());
                     row.setCell(lastDepartment == null ? null : lastDepartment.getName());
                     Department creditsDepartment = teacher.getDepartment(executionSemester.getAcademicInterval()).orElse(null);
@@ -198,15 +174,6 @@ public class TeacherCreditsReportFile extends TeacherCreditsReportFile_Base {
             return null;
         }
         return country.getCountryNationality().getContent();
-    }
-
-    private ProfessionalRegime getProfessionalRegime(PersonContractSituation teacherContractSituation, Interval interval) {
-        GiafProfessionalData giafProfessionalData =
-                teacherContractSituation != null ? teacherContractSituation.getGiafProfessionalData() : null;
-        PersonProfessionalData personProfessionalData =
-                giafProfessionalData != null ? giafProfessionalData.getPersonProfessionalData() : null;
-        return personProfessionalData != null ? personProfessionalData.getDominantProfessionalRegime(giafProfessionalData,
-                interval, CategoryType.TEACHER) : null;
     }
 
     private String getOthersDesciption(TeacherService teacherService) {

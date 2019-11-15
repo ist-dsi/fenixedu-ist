@@ -39,7 +39,6 @@ import org.joda.time.YearMonthDay;
 import pt.ist.fenixedu.contracts.domain.Employee;
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.PersonFunction;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonContractSituation;
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalData;
 import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalExemption;
 import pt.ist.fenixedu.teacher.evaluation.TeacherEvaluationConfiguration;
 import pt.ist.fenixedu.teacher.evaluation.domain.teacher.TeacherService;
@@ -277,8 +276,8 @@ public class TeacherCredits extends TeacherCredits_Base {
         List<Employee> employees = Employee.getAllWorkingEmployees(unit, begin, end);
         for (Employee employee : employees) {
             Teacher teacher = employee.getPerson().getTeacher();
-            if (teacher != null
-                    && PersonProfessionalData.hasAnyTeacherContractSituation(teacher, begin.toLocalDate(), end.toLocalDate())) {
+            if (teacher != null && teacher.getLatestTeacherAuthorizationInInterval(
+                    new Interval(begin.toDateTimeAtMidnight(), end.toDateTimeAtMidnight())) != null) {
                 teachers.add(teacher);
             }
         }
