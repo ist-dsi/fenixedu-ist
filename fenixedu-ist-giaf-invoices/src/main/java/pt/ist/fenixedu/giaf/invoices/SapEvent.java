@@ -680,7 +680,7 @@ public class SapEvent {
      * open value of the invoice
      * @param sapInvoiceRequest
      */
-    private void registerFinalZeroPayment(final SapRequest sapInvoiceRequest) {
+    public void registerFinalZeroPayment(final SapRequest sapInvoiceRequest) {
         JsonObject data = toJsonFinalZeroPayment(sapInvoiceRequest, getPaymentsAndCreditsFor(sapInvoiceRequest));
 
         String documentNumber = getDocumentNumber(data, true);
