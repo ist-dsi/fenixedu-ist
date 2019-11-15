@@ -29,7 +29,6 @@ import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.bennu.core.domain.User;
 
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalData;
 import pt.ist.fenixedu.teacher.evaluation.domain.TeacherCredits;
 import pt.ist.fenixedu.teacher.evaluation.domain.credits.AnnualCreditsState;
 import pt.ist.fenixedu.teacher.evaluation.domain.credits.AnnualTeachingCredits;
@@ -121,7 +120,7 @@ public class TeacherCreditsBean implements Serializable {
 
     private boolean isTeacherActiveForYear(ExecutionYear currentExecutionYear) {
         for (ExecutionSemester executionSemester : currentExecutionYear.getExecutionPeriodsSet()) {
-            if (PersonProfessionalData.isTeacherActiveOrHasAuthorizationForSemester(teacher, executionSemester)) {
+            if (teacher.hasTeacherAuthorization(executionSemester.getAcademicInterval())) {
                 return true;
             }
         }

@@ -47,7 +47,6 @@ import org.fenixedu.bennu.core.security.Authenticate;
 import org.joda.time.LocalDate;
 
 import pt.ist.fenixedu.contracts.domain.accessControl.DepartmentPresidentStrategy;
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalData;
 import pt.ist.fenixedu.teacher.evaluation.domain.TeacherCredits;
 import pt.ist.fenixedu.teacher.evaluation.domain.credits.AnnualTeachingCredits;
 import pt.ist.fenixedu.teacher.evaluation.domain.teacher.OtherService;
@@ -376,8 +375,7 @@ public class AnnualTeachingCreditsBean implements Serializable {
             TeacherAuthorization teacherAuthorization =
                     getTeacher().getTeacherAuthorization(executionSemester.getAcademicInterval()).orElse(null);
             boolean activeContractedTeacherForSemester =
-                    teacherAuthorization != null && teacherAuthorization.isContracted()
-                            && PersonProfessionalData.isTeacherActiveForSemester(getTeacher(), executionSemester);
+                    teacherAuthorization != null && teacherAuthorization.isContracted();
             boolean activeExternalTeacher = teacherAuthorization != null && !teacherAuthorization.isContracted();
             if (activeContractedTeacherForSemester || activeExternalTeacher) {
                 BigDecimal thisSemesterManagementFunctionCredits =

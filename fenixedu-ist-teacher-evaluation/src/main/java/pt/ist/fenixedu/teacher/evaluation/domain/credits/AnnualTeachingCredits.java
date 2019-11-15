@@ -33,7 +33,6 @@ import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.joda.time.DateTime;
 
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalData;
 import pt.ist.fenixedu.teacher.evaluation.domain.TeacherCredits;
 import pt.ist.fenixedu.teacher.evaluation.domain.credits.util.AnnualTeachingCreditsBean;
 import pt.ist.fenixedu.teacher.evaluation.domain.teacher.DegreeProjectTutorialService;
@@ -97,8 +96,7 @@ public class AnnualTeachingCredits extends AnnualTeachingCredits_Base {
             TeacherAuthorization teacherAuthorization =
                     getTeacher().getTeacherAuthorization(executionSemester.getAcademicInterval()).orElse(null);
             boolean activeContractedTeacherForSemester =
-                    teacherAuthorization != null && teacherAuthorization.isContracted()
-                            && PersonProfessionalData.isTeacherActiveForSemester(getTeacher(), executionSemester);
+                    teacherAuthorization != null && teacherAuthorization.isContracted();
             boolean activeExternalTeacher = teacherAuthorization != null && !teacherAuthorization.isContracted();
             if (activeContractedTeacherForSemester || activeExternalTeacher) {
                 BigDecimal thisSemesterManagementFunctionCredits =
