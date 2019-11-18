@@ -52,33 +52,75 @@ public class DegreeStructureForIST {
     public static void initFirstCycleDegreeStructure(final CourseGroup courseGroup) {
         if (courseGroup instanceof CycleCourseGroup) {
             final CycleCourseGroup cycleCourseGroup = (CycleCourseGroup) courseGroup;
+            final ExecutionSemester semester = tryNext(ExecutionSemester.readActualExecutionSemester());
             if (cycleCourseGroup.getCycleType() == CycleType.FIRST_CYCLE) {
-                final ExecutionSemester semester = tryNext(ExecutionSemester.readActualExecutionSemester());
-                final CourseGroup hassGroup = new CourseGroup(courseGroup, "HASS", "HASS", semester, null);
-                CurricularRulesManager.createCurricularRule(hassGroup, semester, null, CurricularRuleType.CREDITS_LIMIT, limitDTO(0d, 9d));
+                {
+                    final CourseGroup baseGroup = new CourseGroup(courseGroup, "Formacao Base", "Base Education", semester, null);
+                    CurricularRulesManager.createCurricularRule(baseGroup, semester, null, CurricularRuleType.CREDITS_LIMIT, limitDTO(0d, 60d));
+                }
 
-                final DegreeCurricularPlan degreeCurricularPlan = courseGroup.getParentDegreeCurricularPlan();
+                {
+                    final CourseGroup hassGroup = new CourseGroup(courseGroup, "HASS", "HASS", semester, null);
+                    CurricularRulesManager.createCurricularRule(hassGroup, semester, null, CurricularRuleType.CREDITS_LIMIT, limitDTO(0d, 9d));
 
-                createOptionalCurricularCourse(degreeCurricularPlan, hassGroup, semester,
-                        "Opção 1a", "Option 1a", new int[] { 1, 1 }, new int[] { 1, 2 });
-                createOptionalCurricularCourse(degreeCurricularPlan, hassGroup, semester,
-                        "Opção 1b", "Option 1b", new int[] { 1, 1 }, new int[] { 1, 2 });
-                createOptionalCurricularCourse(degreeCurricularPlan, hassGroup, semester,
-                        "Opção 1c", "Option 1c", new int[] { 1, 1 }, new int[] { 1, 2 });
+                    final DegreeCurricularPlan degreeCurricularPlan = courseGroup.getParentDegreeCurricularPlan();
 
-                createOptionalCurricularCourse(degreeCurricularPlan, hassGroup, semester,
-                        "Opção Ecónomia a", "Option Economy a", new int[] { 2, 2 }, new int[] { 1, 2 });
-                createOptionalCurricularCourse(degreeCurricularPlan, hassGroup, semester,
-                        "Opção Ecónomia b", "Option Economy b", new int[] { 2, 2 }, new int[] { 1, 2 });
-                createOptionalCurricularCourse(degreeCurricularPlan, hassGroup, semester,
-                        "Opção Ecónomia c", "Option Economy c", new int[] { 2, 2 }, new int[] { 1, 2 });
+                    createOptionalCurricularCourse(degreeCurricularPlan, hassGroup, semester,
+                            "Opção 1a", "Option 1a", new int[]{1, 1}, new int[]{1, 2});
+                    createOptionalCurricularCourse(degreeCurricularPlan, hassGroup, semester,
+                            "Opção 1b", "Option 1b", new int[]{1, 1}, new int[]{1, 2});
+                    createOptionalCurricularCourse(degreeCurricularPlan, hassGroup, semester,
+                            "Opção 1c", "Option 1c", new int[]{1, 1}, new int[]{1, 2});
 
-                createOptionalCurricularCourse(degreeCurricularPlan, hassGroup, semester,
-                        "Opção 2a", "Option 2a", new int[] { 2, 2 }, new int[] { 1, 2 });
-                createOptionalCurricularCourse(degreeCurricularPlan, hassGroup, semester,
-                        "Opção 2b", "Option 2b", new int[] { 2, 2 }, new int[] { 1, 2 });
-                createOptionalCurricularCourse(degreeCurricularPlan, hassGroup, semester,
-                        "Opção 2c", "Option 2c", new int[] { 2, 2 }, new int[] { 1, 2 });
+                    createOptionalCurricularCourse(degreeCurricularPlan, hassGroup, semester,
+                            "Opção Ecónomia a", "Option Economy a", new int[]{2, 2}, new int[]{1, 2});
+                    createOptionalCurricularCourse(degreeCurricularPlan, hassGroup, semester,
+                            "Opção Ecónomia b", "Option Economy b", new int[]{2, 2}, new int[]{1, 2});
+                    createOptionalCurricularCourse(degreeCurricularPlan, hassGroup, semester,
+                            "Opção Ecónomia c", "Option Economy c", new int[]{2, 2}, new int[]{1, 2});
+
+                    createOptionalCurricularCourse(degreeCurricularPlan, hassGroup, semester,
+                            "Opção 2a", "Option 2a", new int[]{2, 2}, new int[]{1, 2});
+                    createOptionalCurricularCourse(degreeCurricularPlan, hassGroup, semester,
+                            "Opção 2b", "Option 2b", new int[]{2, 2}, new int[]{1, 2});
+                    createOptionalCurricularCourse(degreeCurricularPlan, hassGroup, semester,
+                            "Opção 2c", "Option 2c", new int[]{2, 2}, new int[]{1, 2});
+                }
+
+                {
+                    final CourseGroup mainGroup = new CourseGroup(courseGroup, "Area Principal", "Main Area", semester, null);
+                    CurricularRulesManager.createCurricularRule(mainGroup, semester, null, CurricularRuleType.CREDITS_LIMIT, limitDTO(87d, 111d));
+
+                    {
+                        final CourseGroup preMajorGroup = new CourseGroup(mainGroup, "Pre-Major", "Pre-Major", semester, null);
+                        CurricularRulesManager.createCurricularRule(preMajorGroup, semester, null, CurricularRuleType.CREDITS_LIMIT, limitDTO(0d, 12d));
+                    }
+
+                    {
+                        final CourseGroup preMajorGroup = new CourseGroup(mainGroup, "Projeto Integrador", "Integration Project", semester, null);
+                        CurricularRulesManager.createCurricularRule(preMajorGroup, semester, null, CurricularRuleType.CREDITS_LIMIT, limitDTO(6d, 12d));
+                    }
+                }
+            }
+
+            if (cycleCourseGroup.getCycleType() == CycleType.SECOND_CYCLE) {
+                {
+                    final CourseGroup mainGroup = new CourseGroup(courseGroup, "Area Principal", "Main Area", semester, null);
+                    CurricularRulesManager.createCurricularRule(mainGroup, semester, null, CurricularRuleType.CREDITS_LIMIT, limitDTO(0d, 60d));
+                }
+                {
+                    final CourseGroup optionsGroup = new CourseGroup(courseGroup, "Opcoes Livres", "Open Options", semester, null);
+                    CurricularRulesManager.createCurricularRule(optionsGroup, semester, null, CurricularRuleType.CREDITS_LIMIT, limitDTO(18d, 30d));
+
+                    {
+                        final CourseGroup preMajorGroup = new CourseGroup(optionsGroup, "Minor", "Minor", semester, null);
+                        CurricularRulesManager.createCurricularRule(preMajorGroup, semester, null, CurricularRuleType.CREDITS_LIMIT, limitDTO(0d, 18d));
+                    }
+                }
+                {
+                    final CourseGroup dissertationGroup = new CourseGroup(courseGroup, "Dissertacao", "Dissertation", semester, null);
+                    CurricularRulesManager.createCurricularRule(dissertationGroup, semester, null, CurricularRuleType.CREDITS_LIMIT, limitDTO(0d, 42d));
+                }
             }
         }
     }
@@ -118,7 +160,7 @@ public class DegreeStructureForIST {
     private static ExecutionSemester tryNext(final ExecutionSemester semester) {
         final ExecutionYear year = semester.getExecutionYear();
         final ExecutionYear next = year.getNextExecutionYear();
-        return next == null ? semester : next.getFirstExecutionPeriod();
+        return next == null ? semester : tryNext(next.getFirstExecutionPeriod());
     }
 
 }
