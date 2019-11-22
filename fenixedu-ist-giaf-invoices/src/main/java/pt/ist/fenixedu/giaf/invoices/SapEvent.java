@@ -354,7 +354,7 @@ public class SapEvent {
                 //only if the credit value is not equal to the original invoice value must we close the invoice
                 //otherwise there is no need to send a closing document
                 if (!invoice.getValue().equals(openInvoiceAmount) && openInvoiceAmount.equals(amountToCredit)) {
-                    registerFinalZeroPayment(invoice);
+                    registerFinalZeroPayment(invoice, creditEntry.getId());
                 }
                 amountToCredit = amountToCredit.subtract(amountForInvoice);
             }
@@ -679,12 +679,15 @@ public class SapEvent {
      * Closes an invoice that has several documents in which the last one is a credit note that "pays" the remaining
      * open value of the invoice
      * @param sapInvoiceRequest
+     * @param creditId
      */
-    public void registerFinalZeroPayment(final SapRequest sapInvoiceRequest) {
+    public void registerFinalZeroPayment(final SapRequest sapInvoiceRequest, final String creditId) {
         JsonObject data = toJsonFinalZeroPayment(sapInvoiceRequest, getPaymentsAndCreditsFor(sapInvoiceRequest));
 
         String documentNumber = getDocumentNumber(data, true);
-        new SapRequest(event, sapInvoiceRequest.getClientId(), Money.ZERO, documentNumber, SapRequestType.CLOSE_INVOICE, Money.ZERO, data);
+        SapRequest finalPayment = new SapRequest(event, sapInvoiceRequest.getClientId(), Money.ZERO, documentNumber,
+                SapRequestType.CLOSE_INVOICE, Money.ZERO, data);
+        finalPayment.setCreditId(creditId);
     }
 
     private JsonObject toJsonFinalZeroPayment(final SapRequest sapInvoiceRequest, final Stream<SapRequest> documentsFor) {
