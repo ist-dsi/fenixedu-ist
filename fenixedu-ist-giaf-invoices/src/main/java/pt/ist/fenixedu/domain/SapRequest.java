@@ -237,6 +237,10 @@ public class SapRequest extends SapRequest_Base {
             if(paymentDocumentNumber != null) {
                 return paymentDocumentNumber;
             }
+            final String workingDocumentNumber = getDocumentNumber(paymentJson, "workingDocumentNumber", typeCode);
+            if (workingDocumentNumber != null) {
+                return workingDocumentNumber;
+            }
             final String originatingOnDocumentNumber = getDocumentNumber(paymentJson, "originatingOnDocumentNumber", typeCode);
             if (originatingOnDocumentNumber != null) {
                 return originatingOnDocumentNumber;
@@ -256,6 +260,10 @@ public class SapRequest extends SapRequest_Base {
             final String workingDocumentNumber = getDocumentNumber(workingJson, "workingDocumentNumber", typeCode);
             if (workingDocumentNumber != null) {
                 return workingDocumentNumber;
+            }
+            final String paymentDocumentNumber = getDocumentNumber(workingJson, "paymentDocumentNumber", typeCode);
+            if(paymentDocumentNumber != null) {
+                return paymentDocumentNumber;
             }
         }
         return null;
