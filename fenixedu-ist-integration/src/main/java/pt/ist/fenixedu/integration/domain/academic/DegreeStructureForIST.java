@@ -34,8 +34,8 @@ public class DegreeStructureForIST {
 
     private static void delete(final CourseGroup courseGroup, final Set<DegreeModule> toDelete) {
         courseGroup.getChildContextsSet().stream().forEach(c -> delete(c, toDelete));
-        courseGroup.delete();
         courseGroup.setProgramConclusion(null);
+        courseGroup.delete();
     }
 
     private static void delete(final Context context, final Set<DegreeModule> toDelete) {
@@ -137,9 +137,9 @@ public class DegreeStructureForIST {
             }
             if (curricularCourse == null) {
                 curricularCourse = degreeCurricularPlan.createOptionalCurricularCourse(hassGroup, namePT, nameEN,
-                        CurricularStage.DRAFT, curricularPeriod, semester, null);
+                        CurricularStage.DRAFT, curricularPeriod, null, semester, null);
             } else {
-                hassGroup.addContext(curricularCourse, curricularPeriod, semester, null);
+                hassGroup.addContext(curricularCourse, curricularPeriod, null, semester, null);
             }
         }
         return curricularCourse;
