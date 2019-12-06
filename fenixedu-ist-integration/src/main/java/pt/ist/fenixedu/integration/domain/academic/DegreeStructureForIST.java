@@ -28,7 +28,7 @@ public class DegreeStructureForIST {
                 .map(c -> c.getChildDegreeModule())
                 .filter(dm -> dm instanceof CycleCourseGroup)
                 .map(dm -> (CycleCourseGroup) dm)
-                .filter(ccg -> ccg.getCycleType() == CycleType.FIRST_CYCLE)
+                .filter(ccg -> ccg.getCycleType() == CycleType.FIRST_CYCLE || ccg.getCycleType() == CycleType.SECOND_CYCLE)
                 .forEach(ccg -> initFirstCycleDegreeStructure(ccg));
     }
 
@@ -49,7 +49,7 @@ public class DegreeStructureForIST {
         }
     }
 
-    public static void initFirstCycleDegreeStructure(final CourseGroup courseGroup) {
+    private static void initFirstCycleDegreeStructure(final CourseGroup courseGroup) {
         if (courseGroup instanceof CycleCourseGroup) {
             final CycleCourseGroup cycleCourseGroup = (CycleCourseGroup) courseGroup;
             final ExecutionSemester semester = tryNext(ExecutionSemester.readActualExecutionSemester());
@@ -64,7 +64,7 @@ public class DegreeStructureForIST {
                     CurricularRulesManager.createCurricularRule(hassGroup, semester, null, CurricularRuleType.CREDITS_LIMIT, limitDTO(0d, 9d));
 
                     final DegreeCurricularPlan degreeCurricularPlan = courseGroup.getParentDegreeCurricularPlan();
-
+/*
                     createOptionalCurricularCourse(degreeCurricularPlan, hassGroup, semester,
                             "Opção 1a", "Option 1a", new int[]{1, 1}, new int[]{1, 2});
                     createOptionalCurricularCourse(degreeCurricularPlan, hassGroup, semester,
@@ -85,6 +85,7 @@ public class DegreeStructureForIST {
                             "Opção 2b", "Option 2b", new int[]{2, 2}, new int[]{1, 2});
                     createOptionalCurricularCourse(degreeCurricularPlan, hassGroup, semester,
                             "Opção 2c", "Option 2c", new int[]{2, 2}, new int[]{1, 2});
+ */
                 }
 
                 {
