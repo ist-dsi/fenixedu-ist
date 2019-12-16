@@ -10,8 +10,11 @@ import org.fenixedu.academic.domain.curricularRules.CurricularRulesManager;
 import org.fenixedu.academic.domain.degreeStructure.*;
 import org.fenixedu.academic.dto.bolonhaManager.CurricularRuleParametersDTO;
 import org.fenixedu.academic.service.services.bolonhaManager.CreateCurricularCourse;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.commons.i18n.I18N;
 
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 public class DegreeStructureForIST {
@@ -54,76 +57,32 @@ public class DegreeStructureForIST {
             final CycleCourseGroup cycleCourseGroup = (CycleCourseGroup) courseGroup;
             final ExecutionSemester semester = tryNext(ExecutionSemester.readActualExecutionSemester());
             if (cycleCourseGroup.getCycleType() == CycleType.FIRST_CYCLE) {
-                {
-                    final CourseGroup baseGroup = new CourseGroup(courseGroup, "Formacao Base", "Base Education", semester, null);
-                    CurricularRulesManager.createCurricularRule(baseGroup, semester, null, CurricularRuleType.CREDITS_LIMIT, limitDTO(0d, 60d));
-                }
-
-                {
-                    final CourseGroup hassGroup = new CourseGroup(courseGroup, "HASS", "HASS", semester, null);
-                    CurricularRulesManager.createCurricularRule(hassGroup, semester, null, CurricularRuleType.CREDITS_LIMIT, limitDTO(0d, 9d));
-
-                    final DegreeCurricularPlan degreeCurricularPlan = courseGroup.getParentDegreeCurricularPlan();
-/*
-                    createOptionalCurricularCourse(degreeCurricularPlan, hassGroup, semester,
-                            "Opção 1a", "Option 1a", new int[]{1, 1}, new int[]{1, 2});
-                    createOptionalCurricularCourse(degreeCurricularPlan, hassGroup, semester,
-                            "Opção 1b", "Option 1b", new int[]{1, 1}, new int[]{1, 2});
-                    createOptionalCurricularCourse(degreeCurricularPlan, hassGroup, semester,
-                            "Opção 1c", "Option 1c", new int[]{1, 1}, new int[]{1, 2});
-
-                    createOptionalCurricularCourse(degreeCurricularPlan, hassGroup, semester,
-                            "Opção Ecónomia a", "Option Economy a", new int[]{2, 2}, new int[]{1, 2});
-                    createOptionalCurricularCourse(degreeCurricularPlan, hassGroup, semester,
-                            "Opção Ecónomia b", "Option Economy b", new int[]{2, 2}, new int[]{1, 2});
-                    createOptionalCurricularCourse(degreeCurricularPlan, hassGroup, semester,
-                            "Opção Ecónomia c", "Option Economy c", new int[]{2, 2}, new int[]{1, 2});
-
-                    createOptionalCurricularCourse(degreeCurricularPlan, hassGroup, semester,
-                            "Opção 2a", "Option 2a", new int[]{2, 2}, new int[]{1, 2});
-                    createOptionalCurricularCourse(degreeCurricularPlan, hassGroup, semester,
-                            "Opção 2b", "Option 2b", new int[]{2, 2}, new int[]{1, 2});
-                    createOptionalCurricularCourse(degreeCurricularPlan, hassGroup, semester,
-                            "Opção 2c", "Option 2c", new int[]{2, 2}, new int[]{1, 2});
- */
-                }
-
-                {
-                    final CourseGroup mainGroup = new CourseGroup(courseGroup, "Area Principal", "Main Area", semester, null);
-                    CurricularRulesManager.createCurricularRule(mainGroup, semester, null, CurricularRuleType.CREDITS_LIMIT, limitDTO(87d, 111d));
-
-                    {
-                        final CourseGroup preMajorGroup = new CourseGroup(mainGroup, "Pre-Major", "Pre-Major", semester, null);
-                        CurricularRulesManager.createCurricularRule(preMajorGroup, semester, null, CurricularRuleType.CREDITS_LIMIT, limitDTO(0d, 12d));
-                    }
-
-                    {
-                        final CourseGroup preMajorGroup = new CourseGroup(mainGroup, "Projeto Integrador", "Integration Project", semester, null);
-                        CurricularRulesManager.createCurricularRule(preMajorGroup, semester, null, CurricularRuleType.CREDITS_LIMIT, limitDTO(6d, 12d));
-                    }
-                }
+                createGroup(courseGroup, "label.degree.structure.base.education", semester, 0d, 60d);
+                createGroup(courseGroup, "label.degree.structure.hass", semester, 0d, 9d);
+                createGroup(courseGroup, "label.degree.structure.main.education", semester, 87d, 111d);
+                createGroup(courseGroup, "label.degree.structure.pre.major", semester, 0d, 9d);
+                createGroup(courseGroup, "label.degree.structure.integration.project", semester, 6d, 12d);
             }
-
             if (cycleCourseGroup.getCycleType() == CycleType.SECOND_CYCLE) {
-                {
-                    final CourseGroup mainGroup = new CourseGroup(courseGroup, "Area Principal", "Main Area", semester, null);
-                    CurricularRulesManager.createCurricularRule(mainGroup, semester, null, CurricularRuleType.CREDITS_LIMIT, limitDTO(0d, 60d));
-                }
-                {
-                    final CourseGroup optionsGroup = new CourseGroup(courseGroup, "Opcoes Livres", "Open Options", semester, null);
-                    CurricularRulesManager.createCurricularRule(optionsGroup, semester, null, CurricularRuleType.CREDITS_LIMIT, limitDTO(18d, 30d));
-
-                    {
-                        final CourseGroup preMajorGroup = new CourseGroup(optionsGroup, "Minor", "Minor", semester, null);
-                        CurricularRulesManager.createCurricularRule(preMajorGroup, semester, null, CurricularRuleType.CREDITS_LIMIT, limitDTO(0d, 18d));
-                    }
-                }
-                {
-                    final CourseGroup dissertationGroup = new CourseGroup(courseGroup, "Dissertacao", "Dissertation", semester, null);
-                    CurricularRulesManager.createCurricularRule(dissertationGroup, semester, null, CurricularRuleType.CREDITS_LIMIT, limitDTO(0d, 42d));
-                }
+                createGroup(courseGroup, "label.degree.structure.main.education", semester, 0d, 60d);
+                final CourseGroup optionsGroup = createGroup(courseGroup, "label.degree.structure.options", semester, 18d, 30d);
+                createGroup(optionsGroup, "label.degree.structure.minor", semester, 0d, 18d);
+                createGroup(courseGroup, "label.degree.structure.dissertation", semester, 0d, 42d);
             }
         }
+    }
+
+    private static CourseGroup createGroup(final CourseGroup parent, final String nameKey, final ExecutionSemester semester,
+                                    double minCredits, double maxCredits) {
+        final Locale pt = new Locale("pt");
+        final Locale en = new Locale("en");
+        final CourseGroup result = new CourseGroup(parent,
+                BundleUtil.getString("resources.FenixeduIstIntegrationResources", pt, nameKey),
+                BundleUtil.getString("resources.FenixeduIstIntegrationResources", en, nameKey),
+                semester, null);
+        CurricularRulesManager.createCurricularRule(result, semester, null,
+                CurricularRuleType.CREDITS_LIMIT, limitDTO(minCredits, maxCredits));
+        return result;
     }
 
     private static CurricularCourse createOptionalCurricularCourse(final DegreeCurricularPlan degreeCurricularPlan,
