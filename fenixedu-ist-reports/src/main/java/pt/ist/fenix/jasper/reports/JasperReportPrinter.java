@@ -218,6 +218,8 @@ public class JasperReportPrinter implements ReportPrinter {
 
         addFont(result, "Arial", "Arial.ttf", BaseFont.CP1252);
 
+        addFont(result, "Arial Bold", "Arial_Bold.ttf", BaseFont.CP1252);
+
         addFont(result, "Arial Black", "Arial_Black.ttf", BaseFont.CP1252);
 
         addFont(result, "Lucida Handwriting", "LucidaHandwriting.ttf", BaseFont.CP1252);
