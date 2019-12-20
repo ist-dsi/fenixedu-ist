@@ -332,7 +332,7 @@ public class SapEvent {
     public void registerCredit(Event event, CreditEntry creditEntry, boolean isGratuity) {
         Money amountToCredit = new Money(creditEntry.getUsedAmountInDebts());
         if (!amountToCredit.isPositive()) {
-            throw new Error("There is no debt value for the debt exemption: " + creditEntry.getId() + " for event: " + event.getExternalId());
+            throw new Error("There is no debt value for the credit exemption: " + creditEntry.getId() + " for event: " + event.getExternalId());
         }
 
         // diminuir divida no sap (se for propina diminuir dívida) e credit note na última factura existente
