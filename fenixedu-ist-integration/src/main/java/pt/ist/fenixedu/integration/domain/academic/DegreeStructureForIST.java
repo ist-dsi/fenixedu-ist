@@ -23,7 +23,7 @@ public class DegreeStructureForIST {
         final Set<DegreeModule> toDelete = new HashSet<>();
         final RootCourseGroup rootCourseGroup = degreeCurricularPlan.getRoot();
         rootCourseGroup.getChildContextsSet().stream().forEach(c -> delete(c, toDelete));
-        toDelete.forEach(DegreeModule::delete);
+        toDelete.forEach(DegreeStructureForIST::delete);
         rootCourseGroup.delete();
         final RootCourseGroup newRoot = RootCourseGroup.createRoot(degreeCurricularPlan, degreeCurricularPlan.getName(), degreeCurricularPlan.getName());
 
@@ -35,21 +35,24 @@ public class DegreeStructureForIST {
                 .forEach(ccg -> initFirstCycleDegreeStructure(ccg));
     }
 
-    private static void delete(final CourseGroup courseGroup, final Set<DegreeModule> toDelete) {
-        courseGroup.getChildContextsSet().stream().forEach(c -> delete(c, toDelete));
-        courseGroup.setProgramConclusion(null);
-        courseGroup.delete();
+    private static void delete(final DegreeModule degreeModule) {
+        if (degreeModule.isCourseGroup()) {
+            final CourseGroup courseGroup = (CourseGroup) degreeModule;
+            courseGroup.setProgramConclusion(null);
+        }
+        degreeModule.delete();
     }
 
     private static void delete(final Context context, final Set<DegreeModule> toDelete) {
         final DegreeModule degreeModule = context.getChildDegreeModule();
-        context.delete();
         if (degreeModule == null) {
         } else if (degreeModule.isCourseGroup()) {
-            delete((CourseGroup) degreeModule, toDelete);
+            ((CourseGroup) degreeModule).getChildContextsSet().stream().forEach(c -> delete(c, toDelete));
+            toDelete.add(degreeModule);
         } else {
             toDelete.add(degreeModule);
         }
+        context.delete();
     }
 
     private static void initFirstCycleDegreeStructure(final CourseGroup courseGroup) {
