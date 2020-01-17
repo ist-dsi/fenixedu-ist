@@ -78,30 +78,33 @@ public class SyncFinancialInfoToSapTask extends CronTask {
             .distinct()
             .forEach(e -> EventProcessor.syncEventWithSap(errorLogConsumer, elogger, e));
 
-        touch("Dumping error messages.");
-        final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        errors.exportToCSV(stream, "\t");
-        final String subject = "Problemas no envio de informação para o SAP";
-        final String body =
-                "Listagem atualizada com os problemas verificados na sincronização de informação financeira entre o Fénix e o SAP: "
-                        + new DateTime().toString("yyyy-MM-dd HH:mm");
+        if (errors.getRows().size() >= 1) {
+            touch("Dumping error messages.");
+            final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            errors.exportToCSV(stream, "\t");
+            final String subject = "Problemas no envio de informação para o SAP";
+            final String body =
+                    "Listagem atualizada com os problemas verificados na sincronização de informação financeira entre o Fénix e o SAP: "
+                            + new DateTime().toString("yyyy-MM-dd HH:mm");
 
-        try {
-            final String dirPath = GiafInvoiceConfiguration.getConfiguration().sapInvoiceDir() + "Error";
-            final File dir = new File(dirPath);
-            if (!dir.exists()) {
-                dir.mkdirs();
+            try {
+                final String dirPath = GiafInvoiceConfiguration.getConfiguration().sapInvoiceDir() + "Error";
+                final File dir = new File(dirPath);
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                }
+                final File documentFile = new File(dir, "SapErrors.xls");
+                Utils.writeFileWithoutFailuer(documentFile.toPath(), stream.toByteArray(), false);
+            } catch (Exception e) {
+                System.out.println("Erro a gravar o ficheiro de erros! damn!");
+                e.printStackTrace();
             }
-            final File documentFile = new File(dir, "SapErrors.xls");
-            Utils.writeFileWithoutFailuer(documentFile.toPath(), stream.toByteArray(), false);
-        } catch (Exception e) {
-            System.out.println("Erro a gravar o ficheiro de erros! damn!");
-            e.printStackTrace();
+
+            TaskUtils.sendSapReport("errors" + new DateTime().toString("yyyy_MM_dd_HH_mm") + ".xls", stream.toByteArray(), subject,
+                    body);
+        } else {
+            touch("No error messages.");
         }
-
-        TaskUtils.sendSapReport("errors" + new DateTime().toString("yyyy_MM_dd_HH_mm") + ".xls", stream.toByteArray(), subject,
-                body);
-
         touch("Done");
     }
 
