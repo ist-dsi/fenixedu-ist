@@ -1,12 +1,15 @@
 package pt.ist.registration.process.ui;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.bennu.papyrus.domain.PapyrusTemplate;
 import org.fenixedu.bennu.rendering.annotations.BennuIntersection;
 import org.fenixedu.bennu.rendering.annotations.BennuIntersections;
 import org.fenixedu.bennu.spring.portal.SpringApplication;
@@ -188,7 +191,9 @@ public class RegistrationProcessDeclarationController {
         model.addAttribute("declarationRegistrationFiles",
                 registrationProcessDeclarationsService.getRegistrationDeclarationFileOrderedByDate(registration));
         model.addAttribute("declarationTemplateInputFormBean", new DeclarationTemplateInputFormBean());
-        model.addAttribute("declarationTemplates", registrationProcessDeclarationsService.getDeclarationTemplates());
+        model.addAttribute("declarationTemplates", registrationProcessDeclarationsService.getDeclarationTemplates()
+                .stream().filter(DeclarationTemplate.class::isInstance).sorted(Comparator.comparing(PapyrusTemplate::getName))
+                .collect(Collectors.toList()));
         model.addAttribute("errors", errors);
 
         return "registration-process/list";

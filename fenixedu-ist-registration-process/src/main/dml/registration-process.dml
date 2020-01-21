@@ -2,24 +2,9 @@ package pt.ist.registration.process.domain;
 
 enum pt.ist.registration.process.domain.RegistrationDeclarationFileState as RegistrationDeclarationFileState;
 
-class DeclarationTemplate {
-    String name;
-    LocalizedString displayName (REQUIRED);
-    String templateHtml (REQUIRED);
-    Locale locale (REQUIRED);
-    // first %s = executionYearName
-    // second %s = locale
-    // third %s = degreeSigla
-    // forth %s = username
+class DeclarationTemplate extends .org.fenixedu.bennu.papyrus.domain.PapyrusTemplate {
     String filenameFormat (REQUIRED);
-
-    // first %s - username
-    // second %s - language
-    // third %s - degreeName
-    // forth %s - executionYearName
     String displayNameFormat (REQUIRED);
-
-    protected JsonElement signatureFieldSettingsElement;
 }
 
 class RegistrationDeclarationFile extends .org.fenixedu.bennu.io.domain.GenericFile {
@@ -55,15 +40,6 @@ relation RegistrationDeclarationPerson {
     }
     .org.fenixedu.bennu.core.domain.User playsRole creator {
         multiplicity 1..1;
-    }
-}
-
-relation BennuDeclarationTemplates {
-    .org.fenixedu.bennu.core.domain.Bennu playsRole bennuTemplates {
-        multiplicity 1..1;
-    }
-    DeclarationTemplate playsRole declarationTemplate {
-        multiplicity *;
     }
 }
 

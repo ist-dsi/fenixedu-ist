@@ -15,8 +15,8 @@
     <properties>
         <version.com.itextpdf.itextpdf>5.5.13</version.com.itextpdf.itextpdf>
         <version.io.jsonwebtoken.jjwt>0.9.1</version.io.jsonwebtoken.jjwt>
-        <version.papyrus.client>2.0.0</version.papyrus.client>
         <version.org.fenixedu.bennu-modular-rendering>1.1.0</version.org.fenixedu.bennu-modular-rendering>
+        <version.org.fenixedu.bennu.papyrus>2.0.0</version.org.fenixedu.bennu.papyrus>
     </properties>
 
     <dependencies>
@@ -75,9 +75,9 @@
             <artifactId>drive-sdk</artifactId>
         </dependency>
         <dependency>
-            <groupId>pt.ist</groupId>
-            <artifactId>papyrus-client</artifactId>
-            <version>${version.papyrus.client}</version>
+            <groupId>org.fenixedu</groupId>
+            <artifactId>bennu-papyrus</artifactId>
+            <version>${version.org.fenixedu.bennu.papyrus}</version>
         </dependency>
         <dependency>
             <groupId>org.fenixedu</groupId>

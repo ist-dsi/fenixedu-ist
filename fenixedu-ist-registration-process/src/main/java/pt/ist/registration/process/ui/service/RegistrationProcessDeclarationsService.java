@@ -13,9 +13,9 @@ import org.fenixedu.academic.domain.studentCurriculum.CurriculumLine;
 import org.fenixedu.academic.domain.studentCurriculum.ExternalEnrolment;
 import org.fenixedu.bennu.RegistrationProcessConfiguration;
 import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.bennu.papyrus.domain.PapyrusTemplate;
 import org.springframework.stereotype.Service;
 
-import pt.ist.registration.process.domain.DeclarationTemplate;
 import pt.ist.registration.process.domain.RegistrationDeclarationFile;
 
 @Service
@@ -28,19 +28,18 @@ public class RegistrationProcessDeclarationsService {
         }
     };
 
-    public Set<DeclarationTemplate> getDeclarationTemplates() {
-        return Bennu.getInstance().getDeclarationTemplateSet();
+    public Set<PapyrusTemplate> getDeclarationTemplates() {
+        return Bennu.getInstance().getPapyrusTemplateSet();
     }
 
-    public Set<DeclarationTemplate> getSub23DeclarationTemplates() {
+    public Set<PapyrusTemplate> getSub23DeclarationTemplates() {
         return getDeclarationTemplates().stream().filter(dt -> dt.getName().contains("sub23")).collect(Collectors.toSet());
     }
 
     public Set<RegistrationDeclarationFile> getRegistrationDeclarationFileOrderedByDate(Registration registration) {
-        Set<RegistrationDeclarationFile> file_by_date = new TreeSet<RegistrationDeclarationFile>(COMPARATOR_BY_CREATION_DATE);
+        Set<RegistrationDeclarationFile> file_by_date = new TreeSet<>(COMPARATOR_BY_CREATION_DATE);
 
-        for (RegistrationDeclarationFile registrationDeclarationFile : registration.getRegistrationDeclarationFileSet())
-            file_by_date.add(registrationDeclarationFile);
+        file_by_date.addAll(registration.getRegistrationDeclarationFileSet());
 
         return file_by_date;
     }
