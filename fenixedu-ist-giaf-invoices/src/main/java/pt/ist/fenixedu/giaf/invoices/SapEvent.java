@@ -12,6 +12,8 @@ import org.fenixedu.academic.domain.accounting.AccountingTransaction;
 import org.fenixedu.academic.domain.accounting.AccountingTransactionDetail;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.EventType;
+import org.fenixedu.academic.domain.accounting.PaymentMethod;
+import org.fenixedu.academic.domain.accounting.accountingTransactions.detail.SibsTransactionDetail;
 import org.fenixedu.academic.domain.accounting.calculator.CreditEntry;
 import org.fenixedu.academic.domain.accounting.calculator.DebtEntry;
 import org.fenixedu.academic.domain.accounting.calculator.DebtExemption;
@@ -41,6 +43,7 @@ import org.fenixedu.generated.sources.saft.sap.SAFTPTSourceBilling;
 import org.fenixedu.generated.sources.saft.sap.SAFTPTSourcePayment;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
+import org.joda.time.YearMonthDay;
 import pt.ist.fenixedu.domain.ExternalClient;
 import pt.ist.fenixedu.domain.SapDocumentFile;
 import pt.ist.fenixedu.domain.SapRequest;
@@ -77,6 +80,7 @@ public class SapEvent {
     private static final int MAX_SIZE_VAT_NUMBER = 20;
     public static final String PROCESS_ID = "006";
     public static final String IST_VAT_NUMBER = "501507930";
+    private static final String SIBS_DATE_FORMAT = "yyyy-MM-dd";
     public LocalDate currentDate = new LocalDate();
     public Event event = null;
 
@@ -636,6 +640,7 @@ public class SapEvent {
         paymentDocument.addProperty("noPaymentTotals", true);
         paymentDocument.addProperty("isAdvancedPayment", true);
         paymentDocument.addProperty("excessPayment", amount.getAmountAsString());
+        addSibsMetadata(paymentDocument, transactionDetail);
 
         JsonObject workingDocument = toJsonWorkDocument(getDocumentDate(transactionDetail.getWhenRegistered(), false),
                 new DateTime(), amount, "NA", false, transactionDetail.getWhenRegistered());
@@ -870,6 +875,14 @@ public class SapEvent {
         return data;
     }
 
+    private void addSibsMetadata(final JsonObject json, final AccountingTransactionDetail transactionDetail) {
+        if (PaymentMethod.getSibsPaymentMethod() == transactionDetail.getPaymentMethod()) {
+            SibsTransactionDetail sibsTx = (SibsTransactionDetail) transactionDetail;
+            YearMonthDay sibsDate = sibsTx.getSibsLine().getHeader().getWhenProcessedBySibs();
+            json.addProperty("sibsDate", sibsDate.toString(SIBS_DATE_FORMAT));
+        }
+    }
+
     public boolean processPendingRequests(final Event event, final ErrorLogConsumer errorLog, final EventLogger elogger) {
         final Set<SapRequest> requests = new TreeSet<>(SapRequest.COMPARATOR_BY_ORDER);
         requests.addAll(event.getSapRequestSet());
@@ -1000,6 +1013,7 @@ public class SapEvent {
         JsonObject paymentDocument = toJsonPaymentDocument(amount, "NP", sapInvoiceRequest.getDocumentNumber(), transactionDetail.getWhenRegistered(),
                 getPaymentMechanism(transactionDetail), getPaymentMethodReference(transactionDetail),
                 SAFTPTSettlementType.NL.toString(), true);
+        addSibsMetadata(paymentDocument, transactionDetail);
 
         data.add("paymentDocument", paymentDocument);
         return data;
@@ -1025,6 +1039,7 @@ public class SapEvent {
                 SAFTPTSettlementType.NL.toString(), true);
         paymentDocument.addProperty("excessPayment", excess.toPlainString());
         paymentDocument.addProperty("isAdvancedPayment", true);
+        addSibsMetadata(paymentDocument, transactionDetail);
 
         JsonObject workingDocument = toJsonWorkDocument(getDocumentDate(transactionDetail.getWhenRegistered(), false),
                 new DateTime(), excess, "NA", false, transactionDetail.getWhenRegistered());
@@ -1138,7 +1153,7 @@ public class SapEvent {
         JsonObject workDocument =
                 toJsonWorkDocument(documentDate, entryDate, debtFenix, "ND", true, new DateTime(Utils.getDueDate(event)));
         if (!Strings.isNullOrEmpty(pledgeNumber)) {
-            workDocument.addProperty("compromiseMetadata", "{\"COMPROMISSO\":\"" + pledgeNumber + "\"}");
+            workDocument.addProperty("metadata", "{\"COMPROMISSO\":\"" + pledgeNumber + "\"}");
         }
 
         json.add("workingDocument", workDocument);
@@ -1157,9 +1172,9 @@ public class SapEvent {
             final ExecutionYear executionYear = Utils.executionYearOf(event);
             String metadata = String.format("{\"ANO_LECTIVO\":\"%s\", \"START_DATE\":\"%s\", \"END_DATE\":\"%s\"}",
                     executionYear.getName(), debtInterval[0].toString("yyyy-MM-dd"), debtInterval[1].toString("yyyy-MM-dd"));
-            workDocument.addProperty("debtMetadata", metadata);
+            workDocument.addProperty("metadata", metadata);
         } else {
-            workDocument.addProperty("debtMetadata", originalMetadata);
+            workDocument.addProperty("metadata", originalMetadata);
         }
 
         json.add("workingDocument", workDocument);
