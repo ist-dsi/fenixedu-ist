@@ -66,9 +66,10 @@ public class IstRegistryCodeGenerator extends IstRegistryCodeGenerator_Base {
     @Override
     public String getCode(AcademicServiceRequest request) {
         if (request instanceof IProgramConclusionRequest) {
-
-            String type = null;
+            StringBuilder code = new StringBuilder();
+            String type;
             CycleType cycle = ((IProgramConclusionRequest) request).getRequestedCycle();
+
             if (cycle == null) {
                 cycle = getCycle(request);
             }
@@ -86,7 +87,19 @@ public class IstRegistryCodeGenerator extends IstRegistryCodeGenerator_Base {
             default:
                 type = "";
             }
-            return getNextNumber(cycle) + "/ISTC" + type + "/" + new LocalDate().toString("yy");
+
+            code.append(getNextNumber(cycle));
+            code.append("/").append("IST").append("/");
+            code.append(type);
+            code.append("/");
+
+            if (((IProgramConclusionRequest) request).getAssociatedInstitutionsContent().isPresent()) {
+                code.append("a").append("/");
+            }
+
+            code.append(new LocalDate().toString("yyyy"));
+
+            return code.toString();
         }
         return super.getCode(request);
     }
