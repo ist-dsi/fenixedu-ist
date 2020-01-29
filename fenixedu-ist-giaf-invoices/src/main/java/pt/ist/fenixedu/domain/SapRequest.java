@@ -1,22 +1,20 @@
 package pt.ist.fenixedu.domain;
 
-import java.util.Comparator;
-import java.util.Optional;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.Refund;
 import org.fenixedu.academic.util.Money;
 import org.fenixedu.bennu.GiafInvoiceConfiguration;
 import org.joda.time.DateTime;
-
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
+
+import java.util.Comparator;
+import java.util.Optional;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class SapRequest extends SapRequest_Base {
 
@@ -419,6 +417,16 @@ public class SapRequest extends SapRequest_Base {
             paymentDocument.addProperty("paymentDate", dateTime.toString(GiafInvoiceConfiguration.DT_FORMAT));
         }
         setRequest(request.toString());
+    }
+
+    private boolean isUnRestrictedDocumentType() {
+        final SapRequestType type = getRequestType();
+        return type == SapRequestType.PAYMENT || type == SapRequestType.PAYMENT_INTEREST
+                || type == SapRequestType.ADVANCEMENT || type == SapRequestType.CLOSE_INVOICE;
+    }
+
+    public boolean allowedToSend() {
+        return isUnRestrictedDocumentType() || SapRoot.getInstance().yearIsOpen(documentDate().getYear());
     }
 
 }

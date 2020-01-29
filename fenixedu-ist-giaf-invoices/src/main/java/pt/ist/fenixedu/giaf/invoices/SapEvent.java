@@ -841,7 +841,7 @@ public class SapEvent {
     }
 
     public boolean processPendingRequests(final SapRequest sr, final ErrorLogConsumer errorLog, final EventLogger elogger) {
-        if (!sr.getIntegrated()) {
+        if (!sr.getIntegrated() && sr.allowedToSend()) {
             final JsonParser jsonParser = new JsonParser();
             final JsonObject data = (JsonObject) jsonParser.parse(sr.getRequest());
 

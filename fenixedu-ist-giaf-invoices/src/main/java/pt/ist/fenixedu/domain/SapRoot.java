@@ -2,7 +2,6 @@ package pt.ist.fenixedu.domain;
 
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.bennu.core.domain.Bennu;
-
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
 
@@ -43,4 +42,9 @@ public class SapRoot extends SapRoot_Base {
         super.setSapDocumentNumber(sapDocumentNumber + 1);
         return getSapDocumentNumber();
     }
+
+    public boolean yearIsOpen(final int year) {
+        return getOpenYear() != null && getOpenYear().intValue() == year;
+    }
+
 }
