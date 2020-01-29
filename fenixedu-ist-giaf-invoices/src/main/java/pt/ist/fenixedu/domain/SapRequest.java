@@ -8,6 +8,7 @@ import java.util.TreeSet;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.Refund;
 import org.fenixedu.academic.util.Money;
+import org.fenixedu.bennu.GiafInvoiceConfiguration;
 import org.joda.time.DateTime;
 
 import com.google.gson.JsonElement;
@@ -379,6 +380,45 @@ public class SapRequest extends SapRequest_Base {
     @Atomic
     public void revertConsolidation() {
         setSapRootFromConsolidated(null);
+    }
+
+    public DateTime documentDate() {
+        final SapRequestType sapRequestType = getRequestType();
+        final DateTime documentDate;
+        if (sapRequestType == SapRequestType.DEBT || sapRequestType == SapRequestType.DEBT_CREDIT
+                || sapRequestType == SapRequestType.INVOICE || sapRequestType == SapRequestType.INVOICE_INTEREST
+                || sapRequestType == SapRequestType.CREDIT) {
+            documentDate = documentDateFor("workingDocument", "documentDate");
+        } else if (sapRequestType == SapRequestType.PAYMENT || sapRequestType == SapRequestType.PAYMENT_INTEREST
+                || sapRequestType == SapRequestType.ADVANCEMENT || sapRequestType == SapRequestType.CLOSE_INVOICE
+                || sapRequestType == SapRequestType.REIMBURSEMENT) {
+            documentDate = documentDateFor("paymentDocument", "paymentDate");
+        } else {
+            throw new Error("unreachable code");
+        }
+        return documentDate;
+    }
+
+    private DateTime documentDateFor(final String document, final String dateField) {
+        final String s = getRequestAsJson().get(document).getAsJsonObject().get(dateField).getAsString();
+        return new DateTime(Integer.parseInt(s.substring(0, 4)), Integer.parseInt(s.substring(5, 7)), Integer.parseInt(s.substring(8, 10)),
+                Integer.parseInt(s.substring(11, 13)), Integer.parseInt(s.substring(14, 15)), Integer.parseInt(s.substring(17, 19)));
+    }
+
+    public void hackDocumentDate(final DateTime dateTime) {
+        if (getIntegrated()) {
+            throw new Error("Cannot change document date of integrated document.");
+        }
+        final JsonObject request = getRequestAsJson();
+        if (request.get("workingDocument") != null && !request.get("workingDocument").isJsonNull()) {
+            final JsonObject workingDocument = request.get("workingDocument").getAsJsonObject();
+            workingDocument.addProperty("documentDate", dateTime.toString(GiafInvoiceConfiguration.DT_FORMAT));
+        }
+        if (request.get("paymentDocument") != null && !request.get("paymentDocument").isJsonNull()) {
+            final JsonObject paymentDocument = request.get("paymentDocument").getAsJsonObject();
+            paymentDocument.addProperty("paymentDate", dateTime.toString(GiafInvoiceConfiguration.DT_FORMAT));
+        }
+        setRequest(request.toString());
     }
 
 }
