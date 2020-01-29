@@ -26,6 +26,8 @@ import org.fenixedu.commons.configuration.ConfigurationProperty;
 @BennuSpringModule(basePackages = "pt.ist.fenixedu.giaf.invoices.ui", bundles = "GiafInvoicesResources")
 public class GiafInvoiceConfiguration {
 
+    public static final String DT_FORMAT = "yyyy-MM-dd HH:mm:ss";
+
     @ConfigurationManager(description = "Giaf Invoice Configuration")
     public interface ConfigurationProperties {
 

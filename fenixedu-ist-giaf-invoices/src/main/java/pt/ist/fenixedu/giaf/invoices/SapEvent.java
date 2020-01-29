@@ -32,6 +32,7 @@ import org.fenixedu.academic.domain.organizationalStructure.Party;
 import org.fenixedu.academic.domain.phd.debts.ExternalScholarshipPhdGratuityContribuitionEvent;
 import org.fenixedu.academic.domain.phd.debts.PhdGratuityEvent;
 import org.fenixedu.academic.util.Money;
+import org.fenixedu.bennu.GiafInvoiceConfiguration;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.generated.sources.saft.sap.SAFTPTPaymentType;
 import org.fenixedu.generated.sources.saft.sap.SAFTPTSettlementType;
@@ -66,7 +67,6 @@ import java.util.stream.Stream;
 
 public class SapEvent {
 
-    private static final String DT_FORMAT = "yyyy-MM-dd HH:mm:ss";
     private static final String MORADA_DESCONHECIDO = "Desconhecido";
     private static final String EMPTY_JSON = "{}";
     private static final int MAX_SIZE_ADDRESS = 100;
@@ -1059,7 +1059,7 @@ public class SapEvent {
                                              boolean isDebit) {
         JsonObject paymentDocument = new JsonObject();
         paymentDocument.addProperty("paymentDocumentNumber", documentType + getDocumentNumber());
-        paymentDocument.addProperty("paymentDate", paymentDate.toString(DT_FORMAT));
+        paymentDocument.addProperty("paymentDate", paymentDate.toString(GiafInvoiceConfiguration.DT_FORMAT));
         paymentDocument.addProperty("paymentType", SAFTPTPaymentType.RG.toString());
         paymentDocument.addProperty("paymentStatus", "N");
         paymentDocument.addProperty("sourcePayment", SAFTPTSourcePayment.P.toString());
@@ -1157,9 +1157,9 @@ public class SapEvent {
     private JsonObject toJsonWorkDocument(DateTime documentDate, DateTime entryDate, Money amount, String documentType,
                                           boolean isToDebit, DateTime dueDate) {
         JsonObject workDocument = new JsonObject();
-        workDocument.addProperty("documentDate", documentDate.toString(DT_FORMAT));
-        workDocument.addProperty("entryDate", entryDate.toString(DT_FORMAT));
-        workDocument.addProperty("dueDate", dueDate.toString(DT_FORMAT));
+        workDocument.addProperty("documentDate", documentDate.toString(GiafInvoiceConfiguration.DT_FORMAT));
+        workDocument.addProperty("entryDate", entryDate.toString(GiafInvoiceConfiguration.DT_FORMAT));
+        workDocument.addProperty("dueDate", dueDate.toString(GiafInvoiceConfiguration.DT_FORMAT));
         workDocument.addProperty("workingDocumentNumber", documentType + getDocumentNumber());
         workDocument.addProperty("sourceBilling", SAFTPTSourceBilling.P.toString());
         workDocument.addProperty("workingAmount", amount.getAmountAsString());
@@ -1214,8 +1214,9 @@ public class SapEvent {
         json.addProperty("postalCode", "1049-001");
         json.addProperty("region", "Lisboa");
         json.addProperty("street", "Avenida Rovisco Pais, 1");
-        json.addProperty("fromDate", isNewDate ? new DateTime().toString(DT_FORMAT) : documentDate.toString(DT_FORMAT));
-        json.addProperty("toDate", new DateTime().toString(DT_FORMAT)); //tem impacto no ano fiscal!!!
+        json.addProperty("fromDate", isNewDate ? new DateTime().toString(GiafInvoiceConfiguration.DT_FORMAT)
+                : documentDate.toString(GiafInvoiceConfiguration.DT_FORMAT));
+        json.addProperty("toDate", new DateTime().toString(GiafInvoiceConfiguration.DT_FORMAT)); //tem impacto no ano fiscal!!!
         json.addProperty("productCompanyTaxId", "999999999");
         json.addProperty("productId", "FenixEdu/FenixEdu");
         json.addProperty("productVersion", "5.0.0.0");
