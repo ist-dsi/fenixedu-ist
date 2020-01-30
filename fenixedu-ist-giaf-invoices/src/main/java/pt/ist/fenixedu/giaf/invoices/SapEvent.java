@@ -13,6 +13,7 @@ import org.fenixedu.academic.domain.accounting.AccountingTransactionDetail;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.EventType;
 import org.fenixedu.academic.domain.accounting.calculator.CreditEntry;
+import org.fenixedu.academic.domain.accounting.calculator.DebtEntry;
 import org.fenixedu.academic.domain.accounting.calculator.DebtExemption;
 import org.fenixedu.academic.domain.accounting.calculator.DebtInterestCalculator;
 import org.fenixedu.academic.domain.accounting.calculator.ExcessRefund;
@@ -354,7 +355,7 @@ public class SapEvent {
                 //only if the credit value is not equal to the original invoice value must we close the invoice
                 //otherwise there is no need to send a closing document
                 if (!invoice.getValue().equals(openInvoiceAmount) && openInvoiceAmount.equals(amountToCredit)) {
-                    registerFinalZeroPayment(invoice, creditEntry.getId());
+                    registerFinalZeroPayment(invoice, creditEntry.getId(), null);
                 }
                 amountToCredit = amountToCredit.subtract(amountForInvoice);
             }
@@ -368,7 +369,11 @@ public class SapEvent {
     private SapRequest registerCredit(Event event, CreditEntry creditEntry, Money creditAmount, SapRequest sapInvoiceRequest) {
         checkValidDocumentNumber(sapInvoiceRequest.getDocumentNumber(), event);
 
-        JsonObject data = toJsonCredit(event, getDocumentDate(creditEntry.getCreated(), false), creditAmount, sapInvoiceRequest, false, true);
+        DateTime documentDate = getDocumentDate(creditEntry.getCreated(), false);
+        if (sapInvoiceRequest.getDocumentDate().getYear() > documentDate.getYear()) {
+            documentDate = sapInvoiceRequest.getDocumentDate();
+        }
+        JsonObject data = toJsonCredit(event, documentDate, creditAmount, sapInvoiceRequest, false, true);
         String documentNumber = getDocumentNumber(data, false);
         SapRequest sapRequest =
                 new SapRequest(event, sapInvoiceRequest.getClientId(), creditAmount, documentNumber, SapRequestType.CREDIT, Money.ZERO, data);
@@ -534,7 +539,12 @@ public class SapEvent {
 
     private SapRequest registerInterestInvoice(final Money payedInterest, final String clientId,
                                                final AccountingTransactionDetail transactionDetail, DateTime paymentDate) {
-        JsonObject data = toJsonInvoice(event, payedInterest, paymentDate, new DateTime(), clientId, false, true, false);
+        DateTime now = new DateTime();
+        DateTime invoiceDate = paymentDate;
+        if (paymentDate.getYear() < now.getYear()) {
+            invoiceDate = now;
+        }
+        JsonObject data = toJsonInvoice(event, payedInterest, invoiceDate, new DateTime(), clientId, false, true, false);
 
         String documentNumber = getDocumentNumber(data, false);
         SapRequest sapRequest = new SapRequest(event, clientId, payedInterest, documentNumber,
@@ -656,12 +666,25 @@ public class SapEvent {
 
     private void registerFinalPayment(final AccountingTransactionDetail transactionDetail, final Money payedAmount, final SapRequest sapInvoiceRequest,
                                       final boolean isInterest, final SapRequestType requestType, final Stream<SapRequest> documentsFor) {
-        JsonObject data = toJsonFinalPayment(transactionDetail, payedAmount, sapInvoiceRequest, isInterest, documentsFor);
 
-        String documentNumber = getDocumentNumber(data, true);
-        SapRequest sapRequest = new SapRequest(event, sapInvoiceRequest.getClientId(), payedAmount, documentNumber,
-                requestType, Money.ZERO, data);
-        sapRequest.setPayment(transactionDetail.getTransaction());
+        if (sapInvoiceRequest.getDocumentDate().getYear() > transactionDetail.getWhenRegistered().getYear()) {
+            registerAdvancementAndUsedIt(transactionDetail, payedAmount, sapInvoiceRequest, requestType);
+            registerFinalZeroPayment(sapInvoiceRequest, null, transactionDetail.getTransaction());
+        } else {
+            JsonObject data = toJsonFinalPayment(transactionDetail, payedAmount, sapInvoiceRequest, isInterest, documentsFor);
+
+            String documentNumber = getDocumentNumber(data, true);
+            SapRequest sapRequest = new SapRequest(event, sapInvoiceRequest.getClientId(), payedAmount, documentNumber,
+                    requestType, Money.ZERO, data);
+            sapRequest.setPayment(transactionDetail.getTransaction());
+        }
+    }
+
+    private void registerAdvancementAndUsedIt(final AccountingTransactionDetail transactionDetail, final Money payedAmount, final SapRequest sapInvoiceRequest, final SapRequestType requestType) {
+        registerAdvancementOnly(sapInvoiceRequest.getClientId(), transactionDetail, payedAmount);
+        CreditEntry creditEntry = new Payment(transactionDetail.getTransaction().getExternalId(), null, null, null, null, null);
+        PartialPayment<DebtEntry> partialPayment = new PartialPayment<DebtEntry>(creditEntry, null, null);
+        registerAdvancementInPayment(null, partialPayment, transactionDetail, event, payedAmount, sapInvoiceRequest, requestType, true);
     }
 
     private JsonObject toJsonFinalPayment(final AccountingTransactionDetail transactionDetail, final Money payedAmount, final SapRequest sapInvoiceRequest,
@@ -676,18 +699,19 @@ public class SapEvent {
     }
 
     /**
-     * Closes an invoice that has several documents in which the last one is a credit note that "pays" the remaining
-     * open value of the invoice
+     * Closes an invoice that has several documents in which the last one is a credit note or a payment
      * @param sapInvoiceRequest
      * @param creditId
+     * @param payment
      */
-    public void registerFinalZeroPayment(final SapRequest sapInvoiceRequest, final String creditId) {
+    public void registerFinalZeroPayment(final SapRequest sapInvoiceRequest, final String creditId, final AccountingTransaction payment) {
         JsonObject data = toJsonFinalZeroPayment(sapInvoiceRequest, getPaymentsAndCreditsFor(sapInvoiceRequest));
 
         String documentNumber = getDocumentNumber(data, true);
         SapRequest finalPayment = new SapRequest(event, sapInvoiceRequest.getClientId(), Money.ZERO, documentNumber,
                 SapRequestType.CLOSE_INVOICE, Money.ZERO, data);
         finalPayment.setCreditId(creditId);
+        finalPayment.setPayment(payment);
     }
 
     private JsonObject toJsonFinalZeroPayment(final SapRequest sapInvoiceRequest, final Stream<SapRequest> documentsFor) {
@@ -716,12 +740,17 @@ public class SapEvent {
 
     private void registerSinglePayment(final AccountingTransactionDetail transactionDetail, final Money payedAmount, final SapRequest sapInvoiceRequest,
                                        final boolean isInterest, final boolean isPastPayment, final SapRequestType requestType) {
-        JsonObject data = toJsonPayment(transactionDetail, payedAmount, sapInvoiceRequest, isInterest, isPastPayment);
-        String documentNumber = getDocumentNumber(data, true);
 
-        SapRequest sapRequest = new SapRequest(event, sapInvoiceRequest.getClientId(), payedAmount, documentNumber,
-                requestType, Money.ZERO, data);
-        sapRequest.setPayment(transactionDetail.getTransaction());
+        if (sapInvoiceRequest.getDocumentDate().getYear() > transactionDetail.getWhenRegistered().getYear()) {
+            registerAdvancementAndUsedIt(transactionDetail, payedAmount, sapInvoiceRequest, requestType);
+        } else {
+            JsonObject data = toJsonPayment(transactionDetail, payedAmount, sapInvoiceRequest, isInterest, isPastPayment);
+            String documentNumber = getDocumentNumber(data, true);
+
+            SapRequest sapRequest = new SapRequest(event, sapInvoiceRequest.getClientId(), payedAmount, documentNumber,
+                    requestType, Money.ZERO, data);
+            sapRequest.setPayment(transactionDetail.getTransaction());
+        }
     }
 
     private void registerAdvancement(Money amount, Money advancement, SapRequest sapInvoiceRequest, AccountingTransactionDetail transactionDetail) {
@@ -769,7 +798,9 @@ public class SapEvent {
 
                 final String clientId = ClientMap.uVATNumberFor(event.getParty());
                 SapRequest interestInvoice = registerInterestInvoice(interestToProcess, clientId, payment, payment.getWhenRegistered());
-                registerAdvancementInPayment(excessRefund, partialPayment, payment, originEvent, interestToProcess, interestInvoice, SapRequestType.PAYMENT_INTEREST);
+                //if the invoice was pushed to the next year, this payment must be too
+                boolean isNewDate = interestInvoice.getDocumentDate().getYear() > payment.getWhenRegistered().getYear();
+                registerAdvancementInPayment(excessRefund, partialPayment, payment, originEvent, interestToProcess, interestInvoice, SapRequestType.PAYMENT_INTEREST, isNewDate);
                 partialPayments.put(partialPayment, Money.max(Money.ZERO, pAmount.subtract(interestAmount)));
                 interestAmount = interestAmount.subtract(pAmount);
             }
@@ -784,9 +815,13 @@ public class SapEvent {
             final Money openInvoiceValue = entry.getValue();
 
             if (openInvoiceValue.greaterOrEqualThan(amountUsed)) {
-                registerAdvancementInPayment(excessRefund, partialPayment, payment, originEvent, amountUsed, openInvoice, SapRequestType.PAYMENT);
+                registerAdvancementInPayment(excessRefund, partialPayment, payment, originEvent, amountUsed, openInvoice, SapRequestType.PAYMENT, false);
+                //this advancement use closes this invoice money wise, so we have to close it with a document
+                if (openInvoiceValue.compareTo(amountUsed) == 0) {
+                    registerFinalZeroPayment(openInvoice, null, payment.getTransaction());
+                }
             } else if (openInvoices.length > 1) {
-                registerAdvancementInPayment(excessRefund, partialPayment, payment, originEvent, openInvoiceValue, openInvoice, SapRequestType.PAYMENT);
+                registerAdvancementInPayment(excessRefund, partialPayment, payment, originEvent, openInvoiceValue, openInvoice, SapRequestType.PAYMENT, false);
                 registerAdvancementInPayment(excessRefund, partialPayment, amountUsed.subtract(openInvoiceValue), payment, originEvent, Arrays.copyOfRange(openInvoices, 1, openInvoices.length));
             } else {
                 throw new Error("There is no open invoice to register payment: " + payment.getExternalId() + " - that resulted from an advance");
@@ -795,23 +830,29 @@ public class SapEvent {
     }
 
     private void registerAdvancementInPayment(final ExcessRefund excessRefund, final PartialPayment partialPayment, final AccountingTransactionDetail payment,
-                                              final Event originEvent, final Money amountUsed, final SapRequest openInvoice, final SapRequestType requestType) {
+                                              final Event originEvent, final Money amountUsed, final SapRequest openInvoice, final SapRequestType requestType, final boolean isNewDate) {
         SapEvent sapOriginEvent = new SapEvent(originEvent);
         SapRequest originalPayment = sapOriginEvent.getAdvancementPaymentsFor(partialPayment.getCreditEntry().getId()).findAny()
                 .orElseThrow(() -> new Error("There is no advancement registered for paymentId: " + partialPayment.getCreditEntry().getId()));
-        JsonObject advInPayment = toJsonUseAdvancementInPayment(payment, originalPayment, amountUsed, openInvoice.getDocumentNumber());
+        JsonObject advInPayment = toJsonUseAdvancementInPayment(payment, originalPayment, amountUsed, openInvoice.getDocumentNumber(), isNewDate);
         final SapRequest sapRequest = new SapRequest(event, originalPayment.getClientId(), amountUsed, getDocumentNumber(advInPayment, true),
                 requestType, Money.ZERO, advInPayment);
         sapRequest.setPayment(payment.getTransaction());
-        sapRequest.setRefund(FenixFramework.getDomainObject(excessRefund.getId()));
+        if (excessRefund != null) {
+            sapRequest.setRefund(FenixFramework.getDomainObject(excessRefund.getId()));
+        }
         sapRequest.setAdvancementRequest(originalPayment);
     }
 
-    private JsonObject toJsonUseAdvancementInPayment(final AccountingTransactionDetail payment, final SapRequest originalPayment, final Money amountToUse, final String invoiceNumber) {
+    private JsonObject toJsonUseAdvancementInPayment(final AccountingTransactionDetail payment, final SapRequest originalPayment, final Money amountToUse, final String invoiceNumber, final boolean isNewDate) {
+        DateTime documentDate = payment.getWhenRegistered();
+        if (isNewDate) {
+            documentDate = new DateTime();
+        }
         JsonObject data =
-                toJson(event, originalPayment.getClientJson(), payment.getWhenRegistered(), false, false, false, false, false);
+                toJson(event, originalPayment.getClientJson(), documentDate, false, false, false, false, false);
 
-        JsonObject paymentDocument = toJsonPaymentDocument(amountToUse, "NP", invoiceNumber, payment.getWhenRegistered(),
+        JsonObject paymentDocument = toJsonPaymentDocument(amountToUse, "NP", invoiceNumber, documentDate,
                 "OU", getPaymentMethodReference(payment), SAFTPTSettlementType.NN.toString(), true);
         paymentDocument.addProperty("excessPayment", amountToUse.negate().toPlainString());//the payment amount must be zero
         paymentDocument.addProperty("isToCreditTotal", true);
