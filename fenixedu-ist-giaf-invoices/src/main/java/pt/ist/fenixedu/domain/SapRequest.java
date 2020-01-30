@@ -8,6 +8,7 @@ import org.fenixedu.academic.domain.accounting.Refund;
 import org.fenixedu.academic.util.Money;
 import org.fenixedu.bennu.GiafInvoiceConfiguration;
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
 
@@ -380,7 +381,7 @@ public class SapRequest extends SapRequest_Base {
         setSapRootFromConsolidated(null);
     }
 
-    public DateTime documentDate() {
+    public DateTime getDocumentDate() {
         final SapRequestType sapRequestType = getRequestType();
         final DateTime documentDate;
         if (sapRequestType == SapRequestType.DEBT || sapRequestType == SapRequestType.DEBT_CREDIT
@@ -399,8 +400,7 @@ public class SapRequest extends SapRequest_Base {
 
     private DateTime documentDateFor(final String document, final String dateField) {
         final String s = getRequestAsJson().get(document).getAsJsonObject().get(dateField).getAsString();
-        return new DateTime(Integer.parseInt(s.substring(0, 4)), Integer.parseInt(s.substring(5, 7)), Integer.parseInt(s.substring(8, 10)),
-                Integer.parseInt(s.substring(11, 13)), Integer.parseInt(s.substring(14, 15)), Integer.parseInt(s.substring(17, 19)));
+        return DateTime.parse(s, DateTimeFormat.forPattern(GiafInvoiceConfiguration.DT_FORMAT));
     }
 
     public void hackDocumentDate(final DateTime dateTime) {
@@ -426,7 +426,7 @@ public class SapRequest extends SapRequest_Base {
     }
 
     public boolean allowedToSend() {
-        return isUnRestrictedDocumentType() || SapRoot.getInstance().yearIsOpen(documentDate().getYear());
+        return isUnRestrictedDocumentType() || SapRoot.getInstance().yearIsOpen(getDocumentDate().getYear());
     }
 
 }
