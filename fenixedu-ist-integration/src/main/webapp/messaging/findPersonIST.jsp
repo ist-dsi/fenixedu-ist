@@ -153,7 +153,7 @@
 		<div class="pp">
 			<table class="ppid" cellpadding="0" cellspacing="0">
 				<tr>
-					<td width="70%"><strong> <bean:write name="personalInfo" property="name" /> </strong> <%= personalIds %>
+					<td width="70%"><strong> <bean:write name="personalInfo" property="person.user.displayName" /> </strong> <%= personalIds %>
 					    <em><%=LegacyRoleUtils.mainRolesStr(personalInfo.getUser()) %></em>
 					</td>
 					<td width="30%" style="text-align: right;"><bean:define
