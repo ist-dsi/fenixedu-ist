@@ -27,7 +27,7 @@
 	</columnHeader>
 	<detail>
 		<band height="13" splitType="Stretch">
-			<textField isBlankWhenNull="false">
+			<textField isBlankWhenNull="false" isStretchWithOverflow="true">
 				<reportElement key="textField-2" positionType="Float" x="0" y="0" width="366" height="13"/>
 				<box topPadding="3" leftPadding="3">
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
