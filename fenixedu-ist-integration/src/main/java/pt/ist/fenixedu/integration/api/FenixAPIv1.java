@@ -830,6 +830,44 @@ public class FenixAPIv1 {
     }
 
     /**
+     * Countries
+     *
+     * @return all the supported countries
+     */
+    @GET
+    @Produces(JSON_UTF8)
+    @Path("countries")
+    public String countries() {
+        return Bennu.getInstance().getCountrysSet().stream()
+                .sorted(Country.COMPARATOR_BY_NAME)
+                .map(c -> {
+                    JsonObject object = new JsonObject();
+                    object.addProperty("id", c.getExternalId());
+                    object.addProperty("name", c.getLocalizedName().getContent());
+                    return object;
+                }).collect(StreamUtils.toJsonArray()).toString();
+    }
+
+    /**
+     * Id Document types
+     *
+     * @return all the supported id document types
+     */
+    @GET
+    @Produces(JSON_UTF8)
+    @Path("idDocumentTypes")
+    public String idDocumentTypes() {
+        return Bennu.getInstance().getIdDocumentTypesSet().stream()
+                .sorted(Comparator.comparing(dt -> dt.getValue().getLocalizedName()))
+                .map(dt -> {
+                    JsonObject object = new JsonObject();
+                    object.addProperty("id", dt.getExternalId());
+                    object.addProperty("name", dt.getValue().getLocalizedName());
+                    return object;
+                }).collect(StreamUtils.toJsonArray()).toString();
+    }
+
+    /**
      * Academic Terms
      *
      * @return all the academic terms available to be used in other endpoints as academicTerm query parameter.
