@@ -510,7 +510,7 @@
 				<subreportExpression class="java.lang.String"><![CDATA["reports/documentRequests/diploma/diplomaSupplementBody3.jasper"]]></subreportExpression>
 			</subreport>
 			<subreport isUsingCache="true">
-				<reportElement key="subreport-4" positionType="Float" x="0" y="160" width="366" height="52" isPrintInFirstWholeBand="true"/>
+				<reportElement key="subreport-4" positionType="Float" x="0" y="160" width="366" height="52" isPrintInFirstWholeBand="false"/>
 				<subreportParameter name="institutionName">
 					<subreportParameterExpression><![CDATA[$P{institutionName}]]></subreportParameterExpression>
 				</subreportParameter>
