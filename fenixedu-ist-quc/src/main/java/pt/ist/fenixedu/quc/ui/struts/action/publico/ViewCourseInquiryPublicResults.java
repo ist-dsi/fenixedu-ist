@@ -97,6 +97,15 @@ public class ViewCourseInquiryPublicResults extends ViewInquiryPublicResults {
                 getGeneralResults(results, resultBlocks, GroupResultType.COURSE_ANSWERS);
         GroupResultsSummaryBean nonAnswersResultsSummaryBean =
                 getGeneralResults(results, resultBlocks, GroupResultType.COURSE_NON_ANSWERS);
+
+        if (results.size() < nonAnswersResultsSummaryBean.getQuestionsResults().size()) {
+            request.setAttribute("hasResults", false);
+            request.setAttribute("executionCourse", executionCourse);
+            request.setAttribute("executionPeriod", executionPeriod);
+            request.setAttribute("executionDegree", executionDegree);
+            return new ActionForward(null, "/inquiries/showCourseInquiryResult_v3.jsp", false, "/teacher");
+        }
+
         if (InquiriesRoot.getAvailableForInquiries(executionCourse)) {
             Collections.sort(
                     nonAnswersResultsSummaryBean.getQuestionsResults(),
@@ -161,6 +170,7 @@ public class ViewCourseInquiryPublicResults extends ViewInquiryPublicResults {
         Collections.sort(blockResultsSummaryBeans, Comparator.comparing(BlockResultsSummaryBean::getInquiryBlock));
 
         request.setAttribute("hasNotRelevantData", hasNotRelevantData);
+        request.setAttribute("hasResults", true);
         request.setAttribute("executionCourse", executionCourse);
         request.setAttribute("isAvailableForInquiries", InquiriesRoot.isAvailableForInquiry(executionCourse));
         request.setAttribute("executionPeriod", executionPeriod);
