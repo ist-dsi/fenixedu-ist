@@ -1202,7 +1202,7 @@ public class SapEvent {
     private JsonObject toJsonDebtCredit(Event event, Money debtFenix, String clientId, DateTime documentDate, DateTime entryDate,
                                         boolean isDebtRegistration, String docType, boolean isToDebit, boolean isNewDate, SapRequest debtRequest) {
         JsonObject request = new JsonParser().parse(debtRequest.getRequest()).getAsJsonObject();
-        String originalMetadata = request.get("workingDocument").getAsJsonObject().get("debtMetadata").getAsString();
+        String originalMetadata = request.get("workingDocument").getAsJsonObject().get("metadata").getAsString();
         JsonObject json = toJsonDebt(event, debtFenix, clientId, documentDate, entryDate, isDebtRegistration, docType, isToDebit,
                 isNewDate, originalMetadata);
         JsonObject workingDocument = json.get("workingDocument").getAsJsonObject();
