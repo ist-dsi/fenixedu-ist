@@ -30,7 +30,7 @@ public class ActiveInvitationsGroup extends GroupStrategy {
 
     private boolean hasActiveInvitation(final User user, final YearMonthDay when) {
         final Person person = user.getPerson();
-        return person.getParentsSet().stream()
+        return person != null && person.getParentsSet().stream()
                 .filter(a -> a instanceof Invitation)
                 .map(a -> (Invitation) a)
                 .anyMatch(i -> i.isActive(when));
