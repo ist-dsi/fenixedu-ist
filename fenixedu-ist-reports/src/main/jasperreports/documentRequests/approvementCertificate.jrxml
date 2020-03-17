@@ -63,7 +63,7 @@
 					<textElement textAlignment="Right" lineSpacing="1_1_2">
 						<font size="12" isItalic="true" pdfFontName="Courier-Oblique"/>
 					</textElement>
-					<textFieldExpression class="java.lang.String"><![CDATA[$P{bundle}.getString("label.coordinator." + ($P{administrativeOfficeCoordinator}.isMale() ? "male" : "female")) + " " + $P{bundle}.getString("label.of.the.male") + " " + $P{administrativeOfficeName}]]></textFieldExpression>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{bundle}.getString("label.coordinator." + ($P{administrativeOfficeCoordinator}.isMale() ? "male" : "female")) + " " + $P{bundle}.getString("label.of.the.female") + " " + $P{administrativeOfficeName}]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true" isBlankWhenNull="false">
 					<reportElement key="textField-30" positionType="Float" x="72" y="105" width="469" height="22"/>
@@ -237,7 +237,7 @@
 				<textElement textAlignment="Justified" lineSpacing="1_1_2">
 					<font size="12" isBold="true" isItalic="true" pdfFontName="Courier-BoldOblique"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA["      " + $P{administrativeOfficeCoordinator}.getName() + ", " + $P{bundle}.getString("label.coordinator." + ($P{administrativeOfficeCoordinator}.isMale() ? "male" : "female")) + " " + $P{bundle}.getString("label.of.the.male") + " " + $P{administrativeOfficeName}.toUpperCase() + " " + $P{bundle}.getString("label.of.male") + " " + $P{institutionName}.toUpperCase() + ", " + $P{universityName}.toUpperCase()]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA["      " + $P{administrativeOfficeCoordinator}.getName() + ", " + $P{bundle}.getString("label.coordinator." + ($P{administrativeOfficeCoordinator}.isMale() ? "male" : "female")) + " " + $P{bundle}.getString("label.of.the.female") + " " + $P{administrativeOfficeName}.toUpperCase() + " " + $P{bundle}.getString("label.of.male") + " " + $P{institutionName}.toUpperCase() + ", " + $P{universityName}.toUpperCase()]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="false">
 				<reportElement key="textField-34" positionType="Float" x="64" y="33" width="469" height="22"/>
