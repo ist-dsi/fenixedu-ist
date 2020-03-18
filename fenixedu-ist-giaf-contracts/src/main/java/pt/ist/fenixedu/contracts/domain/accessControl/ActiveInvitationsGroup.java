@@ -1,6 +1,7 @@
 package pt.ist.fenixedu.contracts.domain.accessControl;
 
 import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.annotation.GroupOperator;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
@@ -19,7 +20,7 @@ public class ActiveInvitationsGroup extends GroupStrategy {
 
     @Override
     public String getPresentationName() {
-        return BundleUtil.getString("resources.GiafContractResources", "label.name.ActiveInvitationsGroup");
+        return BundleUtil.getString(Bundle.GROUP, "label.name.ActiveInvitationsGroup");
     }
 
     @Override
