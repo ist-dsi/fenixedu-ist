@@ -1597,6 +1597,7 @@ public class FenixAPIv1 {
      *                    "date": "yyyy-MM-dd HH:mm:ss",
      *                    "room": "room_id",
      *                    "taught": true/false,
+     *                    "onlineLesson": true/false,
      *                    "attendance": 0,
      *                    "title": {
      *                    "pt-PT": "pt title",
@@ -1633,6 +1634,7 @@ public class FenixAPIv1 {
      *                    "date": "yyyy-MM-dd HH:mm:ss",
      *                    "room": "room_id",
      *                    "taught": true/false,
+     *                    "onlineLesson": true/false,
      *                    "attendance": 0,
      *                    "title": {
      *                    "pt-PT": "pt title",
@@ -1662,6 +1664,7 @@ public class FenixAPIv1 {
     private FenixLessonSummary addOrUpdateSummary(String courseOid, JsonObject summaryInfo, Consumer<SummariesManagementBean> service) {
         final String room, shiftId, date;
         final Boolean taught;
+        final Boolean onlineLesson;
         final int attendance;
         final JsonObject title, content;
 
@@ -1675,6 +1678,7 @@ public class FenixAPIv1 {
 
         try {
             taught = summaryInfo.get("taught").getAsBoolean();
+            onlineLesson = summaryInfo.has("onlineLesson") ? summaryInfo.get("onlineLesson").getAsBoolean() : false;
             attendance = summaryInfo.get("attendance").getAsInt();
         } catch (Exception ignored) {
             throw newApplicationError(Status.PRECONDITION_FAILED, "invalid parameters", "missing keys 'taught' or 'attendance'");
@@ -1697,7 +1701,7 @@ public class FenixAPIv1 {
         }
 
         SummariesManagementBean bean =
-                fillSummaryManagementBean(executionCourse, shift, space, date, title, content, taught, attendance);
+                fillSummaryManagementBean(executionCourse, shift, space, date, title, content, taught, attendance, onlineLesson);
         service.accept(bean);
 
         Lesson lesson = bean.getLesson();
@@ -1707,7 +1711,7 @@ public class FenixAPIv1 {
     }
 
     private SummariesManagementBean fillSummaryManagementBean(ExecutionCourse executionCourse, Shift shift, Space space,
-                                                              String date, JsonObject title, JsonObject content, Boolean taught, int attendance) {
+                                                              String date, JsonObject title, JsonObject content, Boolean taught, int attendance, Boolean onlineLesson) {
 
         LocalizedString titleMLS, contentMLS;
         try {
@@ -1742,7 +1746,7 @@ public class FenixAPIv1 {
         ShiftType shiftType = shift.getSortedTypes().first();
 
         return new SummariesManagementBean(titleMLS, contentMLS, attendance, NORMAL_SUMMARY, professorship,
-                teacherName, null, shift, lesson.get(), lessonDate, space, lessonTime, summary, professorship, shiftType, taught);
+                teacherName, null, shift, lesson.get(), lessonDate, space, lessonTime, summary, professorship, shiftType, taught, onlineLesson);
     }
 
     /**
