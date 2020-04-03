@@ -502,6 +502,15 @@ public class SapEvent {
     public void registerPastPayment(final Payment payment) {
         String clientId = ClientMap.uVATNumberFor(event.getParty());
         AccountingTransaction transaction = FenixFramework.getDomainObject(payment.getId());
+        
+        //if it's a past internal payment, do nothing, just register ND0 and NP0
+        if (Bennu.getInstance().getInternalPaymentMethod() == transaction.getTransactionDetail().getPaymentMethod()) {
+            SapRequest invoiceRequest = fakeSapRequest(SapRequestType.INVOICE, "ND0", new Money(payment.getAmount()), null);
+            invoiceRequest.setPayment(transaction);
+            SapRequest paymentRequest = fakeSapRequest(SapRequestType.PAYMENT, "NP0", new Money(payment.getAmount()), null);
+            paymentRequest.setPayment(transaction);
+            return;
+        }
 
         final Money payedInterest = new Money(payment.getUsedAmountInInterests().add(payment.getUsedAmountInFines()));
         if (payedInterest.isPositive()) {
