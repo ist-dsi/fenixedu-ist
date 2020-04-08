@@ -822,7 +822,8 @@ public class SapEvent {
             if (openInvoiceValue.greaterOrEqualThan(amountUsed)) {
                 registerAdvancementInPayment(excessRefund, partialPayment, payment, originEvent, amountUsed, openInvoice, SapRequestType.PAYMENT, false);
                 //this advancement use closes this invoice money wise, so we have to close it with a document
-                if (openInvoiceValue.compareTo(amountUsed) == 0) {
+                //unless the advancement is the only paying document and it closes by itself the invoice
+                if (openInvoiceValue.compareTo(amountUsed) == 0 && openInvoice.getValue().compareTo(amountUsed) != 0) {
                     registerFinalZeroPayment(openInvoice, null, payment.getTransaction());
                 }
             } else if (openInvoices.length > 1) {
