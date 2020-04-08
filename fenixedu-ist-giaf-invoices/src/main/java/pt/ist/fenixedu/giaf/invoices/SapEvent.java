@@ -138,7 +138,7 @@ public class SapEvent {
         if (remainder.isNegative()) {
             throw new Error("label.error.amount.exceeds.invoice.value");
         } else {
-            registerCredit(event, EventProcessor.getCreditEntry(availableInvoiceValue), availableInvoiceValue, sapRequest);
+            registerCredit(event, EventProcessor.getCreditEntry(availableInvoiceValue), availableInvoiceValue, sapRequest, false);
 
             final JsonObject data = toJsonInvoice(externalClient, amountToTransfer, getDocumentDate(event.getWhenOccured(), true), new DateTime(), false, false, pledgeNumber);
             final String documentNumber = getDocumentNumber(data, false);
@@ -166,7 +166,7 @@ public class SapEvent {
         final Money documentValue = sapRequest.getValue();
         final CreditEntry creditEntry = EventProcessor.getCreditEntry(documentValue);
         if (requestType == SapRequestType.INVOICE || requestType == SapRequestType.INVOICE_INTEREST) {
-            final SapRequest creditRequest = registerCredit(event, creditEntry, documentValue, sapRequest);
+            final SapRequest creditRequest = registerCredit(event, creditEntry, documentValue, sapRequest, false);
             creditRequest.setIgnore(true);
         } else if (requestType == SapRequestType.DEBT) {
             final SapRequest debtCreditRequest = registerDebtCredit(sapRequest.getClientId(), event, documentValue, creditEntry, sapRequest, true);
@@ -267,7 +267,7 @@ public class SapEvent {
         }
 
         final Money invoiceValue = sapRequest.getValue();
-        final SapRequest creditRequest = registerCredit(event, EventProcessor.getCreditEntry(invoiceValue), invoiceValue, sapRequest);
+        final SapRequest creditRequest = registerCredit(event, EventProcessor.getCreditEntry(invoiceValue), invoiceValue, sapRequest, false);
         sapRequest.setIgnore(true);
         creditRequest.setIgnore(true);
 
@@ -334,7 +334,7 @@ public class SapEvent {
         return sapRequest;
     }
 
-    public void registerCredit(Event event, CreditEntry creditEntry, boolean isGratuity) {
+    public void registerCredit(Event event, CreditEntry creditEntry, boolean isGratuity, boolean isPastPayment) {
         Money amountToCredit = new Money(creditEntry.getUsedAmountInDebts());
         if (!amountToCredit.isPositive()) {
             throw new Error("There is no debt value for the credit exemption: " + creditEntry.getId() + " for event: " + event.getExternalId());
@@ -355,7 +355,7 @@ public class SapEvent {
                 final Money openInvoiceAmount = entry.getValue();
 
                 final Money amountForInvoice = Money.min(openInvoiceAmount, amountToCredit);
-                registerCredit(event, creditEntry, amountForInvoice, invoice);
+                registerCredit(event, creditEntry, amountForInvoice, invoice, isPastPayment);
                 //only if the credit value is not equal to the original invoice value must we close the invoice
                 //otherwise there is no need to send a closing document
                 if (!invoice.getValue().equals(openInvoiceAmount) && openInvoiceAmount.equals(amountToCredit)) {
@@ -370,14 +370,14 @@ public class SapEvent {
         }
     }
 
-    private SapRequest registerCredit(Event event, CreditEntry creditEntry, Money creditAmount, SapRequest sapInvoiceRequest) {
+    private SapRequest registerCredit(Event event, CreditEntry creditEntry, Money creditAmount, SapRequest sapInvoiceRequest, boolean isPastPayment) {
         checkValidDocumentNumber(sapInvoiceRequest.getDocumentNumber(), event);
 
         DateTime documentDate = getDocumentDate(creditEntry.getCreated(), false);
         if (sapInvoiceRequest.getDocumentDate().getYear() > documentDate.getYear()) {
             documentDate = sapInvoiceRequest.getDocumentDate();
         }
-        JsonObject data = toJsonCredit(event, documentDate, creditAmount, sapInvoiceRequest, false, true);
+        JsonObject data = toJsonCredit(event, documentDate, creditAmount, sapInvoiceRequest, false, true, isPastPayment);
         String documentNumber = getDocumentNumber(data, false);
         SapRequest sapRequest =
                 new SapRequest(event, sapInvoiceRequest.getClientId(), creditAmount, documentNumber, SapRequestType.CREDIT, Money.ZERO, data);
@@ -434,7 +434,7 @@ public class SapEvent {
         if (refundTotal && valueToRefund.isZero()) {
             //when a reimbursement of total payed is done the event is closed, so we have to close all invoices
             //if for an invoice no payment was done we just have to send a credit note to close it, no real reimbursement needed
-            final JsonObject jsonCredit = toJsonCredit(event, new DateTime(), valueToExempt, sapInvoiceRequest, false, true);
+            final JsonObject jsonCredit = toJsonCredit(event, new DateTime(), valueToExempt, sapInvoiceRequest, false, true, false);
             final String documentNumber = getDocumentNumber(jsonCredit, true);
             final SapRequest sapRequestNA = new SapRequest(event, clientId, valueToExempt, documentNumber, SapRequestType.CREDIT, Money.ZERO, jsonCredit);
             sapRequestNA.setRefund(refund);
@@ -513,8 +513,14 @@ public class SapEvent {
             // registering the invoice
             SapRequest pastInvoiceRequest = registerPastInvoice(amountPayed, clientId,
                     transaction.getTransactionDetail(), transaction.getTransactionDetail().getWhenRegistered());
-            // registering the payment
-            registerSinglePayment(transaction.getTransactionDetail(), amountPayed, pastInvoiceRequest, false, true, SapRequestType.PAYMENT);
+            
+            // if it is an internal imputation gets a different treatment
+            if (Bennu.getInstance().getInternalPaymentMethod() == transaction.getTransactionDetail().getPaymentMethod()) {
+                processInternalPayment(payment, true);
+            } else {
+                // registering the payment
+                registerSinglePayment(transaction.getTransactionDetail(), amountPayed, pastInvoiceRequest, false, true, SapRequestType.PAYMENT);
+            }
         }
     }
 
@@ -569,7 +575,7 @@ public class SapEvent {
 
         // if it is an internal imputation gets a different treatment
         if (Bennu.getInstance().getInternalPaymentMethod() == transactionDetail.getPaymentMethod()) {
-            processInternalPayment(payment);
+            processInternalPayment(payment, false);
             return;
         }
 
@@ -594,10 +600,10 @@ public class SapEvent {
         }
     }
 
-    private void processInternalPayment(final CreditEntry payment) {
+    private void processInternalPayment(final CreditEntry payment, final boolean isPastPayment) {
         if (!hasCredit(payment.getId())) {
             Set<SapRequest> before = new HashSet<>(event.getSapRequestSet());
-            registerCredit(event, payment, false);
+            registerCredit(event, payment, false, isPastPayment);
             Set<SapRequest> after = new HashSet<>(event.getSapRequestSet());
             after.removeAll(before);
             //associate all requests originated from registerCredit to the payment
@@ -1054,8 +1060,8 @@ public class SapEvent {
     }
 
     private JsonObject toJsonCredit(Event event, DateTime documentDate, Money creditAmount, SapRequest sapInvoiceRequest,
-                                    boolean isDebtRegistration, boolean isNewDate) {
-        JsonObject json = toJson(event, sapInvoiceRequest.getClientJson(), new DateTime(), isDebtRegistration, isNewDate, false, false, false);
+                                    boolean isDebtRegistration, boolean isNewDate, boolean isPastPayment) {
+        JsonObject json = toJson(event, sapInvoiceRequest.getClientJson(), new DateTime(), isDebtRegistration, isNewDate, false, false, isPastPayment);
         JsonObject workDocument = toJsonWorkDocument(documentDate, new DateTime(), creditAmount, "NA", false, new DateTime());
         workDocument.addProperty("workOriginDocNumber", sapInvoiceRequest.getDocumentNumber());
         json.add("workingDocument", workDocument);
