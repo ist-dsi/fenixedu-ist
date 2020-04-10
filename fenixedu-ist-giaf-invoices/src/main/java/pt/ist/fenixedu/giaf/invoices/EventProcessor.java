@@ -141,7 +141,7 @@ public class EventProcessor {
                             sapEvent.fakeSapRequest(SapRequestType.INVOICE, "ND0", value, null);
                             sapEvent.fakeSapRequest(SapRequestType.CREDIT, "NA0", value, debtExemption.getId());
                         } else {
-                            sapEvent.registerCredit(event, debtExemption, eventWrapper.isGratuity());
+                            sapEvent.registerCredit(event, debtExemption, eventWrapper.isGratuity(), false);
                         }
                     }
                 } else if (accountingEntry instanceof Refund && !sapEvent.hasRefund(accountingEntry.getId())) {
@@ -160,7 +160,8 @@ public class EventProcessor {
         } else {
             //processing payments of past events
             DebtInterestCalculator calculator = event.getDebtInterestCalculator(new DateTime());
-            calculator.getPayments().filter(p -> !sapEvent.hasPayment(p.getId()) && p.getCreated().isAfter(EventWrapper.SAP_TRANSACTIONS_THRESHOLD))
+            calculator.getPayments().filter(p -> !sapEvent.hasPayment(p.getId()) && !sapEvent.hasCredit(p.getId())
+                                                && p.getCreated().isAfter(EventWrapper.SAP_TRANSACTIONS_THRESHOLD))
                     .filter(p -> !offsetPayments || p.getCreated().plusDays(15).isBeforeNow())
                     .forEach(p -> sapEvent.registerPastPayment(p));
         }
