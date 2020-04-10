@@ -868,14 +868,8 @@ public class SapEvent {
                 "OU", getPaymentMethodReference(payment), SAFTPTSettlementType.NN.toString(), true);
         paymentDocument.addProperty("excessPayment", amountToUse.negate().toPlainString());//the payment amount must be zero
         paymentDocument.addProperty("isToCreditTotal", true);
-
-        final JsonArray documents = new JsonArray();
-        JsonObject line = new JsonObject();
-        line.addProperty("amount", amountToUse.getAmountAsString());
-        line.addProperty("isToDebit", false);
-        line.addProperty("originDocNumber", originalPayment.getDocumentNumberForType("NA"));
-        documents.add(line);
-        paymentDocument.add("documents", documents);
+        paymentDocument.addProperty("isAdvancedPayment", true);
+        paymentDocument.addProperty("originatingOnDocumentNumber", originalPayment.getDocumentNumberForType("NA"));
 
         data.add("paymentDocument", paymentDocument);
 
