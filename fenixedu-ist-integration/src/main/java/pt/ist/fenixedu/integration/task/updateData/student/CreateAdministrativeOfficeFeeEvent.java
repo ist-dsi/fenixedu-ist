@@ -114,14 +114,6 @@ public class CreateAdministrativeOfficeFeeEvent extends CronTask {
                     createAdministrativeOfficeFeeEvent(studentCurricularPlan, executionYear);
                 }
             }
-            if (student.getPerson() != null) {
-                for (final PhdIndividualProgramProcess process : student.getPerson().getPhdIndividualProgramProcessesSet()) {
-                    if (process.getActiveState() == PhdIndividualProgramProcessState.WORK_DEVELOPMENT) {
-                        createInsuranceEvent(student.getPerson(), executionYear);
-                        break;
-                    }
-                }
-            }
         }
         taskLog("Created %s AdministrativeOfficeFee events\n", AdministrativeOfficeFee_TOTAL_CREATED);
         taskLog("Created %s InsuranceEvent events\n", InsuranceEvent_TOTAL_CREATED);
