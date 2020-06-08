@@ -1,25 +1,11 @@
 package pt.ist.fenixedu.sap.servlet;
 
-import java.util.Collection;
-import java.util.Optional;
-
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.servlet.annotation.WebListener;
-
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
-import org.fenixedu.academic.domain.accounting.AccountingTransaction;
-import org.fenixedu.academic.domain.accounting.Discount;
-import org.fenixedu.academic.domain.accounting.EnrolmentBlocker;
-import org.fenixedu.academic.domain.accounting.Event;
-import org.fenixedu.academic.domain.accounting.EventState;
+import org.fenixedu.academic.domain.accounting.*;
 import org.fenixedu.academic.domain.accounting.EventState.ChangeStateEvent;
-import org.fenixedu.academic.domain.accounting.Exemption;
-import org.fenixedu.academic.domain.accounting.Refund;
 import org.fenixedu.academic.domain.accounting.calculator.DebtExemption;
 import org.fenixedu.academic.domain.accounting.calculator.DebtInterestCalculator;
-import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeAndInsuranceEvent;
 import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeEvent;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEvent;
 import org.fenixedu.academic.domain.accounting.events.insurance.InsuranceEvent;
@@ -32,12 +18,17 @@ import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.signals.DomainObjectEvent;
 import org.fenixedu.bennu.core.signals.Signal;
 import org.joda.time.DateTime;
-
 import pt.ist.fenixedu.domain.SapRequestType;
 import pt.ist.fenixedu.giaf.invoices.EventProcessor;
 import pt.ist.fenixedu.giaf.invoices.SapEvent;
-import pt.ist.fenixframework.Atomic;
+import pt.ist.fenixedu.giaf.invoices.Utils;
 import pt.ist.fenixframework.FenixFramework;
+
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
+import java.util.Collection;
+import java.util.Optional;
 
 @WebListener
 public class FenixEduSapInvoiceContextListener implements ServletContextListener {
@@ -79,12 +70,12 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
                 for (final Event event : scp.getPerson().getEventsSet()) {
                     if (event.getSapRoot() == null) {
                         if (event instanceof InsuranceEvent && ((InsuranceEvent) event).getExecutionYear().isBefore(executionYear)
-                                && event.isOpen()) {
+                                && Utils.isOverDue(event)) {
                             return true;
                         }
                         if (event instanceof AdministrativeOfficeFeeEvent
                                 && ((AdministrativeOfficeFeeEvent) event).getExecutionYear().isBefore(executionYear)
-                                && event.isOpen()) {
+                                && Utils.isOverDue(event)) {
                             return true;
                         }
                     }
@@ -108,7 +99,7 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
 
             final public boolean hasAnyNotPayedGratuityEventsForPreviousYears(final StudentCurricularPlan scp, final ExecutionYear limitExecutionYear) {
                 for (final GratuityEvent gratuityEvent : scp.getGratuityEventsSet()) {
-                    if (gratuityEvent.getSapRoot() == null && gratuityEvent.getExecutionYear().isBefore(limitExecutionYear) && gratuityEvent.isInDebt()) {
+                    if (gratuityEvent.getSapRoot() == null && gratuityEvent.getExecutionYear().isBefore(limitExecutionYear) && Utils.isOverDue(gratuityEvent)) {
                         return true;
                     }
                 }
