@@ -55,11 +55,11 @@ public class BulletCharacteristic extends BulletObject {
          * because some characteristics represent undesirable/erroneous rooms (Antecâmara, Secretariado...)
          * Once sure these rooms are not included then simply return the remaining map values */
         Set<String> present = new HashSet<>();
-        Set<String> remaining = new HashSet<>(patterns.values());
+//        Set<String> remaining = new HashSet<>(patterns.values());
         Iterator<BulletRoom> rooms = context.all(BulletRoom.class).iterator();
-        while (!remaining.isEmpty() || rooms.hasNext()) {
+        while (/*!remaining.isEmpty() || */ rooms.hasNext()) {
             Set<String> c = getCharacteristics(rooms.next().space).collect(Collectors.toSet());
-            remaining.removeAll(c);
+  //          remaining.removeAll(c);
             present.addAll(c);
         }
         return present.stream().map(BulletCharacteristic::new);

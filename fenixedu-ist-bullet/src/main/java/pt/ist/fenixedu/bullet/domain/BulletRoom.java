@@ -1,13 +1,14 @@
 package pt.ist.fenixedu.bullet.domain;
 
-import java.util.LinkedHashMap;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.fenixedu.academic.domain.space.SpaceUtils;
+import org.fenixedu.academic.domain.Lesson;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.spaces.domain.Space;
+import org.fenixedu.spaces.domain.SpaceClassification;
+
+import java.util.LinkedHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class BulletRoom extends BulletSpace {
 
@@ -17,11 +18,37 @@ public class BulletRoom extends BulletSpace {
 
     public static Stream<BulletRoom> all(final DumpContext context) {
         //XXX SpaceUtils forEducation method is user relative
-        User GOPUser = User.findByUsername("ist22986"); // Suzana Visenjou
+        final User GOPUser = User.findByUsername("ist22986"); // Suzana Visenjou
         Authenticate.mock(GOPUser, "Script");
-        Stream<BulletRoom> rooms = SpaceUtils.allocatableSpacesForEducation().filter(s -> s.getAllocatableCapacity() != 0).map(BulletRoom::new);
+/*
+        Stream<BulletRoom> rooms = SpaceUtils.allocatableSpacesForEducation()
+                .filter(s -> s.getAllocatableCapacity() != 0)
+                .filter(s -> isForEducation(s))
+                .map(BulletRoom::new);
+ */
+
+        Stream<BulletRoom> rooms = Stream.of(context.baseSemester.getPreviousExecutionPeriod(), context.baseSemester)
+                .flatMap(es -> es.getAssociatedExecutionCoursesSet().stream())
+                .flatMap(ec -> ec.getCourseLoadsSet().stream())
+                .flatMap(cl -> cl.getShiftsSet().stream())
+                .flatMap(s -> s.getAssociatedLessonsSet().stream())
+                .flatMap(l -> roomStream(l))
+                .distinct()
+                .map(BulletRoom::new);
+
         Authenticate.unmock();
         return rooms;
+    }
+
+    private static Stream<Space> roomStream(final Lesson lesson) {
+        return Stream.concat(lesson.getLessonInstancesSet().stream().map(i -> i.getRoom()).filter(r -> r != null),
+                Stream.of(lesson).map(l -> l.getRoomOccupation()).filter(o -> o != null).map(o -> o.getRoom()));
+    }
+
+    private static boolean isForEducation(final Space space) {
+        final SpaceClassification spaceClassification = space.getClassification();
+        final String code = spaceClassification == null ? null : spaceClassification.getAbsoluteCode();
+        return code != null && (code.startsWith("1.") || code.startsWith("2."));
     }
 
     @Override

@@ -19,7 +19,7 @@ public enum BulletObjectTag {
     COURSE("Disciplina", "Disciplinas", BulletCourse.class, BulletObjectType.CURRICULUM),
     LOAD("CargaSemanal", "CargasSemanais", BulletLoad.class, BulletObjectType.SCHEDULE),
     CLASS("Turma", "Turmas", BulletClass.class, BulletObjectType.ENTITY),
-    NEWCLASS("Turma", "Turmas", NewBulletClass.class, BulletObjectType.ENTITY),
+    //NEWCLASS("Turma", "Turmas", NewBulletClass.class, BulletObjectType.ENTITY),
     
     NAME("Nome"),
     DESCRIPTION("Descricao"),
