@@ -56,13 +56,13 @@ public class BulletPlan extends BulletObject {
     }
 
     protected String getName() {
-        return courseGroup == null ? String.join(" - ", plan.getPresentationName(),
-                semester.getCurricularYear().getYear() + "º Ano",
-                semester.getSemester() + "º Semestre") :
-                String.join(" - ", plan.getPresentationName(),
-                semester.getCurricularYear().getYear() + "º Ano",
-                semester.getSemester() + "º Semestre",
-                courseGroup);
+        return courseGroup == null ? String.join(" - ", plan.getName(),
+                semester.getCurricularYear().getYear().toString(),
+                semester.getSemester().toString()) :
+                String.join(" - ", plan.getName(),
+                    courseGroup,
+                    semester.getCurricularYear().getYear().toString(),
+                    semester.getSemester().toString());
     }
 
     public Stream<ExecutionCourse> getTargetExecutions(final DumpContext context) {

@@ -42,7 +42,8 @@ public enum BulletObjectTag {
     PLAN_CODE("CodigoPlanoCurricular"),
     NUMBER_STUDENTS("NumeroAlunos"),
     MAX_LIMIT("LimiteMaximo"),
-    CONSECUTIVE_LIMIT("LimiteConsecutivo");
+    CONSECUTIVE_LIMIT("LimiteConsecutivo"),
+    ECTS("ECTS");
 
     private String unit, group = null;
     private Class<? extends BulletObject> entity = null;
