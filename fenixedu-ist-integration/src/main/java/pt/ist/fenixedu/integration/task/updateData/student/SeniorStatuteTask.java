@@ -65,7 +65,7 @@ public class SeniorStatuteTask extends CustomTask {
 
     }
 
-    protected ExecutionYear specialSeasonEnrolmentPeriodOpeningSoonForThisYear(Integer howSoon) {
+    static ExecutionYear specialSeasonEnrolmentPeriodOpeningSoonForThisYear(Integer howSoon) {
         Set<EnrolmentPeriod> enrolmentPeriods = Bennu.getInstance().getEnrolmentPeriodsSet();
         Map<DegreeType, ExecutionSemester> fallTermEnrolmentPeriods = new HashMap<DegreeType, ExecutionSemester>();
         Map<DegreeType, ExecutionSemester> springTermEnrolmentPeriods = new HashMap<DegreeType, ExecutionSemester>();
