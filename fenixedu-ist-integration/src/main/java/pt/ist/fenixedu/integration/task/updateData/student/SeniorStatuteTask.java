@@ -18,13 +18,14 @@ import org.fenixedu.academic.domain.degreeStructure.CycleType;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.SeniorStatute;
 import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.bennu.scheduler.CronTask;
 import org.fenixedu.bennu.scheduler.custom.CustomTask;
 import org.fenixedu.commons.i18n.I18N;
 import org.joda.time.LocalDate;
 import org.fenixedu.bennu.scheduler.annotation.Task;
 
 @Task(englishTitle = "Update senior statute 3 weeks before the special season and onwards")
-public class SeniorStatuteTask extends CustomTask {
+public class SeniorStatuteTask extends CronTask {
 
     final static int HOW_MANY_WEEKS_SOONER = 3;
 
