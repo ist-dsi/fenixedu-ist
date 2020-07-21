@@ -183,7 +183,8 @@ public class SapEvent {
                 && requestType != SapRequestType.PAYMENT
                 && requestType != SapRequestType.PAYMENT_INTEREST
                 && requestType != SapRequestType.ADVANCEMENT
-                && requestType != SapRequestType.CREDIT) {
+                && requestType != SapRequestType.CREDIT
+                && requestType != SapRequestType.CLOSE_INVOICE) {
             throw new Error("label.document.type.cannot.be.canceled");
         }
         if (sapRequest.isReferencedByOtherRequest()) {
@@ -207,7 +208,8 @@ public class SapEvent {
         if (requestType == SapRequestType.PAYMENT
                 || requestType == SapRequestType.PAYMENT_INTEREST
                 || requestType == SapRequestType.ADVANCEMENT
-                || requestType == SapRequestType.CREDIT) {
+                || requestType == SapRequestType.CREDIT
+                || requestType == SapRequestType.CLOSE_INVOICE) {
             final JsonObject paymentDocument = jsonAnnulled.get("paymentDocument").getAsJsonObject();
             paymentDocument.addProperty("paymentStatus", "A");
             paymentDocument.addProperty("paymentDate", new DateTime().toString("yyyy-MM-dd HH:mm:ss"));
