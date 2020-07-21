@@ -72,6 +72,10 @@ class student.importation.DgesIngressionTypeMapping {
 	String dgesCode (REQUIRED);
 }
 
+class student.importation.DgesIngressionPassword {
+	String dgesPassword (REQUIRED);
+}
+
 class accounting.events.export.DebtsFile extends .org.fenixedu.academic.domain.File {
     String errors;
 }
@@ -218,6 +222,24 @@ relation DgesStudentImportationProcessCampus {
 relation DgesStudentImportationProcessStudentCandidacy {
     student.importation.DgesStudentImportationProcess playsRole dgesStudentImportationProcess;
     .org.fenixedu.academic.domain.candidacy.StudentCandidacy playsRole studentCandidacy {
+        multiplicity *;
+    }
+}
+
+relation DgesIngressionPasswordStudentCandidacy {
+    student.importation.DgesIngressionPassword playsRole dgesIngressionPassword {
+        multiplicity 0..1;
+    }
+    .org.fenixedu.academic.domain.candidacy.StudentCandidacy playsRole studentCandidacy {
+        multiplicity 1..1;
+    }
+}
+
+relation BennuDgesIngressionPassword {
+    .org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject {
+        multiplicity 1..1;
+    }
+    student.importation.DgesIngressionPassword playsRole dgesIngressionPassword {
         multiplicity *;
     }
 }

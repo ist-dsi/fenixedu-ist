@@ -266,6 +266,8 @@ public class DgesStudentImportationProcess extends DgesStudentImportationProcess
         candidacy.setFirstTimeCandidacy(true);
         createPrecedentDegreeInformation(candidacy, degreeCandidateDTO, highSchoolCache);
         candidacy.setDgesStudentImportationProcess(this);
+        DgesIngressionPassword ingressionPassword = new DgesIngressionPassword(degreeCandidateDTO.getDgesPassword());
+        candidacy.setDgesIngressionPassword(ingressionPassword);
 
         return candidacy;
     }
