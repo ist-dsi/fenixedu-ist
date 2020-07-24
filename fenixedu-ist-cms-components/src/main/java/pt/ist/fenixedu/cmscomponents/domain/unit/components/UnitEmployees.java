@@ -22,6 +22,7 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 
+import java.util.Objects;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -30,12 +31,12 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
-import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.cms.domain.Page;
 import org.fenixedu.cms.domain.component.ComponentType;
 import org.fenixedu.cms.rendering.TemplateContext;
 
 import pt.ist.fenixedu.contracts.domain.Employee;
+import pt.ist.fenixedu.contracts.domain.accessControl.ActiveEmployees;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -43,7 +44,7 @@ import com.google.common.collect.Sets;
 @ComponentType(name = "Unit Employees", description = "Unit employees that are not teachers")
 public class UnitEmployees extends UnitSiteComponent {
 
-    private Predicate<Employee> isTeacher = employee -> RoleType.TEACHER.isMember(employee.getPerson().getUser());
+    private Predicate<Employee> isEmployee = employee -> new ActiveEmployees().isMember(employee.getPerson().getUser());
     private static Predicate<Employee> hasWorkingPlace = employee -> employee.getCurrentWorkingPlace() != null;
     private static Supplier<TreeMap<Unit, TreeSet<Employee>>> mapFactory = () -> Maps.newTreeMap(Unit.COMPARATOR_BY_NAME_AND_ID
             .reversed());
@@ -68,7 +69,8 @@ public class UnitEmployees extends UnitSiteComponent {
     }
 
     private Stream<Employee> activeNonTeacherEmployeesStream(Unit unit) {
-        return Employee.getAllCurrentActiveWorkingEmployees(unit).stream().filter(isTeacher.negate());
+		return Employee.getAllCurrentActiveWorkingEmployees(unit).stream()
+				.filter(Objects::nonNull).filter(isEmployee);
     }
 
 }
