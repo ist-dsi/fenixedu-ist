@@ -58,23 +58,6 @@ public class SetFirstCycleFinalistStatus extends CronTask {
                 });
     }
 
-    private void delete(StudentStatute s) {
-        s.setBeginExecutionPeriod(null);
-        s.setEndExecutionPeriod(null);
-        s.setStudent(null);
-        s.setType(null);
-        s.setRootDomainObject(null);
-        try {
-            final Method deletedMethod =
-                    s.getClass().getSuperclass().getSuperclass().getDeclaredMethod("deleteDomainObject");
-            deletedMethod.setAccessible(true);
-            deletedMethod.invoke(s);
-        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
-                | InvocationTargetException e) {
-            throw new DomainException("error.curriculum.validation.cannot.delete.enrolment.evaluation", e.getLocalizedMessage());
-        }
-    }
-
     private boolean hasStatus(final StatuteType statuteType, final Registration registration) {
         return registration.getStudent().getStudentStatutesSet().stream()
                 .filter(statute -> statute.getType().getCode().equals(statuteType.getCode()))
@@ -99,18 +82,6 @@ public class SetFirstCycleFinalistStatus extends CronTask {
                 final double limitedEnrolledCredits = Math.min(enrolledCredits, 15d);
 
                 return aprovedCredits < creditsToCompleteCycle && (aprovedCredits + limitedEnrolledCredits) >= creditsToCompleteCycle;
-            }
-        }
-        return false;
-    }
-
-    private boolean hasSecondCycleEnrolments(final Registration registration, final ExecutionYear executionYear) {
-        final StudentCurricularPlan studentCurricularPlan = registration.getLastStudentCurricularPlan();
-        if (studentCurricularPlan != null) {
-            final CycleCurriculumGroup secondCycle = studentCurricularPlan.getSecondCycle();
-            if (secondCycle != null) {
-                return secondCycle.getCurriculumLineStream()
-                        .anyMatch(cl -> !cl.isApproved() && cl.getExecutionPeriod().getExecutionYear().isCurrent());
             }
         }
         return false;
