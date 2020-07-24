@@ -105,12 +105,15 @@ public class DegreeCandidateDTO {
 
     private String istUniversity;
 
+    private String dgesPassword;
+
     @Override
     public String toString() {
         final StringBuilder result = new StringBuilder();
         printField(result, "Degree Code", this.degreeCode);
         printField(result, "Document ID", this.documentIdNumber);
         printField(result, "Document Check Digit", this.documentCheckDigit);
+        printField(result, "Dges Password", this.dgesPassword);
         printField(result, "Name", this.name);
         printField(result, "Address", this.address);
         printField(result, "Area Code", this.areaCode);
@@ -147,7 +150,7 @@ public class DegreeCandidateDTO {
      * EstabCol(0)	CursoCol (cods old)(1)	NumBI(2)	LocBI(3)	Descr loc BI(4)	Check Digit(5)	Nome(6)	Morada1(7)	
      * Morada2(8)	Codpos(9)	Codpos3(10)	CodLocal(11)	Telefone(12)	Sexo(13)	DataNasc(dd-MMM-yy)(14)	
      * Conting(15)	PrefCol (op ingresso)(16)	EtapCol(17)	Media12(18)	NotaCand(19)	cod_escola_sec(20)	
-     * escola_sec(21)	tipo_estab_sec(22)	curso_secundario(23)
+     * escola_sec(21)	tipo_estab_sec(22)	curso_secundario(23) Senha_DGES(24)
      *</pre>
      *
      * @param dataLine
@@ -180,6 +183,7 @@ public class DegreeCandidateDTO {
         this.highSchoolName = fields[21].trim();
         this.highSchoolType = parseHighSchoolType(fields[22].trim());
         this.highSchoolDegreeDesignation = fields[23].trim();
+        this.dgesPassword = fields[24].trim();
 
         return true;
     }
@@ -365,6 +369,14 @@ public class DegreeCandidateDTO {
 
     public void setIstUniversity(String istUniversity) {
         this.istUniversity = istUniversity;
+    }
+
+    public String getDgesPassword() {
+        return dgesPassword;
+    }
+
+    public void setDgesPassword(String dgesPassword) {
+        this.dgesPassword = dgesPassword;
     }
 
     public Person getMatchingPerson() throws MatchingPersonException {
