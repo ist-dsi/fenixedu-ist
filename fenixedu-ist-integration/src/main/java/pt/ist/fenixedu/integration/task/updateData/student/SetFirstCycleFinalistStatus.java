@@ -1,7 +1,9 @@
-package pt.ist.fenixedu.integration.task.updateData.student;
+package pt.ist.fenix.webapp;
 
+import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
+import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.StatuteType;
 import org.fenixedu.academic.domain.student.StudentStatute;
@@ -12,12 +14,16 @@ import org.fenixedu.bennu.scheduler.CronTask;
 import org.fenixedu.bennu.scheduler.annotation.Task;
 import org.fenixedu.bennu.scheduler.custom.CustomTask;
 import org.fenixedu.commons.i18n.LocalizedString;
+import org.fenixedu.commons.spreadsheet.Spreadsheet;
 
+import java.io.ByteArrayOutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.Locale;
 import java.util.function.Supplier;
 
-@Task(englishTitle = "Set First Cycle Finalists for Integrated Degrees")
+@Task(englishTitle = "Aoto set first cycle finalist statute for integrated degrees")
 public class SetFirstCycleFinalistStatus extends CronTask {
 
     private static final Locale PT = new Locale("pt");
@@ -36,26 +42,43 @@ public class SetFirstCycleFinalistStatus extends CronTask {
 
     @Override
     public void runTask() throws Exception {
-        ExecutionYear subjectYear = SeniorStatuteTask.specialSeasonEnrolmentPeriodOpeningSoonForThisYear(SeniorStatuteTask.HOW_MANY_WEEKS_SOONER);
-        if (subjectYear != null) {
-            final StatuteType statuteType = Singleton.getInstance(GETTER, CREATOR);
-            final ExecutionYear executionYear = ExecutionYear.readCurrentExecutionYear();
-            Bennu.getInstance().getDegreesSet().stream()
-                    .filter(d -> d.getDegreeType().isIntegratedMasterDegree())
-                    .flatMap(d -> d.getRegistrationsSet().stream())
-                    .filter(r -> r.isActive())
-                    .filter(r -> !hasStatus(statuteType, r))
-                    .filter(r -> canCompleteFirstCycle(r, executionYear))
-                    .peek(r -> taskLog("Creating statute for: %s%n", r.getStudent().getPerson().getUser().getUsername()))
-                    .forEach(r -> new StudentStatute(r.getStudent(), statuteType, executionYear.getFirstExecutionPeriod(),
-                            executionYear.getLastExecutionPeriod()));
+        final StatuteType statuteType = Singleton.getInstance(GETTER, CREATOR);
+        final ExecutionYear executionYear = ExecutionYear.readCurrentExecutionYear();
+        final ExecutionSemester executionSemester = ExecutionSemester.readActualExecutionSemester();
+
+        Bennu.getInstance().getDegreesSet().stream()
+                .filter(d -> d.getDegreeType().isIntegratedMasterDegree())
+                .flatMap(d -> d.getRegistrationsSet().stream())
+                .filter(r -> r.isActive())
+                .filter(r -> !hasStatus(statuteType, r))
+                .filter(r -> canCompleteFirstCycle(r, executionYear))
+                .forEach(r -> {
+                    new StudentStatute(r.getStudent(), statuteType, executionYear.getFirstExecutionPeriod(),
+                            executionYear.getLastExecutionPeriod());
+                });
+    }
+
+    private void delete(StudentStatute s) {
+        s.setBeginExecutionPeriod(null);
+        s.setEndExecutionPeriod(null);
+        s.setStudent(null);
+        s.setType(null);
+        s.setRootDomainObject(null);
+        try {
+            final Method deletedMethod =
+                    s.getClass().getSuperclass().getSuperclass().getDeclaredMethod("deleteDomainObject");
+            deletedMethod.setAccessible(true);
+            deletedMethod.invoke(s);
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException e) {
+            throw new DomainException("error.curriculum.validation.cannot.delete.enrolment.evaluation", e.getLocalizedMessage());
         }
     }
 
     private boolean hasStatus(final StatuteType statuteType, final Registration registration) {
         return registration.getStudent().getStudentStatutesSet().stream()
-                .filter(statute -> statute.getType() == statuteType)
-                .anyMatch(statute -> statute.getBeginExecutionPeriod().isCurrent() || statute.getBeginExecutionPeriod().isCurrent());
+                .filter(statute -> statute.getType().getCode().equals(statuteType.getCode()))
+                .anyMatch(statute -> statute.getBeginExecutionPeriod().isCurrent() || statute.getEndExecutionPeriod().isCurrent());
     }
 
     private boolean canCompleteFirstCycle(final Registration registration, final ExecutionYear executionYear) {
@@ -73,8 +96,21 @@ public class SetFirstCycleFinalistStatus extends CronTask {
                         .filter(cl -> !cl.isApproved() && cl.getExecutionPeriod().getExecutionYear().isCurrent())
                         .map(cl -> cl.getEctsCreditsForCurriculum())
                         .reduce(BigDecimal.ZERO, BigDecimal::add).doubleValue();
+                final double limitedEnrolledCredits = Math.min(enrolledCredits, 15d);
 
-                return aprovedCredits < creditsToCompleteCycle && (aprovedCredits + enrolledCredits) >= creditsToCompleteCycle;
+                return aprovedCredits < creditsToCompleteCycle && (aprovedCredits + limitedEnrolledCredits) >= creditsToCompleteCycle;
+            }
+        }
+        return false;
+    }
+
+    private boolean hasSecondCycleEnrolments(final Registration registration, final ExecutionYear executionYear) {
+        final StudentCurricularPlan studentCurricularPlan = registration.getLastStudentCurricularPlan();
+        if (studentCurricularPlan != null) {
+            final CycleCurriculumGroup secondCycle = studentCurricularPlan.getSecondCycle();
+            if (secondCycle != null) {
+                return secondCycle.getCurriculumLineStream()
+                        .anyMatch(cl -> !cl.isApproved() && cl.getExecutionPeriod().getExecutionYear().isCurrent());
             }
         }
         return false;
