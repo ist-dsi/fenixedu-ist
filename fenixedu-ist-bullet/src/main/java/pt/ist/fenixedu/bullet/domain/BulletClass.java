@@ -1,7 +1,6 @@
 package pt.ist.fenixedu.bullet.domain;
 
-import org.fenixedu.academic.domain.ExecutionSemester;
-import org.fenixedu.academic.domain.SchoolClass;
+import org.fenixedu.academic.domain.*;
 
 import java.util.LinkedHashMap;
 import java.util.stream.Stream;
@@ -23,12 +22,31 @@ public class BulletClass extends BulletObject {
     }
 
     private static int numberOfStudentsInClass(final SchoolClass schoolClass) {
-        final long numbberOfStudents = schoolClass.getAssociatedShiftsSet().stream()
-                .flatMap(shift -> shift.getShiftEnrolmentsSet().stream())
-                .map(shiftEnrolment -> shiftEnrolment.getRegistration().getStudent())
+        final int numbberOfStudents = schoolClass.getAssociatedShiftsSet().stream()
+                .filter(shift -> !shift.getTypes().contains(ShiftType.TEORICA))
+                .mapToInt(shift -> Math.round(factorFor(schoolClass, shift) * Math.abs(shift.getLotacao().intValue())))
+                .filter(capacity -> capacity > 0)
+                .min().orElse(0);
+        return numbberOfStudents;
+    }
+
+    private static float factorFor(final SchoolClass schoolClass, final Shift shift) {
+        final int otherStudentCount = shift.getAssociatedClassesSet().stream()
+                .map(someClass -> someClass.getExecutionDegree())
                 .distinct()
-                .count();
-        return Math.toIntExact(numbberOfStudents);
+                .filter(executionDegree -> executionDegree != schoolClass.getExecutionDegree())
+                .mapToInt(executionDegree -> studentCount(executionDegree))
+                .sum();
+        final int studentCount = studentCount(schoolClass.getExecutionDegree());
+        return otherStudentCount == 0 ? 1 : studentCount == 0 ? 0 : (studentCount / (studentCount + otherStudentCount));
+    }
+
+    private static int studentCount(final ExecutionDegree executionDegree) {
+        final DegreeCurricularPlan dcp = executionDegree.getDegreeCurricularPlan();
+        return Math.toIntExact(dcp.getStudentCurricularPlansSet().stream()
+                .map(scp -> scp.getRegistration())
+                .filter(r -> r.isActive())
+                .count());
     }
 
     public static Stream<BulletClass> all(final DumpContext context) {

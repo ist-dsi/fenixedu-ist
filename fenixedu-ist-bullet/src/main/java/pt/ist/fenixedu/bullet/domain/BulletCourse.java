@@ -46,7 +46,7 @@ public class BulletCourse extends BulletObject {
 
     private String creditsFor(final ExecutionCourse course) {
         try {
-            return course.getEctsCredits().toString();
+            return course.getEctsCredits() == null ? "0" : course.getEctsCredits().toString();
         } catch (final DomainException ex) {
             return "Data is not consistent";
         }
