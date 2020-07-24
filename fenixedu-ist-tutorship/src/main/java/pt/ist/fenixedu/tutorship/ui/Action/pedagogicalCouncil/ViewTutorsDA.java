@@ -86,6 +86,7 @@ public class ViewTutorsDA extends FenixDispatchAction {
         spreadsheet.newHeaderRow();
         spreadsheet.addHeader("Tutor-Username");
         spreadsheet.addHeader("Tutor-Nome", 12500);
+        spreadsheet.addHeader("Tutor-Email");
         spreadsheet.addHeader("Tutorando-Nº");
         spreadsheet.addHeader("Tutorando-Nome", 12500);
         spreadsheet.addHeader("Tutorando-Telemóvel", 7000);
@@ -97,6 +98,7 @@ public class ViewTutorsDA extends FenixDispatchAction {
                     spreadsheet.newRow();
                     spreadsheet.addCell(tutorshipIntention.getTeacher().getPerson().getUsername());
                     spreadsheet.addCell(tutorshipIntention.getTeacher().getPerson().getName());
+                    spreadsheet.addCell(tutorshipIntention.getTeacher().getPerson().getEmailForSendingEmails());
                     spreadsheet.addCell(tutorship.getStudent().getNumber());
                     spreadsheet.addCell(tutorship.getStudent().getName());
                     spreadsheet.addCell(tutorship.getStudent().getPerson().getDefaultMobilePhoneNumber());
@@ -107,6 +109,7 @@ public class ViewTutorsDA extends FenixDispatchAction {
                 spreadsheet.newRow();
                 spreadsheet.addCell(tutorshipIntention.getTeacher().getPerson().getUsername());
                 spreadsheet.addCell(tutorshipIntention.getTeacher().getPerson().getName());
+                spreadsheet.addCell(tutorshipIntention.getTeacher().getPerson().getEmailForSendingEmails());
             }
         }
 
@@ -134,6 +137,7 @@ public class ViewTutorsDA extends FenixDispatchAction {
         spreadsheet.newHeaderRow();
         spreadsheet.addHeader("Tutor-Username");
         spreadsheet.addHeader("Tutor-Nome", 12500);
+        spreadsheet.addHeader("Tutor-Email");
         spreadsheet.addHeader("Curso", 17000);
         spreadsheet.addHeader("Tutorando-Nº");
         spreadsheet.addHeader("Tutorando-Nome", 12500);
@@ -149,6 +153,7 @@ public class ViewTutorsDA extends FenixDispatchAction {
                         spreadsheet.newRow();
                         spreadsheet.addCell(tutorshipIntention.getTeacher().getPerson().getUsername());
                         spreadsheet.addCell(tutorshipIntention.getTeacher().getPerson().getName());
+                        spreadsheet.addCell(tutorshipIntention.getTeacher().getPerson().getEmailForSendingEmails());
                         spreadsheet.addCell(degreeName);
                         spreadsheet.addCell(tutorship.getStudent().getNumber());
                         spreadsheet.addCell(tutorship.getStudent().getName());
@@ -160,6 +165,7 @@ public class ViewTutorsDA extends FenixDispatchAction {
                     spreadsheet.newRow();
                     spreadsheet.addCell(tutorshipIntention.getTeacher().getPerson().getUsername());
                     spreadsheet.addCell(tutorshipIntention.getTeacher().getPerson().getName());
+                    spreadsheet.addCell(tutorshipIntention.getTeacher().getPerson().getEmailForSendingEmails());
                     spreadsheet.addCell(degreeName);
                 }
             }
