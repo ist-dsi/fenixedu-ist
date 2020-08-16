@@ -1713,4 +1713,11 @@ public class SapEvent {
         return sapRequest;
     }
 
+    @Atomic
+    public void resendSapRequest(final ErrorLogConsumer errorLogConsumer, final EventLogger elogger, final SapRequest sapRequest) {
+        sapRequest.setIntegrated(false);
+        sapRequest.getSapDocumentFile().setSapRequest(null);
+        processPendingRequests(sapRequest, errorLogConsumer, elogger);
+    }
+
 }

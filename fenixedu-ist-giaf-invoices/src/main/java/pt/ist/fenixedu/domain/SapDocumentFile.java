@@ -23,6 +23,7 @@ public class SapDocumentFile extends SapDocumentFile_Base {
     @Override
     public void delete() {
         setSapRequest(null);
+        setSapRequestFromAll(null);
         super.delete();
     }
 }
