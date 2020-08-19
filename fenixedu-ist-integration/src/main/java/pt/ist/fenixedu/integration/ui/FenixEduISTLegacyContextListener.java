@@ -18,31 +18,27 @@
  */
 package pt.ist.fenixedu.integration.ui;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.servlet.annotation.WebListener;
-
+import com.google.common.base.CharMatcher;
+import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 import org.fenixedu.PostalCodeValidator;
-import org.fenixedu.academic.domain.*;
+import org.fenixedu.TINValidator;
+import org.fenixedu.academic.domain.Country;
+import org.fenixedu.academic.domain.CurricularCourse;
+import org.fenixedu.academic.domain.DegreeCurricularPlan;
+import org.fenixedu.academic.domain.Enrolment;
+import org.fenixedu.academic.domain.ExecutionCourse;
+import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.OccupationPeriod;
+import org.fenixedu.academic.domain.OccupationPeriodType;
+import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.StudentCurricularPlan;
+import org.fenixedu.academic.domain.Summary;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.VatNumberResolver;
 import org.fenixedu.academic.domain.accounting.events.AccountingEventsManager;
 import org.fenixedu.academic.domain.accounting.events.AnnualEvent;
+import org.fenixedu.academic.domain.candidacy.DegreeCandidacy;
 import org.fenixedu.academic.domain.candidacy.workflow.RegistrationOperation.RegistrationCreatedByCandidacy;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
 import org.fenixedu.academic.domain.degreeStructure.Context;
@@ -69,10 +65,6 @@ import org.fenixedu.bennu.spring.BennuSpringContextHelper;
 import org.fenixedu.cms.domain.CMSFolder;
 import org.fenixedu.cms.domain.Category;
 import org.fenixedu.cms.domain.Site;
-
-import com.google.common.base.CharMatcher;
-import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 import org.fenixedu.idcards.domain.SantanderEntry;
 import org.fenixedu.idcards.exception.SantanderCardNoPermissionException;
 import org.fenixedu.idcards.notifications.CardNotifications;
@@ -92,7 +84,24 @@ import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
 import pt.ist.fenixframework.FenixFramework;
 import pt.ist.fenixframework.dml.runtime.RelationAdapter;
-import org.fenixedu.TINValidator;
+
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @WebListener
 public class FenixEduISTLegacyContextListener implements ServletContextListener {
@@ -339,6 +348,9 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
         DegreeCurricularPlan.RESET_DEGREE_CURRICULAR_PLAN_FUNCTION = (dcp) -> {
             DegreeStructureForIST.resetDegreeCurricularPlan(dcp);
         };
+
+        DegreeCandidacy.PASSWORD_FOR_IDENTITY_VALIDATION = candidacy -> candidacy.getDgesIngressionPassword() == null
+                ? null : candidacy.getDgesIngressionPassword().getDgesPassword();
     }
 
     private static boolean isValidPostCode(final String postalCode) {
