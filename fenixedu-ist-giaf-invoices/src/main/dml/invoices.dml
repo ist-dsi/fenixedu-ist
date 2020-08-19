@@ -84,11 +84,20 @@ relation SapRequestPayment {
         
 relation SapRequestSapDocumentFile {
 	SapRequest playsRole sapRequest {
-	    multiplicity 1..1;
+	    multiplicity 0..1;
     }
     SapDocumentFile playsRole sapDocumentFile {
     	multiplicity 0..1;
     }	
+}
+
+relation SapRequestAllSapDocumentFile {
+	SapRequest playsRole sapRequestFromAll {
+	    multiplicity 1..1;
+    }
+    SapDocumentFile playsRole allSapDocumentFile {
+    	multiplicity *;
+    }
 }
 
 relation SapRootBennu {
