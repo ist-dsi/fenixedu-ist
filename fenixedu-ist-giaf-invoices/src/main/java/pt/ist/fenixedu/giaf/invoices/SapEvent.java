@@ -929,8 +929,8 @@ public class SapEvent {
                     JsonObject docResult =
                             SapFinantialClient.getDocument(sapDocumentNumber, data.get("taxRegistrationNumber").getAsString());
                     if (docResult.get("status").getAsString().equalsIgnoreCase("S")) {
-                        sapRequest.setSapDocumentFile(new SapDocumentFile(sanitize(sapDocumentNumber) + ".pdf",
-                                Base64.getDecoder().decode(docResult.get("documentBase64").getAsString())));
+                        new SapDocumentFile(sapRequest,sanitize(sapDocumentNumber) + ".pdf",
+                                Base64.getDecoder().decode(docResult.get("documentBase64").getAsString()));
                     }
                 }
 
