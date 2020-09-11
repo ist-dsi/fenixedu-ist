@@ -18,13 +18,30 @@
  */
 package pt.ist.fenixedu.integration.ui;
 
-import com.google.common.base.CharMatcher;
-import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
+
 import org.fenixedu.PostalCodeValidator;
 import org.fenixedu.TINValidator;
 import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.CurricularCourse;
+import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.ExecutionCourse;
@@ -40,6 +57,8 @@ import org.fenixedu.academic.domain.accounting.events.AccountingEventsManager;
 import org.fenixedu.academic.domain.accounting.events.AnnualEvent;
 import org.fenixedu.academic.domain.candidacy.DegreeCandidacy;
 import org.fenixedu.academic.domain.candidacy.workflow.RegistrationOperation.RegistrationCreatedByCandidacy;
+import org.fenixedu.academic.domain.candidacyProcess.IndividualCandidacy;
+import org.fenixedu.academic.domain.candidacyProcess.IndividualCandidacyPersonalDetails;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
 import org.fenixedu.academic.domain.degreeStructure.Context;
 import org.fenixedu.academic.domain.enrolment.DegreeModuleToEnrol;
@@ -55,6 +74,10 @@ import org.fenixedu.academic.thesis.domain.StudentThesisCandidacy;
 import org.fenixedu.academic.thesis.ui.service.ThesisProposalsService;
 import org.fenixedu.academic.ui.struts.action.candidate.degree.DegreeCandidacyManagementDispatchAction;
 import org.fenixedu.academic.util.Bundle;
+import org.fenixedu.admissions.domain.AdmissionProcess;
+import org.fenixedu.admissions.domain.AdmissionsSystem;
+import org.fenixedu.admissions.domain.Application;
+import org.fenixedu.admissions.domain.Candidate;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
@@ -69,10 +92,20 @@ import org.fenixedu.idcards.domain.SantanderEntry;
 import org.fenixedu.idcards.exception.SantanderCardNoPermissionException;
 import org.fenixedu.idcards.notifications.CardNotifications;
 import org.fenixedu.idcards.service.SantanderIdCardsService;
+import org.fenixedu.identity.domain.Identity;
+import org.fenixedu.messaging.core.domain.Message;
+import org.fenixedu.messaging.core.template.DeclareMessageTemplate;
+import org.fenixedu.messaging.core.template.TemplateParameter;
 import org.fenixedu.santandersdk.exception.SantanderMissingInformationException;
 import org.fenixedu.santandersdk.exception.SantanderValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.CharMatcher;
+import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
+import com.google.gson.JsonObject;
+
 import pt.ist.fenixedu.giaf.invoices.ClientMap;
 import pt.ist.fenixedu.giaf.invoices.Utils;
 import pt.ist.fenixedu.integration.domain.academic.DegreeStructureForIST;
@@ -85,23 +118,41 @@ import pt.ist.fenixframework.Atomic.TxMode;
 import pt.ist.fenixframework.FenixFramework;
 import pt.ist.fenixframework.dml.runtime.RelationAdapter;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.servlet.annotation.WebListener;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+@DeclareMessageTemplate(
+        id = "candidacy.external.alameda.accepted.email",
+        bundle = "resources.CancidacyResources",
+        description = "candidacy.external.alameda.accepted.email.description",
+        subject = "candidacy.external.alameda.accepted.email.subject",
+        text = "candidacy.external.alameda.accepted.email.body",
+        parameters = {
+                @TemplateParameter(id = "name", description = "candidacy.external.alameda.accepted.name"),
+                @TemplateParameter(id = "gender", description = "candidacy.external.alameda.accepted.gender")
+        }
+)
+
+@DeclareMessageTemplate(
+        id = "candidacy.external.tagus.accepted.email",
+        bundle = "resources.CancidacyResources",
+        description = "candidacy.external.tagus.accepted.email.description",
+        subject = "candidacy.external.tagus.accepted.email.subject",
+        text = "candidacy.external.tagus.accepted.email.body",
+        parameters = {
+                @TemplateParameter(id = "name", description = "candidacy.external.tagus.accepted.name"),
+                @TemplateParameter(id = "gender", description = "candidacy.external.tagus.accepted.gender")
+        }
+)
+
+@DeclareMessageTemplate(
+        id = "candidacy.internal.accepted.email",
+        bundle = "resources.CancidacyResources",
+        description = "candidacy.internal.accepted.email.description",
+        subject = "candidacy.internal.accepted.email.subject",
+        text = "candidacy.internal.accepted.email.body",
+        parameters = {
+                @TemplateParameter(id = "name", description = "candidacy.internal.accepted.name"),
+                @TemplateParameter(id = "gender", description = "candidacy.internal.accepted.gender")
+        }
+)
 
 @WebListener
 public class FenixEduISTLegacyContextListener implements ServletContextListener {
@@ -351,8 +402,100 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
 
         DegreeCandidacy.PASSWORD_FOR_IDENTITY_VALIDATION = candidacy -> candidacy.getDgesIngressionPassword() == null
                 ? null : candidacy.getDgesIngressionPassword().getDgesPassword();
+        
+        
+        Signal.register(IndividualCandidacy.ACCEPTED,
+                (Consumer<IndividualCandidacy>) candidacy -> {
+                    if (!isExternal(candidacy)) {
+                        //enviar mail para aluno IST
+                        sendInternalEmail(candidacy);
+                    } else {
+                        //enviar mail candidato externo
+                        sendExternalEmail(candidacy);
+                        
+                        AdmissionProcess admissionProcessAlameda = AdmissionsSystem.getInstance().getAdmissionProcessSet().stream()
+                                .filter(ap -> ap.getTitle().getContent().contains("Alameda"))
+                                .findAny().get();
+                        AdmissionProcess admissionProcessTagus = AdmissionsSystem.getInstance().getAdmissionProcessSet().stream()
+                                .filter(ap -> ap.getTitle().getContent().contains("Tagus"))
+                                .findAny().get();
+                        createApplication(candidacy, admissionProcessAlameda, admissionProcessTagus);
+                    }
+                });
     }
 
+    private void sendExternalEmail(IndividualCandidacy candidacy) {
+        if (isAlamedaCampus(candidacy)) {
+            sendMail(candidacy, "candidacy.external.alameda.accepted.email"); 
+        } else {
+            sendMail(candidacy, "candidacy.external.tagus.accepted.email"); 
+        }
+    }
+
+    private void sendInternalEmail(IndividualCandidacy candidacy) {
+           sendMail(candidacy, "candidacy.internal.accepted.email");
+    }
+
+    private void sendMail(IndividualCandidacy candidacy, String template) {
+        final Message message = Message.fromSystem()
+                .singleTos(candidacy.getPersonalDetails().getEmail())
+                .template(template)
+                .parameter("name", candidacy.getPersonalDetails().getPerson().getName())
+                .parameter("gender", candidacy.getPersonalDetails().getPerson().getGender().name())
+                .and()
+                .wrapped().send();     
+    }
+    
+    private void createApplication(IndividualCandidacy candidacy, AdmissionProcess admissionProcessAlameda, AdmissionProcess admissionProcessTagus) {
+        Candidate candidate = getCandidate(candidacy.getPersonalDetails());
+        if (candidate != null && !hasApplication(candidate.getIdentity(), candidacy)) {            
+            candidacy.getAllDegrees()
+                .forEach(degree -> {
+                    if (degree.getCampus(ExecutionYear.readCurrentExecutionYear()).stream().anyMatch(c -> c.getName().contains("Alameda"))) {                        
+                        createApplicationFor(admissionProcessAlameda, candidate, degree, candidacy);   
+                    } else {
+                        createApplicationFor(admissionProcessTagus, candidate, degree, candidacy);
+                    }
+                });
+        }       
+    }
+    
+    private void createApplicationFor(final AdmissionProcess admissionProcess, final Candidate candidate, Degree degree, IndividualCandidacy candidacy) {
+        final JsonObject data = new JsonObject();
+        data.addProperty("type", "Registration");
+        data.addProperty("title", degree.getPresentationName());
+        data.addProperty("degreeId", degree.getExternalId());
+        data.addProperty("candidacyId", candidacy.getExternalId());
+        data.addProperty("candidacyType", IndividualCandidacy.class.getName());
+        new Application(candidate, admissionProcess, data.toString());
+    }
+
+    private boolean isAlamedaCampus(IndividualCandidacy candidacy) {
+        return candidacy.getAllDegrees().stream()
+            .anyMatch(degree -> degree.getCampus(ExecutionYear.readCurrentExecutionYear()).stream().anyMatch(c -> c.getName().contains("Alameda")));
+    }
+    
+    private boolean hasApplication(Identity identity, IndividualCandidacy candidacy) {
+        return identity.getCandidateSet().stream()                
+                .flatMap(c -> c.getApplicationSet().stream())
+                .map(app -> app.get("candidacyId"))
+                .anyMatch(id -> candidacy.getExternalId().equals(id));
+    }
+    
+    private Candidate getCandidate(IndividualCandidacyPersonalDetails personalDetails) {
+        Identity identity = personalDetails.getPerson().getIdentity();
+        Candidate candidate = null;
+        if (identity != null) {
+            candidate = identity.getCandidateSet().stream()
+                .findAny().orElse(null);
+        }
+        return candidate;        
+    }
+    
+    private boolean isExternal(IndividualCandidacy candidacy) {
+        return candidacy.getPersonalDetails().getPerson().getStudent() == null;        
+    }
+    
     private static boolean isValidPostCode(final String postalCode) {
         if (postalCode != null) {
             final String v = postalCode.trim();
