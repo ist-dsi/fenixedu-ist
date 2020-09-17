@@ -18,15 +18,49 @@
  */
 package pt.ist.fenixedu.integration.api;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.URLDecoder;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+import com.google.common.base.Charsets;
+import com.google.common.base.Strings;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+import org.fenixedu.academic.domain.Degree;
+import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.Photograph;
+import org.fenixedu.academic.domain.Teacher;
+import org.fenixedu.academic.domain.contacts.PhysicalAddress;
+import org.fenixedu.academic.domain.degreeStructure.CycleType;
+import org.fenixedu.academic.domain.degreeStructure.ProgramConclusion;
+import org.fenixedu.academic.domain.organizationalStructure.Party;
+import org.fenixedu.academic.domain.organizationalStructure.Unit;
+import org.fenixedu.academic.domain.person.RoleType;
+import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
+import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcessNumber;
+import org.fenixedu.academic.domain.phd.PhdProgramProcessDocument;
+import org.fenixedu.academic.domain.phd.thesis.PhdThesisProcess;
+import org.fenixedu.academic.domain.photograph.PictureMode;
+import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.academic.domain.student.Student;
+import org.fenixedu.academic.domain.student.curriculum.ConclusionProcess;
+import org.fenixedu.academic.domain.studentCurriculum.CycleCurriculumGroup;
+import org.fenixedu.academic.domain.thesis.Thesis;
+import org.fenixedu.academic.dto.student.RegistrationConclusionBean;
+import org.fenixedu.academic.util.ContentType;
+import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.core.domain.UserProfile;
+import org.fenixedu.bennu.core.groups.Group;
+import org.fenixedu.bennu.io.servlet.FileDownloadServlet;
+import org.fenixedu.commons.stream.StreamUtils;
+import org.joda.time.LocalDate;
+import org.joda.time.YearMonthDay;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import pt.ist.fenixedu.contracts.domain.Employee;
+import pt.ist.fenixedu.contracts.domain.accessControl.ActiveEmployees;
+import pt.ist.fenixedu.contracts.domain.organizationalStructure.ResearchUnit;
+import pt.ist.fenixframework.Atomic;
+import pt.ist.fenixframework.Atomic.TxMode;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -42,51 +76,15 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-
-import org.fenixedu.academic.domain.Degree;
-import org.fenixedu.academic.domain.ExecutionYear;
-import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.Photograph;
-import org.fenixedu.academic.domain.Teacher;
-import org.fenixedu.academic.domain.contacts.PhysicalAddress;
-import org.fenixedu.academic.domain.degreeStructure.CycleType;
-import org.fenixedu.academic.domain.degreeStructure.ProgramConclusion;
-import org.fenixedu.academic.domain.organizationalStructure.Party;
-import org.fenixedu.academic.domain.organizationalStructure.Unit;
-import org.fenixedu.academic.domain.person.RoleType;
-import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
-import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcessNumber;
-import org.fenixedu.academic.domain.photograph.PictureMode;
-import org.fenixedu.academic.domain.student.Registration;
-import org.fenixedu.academic.domain.student.Student;
-import org.fenixedu.academic.domain.student.curriculum.ConclusionProcess;
-import org.fenixedu.academic.domain.studentCurriculum.CycleCurriculumGroup;
-import org.fenixedu.academic.domain.thesis.Thesis;
-import org.fenixedu.academic.dto.student.RegistrationConclusionBean;
-import org.fenixedu.academic.util.ContentType;
-import org.fenixedu.commons.i18n.LocalizedString;
-import org.fenixedu.bennu.core.domain.Bennu;
-import org.fenixedu.bennu.core.domain.User;
-import org.fenixedu.bennu.core.domain.UserProfile;
-import org.fenixedu.bennu.core.groups.Group;
-import org.fenixedu.bennu.io.servlet.FileDownloadServlet;
-import org.fenixedu.commons.stream.StreamUtils;
-import org.joda.time.LocalDate;
-import org.joda.time.YearMonthDay;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
-import pt.ist.fenixedu.contracts.domain.Employee;
-import pt.ist.fenixedu.contracts.domain.accessControl.ActiveEmployees;
-import pt.ist.fenixedu.contracts.domain.organizationalStructure.ResearchUnit;
-import pt.ist.fenixframework.Atomic;
-import pt.ist.fenixframework.Atomic.TxMode;
-
-import com.google.common.base.Charsets;
-import com.google.common.base.Strings;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URLDecoder;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 @Path("/fenix/jersey/services")
 public class JerseyServices {
@@ -497,10 +495,13 @@ public class JerseyServices {
 
                 phdInfo.addProperty("month", phdProcess.getConclusionDate().monthOfYear().getAsShortText());
 
-                try {
-                    phdInfo.addProperty("url",
-                            FileDownloadServlet.getDownloadUrl(phdProcess.getThesisProcess().getProvisionalThesisDocument()));
-                } catch (NullPointerException e) {
+                final PhdThesisProcess process = phdProcess.getThesisProcess();
+                PhdProgramProcessDocument document = process.getFinalThesisDocument();
+                if (document == null) {
+                    document = process.getProvisionalThesisDocument();
+                }
+                if (document != null) {
+                    phdInfo.addProperty("url", FileDownloadServlet.getDownloadUrl(document));
                 }
                 phdInfo.addProperty("type", "phdthesis");
                 infos.add(phdInfo);
