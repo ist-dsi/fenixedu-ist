@@ -472,39 +472,35 @@ public class JerseyServices {
         for (PhdIndividualProgramProcessNumber phdProcessNumber : Bennu.getInstance().getPhdIndividualProcessNumbersSet()) {
             PhdIndividualProgramProcess phdProcess = phdProcessNumber.getProcess();
             if (phdProcess.isConcluded()) {
-                JsonObject phdInfo = new JsonObject();
-                phdInfo.addProperty("id", phdProcess.getExternalId());
-                phdInfo.addProperty("author", phdProcess.getPerson().getUsername());
-                phdInfo.addProperty("title", phdProcess.getThesisTitle());
-
-                JsonArray schools = new JsonArray();
-                switch (phdProcess.getCollaborationType()) {
-                case NONE:
-                case WITH_SUPERVISION:
-                case ERASMUS_MUNDUS:
-                case OTHER:
-                    schools.add(new JsonPrimitive(Unit.getInstitutionName().getContent()));
-                    break;
-                default:
-                    schools.add(new JsonPrimitive(Unit.getInstitutionName().getContent()));
-                    schools.add(new JsonPrimitive(phdProcess.getCollaborationType().getLocalizedName()));
-                }
-                phdInfo.add("schools", schools);
-
-                phdInfo.addProperty("year", phdProcess.getConclusionDate().year().getAsShortText());
-
-                phdInfo.addProperty("month", phdProcess.getConclusionDate().monthOfYear().getAsShortText());
-
                 final PhdThesisProcess process = phdProcess.getThesisProcess();
                 PhdProgramProcessDocument document = process.getFinalThesisDocument();
-                if (document == null) {
-                    document = process.getProvisionalThesisDocument();
-                }
-                if (document != null) {
+                if(document != null) {
+                    JsonObject phdInfo = new JsonObject();
+                    phdInfo.addProperty("id", phdProcess.getExternalId());
+                    phdInfo.addProperty("author", phdProcess.getPerson().getUsername());
+                    phdInfo.addProperty("title", phdProcess.getThesisTitle());
+
+                    JsonArray schools = new JsonArray();
+                    switch (phdProcess.getCollaborationType()) {
+                    case NONE:
+                    case WITH_SUPERVISION:
+                    case ERASMUS_MUNDUS:
+                    case OTHER:
+                        schools.add(new JsonPrimitive(Unit.getInstitutionName().getContent()));
+                        break;
+                    default:
+                        schools.add(new JsonPrimitive(Unit.getInstitutionName().getContent()));
+                        schools.add(new JsonPrimitive(phdProcess.getCollaborationType().getLocalizedName()));
+                    }
+                    phdInfo.add("schools", schools);
+
+                    phdInfo.addProperty("year", phdProcess.getConclusionDate().year().getAsShortText());
+
+                    phdInfo.addProperty("month", phdProcess.getConclusionDate().monthOfYear().getAsShortText());
                     phdInfo.addProperty("url", FileDownloadServlet.getDownloadUrl(document));
+                    phdInfo.addProperty("type", "phdthesis");
+                    infos.add(phdInfo);
                 }
-                phdInfo.addProperty("type", "phdthesis");
-                infos.add(phdInfo);
             }
 
         }
