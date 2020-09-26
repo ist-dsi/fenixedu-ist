@@ -19,7 +19,6 @@
 package pt.ist.fenixedu.integration.ui;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -69,14 +68,13 @@ import org.fenixedu.academic.dto.student.enrollment.bolonha.BolonhaStudentEnroll
 import org.fenixedu.academic.service.StudentWarningsService;
 import org.fenixedu.academic.thesis.domain.StudentThesisCandidacy;
 import org.fenixedu.academic.thesis.ui.service.ThesisProposalsService;
-import org.fenixedu.academic.ui.struts.action.candidate.degree.DegreeCandidacyManagementDispatchAction;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.core.signals.DomainObjectEvent;
 import org.fenixedu.bennu.core.signals.Signal;
-import org.fenixedu.bennu.core.util.CoreConfiguration;
 import org.fenixedu.bennu.spring.BennuSpringContextHelper;
 import org.fenixedu.cms.domain.CMSFolder;
 import org.fenixedu.cms.domain.Category;
@@ -93,6 +91,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
+import com.google.gson.JsonObject;
 
 import pt.ist.fenixedu.giaf.invoices.ClientMap;
 import pt.ist.fenixedu.giaf.invoices.Utils;
@@ -100,6 +99,7 @@ import pt.ist.fenixedu.integration.domain.academic.DegreeStructureForIST;
 import pt.ist.fenixedu.integration.domain.cgd.CgdCard;
 import pt.ist.fenixedu.integration.domain.student.PreEnrolment;
 import pt.ist.fenixedu.integration.dto.QucProfessorshipEvaluation;
+import pt.ist.fenixedu.integration.ui.spring.service.AuthorizePersonalDataAccessService;
 import pt.ist.fenixedu.teacher.evaluation.domain.ProfessorshipEvaluationBean;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
@@ -333,20 +333,20 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
             }
         });
 
-        DegreeCandidacyManagementDispatchAction.finalStepRedirector = (request, response, candidacy) -> {
-            try {
-                if (candidacy.getPerson().getPersonalPhoto() != null) {
-                    response.sendRedirect(CoreConfiguration.getConfiguration().applicationUrl() +
-                            "/tecnico-card/review?candidacy=" + candidacy.getExternalId());
-                } else {
-                    response.sendRedirect(CoreConfiguration.getConfiguration().applicationUrl() +
-                            "/authorize-personal-data-access/cgd-bank?candidacy=" + candidacy.getExternalId());
-                }
-            } catch (IOException e) {
-                throw new Error(e);
-            }
-            return null;
-        };
+//        DegreeCandidacyManagementDispatchAction.finalStepRedirector = (request, response, candidacy) -> {
+//            try {
+//                if (candidacy.getPerson().getPersonalPhoto() != null) {
+//                    response.sendRedirect(CoreConfiguration.getConfiguration().applicationUrl() +
+//                            "/tecnico-card/review?candidacy=" + candidacy.getExternalId());
+//                } else {
+//                    response.sendRedirect(CoreConfiguration.getConfiguration().applicationUrl() +
+//                            "/authorize-personal-data-access/cgd-bank?candidacy=" + candidacy.getExternalId());
+//                }
+//            } catch (IOException e) {
+//                throw new Error(e);
+//            }
+//            return null;
+//        };
 
         DegreeCurricularPlan.RESET_DEGREE_CURRICULAR_PLAN_FUNCTION = (dcp) -> {
             DegreeStructureForIST.resetDegreeCurricularPlan(dcp);
@@ -354,6 +354,12 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
 
         StudentCandidacy.PASSWORD_FOR_IDENTITY_VALIDATION = candidacy -> candidacy.getDgesIngressionPassword() == null
                 ? null : candidacy.getDgesIngressionPassword().getDgesPassword();
+        
+        Signal.register("fenixedu.admissions.banksAuthorizations", (Consumer<JsonObject>) authorizations -> {
+            AuthorizePersonalDataAccessService authorizeService = BennuSpringContextHelper.getBean(AuthorizePersonalDataAccessService.class);
+            authorizeService.setCgdGrantBankAccess(authorizations.get("cgd").getAsBoolean(), Authenticate.getUser());
+            authorizeService.setSantanderGrantBankAccess(authorizations.get("santander").getAsBoolean(), Authenticate.getUser());
+        });
     }
 
     private static boolean isValidPostCode(final String postalCode) {
