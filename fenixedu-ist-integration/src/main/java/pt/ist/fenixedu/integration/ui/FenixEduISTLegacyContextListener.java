@@ -357,8 +357,11 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
         
         Signal.register("fenixedu.admissions.banksAuthorizations", (Consumer<JsonObject>) authorizations -> {
             AuthorizePersonalDataAccessService authorizeService = BennuSpringContextHelper.getBean(AuthorizePersonalDataAccessService.class);
-            authorizeService.setCgdGrantBankAccess(authorizations.get("cgd").getAsBoolean(), Authenticate.getUser());
-            authorizeService.setSantanderGrantBankAccess(authorizations.get("santander").getAsBoolean(), Authenticate.getUser());
+	    User user = User.findByUsername(authorizations.get("username").getAsString());
+            authorizeService.setCgdGrantBankAccess(authorizations.get("cgd").getAsBoolean(), user);
+            authorizeService.setCgdGrantCardAccess(true, user);
+            authorizeService.setSantanderGrantBankAccess(authorizations.get("santander").getAsBoolean(), user);
+            authorizeService.setSantanderGrantCardAccess(true, user);
         });
     }
 

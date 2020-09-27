@@ -1,10 +1,6 @@
 package pt.ist.fenixedu.integration.ui.spring.service;
 
-import java.util.function.Consumer;
-
-import org.fenixedu.academic.ui.struts.action.candidate.degree.DegreeCandidacyManagementDispatchAction;
 import org.fenixedu.bennu.core.domain.User;
-import org.fenixedu.bennu.core.signals.Signal;
 import org.fenixedu.commons.i18n.I18N;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -40,14 +36,6 @@ public class AuthorizePersonalDataAccessService {
     public AuthorizePersonalDataAccessService(MessageSource messageSource, SendCgdCardService sendCgdCardService) {
         this.messageSource = messageSource;
         this.sendCgdCardService = sendCgdCardService;
-
-        Signal.register(DegreeCandidacyManagementDispatchAction.FORM_POSITION_SIGNAL,
-                (Consumer<DegreeCandidacyManagementDispatchAction.FormPositionEvent>) formPositionEvent -> {
-                    if (formPositionEvent.getPosition() == 1) {
-                        setSantanderGrantCardAccess(true, formPositionEvent.getCandidacy().getPerson().getUser());
-                        setCgdGrantCardAccess(true, formPositionEvent.getCandidacy().getPerson().getUser());
-                    }
-        });
     }
 
     private String getMessage(String key) {
