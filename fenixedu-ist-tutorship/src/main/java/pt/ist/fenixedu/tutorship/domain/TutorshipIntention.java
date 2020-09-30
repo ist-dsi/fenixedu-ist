@@ -33,6 +33,8 @@ import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.time.calendarStructure.AcademicInterval;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeFieldType;
+import org.joda.time.LocalDate;
 
 public class TutorshipIntention extends TutorshipIntention_Base {
 
@@ -75,9 +77,13 @@ public class TutorshipIntention extends TutorshipIntention_Base {
     public List<Tutorship> getTutorships() {
         List<Tutorship> result = new ArrayList<Tutorship>();
         for (Tutorship tutorship : getTeacher().getTutorshipsSet()) {
-            if (tutorship.getStudentCurricularPlan().getDegreeCurricularPlan().equals(getDegreeCurricularPlan())
-                    && getAcademicInterval().contains(tutorship.getStartDate().toDateTime(new DateTime(0)))) {
-                result.add(tutorship);
+            if (tutorship.getStudentCurricularPlan().getDegreeCurricularPlan().equals(getDegreeCurricularPlan())) {
+                //the academic interval may not start at the begining of the month, and tutorship start and end are partials with only "year" and "month"
+                LocalDate localDate = new LocalDate(tutorship.getStartDate().get(DateTimeFieldType.year()), tutorship.getStartDate().get(DateTimeFieldType.monthOfYear()), 1);
+                DateTime lastMonthDayStartOfDay = localDate.dayOfMonth().withMaximumValue().toDateTimeAtStartOfDay();
+                if (getAcademicInterval().contains(lastMonthDayStartOfDay)) {
+                    result.add(tutorship);
+                }
             }
         }
         return result;
