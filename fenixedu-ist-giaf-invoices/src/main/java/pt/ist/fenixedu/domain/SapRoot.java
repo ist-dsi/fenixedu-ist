@@ -11,6 +11,7 @@ public class SapRoot extends SapRoot_Base {
         super();
         setBennu(Bennu.getInstance());
         super.setSapDocumentNumber(Long.valueOf(0));
+        setAllowCommunication(true);
     }
     
     public static SapRoot getInstance() {
