@@ -5,6 +5,7 @@ enum pt.ist.fenixedu.domain.SapRequestType  as  SapRequestType;
 class SapRoot {
 	Long sapDocumentNumber;
 	Integer openYear;
+	boolean allowCommunication;
 }
 
 class SapRequest {

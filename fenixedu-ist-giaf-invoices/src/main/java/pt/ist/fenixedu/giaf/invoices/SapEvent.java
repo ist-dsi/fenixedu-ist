@@ -898,6 +898,9 @@ public class SapEvent {
     }
 
     public boolean processPendingRequests(final SapRequest sr, final ErrorLogConsumer errorLog, final EventLogger elogger) {
+        if (!SapRoot.getInstance().getAllowCommunication()) {
+            return false;
+        }
         if (!sr.getIntegrated() && sr.allowedToSend()) {
             final JsonParser jsonParser = new JsonParser();
             final JsonObject data = (JsonObject) jsonParser.parse(sr.getRequest());
