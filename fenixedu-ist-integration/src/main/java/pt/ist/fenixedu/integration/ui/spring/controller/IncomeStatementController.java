@@ -22,6 +22,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.jsonwebtoken.SignatureAlgorithm;
+import kong.unirest.GetRequest;
 import kong.unirest.HttpResponse;
 import kong.unirest.MultipartBody;
 import kong.unirest.Unirest;
@@ -35,7 +36,6 @@ import org.fenixedu.bennu.spring.portal.SpringApplication;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.fenixedu.jwt.Tools;
 import org.fenixedu.messaging.core.domain.Message;
-import org.fenixedu.messaging.core.domain.MessagingSystem;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -45,6 +45,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 @SpringApplication(group = "logged", path = "income-statement", title = "title.income.statement")
@@ -54,7 +57,21 @@ import java.util.function.Function;
 public class IncomeStatementController {
 
     @RequestMapping(method = RequestMethod.GET)
-    public String home() {
+    public String home(final Model model) {
+        final User user = Authenticate.getUser();
+        final List<JsonObject> documents = new ArrayList<>();
+        consumeDirectory(user, "1414452989674240", json -> {
+            final DateTime created = new DateTime(json.get("created").getAsLong());
+            final DateTime modified = new DateTime(json.get("modified").getAsLong());
+            final String year = json.get("parent").getAsJsonObject().get("name").getAsString();
+            final JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("year", year);
+            jsonObject.addProperty("created", created.toString("yyyy-MM-dd HH:mm"));
+            jsonObject.addProperty("modified", modified.toString("yyyy-MM-dd HH:mm"));
+            jsonObject.addProperty("checksum", json.get("checksum").getAsString());
+            documents.add(jsonObject);
+        });
+        model.addAttribute("documents", documents);
         return "fenixedu-ist-integration/incomeStatement";
     }
 
@@ -65,10 +82,11 @@ public class IncomeStatementController {
             final User user = Authenticate.getUser();
             final String fileprefix = user.getUsername();
             try {
+                final String instante = new DateTime().toString("yyyy-MM-dd HH:mm");
                 final String declaration = BundleUtil.getString("resources.FenixeduIstIntegrationResources",
                         "title.income.statement.declaration", user.getPerson().getName())
                         .replaceAll("<br/>", "\n")
-                        + "\n\n" + new DateTime().toString("yyyy-MM-dd HH:mm");
+                        + "\n\n" + instante;
                 upload(Integer.toString(year), fileprefix + ".txt", declaration.getBytes());
                 upload(Integer.toString(year), fileprefix + ".pdf", file.getBytes());
 
@@ -76,7 +94,9 @@ public class IncomeStatementController {
                         .subject(BundleUtil.getString("resources.FenixeduIstIntegrationResources",
                                 "title.income.statement.declaration.subject", Integer.toString(year)))
                         .textBody(BundleUtil.getString("resources.FenixeduIstIntegrationResources",
-                                "title.income.statement.declaration.body", file.getName(), Long.toString(file.getSize())));
+                                "title.income.statement.declaration.body", file.getOriginalFilename(), Long.toString(file.getSize()),
+                                        user.getPerson().getName(), instante))
+                        .send();
             } catch (final IOException e) {
                 throw new Error(e);
             }
@@ -122,6 +142,29 @@ public class IncomeStatementController {
             }
         }
         return accessToken;
+    }
+
+    private void consumeDirectory(final User user, final String remoteDirId, final Consumer<JsonObject> consumer) {
+        final FileSupport fileSupport = FileSupport.getInstance();
+        final DriveAPIStorage driveAPIStorage = fileSupport.getFileStorageSet().stream()
+                .filter(DriveAPIStorage.class::isInstance)
+                .map(DriveAPIStorage.class::cast)
+                .findAny().orElseThrow(() -> new Error());
+
+        final GetRequest request = Unirest.get(driveAPIStorage.getDriveUrl() + "/api/drive/directory/" + remoteDirId)
+                .header("Authorization", "Bearer " + getAccessToken(driveAPIStorage))
+                .header("X-Requested-With", "XMLHttpRequest");
+        final JsonObject directory = new JsonParser().parse(request.asString().getBody()).getAsJsonObject();
+        for (final JsonElement element : directory.get("items").getAsJsonArray()) {
+            final JsonObject node = element.getAsJsonObject();
+            final String name = node.get("name").getAsString();
+            final String type = node.get("type").getAsString();
+            if ("application/vnd.fenixedu.drive.directory".equals(type)) {
+                consumeDirectory(user, node.get("id").getAsString(), consumer);
+            } else if (name.equals(user.getUsername() + ".pdf")) {
+                consumer.accept(node);
+            }
+        }
     }
 
 }

@@ -26,7 +26,7 @@ ${portal.toolkit()}
     ${csrf.field()}
 
     <div class="alert well">
-        <p>
+        <p style="font-size: medium">
             <spring:message code="title.income.statement.declaration" text="I hereby declare ..." arguments="<%= Authenticate.getUser().getPerson().getName() %>"/>
         </p>
         <br/>
@@ -64,6 +64,32 @@ ${portal.toolkit()}
         </div>
     </div>
 
+    <div id="documentsDiv">
+        <h2>
+            <spring:message code="title.income.statement.documents" text="Documents"/>
+        </h2>
+
+        <table class="table">
+            <thead>
+            <tr>
+                <td>
+                    <spring:message code="title.income.statement.year" text="Year"/>
+                </td>
+                <td>
+                    <spring:message code="title.income.statement.firstVersion" text="First Version"/>
+                </td>
+                <td>
+                    <spring:message code="title.income.statement.lastVersion" text="Last Version"/>
+                </td>
+                <td>
+                    <spring:message code="title.income.statement.checksum" text="Checksum"/>
+                </td>
+            </tr>
+            </thead>
+            <tbody id="documentsList"/>
+        </table>
+    </div>
+
 </form>
 
 <script type='text/javascript'>
@@ -71,4 +97,20 @@ ${portal.toolkit()}
         var checkBox = document.getElementById("statementAccept");
         document.getElementById("submitRequest").disabled = !checkBox.checked;
     }
+
+    var documents = ${documents};
+    document.getElementById("documentsDiv").style.display = "none";
+    if (documents.length > 0) {
+        $(documents).each(function(i, doc) {
+            row = $('<tr/>').appendTo($('#documentsList'))
+                .append($('<td/>').text(doc.year))
+                .append($('<td/>').text(doc.created))
+                .append($('<td/>').text(doc.modified))
+                .append($('<td/>').text(doc.checksum))
+        });
+        document.getElementById("documentsDiv").style.display = "block";
+    }
+
 </script>
+
+
