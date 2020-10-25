@@ -11,12 +11,17 @@ import kong.unirest.MultipartBody;
 import kong.unirest.Unirest;
 import org.fenixedu.bennu.RegistrationProcessConfiguration;
 import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.bennu.core.rest.JsonBodyReaderWriter;
 import org.fenixedu.bennu.core.security.SkipCSRF;
 import org.fenixedu.bennu.core.util.CoreConfiguration;
 import org.fenixedu.bennu.io.domain.DriveAPIStorage;
 import org.fenixedu.bennu.io.domain.FileSupport;
 import org.fenixedu.jwt.Tools;
 import org.fenixedu.messaging.core.domain.Message;
+import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
+import org.glassfish.jersey.media.multipart.file.StreamDataBodyPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,7 +32,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import pt.ist.fenixframework.FenixFramework;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.MediaType;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.function.Function;
 
 @RestController
@@ -40,15 +51,63 @@ public class AdhockDocumentController {
     @RequestMapping(method = RequestMethod.POST, value = "store/{user}")
     public String storeCallback(@PathVariable User user, @RequestParam MultipartFile file,
                                 @RequestParam String nounce) {
-        final String uniqueIdentifier = Jwts.parser().setSigningKey(RegistrationProcessConfiguration.signerJwtSecret())
+        final String uuid = Jwts.parser().setSigningKey(RegistrationProcessConfiguration.signerJwtSecret())
                 .parseClaimsJws(nounce).getBody().getSubject();
+        if (logger.isDebugEnabled()) {
+            logger.debug("Processing UUID: " + uuid);
+        }
         final String filename = file.getOriginalFilename();
+        if (logger.isDebugEnabled()) {
+            logger.debug("   filename: " + filename);
+        }
         try {
-            final String downloadFileLink = upload(user.getUsername(), filename, file.getBytes());
+            final byte[] document = file.getBytes();
+            if (logger.isDebugEnabled()) {
+                logger.debug("   read " + document.length + " bytes.");
+            }
+            sendDocumentToBeCertified(filename, new ByteArrayInputStream(document), uuid);
+            if (logger.isDebugEnabled()) {
+                logger.debug("   sent to certifier.");
+            }
+            final String downloadFileLink = upload(user.getUsername(), filename, document);
+            if (logger.isDebugEnabled()) {
+                logger.debug("   sent to drive: " + downloadFileLink);
+            }
             sendEmailNotification(user.getEmail(), filename, downloadFileLink);
+            if (logger.isDebugEnabled()) {
+                logger.debug("   email sent");
+            }
             return "ok";
         } catch (final IOException ex) {
             throw new Error(ex);
+        }
+    }
+
+    public void sendDocumentToBeCertified(final String filename, final InputStream inputStream, final String uuid) {
+        String compactJws = Jwts.builder().setSubject(uuid)
+                .signWith(SignatureAlgorithm.HS512, RegistrationProcessConfiguration.certifierJwtSecret()).compact();
+
+        try (final FormDataMultiPart formDataMultiPart = new FormDataMultiPart()) {
+            final StreamDataBodyPart streamDataBodyPart =
+                    new StreamDataBodyPart("file", inputStream, filename, new MediaType("application", "pdf"));
+            formDataMultiPart.bodyPart(streamDataBodyPart);
+            formDataMultiPart.bodyPart(new FormDataBodyPart("filename", filename));
+            formDataMultiPart.bodyPart(new FormDataBodyPart("mimeType", "application/json"));
+            formDataMultiPart.bodyPart(new FormDataBodyPart("identifier", uuid));
+            formDataMultiPart.bodyPart(new FormDataBodyPart("alreadyCertified", Boolean.FALSE.toString()));
+
+            final String nounce = Jwts.builder().setSubject(uuid)
+                    .signWith(SignatureAlgorithm.HS512, RegistrationProcessConfiguration.certifierJwtSecret()).compact();
+            formDataMultiPart.bodyPart(new FormDataBodyPart("callback", CoreConfiguration.getConfiguration().applicationUrl()
+                    + "/registration-process/registration-declarations/cert/" + "registrationExternalId" + "?nounce=" + nounce));
+            final Client client = ClientBuilder.newClient();
+            client.register(MultiPartFeature.class);
+            client.register(JsonBodyReaderWriter.class);
+            client.target(RegistrationProcessConfiguration.getConfiguration().certifierUrl())
+                    .path("api/documents/certify").request().header("Authorization", "Bearer " + compactJws)
+                    .post(Entity.entity(formDataMultiPart, MediaType.MULTIPART_FORM_DATA_TYPE), String.class);
+        } catch (final IOException e) {
+            throw new Error(e);
         }
     }
 
