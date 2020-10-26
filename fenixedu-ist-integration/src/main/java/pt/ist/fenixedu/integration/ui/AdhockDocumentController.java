@@ -51,6 +51,9 @@ public class AdhockDocumentController {
     @RequestMapping(method = RequestMethod.POST, value = "store/{user}")
     public String storeCallback(@PathVariable User user, @RequestParam MultipartFile file,
                                 @RequestParam String nounce) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Running AdhockDocumentController store callback.");
+        }
         final String uuid = Jwts.parser().setSigningKey(RegistrationProcessConfiguration.signerJwtSecret())
                 .parseClaimsJws(nounce).getBody().getSubject();
         if (logger.isDebugEnabled()) {
