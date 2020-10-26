@@ -48,20 +48,20 @@ public class AdhockDocumentController {
     private static final Logger logger = LoggerFactory.getLogger(AdhockDocumentController.class);
 
     @SkipCSRF
-    @RequestMapping(method = RequestMethod.POST, value = "store/{user}")
-    public String storeCallback(@PathVariable User user, @RequestParam MultipartFile file,
+    @RequestMapping(method = RequestMethod.POST, value = "store/{user}/{filename}")
+    public String storeCallback(@PathVariable User user, @PathVariable String filename,
+                                @RequestParam MultipartFile file,
                                 @RequestParam String nounce) {
         if (logger.isDebugEnabled()) {
             logger.debug("Running AdhockDocumentController store callback.");
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("   filename: " + filename);
         }
         final String uuid = Jwts.parser().setSigningKey(RegistrationProcessConfiguration.signerJwtSecret())
                 .parseClaimsJws(nounce).getBody().getSubject();
         if (logger.isDebugEnabled()) {
             logger.debug("Processing UUID: " + uuid);
-        }
-        final String filename = file.getOriginalFilename();
-        if (logger.isDebugEnabled()) {
-            logger.debug("   filename: " + filename);
         }
         try {
             final byte[] document = file.getBytes();
