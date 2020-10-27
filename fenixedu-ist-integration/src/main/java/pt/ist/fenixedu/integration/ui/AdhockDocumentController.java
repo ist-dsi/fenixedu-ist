@@ -99,10 +99,6 @@ public class AdhockDocumentController {
             formDataMultiPart.bodyPart(new FormDataBodyPart("identifier", uuid));
             formDataMultiPart.bodyPart(new FormDataBodyPart("alreadyCertified", Boolean.FALSE.toString()));
 
-            final String nounce = Jwts.builder().setSubject(uuid)
-                    .signWith(SignatureAlgorithm.HS512, RegistrationProcessConfiguration.certifierJwtSecret()).compact();
-            formDataMultiPart.bodyPart(new FormDataBodyPart("callback", CoreConfiguration.getConfiguration().applicationUrl()
-                    + "/registration-process/registration-declarations/cert/" + "registrationExternalId" + "?nounce=" + nounce));
             final Client client = ClientBuilder.newClient();
             client.register(MultiPartFeature.class);
             client.register(JsonBodyReaderWriter.class);
@@ -126,7 +122,7 @@ public class AdhockDocumentController {
                 .header("Authorization", "Bearer " + getAccessToken("fenix"))
                 .header("X-Requested-With", "XMLHttpRequest")
                 .field("path", "");
-        final Function<MultipartBody, MultipartBody> fileSetter = b -> b.field("file", content, filename);
+        final Function<MultipartBody, MultipartBody> fileSetter = b -> b.field("file", content, filename.endsWith(".pdf") ? filename : filename + ".pdf");
         final HttpResponse<String> response = fileSetter.apply(request).asString();
         final JsonObject result = new JsonParser().parse(response.getBody()).getAsJsonObject();
         final JsonElement id = result.get("id");
