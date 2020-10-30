@@ -1,9 +1,21 @@
 package pt.ist.fenixedu.giaf.invoices;
 
-import com.google.common.base.Strings;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import java.math.BigDecimal;
+import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.fenixedu.PostalCodeValidator;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionYear;
@@ -44,6 +56,12 @@ import org.fenixedu.generated.sources.saft.sap.SAFTPTSourcePayment;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.YearMonthDay;
+
+import com.google.common.base.Strings;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import pt.ist.fenixedu.domain.ExternalClient;
 import pt.ist.fenixedu.domain.SapDocumentFile;
 import pt.ist.fenixedu.domain.SapRequest;
@@ -52,22 +70,6 @@ import pt.ist.fenixedu.domain.SapRoot;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
 import pt.ist.sap.client.SapFinantialClient;
-
-import java.math.BigDecimal;
-import java.util.AbstractMap.SimpleImmutableEntry;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class SapEvent {
 
@@ -1671,12 +1673,13 @@ public class SapEvent {
 
     private JsonObject logError(Event event, ErrorLogConsumer errorLog, EventLogger elogger, String errorMessage, String documentNumber,
                                 String action, SapRequest sr) {
-        BigDecimal amount = null;
+        BigDecimal amount = sr.getValue() != null ? sr.getValue().getAmount() : BigDecimal.ZERO;
+        amount = amount.add(sr.getAdvancement() != null ? sr.getAdvancement().getAmount() : BigDecimal.ZERO);
         DebtCycleType cycleType = Utils.cycleType(event);
         final Party party = event.getParty();
 
         errorLog.accept(event.getExternalId(), Utils.getUserIdentifier(party), party.getName(),
-                amount == null ? "" : amount.toPlainString(), cycleType == null ? "" : cycleType.getDescription(), errorMessage,
+                amount.toPlainString(), cycleType == null ? "" : cycleType.getDescription(), errorMessage,
                 "", "", "", "", "", "", "", "", "", documentNumber, action);
         elogger.log("%s: %s %s %s %n", event.getExternalId(), errorMessage, documentNumber, action);
 
