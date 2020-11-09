@@ -18,18 +18,7 @@
  */
 package pt.ist.fenixedu.giaf.invoices;
 
-import java.io.File;
-import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.util.AbstractMap.SimpleImmutableEntry;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-
+import com.google.common.base.CharMatcher;
 import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionYear;
@@ -59,7 +48,18 @@ import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.CharMatcher;
+import java.io.File;
+import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Utils {
 
@@ -292,6 +292,11 @@ public class Utils {
         } catch (Throwable t) {
         }
 
+        final String documentNumbers = event.getSapRequestSet().stream()
+                .filter(sr -> sr.getSent())
+                .filter(sr -> !sr.getIntegrated())
+                .map(sr -> sr.getDocumentNumber())
+                .collect(Collectors.joining(", "));
         consumer.accept(
                 event.getExternalId(),
                 user,
@@ -308,7 +313,7 @@ public class Utils {
                 address == null ? "" : address.getAreaCode(),
                 countryOfAddress == null ? "" : countryOfAddress.getCode(),
                 "",
-                "",
+                documentNumbers,
                 "");
     }
 
