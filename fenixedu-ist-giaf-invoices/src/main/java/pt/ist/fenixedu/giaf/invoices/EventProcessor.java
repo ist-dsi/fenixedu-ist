@@ -1,8 +1,6 @@
 package pt.ist.fenixedu.giaf.invoices;
 
-import java.math.BigDecimal;
-import java.util.function.Supplier;
-
+import com.google.common.base.Strings;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.calculator.AccountingEntry;
 import org.fenixedu.academic.domain.accounting.calculator.CreditEntry;
@@ -15,15 +13,16 @@ import org.fenixedu.academic.domain.accounting.events.EventExemptionJustificatio
 import org.fenixedu.academic.util.Money;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
-
-import com.google.common.base.Strings;
-
 import pt.ist.esw.advice.pt.ist.fenixframework.AtomicInstance;
 import pt.ist.fenixedu.domain.SapRequestType;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
 import pt.ist.fenixframework.CallableWithoutException;
 import pt.ist.fenixframework.FenixFramework;
+
+import java.math.BigDecimal;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class EventProcessor {
 
@@ -231,9 +230,14 @@ public class EventProcessor {
             cycleType = null;
         }
 
+        final String documentNumbers = event.getSapRequestSet().stream()
+                .filter(sr -> sr.getSent())
+                .filter(sr -> !sr.getIntegrated())
+                .map(sr -> sr.getDocumentNumber())
+                .collect(Collectors.joining(", "));
         errorLog.accept(event.getExternalId(), Utils.getUserIdentifier(event.getParty()), event.getParty().getName(),
                 amount == null ? "" : amount.toPlainString(), cycleType == null ? "" : cycleType.getDescription(), errorMessage,
-                "", "", "", "", "", "", "", "", "", "", "");
+                "", "", "", "", "", "", "", "", "", documentNumbers, "");
         elogger.log("%s: %s%n", event.getExternalId(), errorMessage);
         elogger.log(
                 "Unhandled error for event " + event.getExternalId() + " : " + e.getClass().getName() + " - " + errorMessage);
@@ -252,9 +256,14 @@ public class EventProcessor {
             cycleType = null;
         }
 
+        final String documentNumbers = event.getSapRequestSet().stream()
+                .filter(sr -> sr.getSent())
+                .filter(sr -> !sr.getIntegrated())
+                .map(sr -> sr.getDocumentNumber())
+                .collect(Collectors.joining(", "));
         errorLog.accept(event.getExternalId(), Utils.getUserIdentifier(event.getParty()), event.getParty().getName(),
                 amount == null ? "" : amount.toPlainString(), cycleType == null ? "" : cycleType.getDescription(), errorMessage,
-                "", "", "", "", "", "", "", "", "", "", "");
+                "", "", "", "", "", "", "", "", "", documentNumbers, "");
         elogger.log("%s: %s %s %s %n", event.getExternalId(), errorMessage, "", "");
     }
 

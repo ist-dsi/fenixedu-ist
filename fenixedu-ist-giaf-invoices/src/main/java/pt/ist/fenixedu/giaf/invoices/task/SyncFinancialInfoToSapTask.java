@@ -49,7 +49,7 @@ public class SyncFinancialInfoToSapTask extends CronTask {
                     final String action) {
 
                 final Row row = errors.addRow();
-                row.setCell("OID", oid);
+                row.setCell("OID", "https://fenix.tecnico.ulisboa.pt/sap-invoice-viewer/" + oid);
                 row.setCell("user", user);
                 row.setCell("name", name);
                 row.setCell("amount", amount);

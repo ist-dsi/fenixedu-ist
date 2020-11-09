@@ -1652,7 +1652,7 @@ public class SapEvent {
         errorLog.accept(event.getExternalId(), clientId, party.getName(), "", "", returnMessage, "", "",
                 sentData.get("clientData").getAsJsonObject().get("fiscalCountry").getAsString(), clientId,
                 sentData.get("clientData").getAsJsonObject().get("street").getAsString(), "",
-                sentData.get("clientData").getAsJsonObject().get("postalCode").getAsString(), "", "", "", action);
+                sentData.get("clientData").getAsJsonObject().get("postalCode").getAsString(), "", "", sr.getDocumentNumber(), action);
         elogger.log("Pessoa %s (%s): evento: %s %s %s %s %n", party.getExternalId(), Utils.getUserIdentifier(party),
                 event.getExternalId(), clientId, returnMessage, action);
 
