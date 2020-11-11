@@ -23,13 +23,16 @@ import pt.ist.fenixframework.FenixFramework;
 import java.math.BigDecimal;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class EventProcessor {
 
     public static void calculate(final Supplier<Event> supplier) {
-        final ErrorLogConsumer errorLog = (oid, user, name, amount, cycleType, error, args, type, countryOfVatNumber, 
-                vatNumber, address, locality, postCode, countryOfAddress, paymentMethod, documentNumber, actionType) -> {};
-        final EventLogger elogger = (msg, args) -> {};
+        final ErrorLogConsumer errorLog = (oid, user, name, amount, cycleType, error, args, type, countryOfVatNumber,
+                                           vatNumber, address, locality, postCode, countryOfAddress, paymentMethod, documentNumber, actionType) -> {
+        };
+        final EventLogger elogger = (msg, args) -> {
+        };
         registerEventSapRequests(errorLog, elogger, supplier.get(), true);
     }
 
@@ -63,9 +66,11 @@ public class EventProcessor {
     }
 
     public static void sync(final Supplier<Event> supplier) {
-        final ErrorLogConsumer errorLog = (oid, user, name, amount, cycleType, error, args, type, countryOfVatNumber, 
-                vatNumber, address, locality, postCode, countryOfAddress, paymentMethod, documentNumber, actionType) -> {};
-        final EventLogger elogger = (msg, args) -> {};
+        final ErrorLogConsumer errorLog = (oid, user, name, amount, cycleType, error, args, type, countryOfVatNumber,
+                                           vatNumber, address, locality, postCode, countryOfAddress, paymentMethod, documentNumber, actionType) -> {
+        };
+        final EventLogger elogger = (msg, args) -> {
+        };
         syncEventWithSap(errorLog, elogger, supplier.get());
     }
 
@@ -126,7 +131,7 @@ public class EventProcessor {
                         return;
                     }
 
-                    if(Strings.isNullOrEmpty(payment.getRefundId())) {
+                    if (Strings.isNullOrEmpty(payment.getRefundId())) {
                         sapEvent.registerPayment((CreditEntry) accountingEntry);
                     } else {
                         sapEvent.registerAdvancementInPayment(payment);
@@ -160,7 +165,7 @@ public class EventProcessor {
             //processing payments of past events
             DebtInterestCalculator calculator = event.getDebtInterestCalculator(new DateTime());
             calculator.getPayments().filter(p -> !sapEvent.hasPayment(p.getId()) && !sapEvent.hasCredit(p.getId())
-                                                && p.getCreated().isAfter(EventWrapper.SAP_TRANSACTIONS_THRESHOLD))
+                    && p.getCreated().isAfter(EventWrapper.SAP_TRANSACTIONS_THRESHOLD))
                     .filter(p -> !offsetPayments || p.getCreated().plusDays(15).isBeforeNow())
                     .forEach(p -> sapEvent.registerPastPayment(p));
         }
@@ -235,8 +240,15 @@ public class EventProcessor {
                 .filter(sr -> !sr.getIntegrated())
                 .map(sr -> sr.getDocumentNumber())
                 .collect(Collectors.joining(", "));
+        final String errorMessageExtraInfo = Stream.concat(Stream.of(errorMessage),
+                event.getSapRequestSet().stream()
+                        .filter(sr -> sr.getSent())
+                        .filter(sr -> !sr.getIntegrated())
+                        .flatMap(sr -> sr.getErrorMessages().stream()))
+                .filter(m -> m != null)
+                .collect(Collectors.joining(", "));
         errorLog.accept(event.getExternalId(), Utils.getUserIdentifier(event.getParty()), event.getParty().getName(),
-                amount == null ? "" : amount.toPlainString(), cycleType == null ? "" : cycleType.getDescription(), errorMessage,
+                amount == null ? "" : amount.toPlainString(), cycleType == null ? "" : cycleType.getDescription(), errorMessageExtraInfo,
                 "", "", "", "", "", "", "", "", "", documentNumbers, "");
         elogger.log("%s: %s%n", event.getExternalId(), errorMessage);
         elogger.log(
@@ -261,8 +273,15 @@ public class EventProcessor {
                 .filter(sr -> !sr.getIntegrated())
                 .map(sr -> sr.getDocumentNumber())
                 .collect(Collectors.joining(", "));
+        final String errorMessageExtraInfo = Stream.concat(Stream.of(errorMessage),
+                event.getSapRequestSet().stream()
+                        .filter(sr -> sr.getSent())
+                        .filter(sr -> !sr.getIntegrated())
+                        .flatMap(sr -> sr.getErrorMessages().stream()))
+                .filter(m -> m != null)
+                .collect(Collectors.joining(", "));
         errorLog.accept(event.getExternalId(), Utils.getUserIdentifier(event.getParty()), event.getParty().getName(),
-                amount == null ? "" : amount.toPlainString(), cycleType == null ? "" : cycleType.getDescription(), errorMessage,
+                amount == null ? "" : amount.toPlainString(), cycleType == null ? "" : cycleType.getDescription(), errorMessageExtraInfo,
                 "", "", "", "", "", "", "", "", "", documentNumbers, "");
         elogger.log("%s: %s %s %s %n", event.getExternalId(), errorMessage, "", "");
     }

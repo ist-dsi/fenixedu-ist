@@ -60,6 +60,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Utils {
 
@@ -297,13 +298,20 @@ public class Utils {
                 .filter(sr -> !sr.getIntegrated())
                 .map(sr -> sr.getDocumentNumber())
                 .collect(Collectors.joining(", "));
+        final String errorMessageExtraInfo = Stream.concat(Stream.of(error),
+                event.getSapRequestSet().stream()
+                        .filter(sr -> sr.getSent())
+                        .filter(sr -> !sr.getIntegrated())
+                        .flatMap(sr -> sr.getErrorMessages().stream()))
+                .filter(m -> m != null)
+                .collect(Collectors.joining(", "));
         consumer.accept(
                 event.getExternalId(),
                 user,
                 party == null ? "" : party.getName(),
                 amount == null ? "" : amount.toPlainString(),
                 cycleType == null ? "" : cycleType.getDescription(),
-                error,
+                errorMessageExtraInfo,
                 vat,
                 "",
                 country == null ? "" : country.getCode(),
