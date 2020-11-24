@@ -27,10 +27,7 @@ import com.google.gson.JsonObject;
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.Contract;
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.EmployeeContract;
 import pt.ist.sap.client.SapStaff;
-import pt.ist.sap.client.SapStructure;
-import pt.ist.sap.group.integration.domain.Colaborator;
 import pt.ist.sap.group.integration.domain.ColaboratorSituation;
-import pt.ist.sap.group.integration.domain.Situation;
 
 @Task(englishTitle = "ImportEmployeeUnitsFromSap")
 public class ImportEmployeeUnitsFromSap extends CronTask {
@@ -40,58 +37,51 @@ public class ImportEmployeeUnitsFromSap extends CronTask {
 
     @Override
     public void runTask() {
-        final SapStructure sapStructure = new SapStructure();
         final SapStaff sapStaff = new SapStaff();
 
         final JsonObject input = new JsonObject();
         input.addProperty("institution", SapSdkConfiguration.getConfiguration().sapServiceInstitutionCode());
 
-        Map<User, ColaboratorSituation> colaboratorSituationsMap = getColaboratorSituationsMap(sapStaff, input);
+        Map<User, Set<ColaboratorSituation>> colaboratorSituationsMap = getColaboratorSituationsMap(sapStaff, input);
 
         Set<EmployeeContract> activeWorkingContracts = new HashSet<EmployeeContract>();
         YearMonthDay today = new YearMonthDay();
 
-        sapStructure.listPeople(input).forEach(je ->
-
-        {
-            final Colaborator colaborator = new Colaborator(je.getAsJsonObject());
-            final User user = User.findByUsername(SapSdkConfiguration.usernameProvider().toUsername(colaborator.sapId()));
-            final Person person = user == null ? null : user.getPerson();
-            if (person == null) {
-                taskLog("Skipping colaborator %s because there is no user.%n", colaborator.sapId());
-            } else {
-                if (!SAP_GROUPS.contains(colaborator.group())) {
-                    taskLog("Skipping colaborator %s because there is no group: %s.%n", colaborator.sapId(), colaborator.group());
+        for (User user : colaboratorSituationsMap.keySet()) {
+            for (ColaboratorSituation colaboratorSituation : colaboratorSituationsMap.get(user)) {
+                final Person person = user == null ? null : user.getPerson();
+                if (person == null) {
+                    taskLog("Skipping colaborator %s because there is no user.%n", colaboratorSituation.username());
                 } else {
-                    Unit unit = getUnit(colaborator.costCenter());
-                    if (unit == null) {
-                        taskLog("Skipping colaborator %s because there is no cost center: %s.%n", colaborator.sapId(),
-                                colaborator.costCenter());
+                    if (!SAP_GROUPS.contains(colaboratorSituation.categoryTypeName())) {
+                        taskLog("Skipping colaborator %s because there is no group: %s.%n", colaboratorSituation.username(),
+                                colaboratorSituation.categoryTypeName());
                     } else {
-                        Contract workingContractOnDate =
-                                getLastContractByContractType(person, AccountabilityTypeEnum.WORKING_CONTRACT, today);
-                        ColaboratorSituation colaboratorSituation = colaboratorSituationsMap.get(user);
-                        if (workingContractOnDate != null) {
-                            if (colaboratorSituation != null) {
-                                if (!workingContractOnDate.getUnit().equals(unit)) {
-                                    activeWorkingContracts.add(createEmployeeContract(person, today, unit,
-                                            AccountabilityTypeEnum.WORKING_CONTRACT, workingContractOnDate));
-                                } else {
-                                    activeWorkingContracts.add((EmployeeContract) workingContractOnDate);
-                                }
-                            } else {
-                                closeCurrentContract(AccountabilityTypeEnum.WORKING_CONTRACT, workingContractOnDate,
-                                        today.minusDays(1));
-                            }
-                        } else if (colaboratorSituation != null) {
-                            activeWorkingContracts.add(
-                                    createEmployeeContract(person, today, unit, AccountabilityTypeEnum.WORKING_CONTRACT, null));
-                        }
+                        Unit unit = getUnit(colaboratorSituation.costcenter());
+                        if (unit == null) {
+                            taskLog("Skipping colaborator %s because there is no cost center: %s.%n",
+                                    colaboratorSituation.username(), colaboratorSituation.costcenter());
+                        } else {
+                            Set<Contract> workingContractOnDateSet =
+                                    getLastContractByContractType(person, AccountabilityTypeEnum.WORKING_CONTRACT, today);
 
+                            EmployeeContract existingContractOnUnit = null;
+                            for (Contract workingContractOnDate : workingContractOnDateSet) {
+                                if (workingContractOnDate.getUnit().equals(unit)) {
+                                    existingContractOnUnit = (EmployeeContract) workingContractOnDate;
+                                }
+                            }
+                            if (existingContractOnUnit == null) {
+                                activeWorkingContracts.add(
+                                        createEmployeeContract(person, today, unit, AccountabilityTypeEnum.WORKING_CONTRACT));
+                            } else {
+                                activeWorkingContracts.add(existingContractOnUnit);
+                            }
+                        }
                     }
                 }
             }
-        });
+        }
 
         for (Accountability accountability : Bennu.getInstance().getAccountabilitysSet()) {
             if (EmployeeContract.class.isAssignableFrom(accountability.getClass())
@@ -102,21 +92,21 @@ public class ImportEmployeeUnitsFromSap extends CronTask {
         }
     }
 
-    private Map<User, ColaboratorSituation> getColaboratorSituationsMap(SapStaff sapStaff, JsonObject input) {
-        Set<Situation> situations = new HashSet<Situation>();
-        sapStaff.listProfessionalSituation(input).forEach(e -> {
-            situations.add(new Situation(e.getAsJsonObject()));
-        });
-
-        Map<User, ColaboratorSituation> colaboratorSituationsMap = new HashMap<User, ColaboratorSituation>();
+    private Map<User, Set<ColaboratorSituation>> getColaboratorSituationsMap(SapStaff sapStaff, JsonObject input) {
+        Map<User, Set<ColaboratorSituation>> colaboratorSituationsMap = new HashMap<User, Set<ColaboratorSituation>>();
         sapStaff.listPersonProfessionalInformation(input).forEach(e -> {
             final ColaboratorSituation colaboratorSituation = new ColaboratorSituation(e.getAsJsonObject());
             final User user = User.findByUsername(colaboratorSituation.username().toLowerCase());
-            if (isActive(colaboratorSituation)) {
+            if (colaboratorSituation.inExercise() && isActive(colaboratorSituation)) {
                 if (user == null) {
                     taskLog("\nError: No valid user found for " + colaboratorSituation.username());
                 } else {
-                    colaboratorSituationsMap.put(user, colaboratorSituation);
+                    Set<ColaboratorSituation> colaboratorSituationSet = colaboratorSituationsMap.get(user);
+                    if (colaboratorSituationSet == null) {
+                        colaboratorSituationSet = new HashSet<ColaboratorSituation>();
+                    }
+                    colaboratorSituationSet.add(colaboratorSituation);
+                    colaboratorSituationsMap.put(user, colaboratorSituationSet);
                 }
             }
         });
@@ -143,19 +133,15 @@ public class ImportEmployeeUnitsFromSap extends CronTask {
         return Unit.readByCostCenterCode(costCenterCode);
     }
 
-    private Contract getLastContractByContractType(Person person, AccountabilityTypeEnum contractType, YearMonthDay begin) {
-        YearMonthDay date = null;
-        Contract contractToReturn = null;
+    private Set<Contract> getLastContractByContractType(Person person, AccountabilityTypeEnum contractType, YearMonthDay begin) {
+        Set<Contract> result = new HashSet<Contract>();
         for (final Contract accountability : (Collection<Contract>) person.getParentAccountabilities(contractType,
                 EmployeeContract.class)) {
             if (accountability.belongsToPeriod(begin, null)) {
-                if (date == null || accountability.getBeginDate().isAfter(date)) {
-                    date = accountability.getBeginDate();
-                    contractToReturn = accountability;
-                }
+                result.add(accountability);
             }
         }
-        return contractToReturn;
+        return result;
     }
 
     private void closeCurrentContract(final AccountabilityTypeEnum accountabilityTypeEnum, final Contract currentWorkingContract,
@@ -174,13 +160,9 @@ public class ImportEmployeeUnitsFromSap extends CronTask {
     }
 
     private EmployeeContract createEmployeeContract(final Person person, final YearMonthDay today, final Unit unit,
-            final AccountabilityTypeEnum accountabilityTypeEnum, final Contract currentWorkingContract) {
-        if (currentWorkingContract != null) {
-            closeCurrentContract(accountabilityTypeEnum, currentWorkingContract, today.minusDays(1));
-        }
+            final AccountabilityTypeEnum accountabilityTypeEnum) {
         taskLog(accountabilityTypeEnum.getName() + ". NEW contract - unit: " + unit.getPresentationName() + " user:"
                 + person.getUsername() + " begin date:" + today);
         return new EmployeeContract(person, today, null, unit, accountabilityTypeEnum, false);
     }
-
 }
