@@ -36,8 +36,6 @@ import com.google.gson.JsonObject;
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.EmployeeContract;
 import pt.ist.fenixframework.FenixFramework;
 import pt.ist.sap.client.SapStaff;
-import pt.ist.sap.client.SapStructure;
-import pt.ist.sap.group.integration.domain.Colaborator;
 import pt.ist.sap.group.integration.domain.ColaboratorSituation;
 
 public class UpdateTeacherAuthorizationsForSemesterFromSap {
@@ -53,9 +51,7 @@ public class UpdateTeacherAuthorizationsForSemesterFromSap {
 		Interval semesterInterval = executionSemester.getAcademicInterval().toInterval();
 
 		final SapStaff sapStaff = new SapStaff();
-		final SapStructure sapStructure = new SapStructure();
 
-		Map<User, Department> userDepartment = new HashMap<>();
 		Map<User, Set<ColaboratorSituation>> colaboratorSituationsMap = new HashMap<>();
 			final JsonObject params = new JsonObject();
 		params.addProperty("institution", SapSdkConfiguration.getConfiguration().sapServiceInstitutionCode());
@@ -67,36 +63,20 @@ public class UpdateTeacherAuthorizationsForSemesterFromSap {
 					output.append("\nError: No valid user found for " + colaboratorSituation.username());
 				} else {
 
-					Set<ColaboratorSituation> colaboratorSituations = colaboratorSituationsMap.get(user);
-					if (colaboratorSituations == null) {
-						colaboratorSituations = new HashSet<>();
-					}
-					colaboratorSituations.add(colaboratorSituation);
-					colaboratorSituationsMap.put(user, colaboratorSituations);
-				}
+                    Set<ColaboratorSituation> colaboratorSituations = colaboratorSituationsMap.get(user);
+                    if (colaboratorSituations == null) {
+                        colaboratorSituations = new HashSet<>();
+                    }
+                    colaboratorSituations.add(colaboratorSituation);
+                    colaboratorSituationsMap.put(user, colaboratorSituations);
+                }
 			});
-
-		sapStructure.listPeople(params).forEach(e -> {
-			final Colaborator colaborator = new Colaborator(e.getAsJsonObject());
-			final User user = User
-					.findByUsername(SapSdkConfiguration.usernameProvider().toUsername(colaborator.sapId()));
-			if (user != null && !Strings.isNullOrEmpty(colaborator.costCenter())) {
-				try {
-					Unit unit = Unit.readByCostCenterCode(Integer.parseInt(colaborator.costCenter().substring(2)));
-					if (unit != null) {
-						userDepartment.put(user, getEmployeeDepartmentUnit(unit));
-		}
-				} catch (NumberFormatException ex) {
-					output.append("\nError: Invalid CC: " + colaborator.costCenter());
-				}
-			}
-		});
 
 		Set<TeacherAuthorization> processedAuthorizations = new HashSet<>();
 
 		for (User user : colaboratorSituationsMap.keySet()) {
 			Person person = user.getPerson();
-			Department department = userDepartment.get(user);// getDominantDepartment(person, executionSemester);
+			Department department = getDominantDepartment(person, executionSemester);
 			TeacherAuthorization teacherAuthorization = null;
 			if (department != null) {
 				SortedSet<ColaboratorSituation> validColaboratorSituations = getValidPersonContractSituations(
