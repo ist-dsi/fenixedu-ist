@@ -17,13 +17,13 @@ import org.fenixedu.spaces.domain.Space;
 import org.springframework.stereotype.Service;
 
 import com.google.common.io.BaseEncoding;
+
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveEmployees;
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveGrantOwner;
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveResearchers;
 import pt.ist.fenixedu.contracts.domain.accessControl.CampusEmployeeGroup;
 import pt.ist.fenixedu.contracts.domain.accessControl.CampusGrantOwnerGroup;
 import pt.ist.fenixedu.contracts.domain.accessControl.CampusResearcherGroup;
-import pt.ist.fenixedu.contracts.domain.accessControl.SapBackedGroup;
 import pt.ist.fenixedu.integration.dto.PersonInformationDTO;
 
 @Service
@@ -86,7 +86,7 @@ public class UserInformationService implements IUserInfoService {
         if (person.getStudent() != null) {
             final List<Registration> activeRegistrations = person.getStudent().getActiveRegistrations();
             for (final Registration registration : activeRegistrations) {
-                if (registration.isBolonha() && !registration.getDegreeType().isEmpty()) {
+                if (registration.isBolonha()) {
                     return true;
                 }
             }
