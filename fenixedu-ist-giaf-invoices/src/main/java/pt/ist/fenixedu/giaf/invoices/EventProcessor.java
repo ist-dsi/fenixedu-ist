@@ -127,7 +127,7 @@ public class EventProcessor {
                         && accountingEntry.getCreated().isAfter(EventWrapper.SAP_TRANSACTIONS_THRESHOLD)) {
                     final Payment payment = (Payment) accountingEntry;
 
-                    if (offsetPayments && payment.getCreated().plusDays(15).isAfterNow()) {
+                    if (offsetPayments && payment.getCreated().plusDays(7).isAfterNow()) {
                         return;
                     }
 
