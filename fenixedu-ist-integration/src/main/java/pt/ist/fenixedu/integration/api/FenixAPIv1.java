@@ -332,7 +332,8 @@ public class FenixAPIv1 {
         final String name = pib.getName();
         final String displayName = person.getDisplayName();
         final String gender = person.getGender().name();
-        final String birthday = person.getDateOfBirthYearMonthDay().toString(formatDay);
+        final String birthday = person.getDateOfBirthYearMonthDay() == null ? null
+				: person.getDateOfBirthYearMonthDay().toString(formatDay);
         final String username = person.getUsername();
         final String campus = pib.getCampus();
         final String email = pib.getEmail();
