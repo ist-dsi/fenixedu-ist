@@ -217,8 +217,9 @@ public class SendFirstTimeStudentNotifications extends CronTask {
         taskLog("%s%n", message);
 
         try {
-            final boolean result = PhoneValidationUtils.getInstance().sendSMS(number, message);
-            taskLog("Sent SMS via gateway to %s : %s%n", number, result);
+            //final boolean result = PhoneValidationUtils.getInstance().sendSMS(number, message);
+            //taskLog("Sent SMS via gateway to %s : %s%n", number, result);
+            throw new Error("Need to review / reimplement code.");
         } catch (final Throwable t) {
             taskLog("Faild send sms with exception: %s to number %s%n", t.getMessage(), number);
             t.printStackTrace();
