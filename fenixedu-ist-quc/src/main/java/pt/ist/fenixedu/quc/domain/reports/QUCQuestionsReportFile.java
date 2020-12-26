@@ -51,8 +51,10 @@ public class QUCQuestionsReportFile extends QUCQuestionsReportFile_Base {
             if (inquiryQuestionHeader != null && inquiryQuestionHeader.getTitle() != null) {
                 row.setCell(inquiryQuestionHeader.getTitle().getContent());
             } else {
-                row.setCell(inquiryQuestion.getInquiryGroupQuestion().getInquiryBlock().getInquiryQuestionHeader().getTitle()
-                        .getContent());
+                if (inquiryQuestion.getInquiryGroupQuestion().getInquiryBlock() != null) {
+                    row.setCell(inquiryQuestion.getInquiryGroupQuestion().getInquiryBlock().getInquiryQuestionHeader().getTitle()
+                            .getContent());
+                }
             }
         }
     }
