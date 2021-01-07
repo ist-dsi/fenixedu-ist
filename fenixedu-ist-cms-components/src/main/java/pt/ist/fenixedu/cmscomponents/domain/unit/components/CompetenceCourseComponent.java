@@ -50,7 +50,7 @@ public class CompetenceCourseComponent extends UnitSiteComponent {
 
     @Override
     public void handle(Page page, TemplateContext componentContext, TemplateContext globalContext) {
-        CompetenceCourse competenceCourse = FenixFramework.getDomainObject(globalContext.getRequestContext()[1]);
+        CompetenceCourse competenceCourse = FenixFramework.getDomainObject(globalContext.getRequestContext()[1]);        
         if (competenceCourse == null) {
             throw new ResourceNotFoundException();
         }
@@ -71,6 +71,11 @@ public class CompetenceCourseComponent extends UnitSiteComponent {
         wrap.put("evaluationMethod", competenceCourse.getLocalizedEvaluationMethod(semester));
         wrap.put("program", competenceCourse.getProgramI18N(semester));
         wrap.put("objectives", competenceCourse.getObjectivesI18N(semester));
+        wrap.put("prerequisites", competenceCourse.getPrerequisitesI18N(semester)); 
+        wrap.put("laboratorialComponent", competenceCourse.getLaboratorialComponentI18N(semester)); 
+        wrap.put("ethicalPrinciples", competenceCourse.getEthicalPrinciplesI18N(semester));
+        wrap.put("programmingAndComputingComponent", competenceCourse.getProgrammingAndComputingComponentI18N(semester));
+        wrap.put("crossCompetenceComponent", competenceCourse.getCrossCompetenceComponentI18N(semester));
         wrap.put("regime", competenceCourse.getRegime(semester).getLocalizedName());
         wrap.put("isBasic", competenceCourse.isBasic(semester));
         wrap.put("competenceCourseLevel", competenceCourse.getLocalizedEvaluationMethod(semester));

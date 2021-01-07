@@ -14,7 +14,7 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public License
+    You should have received a copy of the GNU Lesser General Public Licensepost.address
     along with FenixEdu IST CMS Components.  If not, see <http://www.gnu.org/licenses/>.
 
 -->
@@ -133,6 +133,33 @@
         <h3>{{ i18n('resources.BolonhaManagerResources', 'evaluationMethod') | raw }}</h3>
         <p>{{ competenceCourse.evaluationMethod.content }}</p>
     {% endif %}
+ 
+    {% if competenceCourse.prerequisites is not empty %}
+        <h3>{{ i18n('resources.BolonhaManagerResources', 'prerequisites') | raw }}</h3>
+        <p>{{ competenceCourse.prerequisites.content }}</p>
+    {% endif %}
+    
+    {% if competenceCourse.laboratorialComponent is not empty %}
+        <h3>{{ i18n('resources.BolonhaManagerResources', 'laboratorialComponent') | raw }}</h3>
+        <p>{{ competenceCourse.laboratorialComponent.content }}</p>
+    {% endif %}
+    
+     {% if competenceCourse.ethicalPrinciples is not empty %}
+        <h3>{{ i18n('resources.BolonhaManagerResources', 'ethicalPrinciples') | raw }}</h3>
+        <p>{{ competenceCourse.ethicalPrinciples.content }}</p>
+    {% endif %}
+    
+     {% if competenceCourse.programmingAndComputingComponent is not empty %}
+        <h3>{{ i18n('resources.BolonhaManagerResources', 'programmingAndComputingComponent') | raw }}</h3>
+        <p>{{ competenceCourse.programmingAndComputingComponent.content }}</p>
+    {% endif %}
+    
+    {% if competenceCourse.crossCompetenceComponent is not empty %}
+        <h3>{{ i18n('resources.BolonhaManagerResources', 'crossCompetenceComponent') | raw }}</h3>
+        <p>{{ competenceCourse.crossCompetenceComponent.content }}</p>
+    {% endif %}
+    
+    
 
     {% if competenceCourse.mainBibliographicReferences is not empty or competenceCourse.secondaryBibliographicReferences is not empty %}
         <h3>{{ i18n('resources.BolonhaManagerResources', 'bibliographicReference') }}</h3>
