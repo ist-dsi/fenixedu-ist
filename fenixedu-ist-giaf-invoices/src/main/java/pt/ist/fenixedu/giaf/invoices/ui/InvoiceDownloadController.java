@@ -18,18 +18,17 @@
  */
 package pt.ist.fenixedu.giaf.invoices.ui;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
-import javax.servlet.http.HttpServletResponse;
-
+import com.google.common.io.ByteStreams;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.accessControl.AcademicAuthorizationGroup;
 import org.fenixedu.academic.domain.accessControl.academicAdministration.AcademicOperationType;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.EventState;
+import org.fenixedu.academic.domain.accounting.ProofOfPayment;
+import org.fenixedu.academic.domain.accounting.ProofOfPaymentFile;
 import org.fenixedu.academic.ui.spring.controller.AccountingEventForOwnerController;
 import org.fenixedu.academic.ui.spring.controller.AccountingEventsPaymentManagerController;
 import org.fenixedu.academic.ui.spring.service.AccountingManagementAccessControlService;
@@ -40,18 +39,13 @@ import org.fenixedu.bennu.rendering.annotations.BennuIntersection;
 import org.fenixedu.bennu.rendering.annotations.BennuIntersections;
 import org.fenixedu.bennu.spring.portal.SpringApplication;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
+import org.fenixedu.commons.i18n.I18N;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-
-import com.google.common.io.ByteStreams;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-
 import pt.ist.fenixedu.domain.SapDocumentFile;
 import pt.ist.fenixedu.domain.SapRequest;
 import pt.ist.fenixedu.domain.documents.DebtCertificate;
@@ -59,6 +53,12 @@ import pt.ist.fenixedu.domain.documents.FinancialDocument;
 import pt.ist.fenixedu.domain.documents.FinancialDocumentFile;
 import pt.ist.fenixedu.domain.documents.LiquidationLetter;
 import pt.ist.fenixedu.giaf.invoices.GiafEvent;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 @BennuIntersections({
     @BennuIntersection(location = "event.details.extra.info", position = "info", file= "templates/sapInvoiceDetails.html"),
@@ -125,11 +125,30 @@ public class InvoiceDownloadController {
                     .collect(SapInvoiceController.toJsonArray());
             model.addAttribute("financialDocuments", financialDocuments);
 
+            final JsonArray proofOfPayments = event.getProofOfPaymentSet().stream()
+                    .map(doc -> toJson(doc))
+                    .collect(SapInvoiceController.toJsonArray());
+            model.addAttribute("proofOfPayments", proofOfPayments);
+
             return "invoice-viewer/home";
         } else {
             response.setStatus(HttpStatus.FORBIDDEN.value());
             return "/";
         }
+    }
+
+    private JsonObject toJson(final ProofOfPayment proofOfPayment) {
+        final Event event = proofOfPayment.getEvent();
+        final ProofOfPaymentFile proofOfPaymentFile = proofOfPayment.getProofOfPaymentFile();
+        final JsonObject result = new JsonObject();
+        result.addProperty("id", proofOfPaymentFile.getExternalId());
+        result.addProperty("eventDescription", event.getDescription().toString());
+        result.addProperty("created", proofOfPayment.getUploadDate().toString("yyyy-MM-dd HH:mm:ss"));
+        result.addProperty("eventDescription", event.getDescription().toString());
+        final String documentType = "pt".equals(I18N.getLocale().getLanguage()) ? "Prova de Pagamento" : "Proof Of Payment";
+        result.addProperty("documentType", documentType);
+        result.addProperty("url", FileDownloadServlet.getDownloadUrl(proofOfPaymentFile));
+        return result;
     }
 
     private JsonObject toJson(final FinancialDocument financialDocument) {
