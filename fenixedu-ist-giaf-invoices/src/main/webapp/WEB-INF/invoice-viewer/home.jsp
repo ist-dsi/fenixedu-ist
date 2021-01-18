@@ -96,6 +96,7 @@
 	var sapRequests = ${sapRequests};
 	var giafDocuments = ${giafDocuments};
 	var financialDocuments = ${financialDocuments};
+	var proofOfPayments = ${proofOfPayments};
 	var contextPath = '<%= contextPath %>';
 
     function sapDocumentNumberPart(sapRequest) {
@@ -201,6 +202,17 @@
 					.append($('<td/>').text(financialDocument.documentType))
 					.append($('<td/>').text(financialDocument.documentNumber))
 					.append($('<td/>').html(downloadLink(financialDocument.displayName, financialDocument.url)))
+			;
+		});
+		$(proofOfPayments).sort(sortSap).each(function(i, proofOfPayment) {
+			row = $('<tr/>').appendTo($('#invoiceTable'))
+					.append($('<td/>').text(proofOfPayment.created))
+					.append($('<td/>').text(proofOfPayment.id))
+					.append($('<td/>').text(proofOfPayment.eventDescription))
+					.append($('<td/>').text('-'))
+					.append($('<td/>').text(proofOfPayment.documentType))
+					.append($('<td/>').text("-"))
+					.append($('<td/>').html(downloadLink('Proof Of Payment', proofOfPayment.url)))
 			;
 		});
 	});
