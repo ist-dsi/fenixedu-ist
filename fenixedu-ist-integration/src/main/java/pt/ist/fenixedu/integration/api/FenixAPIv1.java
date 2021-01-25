@@ -660,8 +660,10 @@ public class FenixAPIv1 {
                         } else if (iCurriculumEntry instanceof Dismissal) {
                             Dismissal dismissal = (Dismissal) iCurriculumEntry;
                             CurricularCourse curricularCourse = dismissal.getCurricularCourse();
-                            String entryName = mls(iCurriculumEntry.getPresentationName());
-                            course = new FenixCourse(curricularCourse.getExternalId(), curricularCourse.getAcronym(), entryName);
+                            if (curricularCourse != null) {
+                                String entryName = mls(iCurriculumEntry.getPresentationName());
+                                course = new FenixCourse(curricularCourse.getExternalId(), curricularCourse.getAcronym(), entryName);
+                            }
                         } else {
                             continue;
                         }
