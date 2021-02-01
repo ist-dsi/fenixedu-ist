@@ -512,6 +512,7 @@ public class SapEvent {
         }
 
         final Money amountPayed = new Money(payment.getUsedAmountInDebts());
+        final Money advancementAmount = new Money(payment.getUnusedAmount());
         if (amountPayed.isPositive()) {
             // registering the invoice
             SapRequest pastInvoiceRequest = registerPastInvoice(amountPayed, clientId,
@@ -523,6 +524,9 @@ public class SapEvent {
             } else {
                 // registering the payment
                 registerSinglePayment(transaction.getTransactionDetail(), amountPayed, pastInvoiceRequest, false, true, SapRequestType.PAYMENT);
+                if (advancementAmount.isPositive()) {
+                    registerAdvancementOnly(clientId, transaction.getTransactionDetail(), advancementAmount, true);
+                }
             }
         }
     }
@@ -597,7 +601,7 @@ public class SapEvent {
 
         final SortedMap<SapRequest, Money> openInvoices = getOpenInvoicesAndRemainingValue();
         if (openInvoices.size() == 0) {
-            registerAdvancementOnly(clientId, transactionDetail, payedAmount);
+            registerAdvancementOnly(clientId, transactionDetail, payedAmount, false);
         } else {
             registerPayment(transactionDetail, payedAmount, (Entry<SapRequest, Money>[]) openInvoices.entrySet().toArray(new Entry[0]));
         }
@@ -631,17 +635,17 @@ public class SapEvent {
         }
     }
 
-    private void registerAdvancementOnly(final String clientId, final AccountingTransactionDetail transactionDetail, final Money payedAmount) {
-        final JsonObject data = toJsonAdvancementOnly(clientId, transactionDetail, payedAmount);
+    private void registerAdvancementOnly(final String clientId, final AccountingTransactionDetail transactionDetail, final Money payedAmount, boolean pastPayment) {
+        final JsonObject data = toJsonAdvancementOnly(clientId, transactionDetail, payedAmount, pastPayment);
         String documentNumber = getDocumentNumber(data, true);
         SapRequest sapRequest = new SapRequest(event, clientId, Money.ZERO, documentNumber,
                 SapRequestType.ADVANCEMENT, payedAmount, data);
         sapRequest.setPayment(transactionDetail.getTransaction());
     }
 
-    private JsonObject toJsonAdvancementOnly(final String clientId, final AccountingTransactionDetail transactionDetail, final Money amount) {
+    private JsonObject toJsonAdvancementOnly(final String clientId, final AccountingTransactionDetail transactionDetail, final Money amount, boolean pastPayment) {
         final JsonObject clientData = toJsonClient(event.getParty(), clientId);
-        JsonObject data = toJson(event, clientData, transactionDetail.getWhenRegistered(), false, false, false, true, false);
+        JsonObject data = toJson(event, clientData, transactionDetail.getWhenRegistered(), false, false, false, true, pastPayment);
         JsonObject paymentDocument = toJsonPaymentDocument(Money.ZERO, "NP", "", transactionDetail.getWhenRegistered(),
                 getPaymentMechanism(transactionDetail), getPaymentMethodReference(transactionDetail),
                 SAFTPTSettlementType.NL.toString(), true);
@@ -695,7 +699,7 @@ public class SapEvent {
     }
 
     private void registerAdvancementAndUsedIt(final AccountingTransactionDetail transactionDetail, final Money payedAmount, final SapRequest sapInvoiceRequest, final SapRequestType requestType) {
-        registerAdvancementOnly(sapInvoiceRequest.getClientId(), transactionDetail, payedAmount);
+        registerAdvancementOnly(sapInvoiceRequest.getClientId(), transactionDetail, payedAmount, false);
         CreditEntry creditEntry = new Payment(transactionDetail.getTransaction().getExternalId(), null, null, null, null, null);
         PartialPayment<DebtEntry> partialPayment = new PartialPayment<DebtEntry>(creditEntry, null, null);
         Money amountToUse = sapInvoiceRequest.getValue().lessThan(payedAmount) ? sapInvoiceRequest.getValue() : payedAmount;
@@ -782,7 +786,7 @@ public class SapEvent {
                 sapRequest.setPayment(transactionDetail.getTransaction());
             } else {
                 registerFinalPayment(transactionDetail, amount, sapInvoiceRequest, false, SapRequestType.PAYMENT, getPaymentsAndCreditsFor(sapInvoiceRequest));
-                registerAdvancementOnly(ClientMap.uVATNumberFor(transactionDetail.getEvent().getParty()), transactionDetail, advancement);
+                registerAdvancementOnly(ClientMap.uVATNumberFor(transactionDetail.getEvent().getParty()), transactionDetail, advancement, false);
             }
         }
     }
@@ -1526,14 +1530,14 @@ public class SapEvent {
     public static SimpleImmutableEntry<String, String> mapToProduct(Event event, String eventDescription,
                                                                     boolean isDebtRegistration, boolean isInterest,
                                                                     boolean isAdvancement, boolean isPastEvent) {
+        if (isPastEvent) {
+            return new SimpleImmutableEntry<String, String>("0063", "REGULARIZAÇAO ANOS ANTERIORES");
+        }
         if (isInterest) {
             return new SimpleImmutableEntry<String, String>("0036", "MULTAS");
         }
         if (isAdvancement) {
             return new SimpleImmutableEntry<String, String>("0056", "ADIANTAMENTO");
-        }
-        if (isPastEvent) {
-            return new SimpleImmutableEntry<String, String>("0063", "REGULARIZAÇAO ANOS ANTERIORES");
         }
         if (event instanceof CustomEvent) {
             final CustomEvent customEvent = (CustomEvent) event;
