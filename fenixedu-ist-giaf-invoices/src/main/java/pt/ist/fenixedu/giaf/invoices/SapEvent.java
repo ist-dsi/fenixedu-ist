@@ -1578,10 +1578,18 @@ public class SapEvent {
                 }
             }
             if (degree.isThirdCycle()) {
-                if (isDebtRegistration) {
-                    return new SimpleImmutableEntry<String, String>("E0029", "ESP PROPINAS 3 CICLO");
+                if (degree.getDegreeType().isAdvancedFormationDiploma()) {
+                    if (isDebtRegistration) {
+                        return new SimpleImmutableEntry<String, String>("E0088", "ESP PROPINAS POS-GRADUACOES");
+                    } else {
+                        return new SimpleImmutableEntry<String, String>("0088", "PROPINAS POS-GRADUACOES");
+                    }
                 } else {
-                    return new SimpleImmutableEntry<String, String>("0029", "PROPINAS 3 CICLO");
+                    if (isDebtRegistration) {
+                        return new SimpleImmutableEntry<String, String>("E0029", "ESP PROPINAS 3 CICLO");
+                    } else {
+                        return new SimpleImmutableEntry<String, String>("0029", "PROPINAS 3 CICLO");
+                    }
                 }
             }
             if (isDebtRegistration) {
