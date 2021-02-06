@@ -102,7 +102,7 @@ public class UnitCourses extends UnitSiteComponent {
     public Map wrap(CompetenceCourse competenceCourse, String courseComponentUrl) {
         return ImmutableMap.of("name", competenceCourse.getNameI18N(), "acronym",
                 competenceCourse.getAcronym(), "url", format("%s/%s", courseComponentUrl, competenceCourse.getExternalId()),
-                "approved", competenceCourse.isApproved());
+                "approved", competenceCourse.isApproved(), "ectsCredits", competenceCourse.getEctsCredits());
     }
 
     public DepartmentUnit getPersonDepartmentUnit() {
