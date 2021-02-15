@@ -36,11 +36,10 @@ import org.fenixedu.academic.domain.organizationalStructure.AccountabilityTypeEn
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.groups.DynamicGroup;
 import org.fenixedu.bennu.core.security.Authenticate;
-import org.joda.time.Interval;
 
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.PersonFunction;
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonContractSituation;
 import pt.ist.fenixedu.teacher.evaluation.domain.CreditsManagerGroup;
+import pt.ist.fenixedu.teacher.evaluation.domain.contracts.NonExerciseSituation;
 import pt.ist.fenixedu.teacher.evaluation.domain.teacher.InstitutionWorkTime;
 import pt.ist.fenixedu.teacher.evaluation.domain.teacher.OtherService;
 import pt.ist.fenixedu.teacher.evaluation.domain.teacher.ReductionService;
@@ -146,12 +145,8 @@ public class AnnualTeachingCreditsByPeriodBean implements Serializable {
         return otherServices;
     }
 
-    public List<PersonContractSituation> getServiceExemptions() {
-        Interval executionYearInterval =
-                new Interval(executionPeriod.getBeginDateYearMonthDay().toDateTimeAtMidnight(), executionPeriod
-                        .getEndDateYearMonthDay().plusDays(1).toDateTimeAtMidnight());
-        return new ArrayList<PersonContractSituation>(PersonContractSituation.getValidTeacherServiceExemptions(teacher,
-                executionYearInterval));
+    public List<NonExerciseSituation> getServiceExemptions() {
+        return new ArrayList<NonExerciseSituation>(NonExerciseSituation.getNonExerciseSituationSet(teacher, executionPeriod));
     }
 
     public ReductionService getCreditsReductionService() {

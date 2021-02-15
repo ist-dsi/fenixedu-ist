@@ -162,6 +162,35 @@ class reports.TeachersByShiftReportFile extends .org.fenixedu.academic.domain.re
 
 class reports.TimetablesReportFile extends .org.fenixedu.academic.domain.reports.GepReportFile {}
 
+class contracts.NonExerciseSituation  {
+	String description;
+    LocalDate beginDate;
+    LocalDate endDate;
+}
+
+class contracts.Sabbatical extends contracts.NonExerciseSituation {
+}
+
+class contracts.ServiceExemptionSituation extends contracts.NonExerciseSituation {
+}
+
+class contracts.OtherServiceExemption extends contracts.NonExerciseSituation {
+}
+
+relation PersonNonExerciseSituation {
+    .org.fenixedu.academic.domain.Person playsRole person;
+    contracts.NonExerciseSituation playsRole nonExerciseSituation {
+        multiplicity *;
+    }
+}
+
+relation NonExerciseSituationRootDomainObject {
+     contracts.NonExerciseSituation playsRole nonExerciseSituation {
+        multiplicity *;
+    }
+    .org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject;
+}
+
 
 relation CareerTeacher {
     teacher.Career playsRole associatedCareers {

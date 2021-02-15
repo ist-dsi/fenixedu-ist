@@ -84,6 +84,7 @@
 		    <td><c:out value="${executionCourse.name} (${executionCourse.sigla})"/></td>
 	        <td><c:out value="${executionCourse.degreePresentationString}"/></td>
 		    <td><c:out value="${executionCourse.effortRate}"/></td>
+		    </td>
 		</tr>
 	</c:forEach></tbody>
 </table>
