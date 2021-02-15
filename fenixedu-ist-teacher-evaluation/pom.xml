@@ -10,7 +10,9 @@
     <artifactId>fenixedu-ist-teacher-evaluation</artifactId>
 
     <name>FenixEdu IST Teacher Evaluation</name>
-
+	<properties>
+		<version.pt.ist.sap-group-integration>3.0.0</version.pt.ist.sap-group-integration>
+	</properties>
     <dependencies>
         <dependency>
             <groupId>org.fenixedu</groupId>
@@ -69,6 +71,11 @@
             <groupId>javax.ws.rs</groupId>
             <artifactId>javax.ws.rs-api</artifactId>
         </dependency>
+        <dependency>
+        	<groupId>pt.ist</groupId>
+        	<artifactId>sap-group-integration</artifactId>
+        	<version>${version.pt.ist.sap-group-integration}</version>
+		</dependency>
     </dependencies>
 
     <repositories>

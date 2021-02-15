@@ -8,23 +8,27 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
+import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.reports.GepReportFile;
+import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.commons.i18n.I18N;
 import org.fenixedu.commons.spreadsheet.WorkbookExportFormat;
+import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.google.common.io.ByteStreams;
-
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.SharedFunction;
 import pt.ist.fenixedu.teacher.evaluation.domain.DepartmentCreditsPool;
+import pt.ist.fenixedu.teacher.evaluation.domain.contracts.OtherServiceExemption;
 import pt.ist.fenixedu.teacher.evaluation.domain.credits.util.CreditsPoolBean;
 import pt.ist.fenixedu.teacher.evaluation.domain.credits.util.CreditsPoolBean.CreditsPoolByDepartmentBean;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
 import pt.ist.fenixframework.FenixFramework;
+
+import com.google.common.io.ByteStreams;
 
 @Service
 public class CreditsManagementService {
@@ -35,8 +39,8 @@ public class CreditsManagementService {
     @Atomic(mode = TxMode.WRITE)
     public void editCreditsPool(CreditsPoolBean creditsPoolBean) {
         for (CreditsPoolByDepartmentBean creditsPoolByDepartmentBean : creditsPoolBean.getCreditsPoolByDepartments()) {
-            DepartmentCreditsPool departmentCreditsPool = DepartmentCreditsPool
-                    .getDepartmentCreditsPool(creditsPoolByDepartmentBean.getDepartment(), creditsPoolBean.getExecutionYear());
+            DepartmentCreditsPool departmentCreditsPool =
+                    DepartmentCreditsPool.getDepartmentCreditsPool(creditsPoolByDepartmentBean.getDepartment(), creditsPoolBean.getExecutionYear());
             if (departmentCreditsPool == null) {
                 new DepartmentCreditsPool(creditsPoolByDepartmentBean.getDepartment(), creditsPoolBean.getExecutionYear(),
                         creditsPoolByDepartmentBean.getOriginalCreditsPool(), creditsPoolByDepartmentBean.getCreditsPool());
@@ -113,7 +117,7 @@ public class CreditsManagementService {
     public Set<String> setSharedFunctionsCredits(String[] lines) {
         Set<String> output = new HashSet<String>();
         for (String line : lines) {
-            String[] values = line.split(WorkbookExportFormat.TSV.getSeparator());
+            String[] values = getLineValues(line);
             if (values.length < 5) {
                 output.add(messageSource.getMessage("error.upload.file.line", new Object[] { line }, I18N.getLocale()));
                 continue;
@@ -124,7 +128,7 @@ public class CreditsManagementService {
                 continue;
             }
 
-            SharedFunction sharedFunction =  FenixFramework.getDomainObject(sharedFunctionOid);
+            SharedFunction sharedFunction = FenixFramework.getDomainObject(sharedFunctionOid);
             if (sharedFunction == null) {
                 output.add(messageSource.getMessage("error.upload.file.line", new Object[] { line }, I18N.getLocale()));
                 continue;
@@ -144,4 +148,60 @@ public class CreditsManagementService {
         return output;
     }
 
+    public Set<String> uploadOtherServiceExemptions(MultipartFile file) throws Exception {
+        String[] lines = getFileLines(file);
+        return createOtherServiceExemptions(lines);
+    }
+
+    @Atomic(mode = TxMode.WRITE)
+    public Set<String> createOtherServiceExemptions(String[] lines) {
+        Set<String> output = new HashSet<String>();
+        for (String line : lines) {
+            if (StringUtils.isBlank(line)) {
+                continue;
+            }
+            String[] values = getLineValues(line);
+            if (values.length < 4) {
+                output.add(messageSource.getMessage("error.upload.file.line", new Object[] { line }, I18N.getLocale()));
+                continue;
+            }
+            String username = values[0];
+            if (StringUtils.isBlank(username)) {
+                output.add(messageSource.getMessage("error.upload.file.line", new Object[] { line }, I18N.getLocale()));
+                continue;
+            }
+            User user = User.findByUsername(username);
+            if (user == null) {
+                output.add(messageSource.getMessage("error.upload.file.line", new Object[] { line }, I18N.getLocale()));
+                continue;
+            }
+            if (StringUtils.isBlank(values[1])) {
+                output.add(messageSource.getMessage("error.upload.file.line", new Object[] { line }, I18N.getLocale()));
+                continue;
+            }
+            LocalDate beginDate = new LocalDate(values[1]);
+            LocalDate endDate = StringUtils.isBlank(values[2]) ? null : new LocalDate(values[2]);
+            String description = values[3];
+            try {
+                OtherServiceExemption.create(user.getPerson(), beginDate, endDate, description);
+            } catch (DomainException e) {
+                output.add(messageSource.getMessage("error.upload.file.line", new Object[] { line }, I18N.getLocale()));
+                continue;
+            }
+        }
+        return output;
+    }
+
+    private String[] getLineValues(String line) {
+        String[] values = line.split(WorkbookExportFormat.TSV.getSeparator());
+        if (values.length == 1) {
+            values = line.split(WorkbookExportFormat.CSV.getSeparator());
+        }
+        return values;
+    }
+
+    @Atomic(mode = TxMode.WRITE)
+    public void deleteOtherServiceExemption(OtherServiceExemption otherServiceExemption) {
+        otherServiceExemption.delete();
+    }
 }

@@ -608,14 +608,14 @@ if(RoleType.SCIENTIFIC_COUNCIL.actualGroup().isMember(user)){
 			</logic:empty>
 			<logic:notEmpty name="serviceExemptions">
 				<fr:view name="annualTeachingCreditsByPeriodBean" property="serviceExemptions">
-					<fr:schema bundle="TEACHER_CREDITS_SHEET_RESOURCES" type="pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonContractSituation">
-						<fr:slot name="contractSituation.name.content" key="label.serviceExemption.type"/>
+					<fr:schema bundle="TEACHER_CREDITS_SHEET_RESOURCES" type="pt.ist.fenixedu.teacher.evaluation.domain.contracts.NonExerciseSituation">
+						<fr:slot name="description" key="label.serviceExemption.type"/>
 						<fr:slot name="beginDate" key="label.serviceExemption.start"/>
-						<fr:slot name="serviceExemptionEndDate" key="label.serviceExemption.end" layout="null-as-label"/>
+						<fr:slot name="endDate" key="label.serviceExemption.end" layout="null-as-label"/>
 					</fr:schema>
 					<fr:layout name="tabular">
 						<fr:property name="classes" value="tstyle2 thlight thleft mtop05 mbottom05"/>
-					</fr:layout>
+					</fr:layout>					
 				</fr:view>
 			</logic:notEmpty>
 		</logic:iterate>

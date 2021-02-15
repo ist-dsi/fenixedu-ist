@@ -25,9 +25,9 @@
 
 	<parameter name="executionPeriodName" isForPrompting="false" class="java.lang.String"/>
 
-	<field name="contractSituation" class="pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ContractSituation"/>
+	<field name="description" class="java.lang.String"/>
 	<field name="beginDate" class="org.joda.time.LocalDate"/>
-	<field name="serviceExemptionEndDate" class="org.joda.time.LocalDate"/>
+	<field name="endDate" class="org.joda.time.LocalDate"/>
 
 		<background>
 			<band height="0">
@@ -139,7 +139,7 @@
 					<textElement verticalAlignment="Middle">
 						<font/>
 					</textElement>
-				<textFieldExpression   class="java.lang.String"><![CDATA[$F{contractSituation}.getName().getContent()]]></textFieldExpression>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{description}]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
 					<reportElement
@@ -181,7 +181,7 @@
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font/>
 					</textElement>
-				<textFieldExpression   class="java.lang.String"><![CDATA[$F{serviceExemptionEndDate}!=null?$F{serviceExemptionEndDate}.toString("dd/MM/yyyy"):" - "]]></textFieldExpression>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{endDate}!=null?$F{endDate}.toString("dd/MM/yyyy"):" - "]]></textFieldExpression>
 				</textField>
 			</band>
 		</detail>
