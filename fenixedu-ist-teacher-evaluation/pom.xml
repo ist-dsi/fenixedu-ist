@@ -11,7 +11,7 @@
 
     <name>FenixEdu IST Teacher Evaluation</name>
 	<properties>
-		<version.pt.ist.sap-group-integration>3.0.0</version.pt.ist.sap-group-integration>
+		<version.pt.ist.sap-group-integration>3.1.0</version.pt.ist.sap-group-integration>
 	</properties>
     <dependencies>
         <dependency>
