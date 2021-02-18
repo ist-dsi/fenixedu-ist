@@ -22,7 +22,6 @@ import com.google.common.io.ByteStreams;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.accessControl.AcademicAuthorizationGroup;
 import org.fenixedu.academic.domain.accessControl.academicAdministration.AcademicOperationType;
 import org.fenixedu.academic.domain.accounting.Event;
@@ -43,6 +42,7 @@ import org.fenixedu.commons.i18n.I18N;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -97,7 +97,7 @@ public class InvoiceDownloadController {
             model.addAttribute("isAcademicServiceStaff", Boolean.valueOf(isAcademicServiceStaff(user)));
             model.addAttribute("event", event);
             model.addAttribute("isInDebt", Boolean.valueOf(event.isInDebt()));
-            model.addAttribute("eventDetailsUrl", accessControlService.isEventOwner(event, Authenticate.getUser()) ?
+            model.addAttribute("eventDetailsUrl", accessControlService.isEventOwner(event) ?
                     ownerEventDetails(event): eventDetails(event));
 
             final JsonArray sapRequests = event.getSapRequestSet().stream()
@@ -236,7 +236,7 @@ public class InvoiceDownloadController {
     public String sapInvoiceDetails(final @PathVariable SapRequest sapRequest, final Model model, final HttpServletResponse response) {
         final Event event = sapRequest.getEvent();
         if (isAllowedToAccess(event)) {
-            model.addAttribute("eventDetailsUrl", accessControlService.isEventOwner(event, Authenticate.getUser()) ?
+            model.addAttribute("eventDetailsUrl", accessControlService.isEventOwner(event) ?
                     ownerEventDetails(event): eventDetails(event));
 
             model.addAttribute("sapRequest", sapRequest);
@@ -255,13 +255,11 @@ public class InvoiceDownloadController {
     }
 
     private boolean isAllowedToAccess(final Event event) {
-        final User user = Authenticate.getUser();
-        return isOwner(event, user) || isAcademicServiceStaff(user);
+        return isOwner(event) || isAcademicServiceStaff(Authenticate.getUser());
     }
 
-    private boolean isOwner(final Event event, final User user) {
-        final Person person = event == null ? null : event.getPerson();
-        return user != null && user == person.getUser();
+    private boolean isOwner(final Event event) {
+        return accessControlService.isEventOwner(event);
     }
 
     static boolean isAllowedToAccess(final User user) {
