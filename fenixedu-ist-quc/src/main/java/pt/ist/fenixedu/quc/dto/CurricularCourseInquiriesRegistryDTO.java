@@ -77,7 +77,7 @@ public class CurricularCourseInquiriesRegistryDTO implements Serializable {
     }
 
     public double getWeeklyContactLoad() {
-        BigDecimal result = new BigDecimal(getCurricularCourse().getCompetenceCourse().getContactLoad(getExecutionSemester()));
+        BigDecimal result = new BigDecimal(getCurricularCourse().getContactLoad(getExecutionSemester()));
         return result.divide(new BigDecimal(14), 1, RoundingMode.UP).doubleValue();
     }
 
