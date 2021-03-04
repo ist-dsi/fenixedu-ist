@@ -419,14 +419,8 @@ public class SapRequest extends SapRequest_Base {
         setRequest(request.toString());
     }
 
-    private boolean isUnRestrictedDocumentType() {
-        final SapRequestType type = getRequestType();
-        return type == SapRequestType.PAYMENT || type == SapRequestType.PAYMENT_INTEREST
-                || type == SapRequestType.ADVANCEMENT || type == SapRequestType.CLOSE_INVOICE;
-    }
-
     public boolean allowedToSend() {
-        return isUnRestrictedDocumentType() || SapRoot.getInstance().yearIsOpen(getDocumentDate().getYear());
+        return SapRoot.getInstance().yearIsOpen(getDocumentDate().getYear());
     }
 
 }
