@@ -606,13 +606,15 @@ public class VigilantGroupManagement extends FenixDispatchAction {
         List<VigilantBoundBean> bounds = new ArrayList<VigilantBoundBean>();
 
         for (Employee employee : employees) {
-            Person employeePerson = employee.getPerson();
+            if (employee != null) {
+                Person employeePerson = employee.getPerson();
 
-            for (VigilantGroup group : groups) {
-                if (group.hasPerson(employeePerson) != null) {
-                    bounds.add(new VigilantBoundBean(employeePerson, group, true));
-                } else {
-                    bounds.add(new VigilantBoundBean(employeePerson, group, false));
+                for (VigilantGroup group : groups) {
+                    if (group.hasPerson(employeePerson) != null) {
+                        bounds.add(new VigilantBoundBean(employeePerson, group, true));
+                    } else {
+                        bounds.add(new VigilantBoundBean(employeePerson, group, false));
+                    }
                 }
             }
         }
