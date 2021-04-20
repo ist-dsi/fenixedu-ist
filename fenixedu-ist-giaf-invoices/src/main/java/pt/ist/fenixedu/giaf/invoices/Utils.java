@@ -47,6 +47,7 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pt.ist.fenixframework.FenixFramework;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -57,7 +58,9 @@ import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -443,7 +446,31 @@ public class Utils {
         }
     }
 
+    private static InheritableThreadLocal<Map<Integer, Map<String, Boolean>>> overDueMap = new InheritableThreadLocal<>();
+
     public static boolean isOverDue(final Event event) {
+        Map<Integer, Map<String, Boolean>> mapTx = overDueMap.get();
+        if (mapTx != null) {
+            final Map<String, Boolean> map = mapTx.get(Integer.valueOf(FenixFramework.getTransaction().hashCode()));
+            if (map != null && map.containsKey(event.getExternalId())) {
+                return map.get(event.getExternalId());
+            }
+        }
+        final boolean result = isOverDueSimple(event);
+        if (mapTx == null) {
+            mapTx = new HashMap<>();
+            overDueMap.set(mapTx);
+        }
+        Map<String, Boolean> map = mapTx.get(Integer.valueOf(FenixFramework.getTransaction().hashCode()));
+        if (map == null) {
+            map = new HashMap<>();
+            mapTx.put(Integer.valueOf(FenixFramework.getTransaction().hashCode()), map);
+        }
+        map.put(event.getExternalId(), result);
+        return result;
+    }
+
+    private static boolean isOverDueSimple(final Event event) {
         if (event.isCancelled()) {
             return false;
         }
