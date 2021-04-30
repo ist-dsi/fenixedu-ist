@@ -14,10 +14,14 @@ import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.commons.i18n.I18N;
 import org.fenixedu.commons.spreadsheet.WorkbookExportFormat;
 import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.google.common.io.ByteStreams;
 
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.SharedFunction;
 import pt.ist.fenixedu.teacher.evaluation.domain.DepartmentCreditsPool;
@@ -27,8 +31,6 @@ import pt.ist.fenixedu.teacher.evaluation.domain.credits.util.CreditsPoolBean.Cr
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
 import pt.ist.fenixframework.FenixFramework;
-
-import com.google.common.io.ByteStreams;
 
 @Service
 public class CreditsManagementService {
@@ -179,15 +181,19 @@ public class CreditsManagementService {
                 output.add(messageSource.getMessage("error.upload.file.line", new Object[] { line }, I18N.getLocale()));
                 continue;
             }
-            LocalDate beginDate = new LocalDate(values[1]);
-            LocalDate endDate = StringUtils.isBlank(values[2]) ? null : new LocalDate(values[2]);
-            String description = values[3];
-            try {
-                OtherServiceExemption.create(user.getPerson(), beginDate, endDate, description);
-            } catch (DomainException e) {
-                output.add(messageSource.getMessage("error.upload.file.line", new Object[] { line }, I18N.getLocale()));
-                continue;
-            }
+            DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyyy");
+			String description = values[3];
+			try {
+				LocalDate beginDate = LocalDate.parse(values[1], formatter);
+				LocalDate endDate = StringUtils.isBlank(values[2]) ? null : LocalDate.parse(values[2], formatter);
+				OtherServiceExemption.create(user.getPerson(), beginDate, endDate, description);
+			} catch (DomainException e) {
+				output.add(messageSource.getMessage("error.upload.file.line", new Object[] { line }, I18N.getLocale()));
+				continue;
+			} catch (IllegalArgumentException e) {
+				output.add(messageSource.getMessage("error.upload.file.line", new Object[] { line }, I18N.getLocale()));
+				continue;
+			}
         }
         return output;
     }

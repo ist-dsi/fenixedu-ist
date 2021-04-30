@@ -46,12 +46,13 @@ public class NonExerciseSituationsManagementController {
     }
 
     private boolean getTeacherCreditsStateOpen(LocalDate date) {
+    	ExecutionSemester executionSemester = ExecutionSemester.readByDateTime(date.toDateTimeAtStartOfDay());
         for (TeacherCreditsState teacherCreditsState : Bennu.getInstance().getTeacherCreditsStateSet()) {
-            if (teacherCreditsState.getExecutionSemester().equals(ExecutionSemester.readByDateTime(date.toDateTimeAtStartOfDay()))) {
+            if (teacherCreditsState.getExecutionSemester().equals(executionSemester)) {
                 return teacherCreditsState == null || teacherCreditsState.isOpenState();
             }
         }
-        return false;
+        return true;
     }
 
     @RequestMapping(method = POST, value = "uploadOtherServiceExemptions")
