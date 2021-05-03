@@ -53,8 +53,8 @@
 	<tbody><c:forEach var="situation" items="${otherServiceExemptions}">
 		<tr>
 			<td><c:out value="${situation.person.name} (${situation.person.username})"/></td>
-		    <td><c:out value="${situation.beginDate}"/></td>
-	        <td><c:out value="${situation.endDate}"/></td>
+		    <td><c:out value="${situation.beginDate.toString('dd/MM/yyyy')}"/></td>
+	        <td><c:out value="${situation.endDate.toString('dd/MM/yyyy')}"/></td>
 		    <td><c:out value="${situation.description}"/></td>
 		    <spring:url var="deleteUrl" value="/nonExerciseSituations/deleteOtherServiceExemption/${situation.externalId}"></spring:url>
 		    <td><a class="btn btn-default" href="${deleteUrl}"><spring:message code="label.delete"/></a>
