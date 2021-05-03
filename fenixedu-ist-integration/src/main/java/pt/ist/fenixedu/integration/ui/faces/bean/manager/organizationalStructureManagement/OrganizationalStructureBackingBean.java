@@ -459,35 +459,32 @@ public class OrganizationalStructureBackingBean extends FenixBackingBean {
 
         List<Degree> allDegrees = Degree.readNotEmptyDegrees();
 
-        for (Degree degree : allDegrees) {
-            selectItem = new SelectItem();
-
-            if (!degree.isBolonhaDegree()) {
-                if (degree.getDegreeType().isPreBolonhaDegree()) {
-                    selectItem.setLabel("(L) " + degree.getNome());
-                } else if (degree.getDegreeType().isPreBolonhaMasterDegree()) {
-                    selectItem.setLabel("(M) " + degree.getNome());
-                }
-            } else if (degree.isBolonhaDegree()) {
-                if (degree.getDegreeType().isBolonhaDegree()) {
-                    selectItem.setLabel("(L-B) " + degree.getNome());
-                } else if (degree.getDegreeType().isBolonhaMasterDegree()) {
-                    selectItem.setLabel("(M-B) " + degree.getNome());
-                } else if (degree.getDegreeType().isIntegratedMasterDegree()) {
-                    selectItem.setLabel("(MI) " + degree.getNome());
-                } else if (degree.getDegreeType().isAdvancedFormationDiploma()) {
-                    selectItem.setLabel("(DFA) " + degree.getNome());
-                } else if (degree.getDegreeType().isAdvancedSpecializationDiploma()) {
-                    selectItem.setLabel("(DEA) " + degree.getNome());
-                } else if (degree.getDegreeType().isSpecializationDegree()) {
-                    selectItem.setLabel("(SD) " + degree.getNome());
-                }
-            }
-
-            selectItem.setValue(degree.getExternalId().toString());
-            list.add(selectItem);
-        }
-
+		for (Degree degree : allDegrees) {
+			selectItem = new SelectItem();
+			if (degree.getDegreeType().isPreBolonhaDegree()) {
+				selectItem.setLabel("(L) " + degree.getNome());
+			} else if (degree.getDegreeType().isPreBolonhaMasterDegree()) {
+				selectItem.setLabel("(M) " + degree.getNome());
+			} else if (degree.getDegreeType().isBolonhaDegree()) {
+				selectItem.setLabel("(L-B) " + degree.getNome());
+			} else if (degree.getDegreeType().isBolonhaMasterDegree()) {
+				selectItem.setLabel("(M-B) " + degree.getNome());
+			} else if (degree.getDegreeType().isIntegratedMasterDegree()) {
+				selectItem.setLabel("(MI) " + degree.getNome());
+			} else if (degree.getDegreeType().isAdvancedFormationDiploma()) {
+				selectItem.setLabel("(DFA) " + degree.getNome());
+			} else if (degree.getDegreeType().isAdvancedSpecializationDiploma()) {
+				selectItem.setLabel("(DEA) " + degree.getNome());
+			} else if (degree.getDegreeType().isSpecializationDegree()) {
+				selectItem.setLabel("(SD) " + degree.getNome());
+			} else if (degree.getDegreeType().getMinor()) {
+				selectItem.setLabel("(Min) " + degree.getNome());
+			} else {
+				selectItem.setLabel("(" + degree.getDegreeTypeName() + ") " + degree.getNome());
+			}
+			selectItem.setValue(degree.getExternalId().toString());
+			list.add(selectItem);
+		}
         Collections.sort(list, Comparator.comparing(SelectItem::getLabel));
         addDefaultSelectedItem(list);
         return list;
