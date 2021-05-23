@@ -21,11 +21,9 @@ package pt.ist.fenixedu.teacher.evaluation.domain;
 import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.bennu.core.annotation.GroupArgument;
-import org.fenixedu.bennu.core.annotation.GroupArgumentParser;
 import org.fenixedu.bennu.core.annotation.GroupOperator;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.groups.PersistentGroup;
-import org.fenixedu.bennu.core.groups.ArgumentParser;
 import org.fenixedu.bennu.core.groups.CustomGroup;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.joda.time.DateTime;
@@ -34,24 +32,6 @@ import java.util.stream.Stream;
 
 @GroupOperator("departmentManager")
 public class DepartmentManagerGroup extends CustomGroup {
-    @GroupArgumentParser
-    public class DepartmentManagerArgumentParser implements ArgumentParser<Department> {
-        @Override
-        public Department parse(String argument) {
-            return Department.find(argument);
-        }
-
-        @Override
-        public String serialize(Department argument) {
-            return argument.getAcronym();
-        }
-
-        @Override
-        public Class<Department> type() {
-            return Department.class;
-        }
-    }
-
     @GroupArgument("")
     private Department department;
 
