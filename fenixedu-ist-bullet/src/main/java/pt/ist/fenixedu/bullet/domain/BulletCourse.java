@@ -9,6 +9,7 @@ import org.fenixedu.academic.domain.Department;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.Professorship;
 import org.fenixedu.academic.domain.Teacher;
+import org.fenixedu.academic.domain.exceptions.DomainException;
 
 public class BulletCourse extends BulletObject {
     private ExecutionCourse course;
@@ -40,5 +41,14 @@ public class BulletCourse extends BulletObject {
             departments.retainAll(teacherDepartments);
         }
         slots.put(BulletObjectTag.AREA.unit(), departments.isEmpty() ? "" : BulletArea.key(departments.iterator().next()));
+        slots.put(BulletObjectTag.ECTS.unit(), creditsFor(course));
+    }
+
+    private String creditsFor(final ExecutionCourse course) {
+        try {
+            return course.getEctsCredits() == null ? "0" : course.getEctsCredits().toString();
+        } catch (final DomainException ex) {
+            return "Data is not consistent";
+        }
     }
 }

@@ -19,7 +19,7 @@ public enum BulletObjectTag {
     COURSE("Disciplina", "Disciplinas", BulletCourse.class, BulletObjectType.CURRICULUM),
     LOAD("CargaSemanal", "CargasSemanais", BulletLoad.class, BulletObjectType.SCHEDULE),
     CLASS("Turma", "Turmas", BulletClass.class, BulletObjectType.ENTITY),
-    NEWCLASS("Turma", "Turmas", NewBulletClass.class, BulletObjectType.ENTITY),
+    //NEWCLASS("Turma", "Turmas", NewBulletClass.class, BulletObjectType.ENTITY),
     
     NAME("Nome"),
     DESCRIPTION("Descricao"),
@@ -42,7 +42,8 @@ public enum BulletObjectTag {
     PLAN_CODE("CodigoPlanoCurricular"),
     NUMBER_STUDENTS("NumeroAlunos"),
     MAX_LIMIT("LimiteMaximo"),
-    CONSECUTIVE_LIMIT("LimiteConsecutivo");
+    CONSECUTIVE_LIMIT("LimiteConsecutivo"),
+    ECTS("ECTS");
 
     private String unit, group = null;
     private Class<? extends BulletObject> entity = null;
