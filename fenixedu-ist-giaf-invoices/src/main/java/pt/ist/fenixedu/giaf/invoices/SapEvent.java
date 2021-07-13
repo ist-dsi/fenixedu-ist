@@ -13,6 +13,7 @@ import org.fenixedu.academic.domain.accounting.AccountingTransactionDetail;
 import org.fenixedu.academic.domain.accounting.CustomEvent;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.EventType;
+import org.fenixedu.academic.domain.accounting.Exemption;
 import org.fenixedu.academic.domain.accounting.PaymentMethod;
 import org.fenixedu.academic.domain.accounting.accountingTransactions.detail.SibsTransactionDetail;
 import org.fenixedu.academic.domain.accounting.calculator.CreditEntry;
@@ -26,6 +27,8 @@ import org.fenixedu.academic.domain.accounting.calculator.Refund;
 import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeAndInsuranceEvent;
 import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeEvent;
 import org.fenixedu.academic.domain.accounting.events.EnrolmentEvaluationEvent;
+import org.fenixedu.academic.domain.accounting.events.EventExemption;
+import org.fenixedu.academic.domain.accounting.events.EventExemptionJustification;
 import org.fenixedu.academic.domain.accounting.events.ImprovementOfApprovedEnrolmentEvent;
 import org.fenixedu.academic.domain.accounting.events.SpecialSeasonEnrolmentEvent;
 import org.fenixedu.academic.domain.accounting.events.dfa.DFACandidacyEvent;
@@ -51,6 +54,7 @@ import pt.ist.fenixedu.domain.SapRequest;
 import pt.ist.fenixedu.domain.SapRequestType;
 import pt.ist.fenixedu.domain.SapRoot;
 import pt.ist.fenixframework.Atomic;
+import pt.ist.fenixframework.DomainObject;
 import pt.ist.fenixframework.FenixFramework;
 import pt.ist.sap.client.SapFinantialClient;
 
@@ -328,8 +332,17 @@ public class SapEvent {
                                           SapRequest debtRequest, boolean isNewDate) {
         checkValidDocumentNumber(debtRequest.getDocumentNumber(), event);
 
+        final EventExemption exemption = FenixFramework.getDomainObject(creditEntry.getId());
+        final DateTime documentDate = getDocumentDate(creditEntry.getCreated(), isNewDate);
+        LocalDate dispatchDate = documentDate.toLocalDate();
+        if (exemption != null) {
+            EventExemptionJustification justification = (EventExemptionJustification) exemption.getExemptionJustification();
+            if (justification.getDispatchDate() != null) {
+                dispatchDate = justification.getDispatchDate();
+            }
+        }
         JsonObject data = toJsonDebtCredit(event, amountToRegister, clientId,
-                getDocumentDate(creditEntry.getCreated(), isNewDate), new DateTime(), true, "NJ", false, isNewDate, debtRequest);
+                documentDate, new DateTime(), dispatchDate, true, "NJ", false, isNewDate, debtRequest);
         String documentNumber = getDocumentNumber(data, false);
         SapRequest sapRequest =
                 new SapRequest(event, clientId, amountToRegister, documentNumber, SapRequestType.DEBT_CREDIT, Money.ZERO, data);
@@ -1216,11 +1229,12 @@ public class SapEvent {
     }
 
     private JsonObject toJsonDebtCredit(Event event, Money debtFenix, String clientId, DateTime documentDate, DateTime entryDate,
-                                        boolean isDebtRegistration, String docType, boolean isToDebit, boolean isNewDate, SapRequest debtRequest) {
+                                        LocalDate dispatchDate, boolean isDebtRegistration, String docType, boolean isToDebit, boolean isNewDate, SapRequest debtRequest) {
         JsonObject request = new JsonParser().parse(debtRequest.getRequest()).getAsJsonObject();
-        String originalMetadata = request.get("workingDocument").getAsJsonObject().get("metadata").getAsString();
+        String metadata = request.get("workingDocument").getAsJsonObject().get("metadata").getAsString();
+        metadata = metadata.replace("}", ", \"Despacho\":\"" + dispatchDate.toString("yyyy-MM-dd") + "\"}");
         JsonObject json = toJsonDebt(event, debtFenix, clientId, documentDate, entryDate, isDebtRegistration, docType, isToDebit,
-                isNewDate, originalMetadata);
+                isNewDate, metadata);
         JsonObject workingDocument = json.get("workingDocument").getAsJsonObject();
         workingDocument.addProperty("workOriginDocNumber", debtRequest.getDocumentNumber());
         return json;
