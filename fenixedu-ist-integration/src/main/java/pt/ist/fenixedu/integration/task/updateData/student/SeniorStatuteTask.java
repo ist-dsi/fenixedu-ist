@@ -1,15 +1,9 @@
 package pt.ist.fenixedu.integration.task.updateData.student;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.EnrolmentPeriod;
+import org.fenixedu.academic.domain.EnrolmentPeriodInExtraordinarySeasonEvaluations;
 import org.fenixedu.academic.domain.EnrolmentPeriodInSpecialSeasonEvaluations;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
@@ -19,10 +13,17 @@ import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.SeniorStatute;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.scheduler.CronTask;
+import org.fenixedu.bennu.scheduler.annotation.Task;
 import org.fenixedu.bennu.scheduler.custom.CustomTask;
 import org.fenixedu.commons.i18n.I18N;
 import org.joda.time.LocalDate;
-import org.fenixedu.bennu.scheduler.annotation.Task;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 @Task(englishTitle = "Update senior statute 3 weeks before the special season and onwards")
 public class SeniorStatuteTask extends CronTask {
@@ -73,7 +74,8 @@ public class SeniorStatuteTask extends CronTask {
         Map<DegreeType, ExecutionSemester> switcherTermEnrolmentPeriods = null;
 
         for (EnrolmentPeriod enrolmentPeriod : enrolmentPeriods) {
-            if (!(enrolmentPeriod instanceof EnrolmentPeriodInSpecialSeasonEvaluations)) {
+            if (!(enrolmentPeriod instanceof EnrolmentPeriodInSpecialSeasonEvaluations)
+                    && !(enrolmentPeriod instanceof EnrolmentPeriodInExtraordinarySeasonEvaluations)) {
                 continue;
             }
             LocalDate statuteGrantorStartDate = new LocalDate(enrolmentPeriod.getStartDateDateTime().toLocalDate());
