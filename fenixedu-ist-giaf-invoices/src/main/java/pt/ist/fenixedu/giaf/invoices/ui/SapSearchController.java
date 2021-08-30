@@ -28,8 +28,7 @@ public class SapSearchController {
             model.addAttribute("sizeWarning", BundleUtil.getString("resources.GiafInvoicesResources", "warning.no.documents"));
             return "sap-integration/search";
         } else {
-            model.addAttribute("event", eventOid);
-            return "sap-invoice-viewer/eventDetails";
+            return "redirect:/sap-invoice-viewer/" + eventOid;
         }
     }
 }
