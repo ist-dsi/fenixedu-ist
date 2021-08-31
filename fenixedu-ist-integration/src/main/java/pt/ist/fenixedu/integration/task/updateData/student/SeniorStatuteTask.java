@@ -7,6 +7,7 @@ import org.fenixedu.academic.domain.EnrolmentPeriodInExtraordinarySeasonEvaluati
 import org.fenixedu.academic.domain.EnrolmentPeriodInSpecialSeasonEvaluations;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.degreeStructure.CycleType;
 import org.fenixedu.academic.domain.student.Registration;
@@ -14,7 +15,6 @@ import org.fenixedu.academic.domain.student.SeniorStatute;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.scheduler.CronTask;
 import org.fenixedu.bennu.scheduler.annotation.Task;
-import org.fenixedu.bennu.scheduler.custom.CustomTask;
 import org.fenixedu.commons.i18n.I18N;
 import org.joda.time.LocalDate;
 
@@ -248,7 +248,11 @@ public class SeniorStatuteTask extends CronTask {
     }
 
     protected boolean hasConditionsToFinishMasterDegree(final Registration registration, final ExecutionYear executionYear) {
-        Enrolment dissertationEnrolment = registration.getStudentCurricularPlan(executionYear).getLatestDissertationEnrolment();
+        final StudentCurricularPlan scp = registration.getStudentCurricularPlan(executionYear);
+        if (scp == null) {
+            return false;
+        }
+        Enrolment dissertationEnrolment = scp.getLatestDissertationEnrolment();
 
         if (dissertationEnrolment == null) {
             return false;
