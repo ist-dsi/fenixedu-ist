@@ -38,7 +38,7 @@ public class SetFirstCycleFinalistStatus extends CronTask {
             .findAny().orElse(null);
     private static final Supplier<StatuteType> CREATOR = () -> new StatuteType(CODE, NAME, false,
             false,false, false, false,
-            false,true, false, false, true);
+            false,true, false, false, true, true);
 
     @Override
     public void runTask() throws Exception {
