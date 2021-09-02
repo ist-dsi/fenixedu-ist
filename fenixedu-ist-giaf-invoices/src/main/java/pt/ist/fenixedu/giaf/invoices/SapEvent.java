@@ -1663,7 +1663,8 @@ public class SapEvent {
             return new SimpleImmutableEntry<String, String>("0031", "TAXAS DE MATRICULA");
         }
         if (event instanceof SpecialSeasonEnrolmentEvent
-                || (event instanceof EnrolmentEvaluationEvent && event.getEventType() == EventType.SPECIAL_SEASON_ENROLMENT)) {
+                || (event instanceof EnrolmentEvaluationEvent && event.getEventType() == EventType.SPECIAL_SEASON_ENROLMENT)
+                || (event instanceof EnrolmentEvaluationEvent && event.getEventType() == EventType.EXTRAORDINARY_SEASON_ENROLMENT)) {
             return new SimpleImmutableEntry<String, String>("0032", "TAXAS  DE EXAMES");
         }
         if (event.isPhdEvent()) {
