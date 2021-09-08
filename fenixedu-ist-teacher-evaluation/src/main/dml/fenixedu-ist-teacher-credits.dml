@@ -123,6 +123,9 @@ class credits.CalculateCreditsQueueJob extends .org.fenixedu.academic.domain.Que
 class credits.CloseCreditsQueueJob extends .org.fenixedu.academic.domain.QueueJob {
 }
 
+class PersistentDepartmentManagerGroup extends .org.fenixedu.bennu.core.domain.groups.PersistentGroup {
+}
+
 class credits.AnnualTeachingCredits  {
     BigDecimal efectiveTeachingLoad;
     BigDecimal teachingCredits;
@@ -510,5 +513,15 @@ relation PersonDepartment {
     }
     .org.fenixedu.academic.domain.Department playsRole manageableDepartmentCredits {
         multiplicity *;
+    }
+}
+
+relation PersistentDepartmentManagerGroupDepartment {
+    PersistentDepartmentManagerGroup playsRole departmentManagerGroup {
+        multiplicity 0..1;
+    }
+
+    .org.fenixedu.academic.domain.Department playsRole department {
+        multiplicity 1..1;
     }
 }
