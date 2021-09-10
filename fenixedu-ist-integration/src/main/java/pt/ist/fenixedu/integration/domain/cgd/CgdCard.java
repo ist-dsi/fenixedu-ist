@@ -139,7 +139,8 @@ public class CgdCard extends CgdCard_Base {
         if (user != null) {
             final int year = Year.now().getValue();
             final CgdCard card = findCardFor(user, year, false);
-            return card != null && card.getAllowSendBankDetails();
+            return card != null && card.getAllowSendBankDetails() != null
+                    && card.getAllowSendBankDetails();
         }
         return null;
     }
