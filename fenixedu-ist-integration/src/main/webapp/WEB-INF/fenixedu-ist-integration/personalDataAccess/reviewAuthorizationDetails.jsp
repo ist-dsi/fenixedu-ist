@@ -118,39 +118,6 @@
                 </div>
             </div>
         </div>
-
-        <h2>
-            ${bpiBankTitle}
-        </h2>
-
-        <div class="alert well">
-            ${bpiBankMessage}
-
-
-            <div class="row">
-                <div class="col-lg-12 text-left">
-                    <p><strong>Autoriza a cedência de dados acima descrita?</strong></p>
-
-                    <form action="${baseUrl}/bpi-bank" method="post">
-                        ${csrf.field()}
-                        <p>
-                            <span style="line-height: 20px; vertical-align: bottom; margin-right: 55px;">
-                                <input type="radio" name="allowBpiBankAccess" value="true" onclick="removeBpiDisabled()" <c:if test="${allowBpiBankAccess}">checked</c:if>>
-                                <spring:message code="authorize.personal.data.access.yes"/>
-                            </span>
-                            <span>
-                                <input type="radio" name="allowBpiBankAccess" value="false" onclick="removeBpiDisabled()" <c:if test="${!allowBpiBankAccess}">checked</c:if>>
-                                <spring:message code="authorize.personal.data.access.no"/>
-                            </span>
-                        </p>
-
-                        <button id="bpi-form-submit-button" class="btn btn-primary disabled" type="submit">
-                            <spring:message code="authorize.personal.data.access.submit"/>
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
 </div>
 
 <script type="text/javascript">
@@ -159,8 +126,5 @@
     }
     function removeCgdDisabled() {
         $('#cgd-form-submit-button').removeClass('disabled');
-    }
-    function removeBpiDisabled() {
-        $('#bpi-form-submit-button').removeClass('disabled');
     }
 </script>

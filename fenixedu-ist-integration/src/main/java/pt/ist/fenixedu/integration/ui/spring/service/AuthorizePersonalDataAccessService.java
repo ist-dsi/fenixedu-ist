@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
-import pt.ist.fenixedu.integration.domain.BpiCard;
 import pt.ist.fenixedu.integration.domain.SantanderCard;
 import pt.ist.fenixedu.integration.domain.cgd.CgdCard;
 
@@ -26,19 +25,17 @@ public class AuthorizePersonalDataAccessService {
     private static final String santanderBankMessage = "authorize.personal.data.access.description.santander.bank";
     private static final String cgdBankTitle = "authorize.personal.data.access.title.cgd.bank";
     private static final String cgdBankMessage = "authorize.personal.data.access.description.cgd.bank";
-    private static final String bpiBankTitle = "authorize.personal.data.access.title.bpi.bank";
-    private static final String bpiBankMessage = "authorize.personal.data.access.description.bpi.bank";
 
     private final MessageSource messageSource;
     private final SendCgdCardService sendCgdCardService;
 
     @Autowired
-    public AuthorizePersonalDataAccessService(MessageSource messageSource, SendCgdCardService sendCgdCardService) {
+    public AuthorizePersonalDataAccessService(final MessageSource messageSource, final SendCgdCardService sendCgdCardService) {
         this.messageSource = messageSource;
         this.sendCgdCardService = sendCgdCardService;
     }
 
-    private String getMessage(String key) {
+    private String getMessage(final String key) {
         return messageSource.getMessage(key, new Object[0], I18N.getLocale());
     }
 
@@ -74,36 +71,21 @@ public class AuthorizePersonalDataAccessService {
         return getMessage(cgdBankMessage);
     }
 
-    public String getBpiBankTitle() {
-        return getMessage(bpiBankTitle);
-    }
-
-    public String getBpiBankMessage() {
-        return getMessage(bpiBankMessage);
-    }
-
-    public void setSantanderGrantBankAccess(boolean allow, User user) {
+    public void setSantanderGrantBankAccess(final boolean allow, final User user) {
         SantanderCard.setGrantBankAccess(allow, user, getSantanderBankTitle(), getSantanderBankMessage());
     }
 
-    public String setCgdGrantBankAccess(boolean allow, User user) {
-        CgdCard cgdCard = CgdCard.setGrantBankAccess(allow, user, getCgdBankTitle(), getCgdBankMessage());
+    public String setCgdGrantBankAccess(final boolean allow, final User user) {
+        final CgdCard cgdCard = CgdCard.setGrantBankAccess(allow, user, getCgdBankTitle(), getCgdBankMessage());
         return sendCgdCardService.sendCgdCard(cgdCard);
     }
 
-    public void setBpiGrantBankAccess(boolean allow, User user) {
-        BpiCard.setGrantBankAccess(allow, user, getBpiBankTitle(), getBpiBankMessage());
-    }
-
-    public void setSantanderGrantCardAccess(boolean allow, User user) {
+    public void setSantanderGrantCardAccess(final boolean allow, final User user) {
         SantanderCard.setGrantCardAccess(allow, user, getSantanderCardTitle(), getSantanderCardMessage());
     }
 
-    public void setCgdGrantCardAccess(boolean allow, User user) {
-        final CgdCard card = CgdCard.setGrantCardAccess(allow, user, getCgdCardTitle(), getCgdCardMessage());
+    public void setCgdGrantCardAccess(final boolean allow, final User user) {
+        CgdCard.setGrantCardAccess(allow, user, getCgdCardTitle(), getCgdCardMessage());
     }
 
-    public void setBpiGrantCardAccess(boolean allowBpiBankAccess, User user) {
-        // does not exist
-    }
 }
