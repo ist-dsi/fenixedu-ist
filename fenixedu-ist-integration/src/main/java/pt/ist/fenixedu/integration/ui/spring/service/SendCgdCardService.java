@@ -32,43 +32,61 @@ public class SendCgdCardService {
         this.registrationDeclarationForBanksService = registrationDeclarationForBanksService;
     }
 
-    @Atomic(mode = TxMode.READ)
     public String sendCgdCard(CgdCard card) {
-        if (card == null) {
-            return "CGD: Não existe cartão para este pedido.";
-        }
-        final Person person = card.getUser().getPerson();
-        final String username = card.getUser().getUsername();
-        if (BooleanUtils.isTrue(card.getAllowSendBankDetails())) {
-            if (person != null) {
-                final Student student = person.getStudent();
-                if (student != null) {
-                    for (final Registration registration : student.getRegistrationsSet()) {
-                        if (registration.isActive()) {
-                            CgdForm43Sender sender = new CgdForm43Sender();
-                            boolean form = sender.sendForm43For(registration);
-                            boolean attachment = sender.uploadFormAttachment(registration,registrationDeclarationForBanksService
-                                    .getRegistrationDeclarationFileForBanks(registration));
-                            LOGGER.info("Sent Form43 ({}) and registration declaration file ({}) for registration {}",
-                                    form, attachment, registration.getExternalId() );
-                            if (form && attachment) {
-                                FenixFramework.atomic(() -> card.setSuccessfulSentData(new DateTime()));
-                                return String.format("CGD: Comunicação efectuada à CGD com sucesso para o utilizador %s",
-                                        username);
-                            } else {
-                                return String.format("CGD: Comunicação falhou para o utilizador %s. Contactar a CGD.", username);
-                            }
-                        }
-                    }
-                    return String.format("CGD: Não existe uma matrícula activa para o aluno %s", username);
-                }
-                return String.format("CGD: Utilizador %s não é aluno", username);
-            } else {
-                return  String.format("CGD: Utilizador %s não tem pessoa activa", username);
-            }
-        }
-        return String.format("CGD: %s - É necessário autorização a cedência de dados à CGD para efeitos de abertura de conta",
-                username) ;
+        CgdRunnable cgdRunnable = new CgdRunnable(card);
+        Thread thread = new Thread(cgdRunnable);
+        thread.start();
+        return "CGD: Pedido lançado para processamento.";
     }
 
+    private class CgdRunnable implements Runnable {
+
+        private CgdCard card;
+        public CgdRunnable(CgdCard card) {
+            this.card = card;
+        }
+
+        @Atomic(mode = TxMode.READ)
+        public void run() {
+            if (this.card == null) {
+                LOGGER.info("CGD: Não existe cartão para este pedido.");
+                return;
+            }
+            final Person person = this.card.getUser().getPerson();
+            final String username = this.card.getUser().getUsername();
+            if (BooleanUtils.isTrue(this.card.getAllowSendBankDetails())) {
+                if (person != null) {
+                    final Student student = person.getStudent();
+                    if (student != null) {
+                        for (final Registration registration : student.getRegistrationsSet()) {
+                            if (registration.isActive()) {
+                                CgdForm43Sender sender = new CgdForm43Sender();
+                                boolean form = sender.sendForm43For(registration);
+                                boolean attachment = sender.uploadFormAttachment(registration,registrationDeclarationForBanksService
+                                        .getRegistrationDeclarationFileForBanks(registration));
+                                LOGGER.info("Sent Form43 ({}) and registration declaration file ({}) for registration {}",
+                                        form, attachment, registration.getExternalId() );
+                                if (form && attachment) {
+                                    FenixFramework.atomic(() -> card.setSuccessfulSentData(new DateTime()));
+                                    LOGGER.info(String.format("CGD: Comunicação efectuada à CGD com sucesso para o utilizador %s", username));
+                                    return;
+                                } else {
+                                    LOGGER.info(String.format("CGD: Comunicação falhou para o utilizador %s. Contactar a CGD.", username));
+                                    return;
+                                }
+                            }
+                        }
+                        LOGGER.info(String.format("CGD: Não existe uma matrícula activa para o aluno %s", username));
+                        return;
+                    }
+                    LOGGER.info(String.format("CGD: Utilizador %s não é aluno", username));
+                    return;
+                } else {
+                    LOGGER.info(String.format("CGD: Utilizador %s não tem pessoa activa", username));
+                    return;
+                }
+            }
+            LOGGER.info(String.format("CGD: %s - É necessário autorização a cedência de dados à CGD para efeitos de abertura de conta", username));
+        }
+    }
 }
