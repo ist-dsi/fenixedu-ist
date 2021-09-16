@@ -23,7 +23,6 @@ import pt.ist.fenixframework.FenixFramework;
 @Service
 public class SendCgdCardService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SendCgdCardService.class);
-    private static final int waitForThread = 3000;
 
     private RegistrationDeclarationForBanksService registrationDeclarationForBanksService;
 
@@ -34,21 +33,15 @@ public class SendCgdCardService {
     }
 
     public String sendCgdCard(CgdCard card) {
-        try {
-            CgdRunnable cgdRunnable = new CgdRunnable(card);
-            Thread thread = new Thread(cgdRunnable);
-            thread.start();
-            thread.join(waitForThread);
-            return cgdRunnable.getResult();
-        } catch (Exception e) {
-            return "CGD: Problemas de comunicação.";
-        }
+        CgdRunnable cgdRunnable = new CgdRunnable(card);
+        Thread thread = new Thread(cgdRunnable);
+        thread.start();
+        return "CGD: Pedido lançado para processamento.";
     }
 
     private class CgdRunnable implements Runnable {
 
         private CgdCard card;
-        private String result;
         public CgdRunnable(CgdCard card) {
             this.card = card;
         }
@@ -75,29 +68,25 @@ public class SendCgdCardService {
                                         form, attachment, registration.getExternalId() );
                                 if (form && attachment) {
                                     FenixFramework.atomic(() -> card.setSuccessfulSentData(new DateTime()));
-                                    result = String.format("CGD: Comunicação efectuada à CGD com sucesso para o utilizador %s", username);
+                                    LOGGER.info(String.format("CGD: Comunicação efectuada à CGD com sucesso para o utilizador %s", username));
                                     return;
                                 } else {
-                                    result = String.format("CGD: Comunicação falhou para o utilizador %s. Contactar a CGD.", username);
+                                    LOGGER.info(String.format("CGD: Comunicação falhou para o utilizador %s. Contactar a CGD.", username));
                                     return;
                                 }
                             }
                         }
-                        result = String.format("CGD: Não existe uma matrícula activa para o aluno %s", username);
+                        LOGGER.info(String.format("CGD: Não existe uma matrícula activa para o aluno %s", username));
                         return;
                     }
-                    result = String.format("CGD: Utilizador %s não é aluno", username);
+                    LOGGER.info(String.format("CGD: Utilizador %s não é aluno", username));
                     return;
                 } else {
-                    result = String.format("CGD: Utilizador %s não tem pessoa activa", username);
+                    LOGGER.info(String.format("CGD: Utilizador %s não tem pessoa activa", username));
                     return;
                 }
             }
-            result = String.format("CGD: %s - É necessário autorização a cedência de dados à CGD para efeitos de abertura de conta", username);
-        }
-
-        public String getResult() {
-            return this.result;
+            LOGGER.info(String.format("CGD: %s - É necessário autorização a cedência de dados à CGD para efeitos de abertura de conta", username));
         }
     }
 }
