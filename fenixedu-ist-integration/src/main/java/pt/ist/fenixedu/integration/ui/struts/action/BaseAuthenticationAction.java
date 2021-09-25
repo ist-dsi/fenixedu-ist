@@ -151,9 +151,10 @@ public class BaseAuthenticationAction extends FenixAction {
     }
 
     private boolean hasMissingRAIDESInformation(User userView) {
-        return userView.getPerson() != null && userView.getPerson().getStudent() != null
-                && hasActiveClassPeriod(userView.getPerson().getStudent())
-                && hasFirstTimeCycleRAIDESToRespond(userView.getPerson().getStudent());
+        return false; //TODO it's temporary until revision of this process
+//        return userView.getPerson() != null && userView.getPerson().getStudent() != null
+//                && hasActiveClassPeriod(userView.getPerson().getStudent())
+//                && hasFirstTimeCycleRAIDESToRespond(userView.getPerson().getStudent());
     }
 
     public static boolean hasFirstTimeCycleRAIDESToRespond(Student student) {
