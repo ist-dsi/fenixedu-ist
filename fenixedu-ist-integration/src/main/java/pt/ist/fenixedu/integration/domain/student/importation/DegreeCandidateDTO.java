@@ -21,12 +21,7 @@
  */
 package pt.ist.fenixedu.integration.domain.student.importation;
 
-import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.Locale;
-
+import com.google.common.base.Strings;
 import org.fenixedu.PostalCodeValidator;
 import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.EntryPhase;
@@ -52,7 +47,11 @@ import org.joda.time.YearMonthDay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Strings;
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Collection;
+import java.util.Locale;
 
 public class DegreeCandidateDTO {
 
@@ -106,6 +105,8 @@ public class DegreeCandidateDTO {
     private String istUniversity;
 
     private String dgesPassword;
+
+    private String nationality;
 
     @Override
     public String toString() {
@@ -184,6 +185,7 @@ public class DegreeCandidateDTO {
         this.highSchoolType = parseHighSchoolType(fields[22].trim());
         this.highSchoolDegreeDesignation = fields[23].trim();
         this.dgesPassword = fields[24].trim();
+        this.nationality = fields.length > 25 ? fields[25].trim() : null;
 
         return true;
     }
@@ -378,6 +380,10 @@ public class DegreeCandidateDTO {
     public void setDgesPassword(String dgesPassword) {
         this.dgesPassword = dgesPassword;
     }
+
+    public String getNationality() { return nationality; }
+
+    public void setNationality(String nationality) { this.nationality = nationality; }
 
     public Person getMatchingPerson() throws MatchingPersonException {
         Collection<Person> persons = Person.readByDocumentIdNumber(getDocumentIdNumber());
