@@ -96,8 +96,6 @@ public class BaseAuthenticationAction extends FenixAction {
                 return handleSessionCreationAndForwardToTeachingInquiriesResponseQuestion(request, userView, httpSession);
             } else if (isRegentAndHasInquiriesToRespond(userView)) {
                 return handleSessionCreationAndForwardToRegentInquiriesResponseQuestion(request, userView, httpSession);
-            } else if (isStudentAndHasFirstTimeCycleInquiryToRespond(userView)) {
-                return handleSessionCreationAndForwardToFirstTimeCycleInquiry(request, userView, httpSession);
             } else if (isStudentAndHasGratuityDebtsToPay(userView)) {
                 return handleSessionCreationAndForwardToGratuityPaymentsReminder(request, userView, httpSession);
             } else if (isAlumniWithNoData(userView)) {
@@ -110,19 +108,6 @@ public class BaseAuthenticationAction extends FenixAction {
         } catch (AuthorizationException e) {
             return getAuthenticationFailedForward(request, response);
         }
-    }
-
-    private ActionForward handleSessionCreationAndForwardToFirstTimeCycleInquiry(HttpServletRequest request, User userView,
-            HttpSession session) {
-        return new ActionForward("/respondToFirstTimeCycleInquiry.do?method=showQuestion");
-    }
-
-    private boolean isStudentAndHasFirstTimeCycleInquiryToRespond(User userView) {
-        if (userView.getPerson() != null && userView.getPerson().getStudent() != null) {
-            final Student student = userView.getPerson().getStudent();
-            return hasActiveClassPeriod(student) && InquiryStudentCycleAnswer.hasFirstTimeCycleInquiryToRespond(student);
-        }
-        return false;
     }
 
     private boolean hasMissingTeacherService(User userView) {
