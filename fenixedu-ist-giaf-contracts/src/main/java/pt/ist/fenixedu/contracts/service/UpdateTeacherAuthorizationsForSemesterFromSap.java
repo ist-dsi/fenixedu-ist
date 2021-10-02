@@ -194,6 +194,8 @@ public class UpdateTeacherAuthorizationsForSemesterFromSap {
 					TeacherCategory.findByCode("professor-auxiliar").orElse(null));
 			categoryMap.put("Docentes" + "Prof Auxiliar Convid",
 					TeacherCategory.findByCode("prof-auxiliar-convidado").orElse(null));
+			categoryMap.put("Docentes" + "Monitor",
+					TeacherCategory.findByCode("apoio-ao-ensino-monitor").orElse(null));
 
 			categoryMap.put("Docentes" + "Prof Auxiliar Agreg.",
 					TeacherCategory.findByCode("professor-auxiliar").orElse(null));
@@ -345,7 +347,7 @@ public class UpdateTeacherAuthorizationsForSemesterFromSap {
 		if (teacherCategory != null) {
 			if (Strings.isNullOrEmpty(colaboratorSituation.fulltimeequivalent())) {
 				if (isTeacherMonitorCategory(colaboratorSituation, teacherCategory)) {
-					return Double.valueOf(4);
+					return Double.valueOf(6);
 				} else if (isTeacherInvitedCategory(colaboratorSituation, teacherCategory)) {
 					return Double.valueOf(12);
 				} else {
@@ -358,7 +360,7 @@ public class UpdateTeacherAuthorizationsForSemesterFromSap {
 			if (fullTimeEquivalent != null) {
 				if (fullTimeEquivalent.compareTo(BigDecimal.ONE) >= 0) {
 					if (isTeacherMonitorCategory(colaboratorSituation, teacherCategory)) {
-						return Double.valueOf(4);
+						return Double.valueOf(6);
 					} else if (isTeacherInvitedCategory(colaboratorSituation, teacherCategory)) {
 						return exclusive ? Double.valueOf(18) : Double.valueOf(12);
 					} else {
