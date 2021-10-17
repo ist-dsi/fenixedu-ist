@@ -653,7 +653,10 @@
     <slot name="tutorship.studentCurricularPlan.person.name" key="label.name" />
     <slot name="tutorship.studentCurricularPlan.registration.startExecutionYear.year" key="label.entryYear" />
     <slot name="tutorship.studentCurricularPlan.registration.degree.sigla" key="label.degreeCurricularPlan.degree.sigla" />
-    <slot name="tutorship.studentCurricularPlan.person.phone" key="label.phone" />
+    <slot name="tutorship.studentCurricularPlan.person.defaultMobilePhone" key="label.phone" layout="null-as-label">
+        <property name="subSchema" value="tutorate.phone.number" />
+        <property name="subLayout" value="values" />
+    </slot>
     <slot name="isDislocatedFromPermanentResidence" key="label.dislocatedFromPermanentResidence" />
     <slot name="tutorship.studentCurricularPlan.person" key="label.email" layout="link">
         <property name="linkFormat" value="mailto:${institutionalOrDefaultEmailAddressValue}"/>

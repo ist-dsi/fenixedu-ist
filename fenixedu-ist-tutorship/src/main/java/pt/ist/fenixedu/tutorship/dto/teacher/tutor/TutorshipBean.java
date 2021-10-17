@@ -49,7 +49,7 @@ public class TutorshipBean implements Serializable {
         Registration registration = getTutorship().getStudentCurricularPlan().getRegistration();
         PersonalIngressionData personalIngressionData =
                 registration.getStudent().getPersonalIngressionDataByExecutionYear(
-                        registration.getStudentCandidacy().getExecutionYear());
+                        registration.getRegistrationYear());
         return personalIngressionData != null ? personalIngressionData.getDislocatedFromPermanentResidence() : null;
     }
 }
