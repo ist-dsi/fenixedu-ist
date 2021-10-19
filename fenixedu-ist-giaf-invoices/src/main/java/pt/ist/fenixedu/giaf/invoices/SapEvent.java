@@ -1232,6 +1232,14 @@ public class SapEvent {
                                         LocalDate dispatchDate, boolean isDebtRegistration, String docType, boolean isToDebit, boolean isNewDate, SapRequest debtRequest) {
         JsonObject request = new JsonParser().parse(debtRequest.getRequest()).getAsJsonObject();
         String metadata = request.get("workingDocument").getAsJsonObject().get("metadata").getAsString();
+
+        String stripMetadata = metadata.replace("\\", "");
+        JsonObject metadataJson = new JsonParser().parse(stripMetadata).getAsJsonObject();
+        final LocalDate startDate = LocalDate.parse(metadataJson.get("START_DATE").getAsString());
+        if (dispatchDate.isBefore(startDate)) { //some debts are created before the new year starts and exempted before the new year
+            dispatchDate = startDate;
+        }
+
         metadata = metadata.replace("}", ", \"Despacho\":\"" + dispatchDate.toString("yyyy-MM-dd") + "\"}");
         JsonObject json = toJsonDebt(event, debtFenix, clientId, documentDate, entryDate, isDebtRegistration, docType, isToDebit,
                 isNewDate, metadata);
