@@ -41,6 +41,7 @@ import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.Teacher;
+import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.events.insurance.InsuranceEvent;
 import org.fenixedu.academic.domain.contacts.EmailAddress;
 import org.fenixedu.academic.domain.contacts.MobilePhone;
@@ -304,7 +305,7 @@ public class ExportUserInfoForKoha extends ExternalInterfaceDispatchAction {
     }
 
     private PhdIndividualProgramProcess findPhd(final Person person) {
-        final InsuranceEvent event = person.getInsuranceEventFor(ExecutionYear.readCurrentExecutionYear());
+        final Event event = person.getInsuranceEventFor(ExecutionYear.readCurrentExecutionYear());
         return event != null && event.isClosed() ? findPhd(person.getPhdIndividualProgramProcessesSet()) : null;
     }
 

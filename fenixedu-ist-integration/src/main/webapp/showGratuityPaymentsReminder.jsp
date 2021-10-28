@@ -71,19 +71,6 @@
             </div>
 
             <div id="txt">
-
-                <logic:equal name="remnantGratuity" value="true">
-                    <bean:define id="remainingPaymentEndDate" name="remainingPaymentEndDate" type="java.lang.String" />
-                    <bean:define id="remainingPaymentDebt" name="remainingPaymentDebt" type="java.lang.String" />
-                    <bean:define id="remainingPaymentCode" name="remainingPaymentCode" type="java.lang.String" />
-
-                    <br />
-                    <div class="alert alert-warning">
-                        <bean:message key="message.delayed.debt" bundle="APPLICATION_RESOURCES" 
-                            arg0="<%= remainingPaymentEndDate %>" arg1="<%= remainingPaymentDebt %>" arg3="<%= remainingPaymentCode %>" />
-                    </div>
-                </logic:equal>
-
                 <bean:message key="message.gratuity.payments.reminder.text" arg0="<%= Unit.getInstitutionAcronym() %>" arg1="<%= ExecutionYear.readCurrentExecutionYear().getName() %>" arg2="<%= Unit.getInstitutionName().getContent() %>" bundle="APPLICATION_RESOURCES" />
             </div>
 

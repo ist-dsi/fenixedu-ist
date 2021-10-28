@@ -5,9 +5,15 @@ import org.fenixedu.NumberToText;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
+import org.fenixedu.academic.domain.accounting.CustomEvent;
 import org.fenixedu.academic.domain.accounting.Event;
+import org.fenixedu.academic.domain.accounting.EventTemplate;
+import org.fenixedu.academic.domain.accounting.EventType;
 import org.fenixedu.academic.domain.accounting.events.gratuity.GratuityEvent;
+import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.util.Money;
+import org.fenixedu.bennu.core.json.JsonUtils;
 import org.fenixedu.commons.i18n.I18N;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -66,14 +72,30 @@ public class DebtCertificate {
         if (event instanceof GratuityEvent) {
             final GratuityEvent gratuityEvent = (GratuityEvent) event;
             return gratuityEvent.getDegree().getPresentationName(executionYear);
+        } else if (event instanceof CustomEvent) {
+            CustomEvent customEvent = (CustomEvent) event;
+            if (EventTemplate.Type.TUITION.name().equals(JsonUtils.get(customEvent.getConfigObject(), "type"))) {
+                final Registration registration = JsonUtils.toDomainObject(customEvent.getConfigObject(), "registration");
+                return registration.getDegree().getPresentationName(executionYear);
+            }
         }
         return "";
     }
 
     private static String enrolmentDateFor(final Event event, final ExecutionYear executionYear) {
+        StudentCurricularPlan scp = null;
         if (event instanceof GratuityEvent) {
             final GratuityEvent gratuityEvent = (GratuityEvent) event;
-            final StudentCurricularPlan scp = gratuityEvent.getStudentCurricularPlan();
+            scp = gratuityEvent.getStudentCurricularPlan();
+
+        } else if (event instanceof CustomEvent) {
+            CustomEvent customEvent = (CustomEvent) event;
+            if (EventTemplate.Type.TUITION.name().equals(JsonUtils.get(customEvent.getConfigObject(), "type"))) {
+                final Registration registration = JsonUtils.toDomainObject(customEvent.getConfigObject(), "registration");
+                scp = registration.getStudentCurricularPlan(executionYear);
+            }
+        }
+        if (scp != null) {
             final DateTime enrolmentDate = scp.getRoot().getCurriculumLineStream()
                     .filter(cl -> cl.getExecutionYear() == executionYear)
                     .map(cl -> cl.getCreationDateDateTime())
