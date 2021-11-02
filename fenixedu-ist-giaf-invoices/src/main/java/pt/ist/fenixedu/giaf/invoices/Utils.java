@@ -26,6 +26,7 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.accounting.AccountingTransaction;
 import org.fenixedu.academic.domain.accounting.AccountingTransactionDetail;
+import org.fenixedu.academic.domain.accounting.CustomEvent;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.ResidenceEvent;
 import org.fenixedu.academic.domain.accounting.calculator.Debt;
@@ -42,6 +43,7 @@ import org.fenixedu.academic.domain.phd.debts.PhdEvent;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.util.Money;
+import org.fenixedu.bennu.core.json.JsonUtils;
 import org.fenixedu.commons.StringNormalizer;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -348,8 +350,16 @@ public class Utils {
     }
 
     public static ExecutionYear executionYearOf(final Event event) {
-        return event instanceof AnnualEvent ? ((AnnualEvent) event).getExecutionYear() : ExecutionYear.readByDateTime(event
-                .getWhenOccured());
+        if (event instanceof AnnualEvent) {
+            return ((AnnualEvent) event).getExecutionYear();
+        } else if (event instanceof CustomEvent) {
+            CustomEvent customEvent = (CustomEvent) event;
+            ExecutionYear executionYear = JsonUtils.toDomainObject(customEvent.getConfigObject(), "executionYear");
+            if (executionYear != null) {
+                return executionYear;
+            }
+        }
+        return ExecutionYear.readByDateTime(event.getWhenOccured());
     }
 
     private static DebtCycleType getCycleType(Collection<CycleType> cycleTypes) {

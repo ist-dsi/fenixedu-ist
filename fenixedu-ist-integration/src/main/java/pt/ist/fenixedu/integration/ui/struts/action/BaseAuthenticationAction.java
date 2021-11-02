@@ -230,10 +230,9 @@ public class BaseAuthenticationAction extends FenixAction {
 
     public static boolean hasGratuityOrAdministrativeOfficeFeeAndInsuranceDebtsFor(Person person,
             final ExecutionYear executionYear) {
-        return person.getAnnualEventsFor(executionYear).stream()
-                .filter(annualEvent -> annualEvent.isGratuity() || annualEvent.isInsuranceEvent() || annualEvent
-                        .isAdministrativeOfficeAndInsuranceEvent() || annualEvent instanceof AdministrativeOfficeFeeEvent)
-                .anyMatch(Event::isOpen);
+        return person.hasAnyAdministrativeOfficeFeeDebtUntil(executionYear) ||
+                person.hasAnyInsuranceDebtUntil(executionYear) ||
+                person.hasAnyGratuityDebtUntil(executionYear);
     }
 
     private boolean isTeacherAndHasInquiriesToRespond(User userView) {

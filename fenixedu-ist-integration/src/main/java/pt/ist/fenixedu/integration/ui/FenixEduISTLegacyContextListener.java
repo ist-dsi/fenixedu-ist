@@ -262,29 +262,6 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
             };
         });
 
-        Signal.registerWithoutTransaction("academic.candidacy.registration.created",
-                new Consumer<RegistrationCreatedByCandidacy>() {
-                    @Override
-                    public void accept(final RegistrationCreatedByCandidacy candidacy) {
-                        createEvents(candidacy);
-                    }
-
-                    @Atomic(mode = TxMode.WRITE)
-                    private void createEvents(RegistrationCreatedByCandidacy candidacy) {
-                        final Registration registration = candidacy.getInstance();
-                        final StudentCurricularPlan studentCurricularPlan = registration.getLastStudentCurricularPlan();
-                        final ExecutionYear executionYear = registration.getStartExecutionYear();
-                        final AccountingEventsManager manager = new AccountingEventsManager();
-                        manager.createGratuityEvent(studentCurricularPlan, executionYear);
-                        manager.createAdministrativeOfficeFeeAndInsuranceEvent(studentCurricularPlan, executionYear);
-                        registration.getPerson().getEventsSet().stream()
-                                .filter(event -> event instanceof AnnualEvent)
-                                .filter(e -> ((AnnualEvent) e).getExecutionYear() == executionYear)
-                                .forEach(Event::calculatePaymentCodeEntry);
-
-                    }
-                });
-
         Signal.register(Registration.REGISTRATION_PROCESS_COMPLETE,
                 (Consumer<Registration>) registration -> registration.setBennuCompletedRegistration(Bennu.getInstance()));
 

@@ -67,21 +67,13 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
             }
 
             private boolean isAnyAdministrativeOfficeFeeAndInsuranceInDebtUntil(final StudentCurricularPlan scp, final ExecutionYear executionYear) {
-                for (final Event event : scp.getPerson().getEventsSet()) {
-                    if (event.getSapRoot() == null) {
-                        if (event instanceof InsuranceEvent && ((InsuranceEvent) event).getExecutionYear().isBefore(executionYear)
-                                && Utils.isOverDue(event)) {
-                            return true;
-                        }
-                        if (event instanceof AdministrativeOfficeFeeEvent
-                                && ((AdministrativeOfficeFeeEvent) event).getExecutionYear().isBefore(executionYear)
-                                && Utils.isOverDue(event)) {
-                            return true;
-                        }
-                    }
-                }
+                final boolean hasInsuranceDebt = scp.getPerson().getInsuranceEventsUntil(executionYear.getPreviousExecutionYear())
+                        .anyMatch(event -> Utils.isOverDue(event));
 
-                return false;
+                final boolean hasAdminDebt = scp.getPerson().getAdministrativeOfficeFeeEventsUntil(executionYear.getPreviousExecutionYear())
+                        .anyMatch(event -> Utils.isOverDue(event));
+
+                return hasInsuranceDebt || hasAdminDebt;
             }
 
             private boolean isAnyTuitionInDebt(final Student student, final ExecutionYear executionYear) {
@@ -89,23 +81,10 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
             }
 
             public boolean hasAnyNotPayedGratuityEventsForPreviousYears(final Registration registration, final ExecutionYear limitExecutionYear) {
-                for (final StudentCurricularPlan studentCurricularPlan : registration.getStudentCurricularPlansSet()) {
-                    if (hasAnyNotPayedGratuityEventsForPreviousYears(studentCurricularPlan, limitExecutionYear)) {
-                        return true;
-                    }
-                }
-                return false;
+                return registration.getGratuityEventsUntil(limitExecutionYear.getPreviousExecutionYear())
+                    .filter(event -> event.getSapRoot() == null)
+                    .anyMatch(event -> Utils.isOverDue(event));
             }
-
-            final public boolean hasAnyNotPayedGratuityEventsForPreviousYears(final StudentCurricularPlan scp, final ExecutionYear limitExecutionYear) {
-                for (final GratuityEvent gratuityEvent : scp.getGratuityEventsSet()) {
-                    if (gratuityEvent.getSapRoot() == null && gratuityEvent.getExecutionYear().isBefore(limitExecutionYear) && Utils.isOverDue(gratuityEvent)) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-
         };
     }
     

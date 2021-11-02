@@ -1,23 +1,16 @@
 package pt.ist.fenixedu.integration.ui.spring.santander.service;
 
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.BiFunction;
-
+import com.google.common.io.BaseEncoding;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.accessControl.ActivePhdProcessesGroup;
-import org.fenixedu.academic.domain.accounting.events.insurance.InsuranceEvent;
+import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.photograph.Picture;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.idcards.service.IUserInfoService;
 import org.fenixedu.spaces.domain.Space;
 import org.springframework.stereotype.Service;
-
-import com.google.common.io.BaseEncoding;
-
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveEmployees;
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveGrantOwner;
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveResearchers;
@@ -25,6 +18,11 @@ import pt.ist.fenixedu.contracts.domain.accessControl.CampusEmployeeGroup;
 import pt.ist.fenixedu.contracts.domain.accessControl.CampusGrantOwnerGroup;
 import pt.ist.fenixedu.contracts.domain.accessControl.CampusResearcherGroup;
 import pt.ist.fenixedu.integration.dto.PersonInformationDTO;
+
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BiFunction;
 
 @Service
 public class UserInformationService implements IUserInfoService {
@@ -90,7 +88,7 @@ public class UserInformationService implements IUserInfoService {
                     return true;
                 }
             }
-            final InsuranceEvent event = person.getInsuranceEventFor(executionYear);
+            final Event event = person.getInsuranceEventFor(executionYear);
             return event != null && event.isClosed() && new ActivePhdProcessesGroup().isMember(person.getUser());
         }
         return false;
