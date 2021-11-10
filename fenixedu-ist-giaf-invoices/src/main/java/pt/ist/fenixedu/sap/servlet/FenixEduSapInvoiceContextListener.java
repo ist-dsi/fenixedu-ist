@@ -68,10 +68,10 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
 
             private boolean isAnyAdministrativeOfficeFeeAndInsuranceInDebtUntil(final StudentCurricularPlan scp, final ExecutionYear executionYear) {
                 final boolean hasInsuranceDebt = scp.getPerson().getInsuranceEventsUntil(executionYear.getPreviousExecutionYear())
-                        .anyMatch(event -> Utils.isOverDue(event));
+                        .anyMatch(event -> (!event.getLapsed()) && Utils.isOverDue(event));
 
                 final boolean hasAdminDebt = scp.getPerson().getAdministrativeOfficeFeeEventsUntil(executionYear.getPreviousExecutionYear())
-                        .anyMatch(event -> Utils.isOverDue(event));
+                        .anyMatch(event -> (!event.getLapsed()) && Utils.isOverDue(event));
 
                 return hasInsuranceDebt || hasAdminDebt;
             }
@@ -83,7 +83,7 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
             public boolean hasAnyNotPayedGratuityEventsForPreviousYears(final Registration registration, final ExecutionYear limitExecutionYear) {
                 return registration.getGratuityEventsUntil(limitExecutionYear.getPreviousExecutionYear())
                     .filter(event -> event.getSapRoot() == null)
-                    .anyMatch(event -> Utils.isOverDue(event));
+                    .anyMatch(event -> (!event.getLapsed()) && Utils.isOverDue(event));
             }
         };
     }
