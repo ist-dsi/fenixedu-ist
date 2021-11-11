@@ -18,31 +18,27 @@
  */
 package pt.ist.fenixedu.integration.task.updateData.student;
 
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.util.List;
-import java.util.Locale;
-
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
+import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.degree.degreeCurricularPlan.DegreeCurricularPlanState;
-import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.domain.student.curriculum.ConclusionProcess;
-import org.fenixedu.academic.domain.student.curriculum.RegistrationConclusionProcess;
 import org.fenixedu.academic.domain.studentCurriculum.CycleCurriculumGroup;
 import org.fenixedu.bennu.scheduler.CronTask;
 import org.fenixedu.bennu.scheduler.annotation.Task;
 import org.fenixedu.bennu.scheduler.custom.CustomTask;
 import org.fenixedu.commons.i18n.I18N;
-
 import pt.ist.fenixedu.integration.domain.student.SeparationCyclesManagement;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
-import pt.ist.fenixframework.FenixFramework;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.util.List;
+import java.util.Locale;
 
 @Task(englishTitle = "SeparateRegistrations", readOnly = true)
 public class SeparateRegistrations extends CronTask {
@@ -54,7 +50,6 @@ public class SeparateRegistrations extends CronTask {
             taskLog("Processing DCP: %s%n", degreeCurricularPlan.getName());
 
             for (final StudentCurricularPlan studentCurricularPlan : degreeCurricularPlan.getStudentCurricularPlansSet()) {
-
                 if (canSeparate(studentCurricularPlan)) {
                     taskLog("Separating Student: %s%n", studentCurricularPlan.getRegistration().getStudent().getNumber());
 
@@ -75,13 +70,14 @@ public class SeparateRegistrations extends CronTask {
 
     private boolean studentAlreadyHasNewRegistration(final StudentCurricularPlan studentCurricularPlan) {
         final Student student = studentCurricularPlan.getRegistration().getStudent();
-        return student.hasRegistrationFor(studentCurricularPlan.getSecondCycle().getDegreeCurricularPlanOfDegreeModule());
+        return student.hasRegistrationFor(studentCurricularPlan.getSecondCycle().getDegreeCurricularPlanOfDegreeModule().getDegree());
     }
 
     private boolean canSeparate(final StudentCurricularPlan scp) {
         CycleCurriculumGroup firstCycle = scp.getFirstCycle();
         ConclusionProcess conclusionProcess = firstCycle != null ? firstCycle.getConclusionProcess() : null;
-        return hasFirstCycleConcluded(firstCycle) && hasExternalSecondCycle(scp)
+
+        return hasFirstCycleConcluded(firstCycle) && hasValidExternalSecondCycle(scp)
                 && !studentAlreadyHasNewRegistration(scp)
                 && (scp.isActive() || (conclusionProcess != null && conclusionProcess.isActive()));
     }
@@ -96,9 +92,10 @@ public class SeparateRegistrations extends CronTask {
         return firstCycle != null && firstCycle.isConcluded();
     }
 
-    private boolean hasExternalSecondCycle(final StudentCurricularPlan studentCurricularPlan) {
+    private boolean hasValidExternalSecondCycle(final StudentCurricularPlan studentCurricularPlan) {
         final CycleCurriculumGroup secondCycle = studentCurricularPlan.getSecondCycle();
-        return secondCycle != null && secondCycle.isExternal() && secondCycle.hasAnyCurriculumLines()
+        return secondCycle != null && secondCycle.isExternal()
+                && secondCycle.hasEnrolment(ExecutionSemester.readActualExecutionSemester())
                 && hasActiveExecutionDegree(secondCycle);
     }
 
