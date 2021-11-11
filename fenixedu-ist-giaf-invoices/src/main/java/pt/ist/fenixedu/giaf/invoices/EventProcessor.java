@@ -1,6 +1,7 @@
 package pt.ist.fenixedu.giaf.invoices;
 
 import com.google.common.base.Strings;
+import org.fenixedu.academic.domain.accounting.AccountingTransaction;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.calculator.AccountingEntry;
 import org.fenixedu.academic.domain.accounting.calculator.CreditEntry;
@@ -19,6 +20,7 @@ import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
 import pt.ist.fenixframework.CallableWithoutException;
 import pt.ist.fenixframework.FenixFramework;
+import pt.ist.payments.domain.SibsPayment;
 
 import java.math.BigDecimal;
 import java.util.function.Supplier;
@@ -128,6 +130,12 @@ public class EventProcessor {
                     final Payment payment = (Payment) accountingEntry;
 
                     if (offsetPayments && payment.getCreated().plusDays(7).isAfterNow()) {
+                        return;
+                    }
+
+                    final AccountingTransaction accountingTransaction = ((AccountingTransaction) FenixFramework.getDomainObject(payment.getId()));
+                    final SibsPayment sibsPayment = accountingTransaction.getSibsPayment();
+                    if (sibsPayment != null && sibsPayment.getSettlementDate() == null)  {
                         return;
                     }
 

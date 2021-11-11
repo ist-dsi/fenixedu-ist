@@ -13,7 +13,6 @@ import org.fenixedu.academic.domain.accounting.AccountingTransactionDetail;
 import org.fenixedu.academic.domain.accounting.CustomEvent;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.EventType;
-import org.fenixedu.academic.domain.accounting.Exemption;
 import org.fenixedu.academic.domain.accounting.PaymentMethod;
 import org.fenixedu.academic.domain.accounting.accountingTransactions.detail.SibsTransactionDetail;
 import org.fenixedu.academic.domain.accounting.calculator.CreditEntry;
@@ -54,8 +53,8 @@ import pt.ist.fenixedu.domain.SapRequest;
 import pt.ist.fenixedu.domain.SapRequestType;
 import pt.ist.fenixedu.domain.SapRoot;
 import pt.ist.fenixframework.Atomic;
-import pt.ist.fenixframework.DomainObject;
 import pt.ist.fenixframework.FenixFramework;
+import pt.ist.payments.domain.SibsPayment;
 import pt.ist.sap.client.SapFinantialClient;
 
 import java.math.BigDecimal;
@@ -903,9 +902,20 @@ public class SapEvent {
 
     private void addSibsMetadata(final JsonObject json, final AccountingTransactionDetail transactionDetail) {
         if (PaymentMethod.getSibsPaymentMethod() == transactionDetail.getPaymentMethod()) {
-            SibsTransactionDetail sibsTx = (SibsTransactionDetail) transactionDetail;
-            YearMonthDay sibsDate = sibsTx.getSibsLine().getHeader().getWhenProcessedBySibs();
-            json.addProperty("sibsDate", sibsDate.toString(SIBS_DATE_FORMAT));
+            if (transactionDetail instanceof SibsTransactionDetail) {
+                final SibsTransactionDetail sibsTx = (SibsTransactionDetail) transactionDetail;
+                final YearMonthDay sibsDate = sibsTx.getSibsLine().getHeader().getWhenProcessedBySibs();
+                json.addProperty("sibsDate", sibsDate.toString(SIBS_DATE_FORMAT));
+            } else {
+                final SibsPayment sibsPayment = transactionDetail.getTransaction().getSibsPayment();
+                if (sibsPayment != null) {
+                    final LocalDate settlementDate = sibsPayment.getSettlementDate();
+                    if (settlementDate == null) {
+                        throw new Error("Transaction does not have settlement date! " + transactionDetail.getExternalId());
+                    }
+                    json.addProperty("sibsDate", settlementDate.toString(SIBS_DATE_FORMAT));
+                }
+            }
         }
     }
 
