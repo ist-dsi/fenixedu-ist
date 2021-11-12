@@ -81,7 +81,7 @@ public class SupportLesson extends SupportLesson_Base {
         setStartTimeHourMinuteSecond(startTimeHourMinuteSecond);
         setEndTimeHourMinuteSecond(endTimeHourMinuteSecond);
         setPlace(place);
-        verifyOverlappings();
+       // verifyOverlappings();
     }
 
     public double hours() {
