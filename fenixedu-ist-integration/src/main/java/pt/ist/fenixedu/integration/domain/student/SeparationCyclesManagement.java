@@ -89,6 +89,9 @@ public class SeparationCyclesManagement {
         if (secondCycle == null || !secondCycle.isExternal()) {
             throw new DomainException("error.SeparationCyclesManagement.invalid.secondCycle");
         }
+        if (!secondCycle.hasEnrolment(ExecutionSemester.readActualExecutionSemester())) {
+            throw new DomainException("error.SeparationCyclesManagement.curriculumLines.noCurrentEnrolments");
+        }
 
         final CycleCurriculumGroup firstCycle = studentCurricularPlan.getFirstCycle();
         if (firstCycle == null || !firstCycle.isConcluded()) {
@@ -117,13 +120,9 @@ public class SeparationCyclesManagement {
                 createStudentCurricularPlan(newRegistration, degreeCurricularPlan, oldSecondCycle.getCycleType());
         final CycleCurriculumGroup newSecondCycle = newStudentCurricularPlan.getSecondCycle();
 
-        boolean isToMoveEnrolments = isToMove2ndCycle(oldStudentCurricularPlan);
-        copyCycleCurriculumGroupsInformation(oldSecondCycle, newSecondCycle, isToMoveEnrolments);
-
-        if (isToMoveEnrolments) {
-            moveAttends(oldStudentCurricularPlan, newStudentCurricularPlan);
-            tryRemoveOldSecondCycle(oldSecondCycle);
-        }
+        copyCycleCurriculumGroupsInformation(oldSecondCycle, newSecondCycle);
+        moveAttends(oldStudentCurricularPlan, newStudentCurricularPlan);
+        tryRemoveOldSecondCycle(oldSecondCycle);
 
         if (oldStudentCurricularPlan.getDegreeCurricularPlan().getDegreeType().isIntegratedMasterDegree()) {
             markOldRegistrationWithState(oldStudentCurricularPlan, RegistrationStateType.EXTERNAL_ABANDON);
@@ -131,20 +130,10 @@ public class SeparationCyclesManagement {
             markOldRegistrationWithState(oldStudentCurricularPlan, RegistrationStateType.CONCLUDED);
         }
 
+        newRegistration.updateEnrolmentDate(ExecutionYear.readCurrentExecutionYear());
         return newRegistration;
     }
 
-    private boolean isToMove2ndCycle(final StudentCurricularPlan oldSCP) {        
-        CycleCurriculumGroup secondCycle = oldSCP.getSecondCycle();
-        if (secondCycle.hasEnrolment(ExecutionSemester.readActualExecutionSemester())
-                && secondCycle.getNumberOfAllApprovedEnrolments(getCurrentExecutionPeriod()) == 0
-                && secondCycle.getEnrolmentsBy(getCurrentExecutionPeriod()).size() == secondCycle.getEnrolments().size()) {
-            return true;
-        } else {
-            return false;
-        }           
-    }
-    
     private void moveAttends(final StudentCurricularPlan oldStudentCurricularPlan,
             final StudentCurricularPlan newStudentCurricularPlan) {
         oldStudentCurricularPlan.getRegistration().getAssociatedAttendsSet().stream()
@@ -199,17 +188,17 @@ public class SeparationCyclesManagement {
 
         Degree degree = oldSecondCycle.getDegreeCurricularPlanOfDegreeModule().getDegree();
         registration = new Registration(student.getPerson(), student.getNumber(), degree);
-        StudentCandidacy studentCandidacy = createStudentCandidacy(student, oldSecondCycle);
-        registration.setStudentCandidacy(studentCandidacy);
-        PersonalIngressionData personalIngressionData =
-                student.getPersonalIngressionDataByExecutionYear(registration.getRegistrationYear());
-        if (personalIngressionData == null) {
-            new PersonalIngressionData(student, registration.getRegistrationYear(),
-                    studentCandidacy.getPrecedentDegreeInformation());
-        } else {
-            personalIngressionData.addPrecedentDegreesInformations(studentCandidacy.getPrecedentDegreeInformation());
-        }
-        registration.addPrecedentDegreesInformations(studentCandidacy.getPrecedentDegreeInformation());
+        //RAIDES info has changed
+//        registration.setStudentCandidacy(studentCandidacy);
+//        PersonalIngressionData personalIngressionData =
+//                student.getPersonalIngressionDataByExecutionYear(registration.getRegistrationYear());
+//        if (personalIngressionData == null) {
+//            new PersonalIngressionData(student, registration.getRegistrationYear(),
+//                    studentCandidacy.getPrecedentDegreeInformation());
+//        } else {
+//            personalIngressionData.addPrecedentDegreesInformations(studentCandidacy.getPrecedentDegreeInformation());
+//        }
+//        registration.addPrecedentDegreesInformations(studentCandidacy.getPrecedentDegreeInformation());
 
         registration.setStartDate(getBeginDate(sourceStudentCurricularPlan, getCurrentExecutionPeriod()));
         RegistrationState activeState = registration.getActiveState();
@@ -217,6 +206,7 @@ public class SeparationCyclesManagement {
         activeState.setResponsiblePerson(null);
         registration.setSourceRegistration(sourceStudentCurricularPlan.getRegistration());
         registration.setRegistrationProtocol(sourceStudentCurricularPlan.getRegistration().getRegistrationProtocol());
+        registration.setRegistrationYear(ExecutionYear.readCurrentExecutionYear());
 
         return registration;
     }
@@ -233,11 +223,6 @@ public class SeparationCyclesManagement {
 
         return executionSemester.getBeginDateYearMonthDay().isBefore(stateDate) ? stateDate : executionSemester
                 .getBeginDateYearMonthDay();
-    }
-
-    private StudentCandidacy createStudentCandidacy(final Student student, final CycleCurriculumGroup oldSecondCycle) {
-        final DegreeCurricularPlan dcp = oldSecondCycle.getDegreeCurricularPlanOfDegreeModule();
-        return StudentCandidacy.createStudentCandidacy(dcp.getExecutionDegreeByYear(getCurrentExecutionYear()), student.getPerson());
     }
 
     private StudentCurricularPlan createStudentCurricularPlan(final Registration registration,
@@ -259,20 +244,24 @@ public class SeparationCyclesManagement {
     }
 
     private void copyCycleCurriculumGroupsInformation(final CycleCurriculumGroup oldSecondCycle,
-                                                      final CycleCurriculumGroup newSecondCycle, boolean isToMoveEnrolments) {
+                                                      final CycleCurriculumGroup newSecondCycle) {
         for (final CurriculumModule curriculumModule : oldSecondCycle.getCurriculumModulesSet()) {
             if (curriculumModule.isLeaf()) {
-                copyCurricumLineInformation((CurriculumLine) curriculumModule, newSecondCycle, isToMoveEnrolments);
+                copyCurriculumLineInformation((CurriculumLine) curriculumModule, newSecondCycle);
             } else {
-                copyCurriculumGroupsInformation((CurriculumGroup) curriculumModule, newSecondCycle, isToMoveEnrolments);
+                copyCurriculumGroupsInformation((CurriculumGroup) curriculumModule, newSecondCycle);
             }
         }
     }
 
-    private void copyCurriculumGroupsInformation(final CurriculumGroup source, final CurriculumGroup parent, boolean isToMoveEnrolments) {
+    private void copyCurriculumGroupsInformation(final CurriculumGroup source, final CurriculumGroup parent) {
         final CurriculumGroup destination;
         //test if source group still exists as part of destination DCP
         if (!groupIsStillValid(source)) {
+            return;
+        }
+        if (source.getName().getContent().equals("Minor")) {
+            source.setCurriculumGroup(parent);
             return;
         }
         if (parent.hasChildDegreeModule(source.getDegreeModule())) {
@@ -283,9 +272,9 @@ public class SeparationCyclesManagement {
 
         for (final CurriculumModule curriculumModule : source.getCurriculumModulesSet()) {
             if (curriculumModule.isLeaf()) {
-                copyCurricumLineInformation((CurriculumLine) curriculumModule, destination, isToMoveEnrolments);
+                copyCurriculumLineInformation((CurriculumLine) curriculumModule, destination);
             } else {
-                copyCurriculumGroupsInformation((CurriculumGroup) curriculumModule, destination, isToMoveEnrolments);
+                copyCurriculumGroupsInformation((CurriculumGroup) curriculumModule, destination);
             }
         }
     }
@@ -298,12 +287,12 @@ public class SeparationCyclesManagement {
         return source.getChildCurriculumGroups().stream().anyMatch(this::groupIsStillValid);
     }
 
-    private void copyCurricumLineInformation(final CurriculumLine curriculumLine, final CurriculumGroup parent, boolean isToMoveEnrolments) {
+    private void copyCurriculumLineInformation(final CurriculumLine curriculumLine, final CurriculumGroup parent) {
         if (curriculumLine.isEnrolment()) {
             final Enrolment enrolment = (Enrolment) curriculumLine;
             if (enrolment.isApproved()) {
                 createSubstitutionForEnrolment((Enrolment) curriculumLine, parent);
-            } else if (isToMoveEnrolments) {
+            } else if (enrolment.getExecutionPeriod().isCurrent() && enrolment.isActive()) {
                 moveEnrolment((Enrolment) curriculumLine, parent);
             }
         } else if (curriculumLine.isDismissal()) {
@@ -338,7 +327,7 @@ public class SeparationCyclesManagement {
 
     private boolean canRemoveOldSecondCycle(final CycleCurriculumGroup oldSecondCycle) {
         for (final CurriculumLine curriculumLine : oldSecondCycle.getAllCurriculumLines()) {
-            if (curriculumLine.isEnrolment()) {
+            if (curriculumLine.isEnrolment() || curriculumLine.isDismissal()) {
                 return false;
             } else if (!curriculumLine.isDismissal()) {
                 throw new DomainException("error.unknown.curriculum.line");
@@ -474,6 +463,8 @@ public class SeparationCyclesManagement {
         } else {
             throw new DomainException("error.unknown.dismissal.type");
         }
+
+        dismissal.delete();
     }
 
     private boolean curriculumGroupHasSimilarDismissal(final CurriculumGroup curriculumGroup, final Dismissal dismissal) {
