@@ -29,6 +29,8 @@ import java.util.stream.Stream;
 
 public class EventProcessor {
 
+    private static int PAYMENT_OFFSET = 7; //days
+
     public static void calculate(final Supplier<Event> supplier) {
         final ErrorLogConsumer errorLog = (oid, user, name, amount, cycleType, error, args, type, countryOfVatNumber,
                                            vatNumber, address, locality, postCode, countryOfAddress, paymentMethod, documentNumber, actionType) -> {
@@ -129,7 +131,7 @@ public class EventProcessor {
                         && accountingEntry.getCreated().isAfter(EventWrapper.SAP_TRANSACTIONS_THRESHOLD)) {
                     final Payment payment = (Payment) accountingEntry;
 
-                    if (offsetPayments && payment.getCreated().plusDays(7).isAfterNow()) {
+                    if (offsetPayments && payment.getCreated().plusDays(PAYMENT_OFFSET).isAfterNow()) {
                         return;
                     }
 
@@ -174,7 +176,7 @@ public class EventProcessor {
             DebtInterestCalculator calculator = event.getDebtInterestCalculator(new DateTime());
             calculator.getPayments().filter(p -> !sapEvent.hasPayment(p.getId()) && !sapEvent.hasCredit(p.getId())
                     && p.getCreated().isAfter(EventWrapper.SAP_TRANSACTIONS_THRESHOLD))
-                    .filter(p -> !offsetPayments || p.getCreated().plusDays(15).isBeforeNow())
+                    .filter(p -> !offsetPayments || p.getCreated().plusDays(PAYMENT_OFFSET).isBeforeNow())
                     .forEach(p -> sapEvent.registerPastPayment(p));
         }
     }
