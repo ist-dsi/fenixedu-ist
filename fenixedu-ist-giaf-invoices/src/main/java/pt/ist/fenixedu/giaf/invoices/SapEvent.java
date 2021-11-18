@@ -149,9 +149,13 @@ public class SapEvent {
             new SapRequest(event, externalClient.getClientId(), amountToTransfer, documentNumber, SapRequestType.INVOICE, Money.ZERO, data);
         }
         if (remainder.isPositive()) {
-            final JsonObject data = toJsonInvoice(event, remainder, getDocumentDate(event.getWhenOccured(), true), new DateTime(), sapRequest.getClientId(), false, false, false);
+            String clientId = sapRequest.getClientId();
+            if (clientId.equals(externalClient.getClientId())) { //the remainder it's being transferred from the external entity back to the user
+                clientId = ClientMap.uVATNumberFor(event.getParty());
+            }
+            final JsonObject data = toJsonInvoice(event, remainder, getDocumentDate(event.getWhenOccured(), true), new DateTime(), clientId, false, false, false);
             final String documentNumber = getDocumentNumber(data, false);
-            new SapRequest(event, sapRequest.getClientId(), remainder, documentNumber, SapRequestType.INVOICE, Money.ZERO, data);
+            new SapRequest(event, clientId, remainder, documentNumber, SapRequestType.INVOICE, Money.ZERO, data);
         }
     }
 
