@@ -133,6 +133,7 @@ import org.fenixedu.spaces.services.SpaceBlueprintsDWGProcessor;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeFieldType;
 import org.joda.time.Duration;
+import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 import org.joda.time.Partial;
 import org.joda.time.TimeOfDay;
@@ -142,11 +143,9 @@ import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pt.ist.fenixedu.contracts.domain.Employee;
+import pt.ist.fenixedu.contracts.domain.accessControl.ActiveGrantOwner;
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveEmployees;
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.Contract;
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonContractSituation;
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.PersonProfessionalData;
-import pt.ist.fenixedu.contracts.domain.personnelSection.contracts.ProfessionalCategory;
 import pt.ist.fenixedu.contracts.domain.util.CategoryType;
 import pt.ist.fenixedu.integration.FenixEduIstIntegrationConfiguration;
 import pt.ist.fenixedu.integration.api.beans.FenixCalendar;
@@ -1072,29 +1071,15 @@ public class FenixAPIv1 {
         return BundleUtil.getString("resources.FenixeduIstIntegrationResources", "label.contract.category.type." + type.getName());
     }
 
-    private static Duration getDuration(PersonContractSituation s) {
-        return s.getEndDate() != null ? new Duration(s.getBeginDate().toDateTimeAtStartOfDay(), s.getEndDate().toDateTimeAtStartOfDay()) : null;
-    }
-
-    private static Duration getDuration(Contract c) {
-        return c.getEndDate() != null ? new Duration(c.getBeginDate().toDateMidnight(), c.getEndDate().toDateMidnight()) : null;
-    }
-
-    private static Duration getDuration(TeacherAuthorization ta) {
-        ExecutionSemester semester = ta.getExecutionSemester();
-        return new Duration(semester.getBeginLocalDate().toDateTimeAtCurrentTime(), semester.getEndLocalDate().toDateTimeAtCurrentTime());
+    private static Duration getDuration(Contract c, AcademicInterval i) {
+        Interval contractInterval = new Interval(c.getBeginDate().toLocalDate().toDateTimeAtStartOfDay(),
+                (c.getEndDate() == null ? i.getEnd() : c.getEndDate().toLocalDate().toDateTimeAtStartOfDay()));
+        Interval overlap = contractInterval.overlap(i);
+        return overlap == null ? Duration.ZERO : overlap.toDuration();
     }
 
     private static boolean overlaps(TeacherAuthorization ta, AcademicInterval interval) {
         return ta.getExecutionSemester().getAcademicInterval().overlaps(interval);
-    }
-
-    private static boolean overlaps(PersonContractSituation situation, AcademicInterval interval) {
-        try {
-            return situation.getBeginDate() != null && situation.overlaps(interval.toInterval());
-        } catch (Exception e) { //XXX erroneous contract dates
-            return false;
-        }
     }
 
     private static <T, C> Optional<C> getLongestLasting(Function<T, C> get, Stream<T> stream, Function<T, Duration> getDuration) {
@@ -1102,10 +1087,21 @@ public class FenixAPIv1 {
                 .entrySet().stream().max(Comparator.comparing(Map.Entry::getValue)).map(Map.Entry::getKey);
     }
 
+    private static boolean getUnitUnderDefaultUnit(Unit unit, Unit defaultUnit) {
+        if (unit == null) {
+            return false;
+        }
+        return unit != null && unit.equals(defaultUnit)
+                || unit.getParentUnits().stream().map(u -> getUnitUnderDefaultUnit(u, defaultUnit)).anyMatch(b -> b);
+    }
+    
     private static Unit getPersonDepartmentArea(Employee employee, AcademicInterval interval, boolean direct, Unit defaultArea) {
         if (employee != null) {
-            Stream<Contract> contracts = employee.getWorkingContracts(interval.getBeginYearMonthDayWithoutChronology(), interval.getEndYearMonthDayWithoutChronology()).stream();
-            Optional<Unit> workingUnit = getLongestLasting(Contract::getWorkingUnit, contracts, FenixAPIv1::getDuration);
+            Stream<Contract> contracts = employee
+                    .getWorkingContracts(interval.getBeginYearMonthDayWithoutChronology(),
+                            interval.getEndYearMonthDayWithoutChronology())
+                    .stream().filter(c -> getUnitUnderDefaultUnit(c.getUnit(), defaultArea));
+            Optional<Unit> workingUnit = getLongestLasting(Contract::getWorkingUnit, contracts, c -> getDuration(c, interval));
             if (!direct) {
                 workingUnit = workingUnit.map(FenixAPIv1::getSectionOrScientificArea);
             }
@@ -1128,42 +1124,29 @@ public class FenixAPIv1 {
         return new FenixDepartment.FenixDepartmentMember(username, name, email, photo);
     }
 
-    private static FenixDepartment.FenixDepartmentMember getFenixDepartmentTeacher(Department department, Person person, AcademicInterval interval) {
+    private static FenixDepartment.FenixDepartmentMember getFenixDepartmentTeacher(Department department, Person person,
+            AcademicInterval interval) {
         FenixDepartment.FenixDepartmentMember member = getFenixDepartmentMember(person);
 
-        Stream<TeacherAuthorization> authorizations = person.getTeacher().getTeacherAuthorizationStream().filter(ta -> overlaps(ta, interval));
-        TeacherCategory category = getLongestLasting(TeacherAuthorization::getTeacherCategory, authorizations, FenixAPIv1::getDuration).get();
-
+        TeacherCategory category = person.getTeacher().getCategory(interval).orElse(null);
+        member.setCategory(category != null ? category.getName().getContent() : "");
         member.setRole(localizedName(CategoryType.TEACHER));
-        member.setCategory(category.getName().getContent());
-        member.setArea(getPersonDepartmentArea(person.getEmployee(), interval, false, department.getDepartmentUnit()).getNameI18n().getContent());
+        member.setArea(getPersonDepartmentArea(person.getEmployee(), interval, false, department.getDepartmentUnit())
+                .getNameI18n().getContent());
 
         return member;
     }
 
-    private static FenixDepartment.FenixDepartmentMember getFenixDepartmentEmployee(Department department, Person person, AcademicInterval interval) {
+    private static FenixDepartment.FenixDepartmentMember getFenixDepartmentEmployee(Department department, Person person,
+            AcademicInterval interval) {
         FenixDepartment.FenixDepartmentMember member = getFenixDepartmentMember(person);
-        YearMonthDay begin = interval.getBeginYearMonthDayWithoutChronology();
-        YearMonthDay end = interval.getEndYearMonthDayWithoutChronology();
-
-        CategoryType type = CategoryType.EMPLOYEE;
-        String category = "";
-        Optional<ProfessionalCategory> data = Optional.ofNullable(person.getPersonProfessionalData())
-                .map(PersonProfessionalData::getGiafProfessionalData)
-                .flatMap(gpd -> getLongestLasting(PersonContractSituation::getProfessionalCategory, gpd.getPersonContractSituationsSet().stream().filter(s -> overlaps(s, interval)), FenixAPIv1::getDuration));
-        if (data.isPresent()) {
-            ProfessionalCategory pcat = data.get();
-            type = pcat.getCategoryType();
-            category = pcat.getName().getContent();
-        }
-        String role = localizedName(type);
-        boolean direct = type.equals(CategoryType.EMPLOYEE) || type.equals(CategoryType.GRANT_OWNER);
-        String area = getPersonDepartmentArea(person.getEmployee(), interval, direct, department.getDepartmentUnit()).getNameI18n().getContent();
-
-        member.setRole(role);
-        member.setCategory(category);
+        CategoryType type =
+                ActiveGrantOwner.isGrantOwner(person.getEmployee()) ? CategoryType.GRANT_OWNER : CategoryType.EMPLOYEE;
+        String area = getPersonDepartmentArea(person.getEmployee(), interval, false, department.getDepartmentUnit()).getNameI18n()
+                .getContent();
+        member.setRole(localizedName(type));
+        member.setCategory("");
         member.setArea(area);
-
         return member;
     }
 
