@@ -376,7 +376,7 @@ public class Utils {
             return DebtCycleType.THIRD_CYCLE;
         }
         if (event.getParty().isPerson()) {
-            if (event.isGratuity()) {
+            if (event instanceof GratuityEvent) {
                 final GratuityEvent gratuityEvent = (GratuityEvent) event;
                 final StudentCurricularPlan scp = gratuityEvent.getStudentCurricularPlan();
                 if (scp != null) {
