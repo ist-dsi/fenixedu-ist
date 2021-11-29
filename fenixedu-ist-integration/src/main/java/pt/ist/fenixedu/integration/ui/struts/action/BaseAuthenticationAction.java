@@ -18,10 +18,6 @@
  */
 package pt.ist.fenixedu.integration.ui.struts.action;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -30,8 +26,6 @@ import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.OccupationPeriodType;
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.accounting.Event;
-import org.fenixedu.academic.domain.accounting.events.AdministrativeOfficeFeeEvent;
 import org.fenixedu.academic.domain.alumni.CerimonyInquiryPerson;
 import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
@@ -43,14 +37,12 @@ import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.exceptions.AuthorizationException;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.struts.annotations.Mapping;
-
 import org.joda.time.YearMonthDay;
 import pt.ist.fenixWebFramework.renderers.components.HtmlLink;
 import pt.ist.fenixWebFramework.servlets.filters.contentRewrite.GenericChecksumRewriter;
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveEmployees;
 import pt.ist.fenixedu.contracts.domain.accessControl.DepartmentPresidentStrategy;
 import pt.ist.fenixedu.quc.domain.DelegateInquiryTemplate;
-import pt.ist.fenixedu.quc.domain.InquiryStudentCycleAnswer;
 import pt.ist.fenixedu.quc.domain.RegentInquiryTemplate;
 import pt.ist.fenixedu.quc.domain.StudentInquiryRegistry;
 import pt.ist.fenixedu.quc.domain.TeacherInquiryTemplate;
@@ -58,6 +50,10 @@ import pt.ist.fenixedu.teacher.evaluation.domain.credits.AnnualCreditsState;
 import pt.ist.fenixedu.teacher.evaluation.domain.teacher.ReductionService;
 import pt.ist.fenixedu.teacher.evaluation.domain.teacher.TeacherService;
 import pt.ist.fenixedu.teacher.evaluation.domain.time.calendarStructure.TeacherCreditsFillingCE;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 @Mapping(path = "/login")
 public class BaseAuthenticationAction extends FenixAction {
@@ -79,6 +75,13 @@ public class BaseAuthenticationAction extends FenixAction {
             }
 
             final HttpSession httpSession = request.getSession(false);
+
+            final NotificationPlug notificationPlug = NotificationPlug.PLUGS.stream()
+                    .filter(plug -> plug.showNotification(userView))
+                    .findAny().orElse(null);
+            if (notificationPlug != null) {
+                return new ActionForward(notificationPlug.redirectUrl(httpSession), true);
+            }
 
             if (hasMissingTeacherService(userView)) {
                 return handleSessionCreationAndForwardToTeachingService(request, userView, httpSession);
