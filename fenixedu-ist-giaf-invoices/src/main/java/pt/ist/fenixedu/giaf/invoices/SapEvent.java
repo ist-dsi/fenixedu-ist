@@ -1578,8 +1578,13 @@ public class SapEvent {
         if (event instanceof CustomEvent) {
             final CustomEvent customEvent = (CustomEvent) event;
             final JsonObject config = customEvent.getConfigObject();
-            return new SimpleImmutableEntry<String, String>(config.get("productCode").getAsString(),
-                    config.get("productDescription").getAsString());
+            String productCode = config.get("productCode").getAsString();
+            String productDescription = config.get("productDescription").getAsString();
+            if (isDebtRegistration) {
+                productCode = "E" + productCode;
+                productDescription = "ESP " + productDescription;
+            }
+            return new SimpleImmutableEntry<String, String>(productCode, productDescription);
         }
         if (event.isGratuity() && !(event instanceof PhdGratuityEvent)) {
             final GratuityEvent gratuityEvent = (GratuityEvent) event;
