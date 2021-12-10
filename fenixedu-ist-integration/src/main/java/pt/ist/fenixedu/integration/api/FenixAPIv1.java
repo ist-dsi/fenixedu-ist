@@ -111,7 +111,6 @@ import org.fenixedu.academic.service.services.student.EnrolStudentInWrittenEvalu
 import org.fenixedu.academic.service.services.student.UnEnrollStudentInWrittenEvaluation;
 import org.fenixedu.academic.service.services.teacher.CreateSummary;
 import org.fenixedu.academic.service.services.teacher.DeleteSummary;
-import org.fenixedu.academic.ui.spring.controller.PhotographController;
 import org.fenixedu.academic.ui.struts.action.ICalendarSyncPoint;
 import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.academic.util.ContentType;
@@ -143,8 +142,8 @@ import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pt.ist.fenixedu.contracts.domain.Employee;
-import pt.ist.fenixedu.contracts.domain.accessControl.ActiveGrantOwner;
 import pt.ist.fenixedu.contracts.domain.accessControl.ActiveEmployees;
+import pt.ist.fenixedu.contracts.domain.accessControl.ActiveGrantOwner;
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.Contract;
 import pt.ist.fenixedu.contracts.domain.util.CategoryType;
 import pt.ist.fenixedu.integration.FenixEduIstIntegrationConfiguration;
@@ -184,6 +183,7 @@ import pt.ist.fenixedu.integration.api.beans.publico.FenixSpace;
 import pt.ist.fenixedu.integration.api.infra.FenixAPIFromExternalServer;
 import pt.ist.fenixedu.integration.dto.PersonInformationBean;
 import pt.ist.fenixedu.integration.service.services.externalServices.CreatePreEnrolment;
+import pt.ist.fenixedu.integration.util.PhotoUtils;
 import pt.ist.fenixframework.DomainObject;
 import pt.ist.fenixframework.FenixFramework;
 
@@ -209,7 +209,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -273,18 +272,8 @@ public class FenixAPIv1 {
 
     private FenixPhoto getPhoto(final Person person) {
         final String type = ContentType.PNG.getMimeType();
-        final byte[] avatar = person != null && person.getPersonalPhoto() != null
-                && person.isPhotoAvailableToCurrentUser() ? person.getPersonalPhoto().getDefaultAvatar() : mysteryman();
-        final String data = Base64.getEncoder().encodeToString(avatar);
+        final String data = PhotoUtils.toBase64Png(person, true);
         return new FenixPhoto(type, data);
-    }
-
-    private byte[] mysteryman() {
-        try (final InputStream mm = PhotographController.class.getClassLoader().getResourceAsStream("META-INF/resources/img/mysteryman.png")) {
-            return Avatar.process(mm, "image/png", 100);
-        } catch (final IOException ex) {
-            throw new Error(ex);
-        }
     }
 
     private Person getPerson() {
@@ -1013,7 +1002,6 @@ public class FenixAPIv1 {
      * All information about degrees available
      *
      * @param academicTerm
-     * @see academicTerms
      */
     @GET
     @Produces(JSON_UTF8)

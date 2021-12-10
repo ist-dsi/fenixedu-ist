@@ -46,6 +46,7 @@ import org.fenixedu.academic.domain.studentCurriculum.CycleCurriculumGroup;
 import org.fenixedu.academic.domain.thesis.Thesis;
 import org.fenixedu.academic.dto.student.RegistrationConclusionBean;
 import org.fenixedu.academic.util.ContentType;
+import org.fenixedu.bennu.core.domain.Avatar;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.UserProfile;
@@ -570,8 +571,8 @@ public class JerseyServices {
             pictureMode = PictureMode.valueOf(modeParameter);
         }
 
-        Photograph photo = user.getPerson().getPersonalPhoto();
-        if (photo == null) {
+        final Avatar.PhotoProvider photoProvider = Avatar.photoProvider.apply(user);
+        if (photoProvider == null) {
             if (unavailableDefault != null) {
                 return unavailableDefaultProcess(xRatio, yRatio, width, height, pictureMode, unavailableDefault);
             }
@@ -579,7 +580,7 @@ public class JerseyServices {
         }
         if (user.getPerson().isPhotoAvailableToPerson(client)) {
             try {
-                return Response.ok(photo.getCustomAvatar(xRatio, yRatio, width, height, pictureMode),
+                return Response.ok(photoProvider.getCustomAvatar(width, height, pictureMode.name()),
                         ContentType.PNG.getMimeType()).build();
             } catch (Exception e) {
                 throw new WebApplicationException(Status.BAD_REQUEST);
