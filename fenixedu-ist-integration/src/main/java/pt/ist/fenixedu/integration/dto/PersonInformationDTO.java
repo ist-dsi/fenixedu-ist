@@ -18,11 +18,6 @@
  */
 package pt.ist.fenixedu.integration.dto;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Photograph;
@@ -38,17 +33,24 @@ import org.fenixedu.academic.domain.organizationalStructure.AccountabilityTypeEn
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.person.RoleType;
 import org.fenixedu.academic.domain.phd.PhdIndividualProgramProcess;
+import org.fenixedu.academic.domain.photograph.Picture;
 import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.academic.util.ContentType;
 import org.fenixedu.bennu.core.domain.UserProfile;
 import org.fenixedu.idcards.domain.SantanderEntry;
 import org.fenixedu.spaces.domain.Space;
 import org.joda.time.YearMonthDay;
-
-import com.google.common.io.BaseEncoding;
-
 import pt.ist.fenixedu.contracts.domain.LegacyRoleUtils;
 import pt.ist.fenixedu.contracts.domain.organizationalStructure.Invitation;
+import pt.ist.fenixedu.integration.util.PhotoUtils;
 import pt.ist.fenixedu.integration.util.contacts.ISTPhoneNumberHandler;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author - Shezad Anavarali (shezad@ist.utl.pt)
@@ -235,12 +237,16 @@ public class PersonInformationDTO {
             }
         }
 
-        this.photo =
-                person.getPersonalPhoto() != null ? BaseEncoding.base64().encode(getJpegPhoto(person.getPersonalPhoto())) : null;
-
+        this.photo = PhotoUtils.toBase64Jpeg(person);
         this.eIdentifier = person.getEidentifier();
-
         this.istCardMifareSerialNumber = getLastMifareSerialNumber(person);
+    }
+
+    public byte[] exportAsJPEG(byte[] photo, Color color) {
+        BufferedImage image = Picture.readImage(photo);
+        BufferedImage jpeg = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
+        jpeg.createGraphics().drawImage(image, 0, 0, color, null);
+        return Picture.writeImage(jpeg, ContentType.JPG);
     }
 
     private static String getLastMifareSerialNumber(final Person person) {

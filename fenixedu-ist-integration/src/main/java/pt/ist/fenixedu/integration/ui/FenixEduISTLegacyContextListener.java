@@ -18,24 +18,10 @@
  */
 package pt.ist.fenixedu.integration.ui;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.servlet.annotation.WebListener;
-
+import com.google.common.base.CharMatcher;
+import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
+import com.google.gson.JsonObject;
 import org.fenixedu.PostalCodeValidator;
 import org.fenixedu.TINValidator;
 import org.fenixedu.academic.domain.Country;
@@ -43,18 +29,13 @@ import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.ExecutionCourse;
-import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.OccupationPeriod;
 import org.fenixedu.academic.domain.OccupationPeriodType;
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.Summary;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.VatNumberResolver;
-import org.fenixedu.academic.domain.accounting.events.AccountingEventsManager;
-import org.fenixedu.academic.domain.accounting.events.AnnualEvent;
 import org.fenixedu.academic.domain.candidacy.StudentCandidacy;
-import org.fenixedu.academic.domain.candidacy.workflow.RegistrationOperation.RegistrationCreatedByCandidacy;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
 import org.fenixedu.academic.domain.degreeStructure.Context;
 import org.fenixedu.academic.domain.enrolment.DegreeModuleToEnrol;
@@ -72,7 +53,6 @@ import org.fenixedu.academic.util.Bundle;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
-import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.core.signals.DomainObjectEvent;
 import org.fenixedu.bennu.core.signals.Signal;
 import org.fenixedu.bennu.spring.BennuSpringContextHelper;
@@ -87,12 +67,6 @@ import org.fenixedu.santandersdk.exception.SantanderMissingInformationException;
 import org.fenixedu.santandersdk.exception.SantanderValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.CharMatcher;
-import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
-import com.google.gson.JsonObject;
-
 import pt.ist.fenixedu.giaf.invoices.ClientMap;
 import pt.ist.fenixedu.giaf.invoices.Utils;
 import pt.ist.fenixedu.integration.domain.academic.DegreeStructureForIST;
@@ -102,9 +76,25 @@ import pt.ist.fenixedu.integration.dto.QucProfessorshipEvaluation;
 import pt.ist.fenixedu.integration.ui.spring.service.AuthorizePersonalDataAccessService;
 import pt.ist.fenixedu.teacher.evaluation.domain.ProfessorshipEvaluationBean;
 import pt.ist.fenixframework.Atomic;
-import pt.ist.fenixframework.Atomic.TxMode;
 import pt.ist.fenixframework.FenixFramework;
 import pt.ist.fenixframework.dml.runtime.RelationAdapter;
+
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @WebListener
 public class FenixEduISTLegacyContextListener implements ServletContextListener {
@@ -309,21 +299,6 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
                 }
             }
         });
-
-//        DegreeCandidacyManagementDispatchAction.finalStepRedirector = (request, response, candidacy) -> {
-//            try {
-//                if (candidacy.getPerson().getPersonalPhoto() != null) {
-//                    response.sendRedirect(CoreConfiguration.getConfiguration().applicationUrl() +
-//                            "/tecnico-card/review?candidacy=" + candidacy.getExternalId());
-//                } else {
-//                    response.sendRedirect(CoreConfiguration.getConfiguration().applicationUrl() +
-//                            "/authorize-personal-data-access/cgd-bank?candidacy=" + candidacy.getExternalId());
-//                }
-//            } catch (IOException e) {
-//                throw new Error(e);
-//            }
-//            return null;
-//        };
 
         DegreeCurricularPlan.RESET_DEGREE_CURRICULAR_PLAN_FUNCTION = (dcp) -> {
             DegreeStructureForIST.resetDegreeCurricularPlan(dcp);
