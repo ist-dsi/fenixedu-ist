@@ -18,7 +18,8 @@ public class PhotoUtils {
 
     public static String toBase64Png(final Person person, final boolean checkAccess) {
         final User user = person.getUser();
-        final byte[] content = user == null || (checkAccess && !person.isPhotoAvailableToCurrentUser()) ? mysteryman()
+        final Avatar.PhotoProvider photoProvider = user == null ? null : Avatar.photoProvider.apply(user);
+        final byte[] content = photoProvider == null || (checkAccess && !person.isPhotoAvailableToCurrentUser()) ? mysteryman()
                 : Avatar.photoProvider.apply(user).getCustomAvatar(100, 100, PictureMode.FIT.name());
         return BaseEncoding.base64().encode(content);
     }
