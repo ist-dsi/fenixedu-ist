@@ -19,6 +19,7 @@ import org.fenixedu.bennu.core.signals.DomainObjectEvent;
 import org.fenixedu.bennu.core.signals.Signal;
 import org.joda.time.DateTime;
 import pt.ist.fenixedu.domain.SapRequestType;
+import pt.ist.fenixedu.domain.SapRoot;
 import pt.ist.fenixedu.giaf.invoices.EventProcessor;
 import pt.ist.fenixedu.giaf.invoices.SapEvent;
 import pt.ist.fenixedu.giaf.invoices.Utils;
@@ -47,6 +48,8 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
 //                .map(p -> (AccountingTransaction) FenixFramework.getDomainObject(p.getId()))
 //                .allMatch(t -> event.getSapRequestSet().stream().anyMatch(sr -> sr.getPayment() == t && sr.getCanBeRefunded()));
         };
+
+        Signal.register(AccountingTransactionDetail.SIGNAL_TRANSACTION_DETAIL_INIT, this::checkAllowedPaymentDate);
 
         if (GiafInvoiceConfiguration.getConfiguration().sapSyncActive()) {
             Signal.register(AccountingTransaction.SIGNAL_ANNUL, this::handlerAccountingTransactionAnnulment);
@@ -87,7 +90,15 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
             }
         };
     }
-    
+
+    private void checkAllowedPaymentDate(final DomainObjectEvent<AccountingTransactionDetail> doEvent) {
+        final AccountingTransactionDetail detail = doEvent.getInstance();
+        final DateTime dateTime = detail.getWhenRegistered();
+        if (dateTime.getYear() != SapRoot.getInstance().getOpenYear().intValue()) {
+            throw new DomainException(Optional.of(BUNDLE), "error.not.allowed.to.register.payments.for.year");
+        }
+    }
+
     @Override
     public void contextDestroyed(final ServletContextEvent sce) {
     }
