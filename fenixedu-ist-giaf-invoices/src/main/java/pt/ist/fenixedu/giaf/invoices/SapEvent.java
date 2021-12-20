@@ -15,6 +15,7 @@ import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.EventType;
 import org.fenixedu.academic.domain.accounting.PaymentMethod;
 import org.fenixedu.academic.domain.accounting.accountingTransactions.detail.SibsTransactionDetail;
+import org.fenixedu.academic.domain.accounting.calculator.AccountingEntry;
 import org.fenixedu.academic.domain.accounting.calculator.CreditEntry;
 import org.fenixedu.academic.domain.accounting.calculator.DebtEntry;
 import org.fenixedu.academic.domain.accounting.calculator.DebtExemption;
@@ -112,6 +113,11 @@ public class SapEvent {
 
     @Atomic
     public void registerInvoice(final Money value, final boolean gratuity, final boolean isNewDate, final ExternalClient externalClient, final String pledgeNumber) {
+        event.getSapRequestSet().stream()
+                .filter(sr -> sr.getRequestType() == SapRequestType.INVOICE)
+                .filter(sr -> sr.getValue().equals(value))
+                .forEach(sr -> sr.setIgnore(true));
+
         final String clientId;
         final JsonObject data;
         if (externalClient == null) {
@@ -502,20 +508,61 @@ public class SapEvent {
             throw new Error("More than one advancement payment was done with ID " +
                     partialPayment.getCreditEntry().getId() + " - can not make reimbursement");
         }
-        SapRequest advPayment = paymentsFor.iterator().next();
-        if (advPayment.getAdvancement().lessThan(new Money(partialPayment.getAmount()))) {
-            throw new Error("Trying to reimburse more value than what was sent in request for payment: " +
-                    partialPayment.getCreditEntry().getId() + " - can not make reimbursement");
+        final Money amountToRefund = new Money(partialPayment.getAmount());
+        if (paymentsFor.size() == 0) {
+            final SapRequest paymentRequest = event.getSapRequestSet().stream()
+                    .filter(sr -> sr.getRequestType() == SapRequestType.PAYMENT)
+                    .filter(sr -> !sr.getIgnore())
+                    .filter(sr -> sr.getValue().equals(amountToRefund))
+                    .filter(sr -> event.getSapRequestSet().stream()
+                            .filter(osr -> osr.getRequestType() == SapRequestType.INVOICE)
+                            .filter(osr -> osr.getIgnore())
+                            .anyMatch(osr -> sr.refersToDocument(osr.getDocumentNumber())))
+                    .findAny().orElse(null);
+            final SapRequest invoiceRequest = event.getSapRequestSet().stream()
+                    .filter(sr -> sr.getRequestType() == SapRequestType.INVOICE)
+                    .filter(sr -> sr.getIgnore())
+                    .filter(sr -> paymentRequest.refersToDocument(sr.getDocumentNumber()))
+                    .findAny().orElse(null);
+            if (paymentRequest == null || invoiceRequest == null) {
+                throw new Error("Unable to refund for ID " + partialPayment.getCreditEntry().getId() + " - can not make reimbursement");
+            }
+
+            final JsonObject data = toJsonReimbursement(event, amountToRefund, invoiceRequest.getValue(), invoiceRequest, false, true);
+            final String documentNumber = getDocumentNumber(data, true);
+            final String clientId = ClientMap.uVATNumberFor(event.getParty());
+            final SapRequest reimbursement = new SapRequest(event, clientId, amountToRefund, documentNumber, SapRequestType.REIMBURSEMENT, Money.ZERO, data);
+            reimbursement.setRefund(FenixFramework.getDomainObject(excessRefund.getId()));
+            reimbursement.setIgnore(true);
+
+            //we must create a fictious credit note request so that we know that the invoice is closed
+            final SapRequest creditNoteRequest = new SapRequest(event, clientId, invoiceRequest.getValue(), documentNumber, SapRequestType.CREDIT, Money.ZERO, data);
+            creditNoteRequest.setSent(true);
+            creditNoteRequest.setWhenSent(new DateTime());
+            creditNoteRequest.setIntegrated(true);
+            creditNoteRequest.setRefund(FenixFramework.getDomainObject(excessRefund.getId()));
+            creditNoteRequest.setCreditId(excessRefund.getId());
+            creditNoteRequest.setIgnore(true);
+
+            paymentRequest.setIgnore(true);
+
+            return reimbursement;
+        } else {
+            final SapRequest advPayment = paymentsFor.iterator().next();
+            if (advPayment.getAdvancement().lessThan(new Money(partialPayment.getAmount()))) {
+                throw new Error("Trying to reimburse more value than what was sent in request for payment: " +
+                        partialPayment.getCreditEntry().getId() + " - can not make reimbursement");
+            }
+
+            final String clientId = ClientMap.uVATNumberFor(event.getParty());
+            final JsonObject data = toJsonReimbursementAdvancement(advPayment, false, true);
+
+            final String documentNumber = getDocumentNumber(data, true);
+            final SapRequest reimbursementRequest = new SapRequest(event, clientId, amountToRefund, documentNumber, SapRequestType.REIMBURSEMENT, Money.ZERO, data);
+            reimbursementRequest.setAdvancementRequest(advPayment);
+            reimbursementRequest.setRefund(FenixFramework.getDomainObject(excessRefund.getId()));
+            return reimbursementRequest;
         }
-
-        String clientId = ClientMap.uVATNumberFor(event.getParty());
-        JsonObject data = toJsonReimbursementAdvancement(advPayment, false, true);
-
-        String documentNumber = getDocumentNumber(data, true);
-        SapRequest reimbursementRequest = new SapRequest(event, clientId, new Money(partialPayment.getAmount()), documentNumber, SapRequestType.REIMBURSEMENT, Money.ZERO, data);
-        reimbursementRequest.setAdvancementRequest(advPayment);
-        reimbursementRequest.setRefund(FenixFramework.getDomainObject(excessRefund.getId()));
-        return reimbursementRequest;
     }
 
     public void registerPastPayment(final Payment payment) {
