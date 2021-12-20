@@ -4,7 +4,7 @@
     <parent>
         <groupId>pt.ist</groupId>
         <artifactId>fenixedu-ist</artifactId>
-        <version>DEV-SNAPSHOT</version>
+        <version>18.19.0</version>
     </parent>
 
     <artifactId>fenixedu-ist-libraryspace</artifactId>
