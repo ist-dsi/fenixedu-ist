@@ -19,19 +19,11 @@
  */
 package pt.ist.fenixedu.giaf.invoices.ui;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
-import java.util.stream.Collector.Characteristics;
-
+import com.google.common.base.Strings;
 import com.google.common.io.ByteStreams;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.accessControl.AcademicAuthorizationGroup;
 import org.fenixedu.academic.domain.accessControl.academicAdministration.AcademicOperationType;
@@ -59,12 +51,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import com.google.common.base.Strings;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-
 import pt.ist.fenixedu.domain.ExternalClient;
 import pt.ist.fenixedu.domain.SapRequest;
 import pt.ist.fenixedu.domain.SapRequestType;
@@ -76,6 +62,17 @@ import pt.ist.fenixframework.Atomic;
 import pt.ist.sap.client.SapFinantialClient;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
+import java.util.stream.Collector.Characteristics;
 
 @SpringFunctionality(app = InvoiceDownloadController.class, title = "title.sap.invoice.viewer")
 @RequestMapping("/sap-invoice-viewer")
@@ -168,6 +165,11 @@ public class SapInvoiceController {
     public String refundEvent(final @PathVariable Event event, final User user, final Model model, @RequestParam(required = false) final ExternalClient client,
             final @RequestParam EventExemptionJustificationType justificationType, final @RequestParam String reason, @RequestParam BigDecimal amount) {
         return doRefund(event, user, model, () -> doRefundToExternalClient(event, user, client, justificationType, reason, amount));
+    }
+
+    @RequestMapping(value = "/{event}/updateInvoiceTinInfo", method = RequestMethod.POST)
+    public String updateInvoiceTinInfo(final @PathVariable Event event, final Model model) {
+        return processEvent(model, event, (c, l, e) -> EventProcessor.updateInvoiceTinInfo(c, l, e));
     }
 
     @Atomic
@@ -299,7 +301,9 @@ public class SapInvoiceController {
                 if (sapRequest.getRequestType() == SapRequestType.CREDIT) {
                     sapEvent.cancelCredit(sapRequest);
                 } else {
-                    sapEvent.closeDocument(sapRequest);
+                    if (!sapRequest.isReferencedByOtherRequest()) {
+                        sapEvent.closeDocument(sapRequest);
+                    }
                 }
             } catch (final Exception | Error e) {
                 model.addAttribute("exception", e.getMessage());

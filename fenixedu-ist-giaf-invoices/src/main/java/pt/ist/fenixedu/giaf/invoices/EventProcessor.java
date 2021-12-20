@@ -15,6 +15,7 @@ import org.fenixedu.academic.util.Money;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import pt.ist.esw.advice.pt.ist.fenixframework.AtomicInstance;
+import pt.ist.fenixedu.domain.SapRequest;
 import pt.ist.fenixedu.domain.SapRequestType;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
@@ -85,7 +86,6 @@ public class EventProcessor {
     public static void registerEventSapRequests(final ErrorLogConsumer consumer, final EventLogger elogger, final Supplier<Event> event, final boolean offsetPayments) {
         try {
             FenixFramework.getTransactionManager().withTransaction(new CallableWithoutException<Void>() {
-
                 @Override
                 public Void call() {
                     processSap(consumer, elogger, event.get(), offsetPayments);
@@ -96,6 +96,43 @@ public class EventProcessor {
             logError(consumer, elogger, event, e);
             e.printStackTrace();
         }
+    }
+
+    public static void updateInvoiceTinInfo(final ErrorLogConsumer consumer, final EventLogger elogger, final Event event) {
+        try {
+            FenixFramework.getTransactionManager().withTransaction(new CallableWithoutException<Void>() {
+                @Override
+                public Void call() {
+                    final SapEvent sapEvent = new SapEvent(event);
+                    final Money openInvoiceValue = event.getSapRequestSet().stream()
+                            .filter(sr -> !sr.getIgnore())
+                            .filter(sr -> !sr.isInitialization())
+                            .filter(sr -> sr.getRequestType() == SapRequestType.INVOICE)
+                            .map(sr -> closeAndReturnOpenValue(sapEvent, sr))
+                            .reduce(Money.ZERO, Money::add);
+                    if (openInvoiceValue.isPositive()) {
+                        sapEvent.registerInvoice(openInvoiceValue, event.isGratuity(), true, null, null);
+                    }
+                    return null;
+                }
+            }, new AtomicInstance(TxMode.SPECULATIVE_READ, false));
+        } catch (Throwable e) {
+            logError(consumer, elogger, () -> event, e);
+            e.printStackTrace();
+        }
+    }
+
+    private static Money closeAndReturnOpenValue(final SapEvent sapEvent, final SapRequest sr) {
+        final Money liquidated = sr.getEvent().getSapRequestSet().stream()
+                .filter(osr -> osr != sr)
+                .filter(osr -> osr.refersToDocument(sr.getDocumentNumber()))
+                .map(osr -> osr.getValue())
+                .reduce(Money.ZERO, Money::add);
+        final Money openValue = sr.getValue().subtract(liquidated);
+        if (openValue.isPositive()) {
+            sapEvent.closeDocument(sr);
+        }
+        return openValue;
     }
 
     private static void processSap(final ErrorLogConsumer errorLog, final EventLogger elogger, final Event event, final boolean offsetPayments) {
@@ -137,7 +174,7 @@ public class EventProcessor {
 
                     final AccountingTransaction accountingTransaction = ((AccountingTransaction) FenixFramework.getDomainObject(payment.getId()));
                     final SibsPayment sibsPayment = accountingTransaction.getSibsPayment();
-                    if (sibsPayment != null && sibsPayment.getSettlementDate() == null)  {
+                    if (sibsPayment != null && sibsPayment.getSettlementDate() == null) {
                         return;
                     }
 

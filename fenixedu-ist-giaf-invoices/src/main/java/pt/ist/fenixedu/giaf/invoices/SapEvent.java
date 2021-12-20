@@ -173,20 +173,27 @@ public class SapEvent {
                 && requestType != SapRequestType.INVOICE_INTEREST) {
             throw new Error("label.document.type.cannot.be.closed");
         }
-        if (sapRequest.isReferencedByOtherRequest()) {
+        if ((requestType == SapRequestType.DEBT && sapRequest.isReferencedByOtherRequest())
+                || ((requestType == SapRequestType.INVOICE || requestType == SapRequestType.INVOICE_INTEREST)
+                && !sapRequest.openInvoiceValue().isPositive())) {
             throw new Error("label.error.invoice.already.used");
         }
 
         final Money documentValue = sapRequest.getValue();
-        final CreditEntry creditEntry = EventProcessor.getCreditEntry(documentValue);
         if (requestType == SapRequestType.INVOICE || requestType == SapRequestType.INVOICE_INTEREST) {
-            final SapRequest creditRequest = registerCredit(event, creditEntry, documentValue, sapRequest, false);
+            final Money openInvoiceValue = sapRequest.openInvoiceValue();
+            final CreditEntry creditEntry = EventProcessor.getCreditEntry(openInvoiceValue);
+            final SapRequest creditRequest = registerCredit(event, creditEntry, openInvoiceValue, sapRequest, false);
             creditRequest.setIgnore(true);
+            if (documentValue.equals(openInvoiceValue)) {
+                sapRequest.setIgnore(true);
+            }
         } else if (requestType == SapRequestType.DEBT) {
+            final CreditEntry creditEntry = EventProcessor.getCreditEntry(documentValue);
             final SapRequest debtCreditRequest = registerDebtCredit(sapRequest.getClientId(), event, documentValue, creditEntry, sapRequest, true);
             debtCreditRequest.setIgnore(true);
+            sapRequest.setIgnore(true);
         }
-        sapRequest.setIgnore(true);
     }
 
     @Atomic
