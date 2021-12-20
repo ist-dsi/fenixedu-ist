@@ -34,6 +34,10 @@
                 ${csrf.field()}
                 <button type="submit" class="btn btn-info"><spring:message code="label.repeat.request" text="Sync"/></button>
             </form>
+            <form method="post" action="<%= contextPath %>/sap-invoice-viewer/${event.externalId}/updateInvoiceTinInfo" style="display: inline;">
+                    ${csrf.field()}
+                <button type="submit" class="btn btn-info"><spring:message code="label.update.invoice.tin.info" text="Update TIN Info"/></button>
+            </form>
         </c:if>
 
     <div>
