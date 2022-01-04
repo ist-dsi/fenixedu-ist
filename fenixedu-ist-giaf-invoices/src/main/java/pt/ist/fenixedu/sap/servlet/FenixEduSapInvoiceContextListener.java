@@ -28,6 +28,8 @@ import pt.ist.fenixframework.FenixFramework;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
+import java.time.Year;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -94,7 +96,8 @@ public class FenixEduSapInvoiceContextListener implements ServletContextListener
     private void checkAllowedPaymentDate(final DomainObjectEvent<AccountingTransactionDetail> doEvent) {
         final AccountingTransactionDetail detail = doEvent.getInstance();
         final DateTime dateTime = detail.getWhenRegistered();
-        if (dateTime.getYear() != SapRoot.getInstance().getOpenYear().intValue()) {
+        final int year = dateTime.getYear();
+        if (year != Year.now().getValue() && year != SapRoot.getInstance().getOpenYear().intValue()) {
             throw new DomainException(Optional.of(BUNDLE), "error.not.allowed.to.register.payments.for.year");
         }
     }
