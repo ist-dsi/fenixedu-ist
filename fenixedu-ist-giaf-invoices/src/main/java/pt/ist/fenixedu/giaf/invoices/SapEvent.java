@@ -1006,6 +1006,10 @@ public class SapEvent {
             final SapRequest originalRequest = sr.getOriginalRequest();
             if (originalRequest != null) {
                 originalRequest.setIgnore(true);
+                // If it was cancelled it means that the refund is going to be cancelled and the object will be deleted
+                // and it needs this relation to be free.
+                // If a new request is generated for the same refund object this relation is no longer needed as well
+                originalRequest.setRefund(null);
             }
         }
         return true;
