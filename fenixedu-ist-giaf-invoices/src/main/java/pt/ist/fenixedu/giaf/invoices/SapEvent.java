@@ -15,7 +15,6 @@ import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.EventType;
 import org.fenixedu.academic.domain.accounting.PaymentMethod;
 import org.fenixedu.academic.domain.accounting.accountingTransactions.detail.SibsTransactionDetail;
-import org.fenixedu.academic.domain.accounting.calculator.AccountingEntry;
 import org.fenixedu.academic.domain.accounting.calculator.CreditEntry;
 import org.fenixedu.academic.domain.accounting.calculator.DebtEntry;
 import org.fenixedu.academic.domain.accounting.calculator.DebtExemption;
@@ -540,7 +539,7 @@ public class SapEvent {
             final String clientId = ClientMap.uVATNumberFor(event.getParty());
             final SapRequest reimbursement = new SapRequest(event, clientId, amountToRefund, documentNumber, SapRequestType.REIMBURSEMENT, Money.ZERO, data);
             reimbursement.setRefund(FenixFramework.getDomainObject(excessRefund.getId()));
-            reimbursement.setIgnore(true);
+            reimbursement.setIgnore(false);
 
             //we must create a fictious credit note request so that we know that the invoice is closed
             final SapRequest creditNoteRequest = new SapRequest(event, clientId, invoiceRequest.getValue(), documentNumber, SapRequestType.CREDIT, Money.ZERO, data);
@@ -549,9 +548,10 @@ public class SapEvent {
             creditNoteRequest.setIntegrated(true);
             creditNoteRequest.setRefund(FenixFramework.getDomainObject(excessRefund.getId()));
             creditNoteRequest.setCreditId(excessRefund.getId());
-            creditNoteRequest.setIgnore(true);
+            creditNoteRequest.setIgnore(false);
 
-            paymentRequest.setIgnore(true);
+            paymentRequest.setIgnore(false);
+            invoiceRequest.setIgnore(false);
 
             return reimbursement;
         } else {
