@@ -705,12 +705,13 @@ public class SapEvent {
         }
     }
 
-    private void registerAdvancementOnly(final String clientId, final AccountingTransactionDetail transactionDetail, final Money payedAmount, boolean pastPayment) {
+    private SapRequest registerAdvancementOnly(final String clientId, final AccountingTransactionDetail transactionDetail, final Money payedAmount, boolean pastPayment) {
         final JsonObject data = toJsonAdvancementOnly(clientId, transactionDetail, payedAmount, pastPayment);
         String documentNumber = getDocumentNumber(data, true);
         SapRequest sapRequest = new SapRequest(event, clientId, Money.ZERO, documentNumber,
                 SapRequestType.ADVANCEMENT, payedAmount, data);
         sapRequest.setPayment(transactionDetail.getTransaction());
+        return sapRequest;
     }
 
     private JsonObject toJsonAdvancementOnly(final String clientId, final AccountingTransactionDetail transactionDetail, final Money amount, boolean pastPayment) {
@@ -769,7 +770,15 @@ public class SapEvent {
     }
 
     private void registerAdvancementAndUsedIt(final AccountingTransactionDetail transactionDetail, final Money payedAmount, final SapRequest sapInvoiceRequest, final SapRequestType requestType) {
-        registerAdvancementOnly(sapInvoiceRequest.getClientId(), transactionDetail, payedAmount, false);
+        final SapRequest advancementOnly = registerAdvancementOnly(sapInvoiceRequest.getClientId(), transactionDetail, payedAmount, false);
+        // when the advancement is generated in a year after the openYear and the payment date is of the openYear
+        // the dates in the request must be of the year of the openYear
+        final LocalDate today = new LocalDate();
+        final Integer openYear = SapRoot.getInstance().getOpenYear();
+        if (advancementOnly.getDocumentDate().getYear() == openYear && today.getYear() > openYear) {
+            final String newRequestDate = advancementOnly.getRequest().replace(today.toString("yyyy-MM-dd"), openYear.toString() + "-12-31");
+            advancementOnly.setRequest(newRequestDate);
+        }
         CreditEntry creditEntry = new Payment(transactionDetail.getTransaction().getExternalId(), null, null, null, null, null);
         PartialPayment<DebtEntry> partialPayment = new PartialPayment<DebtEntry>(creditEntry, null, null);
         Money amountToUse = sapInvoiceRequest.getValue().lessThan(payedAmount) ? sapInvoiceRequest.getValue() : payedAmount;
