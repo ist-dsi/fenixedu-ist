@@ -85,6 +85,9 @@ ${portal.toolkit()}
                                     ${refund.refund.amount}
                                 </td>
                                 <td rowspan="${srCount}">
+                                        ${refund.bankAccountNumber}
+                                </td>
+                                <td rowspan="${srCount}">
                                     ${refund.refund.state}
                                 </td>
                                 <c:forEach var="sapRequest" items="${refund.sapRequests}" end="0">

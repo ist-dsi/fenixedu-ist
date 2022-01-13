@@ -88,6 +88,12 @@ ${portal.toolkit()}
                         </div>
                     </div>
                     <div class="form-group">
+                        <label class="control-label col-sm-1"><spring:message code="label.org.fenixedu.academic.dto.accounting.bankAccountNumber"/></label>
+                        <div class="col-sm-4">
+                            <input name="bankAccountNumber" class="form-control" required></input>
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label class="control-label col-sm-1"><spring:message code="label.org.fenixedu.academic.dto.accounting.CreateExemptionBean.reason"/></label>
                         <div class="col-sm-4">
                             <textarea name="reason" class="form-control" rows="4" required></textarea>
@@ -101,6 +107,12 @@ ${portal.toolkit()}
                     <form method="post" action="<%= request.getContextPath() %>/sap-invoice-viewer/${event.externalId}/refundExcessPayment" style="display: inline;">
                         ${csrf.field()}
                         <input type="hidden" id="client2" name="client" value="">
+                        <div class="form-group">
+                            <label class="control-label col-sm-1"><spring:message code="label.org.fenixedu.academic.dto.accounting.bankAccountNumber"/></label>
+                            <div class="col-sm-4">
+                                <input name="bankAccountNumber" class="form-control" required></input>
+                            </div>
+                        </div>
                         <button type="submit" class="btn btn-primary"><spring:message code="label.create.excess.refund"/></button>
                     </form>
                 </c:if>

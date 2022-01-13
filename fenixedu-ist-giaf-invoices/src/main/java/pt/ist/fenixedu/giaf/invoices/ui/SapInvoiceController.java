@@ -162,9 +162,12 @@ public class SapInvoiceController {
     }
 
     @RequestMapping(value = "{event}/refundEvent", method = RequestMethod.POST)
-    public String refundEvent(final @PathVariable Event event, final User user, final Model model, @RequestParam(required = false) final ExternalClient client,
-            final @RequestParam EventExemptionJustificationType justificationType, final @RequestParam String reason, @RequestParam BigDecimal amount) {
-        return doRefund(event, user, model, () -> doRefundToExternalClient(event, user, client, justificationType, reason, amount));
+    public String refundEvent(final @PathVariable Event event, final User user, final Model model,
+                              final @RequestParam(required = false) ExternalClient client,
+                              final @RequestParam EventExemptionJustificationType justificationType,
+                              final @RequestParam String reason, @RequestParam BigDecimal amount,
+                              final @RequestParam String bankAccountNumber) {
+        return doRefund(event, user, model, () -> doRefundToExternalClient(event, user, client, justificationType, reason, amount, bankAccountNumber));
     }
 
     @RequestMapping(value = "/{event}/updateInvoiceTinInfo", method = RequestMethod.POST)
@@ -174,20 +177,24 @@ public class SapInvoiceController {
 
     @Atomic
     private Refund doRefundToExternalClient(final Event event, final User user, final ExternalClient client,
-            final EventExemptionJustificationType justificationType, final String reason, final BigDecimal amount) {
-        final Refund refund = new AccountingManagementService().refundEvent(event, user, justificationType, reason, amount);
+                                            final EventExemptionJustificationType justificationType,
+                                            final String reason, final BigDecimal amount, final String bankAccountNumber) {
+        final Refund refund = new AccountingManagementService().refundEvent(event, user, justificationType, reason, amount, bankAccountNumber);
         refund.setExternalClient(client);
         return refund;
     }
 
     @RequestMapping(value = "{event}/refundExcessPayment", method = RequestMethod.POST)
-    public String refundExcessPayment(final @PathVariable Event event, final User user, final Model model, @RequestParam(required = false) final ExternalClient client){
-        return doRefund(event, user, model, () -> doRefundExcessToExternalClient(event, user, client));
+    public String refundExcessPayment(final @PathVariable Event event, final User user, final Model model,
+                                      @RequestParam(required = false) final ExternalClient client,
+                                      final String bankAccountNumber){
+        return doRefund(event, user, model, () -> doRefundExcessToExternalClient(event, user, client, bankAccountNumber));
     }
 
     @Atomic
-    private Refund doRefundExcessToExternalClient(final Event event, final User user, final ExternalClient client) {
-        final Refund refund = new AccountingManagementService().refundExcessPayment(event, user, null);
+    private Refund doRefundExcessToExternalClient(final Event event, final User user, final ExternalClient client,
+                                                  final String bankAccountNumber) {
+        final Refund refund = new AccountingManagementService().refundExcessPayment(event, user, null, bankAccountNumber);
         refund.setExternalClient(client);
         return refund;
     }
