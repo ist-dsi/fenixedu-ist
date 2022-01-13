@@ -1,14 +1,5 @@
 package pt.ist.fenixedu.giaf.invoices.ui;
 
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.Refund;
 import org.fenixedu.academic.domain.organizationalStructure.Party;
@@ -24,10 +15,18 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-
 import pt.ist.fenixedu.domain.SapRequest;
 import pt.ist.fenixedu.domain.SapRequestType;
 import pt.ist.fenixedu.domain.SapRoot;
+
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 @SpringFunctionality(app = AcademicAdministrationSpringApplication.class, title = "title.accounting.refund")
@@ -84,6 +83,10 @@ public class AccountingRefundController {
 
         public Set<SapRequest> getSapRequests() {
             return sapRequests;
+        }
+
+        public String getBankAccountNumber() {
+            return refund.getBankAccountNumber();
         }
     }
 
