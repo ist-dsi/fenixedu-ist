@@ -97,10 +97,9 @@ public class SotisPublications {
             if (publication.has("author")) {
                 JsonElement jsonElement = publication.get("author");
                 if (jsonElement.isJsonArray()) {
-                    List<String> authors =
-                            StreamUtils.of(jsonElement.getAsJsonArray())
-                                    .map(author -> author.getAsJsonObject().get("name").getAsString())
-                                    .collect(Collectors.toList());
+					List<String> authors = StreamUtils.of(jsonElement.getAsJsonArray())
+							.map(author -> getAsString(author.getAsJsonObject(), "name"))
+							.filter(java.util.Objects::nonNull).collect(Collectors.toList());
                     parts.add(Joiner.on(", ").join(authors));
                     authorsNumber += authors.size();
                 } else {
@@ -120,7 +119,7 @@ public class SotisPublications {
             List<String> otherData = new ArrayList<>();
             if (publication.has("journal")) {
                 if (publication.get("journal").isJsonObject()) {
-                    otherData.add(publication.get("journal").getAsJsonObject().get("name").getAsString());
+                    otherData.add(getAsString(publication.get("journal").getAsJsonObject(),"name"));
                 }else {
                     otherData.add(publication.get("journal").getAsString());
                 }
@@ -129,19 +128,20 @@ public class SotisPublications {
                 }
             }
             if (publication.has("event")) {
-                otherData.add(publication.get("event").getAsJsonObject().get("name").getAsString());
+            	otherData.add(getAsString(publication.get("event").getAsJsonObject(),"name"));
             }
             if (publication.has("pages")) {
                 otherData.add(publication.get("pages").getAsString());
             }
             if (publication.has("publisher")) {
                 if (publication.get("publisher").isJsonObject()) {
-                    otherData.add(publication.get("publisher").getAsJsonObject().get("name").getAsString());
+                	otherData.add(getAsString(publication.get("publisher").getAsJsonObject(),"name"));
                 } else {
                     otherData.add(publication.get("publisher").getAsString());
                 }
             }
-            parts.add(Joiner.on(", ").join(otherData));
+            parts.add(Joiner.on(", ")
+					.join(otherData.stream().filter(java.util.Objects::nonNull).collect(Collectors.toList())));
             publicationString = Joiner.on(". ").join(parts);
 
             if (publication.has("url") && !publication.get("url").isJsonNull()) {
@@ -151,6 +151,11 @@ public class SotisPublications {
             }
         }
 
+		private String getAsString(JsonObject jsonObject, String elementName) {
+			JsonElement jsonElement = jsonObject.get(elementName);
+			return jsonElement != null && !jsonElement.isJsonNull() ? jsonElement.getAsString() : null;
+		}
+		
         public boolean isYearBetween(Integer beginYear, Integer endYear) {
             try {
                 return (!Strings.isNullOrEmpty(getYear()) && Integer.parseInt(getYear()) >= beginYear && Integer
