@@ -36,6 +36,7 @@ import org.fenixedu.academic.ui.struts.action.base.FenixAction;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.exceptions.AuthorizationException;
 import org.fenixedu.bennu.core.security.Authenticate;
+import org.fenixedu.bennu.core.util.NotificationPlug;
 import org.fenixedu.bennu.struts.annotations.Mapping;
 import org.joda.time.YearMonthDay;
 import pt.ist.fenixWebFramework.renderers.components.HtmlLink;
@@ -77,7 +78,7 @@ public class BaseAuthenticationAction extends FenixAction {
             final HttpSession httpSession = request.getSession(false);
 
             final NotificationPlug notificationPlug = NotificationPlug.PLUGS.stream()
-                    .filter(plug -> plug.showNotification(userView))
+                    .filter(plug -> plug.showNotification(Authenticate.getUser(), httpSession))
                     .findAny().orElse(null);
             if (notificationPlug != null) {
                 return new ActionForward(notificationPlug.redirectUrl(httpSession), true);
