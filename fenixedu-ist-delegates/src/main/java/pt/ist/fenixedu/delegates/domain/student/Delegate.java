@@ -22,6 +22,8 @@ import java.util.List;
 
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.CurricularYear;
+import org.fenixedu.academic.domain.ExecutionCourse;
+import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.degreeStructure.CycleType;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.bennu.core.domain.Bennu;
@@ -44,6 +46,8 @@ public abstract class Delegate extends Delegate_Base {
 
     public abstract List<CurricularCourse> getDelegateCourses();
 
+    public abstract List<ExecutionCourse> getDelegateExecutionCourses();
+
     public abstract Boolean isDegreeOrCycleDelegate();
 
     public abstract Boolean isYearDelegate();
@@ -62,6 +66,12 @@ public abstract class Delegate extends Delegate_Base {
 
     public Boolean isAfter(Delegate delegate) {
         return getEnd().isAfter(delegate.getEnd());
+    }
+
+    public List<ExecutionYear> getMandateExecutionYears() {
+        final ExecutionYear start = ExecutionYear.readByDateTime(getStart());
+        final ExecutionYear end = ExecutionYear.readByDateTime(getEnd());
+        return ExecutionYear.readExecutionYears(start, end);
     }
 
     public Registration getRegistration() {

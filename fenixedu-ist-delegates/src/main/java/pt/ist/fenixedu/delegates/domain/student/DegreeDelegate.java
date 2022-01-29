@@ -20,6 +20,7 @@ package pt.ist.fenixedu.delegates.domain.student;
 
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.Degree;
+import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
@@ -27,6 +28,7 @@ import pt.ist.fenixedu.delegates.domain.accessControl.DelegateGroup;
 import pt.ist.fenixedu.delegates.domain.util.email.DelegateSender;
 import pt.ist.fenixedu.delegates.ui.DelegateBean;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -77,6 +79,12 @@ public class DegreeDelegate extends DegreeDelegate_Base {
 
         return getDegree().getDegreeCurricularPlansForYear(executionYearByDate).stream()
                 .flatMap(p -> p.getCurricularCoursesSet().stream()).distinct().collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ExecutionCourse> getDelegateExecutionCourses() {
+        // TODO
+        return new ArrayList<>();
     }
 
     @Override

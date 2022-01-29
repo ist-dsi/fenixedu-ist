@@ -85,14 +85,14 @@
 					<tr>
 						<td class="col-sm-1"></td>
 						<td class="col-sm-8"><spring:message code="delegates.messaging.table.name"/></td>
-						<td class="col-sm-1"><spring:message code="delegates.messaging.table.year"/></td>
+						<td class="col-sm-2"><spring:message code="delegates.messaging.table.academic_year"/></td>
 						<td class="col-sm-1"><spring:message code="delegates.messaging.table.semester"/></td>
 					</tr>
 					<c:forEach var="execCourse" items="${executionCourses}">
 						<tr>
-							<td class="col-sm-1"><form:checkbox value="${execCourse.curricularCourse.externalId}" path="selectedCurricularCourses" /></td>
-							<td class="col-sm-8"><c:out value="${execCourse.curricularCourse.name}"/></td>
-							<td class="col-sm-1"><c:out value="${execCourse.curricularYear}"/></td>
+							<td class="col-sm-1"><form:checkbox value="${execCourse.executionCourse.externalId}" path="selectedExecutionCourses" /></td>
+							<td class="col-sm-8"><c:out value="${execCourse.executionCourse.name}"/></td>
+							<td class="col-sm-2"><c:out value="${execCourse.executionYear.name}"/></td>
 							<td class="col-sm-1"><c:out value="${execCourse.semester}"/></td>
 						</tr>
 					</c:forEach>
@@ -107,17 +107,17 @@
 					<tr>
 						<td class="col-sm-1"></td>
 						<td class="col-sm-8"><spring:message code="delegates.messaging.table.name"/></td>
-						<td class="col-sm-1"><spring:message code="delegates.messaging.table.year"/></td>
+						<td class="col-sm-2"><spring:message code="delegates.messaging.table.academic_year"/></td>
 						<td class="col-sm-1"><spring:message code="delegates.messaging.table.semester"/></td>
 						<td class="col-sm-1"><spring:message code="delegates.messaging.table.students"/></td>
 					</tr>
 					<c:forEach var="execCourse" items="${executionCourses}">
 						<tr>
-							<td class="col-sm-1"><form:checkbox value="${execCourse.curricularCourse.externalId}" path="selectedCurricularCourses" /></td>
-							<td class="col-sm-8"><c:out value="${execCourse.curricularCourse.name}"/></td>
-							<td class="col-sm-1"><c:out value="${execCourse.curricularYear}"/></td>
+							<td class="col-sm-1"><form:checkbox value="${execCourse.executionCourse.externalId}" path="selectedExecutionCourses" /></td>
+							<td class="col-sm-8"><c:out value="${execCourse.executionCourse.name}"/></td>
+							<td class="col-sm-2"><c:out value="${execCourse.executionYear.name}"/></td>
 							<td class="col-sm-1"><c:out value="${execCourse.semester}"/></td>
-							<td class="col-sm-1">${execCourse.enrolledStudents.size()}</td>
+							<td class="col-sm-1">${execCourse.enrollmentCount}</td>
 						</tr>
 					</c:forEach>
 				</table>

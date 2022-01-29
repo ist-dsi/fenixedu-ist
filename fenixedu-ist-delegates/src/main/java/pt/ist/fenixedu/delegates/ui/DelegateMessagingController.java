@@ -61,7 +61,7 @@ public class DelegateMessagingController {
             model.addAttribute("executionCourses", null);
         }
         else {
-            List<DelegateCurricularCourseBean> executionCourses = delegateService.getCurricularCourses(delegateStudentsBean.getSelectedPosition());
+            List<DelegateExecutionCourseBean> executionCourses = delegateService.getExecutionCourses(delegateStudentsBean.getSelectedPosition());
             model.addAttribute("executionCourses", executionCourses.stream().distinct().collect(Collectors.toList()));
         }
         model.addAttribute("yearStudents", delegateStudentsBean.getSelectedPosition().isYearDelegate());

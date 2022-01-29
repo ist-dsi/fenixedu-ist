@@ -21,6 +21,7 @@ package pt.ist.fenixedu.delegates.domain.student;
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
+import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.degreeStructure.CycleType;
@@ -79,6 +80,12 @@ public class CycleDelegate extends CycleDelegate_Base {
             }
         }
         return toRet.stream().distinct().collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ExecutionCourse> getDelegateExecutionCourses() {
+        // TODO
+        return new ArrayList<>();
     }
 
     @Override
