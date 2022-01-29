@@ -60,9 +60,8 @@ public class CycleDelegate extends CycleDelegate_Base {
 
     @Override
     public String getTitle() {
-        String delegate = BundleUtil.getString(BUNDLE, "delegate");
-        String of = BundleUtil.getString(BUNDLE, "delegate.of");
-        return String.format("%s %s %s %s %s", delegate, of, getCycle().getDescription(), of, getDegree().getSigla());
+        return BundleUtil.getString(BUNDLE, "delegate.title.cycle-delegate",
+                getCycle().getDescription(), getDegree().getSigla());
     }
 
     @Override
