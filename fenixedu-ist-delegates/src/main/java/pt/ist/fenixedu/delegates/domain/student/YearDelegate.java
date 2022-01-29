@@ -30,6 +30,7 @@ import pt.ist.fenixedu.delegates.domain.util.email.DelegateSender;
 import pt.ist.fenixedu.delegates.ui.DelegateBean;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.fenixedu.bennu.FenixEduDelegatesConfiguration.BUNDLE;
@@ -83,15 +84,22 @@ public class YearDelegate extends YearDelegate_Base {
         final List<ExecutionYear> execYears = getMandateExecutionYears();
 
         return execYears.stream().flatMap(execYear ->
-                getDegree()
-                        .getDegreeCurricularPlansForYear(execYear)
-                        .stream()
-                        .flatMap(plan ->
-                                plan.getCurricularCoursesByExecutionYearAndCurricularYear(execYear, getCurricularYear().getYear())
+                        getDegree()
+                                .getDegreeCurricularPlansForYear(execYear)
+                                .stream()
+                                .flatMap(plan ->
+                                        plan.getCurricularCoursesSet().stream()
+                                )
+                                .filter(curricularCourse -> curricularCourse
+                                        .getDegreeModuleScopes()
                                         .stream()
-                                        .flatMap(curricularCourse -> curricularCourse.getExecutionCoursesByExecutionYear(execYear).stream())
-                        )
-        ).distinct().collect(Collectors.toList());
+                                        .anyMatch(scope -> scope.isActiveForExecutionYear(execYear) &&
+                                                Objects.equals(scope.getCurricularYear(), getCurricularYear().getYear())
+                                        )
+                                )
+                                .flatMap(curricularCourse -> curricularCourse.getExecutionCoursesByExecutionYear(execYear).stream())
+                )
+                .distinct().collect(Collectors.toList());
     }
 
     @Override

@@ -51,7 +51,7 @@
 		<div class="col-sm-2"><spring:message code="delegates.messaging.send.mail.to"/>:</div>
 		<div class="col-sm-8">
 			<a href="${formActionUrl}${students.selectedPosition.externalId}?studentGroups=true"><spring:message code="delegates.messaging.student.groups"/></a>,
-			<a href="${formActionUrl}${students.selectedPosition.externalId}?studentGroups=false"><spring:message code="delegates.messaging.student.selected.courses"/></a>
+			<a href="${formActionUrl}${students.selectedPosition.externalId}?studentGroups=false"><spring:message code="delegates.messaging.student.selected.courses"/></a>,
 			<a href="${formActionUrl}${students.selectedPosition.externalId}?studentGroups=false&responsibleTeachers=true"><spring:message code="delegates.messaging.responsibleTeachers.selected.courses"/></a>
 		</div>
 	</div>
@@ -91,7 +91,7 @@
 					<c:forEach var="execCourse" items="${executionCourses}">
 						<tr>
 							<td class="col-sm-1"><form:checkbox value="${execCourse.executionCourse.externalId}" path="selectedExecutionCourses" /></td>
-							<td class="col-sm-8"><c:out value="${execCourse.executionCourse.name}"/></td>
+							<td class="col-sm-8"><a href="${execCourse.executionCourse.siteUrl}" target="_blank"><c:out value="${execCourse.executionCourse.name}"/></a></td>
 							<td class="col-sm-2"><c:out value="${execCourse.executionYear.name}"/></td>
 							<td class="col-sm-1"><c:out value="${execCourse.semester}"/></td>
 						</tr>
@@ -114,7 +114,7 @@
 					<c:forEach var="execCourse" items="${executionCourses}">
 						<tr>
 							<td class="col-sm-1"><form:checkbox value="${execCourse.executionCourse.externalId}" path="selectedExecutionCourses" /></td>
-							<td class="col-sm-8"><c:out value="${execCourse.executionCourse.name}"/></td>
+							<td class="col-sm-8"><a href="${execCourse.executionCourse.siteUrl}" target="_blank"><c:out value="${execCourse.executionCourse.name}"/></a></td>
 							<td class="col-sm-2"><c:out value="${execCourse.executionYear.name}"/></td>
 							<td class="col-sm-1"><c:out value="${execCourse.semester}"/></td>
 							<td class="col-sm-1">${execCourse.enrollmentCount}</td>
