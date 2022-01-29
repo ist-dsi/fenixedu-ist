@@ -44,8 +44,6 @@ public abstract class Delegate extends Delegate_Base {
 
     public abstract Boolean samePosition(Delegate delegate);
 
-    public abstract List<CurricularCourse> getDelegateCourses();
-
     public abstract List<ExecutionCourse> getDelegateExecutionCourses();
 
     public abstract Boolean isDegreeOrCycleDelegate();

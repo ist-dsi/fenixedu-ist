@@ -71,18 +71,6 @@ public class CycleDelegate extends CycleDelegate_Base {
     }
 
     @Override
-    public List<CurricularCourse> getDelegateCourses() {
-        List<CurricularCourse> toRet = new ArrayList<>();
-        ExecutionYear executionYearByDate = ExecutionYear.getExecutionYearByDate(getStart().toYearMonthDay());
-        for (DegreeCurricularPlan curricularPlan : getDegree().getActiveDegreeCurricularPlans()) {
-            for (ExecutionSemester execSem : executionYearByDate.getExecutionPeriodsSet()) {
-                toRet.addAll(curricularPlan.getCycleCourseGroup(getCycle()).getAllCurricularCourses(execSem));
-            }
-        }
-        return toRet.stream().distinct().collect(Collectors.toList());
-    }
-
-    @Override
     public List<ExecutionCourse> getDelegateExecutionCourses() {
         final List<ExecutionYear> execYears = getMandateExecutionYears();
 

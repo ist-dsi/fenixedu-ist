@@ -69,15 +69,6 @@ public class YearDelegate extends YearDelegate_Base {
     }
 
     @Override
-    public List<CurricularCourse> getDelegateCourses() {
-        final List<ExecutionYear> execYears = getMandateExecutionYears();
-
-        return execYears.stream().flatMap(execYear -> getDegree().getDegreeCurricularPlansForYear(execYear).stream()
-                .flatMap(p -> p.getCurricularCoursesByExecutionYearAndCurricularYear(execYear, getCurricularYear().getYear())
-                        .stream())).collect(Collectors.toList());
-    }
-
-    @Override
     public List<ExecutionCourse> getDelegateExecutionCourses() {
         final List<ExecutionYear> execYears = getMandateExecutionYears();
 
