@@ -24,10 +24,7 @@ import org.fenixedu.academic.domain.accessControl.StudentGroup;
 import org.fenixedu.academic.domain.accessControl.TeacherResponsibleOfExecutionCourseGroup;
 import org.fenixedu.bennu.core.groups.Group;
 import org.springframework.util.CollectionUtils;
-import pt.ist.fenixedu.delegates.domain.student.CycleDelegate;
-import pt.ist.fenixedu.delegates.domain.student.DegreeDelegate;
 import pt.ist.fenixedu.delegates.domain.student.Delegate;
-import pt.ist.fenixedu.delegates.domain.student.YearDelegate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,28 +34,25 @@ import java.util.stream.Collectors;
 public class DelegateStudentSelectBean {
 
     private List<ExecutionCourse> selectedExecutionCourses;
+    private List<ExecutionYear> selectedGroupsExecutionYears;
     private Delegate selectedPosition;
     private Set<Delegate> positions;
-    private Boolean selectedYearStudents;
-    private Boolean selectedDegreeOrCycleStudents;
     private Boolean selectedResponsibleTeachers;
 
     public DelegateStudentSelectBean(Set<Delegate> delegates) {
         selectedExecutionCourses = new ArrayList<>();
+        selectedGroupsExecutionYears = new ArrayList<>();
         positions = null;
         selectedPosition = null;
         setInfo(delegates);
-        selectedYearStudents = false;
-        selectedDegreeOrCycleStudents = false;
         selectedResponsibleTeachers = false;
     }
 
     public DelegateStudentSelectBean() {
         selectedExecutionCourses = new ArrayList<>();
+        selectedGroupsExecutionYears = new ArrayList<>();
         selectedPosition = null;
         positions = null;
-        selectedYearStudents = false;
-        selectedDegreeOrCycleStudents = false;
         selectedResponsibleTeachers = false;
     }
 
@@ -82,6 +76,10 @@ public class DelegateStudentSelectBean {
         return selectedExecutionCourses;
     }
 
+    public List<ExecutionYear> getSelectedGroupsExecutionYears() {
+        return selectedGroupsExecutionYears;
+    }
+
     public Delegate getSelectedPosition() {
         return selectedPosition;
     }
@@ -90,20 +88,16 @@ public class DelegateStudentSelectBean {
         return positions;
     }
 
-    public Boolean getSelectedYearStudents() {
-        return selectedYearStudents;
-    }
-
-    public Boolean getSelectedDegreeOrCycleStudents() {
-        return selectedDegreeOrCycleStudents;
-    }
-
     public Boolean getSelectedResponsibleTeachers() {
         return selectedResponsibleTeachers;
     }
 
     public void setSelectedExecutionCourses(List<ExecutionCourse> selectedExecutionCourses) {
         this.selectedExecutionCourses = selectedExecutionCourses;
+    }
+
+    public void setSelectedGroupsExecutionYears(List<ExecutionYear> selectedGroupsExecutionYears) {
+        this.selectedGroupsExecutionYears = selectedGroupsExecutionYears;
     }
 
     public void setSelectedPosition(Delegate selectedPosition) {
@@ -117,14 +111,6 @@ public class DelegateStudentSelectBean {
         this.positions = positions;
     }
 
-    public void setSelectedYearStudents(Boolean selectedYearStudents) {
-        this.selectedYearStudents = selectedYearStudents;
-    }
-
-    public void setSelectedDegreeOrCycleStudents(Boolean selectedDegreeOrCycleStudents) {
-        this.selectedDegreeOrCycleStudents = selectedDegreeOrCycleStudents;
-    }
-
     public void setSelectedResponsibleTeachers(Boolean selectedResponsibleTeachers) {
         this.selectedResponsibleTeachers = selectedResponsibleTeachers;
     }
@@ -133,7 +119,6 @@ public class DelegateStudentSelectBean {
         List<Group> toRet = new ArrayList<>();
         if (!CollectionUtils.isEmpty(selectedExecutionCourses)) {
             List<ExecutionCourse> accessibleStudentCourses = selectedPosition.getDelegateExecutionCourses();
-            // TODO verify access (changing the ID on frontend might let people send from groups they don't have access to)
             List<ExecutionCourse> selectedStudentCourses = this.selectedExecutionCourses
                     .stream()
                     .filter(accessibleStudentCourses::contains)
@@ -148,21 +133,10 @@ public class DelegateStudentSelectBean {
                         .forEach(toRet::add);
             }
         }
-        if (selectedYearStudents && selectedPosition instanceof YearDelegate) {
-            // TODO this also needs to support multiple execution years
-            YearDelegate yearDelegate = (YearDelegate) selectedPosition;
-            toRet.add(StudentGroup.get(selectedPosition.getDegree(), yearDelegate.getCurricularYear(),
-                    ExecutionYear.getExecutionYearByDate(yearDelegate.getStart().toYearMonthDay())));
-        }
-        if (selectedDegreeOrCycleStudents) {
-            if (selectedPosition instanceof CycleDelegate) {
-                CycleDelegate cycleDelegate = (CycleDelegate) selectedPosition;
-                toRet.add(StudentGroup.get(selectedPosition.getDegree(), cycleDelegate.getCycle()));
-            }
-            if (selectedPosition instanceof DegreeDelegate) {
-                DegreeDelegate degreeDelegate = (DegreeDelegate) selectedPosition;
-                toRet.add(StudentGroup.get(degreeDelegate.getDegree(), null));
-            }
+        if (!CollectionUtils.isEmpty(selectedGroupsExecutionYears)) {
+            selectedGroupsExecutionYears.stream()
+                    .map(selectedPosition::getStudentGroupForExecutionYear)
+                    .forEach(toRet::add);
         }
         return toRet;
     }

@@ -1,18 +1,18 @@
 /**
  * Copyright © 2013 Instituto Superior Técnico
- *
+ * <p>
  * This file is part of FenixEdu IST Delegates.
- *
+ * <p>
  * FenixEdu IST Delegates is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * FenixEdu IST Delegates is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu IST Delegates.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -54,16 +54,16 @@ public class DelegateMessagingController {
 
     @RequestMapping(value = "/messaging/{delegate}", method = RequestMethod.GET)
     public String messaging(@PathVariable Delegate delegate, @RequestParam(defaultValue = "true") Boolean studentGroups,
-            @RequestParam(defaultValue = "false") Boolean responsibleTeachers, Model model) {
+                            @RequestParam(defaultValue = "false") Boolean responsibleTeachers, Model model) {
         DelegateStudentSelectBean delegateStudentsBean = new DelegateStudentSelectBean();
         delegateStudentsBean.setSelectedPosition(delegate);
         if (studentGroups) {
             model.addAttribute("executionCourses", null);
-        }
-        else {
+        } else {
             List<DelegateExecutionCourseBean> executionCourses = delegateService.getExecutionCourses(delegateStudentsBean.getSelectedPosition());
             model.addAttribute("executionCourses", executionCourses.stream().distinct().collect(Collectors.toList()));
         }
+        model.addAttribute("mandateYears", delegateStudentsBean.getSelectedPosition().getMandateExecutionYears());
         model.addAttribute("yearStudents", delegateStudentsBean.getSelectedPosition().isYearDelegate());
         model.addAttribute("degreeOrCycleStudents", delegateStudentsBean.getSelectedPosition().isDegreeOrCycleDelegate());
         model.addAttribute("responsibleTeachers", responsibleTeachers);
@@ -80,7 +80,7 @@ public class DelegateMessagingController {
 
     @RequestMapping(value = "/messaging/", method = RequestMethod.POST)
     public RedirectView messaging(@ModelAttribute final DelegateStudentSelectBean delegateStudentsBean, final HttpServletResponse response,
-            final HttpServletRequest request) throws IOException {
+                                  final HttpServletRequest request) throws IOException {
         MessageBean bean = new MessageBean();
         bean.setLockedSender(delegateStudentsBean.getSelectedPosition().getSender());
         for (final Group recipient : delegateStudentsBean.getRecipients()) {

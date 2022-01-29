@@ -24,6 +24,7 @@ import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.accessControl.StudentGroup;
 import org.fenixedu.academic.domain.degreeStructure.CycleType;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
@@ -127,4 +128,8 @@ public class CycleDelegate extends CycleDelegate_Base {
         return getCycle();
     }
 
+    @Override
+    public StudentGroup getStudentGroupForExecutionYear(ExecutionYear year) {
+        return StudentGroup.get(null, this.getDegree(), this.getCycleType(), null, null, null, year);
+    }
 }

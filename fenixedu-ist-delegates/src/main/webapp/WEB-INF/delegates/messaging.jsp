@@ -58,27 +58,35 @@
 	<c:if test="${executionCourses == null}">
 		<div class="row">
 			<div class="col-sm-2"><spring:message code="delegates.messaging.bcc"/>:</div>
-			<div class="col-sm-5">
+			<div class="col-sm-8">
 				<c:if test="${yearStudents}">
-					<div class="row">
-						<div class="col-md-5">
-							<form:checkbox path="selectedYearStudents" />
-							<spring:message code="delegates.messaging.year.students"/>
+					<c:forEach var="execYear" items="${mandateYears}">
+						<div class="row">
+							<div class="col-md-8">
+								<form:checkbox value="${execYear.externalId}" path="selectedGroupsExecutionYears" />
+								<spring:message code="delegates.messaging.year.students">
+									<spring:argument>${execYear.name}</spring:argument>
+								</spring:message>
+							</div>
 						</div>
-					</div>
+					</c:forEach>
 				</c:if>
 				<c:if test="${degreeOrCycleStudents}">
-					<div class="row">
-						<div class="col-md-5">
-							<form:checkbox path="selectedDegreeOrCycleStudents" />
-							<spring:message code="delegates.messaging.degreeCycle.students"/>
+					<c:forEach var="execYear" items="${mandateYears}">
+						<div class="row">
+							<div class="col-md-8">
+								<form:checkbox  value="${execYear.externalId}" path="selectedGroupsExecutionYears" />
+								<spring:message code="delegates.messaging.degreeCycle.students">
+									<spring:argument>${execYear.name}</spring:argument>
+								</spring:message>
+							</div>
 						</div>
-					</div>
+					</c:forEach>
 				</c:if>
 			</div>
 		</div>
 	</c:if>
-	<c:if test="${executionCourses != null and responsibleTeachers}">
+	<c:if test="${executionCourses != null}">
 		<div class="row">
 			<div class="col-md-5">
 				<table class="table table-condensed">
@@ -87,6 +95,9 @@
 						<td class="col-sm-8"><spring:message code="delegates.messaging.table.name"/></td>
 						<td class="col-sm-2"><spring:message code="delegates.messaging.table.academic_year"/></td>
 						<td class="col-sm-1"><spring:message code="delegates.messaging.table.semester"/></td>
+						<c:if test="${not responsibleTeachers}">
+							<td class="col-sm-1"><spring:message code="delegates.messaging.table.students"/></td>
+						</c:if>
 					</tr>
 					<c:forEach var="execCourse" items="${executionCourses}">
 						<tr>
@@ -94,30 +105,9 @@
 							<td class="col-sm-8"><a href="${execCourse.executionCourse.siteUrl}" target="_blank"><c:out value="${execCourse.executionCourse.name}"/></a></td>
 							<td class="col-sm-2"><c:out value="${execCourse.executionYear.name}"/></td>
 							<td class="col-sm-1"><c:out value="${execCourse.semester}"/></td>
-						</tr>
-					</c:forEach>
-				</table>
-			</div>
-		</div>
-	</c:if>
-	<c:if test="${executionCourses != null and not responsibleTeachers}">
-		<div class="row">
-			<div class="col-md-5">
-				<table class="table table-condensed">
-					<tr>
-						<td class="col-sm-1"></td>
-						<td class="col-sm-8"><spring:message code="delegates.messaging.table.name"/></td>
-						<td class="col-sm-2"><spring:message code="delegates.messaging.table.academic_year"/></td>
-						<td class="col-sm-1"><spring:message code="delegates.messaging.table.semester"/></td>
-						<td class="col-sm-1"><spring:message code="delegates.messaging.table.students"/></td>
-					</tr>
-					<c:forEach var="execCourse" items="${executionCourses}">
-						<tr>
-							<td class="col-sm-1"><form:checkbox value="${execCourse.executionCourse.externalId}" path="selectedExecutionCourses" /></td>
-							<td class="col-sm-8"><a href="${execCourse.executionCourse.siteUrl}" target="_blank"><c:out value="${execCourse.executionCourse.name}"/></a></td>
-							<td class="col-sm-2"><c:out value="${execCourse.executionYear.name}"/></td>
-							<td class="col-sm-1"><c:out value="${execCourse.semester}"/></td>
-							<td class="col-sm-1">${execCourse.enrollmentCount}</td>
+							<c:if test="${not responsibleTeachers}">
+								<td class="col-sm-1">${execCourse.enrollmentCount}</td>
+							</c:if>
 						</tr>
 					</c:forEach>
 				</table>

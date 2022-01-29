@@ -23,6 +23,7 @@ import org.fenixedu.academic.domain.CurricularYear;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.accessControl.StudentGroup;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import pt.ist.fenixedu.delegates.domain.accessControl.DelegateGroup;
@@ -112,4 +113,8 @@ public class YearDelegate extends YearDelegate_Base {
         return true;
     }
 
+    @Override
+    public StudentGroup getStudentGroupForExecutionYear(ExecutionYear year) {
+        return StudentGroup.get(this.getDegree(), this.getCurricularYear(), year);
+    }
 }
