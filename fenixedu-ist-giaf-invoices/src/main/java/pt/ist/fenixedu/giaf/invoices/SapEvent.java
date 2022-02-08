@@ -298,7 +298,7 @@ public class SapEvent {
         new SapRequest(event, clientId, invoiceValue, documentNumber, SapRequestType.INVOICE, Money.ZERO, data);
     }
 
-    private SapRequest registerDebt(Money debtFenix, Event event, boolean isNewDate) {
+    public SapRequest registerDebt(Money debtFenix, Event event, boolean isNewDate) {
         String clientId = ClientMap.uVATNumberFor(event.getParty());
         JsonObject data = toJsonDebt(event, debtFenix, clientId, getDocumentDate(event.getWhenOccured(), isNewDate),
                 new DateTime(), true, "NG", true, isNewDate, null);
