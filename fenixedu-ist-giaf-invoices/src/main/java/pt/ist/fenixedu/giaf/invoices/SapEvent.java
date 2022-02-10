@@ -1409,9 +1409,11 @@ public class SapEvent {
         clientData.addProperty("clientId", clientId);
         //country must be the same as the fiscal country
         final String countryCode = clientId.substring(0, 2);
-        clientData.addProperty("country", countryCode);
 
         PhysicalAddress physicalAddress = Utils.toAddress(party, countryCode);
+        String countryForAddress = physicalAddress == null  || physicalAddress.getCountryOfResidence() == null
+                ? countryCode : physicalAddress.getCountryOfResidence().getCode();
+        clientData.addProperty("country", countryForAddress);
         clientData.addProperty("street",
                 physicalAddress != null && physicalAddress.getAddress() != null && !Strings.isNullOrEmpty(physicalAddress.getAddress().trim()) ?
                         Utils.limitFormat(MAX_SIZE_ADDRESS, physicalAddress.getAddress()) : MORADA_DESCONHECIDO);
