@@ -229,12 +229,12 @@ public class SapRequest extends SapRequest_Base {
     }
 
     public String getDocumentNumberForType(String typeCode){
-        final JsonObject json = new JsonParser().parse(getRequest()).getAsJsonObject();
+        final JsonObject json = getRequestAsJson();
         final JsonElement paymentDocument = json.get("paymentDocument");
         if (paymentDocument != null && !paymentDocument.isJsonNull()) {
             final JsonObject paymentJson = paymentDocument.getAsJsonObject();
             final String paymentDocumentNumber = getDocumentNumber(paymentJson, "paymentDocumentNumber", typeCode);
-            if(paymentDocumentNumber != null) {
+            if (paymentDocumentNumber != null) {
                 return paymentDocumentNumber;
             }
             final String workingDocumentNumber = getDocumentNumber(paymentJson, "workingDocumentNumber", typeCode);
@@ -253,9 +253,9 @@ public class SapRequest extends SapRequest_Base {
         final JsonElement workingDocument = json.get("workingDocument");
         if (workingDocument != null && !workingDocument.isJsonNull()) {
             final JsonObject workingJson = workingDocument.getAsJsonObject();
-            final String workOriginDocNumber = getDocumentNumber(workingJson, "paymentOriginDocNumber", typeCode);
-            if (workOriginDocNumber != null) {
-                return workOriginDocNumber;
+            final String paymentOriginDocNumber = getDocumentNumber(workingJson, "paymentOriginDocNumber", typeCode);
+            if (paymentOriginDocNumber != null) {
+                return paymentOriginDocNumber;
             }
             final String workingDocumentNumber = getDocumentNumber(workingJson, "workingDocumentNumber", typeCode);
             if (workingDocumentNumber != null) {
@@ -264,6 +264,10 @@ public class SapRequest extends SapRequest_Base {
             final String paymentDocumentNumber = getDocumentNumber(workingJson, "paymentDocumentNumber", typeCode);
             if(paymentDocumentNumber != null) {
                 return paymentDocumentNumber;
+            }
+            final String workOriginDocNumber = getDocumentNumber(workingJson, "workOriginDocNumber", typeCode);
+            if (workOriginDocNumber != null) {
+                return workOriginDocNumber;
             }
         }
         return null;
