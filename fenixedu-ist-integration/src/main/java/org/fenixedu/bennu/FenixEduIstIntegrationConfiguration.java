@@ -19,10 +19,25 @@
 package org.fenixedu.bennu;
 
 import org.fenixedu.bennu.spring.BennuSpringModule;
+import org.fenixedu.commons.configuration.ConfigurationInvocationHandler;
+import org.fenixedu.commons.configuration.ConfigurationManager;
+import org.fenixedu.commons.configuration.ConfigurationProperty;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 @EnableAsync
-@BennuSpringModule(basePackages = { "pt.ist.fenixedu.integration.ui" }, bundles = "FenixEduIstIntegrationResources")
-public class FenixEduIstIntegrationSpringConfiguration {
+@BennuSpringModule(basePackages = { "pt.ist.fenixedu.integration" }, bundles = "FenixEduIstIntegrationResources")
+public class FenixEduIstIntegrationConfiguration {
+
+    @ConfigurationManager(description = "Fenixedu IST Configuration")
+    public interface ConfigurationProperties {
+
+        @ConfigurationProperty(key = "pt.ist.fenixedu.integration.scholarThesesToken",
+                description = "Token used for scholar authentication")
+        public String scholarThesesToken();
+    }
+
+    public static FenixEduIstIntegrationConfiguration.ConfigurationProperties getConfiguration() {
+        return ConfigurationInvocationHandler.getConfiguration(FenixEduIstIntegrationConfiguration.ConfigurationProperties.class);
+    }
 
 }
