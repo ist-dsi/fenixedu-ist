@@ -98,7 +98,7 @@ public class SapEvent {
 
     public SapRequest registerInvoice(Money debtFenix, Event event, boolean isGratuity, boolean isNewDate) {
 
-        if (isToProcessDebt(isGratuity, isNewDate, getDocumentDate(event.getWhenOccured(), isNewDate))) {
+        if (isToProcessDebt(isGratuity)) {
             registerDebt(debtFenix, event, isNewDate);
         }
 
@@ -307,7 +307,7 @@ public class SapEvent {
         return new SapRequest(event, clientId, debtFenix, documentNumber, SapRequestType.DEBT, Money.ZERO, data);
     }
 
-    private void registerDebtCredit(CreditEntry creditEntry, Event event, boolean isNewDate) {
+    public void registerDebtCredit(CreditEntry creditEntry, Event event, boolean isNewDate) {
 
         String clientId = ClientMap.uVATNumberFor(event.getParty());
         SimpleImmutableEntry<List<SapRequest>, Money> openDebtsAndRemainingValue = getOpenDebtsAndRemainingValue();
@@ -372,7 +372,7 @@ public class SapEvent {
         }
 
         // diminuir divida no sap (se for propina diminuir dívida) e credit note na última factura existente
-        if (isToProcessDebt(isGratuity, true, new DateTime())) {
+        if (isToProcessDebt(isGratuity)) {
             registerDebtCredit(creditEntry, event, false);
         }
 
@@ -458,7 +458,7 @@ public class SapEvent {
         final Money valueToRefund = refundTotal ? calculateAmountPayedForInvoice(sapInvoiceRequest) : refundValue;
 
         //if the invoice generated debt we have to send a debt credit
-        if (isToProcessDebt(event.isGratuity(), true, new DateTime())) {
+        if (isToProcessDebt(event.isGratuity())) {
             registerDebtCredit(EventProcessor.getCreditEntry(valueToExempt), event, true);
         }
 
@@ -1066,14 +1066,9 @@ public class SapEvent {
         return documentDate;
     }
 
-    private boolean isToProcessDebt(boolean isGratuity, final boolean isNewDate, final DateTime documentDate) {
+    private boolean isToProcessDebt(boolean isGratuity) {
         return (isGratuity || event instanceof ExternalScholarshipPhdGratuityContribuitionEvent)
-                && event.getWhenOccured().isAfter(EventWrapper.LIMIT)
-                && isNotPastDebtEndDate(isNewDate, documentDate);
-    }
-
-    private boolean isNotPastDebtEndDate(final boolean isNewDate, final DateTime documentDate) {
-        return getDebtInterval(documentDate, isNewDate) != null;
+                && event.getWhenOccured().isAfter(EventWrapper.LIMIT);
     }
 
     /**
