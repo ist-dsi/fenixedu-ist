@@ -21,7 +21,6 @@ package pt.ist.fenixedu.quc.domain;
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionCourse;
-import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.bennu.core.domain.Bennu;
 
@@ -55,7 +54,7 @@ public final class InquiriesRoot extends InquiriesRoot_Base {
 
     private static boolean isAvailableDegreeForInquiries(Degree degree) {
         return degree.getDegreeType().isBolonhaDegree() || degree.getDegreeType().isIntegratedMasterDegree()
-                || degree.getDegreeType().isBolonhaMasterDegree() || isAvailableDegree(degree);
+                || degree.getDegreeType().isBolonhaMasterDegree() || degree.getDegreeType().getUnstructured() || isAvailableDegree(degree);
     }
 
     private static boolean isAvailableDegree(Degree degree) {
@@ -71,13 +70,9 @@ public final class InquiriesRoot extends InquiriesRoot_Base {
         return true;
     }
 
-    public static boolean isBolonhaDegreeOrMasterDegreeOrIntegratedMasterDegree(ExecutionCourse executionCourse) {
+    public static boolean isDegreeAvailableForInquiries(ExecutionCourse executionCourse) {
         for (final CurricularCourse curricularCourse : executionCourse.getAssociatedCurricularCoursesSet()) {
-            DegreeType degreeType = curricularCourse.getDegreeCurricularPlan().getDegree().getDegreeType();
-            if (degreeType.isBolonhaDegree() || degreeType.isBolonhaMasterDegree() || degreeType.isIntegratedMasterDegree()) {
-                return true;
-            }
-            if (isAvailableDegree(curricularCourse.getDegreeCurricularPlan().getDegree())) {
+            if (isAvailableDegreeForInquiries(curricularCourse.getDegreeCurricularPlan().getDegree())) {
                 return true;
             }
         }
@@ -85,7 +80,7 @@ public final class InquiriesRoot extends InquiriesRoot_Base {
     }
 
     public static Boolean getAvailableForInquiries(ExecutionCourse executionCourse) {
-        if (isBolonhaDegreeOrMasterDegreeOrIntegratedMasterDegree(executionCourse)) {
+        if (isDegreeAvailableForInquiries(executionCourse)) {
             return executionCourse.getAvailableForInquiries() != null;
         }
         return Boolean.FALSE;
