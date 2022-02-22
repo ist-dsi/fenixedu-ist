@@ -3,23 +3,70 @@ package pt.ist.fenixedu.integration.api;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.phd.*;
 import org.fenixedu.academic.domain.phd.thesis.PhdThesisProcess;
 import org.fenixedu.academic.domain.thesis.Thesis;
+import org.fenixedu.academic.domain.thesis.ThesisEvaluationParticipant;
 import org.fenixedu.bennu.FenixEduIstIntegrationConfiguration;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.io.servlet.FileDownloadServlet;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Path("/_internal/scholar/theses")
 public class FenixScholarThesesApi {
+
+    private String calculateFosFromPhdProgram(String phdProgram) {
+        switch (phdProgram) {
+            case "Engenharia de Materiais": return "materials-engineering";
+            case "Engenharia e Gestão": return "mechanical-engineering";
+            case "Engenharia e Políticas Públicas": return "other-engineering-and-technologies";
+            case "Restauro e Gestão Fluviais": return "earth-and-related-environmental-sciences";
+            case "Engenharia Computacional": return "computer-and-information-sciences";
+            case "Bioengenharia": return "other-engineering-and-technologies";
+            case "Materiais e Processamento Avançados": return "materials-engineering";
+            case "Engenharia de Sistemas": return "other-engineering-and-technologies";
+            case "Engenharia Mecânica": return "mechanical-engineering";
+            case "Sistemas de Transportes": return "other-engineering-and-technologies";
+            case "Engenharia Electrotécnica e de Computadores": return "electrical-engineering-electronic-engineering-information-engineering";
+            case "Engenharia do Ambiente": return "environmental-engineering";
+            case "Engenharia de Petróleos": return "chemical-engineering";
+            case "Química": return "chemical-sciences";
+            case "Engenharia Química": return "chemical-engineering";
+            case "Biotecnologia e Biociências": return "biological-sciences";
+            case "Engenharia de Minas": return "other-engineering-and-technologies";
+            case "Planeamento Regional e Urbano": return "earth-and-related-environmental-sciences";
+            case "Engenharia e Gestão Industrial": return "mechanical-engineering";
+            case "Segurança de Informação": return "computer-and-information-sciences";
+            case "Engenharia Física": return "physical-sciences";
+            case "Engenharia Informática e de Computadores": return "computer-and-information-sciences";
+            case "Engenharia Física Tecnológica": return "physical-sciences";
+            case "Georrecursos": return "earth-and-related-environmental-sciences";
+            case "Engenharia Metalúrgica e de Materiais": return "materials-engineering";
+            case "Engenharia Aeroespacial": return "mechanical-engineering";
+            case "Física": return "physical-sciences";
+            case "Matemática": return "mathematics";
+            case "Engenharia do Território": return "other-engineering-and-technologies";
+            case "Engenharia da Refinação, Petroquímica e Química": return "chemical-engineering";
+            case "Mudança Tecnológica e Empreendedorismo": return "economics-and-business";
+            case "Engenharia Naval e Oceânica": return "other-engineering-and-technologies";
+            case "Ciências de Engenharia": return "other-engineering-and-technologies";
+            case "Engenharia Biomédica": return "medical-engineering";
+            case "Engenharia Civil": return "civil-engineering";
+            case "Arquitectura": return "civil-engineering";
+            case "Estatística e Processos Estocásticos": return "mathematics";
+            case "Transportes": return "other-engineering-and-technologies";
+            case "Líderes para Indústrias Tecnológicas": return "economics-and-business";
+            case "Alterações Climáticas e Políticas de Desenvolvimento Sustentável": return "earth-and-related-environmental-sciences";
+            case "Sistemas  Sustentáveis de Energia": return "other-engineering-and-technologies";
+        }
+        return null;
+    }
 
     private String calculateFosFromDepartament(String departmentName) {
         switch (departmentName) {
@@ -44,6 +91,7 @@ public class FenixScholarThesesApi {
     @Produces(FenixAPIv1.JSON_UTF8)
     public String list(@HeaderParam("Authorization") String authorization) {
         String token = authorization.substring(7);
+        Map<String, Integer> allPrograms = new HashMap<>();
         if(FenixEduIstIntegrationConfiguration.getConfiguration().scholarThesesToken().equals(token)) {
             JsonArray infos = new JsonArray();
 
@@ -54,10 +102,28 @@ public class FenixScholarThesesApi {
                     PhdProgramProcessDocument document = process.getFinalThesisDocument();
                     if(document != null) {
                         JsonObject phdInfo = new JsonObject();
+                        // [ 'description', 'tid']
                         phdInfo.addProperty("id", phdProcess.getExternalId());
-                        phdInfo.addProperty("author", phdProcess.getPerson().getUsername());
+                        JsonObject author = new JsonObject();
+                        author.addProperty("name", phdProcess.getPerson().getName());
+                        author.addProperty("userId", phdProcess.getPerson().getUsername());
+                        phdInfo.add("author", author);
                         phdInfo.addProperty("title", phdProcess.getThesisTitle());
-
+                        JsonArray advisors = new JsonArray();
+                        for(PhdParticipant participant: process.getIndividualProgramProcess().getGuidingsSet()) {
+                            JsonObject advisor = new JsonObject();
+                            advisor.addProperty("name", participant.getName());
+                            if(participant instanceof InternalPhdParticipant) {
+                                InternalPhdParticipant internalParticipant = (InternalPhdParticipant) participant;
+                                advisor.addProperty("userId", internalParticipant.getPerson().getUsername());
+                            }
+                            advisors.add(advisor);
+                        }
+                        phdInfo.addProperty("subjectFos", phdProcess.getPhdProgram().getName().getContent());
+                        phdInfo.add("advisors", advisors);
+                        // No info about language, defaults to english
+                        String language = "en";
+                        phdInfo.addProperty("language", language);
                         JsonArray schools = new JsonArray();
                         switch (phdProcess.getCollaborationType()) {
                             case NONE:
@@ -72,13 +138,20 @@ public class FenixScholarThesesApi {
                         }
                         phdInfo.add("schools", schools);
 
-                        // phdInfo.addProperty("language", language);
+                        if(phdProcess.getPhdProgram() != null && phdProcess.getPhdProgram().getName() != null) {
+                            phdInfo.addProperty("subjectFos", calculateFosFromPhdProgram(phdProcess.getPhdProgram().getName().getContent()));
+                        }
                         JsonObject dateIssued = new JsonObject();
                         dateIssued.addProperty("year",  phdProcess.getConclusionDate().year().getAsShortText());
                         dateIssued.addProperty("month",  phdProcess.getConclusionDate().monthOfYear().getAsShortText());
                         phdInfo.add("dateIssued", dateIssued);
-                        JsonObject dateSubmission = new JsonObject();
-                        phdInfo.add("dateSubmission", dateSubmission);
+                        if(process.getDiscussionDate() != null) {
+                            JsonObject dateSubmission = new JsonObject();
+                            dateSubmission.addProperty("year",  process.getDiscussionDate().year().getAsShortText());
+                            dateSubmission.addProperty("month",  process.getDiscussionDate().monthOfYear().getAsShortText());
+                            phdInfo.add("dateSubmission", dateSubmission);
+                        }
+
                         phdInfo.addProperty("url", FileDownloadServlet.getDownloadUrl(document));
                         phdInfo.addProperty("type", "phdthesis");
                         infos.add(phdInfo);
@@ -90,16 +163,34 @@ public class FenixScholarThesesApi {
             for (Thesis t : Bennu.getInstance().getThesesSet()) {
                 if (t.isEvaluated()) {
                     JsonObject mscInfo = new JsonObject();
-                    // ['advisors', 'description', 'tid', 'subjectFos', 'language']
+                    // Missing 'tid'
                     JsonArray advisors = new JsonArray();
-                    for(Person advisor :t.getOrientationPersons()){
-                        advisors.add(advisor.getUsername());
+                    for(ThesisEvaluationParticipant participant: t.getOrientation()) {
+                        JsonObject advisor = new JsonObject();
+                        advisor.addProperty("name", participant.getName());
+                        if(participant.getPerson() != null) {
+                            advisor.addProperty("userId", participant.getPerson().getUsername());
+                        }
+                        advisors.add(advisor);
                     }
                     mscInfo.add("advisors", advisors);
-                    String language = t.getLanguage() != null ? t.getLanguage().toLanguageTag(): "REDO";
+                    String language;
+                    if(t.getLanguage() == null) {
+                        language = "en";
+                    } else if(t.getLanguage().toLanguageTag().equals("en-GB")) {
+                        language = "en";
+                    } else if(t.getLanguage().toLanguageTag().equals("pt-PT")) {
+                        language = "pt";
+                    } else {
+                        language = "en";
+                    }
                     mscInfo.addProperty("language", language);
                     mscInfo.addProperty("id", t.getExternalId());
-                    mscInfo.addProperty("author", t.getStudent().getPerson().getUsername());
+
+                    JsonObject author = new JsonObject();
+                    author.addProperty("name", t.getStudent().getPerson().getName());
+                    author.addProperty("userId", t.getStudent().getPerson().getUsername());
+                    mscInfo.add("author", author);
                     if(t.getDepartmentName() != null) {
                         mscInfo.addProperty("subjectFos", calculateFosFromDepartament(t.getDepartmentName()));
                     }
@@ -141,6 +232,6 @@ public class FenixScholarThesesApi {
             }
             return infos.toString();
         }
-        return "no";
+        throw new WebApplicationException(Response.Status.UNAUTHORIZED);
 	}
 }
