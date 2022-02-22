@@ -37,6 +37,7 @@ package pt.ist.fenixedu.delegates.ui;
  * along with FenixEdu Core.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
@@ -46,15 +47,17 @@ import java.util.Objects;
 
 public class DelegateExecutionCourseBean {
     private final ExecutionCourse executionCourse;
-    private int enrollmentCount;
+    private final Degree delegateDegree;
+    private long enrollmentCount;
 
     public static final Comparator<DelegateExecutionCourseBean> EXECUTION_COURSE_COMPARATOR_BY_EXECUTION_YEAR_AND_SEMESTER =
             Comparator.comparing(DelegateExecutionCourseBean::getExecutionYear)
                     .thenComparing(DelegateExecutionCourseBean::getSemester)
                     .thenComparing((bean) -> bean.getExecutionCourse().getNameI18N());
 
-    public DelegateExecutionCourseBean(ExecutionCourse executionCourse) {
+    public DelegateExecutionCourseBean(ExecutionCourse executionCourse, Degree delegateDegree) {
         this.executionCourse = executionCourse;
+        this.delegateDegree = delegateDegree;
         calculateEnrolledStudents();
     }
 
@@ -70,12 +73,14 @@ public class DelegateExecutionCourseBean {
         return this.executionCourse.getExecutionPeriod();
     }
 
-    public int getEnrollmentCount() {
+    public long getEnrollmentCount() {
         return enrollmentCount;
     }
 
     private void calculateEnrolledStudents() {
-        this.enrollmentCount = getExecutionCourse().getEnrolmentCount();
+        this.enrollmentCount = getExecutionCourse().getAttendsSet().stream()
+                .filter(attends -> Objects.equals(attends.getStudentCurricularPlanFromAttends().getDegree(), this.delegateDegree))
+                .count();
     }
 
     public int getSemester() {

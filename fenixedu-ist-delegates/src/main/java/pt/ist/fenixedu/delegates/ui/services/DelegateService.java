@@ -111,7 +111,7 @@ public class DelegateService {
     public List<DelegateExecutionCourseBean> getExecutionCourses(Delegate delegate) {
         return delegate.getDelegateExecutionCourses()
                 .stream()
-                .map(DelegateExecutionCourseBean::new)
+                .map(executionCourse -> new DelegateExecutionCourseBean(executionCourse, delegate.getDegree()))
                 .sorted(DelegateExecutionCourseBean.EXECUTION_COURSE_COMPARATOR_BY_EXECUTION_YEAR_AND_SEMESTER)
                 .collect(Collectors.toList());
     }
