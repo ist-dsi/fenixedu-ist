@@ -39,6 +39,7 @@ public class DelegatePositionBean extends DelegateBean {
         this.curricularYear = delegate.getCurricularYear();
         this.delegate = delegate;
         this.degree = delegate.getDegree();
+        this.delegateTitle = delegate.getTitle();
     }
 
     public DelegatePositionBean(Delegate delegate, CycleType cycleType, CurricularYear curricularYear, Degree degree) {
@@ -46,6 +47,7 @@ public class DelegatePositionBean extends DelegateBean {
         this.curricularYear = curricularYear;
         this.cycleType = cycleType;
         this.degree = degree;
+        this.delegateTitle = delegate.getTitle();
     }
 
     public DelegatePositionBean() {

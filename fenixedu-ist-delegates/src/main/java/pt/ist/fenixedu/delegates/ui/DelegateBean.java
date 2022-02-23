@@ -164,8 +164,8 @@ public class DelegateBean {
         return delegate + " " + of + " " + degree.getDegreeType().getName().getContent();
     }
 
-    public void setDelegateTitle(String delegateType) {
-        this.delegateTitle = delegateType;
+    public void setDelegateTitle(String delegateTitle) {
+        this.delegateTitle = delegateTitle;
     }
 
     public String getPicture() {

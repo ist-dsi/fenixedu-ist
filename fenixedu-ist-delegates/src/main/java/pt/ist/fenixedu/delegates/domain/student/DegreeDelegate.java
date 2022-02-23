@@ -1,18 +1,18 @@
 /**
  * Copyright © 2013 Instituto Superior Técnico
- *
+ * <p>
  * This file is part of FenixEdu IST Delegates.
- *
+ * <p>
  * FenixEdu IST Delegates is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * FenixEdu IST Delegates is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu IST Delegates.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -20,7 +20,9 @@ package pt.ist.fenixedu.delegates.domain.student;
 
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.Degree;
+import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.accessControl.StudentGroup;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import pt.ist.fenixedu.delegates.domain.accessControl.DelegateGroup;
@@ -60,9 +62,8 @@ public class DegreeDelegate extends DegreeDelegate_Base {
 
     @Override
     public String getTitle() {
-        String delegate = BundleUtil.getString(BUNDLE, "delegate");
-        String of = BundleUtil.getString(BUNDLE, "delegate.of");
-        return String.format("%s %s %s %s %s", delegate, of, getDegree().getDegreeType().getName().getContent(), of, getDegree().getSigla());
+        return BundleUtil.getString(BUNDLE, "delegate.title.degree-delegate",
+                getDegree().getDegreeType().getName().getContent(), getDegree().getSigla());
     }
 
     @Override
@@ -72,11 +73,25 @@ public class DegreeDelegate extends DegreeDelegate_Base {
     }
 
     @Override
-    public List<CurricularCourse> getDelegateCourses() {
-        ExecutionYear executionYearByDate = ExecutionYear.getExecutionYearByDate(getStart().toYearMonthDay());
+    public List<ExecutionCourse> getDelegateExecutionCourses() {
 
-        return getDegree().getDegreeCurricularPlansForYear(executionYearByDate).stream()
-                .flatMap(p -> p.getCurricularCoursesSet().stream()).distinct().collect(Collectors.toList());
+        final List<ExecutionYear> execYears = getMandateExecutionYears();
+
+        return execYears.stream().flatMap(execYear ->
+                        getDegree()
+                                .getDegreeCurricularPlansForYear(execYear)
+                                .stream()
+                                .flatMap(plan ->
+                                        plan.getCurricularCoursesSet().stream()
+                                )
+                                .filter(curricularCourse -> curricularCourse
+                                        .getDegreeModuleScopes()
+                                        .stream()
+                                        .anyMatch(scope -> scope.isActiveForExecutionYear(execYear))
+                                )
+                                .flatMap(curricularCourse -> curricularCourse.getExecutionCoursesByExecutionYear(execYear).stream())
+                )
+                .distinct().collect(Collectors.toList());
     }
 
     @Override
@@ -89,4 +104,8 @@ public class DegreeDelegate extends DegreeDelegate_Base {
         return false;
     }
 
+    @Override
+    public StudentGroup getStudentGroupForExecutionYear(ExecutionYear year) {
+        return StudentGroup.get(null, this.getDegree(), null, null, null, null, year);
+    }
 }
