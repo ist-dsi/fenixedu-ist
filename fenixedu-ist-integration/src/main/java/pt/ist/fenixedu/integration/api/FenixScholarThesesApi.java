@@ -8,18 +8,23 @@ import org.fenixedu.academic.domain.phd.*;
 import org.fenixedu.academic.domain.phd.thesis.PhdThesisProcess;
 import org.fenixedu.academic.domain.thesis.Thesis;
 import org.fenixedu.academic.domain.thesis.ThesisEvaluationParticipant;
+import org.fenixedu.academic.domain.thesis.ThesisFile;
 import org.fenixedu.bennu.FenixEduIstIntegrationConfiguration;
 import org.fenixedu.bennu.core.domain.Bennu;
-import org.fenixedu.bennu.io.servlet.FileDownloadServlet;
+import org.fenixedu.bennu.core.util.CoreConfiguration;
+import pt.ist.fenixframework.DomainObject;
+import pt.ist.fenixframework.FenixFramework;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.HashMap;
-import java.util.Map;
-
+import java.io.IOException;
+import java.io.InputStream;
 
 @Path("/_internal/scholar/theses")
 public class FenixScholarThesesApi {
+
+    private final String FENIX_PDF = "fenix.pdf";
 
     private String calculateFosFromPhdProgram(String phdProgram) {
         switch (phdProgram) {
@@ -90,8 +95,7 @@ public class FenixScholarThesesApi {
     @GET
     @Produces(FenixAPIv1.JSON_UTF8)
     public String list(@HeaderParam("Authorization") String authorization) {
-        String token = authorization.substring(7);
-        Map<String, Integer> allPrograms = new HashMap<>();
+        String token = authorization != null ? authorization.substring(7):"";
         if(FenixEduIstIntegrationConfiguration.getConfiguration().scholarThesesToken().equals(token)) {
             JsonArray infos = new JsonArray();
 
@@ -152,7 +156,7 @@ public class FenixScholarThesesApi {
                             phdInfo.add("dateSubmission", dateSubmission);
                         }
 
-                        phdInfo.addProperty("url", FileDownloadServlet.getDownloadUrl(document));
+                        phdInfo.addProperty("fileId", document.getExternalId());
                         phdInfo.addProperty("type", "phdthesis");
                         infos.add(phdInfo);
                     }
@@ -220,7 +224,7 @@ public class FenixScholarThesesApi {
                     schools.add(new JsonPrimitive(Unit.getInstitutionName().getContent()));
                     mscInfo.add("schools", schools);
 
-                    mscInfo.addProperty("url", FileDownloadServlet.getDownloadUrl(t.getDissertation()));
+                    mscInfo.addProperty("fileId", t.getDissertation().getExternalId());
                     mscInfo.addProperty("type", "mastersthesis");
                     JsonArray conditions = new JsonArray();
                     t.getGeneralConditions().stream().forEach(tc -> {
@@ -234,4 +238,38 @@ public class FenixScholarThesesApi {
         }
         throw new WebApplicationException(Response.Status.UNAUTHORIZED);
 	}
+
+    @GET
+    @Path("{id}/download")
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    public Response get(@HeaderParam("Authorization") String authorization, @PathParam("id") String id) throws IOException {
+        String token = authorization != null ? authorization.substring(7):"";
+        if(FenixEduIstIntegrationConfiguration.getConfiguration().scholarThesesToken().equals(token)) {
+            DomainObject object = FenixFramework.getDomainObject(id);
+            String fileName;
+            InputStream stream;
+            if(object instanceof ThesisFile) {
+                ThesisFile thesisFile = (ThesisFile) object;
+                fileName = thesisFile.getDisplayName();
+                stream = CoreConfiguration.getConfiguration().developmentMode() ? devPdf() : thesisFile.getStream();
+            } else if(object instanceof PhdProgramProcessDocument) {
+                PhdProgramProcessDocument thesisFile = (PhdProgramProcessDocument) object;
+                fileName = thesisFile.getDisplayName();
+                stream = CoreConfiguration.getConfiguration().developmentMode() ? devPdf() : thesisFile.getStream();
+            } else {
+                throw new WebApplicationException(Response.Status.NOT_FOUND);
+            }
+            return Response.ok(stream, MediaType.APPLICATION_OCTET_STREAM)
+                    .header("Content-Disposition", "attachment; filename=\"" + fileName + "\"")
+                    .build();
+        }
+        throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+    }
+
+
+    private InputStream devPdf() {
+        return this.getClass().getClassLoader().getResourceAsStream(FENIX_PDF);
+    }
+
+
 }
