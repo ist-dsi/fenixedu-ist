@@ -29,38 +29,38 @@ public class FenixScholarThesesApi {
     private String calculateFosFromPhdProgram(String phdProgram) {
         switch (phdProgram) {
             case "Engenharia de Materiais": return "materials-engineering";
-            case "Engenharia e Gestão": return "mechanical-engineering";
+            case "Engenharia e Gestão": return "other-engineering-and-technologies";
             case "Engenharia e Políticas Públicas": return "other-engineering-and-technologies";
             case "Restauro e Gestão Fluviais": return "earth-and-related-environmental-sciences";
             case "Engenharia Computacional": return "computer-and-information-sciences";
-            case "Bioengenharia": return "other-engineering-and-technologies";
+            case "Bioengenharia": return "industrial-biotechnology";
             case "Materiais e Processamento Avançados": return "materials-engineering";
             case "Engenharia de Sistemas": return "other-engineering-and-technologies";
             case "Engenharia Mecânica": return "mechanical-engineering";
-            case "Sistemas de Transportes": return "other-engineering-and-technologies";
+            case "Sistemas de Transportes": return "civil-engineering";
             case "Engenharia Electrotécnica e de Computadores": return "electrical-engineering-electronic-engineering-information-engineering";
             case "Engenharia do Ambiente": return "environmental-engineering";
-            case "Engenharia de Petróleos": return "chemical-engineering";
+            case "Engenharia de Petróleos": return "environmental-engineering";
             case "Química": return "chemical-sciences";
             case "Engenharia Química": return "chemical-engineering";
             case "Biotecnologia e Biociências": return "biological-sciences";
-            case "Engenharia de Minas": return "other-engineering-and-technologies";
-            case "Planeamento Regional e Urbano": return "earth-and-related-environmental-sciences";
+            case "Engenharia de Minas": return "environmental-engineering";
+            case "Planeamento Regional e Urbano": return "civil-engineering";
             case "Engenharia e Gestão Industrial": return "mechanical-engineering";
             case "Segurança de Informação": return "computer-and-information-sciences";
             case "Engenharia Física": return "physical-sciences";
-            case "Engenharia Informática e de Computadores": return "computer-and-information-sciences";
+            case "Engenharia Informática e de Computadores": return "electrical-engineering-electronic-engineering-information-engineering";
             case "Engenharia Física Tecnológica": return "physical-sciences";
             case "Georrecursos": return "earth-and-related-environmental-sciences";
             case "Engenharia Metalúrgica e de Materiais": return "materials-engineering";
             case "Engenharia Aeroespacial": return "mechanical-engineering";
             case "Física": return "physical-sciences";
             case "Matemática": return "mathematics";
-            case "Engenharia do Território": return "other-engineering-and-technologies";
+            case "Engenharia do Território": return "civil-engineering";
             case "Engenharia da Refinação, Petroquímica e Química": return "chemical-engineering";
             case "Mudança Tecnológica e Empreendedorismo": return "economics-and-business";
             case "Engenharia Naval e Oceânica": return "other-engineering-and-technologies";
-            case "Ciências de Engenharia": return "other-engineering-and-technologies";
+            case "Ciências de Engenharia": return "environmental-engineering";
             case "Engenharia Biomédica": return "medical-engineering";
             case "Engenharia Civil": return "civil-engineering";
             case "Arquitectura": return "civil-engineering";
@@ -68,7 +68,7 @@ public class FenixScholarThesesApi {
             case "Transportes": return "other-engineering-and-technologies";
             case "Líderes para Indústrias Tecnológicas": return "economics-and-business";
             case "Alterações Climáticas e Políticas de Desenvolvimento Sustentável": return "earth-and-related-environmental-sciences";
-            case "Sistemas  Sustentáveis de Energia": return "other-engineering-and-technologies";
+            case "Sistemas  Sustentáveis de Energia": return "environmental-engineering";
         }
         return null;
     }
@@ -77,16 +77,16 @@ public class FenixScholarThesesApi {
         switch (departmentName) {
             case "Departamento de Engenharia Civil, Arquitectura e Georrecursos (DECivil)": return "civil-engineering";
             case "Departamento de Física (DF)": return "physical-sciences";
-            case "Departamento de Engenharia Informática (DEI)": return "computer-and-information-sciences";
-            case "Departamento de Engenharia e Gestão (DEG)": return "mechanical-engineering";
+            case "Departamento de Engenharia Informática (DEI)": return "electrical-engineering-electronic-engineering-information-engineering";
+            case "Departamento de Engenharia e Gestão (DEG)": return " other-engineering-and-technologies";
             case "Departamento de Engenharia de Materiais (DEMAT)": return "materials-engineering";
             case "Departamento de Engenharia de Minas e Georrecursos (DEMG)": return "environmental-engineering";
             case "Departamento de Engenharia Mecânica (DEM)": return "mechanical-engineering";
             case "Departamento de Engenharia Electrotécnica e de Computadores (DEEC)": return "electrical-engineering-electronic-engineering-information-engineering";
             case "Departamento de Matemática (DM)": return "mathematics";
             case "Departamento de Engenharia e Ciências Nucleares (DECN)": return "physical-sciences";
-            case "Secção Autónoma de Engenharia Naval (SAEN)": return "other-engineering-and-technologies";
-            case "Departamento de Bioengenharia (DBE)": return "other-engineering-and-technologies";
+            case "Secção Autónoma de Engenharia Naval (SAEN)": return " environmental-engineering";
+            case "Departamento de Bioengenharia (DBE)": return " industrial-biotechnology";
             case "Departamento de Engenharia Química (DEQ)": return "chemical-engineering";
         }
         return null;
