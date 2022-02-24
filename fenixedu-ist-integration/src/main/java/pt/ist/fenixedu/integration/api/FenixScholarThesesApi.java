@@ -9,6 +9,7 @@ import org.fenixedu.academic.domain.phd.thesis.PhdThesisProcess;
 import org.fenixedu.academic.domain.thesis.Thesis;
 import org.fenixedu.academic.domain.thesis.ThesisEvaluationParticipant;
 import org.fenixedu.academic.domain.thesis.ThesisFile;
+import org.fenixedu.academic.domain.thesis.ThesisVisibilityType;
 import org.fenixedu.bennu.FenixEduIstIntegrationConfiguration;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.util.CoreConfiguration;
@@ -146,18 +147,22 @@ public class FenixScholarThesesApi {
                             phdInfo.addProperty("subjectFos", calculateFosFromPhdProgram(phdProcess.getPhdProgram().getName().getContent()));
                         }
                         JsonObject dateIssued = new JsonObject();
-                        dateIssued.addProperty("year",  phdProcess.getConclusionDate().year().getAsShortText());
-                        dateIssued.addProperty("month",  phdProcess.getConclusionDate().monthOfYear().getAsShortText());
+                        dateIssued.addProperty("year",  Integer.valueOf(phdProcess.getConclusionDate().year().getAsShortText()));
+                        dateIssued.addProperty("month",  Integer.valueOf(phdProcess.getConclusionDate().monthOfYear().getAsShortText()));
                         phdInfo.add("dateIssued", dateIssued);
                         if(process.getDiscussionDate() != null) {
                             JsonObject dateSubmission = new JsonObject();
-                            dateSubmission.addProperty("year",  process.getDiscussionDate().year().getAsShortText());
-                            dateSubmission.addProperty("month",  process.getDiscussionDate().monthOfYear().getAsShortText());
+                            dateSubmission.addProperty("year",  Integer.valueOf(process.getDiscussionDate().year().getAsShortText()));
+                            dateSubmission.addProperty("month",  Integer.valueOf(process.getDiscussionDate().monthOfYear().getAsShortText()));
                             phdInfo.add("dateSubmission", dateSubmission);
                         }
 
-                        phdInfo.addProperty("fileId", document.getExternalId());
-                        phdInfo.addProperty("type", "phdthesis");
+                        JsonObject file = new JsonObject();
+                        file.addProperty("id", document.getExternalId());
+                        file.addProperty("filename", document.getFilename());
+                        file.addProperty("rights", "restricted-access");
+                        phdInfo.add("file", file);
+                        phdInfo.addProperty("type", "doctoral-thesis");
                         infos.add(phdInfo);
                     }
                 }
@@ -212,20 +217,33 @@ public class FenixScholarThesesApi {
                     mscInfo.addProperty("description", abstractText);
 
                     JsonObject dateIssued = new JsonObject();
-                    dateIssued.addProperty("year", t.getDiscussed().year().getAsShortText());
-                    dateIssued.addProperty("month", t.getDiscussed().monthOfYear().getAsShortText());
+                    dateIssued.addProperty("year", Integer.valueOf(t.getDiscussed().year().getAsShortText()));
+                    dateIssued.addProperty("month", Integer.valueOf(t.getDiscussed().monthOfYear().getAsShortText()));
                     mscInfo.add("dateIssued", dateIssued);
                     JsonObject dateSubmission = new JsonObject();
-                    dateSubmission.addProperty("year", t.getSubmission().year().getAsShortText());
-                    dateSubmission.addProperty("month", t.getSubmission().monthOfYear().getAsShortText());
+                    dateSubmission.addProperty("year", Integer.valueOf(t.getSubmission().year().getAsShortText()));
+                    dateSubmission.addProperty("month", Integer.valueOf(t.getSubmission().monthOfYear().getAsShortText()));
                     mscInfo.add("dateSubmission", dateSubmission);
 
                     JsonArray schools = new JsonArray();
                     schools.add(new JsonPrimitive(Unit.getInstitutionName().getContent()));
                     mscInfo.add("schools", schools);
 
-                    mscInfo.addProperty("fileId", t.getDissertation().getExternalId());
-                    mscInfo.addProperty("type", "mastersthesis");
+                    JsonObject file = new JsonObject();
+                    file.addProperty("id", t.getDissertation().getExternalId());
+                    file.addProperty("filename", t.getDissertation().getFilename());
+                    if(t.getDocumentsAvailableAfter() == null || t.getDocumentsAvailableAfter().isBeforeNow()) {
+                        if(t.getVisibility().equals(ThesisVisibilityType.PUBLIC)) {
+                            file.addProperty("rights", "open-access");
+                        } else {
+
+                            file.addProperty("rights", "restricted-access");
+                        }
+                    } else {
+                        file.addProperty("rights", "metadata-only-access");
+                    }
+                    mscInfo.add("file", file);
+                    mscInfo.addProperty("type", "master-thesis");
                     JsonArray conditions = new JsonArray();
                     t.getGeneralConditions().stream().forEach(tc -> {
                         conditions.add(tc.getKey());
