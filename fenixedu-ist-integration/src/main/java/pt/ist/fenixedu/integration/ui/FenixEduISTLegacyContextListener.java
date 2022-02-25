@@ -45,6 +45,7 @@ import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.domain.studentCurriculum.CurriculumGroup;
+import org.fenixedu.academic.domain.studentCurriculum.ExternalCurriculumGroup;
 import org.fenixedu.academic.dto.student.enrollment.bolonha.BolonhaStudentEnrollmentBean;
 import org.fenixedu.academic.service.StudentWarningsService;
 import org.fenixedu.academic.thesis.domain.StudentThesisCandidacy;
@@ -83,7 +84,10 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -186,6 +190,32 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
         		return ClientMap.uVATNumberFor(person);
 			}
 
+        };
+
+        ExternalCurriculumGroup.CAN_HAVE_EXTERNAL_GROUP = (scp, group) -> {
+            final String path = "/afs/ist.utl.pt/ciist/fenix/fenix015/ist/allowed2ndCycles.csv";
+            try {
+                final List<String> allLines = Files.readAllLines(new File(path).toPath());
+                for (String line : allLines) {
+                    String[] split = line.split(",");
+                    if (split.length != 2) {
+                        continue;
+                    }
+                    String istID = split[0];
+                    String degreeSigla = split[1];
+                    if (Strings.isNullOrEmpty(istID) || Strings.isNullOrEmpty(degreeSigla)) {
+                        continue;
+                    }
+                    if (istID.equals(scp.getPerson().getUsername())) {
+                        if (degreeSigla.equals(group.getDegree().getSigla())) {
+                            return true;
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return false;
         };
 
         StudentWarningsService.register(new Function<Student, Collection<String>>() {
