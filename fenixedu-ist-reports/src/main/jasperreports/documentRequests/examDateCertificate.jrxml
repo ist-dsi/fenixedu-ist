@@ -66,7 +66,7 @@
 				<textElement textAlignment="Justified" lineSpacing="1_1_2" markup="styled">
 					<font size="12" isBold="false" isItalic="false" pdfFontName="Times-Roman"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA["A Técnica Superior da Secção de Graduação do "+ $P{institutionName} +" da "+ $P{universityName} + ", certifica que <style pdfFontName=\"Times-Bold\"> " + $P{name} + ",</style> aluno com o número <style pdfFontName=\"Times-Bold\"> " + $P{studentNumber} + "</style>, do <style pdfFontName=\"Times-Bold\"> " + $P{degreeDescription} + "</style>, consta o(s) seguinte(s) registo(s) de teste(s) na(s) disciplina(s) abaixo discriminada(s) (à data da emissão deste documento):"]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA["A Técnica Superior da Secção de Graduação do "+ $P{institutionName} +" da "+ $P{universityName} + ", certifica que <style pdfFontName=\"Times-Bold\"> " + $P{name} + ",</style> aluno com o número <style pdfFontName=\"Times-Bold\"> " + $P{studentNumber} + "</style>, do <style pdfFontName=\"Times-Bold\"> " + $P{degreeDescription} + "</style>, consta o(s) seguinte(s) registo(s) de exame(s) na(s) disciplina(s) abaixo discriminada(s) (à data da emissão deste documento):"]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
