@@ -125,6 +125,9 @@ public class FenixScholarThesesApi {
                             }
                             advisors.add(advisor);
                         }
+                        if(document.getThesisId() != null){
+                            phdInfo.addProperty("tid", document.getThesisId().getId());
+                        }
                         phdInfo.addProperty("subjectFos", phdProcess.getPhdProgram().getName().getContent());
                         phdInfo.add("advisors", advisors);
                         // No info about language, defaults to english
@@ -189,6 +192,9 @@ public class FenixScholarThesesApi {
                         advisors.add(advisor);
                     }
                     mscInfo.add("advisors", advisors);
+                    if(t.getThesisId() != null){
+                        mscInfo.addProperty("tid", t.getThesisId().getId());
+                    }
                     String language;
                     if(t.getLanguage() == null) {
                         language = "eng";
