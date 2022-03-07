@@ -134,7 +134,9 @@ public class DelegateStudentSelectBean {
             }
         }
         if (!CollectionUtils.isEmpty(selectedGroupsExecutionYears)) {
+            final List<ExecutionYear> mandateExecutionYears = selectedPosition.getMandateExecutionYears();
             selectedGroupsExecutionYears.stream()
+                    .filter(mandateExecutionYears::contains)
                     .map(selectedPosition::getStudentGroupForExecutionYear)
                     .forEach(toRet::add);
         }
