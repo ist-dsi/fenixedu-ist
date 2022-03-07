@@ -18,7 +18,6 @@
  */
 package pt.ist.fenixedu.delegates.domain.student;
 
-import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.CurricularYear;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionYear;
@@ -31,6 +30,7 @@ import org.joda.time.Interval;
 import pt.ist.fenixedu.delegates.ui.DelegateBean;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class Delegate extends Delegate_Base {
 
@@ -71,7 +71,10 @@ public abstract class Delegate extends Delegate_Base {
     public List<ExecutionYear> getMandateExecutionYears() {
         final ExecutionYear start = ExecutionYear.readByDateTime(getStart());
         final ExecutionYear end = ExecutionYear.readByDateTime(getEnd());
-        return ExecutionYear.readExecutionYears(start, end);
+        return ExecutionYear.readExecutionYears(start, end)
+                .stream()
+                .filter(executionYear -> executionYear.isBeforeOrEquals(ExecutionYear.readCurrentExecutionYear()))
+                .collect(Collectors.toList());
     }
 
     public Registration getRegistration() {
