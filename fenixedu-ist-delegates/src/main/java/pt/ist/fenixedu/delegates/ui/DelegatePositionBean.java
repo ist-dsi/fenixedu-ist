@@ -47,7 +47,9 @@ public class DelegatePositionBean extends DelegateBean {
         this.curricularYear = curricularYear;
         this.cycleType = cycleType;
         this.degree = degree;
-        this.delegateTitle = delegate.getTitle();
+        if (delegate != null) {
+            this.delegateTitle = delegate.getTitle();
+        }
     }
 
     public DelegatePositionBean() {

@@ -152,16 +152,18 @@ public class DelegateBean {
         if (delegateTitle != null) {
             return delegateTitle;
         }
-        String delegate = BundleUtil.getString(BUNDLE, "delegate");
-        String of = BundleUtil.getString(BUNDLE, "delegate.of");
-        String year = BundleUtil.getString(BUNDLE, "delegate.year");
         if (cycleType != null) {
-            return delegate + " " + of + " " + cycleType.getDescription();
+            // CycleDelegate title
+            return BundleUtil.getString(BUNDLE, "delegate.title.cycle-delegate",
+                    cycleType.getDescription(), degree.getSigla());
         }
         if (curricularYear != null) {
-            return delegate + " " + of + " " + curricularYear.getYear() + " " + year;
+            // YearDelegate title
+            return BundleUtil.getString(BUNDLE, "delegate.title.year-delegate", curricularYear.getYear().toString(), degree.getSigla());
         }
-        return delegate + " " + of + " " + degree.getDegreeType().getName().getContent();
+        // DegreeDelegate title
+        return BundleUtil.getString(BUNDLE, "delegate.title.degree-delegate",
+                degree.getDegreeType().getName().getContent(), degree.getSigla());
     }
 
     public void setDelegateTitle(String delegateTitle) {
