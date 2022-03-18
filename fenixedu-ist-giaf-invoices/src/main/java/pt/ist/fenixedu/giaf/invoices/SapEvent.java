@@ -141,13 +141,18 @@ public class SapEvent {
             throw new Error("label.error.value.to.transfer.must.be.posituve");
         }
         final Money invoiceValue = sapRequest.getValue();
-        final Money consumedAmount = sapRequest.consumedAmount();
-        final Money availableInvoiceValue = invoiceValue.subtract(consumedAmount);
+        final Money availableInvoiceValue = sapRequest.openInvoiceValue();
         final Money remainder = availableInvoiceValue.subtract(amountToTransfer);
         if (remainder.isNegative()) {
             throw new Error("label.error.amount.exceeds.invoice.value");
         } else {
             registerCredit(event, EventProcessor.getCreditEntry(availableInvoiceValue), availableInvoiceValue, sapRequest, false);
+
+            //only if the credit value is not equal to the original invoice value must we close the invoice
+            //otherwise there is no need to send a closing document
+            if (!invoiceValue.equals(availableInvoiceValue) && availableInvoiceValue.equals(amountToTransfer)) {
+                registerFinalZeroPayment(sapRequest, null, null);
+            }
 
             final JsonObject data = toJsonInvoice(externalClient, amountToTransfer, getDocumentDate(event.getWhenOccured(), true), new DateTime(), false, false, pledgeNumber);
             final String documentNumber = getDocumentNumber(data, false);
@@ -186,6 +191,12 @@ public class SapEvent {
             creditRequest.setIgnore(true);
             if (documentValue.equals(openInvoiceValue)) {
                 sapRequest.setIgnore(true);
+            }
+            //only if the credit value is not equal to the original invoice value must we close the invoice
+            //otherwise there is no need to send a closing document
+            if (!sapRequest.getValue().equals(openInvoiceValue)) {
+                final SapRequest closeInvoice = registerFinalZeroPayment(sapRequest, null, null);
+                closeInvoice.setIgnore(true);
             }
         } else if (requestType == SapRequestType.DEBT) {
             final CreditEntry creditEntry = EventProcessor.getCreditEntry(documentValue);
@@ -389,7 +400,7 @@ public class SapEvent {
                 registerCredit(event, creditEntry, amountForInvoice, invoice, isPastPayment);
                 //only if the credit value is not equal to the original invoice value must we close the invoice
                 //otherwise there is no need to send a closing document
-                if (!invoice.getValue().equals(openInvoiceAmount) && openInvoiceAmount.equals(amountToCredit)) {
+                if (!isPastPayment && !invoice.getValue().equals(openInvoiceAmount) && openInvoiceAmount.equals(amountToCredit)) {
                     registerFinalZeroPayment(invoice, creditEntry.getId(), null);
                 }
                 amountToCredit = amountToCredit.subtract(amountForInvoice);
@@ -801,8 +812,9 @@ public class SapEvent {
      * @param sapInvoiceRequest
      * @param creditId
      * @param payment
+     * @return
      */
-    public void registerFinalZeroPayment(final SapRequest sapInvoiceRequest, final String creditId, final AccountingTransaction payment) {
+    public SapRequest registerFinalZeroPayment(final SapRequest sapInvoiceRequest, final String creditId, final AccountingTransaction payment) {
         JsonObject data = toJsonFinalZeroPayment(sapInvoiceRequest, getPaymentsAndCreditsFor(sapInvoiceRequest));
 
         String documentNumber = getDocumentNumber(data, true);
@@ -810,6 +822,7 @@ public class SapEvent {
                 SapRequestType.CLOSE_INVOICE, Money.ZERO, data);
         finalPayment.setCreditId(creditId);
         finalPayment.setPayment(payment);
+        return finalPayment;
     }
 
     private JsonObject toJsonFinalZeroPayment(final SapRequest sapInvoiceRequest, final Stream<SapRequest> documentsFor) {
