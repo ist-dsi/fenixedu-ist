@@ -35,6 +35,7 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Summary;
 import org.fenixedu.academic.domain.accounting.Event;
 import org.fenixedu.academic.domain.accounting.VatNumberResolver;
+import org.fenixedu.academic.domain.accounting.events.EventExemptionJustification;
 import org.fenixedu.academic.domain.candidacy.StudentCandidacy;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
 import org.fenixedu.academic.domain.degreeStructure.Context;
@@ -66,8 +67,10 @@ import org.fenixedu.idcards.notifications.CardNotifications;
 import org.fenixedu.idcards.service.SantanderIdCardsService;
 import org.fenixedu.santandersdk.exception.SantanderMissingInformationException;
 import org.fenixedu.santandersdk.exception.SantanderValidationException;
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pt.ist.fenixedu.domain.SapRoot;
 import pt.ist.fenixedu.giaf.invoices.ClientMap;
 import pt.ist.fenixedu.giaf.invoices.Utils;
 import pt.ist.fenixedu.integration.domain.academic.DegreeStructureForIST;
@@ -345,6 +348,14 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
             authorizeService.setSantanderGrantBankAccess(authorizations.get("santander").getAsBoolean(), user);
             authorizeService.setSantanderGrantCardAccess(true, user);
         });
+
+        Signal.register(EventExemptionJustification.SIGNAL_CREATED,
+                ((DomainObjectEvent<EventExemptionJustification> exemptionJustification) -> {
+                    final LocalDate dispatchDate = exemptionJustification.getInstance().getDispatchDate();
+                    if (LocalDate.now().getYear() != dispatchDate.getYear() && !SapRoot.getInstance().yearIsOpen(dispatchDate.getYear())) {
+                        throw new DomainException(Optional.of("resources.GiafInvoicesResources"), "error.not.allowed.exemption.not.open.year.sap");
+                    }
+                }));
     }
 
     private static boolean isValidPostCode(final String postalCode) {

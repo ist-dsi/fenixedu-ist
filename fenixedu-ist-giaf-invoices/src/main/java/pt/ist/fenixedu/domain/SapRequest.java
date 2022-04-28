@@ -19,6 +19,8 @@ import java.util.TreeSet;
 
 public class SapRequest extends SapRequest_Base {
 
+    final static public String LOCAL_DATE_FORMAT = "yyyy-MM-dd";
+
     public class ClientData {
 
         private final JsonObject clientData = getRequestAsJson().get("clientData").getAsJsonObject();
@@ -403,8 +405,12 @@ public class SapRequest extends SapRequest_Base {
     }
 
     private DateTime documentDateFor(final String document, final String dateField) {
-        final String s = getRequestAsJson().get(document).getAsJsonObject().get(dateField).getAsString();
-        return DateTime.parse(s, DateTimeFormat.forPattern(GiafInvoiceConfiguration.DT_FORMAT));
+        final String date = getRequestAsJson().get(document).getAsJsonObject().get(dateField).getAsString();
+        return parseDate(date, GiafInvoiceConfiguration.DT_FORMAT);
+    }
+
+    private DateTime parseDate(final String date, final String dateFormat) {
+        return DateTime.parse(date, DateTimeFormat.forPattern(dateFormat));
     }
 
     public void hackDocumentDate(final DateTime dateTime) {
@@ -423,8 +429,20 @@ public class SapRequest extends SapRequest_Base {
         setRequest(request.toString());
     }
 
+    private String getMetadataField(final String field) {
+        final JsonObject workingDocument = getRequestAsJson().get("workingDocument").getAsJsonObject();
+        final String metadataString = workingDocument.get("metadata").getAsString().replace("\\", "");
+        final JsonObject metadata = new JsonParser().parse(metadataString).getAsJsonObject();
+        return metadata.get(field).getAsString();
+    }
+
     public boolean allowedToSend() {
-        return SapRoot.getInstance().yearIsOpen(getDocumentDate().getYear());
+        if (getRequestType() != SapRequestType.DEBT_CREDIT) {
+            return SapRoot.getInstance().yearIsOpen(getDocumentDate().getYear());
+        } else {
+            return SapRoot.getInstance().yearIsOpen(getDocumentDate().getYear()) &&
+                SapRoot.getInstance().yearIsOpen(parseDate(getMetadataField("Despacho"), LOCAL_DATE_FORMAT).getYear());
+        }
     }
 
 }
