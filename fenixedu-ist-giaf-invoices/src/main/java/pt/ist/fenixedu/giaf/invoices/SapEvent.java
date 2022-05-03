@@ -1309,12 +1309,12 @@ public class SapEvent {
             endDate = localDate.plusYears(1);
         } else {
             final ExecutionYear executionYear = Utils.executionYearOf(event);
-            if (startDate.isBefore(executionYear.getBeginLocalDate())) {
-                startDate = executionYear.getBeginLocalDate();
-            }
             endDate = executionYear.getEndDateYearMonthDay().toLocalDate();
         }
-        return startDate.isAfter(endDate) ? null : new LocalDate[]{startDate, endDate};
+        if (startDate.isAfter(endDate)) {
+            throw new Error("The event was created after the end of the Execution Year that is associated with.");
+        }
+        return new LocalDate[]{startDate, endDate};
     }
 
     private JsonObject toJsonDebtCredit(Event event, Money debtFenix, String clientId, DateTime documentDate, DateTime entryDate,
