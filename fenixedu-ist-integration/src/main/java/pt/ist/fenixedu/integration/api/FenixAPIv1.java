@@ -2116,8 +2116,9 @@ public class FenixAPIv1 {
         try {
             for (Object occupation : bodyComponent.getInfoShowOccupation()) {
                 InfoShowOccupation showOccupation = (InfoShowOccupation) occupation;
-                String dayStart = formatDay.print(showOccupation.getInicio().getTimeInMillis());
-                String dayEnd = formatDay.print(showOccupation.getFim().getTimeInMillis());
+                DateTime date = new DateTime(rightNow);
+                DateTime newDate = date.withDayOfWeek(showOccupation.getDiaSemana().getDiaSemanaInDayOfWeekJodaFormat());
+                String day = formatDay.print(newDate);
 
                 FenixRoomEvent roomEvent = null;
 
@@ -2129,13 +2130,13 @@ public class FenixAPIv1 {
                     String end = formatHour.print(lesson.getFim().getTimeInMillis());
                     String weekday = lesson.getDiaSemana().getDiaSemanaString();
 
-                    FenixPeriod period = new FenixPeriod(dayStart + " " + start, dayEnd + " " + end);
+                    FenixPeriod period = new FenixPeriod(day + " " + start, day + " " + end);
 
                     String info = lesson.getInfoShift().getShiftTypesCodePrettyPrint();
 
                     FenixCourse course = new FenixCourse(infoExecutionCourse.getExecutionCourse());
 
-                    roomEvent = new FenixRoomEvent.LessonEvent(start, end, weekday, dayStart, period, info, course);
+                    roomEvent = new FenixRoomEvent.LessonEvent(start, end, weekday, day, period, info, course);
 
                 } else if (showOccupation instanceof InfoWrittenEvaluation) {
                     InfoWrittenEvaluation infoWrittenEvaluation = (InfoWrittenEvaluation) showOccupation;
@@ -2157,12 +2158,12 @@ public class FenixAPIv1 {
                         end = infoExam.getEndHour();
                         weekday = infoWrittenEvaluation.getDiaSemana().getDiaSemanaString();
 
-                        FenixPeriod period = new FenixPeriod(dayStart + " " + start, dayEnd + " " + end);
+                        FenixPeriod period = new FenixPeriod(day + " " + start, day + " " + end);
 
                         Integer season = infoExam.getSeason().getSeason();
 
                         roomEvent =
-                                new FenixRoomEvent.WrittenEvaluationEvent.ExamEvent(start, end, weekday, dayStart, period, courses,
+                                new FenixRoomEvent.WrittenEvaluationEvent.ExamEvent(start, end, weekday, day, period, courses,
                                         season);
 
                     } else if (infoWrittenEvaluation instanceof InfoWrittenTest) {
@@ -2172,10 +2173,10 @@ public class FenixAPIv1 {
                         end = formatHour.print(infoWrittenTest.getFim().getTimeInMillis());
                         weekday = infoWrittenTest.getDiaSemana().getDiaSemanaString();
 
-                        FenixPeriod period = new FenixPeriod(dayStart + " " + start, dayEnd + " " + end);
+                        FenixPeriod period = new FenixPeriod(day + " " + start, day + " " + end);
 
                         roomEvent =
-                                new FenixRoomEvent.WrittenEvaluationEvent.TestEvent(start, end, weekday, dayStart, period, courses,
+                                new FenixRoomEvent.WrittenEvaluationEvent.TestEvent(start, end, weekday, day, period, courses,
                                         description);
                     }
 
@@ -2186,6 +2187,8 @@ public class FenixAPIv1 {
                     String title = infoGenericEvent.getTitle();
                     String start = formatHour.print(infoGenericEvent.getInicio().getTimeInMillis());
                     String end = formatHour.print(infoGenericEvent.getFim().getTimeInMillis());
+                    String dayStart = formatDay.print(showOccupation.getInicio().getTimeInMillis());
+                    String dayEnd = formatDay.print(showOccupation.getFim().getTimeInMillis());
                     String weekday = infoGenericEvent.getDiaSemana().getDiaSemanaString();
                     FenixPeriod period = new FenixPeriod(dayStart + " " + start, dayEnd + " " + end);
 
