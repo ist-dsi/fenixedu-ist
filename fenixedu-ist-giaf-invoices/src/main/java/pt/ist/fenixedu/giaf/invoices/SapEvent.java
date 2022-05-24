@@ -1081,7 +1081,16 @@ public class SapEvent {
 
     private boolean isToProcessDebt(boolean isGratuity) {
         return (isGratuity || event instanceof ExternalScholarshipPhdGratuityContribuitionEvent)
-                && event.getWhenOccured().isAfter(EventWrapper.LIMIT);
+                && !isGratuityBeforeOpenYear(event);
+    }
+
+    private static boolean isGratuityBeforeOpenYear(final Event event) {
+        if (event.isGratuity()) {
+            final ExecutionYear executionYear = Utils.executionYearOf(event);
+            return executionYear.getEndCivilYear() < SapRoot.getInstance().getOpenYear();
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -1643,7 +1652,8 @@ public class SapEvent {
     public static SimpleImmutableEntry<String, String> mapToProduct(Event event, String eventDescription,
                                                                     boolean isDebtRegistration, boolean isInterest,
                                                                     boolean isAdvancement, boolean isPastEvent) {
-        if (isPastEvent) {
+
+        if (isPastEvent || isGratuityBeforeOpenYear(event)) {
             return new SimpleImmutableEntry<String, String>("0063", "REGULARIZAÇAO ANOS ANTERIORES");
         }
         if (isInterest) {
