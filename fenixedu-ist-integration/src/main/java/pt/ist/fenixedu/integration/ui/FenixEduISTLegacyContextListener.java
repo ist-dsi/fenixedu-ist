@@ -150,7 +150,14 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
 
                     Enrolment enrolment = e.getInstance();
 
-                    if (enrolment.getCurricularCourse().isDissertation()) {
+                    final CurricularCourse curricularCourse = enrolment.getCurricularCourse();
+                    if (curricularCourse.isDissertation()) {
+                        if (curricularCourse.getDegree().isSecondCycle()) {
+                            if (enrolment.getParentCycleCurriculumGroup().isExternal()) {
+                                throw new DomainException("error.enrolment.in.dissertation.not.allowed.in.external.cycle");
+                            }
+                        }
+
                         Optional<StudentThesisCandidacy> hit =
                                 enrolment
                                         .getRegistration()
