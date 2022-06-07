@@ -163,6 +163,7 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
                             }
                         }
                         final Registration registration = enrolment.getRegistration();
+                        /*
                         if (degree.getDegreeType().isIntegratedMasterDegree()) {
                             final Set<CycleCurriculumGroup> firstCycles = registration.getStudentCurricularPlanStream()
                                     .flatMap(scp -> scp.getCycleCurriculumGroups().stream())
@@ -171,8 +172,8 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
                             if ((!firstCycles.isEmpty()) && firstCycles.stream().noneMatch(group -> group.isConcluded()) ) {
                                 throw new DomainException("error.enrolment.in.dissertation.not.allowed.with.incomplete.first.cycle");
                             }
-
                         }
+                         */
                         final Optional<StudentThesisCandidacy> hit = registration.getStudentThesisCandidacySet().stream()
                                         .filter(c -> partOf(curricularCourse.getAssociatedExecutionCoursesSet(), c))
                                         .filter(StudentThesisCandidacy::getAcceptedByAdvisor)
