@@ -2187,10 +2187,12 @@ public class FenixAPIv1 {
                     String title = infoGenericEvent.getTitle();
                     String start = formatHour.print(infoGenericEvent.getInicio().getTimeInMillis());
                     String end = formatHour.print(infoGenericEvent.getFim().getTimeInMillis());
+                    String dayStart = formatDay.print(showOccupation.getInicio().getTimeInMillis());
+                    String dayEnd = formatDay.print(showOccupation.getFim().getTimeInMillis());
                     String weekday = infoGenericEvent.getDiaSemana().getDiaSemanaString();
-                    FenixPeriod period = new FenixPeriod(day + " " + start, day + " " + end);
+                    FenixPeriod period = new FenixPeriod(dayStart + " " + start, dayEnd + " " + end);
 
-                    roomEvent = new FenixRoomEvent.GenericEvent(start, end, weekday, day, period, description, title);
+                    roomEvent = new FenixRoomEvent.GenericEvent(start, end, weekday, dayStart, period, description, title);
                 }
 
                 if (roomEvent != null) {
