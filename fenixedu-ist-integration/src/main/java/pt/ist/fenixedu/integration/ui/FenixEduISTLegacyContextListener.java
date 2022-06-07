@@ -26,6 +26,7 @@ import org.fenixedu.PostalCodeValidator;
 import org.fenixedu.TINValidator;
 import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.CurricularCourse;
+import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.ExecutionCourse;
@@ -39,6 +40,7 @@ import org.fenixedu.academic.domain.accounting.events.EventExemptionJustificatio
 import org.fenixedu.academic.domain.candidacy.StudentCandidacy;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
 import org.fenixedu.academic.domain.degreeStructure.Context;
+import org.fenixedu.academic.domain.degreeStructure.CycleType;
 import org.fenixedu.academic.domain.enrolment.DegreeModuleToEnrol;
 import org.fenixedu.academic.domain.enrolment.IDegreeModuleToEvaluate;
 import org.fenixedu.academic.domain.exceptions.DomainException;
@@ -46,6 +48,7 @@ import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.domain.studentCurriculum.CurriculumGroup;
+import org.fenixedu.academic.domain.studentCurriculum.CycleCurriculumGroup;
 import org.fenixedu.academic.domain.studentCurriculum.ExternalCurriculumGroup;
 import org.fenixedu.academic.dto.student.enrollment.bolonha.BolonhaStudentEnrollmentBean;
 import org.fenixedu.academic.service.StudentWarningsService;
@@ -152,21 +155,28 @@ public class FenixEduISTLegacyContextListener implements ServletContextListener 
 
                     final CurricularCourse curricularCourse = enrolment.getCurricularCourse();
                     if (curricularCourse.isDissertation()) {
-                        if (curricularCourse.getDegree().isSecondCycle()) {
-                            if (enrolment.getParentCycleCurriculumGroup().isExternal()) {
+                        final Degree degree = curricularCourse.getDegree();
+                        if (degree.isSecondCycle()) {
+                            final CycleCurriculumGroup cycleCurriculumGroup = enrolment.getParentCycleCurriculumGroup();
+                            if (cycleCurriculumGroup != null && (cycleCurriculumGroup.isExternal() || !cycleCurriculumGroup.isCycle(CycleType.SECOND_CYCLE))) {
                                 throw new DomainException("error.enrolment.in.dissertation.not.allowed.in.external.cycle");
                             }
                         }
+                        final Registration registration = enrolment.getRegistration();
+                        if (degree.getDegreeType().isIntegratedMasterDegree()) {
+                            final Set<CycleCurriculumGroup> firstCycles = registration.getStudentCurricularPlanStream()
+                                    .flatMap(scp -> scp.getCycleCurriculumGroups().stream())
+                                    .filter(cycleCurriculumGroup -> cycleCurriculumGroup.isFirstCycle())
+                                    .collect(Collectors.toSet());
+                            if ((!firstCycles.isEmpty()) && firstCycles.stream().noneMatch(group -> group.isConcluded()) ) {
+                                throw new DomainException("error.enrolment.in.dissertation.not.allowed.with.incomplete.first.cycle");
+                            }
 
-                        Optional<StudentThesisCandidacy> hit =
-                                enrolment
-                                        .getRegistration()
-                                        .getStudentThesisCandidacySet()
-                                        .stream()
-                                        .filter(c -> partOf(enrolment.getCurricularCourse().getAssociatedExecutionCoursesSet(), c))
+                        }
+                        final Optional<StudentThesisCandidacy> hit = registration.getStudentThesisCandidacySet().stream()
+                                        .filter(c -> partOf(curricularCourse.getAssociatedExecutionCoursesSet(), c))
                                         .filter(StudentThesisCandidacy::getAcceptedByAdvisor)
                                         .min(StudentThesisCandidacy.COMPARATOR_BY_CANDIDACY_PERIOD_AND_PREFERENCE_NUMBER);
-
                         if (hit.isPresent()) {
                             StudentThesisCandidacy candidacy = hit.get();
                             ThesisProposalsService.createThesisForStudent(candidacy);
