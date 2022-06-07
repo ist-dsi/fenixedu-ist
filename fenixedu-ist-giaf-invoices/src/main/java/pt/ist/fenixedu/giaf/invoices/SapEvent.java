@@ -1081,13 +1081,31 @@ public class SapEvent {
 
     private boolean isToProcessDebt(boolean isGratuity) {
         return (isGratuity || event instanceof ExternalScholarshipPhdGratuityContribuitionEvent)
-                && !isGratuityBeforeOpenYear(event);
+                && !isGratuityCreatedAfterOpenYear(event);
     }
 
-    private static boolean isGratuityBeforeOpenYear(final Event event) {
+    private static boolean isGratuityCreatedAfterOpenYear(final Event event) {
         if (event.isGratuity()) {
-            final ExecutionYear executionYear = Utils.executionYearOf(event);
-            return executionYear.getEndCivilYear() < SapRoot.getInstance().getOpenYear();
+            final boolean hasDebt = event.getSapRequestSet().stream()
+                    .filter(sr -> sr.getRequestType() == SapRequestType.DEBT)
+                    .filter(sr -> !sr.getIgnore())
+                    .anyMatch(sr -> !sr.isInitialization());
+
+            if (hasDebt) {
+                return false;
+            }
+
+            int endYear;
+            if (event instanceof PhdGratuityEvent) {
+                PhdGratuityEvent phdEvent = (PhdGratuityEvent) event;
+                final LocalDate localDate = phdEvent.getPhdGratuityDate().getYear() == phdEvent.getYear() ?
+                        phdEvent.getPhdGratuityDate().toLocalDate() : phdEvent.getWhenOccured().toLocalDate();
+                endYear = localDate.plusYears(1).getYear();
+            } else {
+                final ExecutionYear executionYear = Utils.executionYearOf(event);
+                endYear = executionYear.getEndCivilYear();
+            }
+            return endYear < SapRoot.getInstance().getOpenYear(); //events created 'now' from closed years
         } else {
             return false;
         }
@@ -1653,7 +1671,7 @@ public class SapEvent {
                                                                     boolean isDebtRegistration, boolean isInterest,
                                                                     boolean isAdvancement, boolean isPastEvent) {
 
-        if (isPastEvent || isGratuityBeforeOpenYear(event)) {
+        if (isPastEvent || isGratuityCreatedAfterOpenYear(event)) {
             return new SimpleImmutableEntry<String, String>("0063", "REGULARIZAÇAO ANOS ANTERIORES");
         }
         if (isInterest) {
