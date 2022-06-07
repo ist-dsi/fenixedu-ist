@@ -1453,7 +1453,7 @@ public class SapEvent {
             postalCode = PostalCodeValidator.examplePostCodeFor(countryCode);
         }
         clientData.addProperty("postalCode",
-                !Strings.isNullOrEmpty(postalCode) ? postalCode : PostalCodeValidator.examplePostCodeFor(countryCode));
+                !Strings.isNullOrEmpty(postalCode) ? postalCode : PostalCodeValidator.examplePostCodeFor(countryForAddress));
 
         clientData.addProperty("vatNumber", Utils.limitFormat(MAX_SIZE_VAT_NUMBER, clientId));
         clientData.addProperty("fiscalCountry", countryCode);
